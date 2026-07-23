@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarAdvance — Prémium autók Németországból</title>
+<meta name="description" content="Prémium autóbérlés és eladás, autóimport Németországból. A te autódat pedig bizományban eladjuk.">
+<style>
+  html,body{margin:0;padding:0;background:#F4F5F7;overflow-x:hidden}
+  iframe.sec{display:block;width:100%;border:0;overflow:hidden}
+</style>
+</head>
+<body>
+  <iframe class="sec" title="Fejléc" src="caradvance-header.html" scrolling="no" style="height:660px"></iframe>
+  <iframe class="sec" title="Statisztika" src="caradvance-statisztika.html" scrolling="no" style="height:340px"></iframe>
+  <iframe class="sec" title="Kiemelt autók" src="caradvance-autoink-kiemelt.html" scrolling="no" style="height:1200px"></iframe>
+
+  <script>
+    // Same-origin auto-height: measure each section's content and size its iframe.
+    function fit(f){
+      try{
+        var d = f.contentDocument;
+        if(d && d.documentElement){
+          var h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+          if(h > 0) f.style.height = h + 'px';
+        }
+      }catch(e){}
+    }
+    function fitAll(){ document.querySelectorAll('iframe.sec').forEach(fit); }
+    document.querySelectorAll('iframe.sec').forEach(function(f){
+      f.addEventListener('load', function(){
+        fit(f);
+        [200,600,1200,2500].forEach(function(t){ setTimeout(function(){ fit(f); }, t); });
+      });
+    });
+    window.addEventListener('resize', fitAll);
+    // sections that load data async (featured) can grow after load — re-check periodically
+    setInterval(fitAll, 2000);
+  </script>
+</body>
+</html>
