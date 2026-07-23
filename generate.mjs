@@ -557,8 +557,9 @@ function renderHome(cars, rate) {
     <div class="autok-more"><a class="btn btn-soft" href="autoink/">Összes eladó autónk →</a></div>
   </div>
   <div class="autok-panel" id="panel-berelheto">
-    <div class="grid">${rentFeat.map((c) => featCard(c, rate, "rent")).join("")}</div>
-    <div class="autok-more"><a class="btn btn-soft" href="autoink/">Összes bérelhető autónk →</a></div>
+    ${rentFeat.length
+      ? `<div class="grid">${rentFeat.map((c) => featCard(c, rate, "rent")).join("")}</div><div class="autok-more"><a class="btn btn-soft" href="autoink/">Összes bérelhető autónk →</a></div>`
+      : `<div style="text-align:center;padding:52px 24px;background:#fff;border:1px solid var(--line);border-radius:18px"><p style="color:var(--muted);font-size:16.5px;max-width:460px;margin:0 auto 20px">Bérelhető prémium autóink hamarosan itt is elérhetők lesznek. Addig is szívesen adunk személyre szabott bérlési ajánlatot.</p><a class="btn btn-red" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Autóbérlés érdeklődés")}">Kérj bérlési ajánlatot</a></div>`}
   </div>
   <div class="rate-note">A forint árak élő árfolyammal számolódnak, óránként frissülnek (1 € = <span id="ratev">${rate}</span> Ft).</div>
 </section>
