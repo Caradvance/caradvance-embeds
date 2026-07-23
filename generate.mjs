@@ -1,0 +1,562 @@
+#!/usr/bin/env node
+/*
+ * CarAdvance static site generator (SEO-native).
+ * Reads the Google Sheet (gviz CSV) -> writes real, pre-rendered HTML:
+ *   /index.html                     (home: hero + stats + featured)
+ *   /autoink/index.html             (catalog: every active car in HTML)
+ *   /auto/<slug>/index.html         (one real page per car + schema.org Vehicle)
+ *   /sitemap.xml, /robots.txt
+ *
+ * Design tokens + card style match the approved live design.
+ * All content is baked into the HTML (no iframes, no client-fetch for content) => strong SEO.
+ * A small client script only refreshes the EUR->HUF rate; prices already render server-side.
+ *
+ * Usage:
+ *   node generate.mjs                 # fetch live sheet, write to ./build
+ *   node generate.mjs --csv file.csv  # use a local CSV (offline test)
+ *   OUT=dist node generate.mjs        # change output dir
+ */
+import { promises as fs } from "node:fs";
+import path from "node:path";
+
+// ---------------------------------------------------------------- config
+const SHEET_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv";
+// Absolute base used for <link rel=canonical>, OG tags and sitemap.
+// After you point caradvance.hu at GitHub Pages, change this to "https://caradvance.hu".
+const SITE_BASE = (process.env.SITE_BASE || "https://caradvance.github.io/caradvance-embeds").replace(/\/$/, "");
+const OUT = process.env.OUT || "build";
+const BRAND = "CarAdvance";
+const CONTACT_EMAIL = "info@caradvance.hu";
+const DEFAULT_RATE = 402; // EUR->HUF fallback if live rate can't be fetched at build time
+
+// --------------------------------------------------------------- helpers
+const esc = (s) =>
+  String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+const attr = (s) => esc(s);
+const slugify = (m) =>
+  String(m).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const nEur = (v) => Number(String(v == null ? "" : v).replace(/[^\d.]/g, "")) || 0;
+const fmtHUF = (v) => v.toLocaleString("hu-HU") + " Ft";
+const fmtEUR = (v) => v.toLocaleString("hu-HU") + " €";
+
+function driveImg(u) {
+  u = String(u || "").trim();
+  if (!u) return "";
+  let m = u.match(/\/d\/([-\w]{20,})/) || u.match(/[?&]id=([-\w]{20,})/);
+  if (m) return "https://lh3.googleusercontent.com/d/" + m[1] + "=w1600";
+  if (/^[-\w]{25,}$/.test(u)) return "https://lh3.googleusercontent.com/d/" + u + "=w1600";
+  return u;
+}
+function galleryOf(c) {
+  const list = String(c.galeria || "")
+    .split(/[\n,]+/).map((s) => s.trim()).filter(Boolean).map(driveImg);
+  const main = driveImg(c.kep_url) || list[0] || "";
+  const all = [];
+  if (main) all.push(main);
+  for (const g of list) if (g && !all.includes(g)) all.push(g);
+  return all;
+}
+// Equipment: "#Category | item | item | #Category2 | item ..."
+function equipmentOf(c) {
+  const parts = String(c.felszereltseg || "").split("|").map((s) => s.trim()).filter(Boolean);
+  const cats = [];
+  let cur = null;
+  for (const p of parts) {
+    if (p.startsWith("#")) { cur = { title: p.replace(/^#/, "").trim(), items: [] }; cats.push(cur); }
+    else { if (!cur) { cur = { title: "Felszereltség", items: [] }; cats.push(cur); } cur.items.push(p); }
+  }
+  return cats.filter((c) => c.items.length);
+}
+function priceOf(c, rate) {
+  const eur = nEur(c.vetel_eur);
+  const hufUp = (e) => Math.ceil((Number(e) || 0) * rate / 10000) * 10000;
+  const main = hufUp(eur);
+  const netto = nEur(c.vetel_eur_netto) || eur / 1.19;
+  const huGross = hufUp(netto * 1.27);
+  const save = huGross - main;
+  return { eur, main, huGross, save };
+}
+const isActive = (c) => (c.aktiv || "igen").toLowerCase() !== "nem";
+const isOwn = (c) => (c.sajat || "").toLowerCase() === "igen";
+const specStr = (c) => [c.km, c.valto, c.uzemanyag].filter(Boolean).join(" · ");
+
+// CSV parser (quoted fields, embedded newlines)
+function parseCSV(t) {
+  const rows = []; let i = 0, f = "", row = [], q = false;
+  while (i < t.length) {
+    const ch = t[i];
+    if (q) { if (ch === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += ch; }
+    else { if (ch === '"') q = true; else if (ch === ",") { row.push(f); f = ""; }
+      else if (ch === "\n") { row.push(f); rows.push(row); row = []; f = ""; }
+      else if (ch === "\r") {} else f += ch; }
+    i++;
+  }
+  if (f.length || row.length) { row.push(f); rows.push(row); }
+  const head = rows.shift().map((h) => h.trim());
+  return rows.filter((r) => r.some((x) => x && x.trim())).map((r) => {
+    const o = {}; head.forEach((h, i) => (o[h] = (r[i] || "").trim())); return o;
+  });
+}
+
+async function getRate() {
+  const apis = [
+    ["https://api.frankfurter.app/latest?from=EUR&to=HUF", (d) => d?.rates?.HUF],
+    ["https://open.er-api.com/v6/latest/EUR", (d) => d?.rates?.HUF],
+  ];
+  for (const [url, pick] of apis) {
+    try {
+      const ctl = AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined;
+      const r = await fetch(url, ctl ? { signal: ctl } : {});
+      if (!r.ok) continue;
+      const v = pick(await r.json());
+      if (v && v > 0) return Math.round(v);
+    } catch (_) {}
+  }
+  return DEFAULT_RATE;
+}
+
+// --------------------------------------------------------------- shared UI
+const FONT =
+  '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+  '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">';
+
+const BASE_CSS = `
+:root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;--soft:#EEF1F6;--radius:16px}
+*{box-sizing:border-box}html,body{margin:0;width:100%;max-width:100vw;overflow-x:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5}
+a{color:inherit}
+img{max-width:100%}
+.wrap{width:100%;max-width:1160px;margin:0 auto;padding:28px 16px}
+.btn{display:inline-block;text-align:center;font-weight:700;padding:13px 22px;border-radius:999px;text-decoration:none;cursor:pointer;transition:background .15s,color .15s}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:#000}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(.94)}
+.btn-soft{background:var(--soft);color:var(--ink)}.btn-soft:hover{background:var(--navy);color:#fff}
+/* header/nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 20px}
+.nav .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;letter-spacing:-.02em;text-decoration:none;color:var(--navy)}
+.nav .logo b{color:var(--red)}
+.nav .menu{display:flex;gap:22px;margin-left:14px;flex-wrap:wrap}
+.nav .menu a{text-decoration:none;color:var(--ink);font-weight:600;font-size:14.5px;opacity:.9}
+.nav .menu a:hover{color:var(--red)}
+.nav .spacer{flex:1}
+.nav .cta{background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px}
+.nav .lang{margin-left:6px;font-size:13px;font-weight:700;color:var(--muted)}
+@media(max-width:960px){.nav .menu{display:none}}
+/* footer */
+.footer{background:var(--navy);color:#cfd6e2;margin-top:56px}
+.footer-in{max-width:1160px;margin:0 auto;padding:40px 20px 28px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}
+@media(max-width:760px){.footer-in{grid-template-columns:1fr}}
+.footer h4{color:#fff;font-size:15px;margin:0 0 12px}
+.footer a{color:#cfd6e2;text-decoration:none;display:block;margin:7px 0;font-size:14px}
+.footer a:hover{color:#fff}
+.footer .brand{font-weight:800;font-size:22px;color:#fff;letter-spacing:-.02em}
+.footer .brand b{color:var(--red)}
+.footer .copy{border-top:1px solid rgba(255,255,255,.12);text-align:center;padding:16px;font-size:12.5px;color:#8b95a7}
+`;
+
+function navHtml(rel) {
+  const M = [
+    ["Prémium autóbérlés", rel + "#berles"],
+    ["Megvásárolható autóink", rel + "autoink/"],
+    ["Bizományos értékesítés", rel + "#bizomany"],
+    ["Import", rel + "#import"],
+    ["Rólunk", rel + "#rolunk"],
+  ];
+  return `<header class="nav"><div class="nav-in">
+  <a class="logo" href="${rel}"><span>car<b>advance</b></span></a>
+  <nav class="menu">${M.map(([t, h]) => `<a href="${attr(h)}">${esc(t)}</a>`).join("")}</nav>
+  <span class="spacer"></span>
+  <a class="cta" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a>
+  <span class="lang">HU</span>
+</div></header>`;
+}
+function footerHtml(rel) {
+  return `<footer class="footer"><div class="footer-in">
+  <div><div class="brand">car<b>advance</b></div>
+    <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
+  <div><h4>Menü</h4>
+    <a href="${rel}autoink/">Megvásárolható autóink</a>
+    <a href="${rel}#berles">Prémium autóbérlés</a>
+    <a href="${rel}#bizomany">Bizományos értékesítés</a>
+    <a href="${rel}#import">Import</a></div>
+  <div><h4>Kapcsolat</h4>
+    <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>
+    <a href="${rel}#rolunk">Rólunk</a></div>
+</div><div class="copy">© ${new Date().getFullYear()} ${BRAND} · BH Group</div></footer>`;
+}
+
+// EUR->HUF live refresh (content already server-rendered; this only fine-tunes prices)
+const FX_SCRIPT = `<script>
+(function(){var R=${DEFAULT_RATE};
+function up(e){var eur=+e.getAttribute('data-eur')||0,net=+e.getAttribute('data-net')||0;
+ var main=Math.ceil(eur*R/10000)*10000, gross=Math.ceil((net||eur/1.19)*1.27*R/10000)*10000, save=gross-main;
+ var f=function(v){return v.toLocaleString('hu-HU')+' Ft'};
+ var mE=e.querySelector('[data-main]'); if(mE)mE.textContent=f(main);
+ var cE=e.querySelector('[data-cross]'); if(cE&&save>0)cE.textContent=f(gross);
+ var sE=e.querySelector('[data-save]'); if(sE&&save>0)sE.textContent='−'+f(save);}
+function all(){document.querySelectorAll('[data-eur]').forEach(up);}
+fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
+ .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();}}).catch(function(){});
+})();
+</script>`;
+
+function page({ title, desc, canonical, rel, css, body, head = "", bodyClass = "" }) {
+  return `<!doctype html><html lang="hu"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(title)}</title>
+<meta name="description" content="${attr(desc)}">
+<link rel="canonical" href="${attr(canonical)}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="${BRAND}">
+<meta property="og:title" content="${attr(title)}"><meta property="og:description" content="${attr(desc)}">
+<meta property="og:url" content="${attr(canonical)}"><meta property="og:locale" content="hu_HU">
+<meta name="twitter:card" content="summary_large_image">
+${FONT}
+<style>${BASE_CSS}${css || ""}</style>
+${head}
+</head><body class="${bodyClass}">
+${navHtml(rel)}
+${body}
+${footerHtml(rel)}
+${FX_SCRIPT}
+</body></html>`;
+}
+
+// --------------------------------------------------------------- car card
+function cardCss() {
+  return `
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media(max-width:920px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;position:relative;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}
+.media{aspect-ratio:16/10;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
+.media img{width:100%;height:100%;object-fit:cover;display:block}
+.media .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7a828f;font-size:12px}
+.own{position:absolute;top:12px;left:12px;background:#fff;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(8,8,10,.25)}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+.meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cond{background:var(--soft);color:var(--muted);font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px}
+.year{color:var(--muted);font-size:13px;font-weight:700}
+.title{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+.specs{color:var(--muted);font-size:13px;font-weight:600;margin-bottom:14px}
+.pricerow{display:flex;align-items:baseline;gap:10px;margin-top:auto;flex-wrap:wrap}
+.pcross{width:100%;color:var(--muted);font-size:14px;font-weight:700;text-decoration:line-through}
+.price{font-size:23px;font-weight:800}.peur{color:var(--muted);font-size:14px;font-weight:700}
+.psave{background:#E7F8EE;color:#1DA851;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
+.cbtn{margin-top:14px;display:block;text-align:center;background:var(--soft);color:var(--ink);font-weight:700;padding:12px;border-radius:999px}
+.card:hover .cbtn{background:var(--navy);color:#fff}
+`;
+}
+function carCard(c, rate, rel) {
+  const g = galleryOf(c);
+  const p = priceOf(c, rate);
+  const href = `${rel}auto/${slugify(c.modell)}/`;
+  const img = g[0]
+    ? `<img src="${attr(g[0])}" alt="${attr((c.modell || "").trim())}" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span>`
+    : `<span class="ph">fotó hamarosan</span>`;
+  const cross = p.save > 0 ? `<span class="pcross" data-cross>${fmtHUF(p.huGross)}</span>` : "";
+  const save = p.save > 0 ? `<span class="psave" data-save>−${fmtHUF(p.save)}</span>` : "";
+  return `<a class="card" href="${attr(href)}" data-marka="${attr(c.marka || "")}" data-kar="${attr(c.karosszeria || "")}" data-uz="${attr(c.uzemanyag || "")}"><div class="media">${img}${isOwn(c) ? '<span class="own">CarAdvance saját</span>' : ""}</div>
+  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
+  <h3 class="title">${esc((c.modell || "").trim())}</h3>
+  <div class="specs">${esc(specStr(c))}</div>
+  <div class="pricerow" data-eur="${p.eur}" data-net="${nEur(c.vetel_eur_netto)}">${cross}<span class="price" data-main>${fmtHUF(p.main)}</span><span class="peur">${fmtEUR(p.eur)}</span>${save}</div>
+  <span class="cbtn">Részletek</span></div></a>`;
+}
+
+// --------------------------------------------------------------- HOME
+function renderHome(cars, rate) {
+  const active = cars.filter(isActive);
+  const featured = (active.filter(isOwn).length ? active.filter(isOwn) : active).slice(0, 6);
+  const css = `
+.hero{position:relative;min-height:560px;display:flex;align-items:center;color:#fff;overflow:hidden}
+.hero video,.hero .heroimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .veil{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,6,9,.82),rgba(6,6,9,.35))}
+.hero .hin{position:relative;max-width:1160px;margin:0 auto;padding:60px 20px;width:100%}
+.hero h1{font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 16px;max-width:16ch}
+.hero p{font-size:clamp(15px,2vw,19px);max-width:46ch;color:#e7eaf0;margin:0 0 26px}
+.hero .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.stats{max-width:1160px;margin:-40px auto 0;position:relative;z-index:3;padding:0 20px}
+.stats-in{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(8,8,10,.10);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:26px 18px}
+@media(max-width:700px){.stats-in{grid-template-columns:1fr 1fr}}
+.stat{text-align:center;padding:8px}
+.stat .n{font-size:30px;font-weight:800;letter-spacing:-.02em}.stat .n b{color:var(--red)}
+.stat .l{color:var(--muted);font-size:13px;font-weight:600;margin-top:2px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:8px 0 22px;flex-wrap:wrap}
+.sec-head h2{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0}
+.sec-head p{color:var(--muted);margin:6px 0 0;font-size:15px}
+` + cardCss();
+
+  const stats = [
+    ["5000<b>+</b>", "Értékesített autó"],
+    ["23 <b>év</b>", "Tapasztalat"],
+    ["5,0<b>★</b>", "Ügyfél-értékelés"],
+    ["1 <b>év</b>", "Garancia"],
+  ];
+  const body = `
+<section class="hero">
+  <video autoplay muted loop playsinline poster="caradvance-hero-poster.jpg"><source src="caradvance-hero.mp4" type="video/mp4"></video>
+  <div class="veil"></div>
+  <div class="hin">
+    <h1>Prémium autók Németországból</h1>
+    <p>Megvásárolható prémium autók, autóbérlés, import és bizományos értékesítés — átlátható árakkal és garanciával.</p>
+    <div class="cta-row"><a class="btn btn-red" href="autoink/">Autóink megtekintése</a><a class="btn btn-soft" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a></div>
+  </div>
+</section>
+<div class="stats"><div class="stats-in">${stats.map(([n, l]) => `<div class="stat"><div class="n">${n}</div><div class="l">${esc(l)}</div></div>`).join("")}</div></div>
+<section class="wrap" id="autoink">
+  <div class="sec-head"><div><h2>Kiemelt autóink</h2><p>Válogatás aktuális kínálatunkból — összesen ${active.length} elérhető autó.</p></div><a class="btn btn-soft" href="autoink/">Összes autó →</a></div>
+  <div class="grid">${featured.map((c) => carCard(c, rate, "")).join("")}</div>
+</section>`;
+
+  const ld = {
+    "@context": "https://schema.org", "@type": "AutoDealer", name: BRAND,
+    url: SITE_BASE + "/", email: CONTACT_EMAIL, areaServed: "HU",
+    description: "Prémium autók Németországból — bérlés, eladás, import és bizományos értékesítés.",
+  };
+  return page({
+    title: "CarAdvance — Prémium autók Németországból | Bérlés, eladás, import",
+    desc: "Prémium autók Németországból: megvásárolható autók, prémium autóbérlés, import és bizományos értékesítés. Átlátható árak, garancia.",
+    canonical: SITE_BASE + "/", rel: "", css, body,
+    head: `<script type="application/ld+json">${JSON.stringify(ld)}</script>`,
+  });
+}
+
+// --------------------------------------------------------------- CATALOG
+function renderCatalog(cars, rate) {
+  const active = cars.filter(isActive);
+  const css = `
+.crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:14px}.crumb a{text-decoration:none}.crumb a:hover{color:var(--red)}.crumb b{color:var(--ink)}
+.chead h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.chead p{color:var(--muted);margin:0 0 22px;font-size:15px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.filters input,.filters select{padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.filters input{min-width:220px}
+.count{color:var(--muted);font-size:13px;font-weight:600;margin-bottom:14px}
+.empty{grid-column:1/-1;color:var(--muted);padding:40px;text-align:center}
+` + cardCss();
+  const brands = [...new Set(active.map((c) => c.marka).filter(Boolean))].sort();
+  const bodies = [...new Set(active.map((c) => c.karosszeria).filter(Boolean))].sort();
+  const fuels = [...new Set(active.map((c) => c.uzemanyag).filter(Boolean))].sort();
+  const body = `
+<div class="wrap">
+  <div class="crumb"><a href="../">Főoldal</a> / <b>Megvásárolható autóink</b></div>
+  <div class="chead"><h1>Megvásárolható autóink</h1><p>Prémium autók Németországból, magyar áfás árral és garanciával.</p></div>
+  <div class="filters">
+    <input id="q" placeholder="Keresés (pl. X5, Porsche)…">
+    <select id="marka"><option value="">Minden márka</option>${brands.map((b) => `<option>${esc(b)}</option>`).join("")}</select>
+    <select id="kar"><option value="">Minden karosszéria</option>${bodies.map((b) => `<option>${esc(b)}</option>`).join("")}</select>
+    <select id="uz"><option value="">Minden üzemanyag</option>${fuels.map((b) => `<option>${esc(b)}</option>`).join("")}</select>
+  </div>
+  <div class="count" id="count">${active.length} autó</div>
+  <div class="grid" id="grid">${active.map((c) => carCard(c, rate, "../")).join("")}</div>
+</div>
+<script>
+(function(){var g=document.getElementById('grid'),cards=[].slice.call(g.children);
+var meta=cards.map(function(el){return{el:el,t:(el.querySelector('.title').textContent||'').toLowerCase(),
+ m:(el.getAttribute('data-marka')||''),k:(el.getAttribute('data-kar')||''),u:(el.getAttribute('data-uz')||'')}});
+function f(){var q=(document.getElementById('q').value||'').toLowerCase(),m=document.getElementById('marka').value,k=document.getElementById('kar').value,u=document.getElementById('uz').value,n=0;
+ meta.forEach(function(o){var ok=(!q||o.t.indexOf(q)>=0)&&(!m||o.m===m)&&(!k||o.k===k)&&(!u||o.u===u);o.el.style.display=ok?'':'none';if(ok)n++;});
+ document.getElementById('count').textContent=n+' autó';}
+['q','marka','kar','uz'].forEach(function(id){var e=document.getElementById(id);e.addEventListener('input',f);e.addEventListener('change',f);});})();
+</script>`;
+  return page({
+    title: "Megvásárolható autóink — CarAdvance",
+    desc: `Böngéssz ${active.length} prémium autó között Németországból — BMW, Porsche és más márkák, magyar áfás árral és garanciával.`,
+    canonical: SITE_BASE + "/autoink/", rel: "../", css, body,
+  });
+}
+
+// --------------------------------------------------------------- DETAIL
+function renderDetail(c, cars, rate) {
+  const g = galleryOf(c);
+  const p = priceOf(c, rate);
+  const slug = slugify(c.modell);
+  const title = (c.modell || "").trim();
+  const eq = equipmentOf(c);
+  const related = cars.filter((x) => isActive(x) && x.marka === c.marka && slugify(x.modell) !== slug).slice(0, 3);
+  const descText =
+    `A(z) ${title} ${c.evjarat ? c.evjarat + " évjáratú, " : ""}${c.km ? c.km + " futott, " : ""}` +
+    `${c.uzemanyag ? c.uzemanyag.toLowerCase() + " üzemű " : ""}${c.karosszeria || "prémium autó"}. ` +
+    `${c.teljesitmeny ? c.teljesitmeny + ", " : ""}${c.valto || ""}${c.hajtas ? ", " + c.hajtas : ""}. ` +
+    `Magyar áfás ár garanciával, ${BRAND} import.`;
+
+  const css = `
+.crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:18px}.crumb a{text-decoration:none}.crumb a:hover{color:var(--red)}.crumb b{color:var(--ink)}
+.layout{display:grid;gap:28px;align-items:start;grid-template-columns:minmax(0,1fr) minmax(0,360px)}
+@media(max-width:1024px){.layout{grid-template-columns:1fr}}
+.gallery{min-width:0}
+.stage{position:relative;width:100%;aspect-ratio:16/10;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#1A1B1F,#26272C)}
+.stage img{width:100%;height:100%;object-fit:cover;display:block}
+.counter{position:absolute;bottom:14px;right:14px;background:rgba(11,11,13,.75);color:#fff;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px}
+.nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.6);border:0;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.7}
+.nav-btn:hover{opacity:1;background:#fff}.nav-btn.prev{left:12px}.nav-btn.next{right:12px}
+.thumbs{display:flex;gap:10px;margin-top:12px;overflow-x:auto;padding-bottom:6px}
+.thumbs img{height:72px;width:108px;flex:0 0 auto;object-fit:cover;border-radius:10px;cursor:pointer;opacity:.6;border:2px solid transparent}
+.thumbs img.active{opacity:1;border-color:var(--red)}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:22px}
+.card:first-of-type{margin-top:0}
+.sec-h{font-size:21px;font-weight:800;margin:0 0 14px}
+.iconrow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:560px){.iconrow{grid-template-columns:1fr 1fr}}
+.ic .k{font-size:12px;color:var(--muted);font-weight:700}.ic .v{font-size:15px;font-weight:800}
+.desc{color:#33404f;line-height:1.65;font-size:15px}
+table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px solid var(--line);font-size:14.5px}td.k{color:var(--muted);font-weight:600;width:45%}td.v{font-weight:700}
+.cateq{columns:2;column-gap:32px}@media(max-width:560px){.cateq{columns:1}}
+.cateq .cath{font-weight:800;font-size:14px;margin:12px 0 6px;break-inside:avoid}.cateq .cath:first-child{margin-top:0}
+.cateq .catit{padding:3px 0;color:#33404f;font-size:14px;break-inside:avoid}.cateq .catit::before{content:"•";color:var(--muted);margin-right:8px}
+.side{display:flex;flex-direction:column;gap:18px}
+@media(min-width:1025px){.side{position:sticky;top:84px}}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+.badge{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cond{background:var(--soft);color:var(--muted);font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
+.own{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:11px;font-weight:800;color:var(--navy);margin-bottom:10px}
+.year{font-weight:800;color:var(--muted)}
+.ptitle{font-size:23px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px;line-height:1.15}
+.pcross{color:var(--muted);font-size:17px;font-weight:700;text-decoration:line-through}
+.price{font-size:38px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.peur{color:var(--muted);font-weight:700;font-size:18px;margin-top:6px}
+.psave{display:inline-block;background:#E7F8EE;color:#1DA851;font-size:13px;font-weight:800;padding:6px 13px;border-radius:999px;margin-top:10px}
+.taxnote{color:var(--muted);font-size:12.5px;font-weight:600;margin-top:8px}
+.rel-h{margin:44px 0 18px;font-size:24px;font-weight:800}
+.rel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}@media(max-width:900px){.rel-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.rel-grid{grid-template-columns:1fr}}
+` + cardCss();
+
+  const specs = [
+    ["Évjárat", c.evjarat], ["Kilométer", c.km], ["Teljesítmény", c.teljesitmeny],
+    ["Üzemanyag", c.uzemanyag], ["Váltó", c.valto], ["Hajtás", c.hajtas],
+    ["Márka", c.marka], ["Karosszéria", c.karosszeria],
+  ].filter(([, v]) => v);
+
+  const stage = g.length
+    ? `<div class="stage"><img id="stg" src="${attr(g[0])}" alt="${attr(title)}" referrerpolicy="no-referrer">
+       ${g.length > 1 ? '<button class="nav-btn prev" onclick="ca_step(-1)" aria-label="Előző">‹</button><button class="nav-btn next" onclick="ca_step(1)" aria-label="Következő">›</button>' : ""}
+       <span class="counter"><span id="cidx">1</span> / ${g.length}</span></div>
+       ${g.length > 1 ? `<div class="thumbs" id="thumbs">${g.map((u, i) => `<img src="${attr(u)}" alt="${attr(title + " – " + (i + 1))}" referrerpolicy="no-referrer" onclick="ca_go(${i})" class="${i === 0 ? "active" : ""}">`).join("")}</div>` : ""}`
+    : `<div class="stage"><span class="counter">fotó hamarosan</span></div>`;
+
+  const cross = p.save > 0 ? `<div class="pcross" data-cross>${fmtHUF(p.huGross)}</div>` : "";
+  const save = p.save > 0 ? `<div class="psave" data-save>−${fmtHUF(p.save)}</div>` : "";
+
+  const body = `
+<div class="wrap">
+  <div class="crumb"><a href="../../">Főoldal</a> / <a href="../../autoink/">Autóink</a> / <b>${esc(title)}</b></div>
+  <div class="layout">
+    <div class="gallery">${stage}
+      <div class="card"><h2 class="sec-h">Áttekintés</h2>
+        <div class="iconrow">${specs.slice(0, 6).map(([k, v]) => `<div class="ic"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("")}</div>
+        <p class="desc" style="margin-top:18px">${esc(descText)}</p>
+      </div>
+      <div class="card"><h2 class="sec-h">Műszaki adatok</h2>
+        <table><tbody>${specs.map(([k, v]) => `<tr><td class="k">${esc(k)}</td><td class="v">${esc(v)}</td></tr>`).join("")}</tbody></table></div>
+      ${eq.length ? `<div class="card"><h2 class="sec-h">Felszereltség</h2><div class="cateq">${eq.map((cat) => `<div class="cath">${esc(cat.title)}</div>${cat.items.map((it) => `<div class="catit">${esc(it)}</div>`).join("")}`).join("")}</div></div>` : ""}
+    </div>
+    <aside class="side">
+      <div class="panel">
+        ${isOwn(c) ? '<div class="own">CarAdvance saját autó</div>' : ""}
+        <div class="badge"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
+        <div class="ptitle">${esc(title)}</div>
+        <div data-eur="${p.eur}" data-net="${nEur(c.vetel_eur_netto)}">
+          ${cross}
+          <div class="price" data-main>${fmtHUF(p.main)}</div>
+          <div class="peur">${fmtEUR(p.eur)}</div>
+          ${save}
+        </div>
+        <div class="taxnote">Magyar áfás ár. Árfolyam: 1 € ≈ ${rate} Ft.</div>
+        <a class="btn btn-primary" style="width:100%;margin-top:16px" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Ajánlatkérés: " + title)}">Ajánlatkérés</a>
+        <a class="btn btn-soft" style="width:100%;margin-top:10px" href="../../autoink/">Vissza a listához</a>
+      </div>
+    </aside>
+  </div>
+  ${related.length ? `<h2 class="rel-h">Hasonló autók</h2><div class="rel-grid">${related.map((r) => carCard(r, rate, "../../")).join("")}</div>` : ""}
+</div>
+${g.length > 1 ? `<script>
+var CAG=${JSON.stringify(g)},CI=0;
+function ca_go(i){CI=(i+CAG.length)%CAG.length;document.getElementById('stg').src=CAG[CI];document.getElementById('cidx').textContent=CI+1;
+ var t=document.getElementById('thumbs');if(t){[].forEach.call(t.children,function(im,j){im.className=j===CI?'active':'';});}}
+function ca_step(d){ca_go(CI+d);}
+</script>` : ""}`;
+
+  const ld = {
+    "@context": "https://schema.org", "@type": "Car", name: title,
+    brand: { "@type": "Brand", name: c.marka || "" },
+    ...(g[0] ? { image: g[0] } : {}),
+    description: descText,
+    ...(c.uzemanyag ? { fuelType: c.uzemanyag } : {}),
+    ...(c.valto ? { vehicleTransmission: c.valto } : {}),
+    ...(c.km ? { mileageFromOdometer: { "@type": "QuantitativeValue", value: nEur(c.km), unitCode: "KMT" } } : {}),
+    ...(c.evjarat ? { vehicleModelDate: c.evjarat } : {}),
+    itemCondition: "https://schema.org/UsedCondition",
+    offers: {
+      "@type": "Offer", price: p.main, priceCurrency: "HUF",
+      availability: "https://schema.org/InStock", url: SITE_BASE + "/auto/" + slug + "/",
+    },
+  };
+  const bc = {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Főoldal", item: SITE_BASE + "/" },
+      { "@type": "ListItem", position: 2, name: "Autóink", item: SITE_BASE + "/autoink/" },
+      { "@type": "ListItem", position: 3, name: title, item: SITE_BASE + "/auto/" + slug + "/" },
+    ],
+  };
+  return page({
+    title: `${title} (${c.evjarat || ""}) — ${BRAND}`,
+    desc: `${title} eladó — ${specStr(c)}. ${fmtHUF(p.main)} (${fmtEUR(p.eur)}). Magyar áfás ár, garancia, ${BRAND} import.`,
+    canonical: SITE_BASE + "/auto/" + slug + "/", rel: "../../", css, body,
+    head: `<meta property="og:type" content="product">${g[0] ? `<meta property="og:image" content="${attr(g[0])}">` : ""}
+<script type="application/ld+json">${JSON.stringify(ld)}</script>
+<script type="application/ld+json">${JSON.stringify(bc)}</script>`,
+  });
+}
+
+// --------------------------------------------------------------- write
+async function main() {
+  const args = process.argv.slice(2);
+  const csvArg = args.includes("--csv") ? args[args.indexOf("--csv") + 1] : null;
+  let csv;
+  if (csvArg) { csv = await fs.readFile(csvArg, "utf8"); console.log("Using local CSV:", csvArg); }
+  else { console.log("Fetching sheet…"); csv = await (await fetch(SHEET_CSV_URL, { cache: "no-store" })).text(); }
+  const cars = parseCSV(csv);
+  const rate = await getRate();
+  console.log(`Parsed ${cars.length} rows, ${cars.filter(isActive).length} active. Rate=${rate}`);
+
+  const outDir = path.resolve(OUT);
+  await fs.mkdir(outDir, { recursive: true });
+
+  const write = async (rel, html) => {
+    const fp = path.join(outDir, rel);
+    await fs.mkdir(path.dirname(fp), { recursive: true });
+    await fs.writeFile(fp, html);
+  };
+
+  await write("index.html", renderHome(cars, rate));
+  await write("autoink/index.html", renderCatalog(cars, rate));
+
+  const active = cars.filter(isActive);
+  const urls = [SITE_BASE + "/", SITE_BASE + "/autoink/"];
+  const seen = new Set();
+  for (const c of active) {
+    const slug = slugify(c.modell);
+    if (!slug || seen.has(slug)) continue; // first active wins on dupes
+    seen.add(slug);
+    await write(`auto/${slug}/index.html`, renderDetail(c, cars, rate));
+    urls.push(SITE_BASE + "/auto/" + slug + "/");
+  }
+
+  const now = new Date().toISOString().slice(0, 10);
+  const sitemap =
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls.map((u) => `  <url><loc>${u}</loc><lastmod>${now}</lastmod></url>`).join("\n") +
+    `\n</urlset>\n`;
+  await write("sitemap.xml", sitemap);
+  await write("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${SITE_BASE}/sitemap.xml\n`);
+
+  console.log(`Done. ${seen.size} car pages + home + catalog + sitemap (${urls.length} urls) -> ${outDir}`);
+}
+main().catch((e) => { console.error(e); process.exit(1); });
