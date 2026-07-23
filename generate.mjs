@@ -520,7 +520,7 @@ function renderHome(cars, rate) {
 @media(max-width:640px){.hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:84px 18px 72px;min-height:480px}}
 .hero .video-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
 .hero .overlay{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(180deg,rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7))}
-.hero .inner{position:relative;z-index:2;max-width:1120px;margin:0 auto}
+.hero .inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0}
 .hero .brand-logo{height:64px;width:auto;display:block;margin:0 auto 26px;filter:drop-shadow(0 4px 18px rgba(0,0,0,.5))}
 @media(max-width:640px){.hero .brand-logo{height:48px;margin-bottom:20px}}
 .hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;white-space:nowrap;text-shadow:0 2px 24px rgba(0,0,0,.35)}
