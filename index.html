@@ -1,41 +1,163 @@
-<!doctype html>
-<html lang="hu">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CarAdvance — Prémium autók Németországból</title>
-<meta name="description" content="Prémium autóbérlés és eladás, autóimport Németországból. A te autódat pedig bizományban eladjuk.">
+<!doctype html><html lang="hu"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarAdvance — Prémium autók Németországból | Bérlés, eladás, import</title>
+<meta name="description" content="Prémium autók Németországból: megvásárolható autók, prémium autóbérlés, import és bizományos értékesítés. Átlátható árak, garancia.">
+<link rel="canonical" href="https://caradvance.github.io/caradvance-embeds/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="CarAdvance">
+<meta property="og:title" content="CarAdvance — Prémium autók Németországból | Bérlés, eladás, import"><meta property="og:description" content="Prémium autók Németországból: megvásárolható autók, prémium autóbérlés, import és bizományos értékesítés. Átlátható árak, garancia.">
+<meta property="og:url" content="https://caradvance.github.io/caradvance-embeds/"><meta property="og:locale" content="hu_HU">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;padding:0;background:#F4F5F7;overflow-x:hidden}
-  iframe.sec{display:block;width:100%;border:0;overflow:hidden}
-</style>
-</head>
-<body>
-  <iframe class="sec" title="Fejléc" src="caradvance-header.html" scrolling="no" style="height:660px"></iframe>
-  <iframe class="sec" title="Statisztika" src="caradvance-statisztika.html" scrolling="no" style="height:340px"></iframe>
-  <iframe class="sec" title="Kiemelt autók" src="caradvance-autoink-kiemelt.html" scrolling="no" style="height:1200px"></iframe>
+:root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;--soft:#EEF1F6;--radius:16px}
+*{box-sizing:border-box}html,body{margin:0;width:100%;max-width:100vw;overflow-x:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5}
+a{color:inherit}
+img{max-width:100%}
+.wrap{width:100%;max-width:1160px;margin:0 auto;padding:28px 16px}
+.btn{display:inline-block;text-align:center;font-weight:700;padding:13px 22px;border-radius:999px;text-decoration:none;cursor:pointer;transition:background .15s,color .15s}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:#000}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(.94)}
+.btn-soft{background:var(--soft);color:var(--ink)}.btn-soft:hover{background:var(--navy);color:#fff}
+/* header/nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 20px}
+.nav .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;letter-spacing:-.02em;text-decoration:none;color:var(--navy)}
+.nav .logo b{color:var(--red)}
+.nav .menu{display:flex;gap:22px;margin-left:14px;flex-wrap:wrap}
+.nav .menu a{text-decoration:none;color:var(--ink);font-weight:600;font-size:14.5px;opacity:.9}
+.nav .menu a:hover{color:var(--red)}
+.nav .spacer{flex:1}
+.nav .cta{background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px}
+.nav .lang{margin-left:6px;font-size:13px;font-weight:700;color:var(--muted)}
+@media(max-width:960px){.nav .menu{display:none}}
+/* footer */
+.footer{background:var(--navy);color:#cfd6e2;margin-top:56px}
+.footer-in{max-width:1160px;margin:0 auto;padding:40px 20px 28px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}
+@media(max-width:760px){.footer-in{grid-template-columns:1fr}}
+.footer h4{color:#fff;font-size:15px;margin:0 0 12px}
+.footer a{color:#cfd6e2;text-decoration:none;display:block;margin:7px 0;font-size:14px}
+.footer a:hover{color:#fff}
+.footer .brand{font-weight:800;font-size:22px;color:#fff;letter-spacing:-.02em}
+.footer .brand b{color:var(--red)}
+.footer .copy{border-top:1px solid rgba(255,255,255,.12);text-align:center;padding:16px;font-size:12.5px;color:#8b95a7}
 
-  <script>
-    // Same-origin auto-height: measure each section's content and size its iframe.
-    function fit(f){
-      try{
-        var d = f.contentDocument;
-        if(d && d.documentElement){
-          var h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
-          if(h > 0) f.style.height = h + 'px';
-        }
-      }catch(e){}
-    }
-    function fitAll(){ document.querySelectorAll('iframe.sec').forEach(fit); }
-    document.querySelectorAll('iframe.sec').forEach(function(f){
-      f.addEventListener('load', function(){
-        fit(f);
-        [200,600,1200,2500].forEach(function(t){ setTimeout(function(){ fit(f); }, t); });
-      });
-    });
-    window.addEventListener('resize', fitAll);
-    // sections that load data async (featured) can grow after load — re-check periodically
-    setInterval(fitAll, 2000);
-  </script>
-</body>
-</html>
+.hero{position:relative;min-height:560px;display:flex;align-items:center;color:#fff;overflow:hidden}
+.hero video,.hero .heroimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .veil{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,6,9,.82),rgba(6,6,9,.35))}
+.hero .hin{position:relative;max-width:1160px;margin:0 auto;padding:60px 20px;width:100%}
+.hero h1{font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 16px;max-width:16ch}
+.hero p{font-size:clamp(15px,2vw,19px);max-width:46ch;color:#e7eaf0;margin:0 0 26px}
+.hero .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.stats{max-width:1160px;margin:-40px auto 0;position:relative;z-index:3;padding:0 20px}
+.stats-in{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(8,8,10,.10);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:26px 18px}
+@media(max-width:700px){.stats-in{grid-template-columns:1fr 1fr}}
+.stat{text-align:center;padding:8px}
+.stat .n{font-size:30px;font-weight:800;letter-spacing:-.02em}.stat .n b{color:var(--red)}
+.stat .l{color:var(--muted);font-size:13px;font-weight:600;margin-top:2px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:8px 0 22px;flex-wrap:wrap}
+.sec-head h2{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0}
+.sec-head p{color:var(--muted);margin:6px 0 0;font-size:15px}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media(max-width:920px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;position:relative;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}
+.media{aspect-ratio:16/10;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
+.media img{width:100%;height:100%;object-fit:cover;display:block}
+.media .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7a828f;font-size:12px}
+.own{position:absolute;top:12px;left:12px;background:#fff;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(8,8,10,.25)}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+.meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cond{background:var(--soft);color:var(--muted);font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px}
+.year{color:var(--muted);font-size:13px;font-weight:700}
+.title{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+.specs{color:var(--muted);font-size:13px;font-weight:600;margin-bottom:14px}
+.pricerow{display:flex;align-items:baseline;gap:10px;margin-top:auto;flex-wrap:wrap}
+.pcross{width:100%;color:var(--muted);font-size:14px;font-weight:700;text-decoration:line-through}
+.price{font-size:23px;font-weight:800}.peur{color:var(--muted);font-size:14px;font-weight:700}
+.psave{background:#E7F8EE;color:#1DA851;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
+.cbtn{margin-top:14px;display:block;text-align:center;background:var(--soft);color:var(--ink);font-weight:700;padding:12px;border-radius:999px}
+.card:hover .cbtn{background:var(--navy);color:#fff}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"AutoDealer","name":"CarAdvance","url":"https://caradvance.github.io/caradvance-embeds/","email":"info@caradvance.hu","areaServed":"HU","description":"Prémium autók Németországból — bérlés, eladás, import és bizományos értékesítés."}</script>
+</head><body class="">
+<header class="nav"><div class="nav-in">
+  <a class="logo" href=""><span>car<b>advance</b></span></a>
+  <nav class="menu"><a href="#berles">Prémium autóbérlés</a><a href="autoink/">Megvásárolható autóink</a><a href="#bizomany">Bizományos értékesítés</a><a href="#import">Import</a><a href="#rolunk">Rólunk</a></nav>
+  <span class="spacer"></span>
+  <a class="cta" href="mailto:info@caradvance.hu">Kapcsolat</a>
+  <span class="lang">HU</span>
+</div></header>
+
+<section class="hero">
+  <video autoplay muted loop playsinline poster="caradvance-hero-poster.jpg"><source src="caradvance-hero.mp4" type="video/mp4"></video>
+  <div class="veil"></div>
+  <div class="hin">
+    <h1>Prémium autók Németországból</h1>
+    <p>Megvásárolható prémium autók, autóbérlés, import és bizományos értékesítés — átlátható árakkal és garanciával.</p>
+    <div class="cta-row"><a class="btn btn-red" href="autoink/">Autóink megtekintése</a><a class="btn btn-soft" href="mailto:info@caradvance.hu">Kapcsolat</a></div>
+  </div>
+</section>
+<div class="stats"><div class="stats-in"><div class="stat"><div class="n">5000<b>+</b></div><div class="l">Értékesített autó</div></div><div class="stat"><div class="n">23 <b>év</b></div><div class="l">Tapasztalat</div></div><div class="stat"><div class="n">5,0<b>★</b></div><div class="l">Ügyfél-értékelés</div></div><div class="stat"><div class="n">1 <b>év</b></div><div class="l">Garancia</div></div></div></div>
+<section class="wrap" id="autoink">
+  <div class="sec-head"><div><h2>Kiemelt autóink</h2><p>Válogatás aktuális kínálatunkból — összesen 44 elérhető autó.</p></div><a class="btn btn-soft" href="autoink/">Összes autó →</a></div>
+  <div class="grid"><a class="card" href="auto/bmw-x7-m50d-m-sport-pro-22-b-w/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/70/70599f2f-dba9-4802-b496-5e6ab11a1df8?rule=mo-1600" alt="BMW X7 M50d M Sport Pro &quot;22&quot; B&amp;W" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">07/2019</span></div>
+  <h3 class="title">BMW X7 M50d M Sport Pro &quot;22&quot; B&amp;W</h3>
+  <div class="specs">139.923 km · Automata · Dízel</div>
+  <div class="pricerow" data-eur="59990" data-net="50411"><span class="pcross" data-cross>23 310 000 Ft</span><span class="price" data-main>21 840 000 Ft</span><span class="peur">59 990 €</span><span class="psave" data-save>−1 470 000 Ft</span></div>
+  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x2-xdrive20d-m-sport-pro-20-h-k/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/ca/ca7bae64-676d-42cb-bec5-1499ba6bf63c?rule=mo-1600" alt="BMW X2 xDrive20d M Sport Pro &quot;20&quot; H&amp;K" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">11/2025</span></div>
+  <h3 class="title">BMW X2 xDrive20d M Sport Pro &quot;20&quot; H&amp;K</h3>
+  <div class="specs">17.900 km · Automata · Dízel</div>
+  <div class="pricerow" data-eur="51500" data-net="43277"><span class="pcross" data-cross>20 010 000 Ft</span><span class="price" data-main>18 750 000 Ft</span><span class="peur">51 500 €</span><span class="psave" data-save>−1 260 000 Ft</span></div>
+  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x6-m60i-xdrive-full-option-carbon-m-sitze/" data-marka="BMW" data-kar="SUV" data-uz="Benzin"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/24/24857cd6-33a6-4c12-8302-fd0c2ef1f671?rule=mo-1600" alt="BMW X6 M60i xDrive FULL OPTION*CARBON*M SITZE" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">06/2023</span></div>
+  <h3 class="title">BMW X6 M60i xDrive FULL OPTION*CARBON*M SITZE</h3>
+  <div class="specs">21.000 km · Automata · Benzin</div>
+  <div class="pricerow" data-eur="112500" data-net="94537"><span class="pcross" data-cross>43 710 000 Ft</span><span class="price" data-main>40 950 000 Ft</span><span class="peur">112 500 €</span><span class="psave" data-save>−2 760 000 Ft</span></div>
+  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-i5-m60-xdrive-i5m60-xdrive/" data-marka="BMW" data-kar="Limuzin" data-uz="Elektromos"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/ae/aef32313-b261-42ee-a3e1-4a94f06444ad?rule=mo-1600" alt="BMW i5 M60 xDrive i5M60 xDrive" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">12/2023</span></div>
+  <h3 class="title">BMW i5 M60 xDrive i5M60 xDrive</h3>
+  <div class="specs">33.500 km · Automata · Elektromos</div>
+  <div class="pricerow" data-eur="69900" data-net="58739"><span class="pcross" data-cross>27 160 000 Ft</span><span class="price" data-main>25 450 000 Ft</span><span class="peur">69 900 €</span><span class="psave" data-save>−1 710 000 Ft</span></div>
+  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x5-xdrive30d/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/e4/e498a290-8d7c-41ee-a73b-cd92a66fc13a?rule=mo-1600" alt="BMW X5 xDrive30d" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">07/2025</span></div>
+  <h3 class="title">BMW X5 xDrive30d</h3>
+  <div class="specs">19.500 km · Automata · Dízel</div>
+  <div class="pricerow" data-eur="78500" data-net="65966"><span class="pcross" data-cross>30 500 000 Ft</span><span class="price" data-main>28 580 000 Ft</span><span class="peur">78 500 €</span><span class="psave" data-save>−1 920 000 Ft</span></div>
+  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x6-xdrive30d-m-sport-pro/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/fa/fad5718d-0d20-44a5-a841-2a08312a89b0?rule=mo-1600" alt="BMW X6 xDrive30d M Sport Pro" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">06/2025</span></div>
+  <h3 class="title">BMW X6 xDrive30d M Sport Pro</h3>
+  <div class="specs">19.623 km · Automata · Dízel</div>
+  <div class="pricerow" data-eur="81500" data-net="68487"><span class="pcross" data-cross>31 670 000 Ft</span><span class="price" data-main>29 670 000 Ft</span><span class="peur">81 500 €</span><span class="psave" data-save>−2 000 000 Ft</span></div>
+  <span class="cbtn">Részletek</span></div></a></div>
+</section>
+<footer class="footer"><div class="footer-in">
+  <div><div class="brand">car<b>advance</b></div>
+    <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
+  <div><h4>Menü</h4>
+    <a href="autoink/">Megvásárolható autóink</a>
+    <a href="#berles">Prémium autóbérlés</a>
+    <a href="#bizomany">Bizományos értékesítés</a>
+    <a href="#import">Import</a></div>
+  <div><h4>Kapcsolat</h4>
+    <a href="mailto:info@caradvance.hu">info@caradvance.hu</a>
+    <a href="#rolunk">Rólunk</a></div>
+</div><div class="copy">© 2026 CarAdvance · BH Group</div></footer>
+<script>
+(function(){var R=402;
+function up(e){var eur=+e.getAttribute('data-eur')||0,net=+e.getAttribute('data-net')||0;
+ var main=Math.ceil(eur*R/10000)*10000, gross=Math.ceil((net||eur/1.19)*1.27*R/10000)*10000, save=gross-main;
+ var f=function(v){return v.toLocaleString('hu-HU')+' Ft'};
+ var mE=e.querySelector('[data-main]'); if(mE)mE.textContent=f(main);
+ var cE=e.querySelector('[data-cross]'); if(cE&&save>0)cE.textContent=f(gross);
+ var sE=e.querySelector('[data-save]'); if(sE&&save>0)sE.textContent='−'+f(save);}
+function all(){document.querySelectorAll('[data-eur]').forEach(up);}
+fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
+ .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();}}).catch(function(){});
+})();
+</script>
+</body></html>
