@@ -474,11 +474,11 @@ function renderHome(cars, rate) {
 .hero .scrolldown:hover{color:#fff}.hero .scrolldown svg{width:26px;height:26px}
 @keyframes caScrollBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
 .stats{max-width:1160px;margin:28px auto 0;position:relative;z-index:3;padding:0 20px}
-.stats-in{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(8,8,10,.10);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:26px 18px}
+.stats-in{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 @media(max-width:700px){.stats-in{grid-template-columns:1fr 1fr}}
-.stat{text-align:center;padding:8px}
-.stat .n{font-size:30px;font-weight:800;letter-spacing:-.02em}.stat .n b{color:var(--red)}
-.stat .l{color:var(--muted);font-size:13px;font-weight:600;margin-top:2px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 40px rgba(8,8,10,.08);text-align:center;padding:26px 22px}
+.stat .n{font-size:clamp(26px,3.2vw,34px);font-weight:800;letter-spacing:-.02em;color:var(--navy)}.stat .n b{color:var(--red)}
+.stat .l{color:var(--muted);font-size:13.5px;font-weight:600;margin-top:6px;line-height:1.4}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:8px 0 22px;flex-wrap:wrap}
 .sec-head h2{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:6px 0 0}
 .feyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
