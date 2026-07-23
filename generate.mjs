@@ -366,6 +366,7 @@ function featCard(c, rate, mode) {
 
 // --------------------------------------------------------------- HOME
 const YT_SVG = '<svg viewBox="0 0 28 20" width="24" aria-label="YouTube"><rect width="28" height="20" rx="5" fill="#FF0000"/><path d="M11 6l7 4-7 4z" fill="#fff"/></svg>';
+const GMARK = '<svg class="gmark" viewBox="0 0 48 48" width="20" height="20" aria-label="Google"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
 
 const CONTENT_CSS = `
 .cah{--navy-2:#1A1B1F;--navy-3:#26272C;--red-dark:#B80015;--card:#fff;--cr:22px;--shadow:0 14px 40px rgba(8,8,10,.10)}
@@ -434,6 +435,64 @@ const CONTENT_CSS = `
 @media(max-width:960px){.cah .svc-grid{grid-template-columns:1fr}.cah .charity{grid-template-columns:1fr;padding:34px 26px}.cah .why-grid{grid-template-columns:1fr;max-width:560px;margin-left:auto;margin-right:auto}.cah .charity-btn:not(.charity-btn-mobile){display:none}.cah .charity-btn-mobile{display:inline-flex}}
 `;
 
+const CONTENT_CSS2 = `
+.cah p.sec-lead{font-size:17px;color:var(--muted);max-width:640px;margin-top:6px}
+.cah .values-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:38px}
+.cah .value{padding:28px 24px;transition:transform .2s,box-shadow .2s}
+.cah .value:hover{transform:translateY(-4px);box-shadow:0 20px 46px rgba(8,8,10,.14)}
+.cah .value .ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(226,0,26,.09);margin-bottom:16px}
+.cah .value .ic svg{width:26px;height:26px;stroke:var(--red)}
+.cah .value h3{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.cah .value p{font-size:14.5px;color:var(--muted)}
+.cah .story-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:stretch;margin-top:24px}
+.cah .story-text{display:flex;flex-direction:column;justify-content:space-between}
+.cah .story-text p{color:var(--muted);font-size:16.5px;margin:0}
+.cah .story-text p+p{margin-top:16px}
+.cah .story-text p strong{color:var(--navy)}
+.cah .mission{background:linear-gradient(160deg,var(--navy),var(--navy-2));color:#fff;border:none;padding:28px 30px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.cah .mission::before{content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(226,0,26,.22);filter:blur(10px)}
+.cah .mission-logo{width:180px;height:auto;margin-bottom:16px;position:relative}
+.cah .mission h3{font-size:21px;font-weight:800;margin-bottom:10px;position:relative}
+.cah .mission p{color:rgba(255,255,255,.85);font-size:15px;position:relative}
+.cah .mission-since{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);font-size:14px;position:relative}
+.cah .mission-since strong{color:#fff}
+.cah .mission .sig{margin-top:14px;font-weight:700;color:#fff;position:relative}
+.cah .mission .sig span{display:block;font-weight:500;font-size:13.5px;color:rgba(255,255,255,.65)}
+.cah .story-foot{margin-top:22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.cah .bhg-logo{width:60px;height:auto;border-radius:10px;box-shadow:0 6px 16px rgba(8,8,10,.14)}
+.cah .story-more{background:var(--navy);color:#fff;display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;padding:12px 22px;border-radius:999px;text-decoration:none;transition:background .18s,transform .18s}
+.cah .story-more:hover{background:var(--red);transform:translateY(-2px)}
+.cah .rev-summary{display:inline-flex;align-items:center;gap:10px;margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 20px}
+.cah .rev-summary b{font-size:18px}
+.cah .rev-summary .rs-txt{color:#6B7688;font-size:14px}
+.cah .gstars{color:#F4A300;letter-spacing:2px;font-size:16px;line-height:1}
+.cah .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px}
+.cah .rev-card{padding:22px;display:flex;flex-direction:column;gap:12px}
+.cah .rev-card header{display:flex;align-items:center;gap:12px}
+.cah .rev-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:15px;flex:none}
+.cah .rev-card .who{flex:1;min-width:0}.cah .rev-card .gmark{flex:none}
+.cah .rev-card .who b{display:block;font-size:14px;line-height:1.2;color:var(--navy)}
+.cah .rev-card .who span{font-size:12px;color:#8A93A3}
+.cah .rev-card p{font-size:14.5px;color:#3D4552;line-height:1.6;margin:0}
+.cah .rev-foot{margin-top:22px;text-align:center;font-size:13px;color:#8A93A3}
+.cah .rev-foot a{color:var(--navy);font-weight:700;text-decoration:none;display:inline-block;margin-top:6px}
+.cah .rev-foot a:hover{color:var(--red)}
+.cah .seo-copy{font-size:15.5px;color:#3D4756;max-width:820px}
+.cah .seo-copy p{margin-bottom:14px}
+.cah .seo-copy a{color:var(--red);font-weight:700;text-decoration:none}
+.cah .seo-copy strong{color:var(--navy)}
+.cah .faq-list{max-width:820px;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.cah .faq-item{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.cah .faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 22px;font-weight:700;font-size:16px;color:var(--navy)}
+.cah .faq-item summary::-webkit-details-marker{display:none}
+.cah .faq-item summary::after{content:"+";flex:none;width:26px;height:26px;border-radius:50%;background:var(--bg);color:var(--red);font-weight:800;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.cah .faq-item[open] summary::after{transform:rotate(45deg)}
+.cah .faq-item .faq-a{padding:0 22px 18px;font-size:15px;color:#3D4756;line-height:1.65}
+.cah .faq-item .faq-a a{color:var(--red);font-weight:700;text-decoration:none}
+@media(max-width:960px){.cah .values-grid{grid-template-columns:repeat(2,1fr)}.cah .story-grid{grid-template-columns:1fr}.cah .rev-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.cah .values-grid{grid-template-columns:1fr}}
+`;
+
 function svcCard({ img, alt, tag, title, lead, items, extra, accent }) {
   return `<div class="card svc${accent ? " charity-accent" : ""} reveal">
   <div class="svc-media"><img src="${attr(img)}" alt="${attr(alt)}" loading="lazy"></div>
@@ -483,6 +542,29 @@ function contentSections(rel) {
     ["5", "Melletted maradunk", "Az átadás után sem szakad meg a kapcsolatunk — kérdéseiddel és garanciális ügyeiddel is bizalommal fordulhatsz hozzánk."],
   ].map(([n, t, p]) => `<div class="card why reveal"><div class="n">${n}</div><div><h3>${esc(t)}</h3><p>${esc(p)}</p></div></div>`).join("");
 
+  const revs = [
+    ["AI", "#D8232A", "Alexandru Ion", "2 éve", "Kiváló munka. Délelőtt 11-re érkeztem, és 14 órára, a fizetés után már vittem is az autót. Az ár stimmelt, az autó minden adata pontos volt. Köszönöm!"],
+    ["CG", "#0E9F6E", "Ciccio Grifó", "4 éve", "Komoly, és főleg előzékeny, kedves munkatársak. A megkereséseket és e-maileket gyorsan megválaszolják."],
+    ["BM", "#7C3AED", "Bad Martin", "2 éve", "Nagyon kedves és hozzáértő munkatársak. Itt fel is veszik a telefont — és pontosan azt kapod, amit ígérnek."],
+    ["R", "#F4A300", "RMF", "1 éve", "Nagyon jó kapcsolat. Barátságos és teljesen megbízható! Bármikor újra, szívesen :-)"],
+    ["D", "#2563EB", "Dennis", "3 éve", "Szuper kedves személyzet, korrekt, gördülékeny ügyintézés — összességében nagyon elégedett vagyok."],
+    ["S", "#141519", "Saab900 Freak", "2 éve", "Nagyon igyekvő csapat, korrekt hozzáállás — itt profik dolgoznak."],
+  ];
+  const reviewCards = revs.map(([i, c, n, a, t]) => `<article class="card rev-card reveal"><header><span class="rev-av" style="background:${c}">${esc(i)}</span><span class="who"><b>${esc(n)}</b><span>${esc(a)}</span></span>${GMARK}</header><div class="gstars">★★★★★</div><p>${esc(t)}</p></article>`).join("");
+  const faqs = [
+    ["Mennyibe kerül a prémium autóbérlés a Caradvance-nál?", `A legkedvezőbb havidíj 912 €/hó nettó-tól indul (Mini Cooper), prémium BMW-ink 937 €/hó nettó-tól érhetők el; a konkrét ár a modelltől, a bérlés időtartamától és a havi km-kerettől függ. Az aktuális <a href="#autoink">bérelhető autókat itt találod</a>, ajánlatért hívd Pálinkás Áront: <a href="tel:+36300942081">+36 30 094 2081</a>.`],
+    ["Lehet hosszú távra vagy tartósan autót bérelni?", "A rövid távú bérlés mellett hosszú távú és tartós autóbérlést is kínálunk, rugalmas időtartammal — a hosszabb elköteleződés kedvezőbb havidíjat jelent. Az átadás-átvétel egyeztetett helyszínen történik, Pest megyén belül."],
+    ["Kell kauciót fizetni a bérléshez, és mennyit?", "Igen, a bérléshez egyszeri, visszatérítendő kaució szükséges, amelynek összege a modelltől függ. Példák: BMW X2 — 3 000 €, BMW 550e és BMW X7 — 7 500 €, a csúcsmodelleknél (pl. BMW M5 vagy X6 M) akár 10 000 €."],
+    ["Hogyan működik az autóimport Németországból?", `Elmondod, milyen autót keresel, mi pedig a teljes német piacról ajánlunk: az autót leinformáljuk, a helyszínen bevizsgáljuk, majd intézzük a szállítást, a honosítást és a teljes papírmunkát. Az importált autókra 1 év szavatosságot vállalunk. Tóth Károly import igazgató: <a href="tel:+36302146989">+36 30 214 6989</a>.`],
+    ["Milyen garanciát kapok a megvásárolt autóra?", "Minden importált és eladó autónkra 1 év szavatosságot vállalunk. Minden jármű előélete ismert és dokumentált, az átadás előtt helyszíni bevizsgáláson esik át — az átadás után is számíthatsz ránk garanciális ügyekben."],
+    ["Milyen eladó BMW-k és használt prémium autók érhetők el?", `Kínálatunkban gondosan válogatott, bevizsgált prémium használt autók szerepelnek — főként BMW X5 és X6, emellett további modellek is, mint BMW 550e, BMW X7 vagy BMW X2 —, azonnal elérhetően, igény szerint finanszírozással. A teljes kínálatot az <a href="#autoink">Autóink</a> szekcióban találod.`],
+    ["Hogyan tudom eladni az autómat a Caradvance-szal?", "Bizományos értékesítésben teljes körűen kezeljük az eladást: profi fotókat és videót készítünk, a legnagyobb platformokon hirdetünk, és mi tárgyalunk a vevőkkel — te csak átveszed a vételárat. A jutalék egy részét magyar jótékonysági szervezeteknek ajánljuk fel."],
+    ["Van finanszírozási lehetőség autóvásárlásnál?", `Igen, eladó autóinkhoz igény szerint finanszírozási lehetőséget is biztosítunk — a részletekről kereskedelmi vezetőnk ad tájékoztatást: <a href="mailto:sales@caradvance.hu">sales@caradvance.hu</a>.`],
+    ["Kik állnak a Caradvance Hungary mögött?", "A Caradvance a müncheni Caradvance GmbH márkája, amely 2003 óta foglalkozik prémium használt autókkal Sauerlachban. Magyarországon a BH Group Zrt. képviseli Caradvance Hungary néven — a bérlések és eladások többsége közvetlenül a német Caradvance GmbH-val jön létre, mi pedig itthonról, magyarul kísérünk végig."],
+    ["Hol találom a Caradvance irodáját és mikor vagytok elérhetők?", `Irodánk címe: 2083 Solymár, Ibolya utca 12. — Budapesttől 15 percre. Munkaidő: hétfőtől péntekig 9:00–17:00. Telefon: <a href="tel:+36302336060">+36 30 233 6060</a>, e-mail: <a href="mailto:info@caradvance.hu">info@caradvance.hu</a>.`],
+    ["Miért megbízható a Caradvance?", "Több mint 5000 eladott autó, 5,0-s Google-értékelés és 23 év német piaci tapasztalat áll mögöttünk. Minden autót leinformálunk és bevizsgálunk, nincs apró betű és nincs rejtett költség — importált autóinkra 1 év szavatosságot vállalunk."],
+  ];
+  const faqItems = faqs.map(([q, a]) => `<details class="faq-item"><summary>${esc(q)}</summary><div class="faq-a">${a}</div></details>`).join("");
   return `<div class="cah">
 <section class="block" id="szolgaltatasok"><div class="wrap">
   <span class="eyebrow reveal">Szolgáltatásaink</span>
@@ -505,6 +587,54 @@ function contentSections(rel) {
   <span class="eyebrow reveal">Miért a Caradvance?</span>
   <h2 class="sec-title reveal">Így dolgozunk</h2>
   <div class="why-grid">${steps}<div class="card why why-special reveal"><div class="n">♥</div><div><h3>Visszaadunk</h3><p>A használtautó-eladások jutalékának egy részével magyar jótékonysági szervezeteket támogatunk.</p></div></div></div>
+</div></section>
+<section class="block" id="tortenet" style="padding-top:0"><div class="wrap">
+  <span class="eyebrow reveal">Történetünk</span>
+  <h2 class="sec-title reveal">Kik vagyunk?</h2>
+  <p class="sec-lead reveal">A Caradvance a müncheni Caradvance GmbH márkája — Magyarországon a BH Group Zrt. képviseli, Caradvance Hungary néven.</p>
+  <div class="story-grid">
+    <div class="story-text reveal">
+      <p>A <strong>Caradvance GmbH</strong> 2003 óta a német autópiac megbízható szereplője: Sauerlachban, München mellett működő kereskedésük több mint két évtizede foglalkozik prémium használt autókkal — a mobile.de-n <strong>5 csillagos értékeléssel</strong>. Náluk az autó nem áru, hanem felelősség: minden járműnek ismert az előélete, és minden ügyfél pontosan azt kapja, amit ígértek neki.</p>
+      <p>A <strong>BH Group Zrt.</strong> kizárólag a Caradvance GmbH <strong>hivatalos magyarországi képviselete</strong> — Caradvance Hungary néven mi vagyunk az itthoni kapcsolat: magyarul, helyben, személyesen. <strong>Az autóbérlés és az eladások többsége közvetlenül a német Caradvance GmbH-n keresztül zajlik</strong> — Te tehát egy több mint két évtizedes múltú német kereskedéssel szerződsz, mi pedig végigkísérünk itthonról: leinformált, bevizsgált autók, kulcsrakész átadás, <strong>1 év szavatossággal</strong>.</p>
+      <p>Több mint <strong>5000 eladott autó</strong> és ügyfeleink <strong>5,0-s értékelése</strong> mutatja: a két ország legjobbjait összekötni működő recept.</p>
+      <div class="story-foot"><img class="bhg-logo" src="${rel}bh-group-zrt.webp" alt="BH Group Zrt." loading="lazy"><a class="btn story-more" href="https://caradvance.de/" target="_blank" rel="noopener">Tudj meg többet rólunk →</a></div>
+    </div>
+    <div class="card mission reveal">
+      <img class="mission-logo" src="${rel}caradvance-the-automotive-people.webp" alt="Caradvance — the automotive people" loading="lazy">
+      <h3>Küldetésünk</h3>
+      <p>Visszaadni a bizalmat az autókereskedelembe. Minden autó mögött álljon valódi előélet, minden ügylet mögött valódi felelősségvállalás — és minden eladásból jusson valami vissza a közösségnek is.</p>
+      <div class="mission-since">A <strong>Caradvance GmbH</strong> 2003 óta a német autópiac megbízható szereplője — erre a tapasztalatra építünk itthon is.</div>
+      <div class="sig">Caradvance csapata<span>BH Group Zrt. · Solymár</span></div>
+    </div>
+  </div>
+</div></section>
+<section class="block" id="ertekek" style="padding-top:0"><div class="wrap">
+  <span class="eyebrow reveal">Értékeink</span>
+  <h2 class="sec-title reveal">Amiben hiszünk</h2>
+  <div class="values-grid">
+    <div class="card value reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg></div><h3>Átláthatóság</h3><p>Minden autót leinformálunk és bevizsgálunk. Nincs apró betű, nincs rejtett költség — azt kapod, amit ígérünk.</p></div>
+    <div class="card value reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg></div><h3>Biztonság</h3><p>Importált autóinkra 1 év szavatosságot vállalunk, mert kiállunk azért, amit átadunk.</p></div>
+    <div class="card value reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3.2"/><path d="M2.5 20c.8-3.4 3-5 5.5-5s4.7 1.6 5.5 5"/><path d="M15.5 3.5a3.2 3.2 0 010 6.2M18 20c-.4-1.9-1.3-3.3-2.5-4.2"/></svg></div><h3>Személyes figyelem</h3><p>Nem eladunk, hanem segítünk. Végigkísérünk a teljes folyamaton — az első kérdéstől az átadásig.</p></div>
+    <div class="card value reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.6-9.5-9C.7 8.6 2.6 5 6 5c2 0 3.4 1 4.5 2.6L12 9l1.5-1.4C14.6 6 16 5 18 5c3.4 0 5.3 3.6 3.5 7-2.5 4.4-9.5 9-9.5 9z"/></svg></div><h3>Társadalmi felelősség</h3><p>A használtautó-eladások jutalékának jelentős részét magyar jótékonysági szervezeteknek ajánljuk fel.</p></div>
+  </div>
+</div></section>
+<section class="block" id="velemenyek"><div class="wrap">
+  <span class="eyebrow reveal">Vélemények</span>
+  <h2 class="sec-title reveal">Amit ügyfeleink mondanak rólunk</h2>
+  <div class="rev-summary reveal"><span class="gstars">★★★★★</span><b>5,0</b><span class="rs-txt">a Google-n</span></div>
+  <div class="rev-grid">${reviewCards}</div>
+  <div class="rev-foot reveal">Valódi Google-vélemények a Caradvance-ról, magyarra fordítva. Eredeti nyelv: német / angol.<br><a href="https://www.google.com/maps/search/?api=1&query=Caradvance+GmbH+Autovermietung" target="_blank" rel="noopener">Összes vélemény megtekintése a Google-n →</a></div>
+</div></section>
+<section class="block" id="gyik" style="padding-top:0"><div class="wrap">
+  <span class="eyebrow reveal">Jó tudni</span>
+  <h2 class="sec-title reveal">Prémium autóbérlés és autóimport Németországból — egy kézből</h2>
+  <div class="seo-copy reveal">
+    <p>A <strong>Caradvance Hungary</strong> a müncheni Caradvance GmbH hivatalos magyarországi képviselete: <strong>prémium autóbérlés</strong>, gondosan bevizsgált <strong>eladó BMW és más prémium használt autók</strong>, valamint kulcsrakész <strong>autóimport Németországból</strong> — Budapesten és környékén, solymári irodánkból, országos kiszolgálással.</p>
+    <p>Autóbérlésnél nálunk nem napidíjas <strong>autókölcsönzést</strong> kapsz, hanem rugalmas, <strong>havidíjas konstrukciót, minimum 6 hónapos időtartamtól</strong>: válogatott BMW modelljeink hosszú távú, akár egy éven túli használatra is elérhetők. Ha vásárolnál, <a href="#autoink">eladó autóink</a> mindegyike leinformált, helyszínen bevizsgált és <strong>1 év szavatossággal</strong> érkezik. Ha pedig pontosan tudod, mit keresel, a teljes német piacról importáljuk neked: <strong>autó behozatal Németországból</strong> szállítással, honosítással és teljes ügyintézéssel — te csak átveszed a kulcsot.</p>
+    <p>Saját autódat is <a href="#szolgaltatasok">eladjuk bizományos értékesítésben</a>: profi fotókkal, videóval, a legnagyobb hirdetési platformokon — és minden eladás jutalékának egy részét magyar jótékonysági szervezeteknek ajánljuk fel. Több mint <strong>5000 eladott autó</strong> és <strong>5,0-s Google-értékelés</strong> áll mögöttünk.</p>
+  </div>
+  <h2 class="sec-title reveal" style="margin-top:44px;font-size:clamp(24px,3vw,32px)">Gyakori kérdések</h2>
+  <div class="faq-list reveal">${faqItems}</div>
 </div></section>
 </div>
 <script>(function(){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});document.querySelectorAll('.cah .reveal').forEach(function(el){io.observe(el)});})();</script>`;
@@ -545,7 +675,7 @@ function renderHome(cars, rate) {
 .feyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
 .feyebrow::before{content:"";width:26px;height:3px;background:var(--red);border-radius:2px}
 .sec-head p{color:var(--muted);margin:6px 0 0;font-size:15px}
-` + cardCss() + CONTENT_CSS;
+` + cardCss() + CONTENT_CSS + CONTENT_CSS2;
 
   const stats = [
     ["5000<b>+</b>", "eladott prémium autó"],
