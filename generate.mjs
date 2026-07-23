@@ -126,7 +126,7 @@ const FONT =
 
 const BASE_CSS = `
 :root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;--soft:#EEF1F6;--radius:16px;--navh:80px}
-*{box-sizing:border-box}html,body{margin:0;width:100%;max-width:100vw;overflow-x:hidden}
+*{box-sizing:border-box}html,body{margin:0;width:100%;max-width:100vw;overflow-x:clip}
 body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5}
 a{color:inherit}
 img{max-width:100%}
