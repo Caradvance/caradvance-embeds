@@ -87,7 +87,7 @@
   function browserLang(){var ls=navigator.languages||[navigator.language||""];for(var i=0;i<ls.length;i++){var k=(ls[i]||"").slice(0,2).toLowerCase();if(LANGMAP[k])return LANGMAP[k];}return null;}
   var cf=wrap.querySelector('.curflag'); if(cf&&FLAGCC[cur]){cf.style.backgroundImage="url(https://flagcdn.com/w80/"+FLAGCC[cur]+".png)";}
   wrap.querySelectorAll('.langopt,.m-langopt').forEach(function(a){a.addEventListener('click',function(e){var href=a.getAttribute('href'),loc=null;for(var k in LOCALES){if(LOCALES[k]===href){loc=k;break;}}if(!loc)return;e.preventDefault();try{localStorage.setItem('ca_lang',loc);}catch(_){}(window.top||window).location.href=targetHref(loc);});});
-  var host=location.hostname||"";var isReal=host && !/^(localhost|127\.|0\.0\.0\.0|\[)/.test(host);
+  var host=location.hostname||"";var isReal=/(^|\.)caradvance\.hu$/i.test(host);
   if(isReal && cur==="hu"){
     var saved=null;try{saved=localStorage.getItem('ca_lang');}catch(_){}
     var done=null;try{done=sessionStorage.getItem('ca_lang_auto');}catch(_){}
