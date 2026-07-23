@@ -1,0 +1,27 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --font:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif; --ink:#0B0B0D; --muted:#5B6270; --red:#E2001A; --line:#E7EAF0; }
+  *{box-sizing:border-box} html,body{margin:0;background:#F4F5F7;font-family:var(--font)}
+  .wrap{max-width:1240px;margin:0 auto;padding:40px 24px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:40px 24px;text-align:center;
+    box-shadow:0 14px 40px rgba(8,8,10,.05)}
+  .num{font-size:clamp(38px,4.4vw,52px);font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+  .num .accent{color:var(--red)}
+  .num .star{color:var(--red)}
+  .label{margin-top:16px;font-size:16px;font-weight:600;color:var(--muted);line-height:1.4}
+  @media(max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:520px){ .grid{grid-template-columns:1fr} }
+</style>
+<div class="wrap">
+  <div class="grid">
+    <div class="card"><div class="num">5000<span class="accent">+</span></div><div class="label">eladott prémium autó</div></div>
+    <div class="card"><div class="num">23 <span class="accent">év</span></div><div class="label">tapasztalat — a Caradvance GmbH 2003 óta</div></div>
+    <div class="card"><div class="num">5,0 <span class="star">★</span></div><div class="label">Google-értékelés</div></div>
+    <div class="card"><div class="num">1 <span class="accent">év</span></div><div class="label">szavatosság minden importált autóra</div></div>
+  </div>
+</div>
