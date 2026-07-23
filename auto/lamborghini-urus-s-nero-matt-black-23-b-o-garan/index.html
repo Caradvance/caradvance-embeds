@@ -22,8 +22,8 @@ img{max-width:100%}
 /* header/nav */
 .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line)}
 .nav-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 20px}
-.nav .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;letter-spacing:-.02em;text-decoration:none;color:var(--navy)}
-.nav .logo b{color:var(--red)}
+.nav .logo{display:flex;align-items:center;text-decoration:none}
+.nav .logo img{height:34px;width:auto;display:block}
 .nav .menu{display:flex;gap:22px;margin-left:14px;flex-wrap:wrap}
 .nav .menu a{text-decoration:none;color:var(--ink);font-weight:600;font-size:14.5px;opacity:.9}
 .nav .menu a:hover{color:var(--red)}
@@ -38,8 +38,7 @@ img{max-width:100%}
 .footer h4{color:#fff;font-size:15px;margin:0 0 12px}
 .footer a{color:#cfd6e2;text-decoration:none;display:block;margin:7px 0;font-size:14px}
 .footer a:hover{color:#fff}
-.footer .brand{font-weight:800;font-size:22px;color:#fff;letter-spacing:-.02em}
-.footer .brand b{color:var(--red)}
+.footer .brand{height:40px;width:auto;display:block;margin-bottom:4px}
 .footer .copy{border-top:1px solid rgba(255,255,255,.12);text-align:center;padding:16px;font-size:12.5px;color:#8b95a7}
 
 .crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:18px}.crumb a{text-decoration:none}.crumb a:hover{color:var(--red)}.crumb b{color:var(--ink)}
@@ -108,7 +107,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Főoldal","item":"https://caradvance.hu/"},{"@type":"ListItem","position":2,"name":"Autóink","item":"https://caradvance.hu/autoink/"},{"@type":"ListItem","position":3,"name":"Lamborghini Urus S Nero-Matt/Black/23\"/B&O/Garan","item":"https://caradvance.hu/auto/lamborghini-urus-s-nero-matt-black-23-b-o-garan/"}]}</script>
 </head><body class="">
 <header class="nav"><div class="nav-in">
-  <a class="logo" href="../../"><span>car<b>advance</b></span></a>
+  <a class="logo" href="../../"><img src="../../caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
   <nav class="menu"><a href="../../#berles">Prémium autóbérlés</a><a href="../../autoink/">Megvásárolható autóink</a><a href="../../#bizomany">Bizományos értékesítés</a><a href="../../#import">Import</a><a href="../../#rolunk">Rólunk</a></nav>
   <span class="spacer"></span>
   <a class="cta" href="mailto:info@caradvance.hu">Kapcsolat</a>
@@ -156,7 +155,7 @@ function ca_go(i){CI=(i+CAG.length)%CAG.length;document.getElementById('stg').sr
 function ca_step(d){ca_go(CI+d);}
 </script>
 <footer class="footer"><div class="footer-in">
-  <div><div class="brand">car<b>advance</b></div>
+  <div><img class="brand" src="../../caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133">
     <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
   <div><h4>Menü</h4>
     <a href="../../autoink/">Megvásárolható autóink</a>
