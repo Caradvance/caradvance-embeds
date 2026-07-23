@@ -62,14 +62,25 @@ img{max-width:100%}
 .footer .brand{height:40px;width:auto;display:block;margin-bottom:4px}
 .footer .copy{border-top:1px solid rgba(255,255,255,.12);text-align:center;padding:16px;font-size:12.5px;color:#8b95a7}
 
-.hero{position:relative;min-height:560px;display:flex;align-items:center;color:#fff;overflow:hidden;margin-top:calc(-1 * var(--navh))}
-.hero video,.hero .heroimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hero .veil{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,6,9,.82),rgba(6,6,9,.35))}
-.hero .hin{position:relative;max-width:1160px;margin:0 auto;padding:60px 20px;width:100%}
-.hero h1{font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 16px;max-width:16ch}
-.hero p{font-size:clamp(15px,2vw,19px);max-width:46ch;color:#e7eaf0;margin:0 0 26px}
-.hero .cta-row{display:flex;gap:12px;flex-wrap:wrap}
-.stats{max-width:1160px;margin:-40px auto 0;position:relative;z-index:3;padding:0 20px}
+.hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:86vh;padding:120px 24px 96px;border-radius:32px;margin:16px;margin-top:calc(16px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
+@media(max-width:640px){.hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:112px 18px 84px;min-height:80vh}}
+.hero .video-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
+.hero .overlay{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(180deg,rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7))}
+.hero .inner{position:relative;z-index:2;max-width:1120px;margin:0 auto}
+.hero .brand-logo{height:64px;width:auto;display:block;margin:0 auto 26px;filter:drop-shadow(0 4px 18px rgba(0,0,0,.5))}
+@media(max-width:640px){.hero .brand-logo{height:48px;margin-bottom:20px}}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;white-space:nowrap;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+@media(max-width:900px){.hero h1{white-space:normal;font-size:clamp(28px,7vw,40px)}}
+.hero .sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#E7EAF0;max-width:600px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
+.hero .cta-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;align-items:center}
+.hero .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:16px;padding:15px 32px;border-radius:999px;text-decoration:none;cursor:pointer;border:0;transition:background .15s}
+.hero .btn-primary{background:var(--red);color:#fff;box-shadow:0 10px 30px rgba(226,0,26,.4)}
+.hero .btn-primary:hover{background:#B80015}
+.hero .btn-white{background:#fff;color:var(--navy)}.hero .btn-white:hover{background:#ECEEF2}
+.hero .scrolldown{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.82);background:none;border:0;cursor:pointer;font:inherit;letter-spacing:.05em;font-size:11px;text-transform:uppercase;animation:caScrollBob 1.9s ease-in-out infinite}
+.hero .scrolldown:hover{color:#fff}.hero .scrolldown svg{width:26px;height:26px}
+@keyframes caScrollBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+.stats{max-width:1160px;margin:28px auto 0;position:relative;z-index:3;padding:0 20px}
 .stats-in{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(8,8,10,.10);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:26px 18px}
 @media(max-width:700px){.stats-in{grid-template-columns:1fr 1fr}}
 .stat{text-align:center;padding:8px}
@@ -116,13 +127,15 @@ img{max-width:100%}
 </div>
 
 <section class="hero">
-  <video autoplay muted loop playsinline preload="auto" poster="caradvance-hero-x5-poster.jpg"><source src="caradvance-hero-x5.mp4" type="video/mp4"></video>
-  <div class="veil"></div>
-  <div class="hin">
+  <video class="video-bg" autoplay muted loop playsinline preload="auto" poster="caradvance-hero-x5-poster.jpg"><source src="caradvance-hero-x5.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+  <div class="inner">
+    <img class="brand-logo" src="caradvance-logo-white.webp" alt="CarAdvance — the automotive people" width="403" height="133">
     <h1>Prémium autók Németországból</h1>
-    <p>Megvásárolható prémium autók, autóbérlés, import és bizományos értékesítés — átlátható árakkal és garanciával.</p>
-    <div class="cta-row"><a class="btn btn-red" href="autoink/">Autóink megtekintése</a><a class="btn btn-soft" href="mailto:info@caradvance.hu">Kapcsolat</a></div>
+    <p class="sub">Prémium autóbérlés és eladás, autóimport Németországból — a te autódat pedig bizományban eladjuk.</p>
+    <div class="cta-row"><a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Aj%C3%A1nlatk%C3%A9r%C3%A9s">Kérj ajánlatot</a><a class="btn btn-white" href="mailto:info@caradvance.hu?subject=Aut%C3%B3%20elad%C3%A1sa%20%E2%80%93%20bizom%C3%A1ny">Add el az autód</a></div>
   </div>
+  <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
 </section>
 <div class="stats"><div class="stats-in"><div class="stat"><div class="n">5000<b>+</b></div><div class="l">Értékesített autó</div></div><div class="stat"><div class="n">23 <b>év</b></div><div class="l">Tapasztalat</div></div><div class="stat"><div class="n">5,0<b>★</b></div><div class="l">Ügyfél-értékelés</div></div><div class="stat"><div class="n">1 <b>év</b></div><div class="l">Garancia</div></div></div></div>
 <section class="wrap" id="autoink">
