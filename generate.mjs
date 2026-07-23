@@ -310,8 +310,8 @@ function renderHome(cars, rate) {
   const active = cars.filter(isActive);
   const featured = (active.filter(isOwn).length ? active.filter(isOwn) : active).slice(0, 6);
   const css = `
-.hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:86vh;padding:120px 24px 96px;border-radius:32px;margin:16px;margin-top:calc(16px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
-@media(max-width:640px){.hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:112px 18px 84px;min-height:80vh}}
+.hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:600px;padding:96px 24px;border-radius:32px;margin:16px;margin-top:calc(16px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
+@media(max-width:640px){.hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:84px 18px 72px;min-height:480px}}
 .hero .video-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
 .hero .overlay{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(180deg,rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7))}
 .hero .inner{position:relative;z-index:2;max-width:1120px;margin:0 auto}
