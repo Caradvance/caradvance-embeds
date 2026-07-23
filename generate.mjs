@@ -230,7 +230,7 @@ function up(e){var eur=+e.getAttribute('data-eur')||0,net=+e.getAttribute('data-
  var sE=e.querySelector('[data-save]'); if(sE&&save>0)sE.textContent='−'+f(save);}
 function all(){document.querySelectorAll('[data-eur]').forEach(up);}
 fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
- .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();}}).catch(function(){});
+ .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();var rv=document.getElementById('ratev');if(rv)rv.textContent=R;}}).catch(function(){});
 })();
 </script>`;
 
@@ -286,6 +286,15 @@ function cardCss() {
 .psave{background:#E7F8EE;color:#1DA851;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
 .cbtn{margin-top:14px;display:block;text-align:center;background:var(--soft);color:var(--ink);font-weight:700;padding:12px;border-radius:999px}
 .card:hover .cbtn{background:var(--navy);color:#fff}
+.feat{position:absolute;top:12px;right:12px;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;z-index:2}
+.autok-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:8px 0 22px}
+.autok-tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px}
+.autok-tab{border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;color:var(--ink);padding:10px 20px;border-radius:999px;cursor:pointer;transition:.2s}
+.autok-tab.on{background:var(--navy);color:#fff}
+.autok-tab:not(.on):hover{background:#F0F3F8}
+.autok-panel{display:none}.autok-panel.on{display:block}
+.autok-more{text-align:center;margin-top:24px}
+.rate-note{margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center}
 `;
 }
 function carCard(c, rate, rel) {
@@ -302,6 +311,35 @@ function carCard(c, rate, rel) {
   <h3 class="title">${esc((c.modell || "").trim())}</h3>
   <div class="specs">${esc(specStr(c))}</div>
   <div class="pricerow" data-eur="${p.eur}" data-net="${nEur(c.vetel_eur_netto)}">${cross}<span class="price" data-main>${fmtHUF(p.main)}</span><span class="peur">${fmtEUR(p.eur)}</span>${save}</div>
+  <span class="cbtn">Részletek</span></div></a>`;
+}
+
+// Featured card with "Kiemelt" badge; mode "sale" (default) or "rent"
+function featCard(c, rate, mode) {
+  const g = galleryOf(c);
+  const href = `auto/${slugify(c.modell)}/`;
+  const img = g[0]
+    ? `<img src="${attr(g[0])}" alt="${attr((c.modell || "").trim())}" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span>`
+    : `<span class="ph">fotó hamarosan</span>`;
+  const spec = [c.km, c.teljesitmeny, c.valto, c.uzemanyag].filter(Boolean).join(" · ");
+  let priceRow, cond;
+  if (mode === "rent") {
+    const eur = nEur(c.berlet_eur);
+    const hufMo = Math.ceil((eur * rate) / 1000) * 1000;
+    cond = "Bérelhető";
+    priceRow = `<div class="pricerow"><span class="price">${eur.toLocaleString("hu-HU")} €/hó</span><span class="peur">≈ ${fmtHUF(hufMo)}/hó</span></div>`;
+  } else {
+    const p = priceOf(c, rate);
+    cond = "Használt";
+    const cross = p.save > 0 ? `<span class="pcross" data-cross>${fmtHUF(p.huGross)}</span>` : "";
+    const save = p.save > 0 ? `<span class="psave" data-save>−${fmtHUF(p.save)}</span>` : "";
+    priceRow = `<div class="pricerow" data-eur="${p.eur}" data-net="${nEur(c.vetel_eur_netto)}">${cross}<span class="price" data-main>${fmtHUF(p.main)}</span><span class="peur">${fmtEUR(p.eur)}</span>${save}</div>`;
+  }
+  return `<a class="card" href="${attr(href)}"><div class="media">${img}<span class="feat">Kiemelt</span></div>
+  <div class="body"><div class="meta"><span class="cond">${cond}</span><span class="year">${esc(c.evjarat || "")}</span></div>
+  <h3 class="title">${esc((c.modell || "").trim())}</h3>
+  <div class="specs">${esc(spec)}</div>
+  ${priceRow}
   <span class="cbtn">Részletek</span></div></a>`;
 }
 
@@ -453,7 +491,9 @@ function contentSections(rel) {
 
 function renderHome(cars, rate) {
   const active = cars.filter(isActive);
-  const featured = (active.filter(isOwn).length ? active.filter(isOwn) : active).slice(0, 6);
+  const pickFeat = (list) => list.filter(isOwn).concat(list.filter((c) => !isOwn(c))).slice(0, 3);
+  const saleFeat = pickFeat(active.filter((c) => nEur(c.vetel_eur) > 0));
+  const rentFeat = pickFeat(active.filter((c) => nEur(c.berlet_eur) > 0));
   const css = `
 .hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:600px;padding:96px 24px;border-radius:32px;margin:16px;margin-top:calc(16px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
 @media(max-width:640px){.hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:84px 18px 72px;min-height:480px}}
@@ -506,10 +546,24 @@ function renderHome(cars, rate) {
 </section>
 <div class="stats"><div class="stats-in">${stats.map(([n, l]) => `<div class="stat"><div class="n">${n}</div><div class="l">${esc(l)}</div></div>`).join("")}</div></div>
 <section class="wrap" id="autoink">
-  <div class="sec-head"><div><span class="feyebrow">Kínálat</span><h2>Autóink</h2><p>Válogatás aktuális kínálatunkból — összesen ${active.length} elérhető autó.</p></div><a class="btn btn-soft" href="autoink/">Összes eladó autónk →</a></div>
-  <div class="grid">${featured.map((c) => carCard(c, rate, "")).join("")}</div>
+  <div class="autok-head"><div><span class="feyebrow">Kínálat</span><h2>Autóink</h2></div>
+    <div class="autok-tabs" role="tablist">
+      <button class="autok-tab" data-tab="berelheto" type="button">Bérelhető autók</button>
+      <button class="autok-tab on" data-tab="elado" type="button">Eladó autók</button>
+    </div>
+  </div>
+  <div class="autok-panel on" id="panel-elado">
+    <div class="grid">${saleFeat.map((c) => featCard(c, rate, "sale")).join("")}</div>
+    <div class="autok-more"><a class="btn btn-soft" href="autoink/">Összes eladó autónk →</a></div>
+  </div>
+  <div class="autok-panel" id="panel-berelheto">
+    <div class="grid">${rentFeat.map((c) => featCard(c, rate, "rent")).join("")}</div>
+    <div class="autok-more"><a class="btn btn-soft" href="autoink/">Összes bérelhető autónk →</a></div>
+  </div>
+  <div class="rate-note">A forint árak élő árfolyammal számolódnak, óránként frissülnek (1 € = <span id="ratev">${rate}</span> Ft).</div>
 </section>
-${contentSections("")}`;
+${contentSections("")}
+<script>document.querySelectorAll('.autok-tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.autok-tab').forEach(function(x){x.classList.remove('on')});t.classList.add('on');document.querySelectorAll('.autok-panel').forEach(function(p){p.classList.remove('on')});var el=document.getElementById('panel-'+t.dataset.tab);if(el)el.classList.add('on');});});</script>`;
 
   const ld = {
     "@context": "https://schema.org", "@type": "AutoDealer", name: BRAND,
