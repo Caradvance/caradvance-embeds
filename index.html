@@ -113,6 +113,15 @@ img{max-width:100%}
 .psave{background:#E7F8EE;color:#1DA851;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
 .cbtn{margin-top:14px;display:block;text-align:center;background:var(--soft);color:var(--ink);font-weight:700;padding:12px;border-radius:999px}
 .card:hover .cbtn{background:var(--navy);color:#fff}
+.feat{position:absolute;top:12px;right:12px;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;z-index:2}
+.autok-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:8px 0 22px}
+.autok-tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px}
+.autok-tab{border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;color:var(--ink);padding:10px 20px;border-radius:999px;cursor:pointer;transition:.2s}
+.autok-tab.on{background:var(--navy);color:#fff}
+.autok-tab:not(.on):hover{background:#F0F3F8}
+.autok-panel{display:none}.autok-panel.on{display:block}
+.autok-more{text-align:center;margin-top:24px}
+.rate-note{margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center}
 
 .cah{--navy-2:#1A1B1F;--navy-3:#26272C;--red-dark:#B80015;--card:#fff;--cr:22px;--shadow:0 14px 40px rgba(8,8,10,.10)}
 .cah .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
@@ -206,38 +215,36 @@ img{max-width:100%}
 </section>
 <div class="stats"><div class="stats-in"><div class="stat"><div class="n">5000<b>+</b></div><div class="l">eladott prémium autó</div></div><div class="stat"><div class="n">23 <b>év</b></div><div class="l">Tapasztalat — a Caradvance GmbH 2003 óta</div></div><div class="stat"><div class="n">5,0<b>★</b></div><div class="l">Google-értékelés</div></div><div class="stat"><div class="n">1 <b>év</b></div><div class="l">szavatosság minden importált autóra</div></div></div></div>
 <section class="wrap" id="autoink">
-  <div class="sec-head"><div><span class="feyebrow">Kínálat</span><h2>Autóink</h2><p>Válogatás aktuális kínálatunkból — összesen 44 elérhető autó.</p></div><a class="btn btn-soft" href="autoink/">Összes eladó autónk →</a></div>
-  <div class="grid"><a class="card" href="auto/bmw-x7-m50d-m-sport-pro-22-b-w/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/70/70599f2f-dba9-4802-b496-5e6ab11a1df8?rule=mo-1600" alt="BMW X7 M50d M Sport Pro &quot;22&quot; B&amp;W" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <div class="autok-head"><div><span class="feyebrow">Kínálat</span><h2>Autóink</h2></div>
+    <div class="autok-tabs" role="tablist">
+      <button class="autok-tab" data-tab="berelheto" type="button">Bérelhető autók</button>
+      <button class="autok-tab on" data-tab="elado" type="button">Eladó autók</button>
+    </div>
+  </div>
+  <div class="autok-panel on" id="panel-elado">
+    <div class="grid"><a class="card" href="auto/bmw-x7-m50d-m-sport-pro-22-b-w/"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/70/70599f2f-dba9-4802-b496-5e6ab11a1df8?rule=mo-1600" alt="BMW X7 M50d M Sport Pro &quot;22&quot; B&amp;W" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="feat">Kiemelt</span></div>
   <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">07/2019</span></div>
   <h3 class="title">BMW X7 M50d M Sport Pro &quot;22&quot; B&amp;W</h3>
-  <div class="specs">139.923 km · Automata · Dízel</div>
+  <div class="specs">139.923 km · 400 LE · Automata · Dízel</div>
   <div class="pricerow" data-eur="59990" data-net="50411"><span class="pcross" data-cross>23 310 000 Ft</span><span class="price" data-main>21 840 000 Ft</span><span class="peur">59 990 €</span><span class="psave" data-save>−1 470 000 Ft</span></div>
-  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x2-xdrive20d-m-sport-pro-20-h-k/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/ca/ca7bae64-676d-42cb-bec5-1499ba6bf63c?rule=mo-1600" alt="BMW X2 xDrive20d M Sport Pro &quot;20&quot; H&amp;K" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x2-xdrive20d-m-sport-pro-20-h-k/"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/ca/ca7bae64-676d-42cb-bec5-1499ba6bf63c?rule=mo-1600" alt="BMW X2 xDrive20d M Sport Pro &quot;20&quot; H&amp;K" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="feat">Kiemelt</span></div>
   <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">11/2025</span></div>
   <h3 class="title">BMW X2 xDrive20d M Sport Pro &quot;20&quot; H&amp;K</h3>
-  <div class="specs">17.900 km · Automata · Dízel</div>
+  <div class="specs">17.900 km · 163 LE · Automata · Dízel</div>
   <div class="pricerow" data-eur="51500" data-net="43277"><span class="pcross" data-cross>20 010 000 Ft</span><span class="price" data-main>18 750 000 Ft</span><span class="peur">51 500 €</span><span class="psave" data-save>−1 260 000 Ft</span></div>
-  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x6-m60i-xdrive-full-option-carbon-m-sitze/" data-marka="BMW" data-kar="SUV" data-uz="Benzin"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/24/24857cd6-33a6-4c12-8302-fd0c2ef1f671?rule=mo-1600" alt="BMW X6 M60i xDrive FULL OPTION*CARBON*M SITZE" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
+  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x6-m60i-xdrive-full-option-carbon-m-sitze/"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/24/24857cd6-33a6-4c12-8302-fd0c2ef1f671?rule=mo-1600" alt="BMW X6 M60i xDrive FULL OPTION*CARBON*M SITZE" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="feat">Kiemelt</span></div>
   <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">06/2023</span></div>
   <h3 class="title">BMW X6 M60i xDrive FULL OPTION*CARBON*M SITZE</h3>
-  <div class="specs">21.000 km · Automata · Benzin</div>
+  <div class="specs">21.000 km · 530 LE · Automata · Benzin</div>
   <div class="pricerow" data-eur="112500" data-net="94537"><span class="pcross" data-cross>43 710 000 Ft</span><span class="price" data-main>40 950 000 Ft</span><span class="peur">112 500 €</span><span class="psave" data-save>−2 760 000 Ft</span></div>
-  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-i5-m60-xdrive-i5m60-xdrive/" data-marka="BMW" data-kar="Limuzin" data-uz="Elektromos"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/ae/aef32313-b261-42ee-a3e1-4a94f06444ad?rule=mo-1600" alt="BMW i5 M60 xDrive i5M60 xDrive" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
-  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">12/2023</span></div>
-  <h3 class="title">BMW i5 M60 xDrive i5M60 xDrive</h3>
-  <div class="specs">33.500 km · Automata · Elektromos</div>
-  <div class="pricerow" data-eur="69900" data-net="58739"><span class="pcross" data-cross>27 160 000 Ft</span><span class="price" data-main>25 450 000 Ft</span><span class="peur">69 900 €</span><span class="psave" data-save>−1 710 000 Ft</span></div>
-  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x5-xdrive30d/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/e4/e498a290-8d7c-41ee-a73b-cd92a66fc13a?rule=mo-1600" alt="BMW X5 xDrive30d" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
-  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">07/2025</span></div>
-  <h3 class="title">BMW X5 xDrive30d</h3>
-  <div class="specs">19.500 km · Automata · Dízel</div>
-  <div class="pricerow" data-eur="78500" data-net="65966"><span class="pcross" data-cross>30 500 000 Ft</span><span class="price" data-main>28 580 000 Ft</span><span class="peur">78 500 €</span><span class="psave" data-save>−1 920 000 Ft</span></div>
-  <span class="cbtn">Részletek</span></div></a><a class="card" href="auto/bmw-x6-xdrive30d-m-sport-pro/" data-marka="BMW" data-kar="SUV" data-uz="Dízel"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/fa/fad5718d-0d20-44a5-a841-2a08312a89b0?rule=mo-1600" alt="BMW X6 xDrive30d M Sport Pro" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="own">CarAdvance saját</span></div>
-  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">06/2025</span></div>
-  <h3 class="title">BMW X6 xDrive30d M Sport Pro</h3>
-  <div class="specs">19.623 km · Automata · Dízel</div>
-  <div class="pricerow" data-eur="81500" data-net="68487"><span class="pcross" data-cross>31 670 000 Ft</span><span class="price" data-main>29 670 000 Ft</span><span class="peur">81 500 €</span><span class="psave" data-save>−2 000 000 Ft</span></div>
   <span class="cbtn">Részletek</span></div></a></div>
+    <div class="autok-more"><a class="btn btn-soft" href="autoink/">Összes eladó autónk →</a></div>
+  </div>
+  <div class="autok-panel" id="panel-berelheto">
+    <div class="grid"></div>
+    <div class="autok-more"><a class="btn btn-soft" href="autoink/">Összes bérelhető autónk →</a></div>
+  </div>
+  <div class="rate-note">A forint árak élő árfolyammal számolódnak, óránként frissülnek (1 € = <span id="ratev">364</span> Ft).</div>
 </section>
 <div class="cah">
 <section class="block" id="szolgaltatasok"><div class="wrap">
@@ -288,6 +295,7 @@ img{max-width:100%}
 </div></section>
 </div>
 <script>(function(){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});document.querySelectorAll('.cah .reveal').forEach(function(el){io.observe(el)});})();</script>
+<script>document.querySelectorAll('.autok-tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.autok-tab').forEach(function(x){x.classList.remove('on')});t.classList.add('on');document.querySelectorAll('.autok-panel').forEach(function(p){p.classList.remove('on')});var el=document.getElementById('panel-'+t.dataset.tab);if(el)el.classList.add('on');});});</script>
 <footer class="footer"><div class="footer-in">
   <div><img class="brand" src="caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133">
     <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
@@ -315,7 +323,7 @@ function up(e){var eur=+e.getAttribute('data-eur')||0,net=+e.getAttribute('data-
  var sE=e.querySelector('[data-save]'); if(sE&&save>0)sE.textContent='−'+f(save);}
 function all(){document.querySelectorAll('[data-eur]').forEach(up);}
 fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
- .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();}}).catch(function(){});
+ .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();var rv=document.getElementById('ratev');if(rv)rv.textContent=R;}}).catch(function(){});
 })();
 </script>
 </body></html>

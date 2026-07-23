@@ -122,6 +122,15 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 .psave{background:#E7F8EE;color:#1DA851;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
 .cbtn{margin-top:14px;display:block;text-align:center;background:var(--soft);color:var(--ink);font-weight:700;padding:12px;border-radius:999px}
 .card:hover .cbtn{background:var(--navy);color:#fff}
+.feat{position:absolute;top:12px;right:12px;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;z-index:2}
+.autok-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:8px 0 22px}
+.autok-tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px}
+.autok-tab{border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;color:var(--ink);padding:10px 20px;border-radius:999px;cursor:pointer;transition:.2s}
+.autok-tab.on{background:var(--navy);color:#fff}
+.autok-tab:not(.on):hover{background:#F0F3F8}
+.autok-panel{display:none}.autok-panel.on{display:block}
+.autok-more{text-align:center;margin-top:24px}
+.rate-note{margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center}
 </style>
 <meta property="og:type" content="product"><meta property="og:image" content="https://img.classistatic.de/api/v1/mo-prod/images/f3/f37723ab-a215-4a3c-bccd-68523947b03c?rule=mo-1600">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Car","name":"Volkswagen Golf GTI Clubsport S /ABT 370PS/19\"/1of400","brand":{"@type":"Brand","name":"Volkswagen"},"image":"https://img.classistatic.de/api/v1/mo-prod/images/f3/f37723ab-a215-4a3c-bccd-68523947b03c?rule=mo-1600","description":"A(z) Volkswagen Golf GTI Clubsport S /ABT 370PS/19\"/1of400 01/2017 évjáratú, 56.800 km futott, benzin üzemű Kompakt. 370 LE, Automata. Magyar áfás ár garanciával, CarAdvance import.","fuelType":"Benzin","vehicleTransmission":"Automata","mileageFromOdometer":{"@type":"QuantitativeValue","value":56.8,"unitCode":"KMT"},"vehicleModelDate":"01/2017","itemCondition":"https://schema.org/UsedCondition","offers":{"@type":"Offer","price":12710000,"priceCurrency":"HUF","availability":"https://schema.org/InStock","url":"https://caradvance.hu/auto/volkswagen-golf-gti-clubsport-s-abt-370ps-19-1of400/"}}</script>
@@ -211,7 +220,7 @@ function up(e){var eur=+e.getAttribute('data-eur')||0,net=+e.getAttribute('data-
  var sE=e.querySelector('[data-save]'); if(sE&&save>0)sE.textContent='−'+f(save);}
 function all(){document.querySelectorAll('[data-eur]').forEach(up);}
 fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
- .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();}}).catch(function(){});
+ .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();var rv=document.getElementById('ratev');if(rv)rv.textContent=R;}}).catch(function(){});
 })();
 </script>
 </body></html>
