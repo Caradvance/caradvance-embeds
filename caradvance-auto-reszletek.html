@@ -1,4 +1,5 @@
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;--soft:#EEF1F6;--radius:18px}
@@ -254,9 +255,9 @@ function getParam(name){
 function driveImg(u){u=String(u||'').trim();if(!u)return'';var m=u.match(/\/d\/([-\w]{20,})/)||u.match(/[?&]id=([-\w]{20,})/);if(m)return'https://lh3.googleusercontent.com/d/'+m[1]+'=w1600';if(/^[-\w]{25,}$/.test(u))return'https://lh3.googleusercontent.com/d/'+u+'=w1600';return u;}
 let PDFDATA=null;
 const SHEET_CSV_URL="https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv";
-const DETAIL_URL="/auto";   // ennek az oldalnak a Framer útvonala (a kapcsolódó autók ide visznek)
-const HOME_URL="/";               // Főoldal útvonala (morzsamenü)
-const CATALOG_URL="/all-inventory"; // Autóink / katalógus útvonala (morzsamenü)
+const DETAIL_URL="auto.html";   // ennek az oldalnak a Framer útvonala (a kapcsolódó autók ide visznek)
+const HOME_URL="index.html";               // Főoldal útvonala (morzsamenü)
+const CATALOG_URL="autoink.html"; // Autóink / katalógus útvonala (morzsamenü)
 /* ÉRTÉKESÍTŐK — a Sheet "ertekesito" oszlopába írd a nevet (pl. "Tóth Károly").
    Ha üres vagy ismeretlen, az alapértelmezett (Csadi Ferenc) jelenik meg.
    Fotó: töltsd fel a Drive-ra, oszd meg (bárki a linkkel), és tedd ide a linket az img mezőbe. */

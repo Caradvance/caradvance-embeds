@@ -1,4 +1,5 @@
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--navy-3:#26272C;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E3E9F2;--bg:#F4F7FB;--radius:18px}
@@ -75,10 +76,10 @@ h2{font-size:clamp(30px,4vw,44px);font-weight:800;letter-spacing:-.02em;margin:8
    Eladó mód: minden aktív sor. Bérelhető mód: aktív sorok, ahol van berlet_eur. */
 const SHEET_CSV_URL="https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv";
 /* === FRAMER OLDAL-ÚTVONALAK — állítsd be a saját oldalaid útvonalára === */
-const SALE_DETAIL="/auto";            // az az oldal, ahol a részletező embed van
-const SALE_ALL="/all-inventory";      // az az oldal, ahol a katalógus embed van
-const RENT_DETAIL="/berles-auto";     // bérlet termékoldal (később)
-const RENT_ALL="/berelheto-autok";    // összes bérelhető (később)
+const SALE_DETAIL="auto.html";            // az az oldal, ahol a részletező embed van
+const SALE_ALL="autoink.html";      // az az oldal, ahol a katalógus embed van
+const RENT_DETAIL="auto.html";     // bérlet termékoldal (később)
+const RENT_ALL="autoink.html";    // összes bérelhető (később)
 let RATE_HUF=402; try{const _c=JSON.parse(localStorage.getItem('caRateHUF')||'null');if(_c&&_c.v>0)RATE_HUF=_c.v;}catch(e){}  // EUR->HUF (megosztott cache), óránként frissül
 async function fetchRate(){
   const apis=[

@@ -1,4 +1,5 @@
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<base target="_top"><meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;--radius:16px}
@@ -67,7 +68,7 @@ select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:1
    Ha CORS miatt nem töltene, a Sheetben: Fájl -> Megosztás -> Publikálás a weben -> CSV,
    és cseréld a SHEET_CSV_URL-t az így kapott linkre. */
 const SHEET_CSV_URL="https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv";
-const DETAIL_URL="/auto";   // FRAMER oldal-útvonal a részletező oldalhoz (állítsd a sajátodra)
+const DETAIL_URL="auto.html";   // FRAMER oldal-útvonal a részletező oldalhoz (állítsd a sajátodra)
 let RATE_HUF=402; try{const _c=JSON.parse(localStorage.getItem('caRateHUF')||'null');if(_c&&_c.v>0)RATE_HUF=_c.v;}catch(e){}  // EUR->HUF (megosztott cache), óránként frissül
 async function fetchRate(){
   const apis=[

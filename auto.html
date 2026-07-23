@@ -1,10 +1,12 @@
-<meta charset="UTF-8">
-<base target="_top">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!doctype html>
+<html lang="hu"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autó adatlap — CarAdvance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+html,body{margin:0;padding:0;background:#F4F7FB;overflow-x:hidden}
+iframe.sec{display:block;width:100%;border:0;overflow:hidden}
 *{box-sizing:border-box}body{margin:0}
 :root{--navy:#0B0B0D;--red:#E2001A;--line:#E6EAF1;--ink:#141519;--muted:#5A6B82}
 .ca-navwrap{position:sticky;top:12px;z-index:1000;display:flex;justify-content:center;padding:28px 14px 0;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
@@ -56,75 +58,7 @@
 .m-langopt:hover{background:#F4F7FB;color:var(--red)}
 @media(max-width:1024px){.menu{display:none}.kapcsolat{display:none}.lang{display:none}.burger{display:flex}.ca-nav{gap:10px;padding:8px 10px}.navright{margin-left:auto}}
 
-
-  :root{
-    --font:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
-    --navy:#0B0B0D; --red:#E2001A; --red-dark:#B80015;
-  }
-  *{box-sizing:border-box} html,body{margin:0;padding:0}
-  body{background:#F4F5F7}
-  .hero{
-    position:relative; font-family:var(--font); color:#fff;
-    min-height:600px; display:flex; align-items:center; justify-content:center;
-    text-align:center; padding:96px 24px; overflow:hidden;
-    background:linear-gradient(180deg,#17181C 0%, var(--navy) 62%, #060607 100%);
-    margin:16px; border-radius:32px;
-  }
-  @media(max-width:640px){ .hero{ margin:8px; border-radius:22px } }
-  /* YouTube háttérvideó */
-  .video-bg{position:absolute; inset:0; z-index:0; overflow:hidden; background:#0B0B0D}
-  .video-bg iframe{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:100vw; height:56.25vw;            /* 16:9 a szélesség alapján */
-    min-height:100%; min-width:177.78vh;     /* 16:9 a magasság alapján -> teljes lefedés */
-    pointer-events:none; border:0;
-  }
-  /* Sötét fátyol a videó felett, hogy a szöveg olvasható legyen */
-  .overlay{position:absolute; inset:0; z-index:1; background:
-    radial-gradient(1100px 460px at 50% -10%, rgba(226,0,26,.18), transparent 60%),
-    linear-gradient(180deg, rgba(8,8,10,.40) 0%, rgba(8,8,10,.46) 45%, rgba(8,8,10,.68) 100%);}
-  .inner{position:relative; z-index:2; max-width:1120px; margin:0 auto}
-  .brand-logo{height:60px; width:auto; display:block; margin:0 auto 26px; filter:drop-shadow(0 4px 18px rgba(0,0,0,.45))}
-  @media(max-width:640px){.brand-logo{height:46px;margin-bottom:20px}}
-  h1{
-    font-size:clamp(34px,5vw,56px); line-height:1.08; font-weight:800;
-    letter-spacing:-.025em; margin:0 0 16px; white-space:nowrap; text-shadow:0 2px 24px rgba(0,0,0,.35);
-  }
-  h1 .accent{color:var(--red); filter:brightness(1.35)}
-  @media(max-width:880px){ h1{white-space:normal; font-size:clamp(30px,7vw,40px)} }
-  .sub{
-    font-size:clamp(16px,1.7vw,19px); line-height:1.5; color:#E7EAF0;
-    max-width:560px; margin:0 auto 32px; text-shadow:0 1px 12px rgba(0,0,0,.4);
-  }
-  .cta-row{display:flex; gap:18px; justify-content:center; flex-wrap:wrap; align-items:center}
-  .btn{
-    display:inline-flex; align-items:center; gap:8px; font-family:inherit;
-    font-weight:700; font-size:16px; padding:15px 32px; border-radius:999px;
-    text-decoration:none; cursor:pointer; border:0; transition:background .15s;
-  }
-  .btn-primary{background:var(--red); color:#fff; box-shadow:0 10px 30px rgba(226,0,26,.4)}
-  .btn-primary:hover{background:var(--red-dark)}
-  .btn-white{background:#fff; color:var(--navy)}
-  .btn-white:hover{background:#ECEEF2}
-  .scrolldown{position:absolute; left:50%; bottom:24px; transform:translateX(-50%); z-index:3;
-    display:flex; flex-direction:column; align-items:center; gap:4px; color:rgba(255,255,255,.8);
-    background:none; border:0; cursor:pointer; font:inherit; letter-spacing:.04em; font-size:11px;
-    text-transform:uppercase; animation:caScrollBob 1.9s ease-in-out infinite; transition:color .15s}
-  .scrolldown:hover{color:#fff}
-  .scrolldown svg{width:26px; height:26px}
-  @keyframes caScrollBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
-  @media(max-width:640px){ .scrolldown{bottom:14px; font-size:0} .scrolldown svg{width:24px;height:24px} }
-
-
-/* ===== combined header overrides ===== */
-html,body{margin:0;background:#F4F5F7}
-.hero{margin:0;border-radius:0;min-height:660px}
-video.video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;background:#0B0B0D}
-/* nav overlays the top of the hero */
-.ca-navwrap{position:absolute;top:0;left:0;right:0;z-index:1000;padding:24px 14px 0}
-
-</style>
-<div class="ca-header" style="position:relative">
+</style></head><body>
 
 <div class="ca-navwrap">
   <nav class="ca-nav" aria-label="Főmenü">
@@ -142,27 +76,8 @@ video.video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover
   <div class="mobilepanel"><div class="m-acc"><button class="m-accbtn" type="button">Prémium autóbérlés<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Bérelhető autóink</a><a href="#">Rövid távú bérlés</a><a href="#">Hosszú távú bérlés</a><a href="#">Flotta kezelés</a><a href="#">Feltételek</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Megvásárolható autóink<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Autóink</a><a href="#">Új autóink – egyedi rendelés</a><a href="#">Finanszírozás – lízing</a><a href="#">Előnyök</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Bizományos értékesítés<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Autóink</a><a href="#">Eladom az autómat</a><a href="#">Jótékonyság</a><a href="#">Értékesítési folyamat</a><a href="#">Gyakori kérdések</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Import<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Autó rendelés</a><a href="#">Beszerzési folyamat</a><a href="#">Előnyök</a><a href="#">Referenciák</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Rólunk<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Miért mi?</a><a href="#">Caradvance Garancia</a><a href="#">Caradvance Hungary</a><a href="#">Referenciák</a><a href="#">Partnereink</a><a href="#">Media</a><a href="#">Blog</a></div></div><a class="m-kapcsolat" href="#">Kapcsolat</a><div class="m-langtitle">Nyelv</div><div class="m-langs"><a class="m-langopt" href="/"><span class="fw" role="img" aria-label="Magyar" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span><span>Magyar</span></a><a class="m-langopt" href="/en"><span class="fw" role="img" aria-label="English" style="background-image:url(https://flagcdn.com/w80/gb.png)"></span><span>English</span></a><a class="m-langopt" href="/de"><span class="fw" role="img" aria-label="Deutsch" style="background-image:url(https://flagcdn.com/w80/de.png)"></span><span>Deutsch</span></a><a class="m-langopt" href="/fr"><span class="fw" role="img" aria-label="Français" style="background-image:url(https://flagcdn.com/w80/fr.png)"></span><span>Français</span></a><a class="m-langopt" href="/sk"><span class="fw" role="img" aria-label="Slovenčina" style="background-image:url(https://flagcdn.com/w80/sk.png)"></span><span>Slovenčina</span></a><a class="m-langopt" href="/cs"><span class="fw" role="img" aria-label="Čeština" style="background-image:url(https://flagcdn.com/w80/cz.png)"></span><span>Čeština</span></a><a class="m-langopt" href="/pl"><span class="fw" role="img" aria-label="Polski" style="background-image:url(https://flagcdn.com/w80/pl.png)"></span><span>Polski</span></a><a class="m-langopt" href="/uk"><span class="fw" role="img" aria-label="Українська" style="background-image:url(https://flagcdn.com/w80/ua.png)"></span><span>Українська</span></a><a class="m-langopt" href="/zh"><span class="fw" role="img" aria-label="中文" style="background-image:url(https://flagcdn.com/w80/cn.png)"></span><span>中文</span></a></div></div>
 </div>
 
-
-
-<section class="hero">
-  <video class="video-bg" autoplay muted loop playsinline preload="auto" poster="https://caradvance.github.io/caradvance-embeds/caradvance-hero-poster.jpg"><source src="https://caradvance.github.io/caradvance-embeds/caradvance-hero.mp4" type="video/mp4"></video>
-  <div class="overlay"></div>
-  <div class="inner">
-    <img class="brand-logo" src="data:image/webp;base64,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" alt="caradvance — the automotive people">
-    <h1>Prémium autók Németországból</h1>
-    <p class="sub">Prémium autóbérlés és eladás, autóimport Németországból — a te autódat pedig bizományban eladjuk.</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="#kapcsolat">Kérj ajánlatot</a>
-      <a class="btn btn-white" href="#elado-autod">Add el az autód</a>
-    </div>
-  </div>
-  <button class="scrolldown" aria-label="Görgess lejjebb" onclick="(window.parent!==window?window.parent:window).scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">
-    Görgess
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-  </button>
-</section>
-
-</div>
+<iframe class="sec" id="det" title="Adatlap" scrolling="no" style="height:1600px"></iframe>
+<script>document.getElementById("det").src="caradvance-auto-reszletek.html"+(location.search||"");</script>
 <script>
 
 (function(){
@@ -196,3 +111,12 @@ video.video-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover
 })();
 
 </script>
+<script>
+
+function fit(f){try{var d=f.contentDocument;if(d&&d.documentElement){var h=Math.max(d.documentElement.scrollHeight,d.body?d.body.scrollHeight:0);if(h>0)f.style.height=h+'px';}}catch(e){}}
+function fitAll(){document.querySelectorAll('iframe.sec').forEach(fit);}
+document.querySelectorAll('iframe.sec').forEach(function(f){f.addEventListener('load',function(){fit(f);[200,600,1200,2500].forEach(function(t){setTimeout(function(){fit(f);},t);});});});
+addEventListener('resize',fitAll);setInterval(fitAll,2000);
+
+</script>
+</body></html>
