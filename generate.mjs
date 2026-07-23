@@ -125,7 +125,7 @@ const FONT =
   '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">';
 
 const BASE_CSS = `
-:root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;--soft:#EEF1F6;--radius:16px}
+:root{--font:'Plus Jakarta Sans',system-ui,sans-serif;--navy:#0B0B0D;--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;--soft:#EEF1F6;--radius:16px;--navh:80px}
 *{box-sizing:border-box}html,body{margin:0;width:100%;max-width:100vw;overflow-x:hidden}
 body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5}
 a{color:inherit}
@@ -136,17 +136,38 @@ img{max-width:100%}
 .btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(.94)}
 .btn-soft{background:var(--soft);color:var(--ink)}.btn-soft:hover{background:var(--navy);color:#fff}
 /* header/nav */
-.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line)}
-.nav-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 20px}
-.nav .logo{display:flex;align-items:center;text-decoration:none}
-.nav .logo img{height:34px;width:auto;display:block}
-.nav .menu{display:flex;gap:22px;margin-left:14px;flex-wrap:wrap}
-.nav .menu a{text-decoration:none;color:var(--ink);font-weight:600;font-size:14.5px;opacity:.9}
-.nav .menu a:hover{color:var(--red)}
-.nav .spacer{flex:1}
-.nav .cta{background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px}
-.nav .lang{margin-left:6px;font-size:13px;font-weight:700;color:var(--muted)}
-@media(max-width:960px){.nav .menu{display:none}}
+.ca-navwrap{position:sticky;top:0;z-index:1000;display:flex;justify-content:center;padding:20px 14px 0}
+.ca-nav{position:relative;width:100%;max-width:1240px;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 10px 8px 20px;box-shadow:0 14px 40px rgba(8,8,10,.20)}
+.ca-nav .brand{display:flex;align-items:center;flex-shrink:0;text-decoration:none}.ca-nav .brand img{height:30px;width:auto;display:block}
+.ca-nav .menu{list-style:none;display:flex;align-items:center;gap:6px;margin:0;padding:0;flex:1;justify-content:center}
+.navitem{position:relative}
+.navlink{border:0;background:transparent;font:inherit;font-weight:700;font-size:15px;color:var(--ink);padding:12px 15px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:color .15s;text-decoration:none}
+.navlink .chev{font-size:13px;color:var(--muted);transition:transform .15s}
+.navitem:hover .navlink{color:var(--red)}.navitem:hover .navlink .chev{transform:rotate(180deg);color:var(--red)}
+.dropdown{position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(4px);min-width:236px;padding-top:12px;opacity:0;visibility:hidden;transition:opacity .16s,transform .16s;z-index:1001}
+.navitem:hover .dropdown{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.dd-inner{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 50px rgba(8,8,10,.18);padding:8px;display:flex;flex-direction:column}
+.ddi{display:block;padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600;font-size:14px;white-space:nowrap;transition:.12s}
+.ddi:hover{background:#F4F7FB;color:var(--red)}
+.navright{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.kapcsolat{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 24px;border-radius:999px;white-space:nowrap;transition:transform .15s,box-shadow .15s,background .15s;box-shadow:0 6px 18px rgba(11,11,13,.22)}
+.kapcsolat::after{content:"→";font-size:15px;transition:transform .15s}
+.kapcsolat:hover{background:var(--red);box-shadow:0 8px 22px rgba(226,0,26,.4);transform:translateY(-1px)}.kapcsolat:hover::after{transform:translateX(3px)}
+.navflag{width:30px;height:30px;border-radius:50%;flex:0 0 auto;background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(11,11,13,.12),0 2px 6px rgba(0,0,0,.15)}
+.burger{display:none;flex-direction:column;justify-content:center;gap:4px;width:44px;height:44px;border:1px solid var(--line);background:#F4F7FB;border-radius:12px;cursor:pointer;padding:0}
+.burger span{display:block;width:20px;height:2px;background:var(--ink);margin:0 auto;border-radius:2px;transition:.2s}
+.ca-navwrap.open .burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.ca-navwrap.open .burger span:nth-child(2){opacity:0}
+.ca-navwrap.open .burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.mobilepanel{display:none;position:absolute;top:calc(100% + 8px);left:14px;right:14px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px rgba(8,8,10,.24);padding:10px;max-height:76vh;overflow:auto;z-index:1001}
+.ca-navwrap.open .mobilepanel{display:block}
+.m-acc{border-bottom:1px solid var(--line)}
+.m-accbtn{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;font:inherit;font-weight:700;font-size:16px;color:var(--ink);padding:15px 12px;cursor:pointer}
+.m-plus{font-size:20px;color:var(--muted);font-weight:400}.m-acc.open .m-plus{transform:rotate(45deg)}
+.m-sub{display:none;flex-direction:column;padding:0 12px 10px}.m-acc.open .m-sub{display:flex}
+.m-sub a{padding:9px 8px;text-decoration:none;color:var(--muted);font-weight:600;font-size:14.5px}.m-sub a:hover{color:var(--red)}
+.m-kapcsolat{display:block;text-align:center;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px;border-radius:999px;margin:12px 6px 6px}
+@media(max-width:1024px){.ca-nav .menu{display:none}.kapcsolat{display:none}.navflag{display:none}.burger{display:flex}.ca-nav{gap:10px;padding:8px 10px}.navright{margin-left:auto}}
 /* footer */
 .footer{background:var(--navy);color:#cfd6e2;margin-top:56px}
 .footer-in{max-width:1160px;margin:0 auto;padding:40px 20px 28px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}
@@ -159,20 +180,29 @@ img{max-width:100%}
 `;
 
 function navHtml(rel) {
-  const M = [
-    ["Prémium autóbérlés", rel + "#berles"],
-    ["Megvásárolható autóink", rel + "autoink/"],
-    ["Bizományos értékesítés", rel + "#bizomany"],
-    ["Import", rel + "#import"],
-    ["Rólunk", rel + "#rolunk"],
+  const cat = rel + "autoink/";
+  const items = [
+    ["Prémium autóbérlés", [["Bérelhető autóink", "#"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
+    ["Megvásárolható autóink", [["Autóink", cat], ["Új autóink – egyedi rendelés", "#"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
+    ["Bizományos értékesítés", [["Autóink", cat], ["Eladom az autómat", "#"], ["Jótékonyság", "#"], ["Értékesítési folyamat", "#"], ["Gyakori kérdések", "#"]]],
+    ["Import", [["Autó rendelés", "#"], ["Beszerzési folyamat", "#"], ["Előnyök", "#"], ["Referenciák", "#"]]],
+    ["Rólunk", [["Miért mi?", "#"], ["Caradvance Garancia", "#"], ["Caradvance Hungary", "#"], ["Referenciák", "#"], ["Partnereink", "#"], ["Media", "#"], ["Blog", "#"]]],
   ];
-  return `<header class="nav"><div class="nav-in">
-  <a class="logo" href="${rel}"><img src="${rel}caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
-  <nav class="menu">${M.map(([t, h]) => `<a href="${attr(h)}">${esc(t)}</a>`).join("")}</nav>
-  <span class="spacer"></span>
-  <a class="cta" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a>
-  <span class="lang">HU</span>
-</div></header>`;
+  const desktop = items.map(([label, subs]) =>
+    `<li class="navitem"><button class="navlink" type="button">${esc(label)}<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner">${subs.map(([t, h]) => `<a class="ddi" href="${attr(h)}">${esc(t)}</a>`).join("")}</div></div></li>`).join("");
+  const mobile = items.map(([label, subs]) =>
+    `<div class="m-acc"><button class="m-accbtn" type="button">${esc(label)}<span class="m-plus">+</span></button><div class="m-sub">${subs.map(([t, h]) => `<a href="${attr(h)}">${esc(t)}</a>`).join("")}</div></div>`).join("");
+  return `<div class="ca-navwrap"><nav class="ca-nav" aria-label="Főmenü">
+  <a class="brand" href="${rel}"><img src="${rel}caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
+  <ul class="menu">${desktop}</ul>
+  <div class="navright">
+    <a class="kapcsolat" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a>
+    <span class="navflag" role="img" aria-label="Magyar" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span>
+    <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobilepanel">${mobile}<a class="m-kapcsolat" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a></div>
+</div>`;
 }
 function footerHtml(rel) {
   return `<footer class="footer"><div class="footer-in">
@@ -204,6 +234,12 @@ fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
 })();
 </script>`;
 
+const NAV_SCRIPT = `<script>
+(function(){var w=document.querySelector('.ca-navwrap');if(!w)return;
+var b=w.querySelector('.burger');if(b)b.addEventListener('click',function(){w.classList.toggle('open');});
+w.querySelectorAll('.m-accbtn').forEach(function(x){x.addEventListener('click',function(){x.parentElement.classList.toggle('open');});});})();
+</script>`;
+
 function page({ title, desc, canonical, rel, css, body, head = "", bodyClass = "" }) {
   return `<!doctype html><html lang="hu"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -221,6 +257,7 @@ ${head}
 ${navHtml(rel)}
 ${body}
 ${footerHtml(rel)}
+${NAV_SCRIPT}
 ${FX_SCRIPT}
 </body></html>`;
 }
@@ -273,7 +310,7 @@ function renderHome(cars, rate) {
   const active = cars.filter(isActive);
   const featured = (active.filter(isOwn).length ? active.filter(isOwn) : active).slice(0, 6);
   const css = `
-.hero{position:relative;min-height:560px;display:flex;align-items:center;color:#fff;overflow:hidden}
+.hero{position:relative;min-height:560px;display:flex;align-items:center;color:#fff;overflow:hidden;margin-top:calc(-1 * var(--navh))}
 .hero video,.hero .heroimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hero .veil{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,6,9,.82),rgba(6,6,9,.35))}
 .hero .hin{position:relative;max-width:1160px;margin:0 auto;padding:60px 20px;width:100%}
