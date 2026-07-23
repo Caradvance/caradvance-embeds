@@ -24,7 +24,7 @@ const SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv";
 // Absolute base used for <link rel=canonical>, OG tags and sitemap.
 // After you point caradvance.hu at GitHub Pages, change this to "https://caradvance.hu".
-const SITE_BASE = (process.env.SITE_BASE || "https://caradvance.github.io/caradvance-embeds").replace(/\/$/, "");
+const SITE_BASE = (process.env.SITE_BASE || "https://caradvance.hu").replace(/\/$/, "");
 const OUT = process.env.OUT || "build";
 const BRAND = "CarAdvance";
 const CONTACT_EMAIL = "info@caradvance.hu";
