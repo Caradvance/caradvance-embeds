@@ -306,6 +306,151 @@ function carCard(c, rate, rel) {
 }
 
 // --------------------------------------------------------------- HOME
+const YT_SVG = '<svg viewBox="0 0 28 20" width="24" aria-label="YouTube"><rect width="28" height="20" rx="5" fill="#FF0000"/><path d="M11 6l7 4-7 4z" fill="#fff"/></svg>';
+
+const CONTENT_CSS = `
+.cah{--navy-2:#1A1B1F;--navy-3:#26272C;--red-dark:#B80015;--card:#fff;--cr:22px;--shadow:0 14px 40px rgba(8,8,10,.10)}
+.cah .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.cah .block{padding:56px 0}
+.cah .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.cah .eyebrow::before{content:"";width:26px;height:3px;background:var(--red);border-radius:2px}
+.cah h2.sec-title{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.02em;color:var(--navy);margin:14px 0 12px}
+.cah .card{background:var(--card);border:1px solid var(--line);border-radius:var(--cr);box-shadow:var(--shadow)}
+.cah .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.cah .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.cah .reveal{opacity:1;transform:none;transition:none}}
+.cah .chip{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;text-decoration:none;transition:transform .18s,box-shadow .18s}
+.cah .chip:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.cah .chip.cta{background:var(--red);color:#fff;box-shadow:0 12px 28px rgba(226,0,26,.38)}
+.cah .chip.cta:hover{background:var(--red-dark)}
+.cah .svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:38px}
+.cah .svc{padding:34px 30px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.cah .svc-media{margin:-34px -30px 24px;height:185px;background:linear-gradient(135deg,var(--navy),var(--navy-3));display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:calc(var(--cr) - 1px) calc(var(--cr) - 1px) 0 0}
+.cah .svc-media img{width:100%;height:100%;object-fit:cover;display:block}
+.cah .svc .tag{align-self:flex-start;font-size:12.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red);background:rgba(226,0,26,.09);padding:6px 12px;border-radius:999px;margin-bottom:16px}
+.cah .svc h3{font-size:23px;font-weight:800;color:var(--navy);letter-spacing:-.01em;margin-bottom:10px}
+.cah .svc p{color:var(--muted);font-size:15.5px;margin-bottom:18px}
+.cah .svc ul{list-style:none;margin:0 0 24px;padding:0}
+.cah .svc ul li{position:relative;padding-left:28px;font-size:14.5px;color:var(--ink);font-weight:600;margin-bottom:9px}
+.cah .svc ul li::before{content:"";position:absolute;left:0;top:4px;width:17px;height:17px;border-radius:50%;background:var(--red);-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>') center/100% no-repeat;mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>') center/100% no-repeat}
+.cah .svc .btn{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;font-weight:700;font-size:14.5px;padding:12px 22px;border-radius:999px;text-decoration:none;transition:background .18s,transform .18s}
+.cah .svc .btn:hover{background:var(--navy-3);transform:translateY(-2px)}
+.cah .svc .btn-row{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px}
+.cah .svc .btn-row .btn{margin-top:0;font-size:12.5px;padding:10px 13px;white-space:nowrap}
+.cah .svc .btn-outline{background:#fff;color:var(--navy);border:2px solid var(--navy)}
+.cah .svc .btn-outline:hover{background:var(--navy);color:#fff}
+.cah .svc.charity-accent{border-top:4px solid var(--red)}
+.cah .platforms{margin:2px 0 24px}
+.cah .plat-lbl{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.cah .plat-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cah .plat{display:inline-flex;align-items:center;border-radius:10px;padding:8px 14px;border:1px solid var(--line);background:#fff}
+.cah .plat-img{height:22px;width:auto;display:block}
+.cah .plat-mobile{background:#340050;border-color:#340050;padding:6px 12px}.cah .plat-img-mb{height:24px}
+.cah .plat-as24{background:#F4F200;border-color:#F4F200;padding:6px 12px}.cah .plat-img-as{height:26px}
+.cah .plat-huhu{background:#1A1A1A;border-color:#1A1A1A;padding:6px 12px}.cah .plat-img-hu{height:22px}
+.cah .plat-heycar{background:#072962;border-color:#072962;padding:6px 12px}.cah .plat-img-hc{height:26px}
+.cah .soc{width:34px;height:34px;border-radius:9px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(8,8,10,.12)}
+.cah .soc img{width:100%;height:100%;object-fit:cover;display:block}
+.cah .soc-yt{background:#fff;border:1px solid var(--line)}
+.cah .charity{background:linear-gradient(160deg,var(--navy),var(--navy-2));color:#fff;border:none;padding:44px 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;position:relative;overflow:hidden;margin-top:8px}
+.cah .charity::before{content:"♥";position:absolute;right:-30px;bottom:-70px;font-size:280px;color:rgba(226,0,26,.14);line-height:1}
+.cah .charity h3{font-size:clamp(22px,3vw,28px);font-weight:800;letter-spacing:-.01em;margin:12px 0 12px}
+.cah .charity p{color:rgba(255,255,255,.84);font-size:15.5px}
+.cah .charity .eyebrow{color:#fff}
+.cah .charity-btn{margin-top:22px;position:relative}
+.cah .charity-btn-mobile{display:none}
+.cah .org-list{display:flex;flex-wrap:wrap;gap:10px;position:relative}
+.cah .org-logo{background:#fff;border-radius:14px;padding:10px 14px;min-height:74px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+.cah .org-logo img{height:54px;max-width:150px;width:auto;object-fit:contain;display:block}
+.cah .org-sos{background:#009DE0}
+.cah .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:38px}
+.cah .why{padding:26px 24px;display:flex;gap:16px;align-items:flex-start}
+.cah .why .n{flex:0 0 auto;width:42px;height:42px;border-radius:12px;background:var(--navy);color:#fff;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center}
+.cah .why h3{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:5px}
+.cah .why p{font-size:14px;color:var(--muted)}
+.cah .why-special{background:linear-gradient(140deg,var(--red),var(--red-dark));border:none;position:relative;overflow:hidden;box-shadow:0 18px 44px rgba(226,0,26,.35)}
+.cah .why-special::after{content:"♥";position:absolute;right:-14px;bottom:-34px;font-size:110px;color:rgba(255,255,255,.14);line-height:1}
+.cah .why-special .n{background:#fff;color:var(--red);font-size:19px}
+.cah .why-special h3{color:#fff}.cah .why-special p{color:rgba(255,255,255,.88)}
+@media(max-width:960px){.cah .svc-grid{grid-template-columns:1fr}.cah .charity{grid-template-columns:1fr;padding:34px 26px}.cah .why-grid{grid-template-columns:1fr;max-width:560px;margin-left:auto;margin-right:auto}.cah .charity-btn:not(.charity-btn-mobile){display:none}.cah .charity-btn-mobile{display:inline-flex}}
+`;
+
+function svcCard({ img, alt, tag, title, lead, items, extra, accent }) {
+  return `<div class="card svc${accent ? " charity-accent" : ""} reveal">
+  <div class="svc-media"><img src="${attr(img)}" alt="${attr(alt)}" loading="lazy"></div>
+  <span class="tag">${esc(tag)}</span><h3>${esc(title)}</h3>
+  <p>${lead}</p>
+  <ul>${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+  ${extra}
+</div>`;
+}
+
+function contentSections(rel) {
+  const cat = rel + "autoink/";
+  const svc = [
+    svcCard({ img: rel + "piros-bmw-x6-m-premium-autoberles.webp", alt: "Piros BMW X6 M — prémium autóbérlés", tag: "Prémium autóbérlés", title: "Prémium autóbérlés",
+      lead: "<strong>Miért vásárolnál, ha bérelhetsz?</strong> Élvezd a prémium autózás minden előnyét vásárlás nélkül — rugalmas, hosszú távú bérléssel, már fél évtől.",
+      items: ["Válogatott prémium modellek", "Rugalmas futamidő — minimum 6 hónaptól", "Átadás-átvétel egyeztetett helyszínen"],
+      extra: `<div class="btn-row"><a class="btn" href="${cat}">Autólista →</a><a class="btn btn-outline" href="#">Rövidtávú bérlés</a><a class="btn btn-outline" href="#">Hosszú távú bérlés</a></div>` }),
+    svcCard({ img: rel + "bmw-m3-touring-premium-auto-eladas.webp", alt: "BMW M3 Touring — prémium autó eladás", tag: "Prémium autó eladás", title: "Prémium autó eladás",
+      lead: "<strong>Miért kockáztatnál, ha biztosra is mehetsz?</strong> Kínálatunkban gondosan válogatott, bevizsgált prémium autók — egyenesen Németországból.",
+      items: ["Leinformált, bevizsgált prémium modellek", "Autóink többsége érvényes gyári garanciával", "Finanszírozási lehetőség igény szerint"],
+      extra: `<div class="btn-row"><a class="btn" href="${cat}">Autólista →</a><a class="btn btn-outline" href="#">Részletek</a><a class="btn btn-outline" href="#">Finanszírozás</a></div>` }),
+    svcCard({ img: rel + "autoszallitas-autoimport-nemetorszagbol.webp", alt: "Autószállítás — autóimport Németországból", tag: "Autóimport", title: "Autóimport Németországból",
+      lead: "<strong>Miért érnéd be a hazai kínálattal?</strong> A teljes német piac kínálata — pontosan a Te igényeid szerint, kulcsrakészen.",
+      items: ["Leinformálás és helyszíni bevizsgálás", "Szállítás és teljes körű honosítás", "1 év szavatosság minden autóra"],
+      extra: `<div class="platforms"><span class="plat-lbl">A teljes kínálat innen:</span><div class="plat-row"><span class="plat plat-mobile"><img class="plat-img plat-img-mb" src="${rel}mobile-de.webp" alt="mobile.de" loading="lazy"></span><span class="plat plat-as24"><img class="plat-img plat-img-as" src="${rel}autoscout24.webp" alt="AutoScout24" loading="lazy"></span><span class="plat plat-heycar"><img class="plat-img plat-img-hc" src="${rel}heycar.webp" alt="heycar" loading="lazy"></span></div></div><a class="btn" href="#">Tudj meg többet →</a>` }),
+    svcCard({ img: rel + "toyota-rav4-hybrid-hasznaltauto-eladas.webp", alt: "Toyota RAV4 Hybrid — használtautó-eladás", tag: "Használtautó-eladás", title: "Eladjuk az autódat", accent: true,
+      lead: "<strong>Miért vesződnél az eladással?</strong> Teljes körűen kezeljük helyetted — Te csak átveszed a vételárat, mi pedig még jót is teszünk közben.",
+      items: ["Profi fotók és videók minden autóhoz", "Hirdetés a legnagyobb platformokon", "A jutalék egy része jótékony célra megy"],
+      extra: `<div class="platforms"><span class="plat-lbl">Itt hirdetjük az autódat:</span><div class="plat-row"><span class="plat plat-huhu"><img class="plat-img plat-img-hu" src="${rel}hasznaltauto-hu.webp" alt="Használtautó.hu" loading="lazy"></span><span class="plat plat-mobile"><img class="plat-img plat-img-mb" src="${rel}mobile-de.webp" alt="mobile.de" loading="lazy"></span></div><span class="plat-lbl" style="margin-top:14px">Itt mutatjuk meg videón:</span><div class="plat-row"><span class="soc"><img src="${rel}instagram.webp" alt="Instagram" loading="lazy"></span><span class="soc"><img src="${rel}facebook.webp" alt="Facebook" loading="lazy"></span><span class="soc"><img src="${rel}tiktok.webp" alt="TikTok" loading="lazy"></span><span class="soc soc-yt">${YT_SVG}</span></div></div><div class="btn-row"><a class="btn" href="#">Tudj meg többet →</a><a class="btn btn-outline" href="#jotekonysag">Jótékonysági program</a></div>` }),
+  ].join("");
+
+  const orgs = [
+    ["sos-gyermekfalvak-magyarorszag.webp", "SOS Gyermekfalvak Magyarország", " org-sos"],
+    ["magyar-elelmiszerbank-egyesulet.webp", "Magyar Élelmiszerbank Egyesület", ""],
+    ["bator-tabor.webp", "Bátor Tábor", ""],
+    ["magyar-maltai-szeretetszolgalat.webp", "Magyar Máltai Szeretetszolgálat", ""],
+    ["rex-kutyaotthon-alapitvany.webp", "Rex Kutyaotthon Alapítvány", ""],
+    ["heim-pal-orszagos-gyermekgyogyaszati-intezet.webp", "Heim Pál Országos Gyermekgyógyászati Intézet", ""],
+    ["patent-egyesulet.webp", "PATENT Egyesület", ""],
+  ].map(([f, a, cls]) => `<span class="org-logo${cls}"><img src="${rel}${f}" alt="${attr(a)}" loading="lazy"></span>`).join("");
+
+  const steps = [
+    ["1", "Meghallgatunk", "Először megértjük, mire van szükséged — csak utána javaslunk autót vagy megoldást."],
+    ["2", "Ellenőrzünk", "A kinézett autót leinformáljuk, és a helyszínen alaposan megnézzük, hogy minden rendben van-e vele, mielőtt véglegesítenéd a vásárlást."],
+    ["3", "Kulcsrakészen intézzük", "Szállítás, honosítás, papírmunka — mindent mi kezelünk, Neked csak át kell venned."],
+    ["4", "Kiállunk érte", "Legyen szó importált vagy hazai használt autóról, minden esetben 1 év szavatosságot vállalunk — mert biztosak vagyunk a munkánkban."],
+    ["5", "Melletted maradunk", "Az átadás után sem szakad meg a kapcsolatunk — kérdéseiddel és garanciális ügyeiddel is bizalommal fordulhatsz hozzánk."],
+  ].map(([n, t, p]) => `<div class="card why reveal"><div class="n">${n}</div><div><h3>${esc(t)}</h3><p>${esc(p)}</p></div></div>`).join("");
+
+  return `<div class="cah">
+<section class="block" id="szolgaltatasok"><div class="wrap">
+  <span class="eyebrow reveal">Szolgáltatásaink</span>
+  <h2 class="sec-title reveal">Amivel foglalkozunk</h2>
+  <div class="svc-grid">${svc}</div>
+</div></section>
+<section class="block" id="jotekonysag-blokk" style="padding-top:0"><div class="wrap">
+  <div class="card charity reveal" id="jotekonysag">
+    <div>
+      <span class="eyebrow">Jótékonyság</span>
+      <h3>Minden eladott autóval jót teszünk</h3>
+      <p>Hisszük, hogy a sikernek akkor van igazi értéke, ha másokkal is megosztjuk. Ezért a használtautó-eladások jutalékának jelentős részét magyar nonprofit szervezeteknek ajánljuk fel — és minden autó videójában megmutatjuk, hova kerül a támogatás.</p>
+      <a class="chip cta charity-btn" href="#">Add el az autód — tegyünk jót együtt</a>
+    </div>
+    <div class="org-list">${orgs}</div>
+    <a class="chip cta charity-btn charity-btn-mobile" href="#">Add el az autód — tegyünk jót együtt</a>
+  </div>
+</div></section>
+<section class="block" id="miert" style="padding-top:0"><div class="wrap">
+  <span class="eyebrow reveal">Miért a Caradvance?</span>
+  <h2 class="sec-title reveal">Így dolgozunk</h2>
+  <div class="why-grid">${steps}<div class="card why why-special reveal"><div class="n">♥</div><div><h3>Visszaadunk</h3><p>A használtautó-eladások jutalékának egy részével magyar jótékonysági szervezeteket támogatunk.</p></div></div></div>
+</div></section>
+</div>
+<script>(function(){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});document.querySelectorAll('.cah .reveal').forEach(function(el){io.observe(el)});})();</script>`;
+}
+
 function renderHome(cars, rate) {
   const active = cars.filter(isActive);
   const featured = (active.filter(isOwn).length ? active.filter(isOwn) : active).slice(0, 6);
@@ -335,15 +480,17 @@ function renderHome(cars, rate) {
 .stat .n{font-size:30px;font-weight:800;letter-spacing:-.02em}.stat .n b{color:var(--red)}
 .stat .l{color:var(--muted);font-size:13px;font-weight:600;margin-top:2px}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:8px 0 22px;flex-wrap:wrap}
-.sec-head h2{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0}
+.sec-head h2{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:6px 0 0}
+.feyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.feyebrow::before{content:"";width:26px;height:3px;background:var(--red);border-radius:2px}
 .sec-head p{color:var(--muted);margin:6px 0 0;font-size:15px}
-` + cardCss();
+` + cardCss() + CONTENT_CSS;
 
   const stats = [
-    ["5000<b>+</b>", "Értékesített autó"],
-    ["23 <b>év</b>", "Tapasztalat"],
-    ["5,0<b>★</b>", "Ügyfél-értékelés"],
-    ["1 <b>év</b>", "Garancia"],
+    ["5000<b>+</b>", "eladott prémium autó"],
+    ["23 <b>év</b>", "Tapasztalat — a Caradvance GmbH 2003 óta"],
+    ["5,0<b>★</b>", "Google-értékelés"],
+    ["1 <b>év</b>", "szavatosság minden importált autóra"],
   ];
   const body = `
 <section class="hero">
@@ -359,9 +506,10 @@ function renderHome(cars, rate) {
 </section>
 <div class="stats"><div class="stats-in">${stats.map(([n, l]) => `<div class="stat"><div class="n">${n}</div><div class="l">${esc(l)}</div></div>`).join("")}</div></div>
 <section class="wrap" id="autoink">
-  <div class="sec-head"><div><h2>Kiemelt autóink</h2><p>Válogatás aktuális kínálatunkból — összesen ${active.length} elérhető autó.</p></div><a class="btn btn-soft" href="autoink/">Összes autó →</a></div>
+  <div class="sec-head"><div><span class="feyebrow">Kínálat</span><h2>Autóink</h2><p>Válogatás aktuális kínálatunkból — összesen ${active.length} elérhető autó.</p></div><a class="btn btn-soft" href="autoink/">Összes eladó autónk →</a></div>
   <div class="grid">${featured.map((c) => carCard(c, rate, "")).join("")}</div>
-</section>`;
+</section>
+${contentSections("")}`;
 
   const ld = {
     "@context": "https://schema.org", "@type": "AutoDealer", name: BRAND,
