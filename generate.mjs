@@ -137,7 +137,7 @@ img{max-width:100%}
 .btn-soft{background:var(--soft);color:var(--ink)}.btn-soft:hover{background:var(--navy);color:#fff}
 /* header/nav */
 .ca-navwrap{position:sticky;top:0;z-index:1000;display:flex;justify-content:center;padding:20px 14px 0}
-.ca-nav{position:relative;width:100%;max-width:1240px;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 10px 8px 20px;box-shadow:0 14px 40px rgba(8,8,10,.20)}
+.ca-nav{position:relative;width:100%;max-width:1200px;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 22px 8px 22px;box-shadow:0 14px 40px rgba(8,8,10,.20)}
 .ca-nav .brand{display:flex;align-items:center;flex-shrink:0;text-decoration:none}.ca-nav .brand img{height:30px;width:auto;display:block}
 .ca-nav .menu{list-style:none;display:flex;align-items:center;gap:6px;margin:0;padding:0;flex:1;justify-content:center}
 .navitem{position:relative}
@@ -153,7 +153,20 @@ img{max-width:100%}
 .kapcsolat{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 24px;border-radius:999px;white-space:nowrap;transition:transform .15s,box-shadow .15s,background .15s;box-shadow:0 6px 18px rgba(11,11,13,.22)}
 .kapcsolat::after{content:"→";font-size:15px;transition:transform .15s}
 .kapcsolat:hover{background:var(--red);box-shadow:0 8px 22px rgba(226,0,26,.4);transform:translateY(-1px)}.kapcsolat:hover::after{transform:translateX(3px)}
-.navflag{width:30px;height:30px;border-radius:50%;flex:0 0 auto;background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(11,11,13,.12),0 2px 6px rgba(0,0,0,.15)}
+.navflag{width:28px;height:28px;border-radius:50%;flex:0 0 auto;background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(11,11,13,.12),0 2px 6px rgba(0,0,0,.15)}
+.lang{position:relative}
+.langbtn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;border-radius:999px;padding:4px 6px;cursor:pointer}
+.langbtn:hover{background:#F4F7FB}
+.langbtn .lchev{width:7px;height:7px;border-right:2px solid #9aa4b2;border-bottom:2px solid #9aa4b2;transform:rotate(45deg);margin-top:-3px}
+.langmenu{position:absolute;top:100%;right:0;margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 50px rgba(8,8,10,.18);padding:8px;display:none;flex-direction:column;min-width:192px;z-index:1002}
+.lang.open .langmenu{display:flex}
+.langopt{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600;font-size:14px;white-space:nowrap}
+.langopt:hover{background:#F4F7FB;color:var(--red)}
+.lf{width:22px;height:22px;border-radius:50%;flex:0 0 auto;background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(11,11,13,.12)}
+.m-langtitle{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 12px 6px}
+.m-langs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 6px 8px}
+.m-langopt{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600;font-size:14px}
+.m-langopt:hover{background:#F4F7FB;color:var(--red)}
 .burger{display:none;flex-direction:column;justify-content:center;gap:4px;width:44px;height:44px;border:1px solid var(--line);background:#F4F7FB;border-radius:12px;cursor:pointer;padding:0}
 .burger span{display:block;width:20px;height:2px;background:var(--ink);margin:0 auto;border-radius:2px;transition:.2s}
 .ca-navwrap.open .burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
@@ -167,7 +180,7 @@ img{max-width:100%}
 .m-sub{display:none;flex-direction:column;padding:0 12px 10px}.m-acc.open .m-sub{display:flex}
 .m-sub a{padding:9px 8px;text-decoration:none;color:var(--muted);font-weight:600;font-size:14.5px}.m-sub a:hover{color:var(--red)}
 .m-kapcsolat{display:block;text-align:center;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px;border-radius:999px;margin:12px 6px 6px}
-@media(max-width:1024px){.ca-nav .menu{display:none}.kapcsolat{display:none}.navflag{display:none}.burger{display:flex}.ca-nav{gap:10px;padding:8px 10px}.navright{margin-left:auto}}
+@media(max-width:1024px){.ca-nav .menu{display:none}.kapcsolat{display:none}.lang{display:none}.burger{display:flex}.ca-nav{gap:10px;padding:8px 12px}.navright{margin-left:auto}}
 /* footer */
 .footer{background:var(--navy);color:#cfd6e2;margin-top:56px}
 .footer-in{max-width:1160px;margin:0 auto;padding:40px 20px 28px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}
@@ -188,6 +201,13 @@ function navHtml(rel) {
     ["Import", [["Autó rendelés", "#"], ["Beszerzési folyamat", "#"], ["Előnyök", "#"], ["Referenciák", "#"]]],
     ["Rólunk", [["Miért mi?", "#"], ["Caradvance Garancia", "#"], ["Caradvance Hungary", "#"], ["Referenciák", "#"], ["Partnereink", "#"], ["Media", "#"], ["Blog", "#"]]],
   ];
+  const langs = [
+    ["hu", "Magyar", rel], ["en", "English", "#"], ["de", "Deutsch", "#"], ["fr", "Français", "#"],
+    ["sk", "Slovenčina", "#"], ["cs", "Čeština", "#"], ["pl", "Polski", "#"], ["uk", "Українська", "#"], ["zh", "中文", "#"],
+  ];
+  const fcc = { hu: "hu", en: "gb", de: "de", fr: "fr", sk: "sk", cs: "cz", pl: "pl", uk: "ua", zh: "cn" };
+  const langMenu = langs.map(([c, name, href]) => `<a class="langopt" href="${attr(href)}"><span class="lf" style="background-image:url(https://flagcdn.com/w80/${fcc[c]}.png)"></span><span>${esc(name)}</span></a>`).join("");
+  const mobileLangs = langs.map(([c, name, href]) => `<a class="m-langopt" href="${attr(href)}"><span class="lf" style="background-image:url(https://flagcdn.com/w80/${fcc[c]}.png)"></span><span>${esc(name)}</span></a>`).join("");
   const desktop = items.map(([label, subs]) =>
     `<li class="navitem"><button class="navlink" type="button">${esc(label)}<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner">${subs.map(([t, h]) => `<a class="ddi" href="${attr(h)}">${esc(t)}</a>`).join("")}</div></div></li>`).join("");
   const mobile = items.map(([label, subs]) =>
@@ -197,11 +217,11 @@ function navHtml(rel) {
   <ul class="menu">${desktop}</ul>
   <div class="navright">
     <a class="kapcsolat" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a>
-    <span class="navflag" role="img" aria-label="Magyar" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span>
+    <div class="lang"><button class="langbtn" type="button" aria-label="Nyelvváltás"><span class="navflag" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span><span class="lchev"></span></button><div class="langmenu">${langMenu}</div></div>
     <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
   </div>
 </nav>
-<div class="mobilepanel">${mobile}<a class="m-kapcsolat" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a></div>
+<div class="mobilepanel">${mobile}<a class="m-kapcsolat" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a><div class="m-langtitle">Nyelv</div><div class="m-langs">${mobileLangs}</div></div>
 </div>`;
 }
 function footerHtml(rel) {
@@ -237,7 +257,8 @@ fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
 const NAV_SCRIPT = `<script>
 (function(){var w=document.querySelector('.ca-navwrap');if(!w)return;
 var b=w.querySelector('.burger');if(b)b.addEventListener('click',function(){w.classList.toggle('open');});
-w.querySelectorAll('.m-accbtn').forEach(function(x){x.addEventListener('click',function(){x.parentElement.classList.toggle('open');});});})();
+w.querySelectorAll('.m-accbtn').forEach(function(x){x.addEventListener('click',function(){x.parentElement.classList.toggle('open');});});
+var lang=w.querySelector('.lang'),lb=w.querySelector('.langbtn');if(lb)lb.addEventListener('click',function(e){e.stopPropagation();lang.classList.toggle('open');});document.addEventListener('click',function(){if(lang)lang.classList.remove('open');});})();
 </script>`;
 
 function page({ title, desc, canonical, rel, css, body, head = "", bodyClass = "" }) {
@@ -495,7 +516,7 @@ function renderHome(cars, rate) {
   const saleFeat = pickFeat(active.filter((c) => nEur(c.vetel_eur) > 0));
   const rentFeat = pickFeat(active.filter((c) => nEur(c.berlet_eur) > 0));
   const css = `
-.hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:600px;padding:96px 24px;border-radius:32px;margin:16px;margin-top:calc(16px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
+.hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:560px;padding:44px 24px 84px;border-radius:32px;margin:16px;margin-top:calc(16px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
 @media(max-width:640px){.hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:84px 18px 72px;min-height:480px}}
 .hero .video-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
 .hero .overlay{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(180deg,rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7))}
