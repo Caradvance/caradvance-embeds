@@ -908,7 +908,7 @@ function renderCatalog(cars, rate) {
   const body = `
 <div class="wrap">
   <div class="crumb"><a href="../">Főoldal</a> / <b>Megvásárolható autóink</b></div>
-  <div class="chead"><h1>Megvásárolható autóink</h1><p>Prémium autók Németországból, nettó árakkal (áfa nélkül) és garanciával. Az árak élő árfolyammal frissülnek (1 € = <span id="ratev">${rate}</span> Ft).</p></div>
+  <div class="chead"><h1>Megvásárolható autóink</h1><p>Prémium autók Németországból, nettó árakkal (áfa nélkül). Az árak élő árfolyammal frissülnek (1 € = <span id="ratev">${rate}</span> Ft).</p></div>
   <div class="filters">
     <input id="q" placeholder="Keresés (pl. X5, Porsche)…">
     <select id="marka"><option value="">Minden márka</option>${brands.map((b) => `<option>${esc(b)}</option>`).join("")}</select>
