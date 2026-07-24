@@ -548,17 +548,26 @@ function cardCss() {
 .rate-note{margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center}
 `;
 }
+// Explicit featured (kiemelt) cars, in this exact order — badged and pinned
+// first on both the homepage and the catalog. Keyed by slug.
+const FEATURED = [
+  "bmw-x5-xdrive30d-m-sport-pro-panorama-22-m-lm-head-up-afas",
+  "bmw-x2-xdrive20d-m-sport-pro-20-h-k",
+  "porsche-911-carrera-gts-approved-3-jahre-voll-leder",
+];
+const featRank = (c) => { const i = FEATURED.indexOf(slugify(c.modell)); return i < 0 ? 999 : i; };
 function carCard(c, rate, rel) {
   const g = galleryOf(c);
   const p = priceOf(c, rate);
   const href = `${rel}auto/${slugify(c.modell)}/`;
   const mir = MIRROR.has(slugify(c.modell)) ? ' class="mir"' : "";
+  const badge = FEATURED.includes(slugify(c.modell)) ? '<span class="feat">Kiemelt</span>' : "";
   const img = g[0]
     ? `<img${mir} src="${attr(g[0])}" alt="${attr((c.modell || "").trim())}" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span>`
     : `<span class="ph">fotó hamarosan</span>`;
   const cross = p.save > 0 ? `<span class="pcross" data-cross>${fmtHUF(p.huGross)}</span>` : "";
   const save = p.save > 0 ? `<span class="psave" data-save>−${fmtHUF(p.save)}</span>` : "";
-  return `<a class="card" href="${attr(href)}" data-marka="${attr(c.marka || "")}" data-kar="${attr(c.karosszeria || "")}" data-uz="${attr(c.uzemanyag || "")}"><div class="media">${img}</div>
+  return `<a class="card" href="${attr(href)}" data-marka="${attr(c.marka || "")}" data-kar="${attr(c.karosszeria || "")}" data-uz="${attr(c.uzemanyag || "")}"><div class="media">${img}${badge}</div>
   <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
   <h3 class="title">${esc((c.modell || "").trim())}</h3>
   <div class="specs">${esc(specStr(c))}</div>
@@ -877,7 +886,7 @@ function contentSections(rel) {
 function renderHome(cars, rate) {
   const active = cars.filter(isActive);
   const pickFeat = (list) => list.filter(isOwn).concat(list.filter((c) => !isOwn(c))).slice(0, 3);
-  const saleFeat = pickFeat(active.filter((c) => nEur(c.vetel_eur) > 0));
+  const saleFeat = FEATURED.map((s) => active.find((c) => slugify(c.modell) === s)).filter(Boolean);
   const rentFeat = pickFeat(active.filter((c) => nEur(c.berlet_eur) > 0));
   const css = `
 .hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;margin:8px 16px 16px;margin-top:calc(6px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
@@ -966,7 +975,11 @@ ${contentSections("")}
 
 // --------------------------------------------------------------- CATALOG
 function renderCatalog(cars, rate) {
-  const active = cars.filter(isActive).sort((a, b) => nEur(a.vetel_eur) - nEur(b.vetel_eur));
+  const active = cars.filter(isActive).sort((a, b) => {
+    const fr = featRank(a) - featRank(b);
+    if (fr !== 0) return fr; // featured (kiemelt) pinned first, in FEATURED order
+    return nEur(a.vetel_eur) - nEur(b.vetel_eur); // then cheapest -> most expensive
+  });
   const css = `
 .crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:14px}.crumb a{text-decoration:none}.crumb a:hover{color:var(--red)}.crumb b{color:var(--ink)}
 .chead h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
