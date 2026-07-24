@@ -776,18 +776,219 @@ function f(){var q=(document.getElementById('q').value||'').toLowerCase(),m=docu
 }
 
 // --------------------------------------------------------------- DETAIL
+// ---- Detail-page extras: salesperson team, benefits, PDF adatlap --------
+const absUrl = (u) => SITE_BASE + "/" + String(u).replace(/^\//, "");
+const hufUpR = (e, rate) => Math.ceil((Number(e) || 0) * rate / 10000) * 10000;
+const SALES_EMAIL = "sales@caradvance.hu";
+const TEAM = ["Tóth Károly", "Csadi Ferenc", "Vadnai Zsombor"];
+const EMP = {
+  "Csadi Ferenc": { role: "Kereskedelmi vezető", tel: "+36 30 094 2081", wa: "36300942081", img: "caradvance-emp-csadi.webp" },
+  "Tóth Károly": { role: "Import igazgató", tel: "+36 30 214 6989", wa: "36302146989", img: "caradvance-emp-toth.webp" },
+  "Vadnai Zsombor": { role: "Értékesítési vezető", tel: "+36 30 094 2105", wa: "36300942105", img: "caradvance-emp-vadnai.webp" },
+};
+const initials = (n) => n.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+
+const IC_PHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h3l1.6 4-2 1.4a12 12 0 0 0 5 5l1.4-2 4 1.6v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z"/></svg>';
+const IC_MAIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>';
+const IC_WA = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.2.1.5.1.6-.1l.7-.9c.2-.3.4-.2.7-.1l2 .9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>';
+const DL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;margin-right:8px"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>';
+const SPEC_ICONS = {
+  "Kilométer": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 17a9 9 0 1 1 15 0"/><path d="M12 13l3.6-3.2"/><circle cx="12" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg>',
+  "Teljesítmény": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>',
+  "Üzemanyag": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V5a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v15M3 20h11"/><path d="M13 8h3l2 2v7a1.5 1.5 0 0 0 3 0V9l-2.5-3"/><path d="M7 8h4"/></svg>',
+  "Váltó": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><path d="M6 8v8M18 8v4M6 12h12"/></svg>',
+  "Évjárat": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M8.5 14.5l2 2 4-4"/></svg>',
+  "Hajtás": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.8-4.5A2 2 0 0 1 6.7 7h10.6a2 2 0 0 1 1.9 1.5L21 13v4H3z"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>',
+};
+// Trim trailing German parenthetical leftovers from old data; keep Hungarian ones.
+const DEFLAG = /(System|Getriebe|Scheinwerfer|Verglasung|Anlage|Bremss|\bSitz|Außen|Innen|Fahrassistenz|Lackierung|schwarz|blau|\bvorn\b|hinten|\bmit\b|\bund\b|\bfür\b|Dachhimmel|Felgen|elektr|abgedunkelt|Multifunktion|Öffnungs|Wireless|Rekuperation|Radioempfang|Kugelkopf|beleuchtet|Hochglanz|Steptronic|Speed Limit|Stop&Go-Funktion)/;
+function cleanDE(s) {
+  s = String(s || "").trim();
+  for (let guard = 0; guard < 3; guard++) {
+    if (!s.endsWith(")")) break;
+    let depth = 0, open = -1;
+    for (let i = s.length - 1; i >= 0; i--) {
+      if (s[i] === ")") depth++;
+      else if (s[i] === "(") { depth--; if (depth === 0) { open = i; break; } }
+    }
+    if (open <= 0) break;
+    const inner = s.slice(open + 1, -1);
+    const before = s.slice(0, open).trim();
+    if (before && DEFLAG.test(inner)) s = before; else break;
+  }
+  return s;
+}
+
+const PDFCSS = `
+.xs{width:100%;background:#fff;color:#141519;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+.xs *{box-sizing:border-box}
+.xs-hd{display:flex;justify-content:space-between;align-items:center}
+.xs-logo{height:46px;width:auto;display:block}
+.xs-hr{text-align:right}.xs-ht{font-size:26px;font-weight:800;letter-spacing:.04em;color:#0B0B0D}
+.xs-hs{font-size:12px;color:#5A6B82;font-weight:600}
+.xs-rl{height:4px;background:#E2001A;border-radius:2px;margin:12px 0 18px}
+.xs-ttl{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.xs-sub{color:#E2001A;font-weight:700;font-size:14px;margin-top:3px;text-transform:uppercase;letter-spacing:.02em}
+.xs-hero{margin:14px 0 6px;border-radius:12px;overflow:hidden;break-inside:avoid}
+.xs-hero img{width:100%;display:block;object-fit:cover;max-height:380px}
+.xs-thg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:6px;break-inside:avoid}
+.xs-tw{border-radius:7px;overflow:hidden;height:56px}
+.xs-grow{display:flex;gap:10px;margin-bottom:10px;break-inside:avoid;page-break-inside:avoid}
+.xs-gi{flex:1;min-width:0;border-radius:10px;overflow:hidden;background:#F4F7FB;border:1px solid #E6EAF1;break-inside:avoid;page-break-inside:avoid}
+.xs-gi img{width:100%;height:auto;display:block}
+.xs-tw img{width:100%;height:100%;object-fit:cover;display:block}
+.xs-desc{font-size:13px;color:#374151;line-height:1.6;margin:6px 0 2px}
+.xs-icrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 16px;margin:10px 0;break-inside:avoid}
+.xs-ic{display:flex;align-items:center;gap:10px}
+.xs-icn{width:40px;height:40px;border-radius:11px;background:#EEF2F8;color:#5A6B82;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.xs-icn svg{width:20px;height:20px}
+.xs-ictx{display:flex;flex-direction:column;min-width:0}
+.xs-ik{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#8a94a6}
+.xs-iv{font-size:14px;font-weight:800;line-height:1.2;word-break:break-word}
+.xs-pb{break-before:page;page-break-before:always}
+.xs-pbox{display:flex;gap:14px;margin:6px 0 8px;break-inside:avoid;align-items:stretch}
+.xs-pl{flex:1;background:#F4F7FB;border:1px solid #E6EAF1;color:#141519;border-radius:14px;padding:18px 22px}
+.xs-plab{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a94a6}
+.xs-huf{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-top:4px;color:#0B0B0D}
+.xs-eur{font-size:15px;font-weight:700;color:#5A6B82;margin-top:2px}
+.xs-pdiv{height:1px;background:#E6EAF1;margin:12px 0}
+.xs-pcross{font-size:13px;color:#5A6B82;font-weight:600}.xs-pcross s{color:#9aa3b2}
+.xs-psave{display:inline-block;background:#E7F8EE;color:#1DA851;font-size:13px;font-weight:800;padding:6px 13px;border-radius:999px;margin-top:8px}
+.xs-pnote{font-size:11px;color:#8a94a6;font-weight:600;margin-top:12px}
+.xs-pers{width:252px;background:#F4F7FB;border:1px solid #E6EAF1;border-radius:14px;padding:14px}
+.xs-pterm{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8a94a6;margin-bottom:4px}
+.xs-tmem{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #E6EAF1}
+.xs-tmem:last-of-type{border-bottom:0}
+.xs-tpf{width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:center top;background:#e3e9f2;flex-shrink:0}
+.xs-tpi{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#0B0B0D}
+.xs-tinfo{min-width:0}
+.xs-tn{font-size:13px;font-weight:800;line-height:1.15}
+.xs-tr{font-size:10.5px;color:#5A6B82;font-weight:600}
+.xs-tt{font-size:12px;font-weight:700;margin-top:1px}
+.xs-pemail{font-size:12px;font-weight:700;margin-top:9px;text-align:center;color:#0B0B0D}
+.xs-h2{font-size:15px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:#0B0B0D;margin:14px 0 6px;padding-left:10px;border-left:4px solid #E2001A}
+.xs-spec{width:100%;border-collapse:collapse}
+.xs-spec td{padding:5px 4px;border-bottom:1px solid #EEF1F6;font-size:12px;vertical-align:top}
+.xs-sk{color:#5A6B82;width:42%}.xs-sv2{font-weight:700;text-align:right}
+.xs-feat{column-count:3;column-gap:18px}
+.xs-fcat{break-inside:avoid;margin-bottom:11px}
+.xs-fct{font-size:10.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#E2001A;margin-bottom:3px}
+.xs-fit{font-size:11px;color:#374151;line-height:1.5}
+.xs-ft{margin-top:16px;padding-top:12px;border-top:1px solid #E6EAF1;font-size:10.5px;color:#8a94a6;font-weight:600;text-align:center}`;
+
+// Server-side "Autó adatlap" PDF document (opened + auto-printed on the client).
+function buildPdfSheet(c, rate) {
+  const g = galleryOf(c).map((u) => u);
+  const eur = nEur(c.vetel_eur), main = hufUpR(eur, rate);
+  const netto = nEur(c.vetel_eur_netto) || eur / 1.19, huG = hufUpR(netto * 1.27, rate), save = huG - main;
+  const srows = [
+    ["Évjárat", c.evjarat], ["Teljesítmény", c.teljesitmeny], ["Hajtás", c.hajtas], ["Váltó", c.valto],
+    ["Üzemanyag", c.uzemanyag], ["Karosszéria", c.karosszeria], ["Márka", c.marka], ["Kilométer", c.km],
+  ].filter(([, v]) => v && v !== "—");
+  const parts = String(c.felszereltseg || "").split("|").map((s) => s.trim()).filter(Boolean);
+  let feat = ""; { let cur = null, items = [];
+    const flush = () => { if (cur && items.length) feat += `<div class="xs-fcat"><div class="xs-fct">${esc(cur)}</div><div class="xs-fit">${items.map(esc).join(" · ")}</div></div>`; items = []; };
+    parts.forEach((p) => { if (p.startsWith("#")) { flush(); cur = p.slice(1); } else { if (!cur) cur = "Felszereltség"; items.push(cleanDE(p)); } }); flush(); }
+  const iconsArr = [["Kilométeróra", c.km, "Kilométer"], ["Teljesítmény", c.teljesitmeny, "Teljesítmény"], ["Üzemanyag", c.uzemanyag, "Üzemanyag"], ["Váltó", c.valto, "Váltó"], ["Évjárat", c.evjarat, "Évjárat"], ["Hajtás", c.hajtas, "Hajtás"]]
+    .filter((x) => x[1] && x[1] !== "—").map((x) => `<div class="xs-ic"><span class="xs-icn">${SPEC_ICONS[x[2]] || ""}</span><span class="xs-ictx"><span class="xs-ik">${esc(x[0])}</span><span class="xs-iv">${esc(x[1])}</span></span></div>`).join("");
+  const sub = [c.karosszeria].filter(Boolean).join(" · ");
+  const hero = g[0] ? `<div class="xs-hero"><img src="${attr(g[0])}" referrerpolicy="no-referrer"></div>` : "";
+  const teamPDF = TEAM.map((nm) => { const e = EMP[nm] || {};
+    const im = e.img ? `<img class="xs-tpf" src="${attr(absUrl(e.img))}" referrerpolicy="no-referrer">` : `<div class="xs-tpf xs-tpi">${initials(nm)}</div>`;
+    return `<div class="xs-tmem">${im}<div class="xs-tinfo"><div class="xs-tn">${esc(nm)}</div><div class="xs-tr">${esc(e.role || "")}</div>${e.tel ? `<div class="xs-tt">${esc(e.tel)}</div>` : ""}</div></div>`;
+  }).join("");
+  let galleryHTML = "";
+  for (let i = 0; i < g.length; i += 2) {
+    galleryHTML += `<div class="xs-grow"><div class="xs-gi"><img src="${attr(g[i])}" referrerpolicy="no-referrer"></div>` +
+      (g[i + 1] ? `<div class="xs-gi"><img src="${attr(g[i + 1])}" referrerpolicy="no-referrer"></div>` : '<div class="xs-gi" style="visibility:hidden"></div>') + `</div>`;
+  }
+  const inner = `<div class="xs">
+  <div class="xs-hd">
+    <img class="xs-logo" src="${attr(absUrl("caradvance-logo.webp"))}" referrerpolicy="no-referrer" alt="caradvance">
+    <div class="xs-hr"><div class="xs-ht">ADATLAP</div><div class="xs-hs">Eladó prémium autó</div></div>
+  </div>
+  <div class="xs-rl"></div>
+  <div class="xs-ttl">${esc(c.modell)}</div>${sub ? `<div class="xs-sub">${esc(sub)}</div>` : ""}
+  ${hero}
+  <div class="xs-icrow">${iconsArr}</div>
+  <div class="xs-pbox">
+    <div class="xs-pl">
+      <div class="xs-plab">VÉTELÁR</div>
+      <div class="xs-huf">${fmtHUF(main)}</div>
+      <div class="xs-eur">${eur.toLocaleString("hu-HU")} €</div>
+      ${save > 0 ? `<div class="xs-pdiv"></div><div class="xs-pcross"><s>${fmtHUF(huG)}</s></div><div class="xs-psave">Megtakarítás: ${fmtHUF(save)}</div>` : ""}
+      <div class="xs-pnote">Árfolyam: 1 € = ${Math.round(rate).toLocaleString("hu-HU")} Ft</div>
+    </div>
+    <div class="xs-pers">
+      <div class="xs-pterm">Kapcsolat</div>
+      ${teamPDF}
+      <div class="xs-pemail">${esc(CONTACT_EMAIL)}</div>
+    </div>
+  </div>
+  <div class="xs-h2 xs-pb">Műszaki adatok</div>
+  <table class="xs-spec">${srows.map((r) => `<tr><td class="xs-sk">${esc(r[0])}</td><td class="xs-sv2">${esc(r[1])}</td></tr>`).join("")}</table>
+  <div class="xs-h2">Felszereltség</div>
+  <div class="xs-feat">${feat}</div>
+  ${g.length ? `<div class="xs-h2 xs-pb">Galéria</div>${galleryHTML}` : ""}
+  <div class="xs-ft">caradvance — the automotive people &nbsp;·&nbsp; www.caradvance.hu &nbsp;·&nbsp; +36 30 094 2081 &nbsp;·&nbsp; ${esc(SALES_EMAIL)}</div>
+</div>`;
+  const fname = ((c.modell || "caradvance autó").replace(/["*]/g, "").trim()) + " - adatlap";
+  const printJs = `window.addEventListener('load',function(){var im=[].slice.call(document.images),n=im.length,c=0,fired=false;function go(){if(fired)return;fired=true;var f=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();f.then(function(){setTimeout(function(){try{window.focus();window.print();}catch(e){}},300);});}window.onafterprint=function(){setTimeout(function(){window.close();},300);};if(!n)return go();im.forEach(function(x){if(x.complete){if(++c===n)go();}else{x.onload=x.onerror=function(){if(++c===n)go();};}});setTimeout(go,7000);});`;
+  return `<!doctype html><html lang="hu"><head><meta charset="utf-8"><title>${esc(fname)}</title>` +
+    `<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">` +
+    `<style>@page{size:A4;margin:12mm}html,body{margin:0;background:#fff}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}${PDFCSS}</style>` +
+    `</head><body>${inner}<script>${printJs}</` + `script></body></html>`;
+}
+
+function benefitsHtml() {
+  const items = [
+    ["23 év tapasztalat", "2003 óta Németországban, 5000+ eladott prémium autó."],
+    ["Bevizsgált német import", "dokumentált, átlátható előélet, valós kilométeróra."],
+    ["1 év szavatosság", "minden eladott autónkra vállaljuk."],
+    ["Kulcsrakész, honosítva", "a papírmunkát és a forgalomba helyezést mi intézzük."],
+    ["Kedvezőbb ár", "német áfával, a magyar 27%-os árnál olcsóbban."],
+    ["5,0 ★ Google-értékelés", "elégedett vásárlók, személyes ügyintézés."],
+  ];
+  return `<ul class="why">${items.map(([b, t]) => `<li><span class="wc">✓</span><div><b>${esc(b)}</b> — ${esc(t)}</div></li>`).join("")}</ul>`;
+}
+
+function contactCardHtml() {
+  const rows = TEAM.map((nm) => {
+    const e = EMP[nm] || {};
+    const photo = e.img ? `<img src="${attr(absUrl(e.img))}" referrerpolicy="no-referrer" alt="${attr(nm)}" loading="lazy">` : `<div class="pinit">${initials(nm)}</div>`;
+    let cc = "";
+    if (e.tel) cc += `<a href="tel:${e.tel.replace(/\s/g, "")}">${IC_PHONE}${esc(e.tel)}</a>`;
+    if (e.wa) cc += `<a class="wa" href="https://wa.me/${e.wa}" target="_blank" rel="noopener">${IC_WA}WhatsApp</a>`;
+    return `<div class="tmem">${photo}<div class="tinfo"><div class="pname">${esc(nm)}</div><div class="prole">${esc(e.role || "")}</div><div class="tcontact">${cc}</div></div></div>`;
+  }).join("");
+  return `<div class="panel contact"><h4>Kapcsolat</h4>${rows}<div class="crow" style="margin-top:14px"><span class="ci">${IC_MAIL}</span> <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></div></div>`;
+}
+
 function renderDetail(c, cars, rate) {
   const g = galleryOf(c);
   const p = priceOf(c, rate);
   const slug = slugify(c.modell);
   const title = (c.modell || "").trim();
   const eq = equipmentOf(c);
+  const flat = eq.flatMap((cat) => cat.items).map(cleanDE);
+  const iconItems = [["Kilométer", c.km], ["Teljesítmény", c.teljesitmeny], ["Üzemanyag", c.uzemanyag], ["Váltó", c.valto], ["Évjárat", c.evjarat], ["Hajtás", c.hajtas]].filter(([, v]) => v);
   const related = cars.filter((x) => isActive(x) && x.marka === c.marka && slugify(x.modell) !== slug).slice(0, 3);
   const descText =
     `A(z) ${title} ${c.evjarat ? c.evjarat + " évjáratú, " : ""}${c.km ? c.km + " futott, " : ""}` +
     `${c.uzemanyag ? c.uzemanyag.toLowerCase() + " üzemű " : ""}${c.karosszeria || "prémium autó"}. ` +
     `${c.teljesitmeny ? c.teljesitmeny + ", " : ""}${c.valto || ""}${c.hajtas ? ", " + c.hajtas : ""}. ` +
     `Magyar áfás ár garanciával, ${BRAND} import.`;
+
+  // Járműleírás: categorized equipment, first 12 items shown, rest collapsed.
+  let _shown = 0;
+  const cateqHtml = eq.map((cat) => {
+    const hideH = _shown >= 12;
+    let s = `<div class="cath${hideH ? " cmore" : ""}">${esc(cat.title)}</div>`;
+    s += cat.items.map((it) => { const hide = _shown >= 12; _shown++; return `<div class="catit${hide ? " cmore" : ""}">${esc(cleanDE(it))}</div>`; }).join("");
+    return s;
+  }).join("");
+  const pdfDoc = buildPdfSheet(c, rate);
+  const pdfName = ((c.modell || "caradvance auto").replace(/["*]/g, "").trim()) + " - adatlap";
 
   const css = `
 .crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:18px}.crumb a{text-decoration:none}.crumb a:hover{color:var(--red)}.crumb b{color:var(--ink)}
@@ -828,6 +1029,33 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 .taxnote{color:var(--muted);font-size:12.5px;font-weight:600;margin-top:8px}
 .rel-h{margin:44px 0 18px;font-size:24px;font-weight:800}
 .rel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}@media(max-width:900px){.rel-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.rel-grid{grid-template-columns:1fr}}
+.ic{display:flex;align-items:center;gap:10px}
+.ic .dot{width:40px;height:40px;border-radius:11px;background:#EEF2F8;color:#5A6B82;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic .dot svg{width:20px;height:20px}
+.feat{display:grid;grid-template-columns:1fr 1fr;column-gap:24px;color:#33404f;font-size:14px}
+@media(max-width:560px){.feat{grid-template-columns:1fr}}
+.feat>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;border-radius:8px}
+.feat>div::after{content:"✓";color:#12924a;font-weight:800;flex-shrink:0}
+.feat>div:nth-child(4n+1),.feat>div:nth-child(4n+2){background:#F5F7FA}
+.feat .fmore{display:none}.feat.open .fmore{display:flex}
+.cateq .cmore{display:none}.cateq.open .cmore{display:block}
+.showmore{margin-top:14px;background:none;border:0;color:var(--red);font-weight:700;font-size:14.5px;cursor:pointer;font-family:inherit;padding:0}
+.dl .dlbtn{width:100%;border:0;font-family:inherit;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.contact h4{margin:0 0 14px;font-size:18px;font-weight:800}
+.tmem{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.tmem:last-of-type{border-bottom:0}
+.tmem img{width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:center top;flex-shrink:0;background:#e3e9f2}
+.pinit{width:56px;height:56px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;flex-shrink:0}
+.tinfo{min-width:0}.pname{font-weight:800;font-size:15px}.prole{color:var(--muted);font-size:12.5px;font-weight:600}
+.tcontact{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:5px;font-size:13.5px;font-weight:700}
+.tcontact a{color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.tcontact a svg{width:15px;height:15px}.tcontact .wa{color:#1DA851}
+.crow{display:flex;align-items:center;gap:10px}.crow a{color:inherit;text-decoration:none}
+.crow .ci{width:38px;height:38px;border-radius:10px;background:#EAF1FB;color:#2b6ce0;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.crow .ci svg{width:19px;height:19px}
+.why{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:13px}
+.why li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:#33404f;line-height:1.5}
+.why .wc{width:22px;height:22px;border-radius:6px;background:#E7F8EE;color:#1DA851;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:800;margin-top:1px}
 ` + cardCss();
 
   const specs = [
@@ -852,12 +1080,13 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
   <div class="layout">
     <div class="gallery">${stage}
       <div class="card"><h2 class="sec-h">Áttekintés</h2>
-        <div class="iconrow">${specs.slice(0, 6).map(([k, v]) => `<div class="ic"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("")}</div>
+        <div class="iconrow">${iconItems.map(([k, v]) => `<div class="ic"><span class="dot">${SPEC_ICONS[k] || ""}</span><div><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div></div>`).join("")}</div>
         <p class="desc" style="margin-top:18px">${esc(descText)}</p>
       </div>
       <div class="card"><h2 class="sec-h">Műszaki adatok</h2>
         <table><tbody>${specs.map(([k, v]) => `<tr><td class="k">${esc(k)}</td><td class="v">${esc(v)}</td></tr>`).join("")}</tbody></table></div>
-      ${eq.length ? `<div class="card"><h2 class="sec-h">Felszereltség</h2><div class="cateq">${eq.map((cat) => `<div class="cath">${esc(cat.title)}</div>${cat.items.map((it) => `<div class="catit">${esc(it)}</div>`).join("")}`).join("")}</div></div>` : ""}
+      ${flat.length ? `<div class="card"><h2 class="sec-h">Felszereltség</h2><div class="feat" id="featbox">${flat.map((f, i) => `<div class="${i >= 8 ? "fmore" : ""}"><span>${esc(f)}</span></div>`).join("")}</div>${flat.length > 8 ? `<button class="showmore" data-t="featbox" data-l="Több megjelenítése (${flat.length - 8})">Több megjelenítése (${flat.length - 8})</button>` : ""}</div>` : ""}
+      ${eq.length ? `<div class="card"><h2 class="sec-h">Járműleírás</h2><div class="cateq" id="cateqbox">${cateqHtml}</div>${flat.length > 12 ? `<button class="showmore" data-t="cateqbox" data-l="Több megjelenítése">Több megjelenítése</button>` : ""}</div>` : ""}
     </div>
     <aside class="side">
       <div class="panel">
@@ -873,10 +1102,26 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
         <a class="btn btn-primary" style="width:100%;margin-top:16px" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Ajánlatkérés: " + title)}">Ajánlatkérés</a>
         <a class="btn btn-soft" style="width:100%;margin-top:10px" href="../../autoink/">Vissza a listához</a>
       </div>
+      <div class="panel dl">
+        <h4 style="margin:0 0 6px;font-size:18px;font-weight:800">Autó adatlap</h4>
+        <p style="margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.45">Töltsd le az autó teljes adatlapját PDF-ben — árral, műszaki adatokkal és felszereltséggel. A megnyíló ablakban válaszd a „Mentés PDF-ként” opciót.</p>
+        <button class="btn btn-soft dlbtn" id="pdfbtn" type="button">${DL_ICON}Adatlap letöltése (PDF)</button>
+      </div>
+      ${contactCardHtml()}
+      <div class="panel"><h4 style="margin:0 0 14px;font-size:18px;font-weight:800">Miért tőlünk vásárolj?</h4>${benefitsHtml()}</div>
     </aside>
   </div>
   ${related.length ? `<h2 class="rel-h">Hasonló autók</h2><div class="rel-grid">${related.map((r) => carCard(r, rate, "../../")).join("")}</div>` : ""}
 </div>
+<script>
+(function(){
+  [].forEach.call(document.querySelectorAll('.showmore'),function(b){b.addEventListener('click',function(){var box=document.getElementById(b.getAttribute('data-t'));if(!box)return;var o=box.classList.toggle('open');b.textContent=o?'Kevesebb megjelenítése':b.getAttribute('data-l');});});
+  var PDF_DOC=${JSON.stringify(pdfDoc).replace(/</g, "\\u003c")};
+  var PDF_NAME=${JSON.stringify(pdfName)};
+  var pb=document.getElementById('pdfbtn');
+  if(pb)pb.addEventListener('click',function(){var w=window.open('about:blank','_blank');if(!w){alert('A böngésző blokkolta a felugró ablakot. Engedélyezd, majd próbáld újra a letöltést.');return;}w.document.open();w.document.write(PDF_DOC);w.document.close();try{w.document.title=PDF_NAME;}catch(e){}try{w.addEventListener('load',function(){try{w.document.title=PDF_NAME;}catch(e){}});}catch(e){}});
+})();
+</` + `script>
 ${g.length > 1 ? `<script>
 var CAG=${JSON.stringify(g)},CI=0;
 function ca_go(i){CI=(i+CAG.length)%CAG.length;document.getElementById('stg').src=CAG[CI];document.getElementById('cidx').textContent=CI+1;
