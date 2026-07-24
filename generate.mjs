@@ -51,6 +51,9 @@ function driveImg(u) {
   if (/^[-\w]{25,}$/.test(u)) return "https://lh3.googleusercontent.com/d/" + u + "=w1600";
   return u;
 }
+// Cars whose hero photo faces the wrong way — mirror it (CSS flip) so every
+// car's main image looks in the same direction. Keyed by slug.
+const MIRROR = new Set(["bmw-x5-xdrive30d-m-sport-pro-22-luft"]);
 // Chosen "hero" main photo per car (3/4 side profile). Keyed by `kulcs`
 // (mobile.de car key) -> a distinctive substring of the chosen image URL.
 const MAIN_PICK = {"bmw-x7-m50d-m-sport-pro-22-b-w": "fe568239", "bmw-x2-xdrive20d-m-sport-pro-20-h-k": "0ec9c853", "bmw-x6-m60i-xdrive-full-option-carbon-m-sitze": "b71ffd45", "bmw-i5-m60-xdrive-i5m60-xdrive": "c2e8e425", "bmw-x5-xdrive30d": "905fe271", "bmw-x6-xdrive30d-m-sport-pro": "c6b0483d", "bmw-x5-xdrive30d-m-sport-pro-luft-22": "7cc9ba26", "porsche-911-carrera-4-gts-approved-3-jahre-voll-leder": "44ce52eb", "bmw-x7-xdrive40d-m-sport-pro-23-luft-h-k": "64574841", "bmw-x5-xdrive40d-m-sport-pro-full-option": "a3dc7592", "bmw-x6-xdrive30d-m-sport-pro-individual-22": "921b1d29", "bmw-x6-xdrive30d-m-sport-pro-luft-22": "a05d3035", "bmw-x5-xdrive30d-m-sport-pro-22-luft": "db6ae02a", "bmw-x5-xdrive30d-m-sport-pro-22": "c32a177b", "bmw-x5-m-competition-21-22": "4783b10e", "porsche-911-carrera-gts-approved-3-jahre-voll-leder": "7544b234", "bmw-x6-xdrive30d-m-sport-pro-22-individual": "87861b10", "bmw-x7-xdrive40d-m-sport-pro-22": "2ad119b8", "porsche-panamera-gts-standheizung-allradlenkung-ptv-pano": "c25bffa2"};
@@ -477,6 +480,7 @@ function cardCss() {
 .card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}
 .media{aspect-ratio:16/10;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
 .media img{width:100%;height:100%;object-fit:cover;display:block}
+.media img.mir{transform:scaleX(-1)}
 .media .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7a828f;font-size:12px}
 .own{position:absolute;top:12px;left:12px;background:#fff;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(8,8,10,.25)}
 .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
@@ -507,8 +511,9 @@ function carCard(c, rate, rel) {
   const g = galleryOf(c);
   const p = priceOf(c, rate);
   const href = `${rel}auto/${slugify(c.modell)}/`;
+  const mir = MIRROR.has(slugify(c.modell)) ? ' class="mir"' : "";
   const img = g[0]
-    ? `<img src="${attr(g[0])}" alt="${attr((c.modell || "").trim())}" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span>`
+    ? `<img${mir} src="${attr(g[0])}" alt="${attr((c.modell || "").trim())}" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span>`
     : `<span class="ph">fotó hamarosan</span>`;
   const cross = p.save > 0 ? `<span class="pcross" data-cross>${fmtHUF(p.huGross)}</span>` : "";
   const save = p.save > 0 ? `<span class="psave" data-save>−${fmtHUF(p.save)}</span>` : "";
@@ -524,8 +529,9 @@ function carCard(c, rate, rel) {
 function featCard(c, rate, mode) {
   const g = galleryOf(c);
   const href = `auto/${slugify(c.modell)}/`;
+  const mir = MIRROR.has(slugify(c.modell)) ? ' class="mir"' : "";
   const img = g[0]
-    ? `<img src="${attr(g[0])}" alt="${attr((c.modell || "").trim())}" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span>`
+    ? `<img${mir} src="${attr(g[0])}" alt="${attr((c.modell || "").trim())}" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span>`
     : `<span class="ph">fotó hamarosan</span>`;
   const spec = [c.km, c.teljesitmeny, c.valto, c.uzemanyag].filter(Boolean).join(" · ");
   let priceRow, cond;
@@ -1154,6 +1160,7 @@ function renderDetail(c, cars, rate) {
   const g = galleryOf(c);
   const p = priceOf(c, rate);
   const slug = slugify(c.modell);
+  const mirHero = MIRROR.has(slug);
   const title = (c.modell || "").trim();
   const eq = equipmentOf(c);
   const flat = eq.flatMap((cat) => cat.items);
@@ -1267,7 +1274,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
   ].filter(([, v]) => v);
 
   const stage = g.length
-    ? `<div class="stage"><img id="stg" src="${attr(g[0])}" alt="${attr(title)}" referrerpolicy="no-referrer">
+    ? `<div class="stage"><img id="stg"${mirHero ? ' class="mir"' : ""} src="${attr(g[0])}" alt="${attr(title)}" referrerpolicy="no-referrer">
        ${g.length > 1 ? '<button class="nav-btn prev" onclick="ca_step(-1)" aria-label="Előző">‹</button><button class="nav-btn next" onclick="ca_step(1)" aria-label="Következő">›</button>' : ""}
        <span class="counter"><span id="cidx">1</span> / ${g.length}</span></div>
        ${g.length > 1 ? `<div class="thumbs" id="thumbs">${g.map((u, i) => `<img src="${attr(u)}" alt="${attr(title + " – " + (i + 1))}" referrerpolicy="no-referrer" onclick="ca_go(${i})" class="${i === 0 ? "active" : ""}">`).join("")}</div>` : ""}`
@@ -1326,6 +1333,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 ${g.length > 1 ? `<script>
 var CAG=${JSON.stringify(g)},CI=0;
 function ca_go(i){CI=(i+CAG.length)%CAG.length;document.getElementById('stg').src=CAG[CI];document.getElementById('cidx').textContent=CI+1;
+ document.getElementById('stg').classList.toggle('mir', ${mirHero ? "true" : "false"} && CI===0);
  var t=document.getElementById('thumbs');if(t){[].forEach.call(t.children,function(im,j){im.className=j===CI?'active':'';});}}
 function ca_step(d){ca_go(CI+d);}
 </script>` : ""}`;
