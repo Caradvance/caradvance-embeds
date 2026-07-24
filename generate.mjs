@@ -558,6 +558,8 @@ const CONTENT_CSS = `
 .cah .svc .btn-row .btn{margin-top:0;font-size:12.5px;padding:10px 13px;white-space:nowrap}
 .cah .svc .btn-outline{background:#fff;color:var(--navy);border:2px solid var(--navy)}
 .cah .svc .btn-outline:hover{background:var(--navy);color:#fff}
+.cah .svc .btn-red{background:var(--red);color:#fff}
+.cah .svc .btn-red:hover{background:var(--red);color:#fff;filter:brightness(.93)}
 .cah .svc.charity-accent{border-top:4px solid var(--red)}
 .cah .platforms{margin:2px 0 24px}
 .cah .plat-lbl{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
@@ -668,7 +670,7 @@ function contentSections(rel) {
     svcCard({ img: rel + "piros-bmw-x6-m-premium-autoberles.webp", alt: "Piros BMW X6 M — prémium autóbérlés", tag: "Prémium autóbérlés", title: "Prémium autóbérlés",
       lead: "<strong>Miért vásárolnál, ha bérelhetsz?</strong> Élvezd a prémium autózás minden előnyét vásárlás nélkül — rugalmas, hosszú távú bérléssel, már fél évtől.",
       items: ["Válogatott prémium modellek", "Rugalmas futamidő — minimum 6 hónaptól", "Átadás-átvétel egyeztetett helyszínen"],
-      extra: `<div class="btn-row"><a class="btn" href="${cat}">Autóink</a><a class="btn btn-outline" href="${cat}">Új autó</a><a class="btn btn-outline" href="#">Rövid távú bérlés</a><a class="btn btn-outline" href="#">Hosszú távú bérlés</a></div>` }),
+      extra: `<div class="btn-row"><a class="btn" href="${cat}">Autóink</a><a class="btn btn-red" href="${cat}">Új autó</a><a class="btn btn-outline" href="#">Rövid távú bérlés</a><a class="btn btn-outline" href="#">Hosszú távú bérlés</a></div>` }),
     svcCard({ img: rel + "bmw-m3-touring-premium-auto-eladas.webp", alt: "BMW M3 Touring — prémium autó eladás", tag: "Prémium autó eladás", title: "Prémium autó eladás",
       lead: "<strong>Miért kockáztatnál, ha biztosra is mehetsz?</strong> Kínálatunkban gondosan válogatott, bevizsgált prémium autók — egyenesen Németországból.",
       items: ["Leinformált, bevizsgált prémium modellek", "Autóink többsége érvényes gyári garanciával", "Finanszírozási lehetőség igény szerint"],
