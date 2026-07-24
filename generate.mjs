@@ -119,6 +119,9 @@ const DE_RULES = [
   [/(soundsystem|harman|bang\s*&?\s*olufsen|bowers|meridian|burmester)/i, "Prémium hangrendszer"],
   [/apple\s*carplay|android\s*auto/i, "Apple CarPlay / Android Auto"],
   [/wireless\s*charging|induktiv.*laden|kabellos.*laden/i, "Vezeték nélküli töltő"],
+  [/garagentoröffner|home-?link/i, "Garázskapu-nyitó"],
+  [/modellbezeichnung/i, "Modellfelirat"],
+  [/schwellerabdeckung|schwellerverkleidung|küssellei|einstiegsblenden|einstiegsleisten/i, "Beépített küszöbvédők"],
   [/dachhimmel/i, "Tetőkárpit"],
   [/innovationspaket|innovations-paket/i, "Innovációs csomag"],
   [/cd-?spieler|cd-?wechsler/i, "CD-lejátszó"],
@@ -196,6 +199,12 @@ function equipmentOf(c) {
   }
   return cats.filter((c) => c.items.length);
 }
+
+// Manually added cars not (yet) in the sheet — appended to the sheet rows at build.
+const EXTRA_CARS = [
+  {"modell": "Porsche Panamera GTS/Standheizung/Allradlenkung/PTV/Pano", "marka": "Porsche", "karosszeria": "Limuzin", "km": "21.970 km", "teljesitmeny": "500 LE", "valto": "Automata", "uzemanyag": "Benzin", "evjarat": "04/2025", "hajtas": "Összkerékhajtás", "berlet_eur": "", "vetel_eur": "149890", "vetel_eur_netto": "125958", "kep_url": "https://img.classistatic.de/api/v1/mo-prod/images/c2/c25bffa2-9097-4bc2-8296-f47fa38dab19?rule=mo-1600", "kiemelt": "", "felszereltseg": "#Egyéb | Ablage-Paket, Adaptive Sportsitze inkl. Sitzverstellung 18-Wege und Memory-Paket | Fahrer-Memory-Paket | Außenspiegel elektr. verstellbar, mit Memory | Lenksäule (Lenkrad) elektr. verstellbar | Außenspiegel lackiert, Außenspiegel Unterschale lackiert | Bremssättel schwarz (Hochglanz) | Dachhimmel Race-Tex | Einstiegsblenden (Carbon) beleuchtet | Fahrassistenz-System: aktiver Park-Assistent vorn und hinten inkl. Rückfahrkamera und Surround View | Fensterzierleisten schwarz (Hochglanz) | Head-up-Display | Home-Link (Garagentoröffner) | Interieur-Paket: Carbon | Interieur-Paket: GTS (Leder/Race-Tex, Ziernähte in Kontrastfarbe) | Ionisator zur Luftreinigung | Kopfstützen vorn und hinten mit Porschewappen | Lenkrad heizbar (GT Sport / Leder) mit Multifunktion und Schaltfunktion | LM-Felgen (lackiert), LM-Felgen vorn/hinten: 9,5x21 / 11,5x21 (Panamera Exclusive Design Rad) | Metallic-Lackierung | Modellbezeichnung lackiert | Panorama-Schiebedach zweiteilig vorn elektrisch | Porsche Torque Vectoring Plus (PTV Plus) | Schwellerabdeckung / -verkleidung Wagenfarbe Sportdesign | Sound-System BOSE | Sport-Design-Paket schwarz Hochglanz | Standheizung | Tankdeckel Exclusive Design | Verglasung hinten abgedunkelt (Privacyverglasung) | Vierradlenkung | Ziffernblatt farbig | Sport Chrono Stoppuhr", "galeria": "https://img.classistatic.de/api/v1/mo-prod/images/c2/c25bffa2-9097-4bc2-8296-f47fa38dab19?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/40/40bf255d-11a0-4b2d-a385-43d6503d5be2?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/65/653110b8-56a5-4782-a2f0-b51cc27c4b05?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/e6/e67d9dcc-a9ec-4ffb-8b04-c438fd45fe6a?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/a0/a0aeb8a8-3806-4f62-a187-a47ffae995cc?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/be/bede2478-76df-4980-837c-8211ce560b8a?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/f8/f821cf0a-95c0-48a9-845d-0695cbc55c34?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/16/164a66c4-d540-4293-88c0-8e3fa4385f8f?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/d0/d09de451-1bff-4c2c-8245-6f26f5995443?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/94/94f941db-d0b2-4980-8992-fe96c9fface6?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/90/90919828-d9d7-4626-83b5-25425a146ee1?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/0c/0cc24c64-cc91-40a8-ba15-364a6daf1935?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/98/989cbfa4-a107-47d4-b08f-30e21b6ae704?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/d6/d6bbc053-1f32-4e31-bf2c-feeeffaeec89?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/35/350b5e04-fc69-41a2-8815-775c988741c1?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/c7/c7157254-db74-4bd2-ae72-a0f7f1f1b288?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/ca/ca40b236-7567-4d66-ae35-d3bdec04675b?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/f6/f6fa9815-9ab2-4086-a2c3-6e4cfb251f56?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/9f/9fc330fa-35f7-44db-984d-4bd9fc695a33?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/1f/1f5a10b2-a7c3-44f6-8d1d-45fffa891b38?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/79/79f01e10-574a-4aee-b277-cb0422c5cec6?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/4b/4b58f1cd-e1c2-4e36-b2e3-9347e3b44efa?rule=mo-1600, https://img.classistatic.de/api/v1/mo-prod/images/a6/a62e93bb-90a2-4e2f-9761-c1106900ca8d?rule=mo-1600", "aktiv": "igen", "sajat": "", "forras": "wega", "kulcs": "c2/c25bffa2-9097-4bc2-8296-f47fa38dab19"}
+];
+
 function priceOf(c, rate) {
   const hufUp = (e) => Math.ceil((Number(e) || 0) * rate / 10000) * 10000;
   // Show the NET price everywhere (áfa nélkül). Fall back to gross/1.19 if net missing.
@@ -204,7 +213,7 @@ function priceOf(c, rate) {
   return { eur, main, huGross: 0, save: 0 };
 }
 // Cars sold / no longer listed on mobile.de — hidden even if still "igen" in the sheet.
-const SOLD_OUT = [/range\s*rover\s*5\.?0\s*sv/i, /t6\s*multivan/i];
+const SOLD_OUT = [/range\s*rover\s*5\.?0\s*sv/i, /t6\s*multivan/i, /fiorino/i];
 const isActive = (c) => {
   if ((c.aktiv || "igen").toLowerCase() === "nem") return false;
   const m = String(c.modell || "");
@@ -1350,6 +1359,7 @@ async function main() {
   if (csvArg) { csv = await fs.readFile(csvArg, "utf8"); console.log("Using local CSV:", csvArg); }
   else { console.log("Fetching sheet…"); csv = await (await fetch(SHEET_CSV_URL, { cache: "no-store" })).text(); }
   const cars = parseCSV(csv);
+  for (const ec of EXTRA_CARS) if (!cars.some((c) => slugify(c.modell) === slugify(ec.modell))) cars.push(ec);
   const rate = await getRate();
   console.log(`Parsed ${cars.length} rows, ${cars.filter(isActive).length} active. Rate=${rate}`);
 
