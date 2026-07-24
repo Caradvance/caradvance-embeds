@@ -65,14 +65,60 @@ const DE2HU = {"3.sitzreihe": "Harmadik üléssor","abdeckkappen außenspiegel m
 // Financing / legal / marketing boilerplate scraped from mobile.de -> drop (not equipment)
 const EQ_JUNK = /(jahreszins|sollzins|monatsrate|\banzahlung|schlussrate|gesamtbetrag|laufzeit|fahrzeugpreis|zahlungsart|finanzierung|darlehen|openbank|check24|impressum|\bagb\b|widerrufen|bestellvorgang|hingucker|funktioniert|eintragen|ergebnis erhalten|abschließen|online-kredit|\bkredit\b|unverbindlich|zuhause|erhältst|bequem|\buvm\b|ratenzahlung|\braten\b|monate|[€%]|datenschutz|barrierefrei|fahrzeugbeschreibung|sicherheitslücke|vulnerability|einstellungen|erklärung|gewährleistung|widerrufs|nutzungsbedingungen|cookie|\banzeige\b|händler|imprint)/i;
 // German compound stems (unambiguous) -> drop untranslatable German
-const DE_STEMS = /(ß|fahrwerk|schaltknauf|aufkleber|feuerlöscher|funkanlage|scheinwerfer|verglasung|sitzheiz|anhänger|getriebe|lenkrad|fahrzeug|datenschutz|barrierefrei|beschreibung|einstellung|erklärung|sicherheit|vulnerability|deutsch|vorhanden|\bsecurity\b|\breport\b|\benglish\b|\bbrief\b)/i;
+const DE_STEMS = /(ß|ä|reifen|heizung|belüftung|beleuchtung|scheinwerfer|scheibe|spiegel|\bleder|licht\b|leuchte|assistent|assistenz|\bpaket|anlage|automatik|differ|sperr|kupplung|verglasung|lenkung|lenkrad|fahrwerk|getriebe|zylinder|blende|träger|steuerung|regelung|warner|halter|bezug|ausstattung|rückfahr|einpark|standheiz|allrad|sommer|winter|allwetter|ganzjahr|sitzheiz|felgen?|\bfelge|räder|\bsitze?\b|fahrer|beifahrer|außen|\binnen|hinten|\bvorn|wärme|kühl|verstellbar|abblend|schwenkbar|federung|dämpfer|schiebedach|\bdach\b|heckklappe|kofferraum|\btüren?\b|lackierung|getönt|abgedunkelt|freisprech|sprachsteuerung|regensensor|lichtsensor|nichtraucher|gewähr|garantie\b|reifendruck|schaltknauf|aufkleber|feuerlöscher|funkanlage|anhänger|fahrzeug|datenschutz|barrierefrei|beschreibung|einstellung|erklärung|sicherheit|vulnerability|deutsch|vorhanden|\bsecurity\b|\breport\b|\benglish\b|\bbrief\b|umfang|inklusive|serienmäßig|optional)/i;
 // Whole German function/marker words (matched per-token, accent-safe)
 const DE_WORDS = new Set(["und","mit","für","der","die","das","dein","deine","deiner","den","dem","des","von","kannst","du","im","am","ein","eine","einfach","absoluter","absolute","online","abschließen","abschliessen","zuhause","wahl","bank","erhältst","bequem","unverbindliches","dich","deinem","zur","zum","ist","sind","vorhanden","deutsches","deutsche","deutscher","zum","beim","oder","auch","sowie","inkl"]);
 const DE_RULES = [
   [/deutsches?\s+fahrzeug/i, "Német jármű (német okmányokkal)"],
-  [/scheckheftgepflegt/i, "Szervizkönyvvel"],
-  [/nichtraucherfahrzeug/i, "Nemdohányzó autó"],
+  [/scheckheftgepflegt|scheckheft/i, "Szervizkönyvvel"],
+  [/nichtraucher/i, "Nemdohányzó autó"],
   [/unfallfrei/i, "Sérülésmentes"],
+  [/sommerreifen/i, "Nyári gumik"],
+  [/winterreifen/i, "Téli gumik"],
+  [/(allwetter|ganzjahres)reifen/i, "Négyévszakos gumik"],
+  [/standheizung/i, "Állófűtés"],
+  [/sitzheizung/i, "Ülésfűtés"],
+  [/(sitzbelüftung|belüftete\s+sitze|sitzklimatisierung|sitzlüftung)/i, "Szellőztetett ülések"],
+  [/(massagesitze|massagefunktion|massage)/i, "Masszázs ülés"],
+  [/(luftfederung|luftfahrwerk|niveauregulierung)/i, "Légrugózás"],
+  [/anhängerkupplung/i, "Vonóhorog"],
+  [/panorama/i, "Panorámatető"],
+  [/schiebedach/i, "Tolótető"],
+  [/(rückfahr|reversier)kamera/i, "Tolatókamera"],
+  [/(360|surround|umgebungs?).{0,8}kamera/i, "360°-os kamera"],
+  [/head-?up/i, "Head-Up kijelző"],
+  [/(klimaautomatik|klimaanlage|klimatronic)/i, "Automata klíma"],
+  [/xenon/i, "Xenon fényszóró"],
+  [/(led-?scheinwerfer|matrix|laserlicht|voll-?led)/i, "LED fényszóró"],
+  [/kurvenlicht/i, "Kanyarfény"],
+  [/(sperrdiff|sperrdifferenzial|differenzialsperre|hinterachs)/i, "Zárható differenciálmű"],
+  [/(allradantrieb|\ballrad\b|4x4|4matic|quattro|xdrive)/i, "Összkerékhajtás"],
+  [/sportfahrwerk/i, "Sportfutómű"],
+  [/adaptive?s?\s*fahrwerk|adaptivfahrwerk/i, "Adaptív futómű"],
+  [/((sport)?abgasanlage|sportauspuff)/i, "Sport kipufogó"],
+  [/multifunktionslenkrad/i, "Multifunkciós kormány"],
+  [/(lederlenkrad|leder\s*lenkrad|sportlenkrad)/i, "Bőr kormány"],
+  [/freisprech/i, "Kihangosító"],
+  [/(keyless|komfortzugang|schlüssellos)/i, "Kulcs nélküli nyitás"],
+  [/soft-?close/i, "Soft-close ajtók"],
+  [/heckklappe|elektr.*kofferraum/i, "Elektromos csomagtérajtó"],
+  [/navigation/i, "Navigációs rendszer"],
+  [/(einparkhilfe|parksensor|\bpdc\b|parkassistent|einparkassistent)/i, "Parkolóasszisztens"],
+  [/(tempomat|geschwindigkeitsregel|abstandsregel|acc\b)/i, "Adaptív tempomat"],
+  [/(memory-?paket|memoryfunktion|sitzmemory)/i, "Memória funkció"],
+  [/(vollleder|nappaleder|lederpolster|lederausstattung|\bleder\b)/i, "Bőr belső"],
+  [/(alufelgen|leichtmetallfelgen|leichtmetallräder|alu-?räder)/i, "Könnyűfém felnik"],
+  [/metallic/i, "Metálfényezés"],
+  [/(getönte|abgedunkelte).{0,10}(scheiben|glas|verglasung)|privacy/i, "Sötétített üvegek"],
+  [/ambiente/i, "Ambient világítás"],
+  [/standklimatisierung|standlüftung/i, "Állóklíma"],
+  [/spurhalte|spurassistent|spurwechsel/i, "Sávtartó asszisztens"],
+  [/totwinkel|toter\s*winkel|spurwechselassistent/i, "Holttér-figyelő"],
+  [/verkehrszeichen/i, "Táblafelismerés"],
+  [/nachtsicht/i, "Éjjellátó"],
+  [/(soundsystem|harman|bang\s*&?\s*olufsen|bowers|meridian|burmester)/i, "Prémium hangrendszer"],
+  [/apple\s*carplay|android\s*auto/i, "Apple CarPlay / Android Auto"],
+  [/wireless\s*charging|induktiv.*laden|kabellos.*laden/i, "Vezeték nélküli töltő"],
 ];
 function hasPhone(s) {
   return /(\+\s?49|\b0049|\btel\.?\b|telefon|\bhandy\b|\bmobil\b|\bwhatsapp\b|\b0\d{2,4}[\s\/.-]\d{4,}|\d{3,}[\s\/.-]\d{4,})/i.test(String(s));
