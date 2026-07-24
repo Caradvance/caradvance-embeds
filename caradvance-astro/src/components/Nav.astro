@@ -1,87 +1,72 @@
 ---
-import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
+import { localizedPath, type Locale } from '../i18n/utils';
 import { localeList, flagCode, languageNames } from '../i18n/ui';
 const { lang, path = '/' } = Astro.props as { lang: Locale; path?: string };
-const t = useTranslations(lang);
-const eladom = localizedPath(lang, '/eladom');
 
+const home = localizedPath(lang, '/');
+const eladom = localizedPath(lang, '/eladom');
+const autoink = localizedPath(lang, '/autoink/');
+
+// Menu mirrors the real caradvance.hu landing-page header exactly.
 const menu = [
-  { label: t('nav.rental'), items: [
-    { t: 'Bérelhető autóink', href: '#' }, { t: 'Rövid távú bérlés', href: '#' },
-    { t: 'Hosszú távú bérlés', href: '#' }, { t: 'Flotta kezelés', href: '#' }, { t: 'Feltételek', href: '#' },
+  { label: 'Prémium autóbérlés', items: [
+    { t: 'Bérelhető autóink', href: '#' }, { t: 'Új autó bérlése', href: '#' },
+    { t: 'Rövid távú bérlés', href: '#' }, { t: 'Hosszú távú bérlés', href: '#' },
+    { t: 'Flotta kezelés', href: '#' }, { t: 'Feltételek', href: '#' },
   ]},
-  { label: t('nav.buy'), items: [
-    { t: 'Autóink', href: '#' }, { t: 'Új autóink – egyedi rendelés', href: '#' },
+  { label: 'Megvásárolható autóink', items: [
+    { t: 'Autóink', href: autoink }, { t: 'Egyedi autó rendelés', href: '#' },
     { t: 'Finanszírozás – lízing', href: '#' }, { t: 'Előnyök', href: '#' },
   ]},
-  { label: t('nav.consign'), items: [
-    { t: 'Eladom az autómat', href: eladom },
-    { t: 'Jótékonyság', href: eladom + '#jotekonysag' },
-    { t: 'Értékesítési folyamat', href: eladom + '#folyamat' },
-    { t: 'Gyakori kérdések', href: eladom + '#gyik' },
+  { label: 'Bizományos értékesítés', items: [
+    { t: 'Eladom az autómat', href: eladom }, { t: 'Jótékonyság', href: eladom + '#jotekonysag' },
+    { t: 'Értékesítési folyamat', href: eladom + '#folyamat' }, { t: 'Gyakori kérdések', href: eladom + '#gyik' },
   ]},
-  { label: t('nav.import'), items: [
+  { label: 'Import', items: [
     { t: 'Autó rendelés', href: '#' }, { t: 'Beszerzési folyamat', href: '#' },
     { t: 'Előnyök', href: '#' }, { t: 'Referenciák', href: '#' },
   ]},
-  { label: t('nav.about'), items: [
-    { t: 'Miért mi?', href: '#' }, { t: 'Caradvance Hungary', href: '#' }, { t: 'Partnereink', href: '#' },
+  { label: 'Rólunk', items: [
+    { t: 'Miért mi?', href: '#' }, { t: 'Caradvance Németország', href: '#' },
+    { t: 'Caradvance Magyarország', href: '#' }, { t: 'Referenciák', href: '#' },
+    { t: 'Partnereink', href: '#' }, { t: 'Media', href: '#' }, { t: 'Blog', href: '#' },
   ]},
 ];
 const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
 ---
-<div class="ca-navwrap">
-  <nav class="ca-nav" aria-label="Főmenü">
-    <a class="brand" href={localizedPath(lang, '/')}>
-      <img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance" />
-    </a>
-    <ul class="menu">
-      {menu.map((m) => (
-        <li class="navitem">
-          <button class="navlink" type="button">{m.label}<span class="chev">⌄</span></button>
-          <div class="dropdown"><div class="dd-inner">
-            {m.items.map((it) => <a class="ddi" href={it.href}>{it.t}</a>)}
-          </div></div>
-        </li>
-      ))}
-    </ul>
-    <div class="navright">
-      <a class="kapcsolat" href="mailto:info@caradvance.hu">{t('nav.contact')} →</a>
-      <div class="lang">
-        <button class="langbtn" type="button" aria-label="Nyelvváltás">
-          <span class="fw" style={`background-image:url(${flagUrl(lang)})`}></span>
-          <span class="chev">⌄</span>
-        </button>
-        <div class="langmenu">
-          {localeList.map((loc) => (
-            <a class="langopt" href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}>
-              <span class="fw" style={`background-image:url(${flagUrl(loc)})`}></span>
-              <span>{languageNames[loc]}</span>
-            </a>
-          ))}
-        </div>
-      </div>
-      <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
-    </div>
-  </nav>
-  <div class="mobilepanel">
+<div class="ca-navwrap"><nav class="ca-nav" aria-label="Főmenü">
+  <a class="brand" href={home}><img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
+  <ul class="menu">
     {menu.map((m) => (
-      <div class="m-acc">
-        <button class="m-accbtn" type="button">{m.label}<span class="m-plus">+</span></button>
-        <div class="m-sub">{m.items.map((it) => <a href={it.href}>{it.t}</a>)}</div>
-      </div>
+      <li class="navitem"><button class="navlink" type="button">{m.label}<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner">
+        {m.items.map((it) => <a class="ddi" href={it.href}>{it.t}</a>)}
+      </div></div></li>
     ))}
-    <a class="m-kapcsolat" href="mailto:info@caradvance.hu">{t('nav.contact')}</a>
-    <div class="m-langtitle">Nyelv</div>
-    <div class="m-langs">
+  </ul>
+  <div class="navright">
+    <a class="kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
+    <div class="lang"><button class="langbtn" type="button" aria-label="Nyelvváltás"><span class="navflag" style={`background-image:url(${flagUrl(lang)})`}></span><span class="lchev"></span></button><div class="langmenu">
       {localeList.map((loc) => (
-        <a class="m-langopt" href={localizedPath(loc, path)}>
-          <span class="fw" style={`background-image:url(${flagUrl(loc)})`}></span>
-          <span>{languageNames[loc]}</span>
-        </a>
+        <a class="langopt" href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
       ))}
-    </div>
+    </div></div>
+    <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
   </div>
+</nav>
+<div class="mobilepanel">
+  {menu.map((m) => (
+    <div class="m-acc"><button class="m-accbtn" type="button">{m.label}<span class="m-plus">+</span></button><div class="m-sub">
+      {m.items.map((it) => <a href={it.href}>{it.t}</a>)}
+    </div></div>
+  ))}
+  <a class="m-kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
+  <div class="m-langtitle">Nyelv</div>
+  <div class="m-langs">
+    {localeList.map((loc) => (
+      <a class="m-langopt" href={localizedPath(loc, path)}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
+    ))}
+  </div>
+</div>
 </div>
 
 <script>
