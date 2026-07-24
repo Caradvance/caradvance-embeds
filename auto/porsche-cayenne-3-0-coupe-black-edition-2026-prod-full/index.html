@@ -149,6 +149,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 .card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}
 .media{aspect-ratio:16/10;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
 .media img{width:100%;height:100%;object-fit:cover;display:block}
+.media img.mir{transform:scaleX(-1)}
 .media .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7a828f;font-size:12px}
 .own{position:absolute;top:12px;left:12px;background:#fff;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(8,8,10,.25)}
 .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
@@ -279,6 +280,7 @@ html.ca-ok #ca-gate{display:none}
 <script>
 var CAG=["https://img.classistatic.de/api/v1/mo-prod/images/e4/e425e500-550f-4cc7-b946-6312e5377b63?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/90/90411835-0048-491c-80bf-773d3e6abfa5?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/04/04da36db-4e95-47e0-bf64-cb280709884b?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/1b/1ba9ec8b-adf1-4559-8e88-c081ec16c9ec?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/c1/c13bb8aa-cd97-4ad0-9bab-c1c49399530c?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/e7/e72ef24f-7acc-4b07-a391-25fb30d7aa1a?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/fc/fcf8f856-1637-4b79-93e2-5cdf18ea6b63?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/b4/b455d1ab-0abb-4bf6-af2d-a3c24a7af042?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/2c/2cce4575-b6a9-4e17-9797-06633669ad5d?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/d8/d8b44726-9809-42dd-8db4-4a0bfd47ec61?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/fa/fa36b0c1-9f10-4268-888b-080c3874ca65?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/45/45cebec2-971a-4458-b85e-bc5fbfc5e162?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/ea/ea52bf65-5f42-4aab-a71a-2262a8974ac4?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/38/38fba61a-3fee-433e-af1e-59e89efc8fb3?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/c2/c24b4235-0753-40c5-a8b7-7d7f342d127b?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/4e/4e25a6aa-6d19-487e-a1db-a501b1cef728?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/2a/2a2a6d7f-7f6d-4cd8-994c-6be6e5243035?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/1e/1ecf3e64-2120-4907-ba02-126d68de4ec7?rule=mo-1600"],CI=0;
 function ca_go(i){CI=(i+CAG.length)%CAG.length;document.getElementById('stg').src=CAG[CI];document.getElementById('cidx').textContent=CI+1;
+ document.getElementById('stg').classList.toggle('mir', false && CI===0);
  var t=document.getElementById('thumbs');if(t){[].forEach.call(t.children,function(im,j){im.className=j===CI?'active':'';});}}
 function ca_step(d){ca_go(CI+d);}
 </script>

@@ -149,6 +149,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 .card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}
 .media{aspect-ratio:16/10;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
 .media img{width:100%;height:100%;object-fit:cover;display:block}
+.media img.mir{transform:scaleX(-1)}
 .media .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7a828f;font-size:12px}
 .own{position:absolute;top:12px;left:12px;background:#fff;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(8,8,10,.25)}
 .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
@@ -279,6 +280,7 @@ html.ca-ok #ca-gate{display:none}
 <script>
 var CAG=["https://img.classistatic.de/api/v1/mo-prod/images/74/745e9618-9494-4b34-af2a-7e7580e533de?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/21/2182e56e-7757-49df-aaa8-aabd493794e0?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/29/29c89ad0-704a-4910-ae7e-ff1fc9998058?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/e4/e45311b0-e594-4e91-ae42-ae7053f0b3c9?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/56/565b664a-de4d-407e-8cd8-9562f39820f2?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/f6/f63ccc24-ff13-4d9e-bd18-73c8b4658995?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/dd/dd38606c-7490-4f18-911f-04ac2db2af26?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/48/48e59899-c258-43f0-85d2-6323d336b7f1?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/0e/0e65c5f3-2a73-4bf3-9914-ef95852c9097?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/3b/3b268194-5a9f-4785-a31e-0a3351a4a803?rule=mo-1600","https://img.classistatic.de/api/v1/mo-prod/images/73/7380bfb8-0c27-4b38-b2a7-7a6bc4a228da?rule=mo-1600"],CI=0;
 function ca_go(i){CI=(i+CAG.length)%CAG.length;document.getElementById('stg').src=CAG[CI];document.getElementById('cidx').textContent=CI+1;
+ document.getElementById('stg').classList.toggle('mir', false && CI===0);
  var t=document.getElementById('thumbs');if(t){[].forEach.call(t.children,function(im,j){im.className=j===CI?'active':'';});}}
 function ca_step(d){ca_go(CI+d);}
 </script>
