@@ -13,7 +13,7 @@ export interface EladomContent {
     eyebrow: string; title: string; intro: string;
     bigNum: string; bigUnit: string; bigLabel: string;
     cardTitle: string; cardText: string; cardCta: string;
-    orgs: { tag: string; color: string; logo: string; name: string; text: string }[];
+    orgs: { tag: string; color: string; icon: string; logo: string; name: string; text: string }[];
     supports: string; orgLink: string; note: string;
   };
   why: {
@@ -62,13 +62,13 @@ const hu: EladomContent = {
     cardText: 'Amikor ránk bízod az autód eladását, a jutalékunk egy meghatározott része egy magyar jótékony szervezethez kerül. A bemutatóvideóban azt is megmutatjuk, melyik ügyet támogatja épp a Te autód — átláthatóan, valódi hatással.',
     cardCta: 'Átlátható felajánlás minden eladás után',
     orgs: [
-      { tag: 'Gyerekek & családok', color: 'linear-gradient(160deg,#2f6b4f,#1d4a37)', logo: `${BASE}/sos-gyermekfalvak-magyarorszag.webp`, name: 'SOS Gyermekfalu Magyarország', text: 'Otthont, biztonságot és szerető családi környezetet ad olyan gyerekeknek, akik nem nevelkedhetnek a saját családjukban.' },
-      { tag: 'Élelmiszer & rászorulók', color: 'linear-gradient(160deg,#d08a2c,#a5641a)', logo: `${BASE}/magyar-elelmiszerbank-egyesulet.webp`, name: 'Magyar Élelmiszerbank Egyesület', text: 'Megmenti a még jó minőségű, feleslegessé vált élelmiszert, és eljuttatja a nélkülöző családokhoz országszerte.' },
-      { tag: 'Beteg gyerekek', color: 'linear-gradient(160deg,#2f5aa8,#1e3c72)', logo: `${BASE}/bator-tabor.webp`, name: 'Bátor Tábor Alapítvány', text: 'Ingyenes, élményterápiás táborokkal ad gondtalan napokat és erőt súlyos betegséggel küzdő gyerekeknek és családjaiknak.' },
-      { tag: 'Humanitárius', color: 'linear-gradient(160deg,#9c2b2b,#6f1d1d)', logo: `${BASE}/magyar-maltai-szeretetszolgalat.webp`, name: 'Magyar Máltai Szeretetszolgálat', text: 'Az ország egyik legnagyobb segélyszervezete: hajléktalan- és családsegítés, katasztrófahelyzeti támogatás.' },
-      { tag: 'Állatvédelem', color: 'linear-gradient(160deg,#7a5a34,#4f3a20)', logo: `${BASE}/rex-kutyaotthon-alapitvany.webp`, name: 'Rex Kutyaotthon Alapítvány', text: 'Bajba jutott, kóbor és bántalmazott kutyák menedéke — ellátás, gyógyítás és új, szerető gazdik keresése.' },
-      { tag: 'Gyermekgyógyászat', color: 'linear-gradient(160deg,#c24d6e,#8a2f49)', logo: `${BASE}/heim-pal-orszagos-gyermekgyogyaszati-intezet.webp`, name: 'Heim Pál Gyermekgyógyászati Intézet', text: 'Az ország vezető gyermekkórháza — a támogatás modernebb eszközöket és jobb gyógyulási esélyt jelent.' },
-      { tag: 'Jogvédelem', color: 'linear-gradient(160deg,#4b5563,#2c333d)', logo: `${BASE}/patent-egyesulet.webp`, name: 'PATENT Egyesület', text: 'Jogi és lelki segítséget nyújt bántalmazást átélt nőknek és gyerekeknek — a biztonságos újrakezdésért.' },
+      { tag: 'Gyerekek & családok', color: 'linear-gradient(160deg,#2f6b4f,#1d4a37)', logo: `${BASE}/sos-gyermekfalvak-magyarorszag.webp`, icon: 'house', name: 'SOS Gyermekfalu Magyarország', text: 'Otthont, biztonságot és szerető családi környezetet ad olyan gyerekeknek, akik nem nevelkedhetnek a saját családjukban.' },
+      { tag: 'Élelmiszer & rászorulók', color: 'linear-gradient(160deg,#d08a2c,#a5641a)', logo: `${BASE}/magyar-elelmiszerbank-egyesulet.webp`, icon: 'food', name: 'Magyar Élelmiszerbank Egyesület', text: 'Megmenti a még jó minőségű, feleslegessé vált élelmiszert, és eljuttatja a nélkülöző családokhoz országszerte.' },
+      { tag: 'Beteg gyerekek', color: 'linear-gradient(160deg,#2f5aa8,#1e3c72)', logo: `${BASE}/bator-tabor.webp`, icon: 'tent', name: 'Bátor Tábor Alapítvány', text: 'Ingyenes, élményterápiás táborokkal ad gondtalan napokat és erőt súlyos betegséggel küzdő gyerekeknek és családjaiknak.' },
+      { tag: 'Humanitárius', color: 'linear-gradient(160deg,#9c2b2b,#6f1d1d)', logo: `${BASE}/magyar-maltai-szeretetszolgalat.webp`, icon: 'cross', name: 'Magyar Máltai Szeretetszolgálat', text: 'Az ország egyik legnagyobb segélyszervezete: hajléktalan- és családsegítés, katasztrófahelyzeti támogatás.' },
+      { tag: 'Állatvédelem', color: 'linear-gradient(160deg,#7a5a34,#4f3a20)', logo: `${BASE}/rex-kutyaotthon-alapitvany.webp`, icon: 'paw', name: 'Rex Kutyaotthon Alapítvány', text: 'Bajba jutott, kóbor és bántalmazott kutyák menedéke — ellátás, gyógyítás és új, szerető gazdik keresése.' },
+      { tag: 'Gyermekgyógyászat', color: 'linear-gradient(160deg,#c24d6e,#8a2f49)', logo: `${BASE}/heim-pal-orszagos-gyermekgyogyaszati-intezet.webp`, icon: 'plus', name: 'Heim Pál Gyermekgyógyászati Intézet', text: 'Az ország vezető gyermekkórháza — a támogatás modernebb eszközöket és jobb gyógyulási esélyt jelent.' },
+      { tag: 'Jogvédelem', color: 'linear-gradient(160deg,#4b5563,#2c333d)', logo: `${BASE}/patent-egyesulet.webp`, icon: 'shield', name: 'PATENT Egyesület', text: 'Jogi és lelki segítséget nyújt bántalmazást átélt nőknek és gyerekeknek — a biztonságos újrakezdésért.' },
     ],
     supports: 'Az eladásod ezt támogatja',
     orgLink: 'A szervezetről',
