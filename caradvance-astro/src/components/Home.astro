@@ -1,8 +1,13 @@
 ---
+import '../styles/eladom.css';
+import '../styles/home.css';
 import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
+import { homeContent } from '../data/home';
 const { lang } = Astro.props as { lang: Locale };
 const t = useTranslations(lang);
+const c = homeContent(lang);
 ---
+<!-- HERO -->
 <section class="hero">
   <video autoplay muted loop playsinline preload="auto" poster="https://caradvance.hu/caradvance-hero-x5-poster.jpg">
     <source src="https://caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4" />
@@ -17,4 +22,126 @@ const t = useTranslations(lang);
       <a class="btn btn-white" href={localizedPath(lang, '/eladom')}>{t('home.cta2')}</a>
     </div>
   </div>
+</section>
+
+<!-- STATS -->
+<section class="section" style="padding-top:64px;padding-bottom:48px">
+  <div class="wrap">
+    <div class="stats">
+      {c.stats.map((s) => (
+        <div class="stat"><div class="num">{s.num}<span>{s.unit}</span></div><div class="lbl">{s.label}</div></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" id="szolgaltatasok" style="padding-top:36px">
+  <div class="wrap center">
+    <span class="eyebrow">{c.services.eyebrow}</span>
+    <h2 class="sec-title">{c.services.title}</h2>
+  </div>
+  <div class="wrap">
+    <div class="svc-grid">
+      {c.services.items.map((s) => (
+        <div class="svc">
+          <img src={s.img} alt={s.title} />
+          <div class="body">
+            <div class="kicker">{s.kicker}</div>
+            <h3>{s.title}</h3>
+            <p>{s.lead}</p>
+            <ul>{s.points.map((p) => <li>{p}</li>)}</ul>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- CHARITY -->
+<section class="section charity-home" id="jotekonysag">
+  <div class="wrap center">
+    <span class="eyebrow">{c.charity.eyebrow}</span>
+    <h2 class="sec-title">{c.charity.title}</h2>
+    <p class="sec-intro">{c.charity.text}</p>
+    <div style="margin-top:22px"><a class="btn btn-primary" href={localizedPath(lang, '/eladom')}>{c.charity.cta}</a></div>
+    <div class="clogos">{c.charity.logos.map((l) => <img src={l} alt="" />)}</div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section" id="folyamat">
+  <div class="wrap center">
+    <span class="eyebrow">{c.process.eyebrow}</span>
+    <h2 class="sec-title">{c.process.title}</h2>
+  </div>
+  <div class="wrap">
+    <div class="step-grid">
+      {c.process.steps.map((s, i) => (
+        <div class="step"><div class="n">{i + 1}</div><div><h4>{s.title}</h4><p>{s.text}</p></div></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="rolunk" style="background:#F1F2F5">
+  <div class="wrap center">
+    <span class="eyebrow">{c.about.eyebrow}</span>
+    <h2 class="sec-title">{c.about.title}</h2>
+  </div>
+  <div class="wrap"><div class="about-wrap">{c.about.paras.map((p) => <p>{p}</p>)}</div></div>
+</section>
+
+<!-- VALUES -->
+<section class="section">
+  <div class="wrap center">
+    <span class="eyebrow">{c.values.eyebrow}</span>
+    <h2 class="sec-title">{c.values.title}</h2>
+  </div>
+  <div class="wrap">
+    <div class="feat-grid">
+      {c.values.items.map((v) => (
+        <div class="feat"><h4>{v.title}</h4><p>{v.text}</p></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section" style="background:#F1F2F5">
+  <div class="wrap center">
+    <span class="eyebrow">{c.reviews.eyebrow}</span>
+    <h2 class="sec-title">{c.reviews.title}</h2>
+    <div class="rev-head"><span class="stars">★★★★★</span><span class="rlabel">{c.reviews.rating}</span></div>
+  </div>
+  <div class="wrap">
+    <div class="rev-grid">
+      {c.reviews.items.map((r) => (
+        <div class="rev"><div class="stars">★★★★★</div><p>{r.text}</p><div class="who">{r.name} · {r.when}</div></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="gyik">
+  <div class="wrap center">
+    <span class="eyebrow">{c.faq.eyebrow}</span>
+    <h2 class="sec-title">{c.faq.title}</h2>
+  </div>
+  <div class="wrap">
+    <div class="faq-list">
+      {c.faq.items.map((f) => (
+        <details class="faq-item"><summary>{f.q}</summary><div class="ans">{f.a}</div></details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING CTA -->
+<section class="close-cta">
+  <h2>{c.closing.title}</h2>
+  <p>{c.closing.text}</p>
+  <a class="btn btn-primary" href="mailto:info@caradvance.hu">{c.closing.cta}</a>
 </section>
