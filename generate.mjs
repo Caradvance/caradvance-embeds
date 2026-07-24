@@ -65,6 +65,10 @@ function galleryOf(c) {
   if (pick) {
     const i = all.findIndex((u) => u.includes(pick));
     if (i > 0) { const [p] = all.splice(i, 1); all.unshift(p); }
+  } else if (all.length > 1 && /classistatic|mo-prod/.test(all[0])) {
+    // Same system for every mobile.de-sourced car: the 3/4 side-profile shot is
+    // reliably the 2nd photo, so promote it to the main image automatically.
+    const [p] = all.splice(1, 1); all.unshift(p);
   }
   return all;
 }
