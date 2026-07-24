@@ -74,6 +74,9 @@ const DE_RULES = [
   [/nichtraucherfahrzeug/i, "Nemdohányzó autó"],
   [/unfallfrei/i, "Sérülésmentes"],
 ];
+function hasPhone(s) {
+  return /(\+\s?49|\b0049|\btel\.?\b|telefon|\bhandy\b|\bmobil\b|\bwhatsapp\b|\b0\d{2,4}[\s\/.-]\d{4,}|\d{3,}[\s\/.-]\d{4,})/i.test(String(s));
+}
 function hasGermanWord(s) {
   return String(s).toLowerCase().split(/[^a-zà-ÿőű]+/).some((w) => w && DE_WORDS.has(w));
 }
@@ -84,6 +87,7 @@ function translateEquip(raw) {
   const key = s.replace(/\s+/g, " ").toLowerCase();
   if (DE2HU[key]) return DE2HU[key];   // exact dictionary hit (translate)
   for (const [re, hu] of DE_RULES) if (re.test(s)) return hu;  // pattern translate
+  if (hasPhone(s)) return null;        // German / any phone numbers
   if (EQ_JUNK.test(s)) return null;    // financing / legal junk
   if (DE_STEMS.test(s)) return null;   // untranslatable German compound
   if (hasGermanWord(s)) return null;   // German sentence / marker word
