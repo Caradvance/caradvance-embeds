@@ -23,6 +23,18 @@ const check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const cross = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 const play = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+const chevL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18 9 12l6-6"/></svg>';
+const chevR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18 15 12 9 6"/></svg>';
+
+const ILLO: Record<string, string> = {
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M12 12.2c-.8-1.2-2.6-.7-2.6.8 0 1.1 1.6 2.2 2.6 3 1-.8 2.6-1.9 2.6-3 0-1.5-1.8-2-2.6-.8z"/></svg>',
+  food: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 13h18a9 9 0 0 1-18 0z"/><circle cx="10" cy="8.5" r="2.3"/><circle cx="14.6" cy="9.6" r="1.8"/></svg>',
+  tent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 4 3 20h18z"/><path d="M12 4v16"/><path d="m12 20 4-6"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="M12 8v6M9 11h6"/></svg>',
+  paw: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="9" r="1.8"/><circle cx="12" cy="7" r="1.8"/><circle cx="17" cy="9" r="1.8"/><path d="M12 11c-2.5 0-4.5 2-4.5 4 0 1.6 1.4 2.5 4.5 2.5s4.5-.9 4.5-2.5c0-2-2-4-4.5-4z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="M12 10.5c-.7-1-2.3-.6-2.3.7 0 1 1.4 1.9 2.3 2.6.9-.7 2.3-1.6 2.3-2.6 0-1.3-1.6-1.7-2.3-.7z"/></svg>',
+};
 
 const FEATURE_ICONS: Record<string, string> = {
   video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
@@ -93,17 +105,25 @@ const FEATURE_ICONS: Record<string, string> = {
         <a class="give-pill" href="#folyamat"><Fragment set:html={heart} /> {c.charity.cardCta}</a>
       </div>
     </div>
-    <div class="charity-grid">
-      {c.charity.orgs.map((o) => (
-        <div class="ch-card">
-          <div class="ch-head" style={`background:${o.color}`}><span class="ch-tag">{o.tag}</span></div>
-          <div class="ch-body"><img class="ch-logo" src={o.logo} alt={o.name} /><h4>{o.name}</h4><p>{o.text}</p></div>
-          <div class="ch-foot">
-            <div class="ch-support"><Fragment set:html={heart} /> {c.charity.supports}</div>
-            <a class="ch-link" href="#">{c.charity.orgLink} <Fragment set:html={arrow} /></a>
+    <div class="charity-wrap">
+      <button class="ch-arrow prev" type="button" aria-label="Előző"><Fragment set:html={chevL} /></button>
+      <button class="ch-arrow next" type="button" aria-label="Következő"><Fragment set:html={chevR} /></button>
+      <div class="charity-scroll" id="charityScroll">
+        {c.charity.orgs.map((o) => (
+          <div class="ch-card">
+            <div class="ch-head" style={`background:${o.color}`}>
+              <span class="ch-illo" set:html={ILLO[o.icon]}></span>
+              <span class="ch-corner"><Fragment set:html={heart} /></span>
+              <span class="ch-tag">{o.tag}</span>
+            </div>
+            <div class="ch-body"><img class="ch-logo" src={o.logo} alt={o.name} /><h4>{o.name}</h4><p>{o.text}</p></div>
+            <div class="ch-foot">
+              <div class="ch-support"><Fragment set:html={heart} /> {c.charity.supports}</div>
+              <a class="ch-link" href="#">{c.charity.orgLink} <Fragment set:html={arrow} /></a>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
     <p class="give-note">{c.charity.note}</p>
   </div>
@@ -239,3 +259,12 @@ const FEATURE_ICONS: Record<string, string> = {
   <p>{c.closing.text}</p>
   <a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Auto%20eladas">{c.closing.cta}</a>
 </section>
+
+<script>
+  const sc = document.getElementById('charityScroll');
+  if (sc) {
+    const step = () => Math.min(sc.clientWidth * 0.85, 352);
+    document.querySelector('.ch-arrow.prev')?.addEventListener('click', () => sc.scrollBy({ left: -step(), behavior: 'smooth' }));
+    document.querySelector('.ch-arrow.next')?.addEventListener('click', () => sc.scrollBy({ left: step(), behavior: 'smooth' }));
+  }
+</script>
