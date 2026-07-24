@@ -1184,8 +1184,8 @@ function renderDetail(c, cars, rate) {
 .layout{display:grid;gap:28px;align-items:start;grid-template-columns:minmax(0,1fr) minmax(0,360px)}
 @media(max-width:1024px){.layout{grid-template-columns:1fr}}
 .gallery{min-width:0}
-.stage{position:relative;width:100%;aspect-ratio:16/10;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#1A1B1F,#26272C)}
-.stage img{width:100%;height:100%;object-fit:cover;display:block}
+.stage{position:relative;width:100%;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#1A1B1F,#26272C)}
+.stage img{width:100%;height:100%;object-fit:contain;display:block}
 .counter{position:absolute;bottom:14px;right:14px;background:rgba(11,11,13,.75);color:#fff;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px}
 .nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.6);border:0;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.7}
 .nav-btn:hover{opacity:1;background:#fff}.nav-btn.prev{left:12px}.nav-btn.next{right:12px}
