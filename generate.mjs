@@ -386,6 +386,37 @@ w.querySelectorAll('.m-accbtn').forEach(function(x){x.addEventListener('click',f
 var lang=w.querySelector('.lang'),lb=w.querySelector('.langbtn');if(lb)lb.addEventListener('click',function(e){e.stopPropagation();lang.classList.toggle('open');});document.addEventListener('click',function(){if(lang)lang.classList.remove('open');});})();
 </script>`;
 
+// ---- "Under construction" gate ---------------------------------------
+// Flip CONSTRUCTION to false (and rebuild) to open the site to the public.
+// Change ACCESS_CODE to whatever you want to share with the team.
+const CONSTRUCTION = true;
+const ACCESS_CODE = "CarAdvance2027";
+const GATE_HEAD = CONSTRUCTION ? `<meta name="robots" content="noindex,nofollow">
+<script>(function(){try{if(localStorage.getItem('ca_ok')===${JSON.stringify(ACCESS_CODE)})document.documentElement.classList.add('ca-ok');}catch(e){}})();</script>
+<style>html:not(.ca-ok) body{overflow:hidden}
+#ca-gate{position:fixed;inset:0;z-index:2147483647;background:linear-gradient(135deg,#0B0B0D,#26272C);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',system-ui,sans-serif;text-align:center;padding:24px}
+html.ca-ok #ca-gate{display:none}
+#ca-gate .box{max-width:460px;width:100%}
+#ca-gate img{height:56px;width:auto;margin:0 auto 28px;display:block}
+#ca-gate h1{font-size:32px;font-weight:800;margin:0 0 12px;letter-spacing:-.02em}
+#ca-gate p{color:#c7cdd6;font-size:16px;line-height:1.55;margin:0 0 28px}
+#ca-gate form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#ca-gate input{flex:1;min-width:180px;max-width:260px;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:16px;outline:none}
+#ca-gate input::placeholder{color:#9aa4b2}
+#ca-gate button{background:#E2001A;color:#fff;border:0;border-radius:12px;padding:14px 24px;font-weight:800;font-size:16px;cursor:pointer}
+#ca-gate .err{color:#ff8a8a;font-size:14px;margin-top:16px;min-height:18px;font-weight:600}</style>` : "";
+function gateBody(rel) {
+  if (!CONSTRUCTION) return "";
+  return `<div id="ca-gate"><div class="box">
+  <img src="${rel}caradvance-logo-white.webp" alt="CarAdvance">
+  <h1>Hamarosan indul</h1>
+  <p>Weboldalunk még építés alatt áll. Ha rendelkezel belépési kóddal, itt megtekintheted az előnézetet.</p>
+  <form onsubmit="return caGate(event)"><input id="ca-code" type="password" placeholder="Belépési kód" autocomplete="off" autofocus><button type="submit">Belépés</button></form>
+  <div class="err" id="ca-err"></div>
+</div></div>
+<script>function caGate(e){e.preventDefault();var v=(document.getElementById('ca-code').value||'').trim();if(v===${JSON.stringify(ACCESS_CODE)}){try{localStorage.setItem('ca_ok',v);}catch(_){}document.documentElement.classList.add('ca-ok');}else{document.getElementById('ca-err').textContent='Hibás kód, próbáld újra.';}return false;}</script>`;
+}
+
 function page({ title, desc, canonical, rel, css, body, head = "", bodyClass = "" }) {
   return `<!doctype html><html lang="hu"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -399,7 +430,9 @@ function page({ title, desc, canonical, rel, css, body, head = "", bodyClass = "
 ${FONT}
 <style>${BASE_CSS}${css || ""}</style>
 ${head}
+${GATE_HEAD}
 </head><body class="${bodyClass}">
+${gateBody(rel)}
 ${navHtml(rel)}
 ${body}
 ${footerHtml(rel)}
