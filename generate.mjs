@@ -57,6 +57,7 @@ const MIRROR = new Set([
   // Only cars with no available right-facing photo — flip to face right.
   "porsche-911-carrera-4-gts-approved-3-jahre-voll-leder",
   "mercedes-benz-g-63-amg-made-to-measure-mint-white-23-brabus-tv",
+  "bmw-x5-xdrive30d-m-sport-pro-22-luft",
 ]);
 // Explicit right-facing main photo (Marc-picked, from each car's own gallery).
 // Keyed by slug -> mobile.de image UUID. Prepended as the hero, deduped, and
