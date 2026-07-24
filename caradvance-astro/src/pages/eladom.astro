@@ -1,0 +1,10 @@
+---
+import Base from '../layouts/Base.astro';
+import Eladom from '../components/Eladom.astro';
+import { useTranslations } from '../i18n/utils';
+const lang = 'hu';
+const t = useTranslations(lang);
+---
+<Base lang={lang} path="/eladom" title={`${t('eladom.title1')} ${t('eladom.title2')} — CarAdvance`} description={t('eladom.sub')}>
+  <Eladom lang={lang} />
+</Base>

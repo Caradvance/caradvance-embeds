@@ -1,0 +1,20 @@
+---
+import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
+const { lang } = Astro.props as { lang: Locale };
+const t = useTranslations(lang);
+---
+<section class="hero">
+  <video autoplay muted loop playsinline preload="auto" poster="https://caradvance.hu/caradvance-hero-x5-poster.jpg">
+    <source src="https://caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4" />
+  </video>
+  <div class="scrim"></div>
+  <div class="inner">
+    <img class="brand-logo" src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance — the automotive people" />
+    <h1>{t('home.title')}</h1>
+    <p class="sub">{t('home.sub')}</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="mailto:info@caradvance.hu">{t('home.cta1')}</a>
+      <a class="btn btn-white" href={localizedPath(lang, '/eladom')}>{t('home.cta2')}</a>
+    </div>
+  </div>
+</section>

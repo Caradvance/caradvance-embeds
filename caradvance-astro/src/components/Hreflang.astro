@@ -1,0 +1,10 @@
+---
+import { localeList, defaultLang } from '../i18n/ui';
+import { localizedPath } from '../i18n/utils';
+const { path = '/' } = Astro.props;
+const site = 'https://caradvance.hu';
+---
+{localeList.map((loc) => (
+  <link rel="alternate" hreflang={loc} href={site + localizedPath(loc, path)} />
+))}
+<link rel="alternate" hreflang="x-default" href={site + localizedPath(defaultLang, path)} />

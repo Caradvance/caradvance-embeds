@@ -1,0 +1,80 @@
+---
+import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
+import { localeList, flagCode, languageNames } from '../i18n/ui';
+const { lang, path = '/' } = Astro.props as { lang: Locale; path?: string };
+const t = useTranslations(lang);
+const eladom = localizedPath(lang, '/eladom');
+
+// Menu structure — top-level label + dropdown items.
+// Items pointing at "#" are pages not built yet (placeholders).
+const menu = [
+  { label: t('nav.rental'), items: [
+    { t: 'Bérelhető autóink', href: '#' }, { t: 'Rövid távú bérlés', href: '#' },
+    { t: 'Hosszú távú bérlés', href: '#' }, { t: 'Flotta kezelés', href: '#' }, { t: 'Feltételek', href: '#' },
+  ]},
+  { label: t('nav.buy'), items: [
+    { t: 'Autóink', href: '#' }, { t: 'Új autóink – egyedi rendelés', href: '#' },
+    { t: 'Finanszírozás – lízing', href: '#' }, { t: 'Előnyök', href: '#' },
+  ]},
+  { label: t('nav.consign'), items: [
+    { t: 'Eladom az autómat', href: eladom },
+    { t: 'Jótékonyság', href: eladom + '#jotekonysag' },
+    { t: 'Értékesítési folyamat', href: eladom + '#folyamat' },
+    { t: 'Gyakori kérdések', href: eladom + '#gyik' },
+  ]},
+  { label: t('nav.import'), items: [
+    { t: 'Autó rendelés', href: '#' }, { t: 'Beszerzési folyamat', href: '#' },
+    { t: 'Előnyök', href: '#' }, { t: 'Referenciák', href: '#' },
+  ]},
+  { label: t('nav.about'), items: [
+    { t: 'Miért mi?', href: '#' }, { t: 'Caradvance Hungary', href: '#' }, { t: 'Partnereink', href: '#' },
+  ]},
+];
+---
+<div class="ca-navwrap">
+  <nav class="ca-nav" aria-label="Főmenü">
+    <a class="brand" href={localizedPath(lang, '/')}>
+      <img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance" />
+    </a>
+    <ul class="menu">
+      {menu.map((m) => (
+        <li class="navitem">
+          <button class="navlink" type="button">{m.label}<span class="chev">⌄</span></button>
+          <div class="dropdown"><div class="dd-inner">
+            {m.items.map((it) => <a class="ddi" href={it.href}>{it.t}</a>)}
+          </div></div>
+        </li>
+      ))}
+    </ul>
+    <div class="navright">
+      <a class="kapcsolat" href="mailto:info@caradvance.hu">{t('nav.contact')} →</a>
+      <div class="lang">
+        {localeList.map((loc) => (
+          <a href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}
+             title={languageNames[loc]} style={`background-image:url(https://flagcdn.com/w40/${flagCode[loc]}.png)`}></a>
+        ))}
+      </div>
+      <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mobilepanel">
+    {menu.map((m) => (
+      <div class="m-acc">
+        <button class="m-accbtn" type="button">{m.label}<span class="m-plus">+</span></button>
+        <div class="m-sub">{m.items.map((it) => <a href={it.href}>{it.t}</a>)}</div>
+      </div>
+    ))}
+    <a class="m-kapcsolat" href="mailto:info@caradvance.hu">{t('nav.contact')}</a>
+  </div>
+</div>
+
+<script>
+  const wrap = document.querySelector('.ca-navwrap');
+  if (wrap) {
+    const burger = wrap.querySelector('.burger');
+    burger && burger.addEventListener('click', () => wrap.classList.toggle('open'));
+    wrap.querySelectorAll('.m-accbtn').forEach((b) =>
+      b.addEventListener('click', () => b.parentElement?.classList.toggle('open'))
+    );
+  }
+</script>

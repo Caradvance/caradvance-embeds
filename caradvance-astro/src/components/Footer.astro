@@ -1,0 +1,27 @@
+---
+import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
+const { lang, path = '/' } = Astro.props as { lang: Locale; path?: string };
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <img src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" />
+      <p>{t('foot.tagline')}</p>
+    </div>
+    <div>
+      <h4>{t('foot.menu')}</h4>
+      <a href={localizedPath(lang, '/')}>{t('nav.buy')}</a>
+      <a href={localizedPath(lang, '/')}>{t('nav.rental')}</a>
+      <a href={localizedPath(lang, '/eladom')}>{t('nav.consign')}</a>
+      <a href={localizedPath(lang, '/')}>{t('nav.import')}</a>
+    </div>
+    <div>
+      <h4>{t('foot.contact')}</h4>
+      <a href="mailto:info@caradvance.hu">info@caradvance.hu</a>
+      <a href={localizedPath(lang, '/')}>{t('nav.about')}</a>
+    </div>
+  </div>
+  <div class="copy">© {year} CarAdvance · BH Group Zrt.</div>
+</footer>

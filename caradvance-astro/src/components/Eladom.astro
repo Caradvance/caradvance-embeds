@@ -1,0 +1,241 @@
+---
+import '../styles/eladom.css';
+import { useTranslations, type Locale } from '../i18n/utils';
+import type { UIKey } from '../i18n/ui';
+import { eladomContent } from '../data/eladom';
+
+const { lang } = Astro.props as { lang: Locale };
+const t = useTranslations(lang);
+const c = eladomContent(lang);
+
+const pills: { key: UIKey; href: string }[] = [
+  { key: 'pill.charity', href: '#jotekonysag' },
+  { key: 'pill.why', href: '#miert' },
+  { key: 'pill.media', href: '#foto-video' },
+  { key: 'pill.alone', href: '#egyedul' },
+  { key: 'pill.how', href: '#folyamat' },
+  { key: 'pill.team', href: '#csapat' },
+  { key: 'pill.faq', href: '#gyik' },
+];
+
+const heart = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21z"/></svg>';
+const check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>';
+const cross = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+const play = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+
+const FEATURE_ICONS: Record<string, string> = {
+  video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
+  reach: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0 1 7-7M12 19a7 7 0 0 0 7-7"/></svg>',
+  price: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  heart: heart,
+};
+---
+<!-- HERO -->
+<section class="hero">
+  <video autoplay muted loop playsinline preload="auto" poster="https://caradvance.hu/caradvance-hero-x5-poster.jpg">
+    <source src="https://caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4" />
+  </video>
+  <div class="scrim"></div>
+  <div class="inner">
+    <img class="brand-logo" src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance — the automotive people" />
+    <h1>{t('eladom.title1')} <span class="accent">{t('eladom.title2')}</span></h1>
+    <p class="sub">{t('eladom.sub')}</p>
+    <a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Auto%20eladas">{t('eladom.cta')}</a>
+    <div class="pills">{pills.map((p) => <a class="pill" href={p.href}>{t(p.key)}</a>)}</div>
+  </div>
+</section>
+
+<!-- STATS + PLATFORMS -->
+<section class="section" style="padding-top:64px">
+  <div class="wrap">
+    <div class="stats">
+      {c.stats.map((s) => (
+        <div class="stat"><div class="num">{s.num}<span>{s.unit}</span></div><div class="lbl">{s.label}</div></div>
+      ))}
+    </div>
+    <div class="platforms">
+      <div class="plabel">{c.platformsLabel}</div>
+      <div class="row">
+        <img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance" />
+        <img src="https://caradvance.hu/hasznaltauto-hu.webp" alt="Használtautó.hu" />
+        <img src="https://caradvance.hu/mobile-de.webp" alt="mobile.de" />
+        <span class="divider"></span>
+        <span class="socials">
+          <img src="https://caradvance.hu/facebook.webp" alt="Facebook" />
+          <img src="https://caradvance.hu/instagram.webp" alt="Instagram" />
+          <img src="https://caradvance.hu/tiktok.webp" alt="TikTok" />
+          <img src="https://caradvance.hu/youtube.webp" alt="YouTube" onerror="this.style.display='none'" />
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JÓTÉKONYSÁG -->
+<section class="section" id="jotekonysag" style="background:#F7F4F2">
+  <div class="wrap center">
+    <span class="eyebrow">{c.charity.eyebrow}</span>
+    <h2 class="sec-title">{c.charity.title}</h2>
+    <p class="sec-intro">{c.charity.intro}</p>
+  </div>
+  <div class="wrap">
+    <div class="give-card">
+      <div>
+        <div class="big">{c.charity.bigNum}<span>{c.charity.bigUnit}</span></div>
+        <div class="biglbl">{c.charity.bigLabel}</div>
+      </div>
+      <div>
+        <h3>{c.charity.cardTitle}</h3>
+        <p>{c.charity.cardText}</p>
+        <a class="give-pill" href="#folyamat"><Fragment set:html={heart} /> {c.charity.cardCta}</a>
+      </div>
+    </div>
+    <div class="charity-grid">
+      {c.charity.orgs.map((o) => (
+        <div class="ch-card">
+          <div class="ch-head" style={`background:${o.color}`}><span class="ch-tag">{o.tag}</span></div>
+          <div class="ch-body"><img class="ch-logo" src={o.logo} alt={o.name} /><h4>{o.name}</h4><p>{o.text}</p></div>
+          <div class="ch-foot">
+            <div class="ch-support"><Fragment set:html={heart} /> {c.charity.supports}</div>
+            <a class="ch-link" href="#">{c.charity.orgLink} <Fragment set:html={arrow} /></a>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p class="give-note">{c.charity.note}</p>
+  </div>
+</section>
+
+<!-- MIÉRT VELÜNK -->
+<section class="section" id="miert">
+  <div class="wrap center">
+    <span class="eyebrow">{c.why.eyebrow}</span>
+    <h2 class="sec-title">{c.why.title}</h2>
+    <p class="sec-intro">{c.why.intro}</p>
+  </div>
+  <div class="wrap">
+    <div class="feat-grid">
+      {c.why.features.map((f) => (
+        <div class="feat">
+          <div class="ico"><Fragment set:html={FEATURE_ICONS[f.icon]} /></div>
+          <h4>{f.title}</h4><p>{f.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- PROFI FOTÓ ÉS VIDEÓ -->
+<section class="section photo" id="foto-video">
+  <div class="wrap">
+    <div class="photo-grid">
+      <div>
+        <span class="eyebrow">{c.photo.eyebrow}</span>
+        <h2 class="sec-title">{c.photo.title}</h2>
+        <p class="sec-intro" style="margin-bottom:0">{c.photo.intro}</p>
+        <ul class="checklist">
+          {c.photo.checks.map((ck) => (
+            <li><span class="check"><Fragment set:html={check} /></span><div><b>{ck.title}</b><span>{ck.text}</span></div></li>
+          ))}
+        </ul>
+        <a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Video">{c.photo.cta}</a>
+      </div>
+      <div class="video-card">
+        <span class="vtag"><Fragment set:html={heart} /> {c.photo.videoTag}</span>
+        <img src="https://caradvance.hu/bmw-m3-touring-premium-auto-eladas.webp" alt={c.photo.videoTitle} />
+        <span class="play"><Fragment set:html={play} /></span>
+        <span class="vmeta"><b>{c.photo.videoTitle}</b><span>{c.photo.videoBy}</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEÓINK -->
+<section class="section videos">
+  <div class="wrap center">
+    <span class="eyebrow">{c.videos.eyebrow}</span>
+    <h2 class="sec-title">{c.videos.title}</h2>
+    <p class="sec-intro">{c.videos.intro}</p>
+  </div>
+  <div class="wrap">
+    <div class="vgrid">
+      {c.videos.items.map((v) => (
+        <div class="vthumb"><span class="badge">{v.badge}</span><span class="play"><Fragment set:html={play} /></span><span class="cap">{v.caption}</span></div>
+      ))}
+    </div>
+    <div class="follow-row">
+      <a class="follow-btn" href="#"><img src="https://caradvance.hu/instagram.webp" alt="" />{c.videos.followIg}</a>
+      <a class="follow-btn" href="#"><img src="https://caradvance.hu/tiktok.webp" alt="" />{c.videos.followTt}</a>
+    </div>
+  </div>
+</section>
+
+<!-- GALÉRIA -->
+<section class="section" id="galeria">
+  <div class="wrap center">
+    <span class="eyebrow">{c.gallery.eyebrow}</span>
+    <h2 class="sec-title">{c.gallery.title}</h2>
+    <p class="sec-intro">{c.gallery.intro}</p>
+  </div>
+  <div class="wrap">
+    <div class="gal-grid">
+      {c.gallery.items.map((g) => (
+        <div class="gal"><span class="ph">{g}</span><span class="lbl">{g}</span></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- EGYEDÜL VAGY VELÜNK -->
+<section class="section compare" id="egyedul">
+  <div class="wrap center">
+    <span class="eyebrow">{c.compare.eyebrow}</span>
+    <h2 class="sec-title">{c.compare.title}</h2>
+    <p class="sec-intro">{c.compare.intro}</p>
+  </div>
+  <div class="wrap">
+    <div class="ctable">
+      <div class="crow chead">
+        <div class="col-label">—</div>
+        <div class="col-label">{c.compare.colAlone}</div>
+        <div class="col-us">{c.compare.colUs}</div>
+      </div>
+      {c.compare.rows.map((r) => (
+        <div class="crow">
+          <div class="c-aspect">{r.aspect}</div>
+          <div class="c-alone"><span class="mark x"><Fragment set:html={cross} /></span>{r.alone}</div>
+          <div class="c-us"><span class="mark v"><Fragment set:html={check} /></span>{r.us}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- HÉT LÉPÉS -->
+<section class="section steps" id="folyamat">
+  <div class="wrap center">
+    <span class="eyebrow">{c.steps.eyebrow}</span>
+    <h2 class="sec-title">{c.steps.title}</h2>
+    <p class="sec-intro">{c.steps.intro}</p>
+  </div>
+  <div class="wrap">
+    <div class="step-grid">
+      {c.steps.items.map((s, i) => (
+        <div class={`step${s.highlight ? ' full' : ''}`}>
+          <div class="n">{i + 1}</div>
+          <div><h4>{s.title}</h4><p>{s.text}</p></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- ZÁRÓ CTA -->
+<section class="close-cta">
+  <h2>{c.closing.title}</h2>
+  <p>{c.closing.text}</p>
+  <a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Auto%20eladas">{c.closing.cta}</a>
+</section>
