@@ -54,32 +54,56 @@ function driveImg(u) {
 // Cars whose hero photo faces the wrong way — mirror it (CSS flip) so every
 // car's main image looks in the same direction. Keyed by slug.
 const MIRROR = new Set([
+  // Only cars with no available right-facing photo — flip to face right.
   "porsche-911-carrera-4-gts-approved-3-jahre-voll-leder",
-  "porsche-911-carrera-gts-approved-3-jahre-voll-leder",
-  "porsche-taycan-cross-turismo-4-pano-21-hud-bose-hud",
-  "porsche-cayenne-3-0-coupe-black-edition-2026-prod-full",
-  "porsche-992-targa-4s-480hp-no-hybrid-pacha-uvp-220k",
-  "porsche-992-2-gt3-6-gang-clubsport-schalensitz-lift-voll",
-  "porsche-panamera-gts-standheizung-allradlenkung-ptv-pano",
-  "lamborghini-urus-s-nero-matt-black-23-b-o-garan",
-  "ferrari-328-gts-zahnriemen-service-neu-historie",
   "mercedes-benz-g-63-amg-made-to-measure-mint-white-23-brabus-tv",
-  "bmw-x6-xdrive30d-porsche-blue-bower-wilkins-full",
 ]);
+// Explicit right-facing main photo (Marc-picked, from each car's own gallery).
+// Keyed by slug -> mobile.de image UUID. Prepended as the hero, deduped, and
+// these cars are NOT mirrored (the raw image already faces front-right).
+const MAIN_INJECT = {
+  "ferrari-328-gts-zahnriemen-service-neu-historie": "9a7fad94-3c9f-4d64-81f2-3dd9d9109786",
+  "lamborghini-urus-s-nero-matt-black-23-b-o-garan": "09bbdebc-1b4b-4f83-8d5c-ecdc13cb7cbc",
+  "bmw-x6-xdrive30d-porsche-blue-bower-wilkins-full": "22d3d91c-05ac-4081-9a7b-6bbedfdb5874",
+  "bmw-x6-xdrive40d-sepang-bronze-1of-b-w-full-full": "26cd4eee-d836-4fcc-be25-b8728f9cb40b",
+  "bmw-i5-m60-xdrive-i5m60-xdrive": "267aa3a4-1289-4b4a-a108-e016c222cfcf",
+  "audi-s5-avant-pano-20-bang-olufsen-ahk-matrix": "307b0180-83e0-4cd7-b23d-e8bf5ada40e4",
+  "porsche-911-carrera-gts-approved-3-jahre-voll-leder": "7544b234-738e-482f-842a-32ba0b12a195",
+  "porsche-992-targa-4s-480hp-no-hybrid-pacha-uvp-220k": "21517196-1dbe-4130-873d-60971294348b",
+  "porsche-taycan-cross-turismo-4-pano-21-hud-bose-hud": "dc34f994-de88-4643-97c2-a84d4af82a6e",
+  "audi-rs-3-limousine-individual-schalensitz-pano-sport": "d67e4019-6fc5-4b64-94b2-b1bd63a85106",
+  "porsche-992-2-gt3-6-gang-clubsport-schalensitz-lift-voll": "d8d599a5-1c4d-4a27-a776-abe79f328946",
+  "porsche-panamera-gts-standheizung-allradlenkung-ptv-pano": "c25bffa2-9097-4bc2-8296-f47fa38dab19",
+  "porsche-cayenne-3-0-coupe-black-edition-2026-prod-full": "e425e500-550f-4cc7-b946-6312e5377b63",
+  "bmw-x6-xdrive30d-22-massage-clarity-stnd-heiz-full": "fffc8da2-3c37-48ea-bcce-b671162f1ad5",
+};
+function injectUrl(id) {
+  return "https://img.classistatic.de/api/v1/mo-prod/images/" + id.slice(0, 2) + "/" + id + "?rule=mo-1600";
+}
 // Chosen "hero" main photo per car (3/4 side profile). Keyed by `kulcs`
 // (mobile.de car key) -> a distinctive substring of the chosen image URL.
 const MAIN_PICK = {"bmw-x7-m50d-m-sport-pro-22-b-w": "fe568239", "bmw-x2-xdrive20d-m-sport-pro-20-h-k": "0ec9c853", "bmw-x6-m60i-xdrive-full-option-carbon-m-sitze": "b71ffd45", "bmw-i5-m60-xdrive-i5m60-xdrive": "c2e8e425", "bmw-x5-xdrive30d": "905fe271", "bmw-x6-xdrive30d-m-sport-pro": "c6b0483d", "bmw-x5-xdrive30d-m-sport-pro-luft-22": "7cc9ba26", "porsche-911-carrera-4-gts-approved-3-jahre-voll-leder": "44ce52eb", "bmw-x7-xdrive40d-m-sport-pro-23-luft-h-k": "64574841", "bmw-x5-xdrive40d-m-sport-pro-full-option": "a3dc7592", "bmw-x6-xdrive30d-m-sport-pro-individual-22": "921b1d29", "bmw-x6-xdrive30d-m-sport-pro-luft-22": "a05d3035", "bmw-x5-xdrive30d-m-sport-pro-22-luft": "db6ae02a", "bmw-x5-xdrive30d-m-sport-pro-22": "c32a177b", "bmw-x5-m-competition-21-22": "4783b10e", "porsche-911-carrera-gts-approved-3-jahre-voll-leder": "7544b234", "bmw-x6-xdrive30d-m-sport-pro-22-individual": "87861b10", "bmw-x7-xdrive40d-m-sport-pro-22": "2ad119b8", "porsche-panamera-gts-standheizung-allradlenkung-ptv-pano": "c25bffa2", "bmw-x7-40d-british-racing-green-brown-b-w-full": "252375f1"};
 const GALLERY_OVERRIDE = {"porsche-992-2-gt3-6-gang-clubsport-schalensitz-lift-voll": ["https://img.classistatic.de/api/v1/mo-prod/images/73/732b2bfb-fb73-41f4-90df-0826d8ff0779?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/d8/d8d599a5-1c4d-4a27-a776-abe79f328946?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/80/8002abff-e3cb-491f-888b-704adfe8c3db?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/45/45d9d37d-5ca5-4971-a32e-f577f7a54401?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/6b/6b1c9bd8-101c-4233-88e7-7ceb978c6011?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/49/4972ad11-b2c9-4054-a2a2-f1e2be4685c5?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/34/340c1bd0-fd48-45f1-b2c3-c5a0e76788b4?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/10/109853e6-bcfd-48d5-a374-75ef399c8cfa?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/4d/4df6c194-dece-4917-86c2-0eaa3582e867?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/a8/a82183d8-9bbd-42d0-b74e-7c1fdc94096a?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/ec/ec92b109-b43b-41f9-abaa-de0ec5b94807?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/0d/0dacf4df-c637-477a-8b6c-3040f5012165?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/e5/e5177feb-a620-4602-a564-b553634036f9?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/77/775636ba-004b-4b82-9eec-42296bf29b0e?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/66/66503c61-e9bd-4a8c-9f15-655a541e041f?rule=mo-1600", "https://img.classistatic.de/api/v1/mo-prod/images/co2class-G?rule=mo-1600"]};
+function applyInject(slug, all) {
+  // Marc-picked right-facing hero: prepend it as the main, dedupe by UUID.
+  const id = MAIN_INJECT[slug];
+  if (!id) return all;
+  const key = id.slice(0, 13);
+  const rest = all.filter((u) => !u.includes(key));
+  return [injectUrl(id), ...rest];
+}
 function galleryOf(c) {
-  const _ov = GALLERY_OVERRIDE[slugify(c.modell)];
-  if (_ov) return _ov.slice();
+  const slug = slugify(c.modell);
+  const _ov = GALLERY_OVERRIDE[slug];
+  if (_ov) return applyInject(slug, _ov.slice());
   const list = String(c.galeria || "")
     .split(/[\n,]+/).map((s) => s.trim()).filter(Boolean).map(driveImg);
   const main = driveImg(c.kep_url) || list[0] || "";
   const all = [];
   if (main) all.push(main);
   for (const g of list) if (g && !all.includes(g)) all.push(g);
-  const pick = MAIN_PICK[slugify(c.modell)];
+  if (MAIN_INJECT[slug]) return applyInject(slug, all);
+  const pick = MAIN_PICK[slug];
   if (pick) {
     const i = all.findIndex((u) => u.includes(pick));
     if (i > 0) { const [p] = all.splice(i, 1); all.unshift(p); }
