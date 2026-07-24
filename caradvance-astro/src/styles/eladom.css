@@ -45,13 +45,14 @@
 .ch-card{flex:0 0 332px;scroll-snap-align:start;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 14px 32px rgba(8,8,10,.06)}
 @media(max-width:560px){.ch-card{flex-basis:84%}}
 .ch-head{height:152px;position:relative;display:flex;align-items:flex-end;padding:16px;overflow:hidden}
-.ch-illo{position:absolute;right:-16px;bottom:-18px;width:158px;height:158px;color:rgba(255,255,255,.24)}
-.ch-illo svg{width:100%;height:100%}
+.ch-illo{position:absolute;inset:0;pointer-events:none}
+.ch-illo svg{width:100%;height:100%;display:block}
 .ch-corner{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:11px;background:rgba(0,0,0,.22);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;color:#fff}
 .ch-corner svg{width:18px;height:18px}
 .ch-tag{position:relative;z-index:2;background:rgba(0,0,0,.4);color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 13px;border-radius:999px;backdrop-filter:blur(3px)}
 .ch-body{padding:22px 22px 0;flex:1}
-.ch-logo{height:44px;width:auto;object-fit:contain;margin-bottom:16px}
+.ch-logo{display:inline-flex;align-items:center;justify-content:center;height:66px;padding:10px 16px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 14px rgba(8,8,10,.07);margin-bottom:16px}
+.ch-logo img{max-height:100%;max-width:160px;width:auto;object-fit:contain;display:block}
 .ch-card h4{font-size:19px;font-weight:800;letter-spacing:-.01em;margin:0 0 12px;line-height:1.2}
 .ch-card p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}
 .ch-foot{margin-top:18px;padding:16px 22px;border-top:1px solid var(--line)}
@@ -64,7 +65,8 @@
 /* miért velünk */
 .feat-grid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 @media(max-width:900px){.feat-grid{grid-template-columns:1fr}}
-.feat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px}
+.feat{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 10px 26px rgba(8,8,10,.05);transition:transform .18s,box-shadow .18s}
+.feat:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(8,8,10,.09)}
 .feat .ico{width:52px;height:52px;border-radius:14px;background:#FBE9EC;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
 .feat .ico svg{width:24px;height:24px;color:var(--red)}
 .feat h4{font-size:19px;font-weight:800;letter-spacing:-.01em;margin:0 0 10px}
@@ -115,7 +117,7 @@
 
 /* összehasonlítás */
 .compare{background:#F1F2F5}
-.ctable{margin-top:44px;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.ctable{margin-top:44px;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 14px 34px rgba(8,8,10,.06)}
 .crow{display:grid;grid-template-columns:1.1fr 1.4fr 1.4fr;border-bottom:1px solid var(--line)}
 .crow:last-child{border-bottom:0}
 .chead>div{padding:20px 22px;font-weight:800;font-size:14px;letter-spacing:.03em}
@@ -135,7 +137,7 @@
 .steps{background:#F1F2F5}
 .step-grid{margin-top:44px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
 @media(max-width:820px){.step-grid{grid-template-columns:1fr}}
-.step{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;display:flex;gap:18px}
+.step{background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;display:flex;gap:18px;box-shadow:0 10px 26px rgba(8,8,10,.05)}
 .step .n{flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:var(--navy);color:#fff;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center}
 .step h4{margin:0 0 8px;font-size:18px;font-weight:800;letter-spacing:-.01em}
 .step p{margin:0;font-size:14.5px;line-height:1.5;color:var(--muted)}
