@@ -197,13 +197,11 @@ function equipmentOf(c) {
   return cats.filter((c) => c.items.length);
 }
 function priceOf(c, rate) {
-  const eur = nEur(c.vetel_eur);
   const hufUp = (e) => Math.ceil((Number(e) || 0) * rate / 10000) * 10000;
+  // Show the NET price everywhere (áfa nélkül). Fall back to gross/1.19 if net missing.
+  const eur = nEur(c.vetel_eur_netto) || nEur(c.vetel_eur) / 1.19;
   const main = hufUp(eur);
-  const netto = nEur(c.vetel_eur_netto) || eur / 1.19;
-  const huGross = hufUp(netto * 1.27);
-  const save = huGross - main;
-  return { eur, main, huGross, save };
+  return { eur, main, huGross: 0, save: 0 };
 }
 const isActive = (c) => (c.aktiv || "igen").toLowerCase() !== "nem";
 const isOwn = (c) => (c.sajat || "").toLowerCase() === "igen";
@@ -1040,8 +1038,8 @@ const PDFCSS = `
 // Server-side "Autó adatlap" PDF document (opened + auto-printed on the client).
 function buildPdfSheet(c, rate) {
   const g = galleryOf(c).map((u) => u);
-  const eur = nEur(c.vetel_eur), main = hufUpR(eur, rate);
-  const netto = nEur(c.vetel_eur_netto) || eur / 1.19, huG = hufUpR(netto * 1.27, rate), save = huG - main;
+  const eur = nEur(c.vetel_eur_netto) || nEur(c.vetel_eur) / 1.19, main = hufUpR(eur, rate);
+  const save = 0;
   const srows = [
     ["Évjárat", c.evjarat], ["Teljesítmény", c.teljesitmeny], ["Hajtás", c.hajtas], ["Váltó", c.valto],
     ["Üzemanyag", c.uzemanyag], ["Karosszéria", c.karosszeria], ["Márka", c.marka], ["Kilométer", c.km],
@@ -1074,11 +1072,10 @@ function buildPdfSheet(c, rate) {
   <div class="xs-icrow">${iconsArr}</div>
   <div class="xs-pbox">
     <div class="xs-pl">
-      <div class="xs-plab">VÉTELÁR</div>
+      <div class="xs-plab">NETTÓ ÁR</div>
       <div class="xs-huf">${fmtHUF(main)}</div>
       <div class="xs-eur">${eur.toLocaleString("hu-HU")} €</div>
-      ${save > 0 ? `<div class="xs-pdiv"></div><div class="xs-pcross"><s>${fmtHUF(huG)}</s></div><div class="xs-psave">Megtakarítás: ${fmtHUF(save)}</div>` : ""}
-      <div class="xs-pnote">Árfolyam: 1 € = ${Math.round(rate).toLocaleString("hu-HU")} Ft</div>
+      <div class="xs-pnote">Nettó ár (áfa nélkül) · Árfolyam: 1 € = ${Math.round(rate).toLocaleString("hu-HU")} Ft</div>
     </div>
     <div class="xs-pers">
       <div class="xs-pterm">Kapcsolat</div>
@@ -1153,7 +1150,7 @@ function renderDetail(c, cars, rate) {
     `A(z) ${title} ${c.evjarat ? c.evjarat + " évjáratú, " : ""}${c.km ? c.km + " futott, " : ""}` +
     `${c.uzemanyag ? c.uzemanyag.toLowerCase() + " üzemű " : ""}${c.karosszeria || "prémium autó"}. ` +
     `${c.teljesitmeny ? c.teljesitmeny + ", " : ""}${c.valto || ""}${c.hajtas ? ", " + c.hajtas : ""}. ` +
-    `Magyar áfás ár garanciával, ${BRAND} import.`;
+    `Nettó ár (áfa nélkül) garanciával, ${BRAND} import.`;
 
   // Járműleírás: categorized equipment, first 12 items shown, rest collapsed.
   let _shown = 0;
@@ -1201,6 +1198,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 .pcross{color:var(--muted);font-size:17px;font-weight:700;text-decoration:line-through}
 .price{font-size:38px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
 .peur{color:var(--muted);font-weight:700;font-size:18px;margin-top:6px}
+.plabel{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
 .psave{display:inline-block;background:#E7F8EE;color:#1DA851;font-size:13px;font-weight:800;padding:6px 13px;border-radius:999px;margin-top:10px}
 .taxnote{color:var(--muted);font-size:12.5px;font-weight:600;margin-top:8px}
 .rel-h{margin:44px 0 18px;font-size:24px;font-weight:800}
@@ -1269,12 +1267,11 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
         <div class="badge"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
         <div class="ptitle">${esc(title)}</div>
         <div data-eur="${p.eur}" data-net="${nEur(c.vetel_eur_netto)}">
-          ${cross}
+          <div class="plabel">Nettó ár</div>
           <div class="price" data-main>${fmtHUF(p.main)}</div>
           <div class="peur">${fmtEUR(p.eur)}</div>
-          ${save}
         </div>
-        <div class="taxnote">Magyar áfás ár. Árfolyam: 1 € ≈ ${rate} Ft.</div>
+        <div class="taxnote">Nettó ár (áfa nélkül). Árfolyam: 1 € ≈ ${rate} Ft.</div>
         <a class="btn btn-primary" style="width:100%;margin-top:16px" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Ajánlatkérés: " + title)}">Ajánlatkérés</a>
         <a class="btn btn-soft" style="width:100%;margin-top:10px" href="../../autoink/">Vissza a listához</a>
       </div>
@@ -1330,7 +1327,7 @@ function ca_step(d){ca_go(CI+d);}
   };
   return page({
     title: `${title} (${c.evjarat || ""}) — ${BRAND}`,
-    desc: `${title} eladó — ${specStr(c)}. ${fmtHUF(p.main)} (${fmtEUR(p.eur)}). Magyar áfás ár, garancia, ${BRAND} import.`,
+    desc: `${title} eladó — ${specStr(c)}. ${fmtHUF(p.main)} (${fmtEUR(p.eur)}). Nettó ár (áfa nélkül), garancia, ${BRAND} import.`,
     canonical: SITE_BASE + "/auto/" + slug + "/", rel: "../../", css, body,
     head: `<meta property="og:type" content="product">${g[0] ? `<meta property="og:image" content="${attr(g[0])}">` : ""}
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
