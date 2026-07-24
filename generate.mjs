@@ -390,9 +390,9 @@ img{max-width:100%}
 function navHtml(rel) {
   const cat = rel + "autoink/";
   const items = [
-    ["Prémium autóbérlés", [["Bérelhető autóink", "#"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
-    ["Megvásárolható autóink", [["Autóink", cat], ["Új autóink – egyedi rendelés", "#"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
-    ["Bizományos értékesítés", [["Autóink", cat], ["Eladom az autómat", "#"], ["Jótékonyság", "#"], ["Értékesítési folyamat", "#"], ["Gyakori kérdések", "#"]]],
+    ["Prémium autóbérlés", [["Bérelhető autóink", "#"], ["Új autó bérlése", "#"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
+    ["Megvásárolható autóink", [["Autóink", cat], ["Egyedi autó rendelés", "#"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
+    ["Bizományos értékesítés", [["Eladom az autómat", "#"], ["Jótékonyság", "#"], ["Értékesítési folyamat", "#"], ["Gyakori kérdések", "#"]]],
     ["Import", [["Autó rendelés", "#"], ["Beszerzési folyamat", "#"], ["Előnyök", "#"], ["Referenciák", "#"]]],
     ["Rólunk", [["Miért mi?", "#"], ["Caradvance Garancia", "#"], ["Caradvance Hungary", "#"], ["Referenciák", "#"], ["Partnereink", "#"], ["Media", "#"], ["Blog", "#"]]],
   ];
