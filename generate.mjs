@@ -871,7 +871,7 @@ function renderHome(cars, rate) {
       ? `<div class="grid">${rentFeat.map((c) => featCard(c, rate, "rent")).join("")}</div><div class="autok-more"><a class="btn btn-red" href="autoink/">Összes bérelhető autónk →</a></div>`
       : `<div style="text-align:center;padding:52px 24px;background:#fff;border:1px solid var(--line);border-radius:18px"><p style="color:var(--muted);font-size:16.5px;max-width:460px;margin:0 auto 20px">Bérelhető prémium autóink hamarosan itt is elérhetők lesznek. Addig is szívesen adunk személyre szabott bérlési ajánlatot.</p><a class="btn btn-red" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Autóbérlés érdeklődés")}">Kérj bérlési ajánlatot</a></div>`}
   </div>
-  <div class="rate-note">A forint árak élő árfolyammal számolódnak, óránként frissülnek (1 € = <span id="ratev">${rate}</span> Ft).</div>
+  <div class="rate-note">A feltüntetett árak nettó árak (áfa nélkül). A forint árak élő árfolyammal számolódnak, óránként frissülnek (1 € = <span id="ratev">${rate}</span> Ft).</div>
 </section>
 ${contentSections("")}
 <script>document.querySelectorAll('.autok-tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.autok-tab').forEach(function(x){x.classList.remove('on')});t.classList.add('on');document.querySelectorAll('.autok-panel').forEach(function(p){p.classList.remove('on')});var el=document.getElementById('panel-'+t.dataset.tab);if(el)el.classList.add('on');});});</script>`;
@@ -908,7 +908,7 @@ function renderCatalog(cars, rate) {
   const body = `
 <div class="wrap">
   <div class="crumb"><a href="../">Főoldal</a> / <b>Megvásárolható autóink</b></div>
-  <div class="chead"><h1>Megvásárolható autóink</h1><p>Prémium autók Németországból, magyar áfás árral és garanciával.</p></div>
+  <div class="chead"><h1>Megvásárolható autóink</h1><p>Prémium autók Németországból, nettó árakkal (áfa nélkül) és garanciával. Az árak élő árfolyammal frissülnek (1 € = <span id="ratev">${rate}</span> Ft).</p></div>
   <div class="filters">
     <input id="q" placeholder="Keresés (pl. X5, Porsche)…">
     <select id="marka"><option value="">Minden márka</option>${brands.map((b) => `<option>${esc(b)}</option>`).join("")}</select>
@@ -929,7 +929,7 @@ function f(){var q=(document.getElementById('q').value||'').toLowerCase(),m=docu
 </script>`;
   return page({
     title: "Megvásárolható autóink — CarAdvance",
-    desc: `Böngéssz ${active.length} prémium autó között Németországból — BMW, Porsche és más márkák, magyar áfás árral és garanciával.`,
+    desc: `Böngéssz ${active.length} prémium autó között Németországból — BMW, Porsche és más márkák, nettó árakkal (áfa nélkül) és garanciával.`,
     canonical: SITE_BASE + "/autoink/", rel: "../", css, body,
   });
 }
