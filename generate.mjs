@@ -203,7 +203,14 @@ function priceOf(c, rate) {
   const main = hufUp(eur);
   return { eur, main, huGross: 0, save: 0 };
 }
-const isActive = (c) => (c.aktiv || "igen").toLowerCase() !== "nem";
+// Cars sold / no longer listed on mobile.de — hidden even if still "igen" in the sheet.
+const SOLD_OUT = [/range\s*rover\s*5\.?0\s*sv/i, /t6\s*multivan/i];
+const isActive = (c) => {
+  if ((c.aktiv || "igen").toLowerCase() === "nem") return false;
+  const m = String(c.modell || "");
+  if (SOLD_OUT.some((re) => re.test(m))) return false;
+  return true;
+};
 const isOwn = (c) => (c.sajat || "").toLowerCase() === "igen";
 const specStr = (c) => [c.km, c.valto, c.uzemanyag].filter(Boolean).join(" · ");
 
