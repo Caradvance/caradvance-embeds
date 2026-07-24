@@ -121,6 +121,42 @@ const DE_RULES = [
   [/wireless\s*charging|induktiv.*laden|kabellos.*laden/i, "Vezeték nélküli töltő"],
   [/dachhimmel/i, "Tetőkárpit"],
   [/innovationspaket|innovations-paket/i, "Innovációs csomag"],
+  [/cd-?spieler|cd-?wechsler/i, "CD-lejátszó"],
+  [/fensterheber/i, "Elektromos ablakemelők"],
+  [/geschwindigkeits-?begrenzer|\bbegrenzer\b|speed limit device/i, "Sebességkorlátozó"],
+  [/musikstreaming/i, "Zenei streaming"],
+  [/partikelfilter/i, "Részecskeszűrő"],
+  [/schaltwippen/i, "Váltófülek a kormányon"],
+  [/sportpaket/i, "Sport csomag"],
+  [/touchscreen/i, "Érintőképernyő"],
+  [/traktionskontrolle|traktions-?control|\bDTC\b/i, "Kipörgésgátló"],
+  [/kombiinstrument/i, "Digitális műszerfal"],
+  [/\bESP\b|elektronisches stabilit|stabilitäts-?control|\bDSC\b/i, "Menetstabilizáló (ESP/DSC)"],
+  [/\bABS\b|anti-?blockier/i, "Blokkolásgátló (ABS)"],
+  [/mittelarmlehne/i, "Középső könyöklő"],
+  [/\barmlehne\b/i, "Könyöklő"],
+  [/\btuner\b|tuner\/?radio/i, "Rádió"],
+  [/nebelscheinwerfer|nebellicht/i, "Ködlámpák"],
+  [/regensensor/i, "Esőszenzor"],
+  [/lichtsensor/i, "Fényszenzor"],
+  [/zentralverriegelung/i, "Központi zár"],
+  [/servolenkung|servotronic/i, "Szervokormány"],
+  [/wegfahrsperre/i, "Indításgátló"],
+  [/bordcomputer|bord-?computer/i, "Fedélzeti számítógép"],
+  [/start.?stop/i, "Start/Stop rendszer"],
+  [/gepäckraum|kofferraum/i, "Csomagtér"],
+  [/lordose|lendenwirbel/i, "Deréktámasz"],
+  [/durchlade|durchladeeinrichtung/i, "Átrakodó nyílás"],
+  [/reifendruck/i, "Guminyomás-ellenőrző rendszer"],
+  [/notruf|ecall/i, "Vészhívó (eCall)"],
+  [/rußpartikel|otto-?partikel/i, "Részecskeszűrő"],
+  [/scheibenwaschd|waschdüsen/i, "Fűthető ablakmosó fúvókák"],
+  [/fußmatten/i, "Szőnyegek"],
+  [/warndreieck/i, "Elakadásjelző háromszög"],
+  [/verbandkasten|erste hilfe/i, "Elsősegélycsomag"],
+  [/mild-?hybrid|mildhybrid/i, "Mild-hybrid hajtás"],
+  [/schadstoffarm|abgasnorm|euro 6/i, "Euro 6 norma"],
+  [/personalisierungssystem|personal profile|personal esim|my modes/i, "Személyre szabás"],
 ];
 function hasPhone(s) {
   return /(\+\s?49|\b0049|\btel\.?\b|telefon|\bhandy\b|\bmobil\b|\bwhatsapp\b|\b0\d{2,4}[\s\/.-]\d{4,}|\d{3,}[\s\/.-]\d{4,})/i.test(String(s));
@@ -388,7 +424,8 @@ function cardCss() {
 .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .cond{background:var(--soft);color:var(--muted);font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px}
 .year{color:var(--muted);font-size:13px;font-weight:700}
-.title{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+.title{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;overflow-wrap:anywhere;word-break:break-word;min-width:0}
+.card .body{min-width:0}
 .specs{color:var(--muted);font-size:13px;font-weight:600;margin-bottom:14px}
 .pricerow{display:flex;align-items:baseline;gap:10px;margin-top:auto;flex-wrap:wrap}
 .pcross{width:100%;color:var(--muted);font-size:14px;font-weight:700;text-decoration:line-through}
@@ -1061,7 +1098,22 @@ function renderDetail(c, cars, rate) {
   const eq = equipmentOf(c);
   const flat = eq.flatMap((cat) => cat.items);
   const iconItems = [["Kilométer", c.km], ["Teljesítmény", c.teljesitmeny], ["Üzemanyag", c.uzemanyag], ["Váltó", c.valto], ["Évjárat", c.evjarat], ["Hajtás", c.hajtas]].filter(([, v]) => v);
-  const related = cars.filter((x) => isActive(x) && x.marka === c.marka && slugify(x.modell) !== slug).slice(0, 3);
+  // Related: same brand first, then fill with closest-priced other cars.
+  // Dedupe by slug so the current car / duplicates never repeat.
+  const _price = nEur(c.vetel_eur);
+  const _pool = cars.filter((x) => isActive(x) && slugify(x.modell) !== slug);
+  const _same = _pool.filter((x) => x.marka === c.marka);
+  const _rest = _pool.filter((x) => x.marka !== c.marka)
+    .sort((a, b) => Math.abs(nEur(a.vetel_eur) - _price) - Math.abs(nEur(b.vetel_eur) - _price));
+  const related = [];
+  const _seen = new Set([slug]);
+  for (const x of [..._same, ..._rest]) {
+    const s = slugify(x.modell);
+    if (_seen.has(s)) continue;
+    _seen.add(s);
+    related.push(x);
+    if (related.length >= 3) break;
+  }
   const descText =
     `A(z) ${title} ${c.evjarat ? c.evjarat + " évjáratú, " : ""}${c.km ? c.km + " futott, " : ""}` +
     `${c.uzemanyag ? c.uzemanyag.toLowerCase() + " üzemű " : ""}${c.karosszeria || "prémium autó"}. ` +
@@ -1110,7 +1162,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
 .cond{background:var(--soft);color:var(--muted);font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
 .own{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:11px;font-weight:800;color:var(--navy);margin-bottom:10px}
 .year{font-weight:800;color:var(--muted)}
-.ptitle{font-size:23px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px;line-height:1.15}
+.ptitle{font-size:23px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px;line-height:1.15;overflow-wrap:anywhere;word-break:break-word}
 .pcross{color:var(--muted);font-size:17px;font-weight:700;text-decoration:line-through}
 .price{font-size:38px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
 .peur{color:var(--muted);font-weight:700;font-size:18px;margin-top:6px}
