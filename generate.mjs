@@ -518,8 +518,8 @@ function cardCss() {
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;position:relative;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s}
 .card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}
-.media{aspect-ratio:16/10;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
-.media img{width:100%;height:100%;object-fit:cover;display:block}
+.media{aspect-ratio:4/3;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
+.media img{width:100%;height:100%;object-fit:contain;display:block}
 .media img.mir{transform:scaleX(-1)}
 .media .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7a828f;font-size:12px}
 .own{position:absolute;top:12px;left:12px;background:#fff;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;color:var(--navy);box-shadow:0 4px 12px rgba(8,8,10,.25)}
