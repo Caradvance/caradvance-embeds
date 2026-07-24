@@ -691,7 +691,7 @@ function renderHome(cars, rate) {
     <img class="brand-logo" src="caradvance-logo-white.webp" alt="CarAdvance — the automotive people" width="403" height="133">
     <h1>Prémium autók Németországból</h1>
     <p class="sub">Prémium autóbérlés és eladás, autóimport Németországból — a te autódat pedig bizományban eladjuk.</p>
-    <div class="cta-row"><a class="btn btn-primary" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Ajánlatkérés")}">Kérj ajánlatot</a><a class="btn btn-white" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Autó eladása – bizomány")}">Add el az autód</a></div>
+    <div class="cta-row"><a class="btn btn-primary" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Autót keresek")}">Autót keresek</a><a class="btn btn-white" href="mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Autó eladása – bizomány")}">Add el az autód</a></div>
   </div>
   <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
 </section>
