@@ -394,7 +394,7 @@ function navHtml(rel) {
     ["Megvásárolható autóink", [["Autóink", cat], ["Egyedi autó rendelés", "#"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
     ["Bizományos értékesítés", [["Eladom az autómat", "#"], ["Jótékonyság", "#"], ["Értékesítési folyamat", "#"], ["Gyakori kérdések", "#"]]],
     ["Import", [["Autó rendelés", "#"], ["Beszerzési folyamat", "#"], ["Előnyök", "#"], ["Referenciák", "#"]]],
-    ["Rólunk", [["Miért mi?", "#"], ["Caradvance Garancia", "#"], ["Caradvance Hungary", "#"], ["Referenciák", "#"], ["Partnereink", "#"], ["Media", "#"], ["Blog", "#"]]],
+    ["Rólunk", [["Miért mi?", "#"], ["Caradvance Németország", "#"], ["Caradvance Magyarország", "#"], ["Referenciák", "#"], ["Partnereink", "#"], ["Media", "#"], ["Blog", "#"]]],
   ];
   const langs = [
     ["hu", "Magyar", rel], ["en", "English", "#"], ["de", "Deutsch", "#"], ["fr", "Français", "#"],
