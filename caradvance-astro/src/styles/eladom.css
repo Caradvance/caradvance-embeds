@@ -8,12 +8,11 @@
 .section{padding:84px 0}
 
 /* stats + platforms */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);border-radius:20px;overflow:hidden}
-.stat{padding:26px 18px;text-align:center;border-right:1px solid var(--line)}
-.stat:last-child{border-right:0}
-.stat .num{font-size:clamp(34px,4vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 40px rgba(8,8,10,.08);text-align:center;padding:26px 22px}
+.stat .num{font-size:clamp(26px,3.2vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--navy)}
 .stat .num span{color:var(--red)}
-.stat .lbl{margin-top:8px;font-size:14px;color:var(--muted);line-height:1.35}
+.stat .lbl{margin-top:6px;font-size:13.5px;font-weight:600;color:var(--muted);line-height:1.4}
 .platforms{margin-top:56px;text-align:center}
 .platforms .plabel{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#9aa0ad;margin-bottom:22px}
 .platforms .row{display:flex;align-items:center;justify-content:center;gap:34px;flex-wrap:wrap}
@@ -21,7 +20,7 @@
 .platforms .divider{width:1px;height:26px;background:var(--line)}
 .platforms .socials{display:flex;align-items:center;gap:18px}
 .platforms .socials img{height:34px}
-@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:0}.stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--line)}}
+@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}}
 
 /* jótékonyság */
 .give-card{margin-top:44px;position:relative;overflow:hidden;border-radius:26px;padding:44px;color:#fff;background:radial-gradient(700px 320px at 88% 20%,rgba(226,0,26,.42),transparent 62%),linear-gradient(180deg,#17181C,#0B0B0D);display:grid;grid-template-columns:200px 1fr;gap:36px;align-items:center}
