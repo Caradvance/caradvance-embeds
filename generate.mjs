@@ -668,7 +668,7 @@ function contentSections(rel) {
     svcCard({ img: rel + "piros-bmw-x6-m-premium-autoberles.webp", alt: "Piros BMW X6 M — prémium autóbérlés", tag: "Prémium autóbérlés", title: "Prémium autóbérlés",
       lead: "<strong>Miért vásárolnál, ha bérelhetsz?</strong> Élvezd a prémium autózás minden előnyét vásárlás nélkül — rugalmas, hosszú távú bérléssel, már fél évtől.",
       items: ["Válogatott prémium modellek", "Rugalmas futamidő — minimum 6 hónaptól", "Átadás-átvétel egyeztetett helyszínen"],
-      extra: `<div class="btn-row"><a class="btn" href="${cat}">Autólista →</a><a class="btn btn-outline" href="#">Rövidtávú bérlés</a><a class="btn btn-outline" href="#">Hosszú távú bérlés</a></div>` }),
+      extra: `<div class="btn-row"><a class="btn" href="${cat}">Autóink</a><a class="btn btn-outline" href="${cat}">Új autó</a><a class="btn btn-outline" href="#">Rövid távú bérlés</a><a class="btn btn-outline" href="#">Hosszú távú bérlés</a></div>` }),
     svcCard({ img: rel + "bmw-m3-touring-premium-auto-eladas.webp", alt: "BMW M3 Touring — prémium autó eladás", tag: "Prémium autó eladás", title: "Prémium autó eladás",
       lead: "<strong>Miért kockáztatnál, ha biztosra is mehetsz?</strong> Kínálatunkban gondosan válogatott, bevizsgált prémium autók — egyenesen Németországból.",
       items: ["Leinformált, bevizsgált prémium modellek", "Autóink többsége érvényes gyári garanciával", "Finanszírozási lehetőség igény szerint"],
