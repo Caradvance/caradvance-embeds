@@ -327,7 +327,7 @@ function carCard(c, rate, rel) {
     : `<span class="ph">fotó hamarosan</span>`;
   const cross = p.save > 0 ? `<span class="pcross" data-cross>${fmtHUF(p.huGross)}</span>` : "";
   const save = p.save > 0 ? `<span class="psave" data-save>−${fmtHUF(p.save)}</span>` : "";
-  return `<a class="card" href="${attr(href)}" data-marka="${attr(c.marka || "")}" data-kar="${attr(c.karosszeria || "")}" data-uz="${attr(c.uzemanyag || "")}"><div class="media">${img}${isOwn(c) ? '<span class="own">CarAdvance saját</span>' : ""}</div>
+  return `<a class="card" href="${attr(href)}" data-marka="${attr(c.marka || "")}" data-kar="${attr(c.karosszeria || "")}" data-uz="${attr(c.uzemanyag || "")}"><div class="media">${img}</div>
   <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
   <h3 class="title">${esc((c.modell || "").trim())}</h3>
   <div class="specs">${esc(specStr(c))}</div>
@@ -732,7 +732,7 @@ ${contentSections("")}
 
 // --------------------------------------------------------------- CATALOG
 function renderCatalog(cars, rate) {
-  const active = cars.filter(isActive);
+  const active = cars.filter(isActive).sort((a, b) => nEur(a.vetel_eur) - nEur(b.vetel_eur));
   const css = `
 .crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:14px}.crumb a{text-decoration:none}.crumb a:hover{color:var(--red)}.crumb b{color:var(--ink)}
 .chead h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
@@ -861,7 +861,6 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
     </div>
     <aside class="side">
       <div class="panel">
-        ${isOwn(c) ? '<div class="own">CarAdvance saját autó</div>' : ""}
         <div class="badge"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
         <div class="ptitle">${esc(title)}</div>
         <div data-eur="${p.eur}" data-net="${nEur(c.vetel_eur_netto)}">
