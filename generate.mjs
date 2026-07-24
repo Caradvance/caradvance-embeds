@@ -76,6 +76,7 @@ const MAIN_INJECT = {
   "porsche-panamera-gts-standheizung-allradlenkung-ptv-pano": "c25bffa2-9097-4bc2-8296-f47fa38dab19",
   "porsche-cayenne-3-0-coupe-black-edition-2026-prod-full": "e425e500-550f-4cc7-b946-6312e5377b63",
   "bmw-x6-xdrive30d-22-massage-clarity-stnd-heiz-full": "fffc8da2-3c37-48ea-bcce-b671162f1ad5",
+  "mercedes-benz-g-63-amg-made-to-measure-mint-white-23-brabus-tv": "e9ed8ff7-b04b-4f5d-8221-22ac2ddaffab",
 };
 function injectUrl(id) {
   return "https://img.classistatic.de/api/v1/mo-prod/images/" + id.slice(0, 2) + "/" + id + "?rule=mo-1600";
