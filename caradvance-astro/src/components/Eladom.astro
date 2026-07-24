@@ -52,17 +52,19 @@ const FEATURE_ICONS: Record<string, string> = {
   </video>
   <div class="scrim"></div>
   <div class="inner">
-    <h1>{t('eladom.title1')} {t('eladom.title2')}</h1>
-    <p class="sub">{t('eladom.sub')}</p>
     <div class="partners" aria-label="CarAdvance · Használtautó.hu · mobile.de">
       <span class="pt"><img src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" /></span>
       <span class="psep"></span>
-      <span class="p-hasznalt">Használtautó<span class="dot"></span>hu</span>
+      <span class="pt"><img src="/hasznaltauto-hu.png" alt="Használtautó.hu" /></span>
       <span class="psep"></span>
-      <span class="p-mobile"><span class="m1"><span class="sq"></span>mobile.de</span><span class="m2">Deutschlands größter Fahrzeugmarkt</span></span>
+      <span class="pt pt-mobile"><img src="/mobile-de.png" alt="mobile.de — Deutschlands größter Fahrzeugmarkt" /></span>
     </div>
-    <a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Auto%20eladas">{t('eladom.cta')}</a>
-    <div class="pills">{pills.map((p) => <a class="pill" href={p.href}>{t(p.key)}</a>)}</div>
+    <h1>{t('eladom.title1')} <span class="accent">{t('eladom.title2')}</span></h1>
+    <p class="sub">{t('eladom.sub')}</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Auto%20eladas">{t('eladom.cta')}</a>
+      <a class="btn btn-white" href="#folyamat">Hogyan működik?</a>
+    </div>
   </div>
   <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
 </section>
