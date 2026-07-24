@@ -47,10 +47,10 @@ const BASE = 'https://caradvance.hu';
 
 const hu: EladomContent = {
   stats: [
-    { num: '20', unit: '+', label: 'év tapasztalat az autókban' },
-    { num: '5,0', unit: '★', label: 'Google értékelés' },
-    { num: '100', unit: '+', label: 'eladott autó' },
-    { num: '30', unit: '%', label: 'jutalék jótékony célra' },
+    { num: '23', unit: ' év', label: 'Tapasztalat — a Caradvance GmbH 2003 óta' },
+    { num: '2', unit: ' piactér', label: 'Használtautó.hu + mobile.de egyszerre' },
+    { num: '100', unit: '%', label: 'Teljes ügyintézés — a papírmunkát mi intézzük' },
+    { num: '30', unit: '%', label: 'Jutalék jótékony célra' },
   ],
   platformsLabel: 'Hirdetési platformjaink',
   charity: {
