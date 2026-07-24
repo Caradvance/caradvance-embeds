@@ -5,8 +5,6 @@ const { lang, path = '/' } = Astro.props as { lang: Locale; path?: string };
 const t = useTranslations(lang);
 const eladom = localizedPath(lang, '/eladom');
 
-// Menu structure — top-level label + dropdown items.
-// Items pointing at "#" are pages not built yet (placeholders).
 const menu = [
   { label: t('nav.rental'), items: [
     { t: 'Bérelhető autóink', href: '#' }, { t: 'Rövid távú bérlés', href: '#' },
@@ -30,6 +28,7 @@ const menu = [
     { t: 'Miért mi?', href: '#' }, { t: 'Caradvance Hungary', href: '#' }, { t: 'Partnereink', href: '#' },
   ]},
 ];
+const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
 ---
 <div class="ca-navwrap">
   <nav class="ca-nav" aria-label="Főmenü">
@@ -49,10 +48,18 @@ const menu = [
     <div class="navright">
       <a class="kapcsolat" href="mailto:info@caradvance.hu">{t('nav.contact')} →</a>
       <div class="lang">
-        {localeList.map((loc) => (
-          <a href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}
-             title={languageNames[loc]} style={`background-image:url(https://flagcdn.com/w40/${flagCode[loc]}.png)`}></a>
-        ))}
+        <button class="langbtn" type="button" aria-label="Nyelvváltás">
+          <span class="fw" style={`background-image:url(${flagUrl(lang)})`}></span>
+          <span class="chev">⌄</span>
+        </button>
+        <div class="langmenu">
+          {localeList.map((loc) => (
+            <a class="langopt" href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}>
+              <span class="fw" style={`background-image:url(${flagUrl(loc)})`}></span>
+              <span>{languageNames[loc]}</span>
+            </a>
+          ))}
+        </div>
       </div>
       <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
     </div>
@@ -65,6 +72,15 @@ const menu = [
       </div>
     ))}
     <a class="m-kapcsolat" href="mailto:info@caradvance.hu">{t('nav.contact')}</a>
+    <div class="m-langtitle">Nyelv</div>
+    <div class="m-langs">
+      {localeList.map((loc) => (
+        <a class="m-langopt" href={localizedPath(loc, path)}>
+          <span class="fw" style={`background-image:url(${flagUrl(loc)})`}></span>
+          <span>{languageNames[loc]}</span>
+        </a>
+      ))}
+    </div>
   </div>
 </div>
 
@@ -74,7 +90,13 @@ const menu = [
     const burger = wrap.querySelector('.burger');
     burger && burger.addEventListener('click', () => wrap.classList.toggle('open'));
     wrap.querySelectorAll('.m-accbtn').forEach((b) =>
-      b.addEventListener('click', () => b.parentElement?.classList.toggle('open'))
+      b.addEventListener('click', () => b.parentElement && b.parentElement.classList.toggle('open'))
     );
+    const lang = wrap.querySelector('.lang');
+    const langbtn = wrap.querySelector('.langbtn');
+    if (lang && langbtn) {
+      langbtn.addEventListener('click', (e) => { e.stopPropagation(); lang.classList.toggle('open'); });
+      document.addEventListener('click', () => lang.classList.remove('open'));
+    }
   }
 </script>
