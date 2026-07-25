@@ -66,7 +66,7 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
     <h1>{t('eladom.title1')}<br /><span class="accent">{t('eladom.title2')}</span></h1>
     <p class="sub sub-wide">{t('eladom.sub')}</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="mailto:info@caradvance.hu?subject=Auto%20eladas">{t('eladom.cta')}</a>
+      <a class="btn btn-primary" href="#ertekbecsles">{t('eladom.cta')}</a>
       <a class="btn btn-white" href="#folyamat">Hogyan működik?</a>
     </div>
   </div>
@@ -110,7 +110,7 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
   <div class="wrap center">
     <span class="eyebrow">Ingyenes &amp; kötelezettségmentes</span>
     <h2 class="sec-title">Mondd el, milyen autód van</h2>
-    <p class="sec-intro">Add meg az autód főbb adatait, és személyre szabott, reális eladási ársávot küldünk — a Használtautó.hu és a mobile.de hasonló hirdetéseivel összevetve. Néhány adat is elég a kezdéshez.</p>
+    <p class="sec-intro">Szeretnéd, hogy eladjuk helyetted az autódat? Add meg a főbb adatokat — mi profin értékesítjük, és személyre szabott, reális eladási ársávot küldünk. Néhány adat is elég a kezdéshez.</p>
   </div>
   <div class="wrap">
     <form class="sf" id="sellForm">
@@ -271,17 +271,21 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
     <div class="fee-wrap">
       <div class="fee-head">
         <h3>Bizományi díjszabás</h3>
-        <p>Átlátható, sávos díj — az elért vételár alapján. A díjunk <b>30%-át</b> minden sikeres eladás után a Te választott jótékony szervezetednek ajánljuk fel.</p>
+        <p>Átlátható, sávos díj — az elért vételár alapján, euróban. A díjunk <b>30%-át</b> minden sikeres eladás után a Te választott jótékony szervezetednek ajánljuk fel.</p>
       </div>
       <table class="fee-table">
-        <thead><tr><th>Elért vételár</th><th>Bizományi díj</th></tr></thead>
+        <thead><tr><th>Árkategória (EUR)</th><th>Jutalék</th><th>Minimum jutalék</th></tr></thead>
         <tbody>
-          <tr><td>4 – 6 M Ft</td><td>8% <span class="fee-min">(minimum 390 000 Ft)</span></td></tr>
-          <tr><td>6 – 10 M Ft</td><td>6%</td></tr>
-          <tr><td>10 – 15 M Ft</td><td>5%</td></tr>
-          <tr><td>15 M Ft felett</td><td>egyedi megállapodás (3–4%)</td></tr>
+          <tr><td>0 – 15 000 €</td><td>5,0%</td><td>500 €<span class="fh" data-min="500"></span></td></tr>
+          <tr><td>15 001 – 35 000 €</td><td>4,5%</td><td>750 €<span class="fh" data-min="750"></span></td></tr>
+          <tr><td>35 001 – 60 000 €</td><td>4,0%</td><td>1 400 €<span class="fh" data-min="1400"></span></td></tr>
+          <tr><td>60 001 – 100 000 €</td><td>3,5%</td><td>2 400 €<span class="fh" data-min="2400"></span></td></tr>
+          <tr><td>100 001 – 150 000 €</td><td>3,0%</td><td>3 500 €<span class="fh" data-min="3500"></span></td></tr>
+          <tr><td>150 001 – 200 000 €</td><td>2,5%</td><td>4 500 €<span class="fh" data-min="4500"></span></td></tr>
+          <tr><td>200 000 € felett</td><td>2,0%</td><td>5 000 €<span class="fh" data-min="5000"></span></td></tr>
         </tbody>
       </table>
+      <p class="fee-rate">Napi árfolyam: 1 € = <b id="eurHuf">…</b> Ft. A forint összegek tájékoztató jellegűek, a napi EUR/HUF árfolyam szerint.</p>
       <p class="fee-note">Jelenleg 4 millió Ft alatti értékű autókkal nem foglalkozunk.</p>
     </div>
   </div>
@@ -601,39 +605,58 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
     modelSel?.addEventListener('change', updateCompare);
 
     // Élő bizományi díj + jótékony felajánlás kalkulátor
-    const fmt = (n) => Math.round(n).toLocaleString('hu-HU') + ' Ft';
+    let EURHUF = 400;
+    const fmtHuf = (n) => Math.round(n).toLocaleString('hu-HU') + ' Ft';
+    const fmtEur = (n) => Math.round(n).toLocaleString('hu-HU') + ' €';
     const priceEl = document.getElementById('f-price');
     const calc = document.getElementById('sfCalc');
     const feeEl = document.getElementById('calcFee');
     const ngoEl = document.getElementById('calcNgo');
     const noteEl = document.getElementById('calcNote');
+    const feeForEur = (eur) => {
+      let pct, min;
+      if (eur <= 15000) { pct = 0.05; min = 500; }
+      else if (eur <= 35000) { pct = 0.045; min = 750; }
+      else if (eur <= 60000) { pct = 0.04; min = 1400; }
+      else if (eur <= 100000) { pct = 0.035; min = 2400; }
+      else if (eur <= 150000) { pct = 0.03; min = 3500; }
+      else if (eur <= 200000) { pct = 0.025; min = 4500; }
+      else { pct = 0.02; min = 5000; }
+      return { fee: Math.max(eur * pct, min), pct };
+    };
     const updateCalc = () => {
       if (!calc) return;
-      const p = parseInt((priceEl.value || '').replace(/\D/g, ''), 10) || 0;
-      if (!p) { calc.hidden = true; return; }
+      const pHuf = parseInt((priceEl.value || '').replace(/\D/g, ''), 10) || 0;
+      if (!pHuf) { calc.hidden = true; return; }
       calc.hidden = false;
       noteEl.className = 'sf-calc-note';
-      if (p < 4000000) {
+      if (pHuf < 4000000) {
         feeEl.textContent = '—'; ngoEl.textContent = '—';
         noteEl.className = 'sf-calc-note warn';
         noteEl.textContent = '4 millió Ft alatti autókkal jelenleg sajnos nem tudunk foglalkozni.';
         return;
       }
-      if (p >= 15000000) {
-        const lo = p * 0.03, hi = p * 0.04;
-        feeEl.textContent = fmt(lo) + ' – ' + fmt(hi);
-        ngoEl.textContent = fmt(lo * 0.3) + ' – ' + fmt(hi * 0.3);
-        noteEl.textContent = 'Egyedi megállapodás (3–4%). A díj 30%-a a választott szervezetet támogatja.';
-        return;
-      }
-      let fee, pct;
-      if (p < 6000000) { fee = Math.max(p * 0.08, 390000); pct = '8% (min. 390 000 Ft)'; }
-      else if (p < 10000000) { fee = p * 0.06; pct = '6%'; }
-      else { fee = p * 0.05; pct = '5%'; }
-      feeEl.textContent = fmt(fee) + ' · ' + pct;
-      ngoEl.textContent = fmt(fee * 0.3);
-      noteEl.textContent = 'A bizományi díjunk 30%-át a választott szervezetnek ajánljuk fel.';
+      const eur = pHuf / EURHUF;
+      const r = feeForEur(eur);
+      const feeHuf = r.fee * EURHUF;
+      const pctTxt = (r.pct * 100).toLocaleString('hu-HU', { minimumFractionDigits: 1 }) + '%';
+      feeEl.innerHTML = fmtEur(r.fee) + '<span class="cv-sub">≈ ' + fmtHuf(feeHuf) + ' · ' + pctTxt + '</span>';
+      ngoEl.innerHTML = fmtEur(r.fee * 0.3) + '<span class="cv-sub">≈ ' + fmtHuf(feeHuf * 0.3) + '</span>';
+      noteEl.textContent = 'A bizományi díjunk 30%-át a választott szervezetnek ajánljuk fel — a napi EUR/HUF árfolyam szerint.';
     };
+    const applyRate = () => {
+      const el = document.getElementById('eurHuf');
+      if (el) el.textContent = Math.round(EURHUF).toLocaleString('hu-HU');
+      document.querySelectorAll('.fh').forEach((s) => {
+        const min = parseFloat(s.dataset.min);
+        if (!isNaN(min)) s.textContent = ' (≈ ' + fmtHuf(min * EURHUF) + ')';
+      });
+      updateCalc();
+    };
+    fetch('https://open.er-api.com/v6/latest/EUR')
+      .then((res) => res.json())
+      .then((d) => { if (d && d.rates && d.rates.HUF) EURHUF = d.rates.HUF; applyRate(); })
+      .catch(() => applyRate());
     const formatPrice = () => {
       const digits = (priceEl.value || '').replace(/\D/g, '');
       priceEl.value = digits ? digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : '';
