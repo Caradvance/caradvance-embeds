@@ -79,22 +79,24 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
     <div class="stats">
       {c.stats.map((s, i) => (
         <div class="stat">
-          <div class="num">{s.num}<span>{s.unit}</span></div>
-          <div class="lbl">{s.label}</div>
-          <div class="stat-logos">
-            {i === 0 && <img class="sl-brand" src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance" />}
-            {i === 1 && (<Fragment>
-              <img class="sl-mkt" src="/hasznaltauto-hu-dark.png" alt="Használtautó.hu" />
-              <img class="sl-mkt" src="/mobile-de-mark.png" alt="mobile.de" />
-            </Fragment>)}
-            {i === 2 && (<Fragment>
-              <img class="sl-soc" src="https://caradvance.hu/facebook.webp" alt="Facebook" />
-              <img class="sl-soc" src="https://caradvance.hu/instagram.webp" alt="Instagram" />
-              <img class="sl-soc" src="https://caradvance.hu/tiktok.webp" alt="TikTok" />
-              <img class="sl-soc" src="/youtube.png" alt="YouTube" />
-            </Fragment>)}
-            {i === 3 && c.charity.orgs.map((o) => <img class="sl-ngo" src={o.logo} alt={o.name} />)}
+          <div class="stat-top">
+            <div class="num">{s.num}<span>{s.unit}</span></div>
+            <div class="lbl">{s.label}</div>
           </div>
+          {i === 0 && <div class="stat-logos lg-1"><img class="sl-brand" src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance" /></div>}
+          {i === 1 && <div class="stat-logos lg-2">
+            <img class="sl-mkt" src="/hasznaltauto-hu-dark.png" alt="Használtautó.hu" />
+            <img class="sl-mkt" src="/mobile-de-mark.png" alt="mobile.de" />
+          </div>}
+          {i === 2 && <div class="stat-logos lg-soc">
+            <img class="sl-soc" src="https://caradvance.hu/facebook.webp" alt="Facebook" />
+            <img class="sl-soc" src="https://caradvance.hu/instagram.webp" alt="Instagram" />
+            <img class="sl-soc" src="https://caradvance.hu/tiktok.webp" alt="TikTok" />
+            <img class="sl-soc" src="/youtube.png" alt="YouTube" />
+          </div>}
+          {i === 3 && <div class="stat-logos lg-ngo"><div class="ngo-track">
+            {c.charity.orgs.map((o) => <span class="sl-ngo"><img src={o.logo} alt={o.name} /></span>)}
+          </div></div>}
         </div>
       ))}
     </div>
