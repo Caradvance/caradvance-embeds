@@ -49,7 +49,7 @@ const hu: EladomContent = {
   stats: [
     { num: '23', unit: ' év', label: 'Tapasztalat — a Caradvance GmbH 2003 óta' },
     { num: '2', unit: ' piactér', label: 'Használtautó.hu + mobile.de egyszerre' },
-    { num: '4', unit: ' csatorna', label: 'Kövess minket a közösségi médiában' },
+    { num: '4', unit: ' csatorna', label: 'A közösségi médiában is hirdetjük az autódat' },
     { num: '30', unit: '%', label: 'Jutalék jótékony célra' },
   ],
   platformsLabel: 'Hirdetési platformjaink',
