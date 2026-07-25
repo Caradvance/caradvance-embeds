@@ -205,6 +205,19 @@ const jsonld = {
   </div>
 </section>
 
+<!-- JOGI HÁTTÉR / BH GROUP -->
+<section class="section">
+  <div class="wrap jot-legal">
+    <div class="jl-logo"><img src="https://caradvance.hu/bh-group-zrt.webp" alt="BH Group Zrt." /></div>
+    <div class="jl-text">
+      <span class="eyebrow">Törvényes és etikus működés</span>
+      <h2 class="sec-title">A jogi hátteret a BH Group Zrt. biztosítja</h2>
+      <p>Az autók bizományos értékesítésének és a jótékonysági felajánlásoknak a teljes jogi hátterét Magyarországon a <b>BH Group Zrt.</b> biztosítja. Minden adásvétel és tranzakció a hatályos magyar jogszabályoknak megfelelően, szabályos, írásos szerződéssel és átláthatóan zajlik.</p>
+      <p>Számunkra a tisztességes, etikus működés nem választás kérdése, hanem alap. A kifizetéseket és a jótékony célú felajánlásokat dokumentáltan, nyomon követhetően kezeljük — hogy teljes bizalommal bízhasd ránk az autód eladását és a jó ügyet is.</p>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="section jot-cta">
   <div class="wrap center">
@@ -247,10 +260,10 @@ const jsonld = {
   .pj-img{position:relative;height:170px;overflow:hidden}
   .pj-img img{width:100%;height:100%;object-fit:cover;display:block}
   .pj-tag{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 12px;border-radius:999px;backdrop-filter:blur(3px)}
-  .pj-badge{position:absolute;bottom:-18px;right:16px;width:56px;height:56px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 8px 20px rgba(8,8,10,.16);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:6px}
-  .pj-badge img{max-width:100%;max-height:100%;object-fit:contain}
-  .pj-badge-sos{background:#009DE0;border-color:#009DE0;padding:0}
-  .pj-badge-sos img{max-width:none;height:100%;width:auto}
+  .pj-badge{position:absolute;bottom:-22px;right:16px;height:68px;min-width:68px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 10px 24px rgba(8,8,10,.18);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:9px}
+  .pj-badge img{max-width:120px;max-height:100%;object-fit:contain}
+  .pj-badge-sos{background:#009DE0;border-color:#009DE0;padding:0 8px;width:auto}
+  .pj-badge-sos img{max-width:none;height:62%;width:auto;object-fit:contain}
   .pj-body{padding:24px 22px 22px;flex:1;display:flex;flex-direction:column}
   .pj-org{font-size:12.5px;font-weight:700;color:var(--c);text-transform:uppercase;letter-spacing:.04em}
   .pj-body h3{font-size:18px;font-weight:800;letter-spacing:-.01em;margin:6px 0 16px;line-height:1.25}
@@ -293,6 +306,14 @@ const jsonld = {
 
   .jot-seo{max-width:900px}
   .jot-seo p{font-size:16px;line-height:1.7;color:var(--muted);margin:16px 0 0}
+
+  .jot-legal{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:24px;padding:38px 42px;box-shadow:0 14px 32px rgba(8,8,10,.05)}
+  .jl-logo{display:flex;align-items:center;justify-content:center;background:var(--page);border:1px solid var(--line);border-radius:18px;padding:26px;min-width:190px}
+  .jl-logo img{max-width:150px;max-height:120px;width:auto;object-fit:contain}
+  .jot-legal .sec-title{font-size:clamp(21px,2.5vw,30px);margin:12px 0 12px}
+  .jot-legal p{font-size:15.5px;line-height:1.64;color:var(--muted);margin:0 0 12px}
+  .jot-legal p b{color:var(--ink)}
+  @media(max-width:760px){.jot-legal{grid-template-columns:1fr;gap:22px;padding:28px 24px;text-align:center}.jl-logo{min-width:0}}
 
   .jot-cta{background:var(--navy);color:#fff;text-align:center}
   .jot-cta h2{font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-.02em;margin:0 0 12px}
