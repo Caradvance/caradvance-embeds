@@ -94,9 +94,9 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
             <img class="sl-soc" src="https://caradvance.hu/tiktok.webp" alt="TikTok" />
             <img class="sl-soc" src="/youtube.png" alt="YouTube" />
           </div>}
-          {i === 3 && <div class="stat-logos lg-ngo">
-            <span class="sl-ngo"><img id="ngoRotImg" src={c.charity.orgs[0].logo} alt={c.charity.orgs[0].name} /></span>
-          </div>}
+          {i === 3 && <div class="stat-logos lg-ngo"><div class="ngo-track">
+            {c.charity.orgs.map((o) => <span class={o.name.startsWith('SOS') ? 'sl-ngo sl-ngo-full' : 'sl-ngo'}><img src={o.logo} alt={o.name} /></span>)}
+          </div></div>}
         </div>
       ))}
     </div>
@@ -657,22 +657,4 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
       window.location.href = 'mailto:info@caradvance.hu?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     });
   }
-</script>
-
-<script define:vars={{ ngoList: c.charity.orgs.map((o) => ({ logo: o.logo, name: o.name })) }}>
-  (function () {
-    var img = document.getElementById('ngoRotImg');
-    if (!img || !Array.isArray(ngoList) || ngoList.length < 2) return;
-    var i = 0;
-    img.style.transition = 'opacity .26s ease';
-    setInterval(function () {
-      img.style.opacity = '0';
-      setTimeout(function () {
-        i = (i + 1) % ngoList.length;
-        img.src = ngoList[i].logo;
-        img.alt = ngoList[i].name;
-        img.style.opacity = '1';
-      }, 260);
-    }, 2200);
-  })();
 </script>
