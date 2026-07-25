@@ -148,8 +148,8 @@ const jsonld = {
           <div class="pj-img">
             <img src={o.photo} alt={o.project.title} loading="lazy" />
             <span class="pj-tag">{o.tag}</span>
-            <span class={`pj-badge${o.name.startsWith('SOS') ? ' pj-badge-sos' : ''}`}><img src={logoOf(o)} alt={o.name} /></span>
           </div>
+          <span class={`pj-badge${o.name.startsWith('SOS') ? ' pj-badge-sos' : ''}`}><img src={logoOf(o)} alt={o.name} /></span>
           <div class="pj-body">
             <div class="pj-org">{o.name}</div>
             <h3>{o.project.title}</h3>
@@ -256,11 +256,11 @@ const jsonld = {
 
   /* Project (crowdfunding) cards */
   .pj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px}
-  .pj-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 14px 32px rgba(8,8,10,.06)}
+  .pj-card{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 14px 32px rgba(8,8,10,.06)}
   .pj-img{position:relative;height:170px;overflow:hidden}
   .pj-img img{width:100%;height:100%;object-fit:cover;display:block}
   .pj-tag{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 12px;border-radius:999px;backdrop-filter:blur(3px)}
-  .pj-badge{position:absolute;bottom:-22px;right:16px;height:68px;min-width:68px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 10px 24px rgba(8,8,10,.18);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:9px}
+  .pj-badge{position:absolute;top:136px;right:16px;z-index:3;height:68px;min-width:68px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 10px 24px rgba(8,8,10,.18);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:9px}
   .pj-badge img{max-width:120px;max-height:100%;object-fit:contain}
   .pj-badge-sos{background:#009DE0;border-color:#009DE0;padding:0 8px;width:auto}
   .pj-badge-sos img{max-width:none;height:62%;width:auto;object-fit:contain}
