@@ -51,6 +51,7 @@ const fuels = ['Benzin','Dízel','Hibrid','Plug-in hibrid','Elektromos','LPG/Ben
 const gears = ['Manuális','Automata'];
 const bodies = ['Ferdehátú','Sedan/Limuzin','Kombi','Coupé','Kabrió','SUV/Terepjáró','Egyterű','Pickup'];
 const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
+const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hónapon belül','Mielőbb','Nagyon sürgős (2 héten belül)'];
 ---
 <!-- HERO -->
 <section class="hero">
@@ -107,6 +108,7 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
   </div>
   <div class="wrap">
     <form class="sf" id="sellForm">
+      <div class="sf-blocktitle">Alapadatok</div>
       <div class="sf-grid">
         <label class="sf-field"><span>Márka</span>
           <select id="f-make" required>
@@ -128,10 +130,26 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
             {years.map((y) => <option>{y}</option>)}
           </select>
         </label>
+      </div>
+      <div class="sf-grid">
         <label class="sf-field"><span>Futásteljesítmény (km)</span>
           <input id="f-km" type="number" min="0" step="1000" placeholder="pl. 120000" />
         </label>
+        <label class="sf-field"><span>Üzemanyag</span>
+          <select id="f-fuel"><option value="" disabled selected>Válassz…</option>{fuels.map((x) => <option>{x}</option>)}</select>
+        </label>
+        <label class="sf-field"><span>Szín</span>
+          <input id="f-color" type="text" placeholder="pl. metálszürke" />
+        </label>
+        <label class="sf-field"><span>Állapot</span>
+          <select id="f-cond"><option value="" disabled selected>Válassz…</option>{conds.map((x) => <option>{x}</option>)}</select>
+        </label>
       </div>
+      <label class="sf-field sf-full"><span>Megjegyzés, felszereltség, extrák</span>
+        <textarea id="f-notes" rows="3" placeholder="pl. vezetett szervizkönyv, téli-nyári gumi, tetőablak, sérülésmentes…"></textarea>
+      </label>
+
+      <div class="sf-blocktitle sf-blocktitle-mt">Ár és időzítés</div>
       <div class="sf-grid">
         <label class="sf-field"><span>Mennyiért adnád el? (Ft)</span>
           <input id="f-price" type="number" min="0" step="50000" placeholder="pl. 8 500 000" />
@@ -145,20 +163,13 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
             <option>Nincs elképzelésem — segítsetek</option>
           </select>
         </label>
+        <label class="sf-field"><span>Mennyire sürgős?</span>
+          <select id="f-urgency">
+            <option value="" disabled selected>Válassz…</option>
+            {urgencies.map((x) => <option>{x}</option>)}
+          </select>
+        </label>
       </div>
-
-      <details class="sf-more">
-        <summary><span>Részletes adatok megadása</span><span class="sf-chev">⌄</span></summary>
-        <div class="sf-grid">
-          <label class="sf-field"><span>Üzemanyag</span><select id="f-fuel"><option value="" disabled selected>Válassz…</option>{fuels.map((x) => <option>{x}</option>)}</select></label>
-          <label class="sf-field"><span>Váltó</span><select id="f-gear"><option value="" disabled selected>Válassz…</option>{gears.map((x) => <option>{x}</option>)}</select></label>
-          <label class="sf-field"><span>Teljesítmény (LE)</span><input id="f-power" type="number" min="0" placeholder="pl. 249" /></label>
-          <label class="sf-field"><span>Karosszéria</span><select id="f-body"><option value="" disabled selected>Válassz…</option>{bodies.map((x) => <option>{x}</option>)}</select></label>
-          <label class="sf-field"><span>Állapot</span><select id="f-cond"><option value="" disabled selected>Válassz…</option>{conds.map((x) => <option>{x}</option>)}</select></label>
-          <label class="sf-field"><span>Szín</span><input id="f-color" type="text" placeholder="pl. metálszürke" /></label>
-        </div>
-        <label class="sf-field sf-full"><span>Megjegyzés, felszereltség, extrák</span><textarea id="f-notes" rows="3" placeholder="pl. vezetett szervizkönyv, téli-nyári gumi, tetőablak, sérülésmentes…"></textarea></label>
-      </details>
 
       <div class="sf-compare">
         <div class="sf-compare-t">Nézd meg a hasonló autók árait</div>
@@ -452,10 +463,10 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
       e.preventDefault();
       const rows = [
         ['Márka', val('f-make')], ['Modell', val('f-model')], ['Típusjel', val('f-type')], ['Évjárat', val('f-year')],
-        ['Futásteljesítmény (km)', val('f-km')], ['Kért ár (Ft)', val('f-price')], ['Ár rugalmassága', val('f-flex')],
-        ['Üzemanyag', val('f-fuel')], ['Váltó', val('f-gear')], ['Teljesítmény (LE)', val('f-power')],
-        ['Karosszéria', val('f-body')], ['Állapot', val('f-cond')], ['Szín', val('f-color')],
-        ['Megjegyzés', val('f-notes')], ['Támogatott szervezet', val('f-ngo')],
+        ['Futásteljesítmény (km)', val('f-km')], ['Üzemanyag', val('f-fuel')], ['Szín', val('f-color')], ['Állapot', val('f-cond')],
+        ['Megjegyzés', val('f-notes')],
+        ['Kért ár (Ft)', val('f-price')], ['Ár rugalmassága', val('f-flex')], ['Sürgősség', val('f-urgency')],
+        ['Támogatott szervezet', val('f-ngo')],
         ['Név', val('f-name')], ['E-mail', val('f-email')], ['Telefon', val('f-phone')],
       ].filter(([, v]) => v);
       const title = (val('f-make') + ' ' + val('f-model')).trim() + (val('f-year') ? ' (' + val('f-year') + ')' : '');
