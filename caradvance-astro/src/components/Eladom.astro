@@ -1,6 +1,6 @@
 ---
 import '../styles/eladom.css';
-import { useTranslations, type Locale } from '../i18n/utils';
+import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
 import type { UIKey } from '../i18n/ui';
 import { eladomContent } from '../data/eladom';
 
@@ -96,7 +96,7 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
           </div>}
           {i === 3 && <div class="stat-logos lg-ngo"><div class="ngo-track">
             {c.charity.orgs.map((o) => o.name.startsWith('SOS')
-              ? <span class="sl-ngo sl-ngo-sos"><img src="/sos-gyermekfalvak.jpg" alt={o.name} /></span>
+              ? <span class="sl-ngo sl-ngo-sos"><img src="/sos-badge.png" alt={o.name} /></span>
               : <span class="sl-ngo"><img src={o.logo} alt={o.name} /></span>)}
           </div></div>}
         </div>
@@ -323,7 +323,7 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
               <span class="ch-corner"><Fragment set:html={heart} /></span>
               <span class="ch-tag">{o.tag}</span>
             </div>
-            <div class="ch-body"><div class={`ch-logo${o.name.startsWith('SOS') ? ' ch-logo-sos' : ''}`}><img src={o.name.startsWith('SOS') ? '/sos-gyermekfalvak.jpg' : o.logo} alt={o.name} /></div><h4>{o.name}</h4><p>{o.text}</p></div>
+            <div class="ch-body"><div class={`ch-logo${o.name.startsWith('SOS') ? ' ch-logo-sos' : ''}`}><img src={o.name.startsWith('SOS') ? '/sos-badge.png' : o.logo} alt={o.name} /></div><h4>{o.name}</h4><p>{o.text}</p></div>
             <div class="ch-foot">
               <div class="ch-support"><Fragment set:html={heart} /> {c.charity.supports}</div>
               <a class="ch-link" href={o.url} target="_blank" rel="noopener noreferrer">{c.charity.orgLink} <Fragment set:html={arrow} /></a>
@@ -332,6 +332,7 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
         ))}
       </div>
     </div>
+    <div class="ch-more"><a href={localizedPath(lang, '/jotekonysag')}><Fragment set:html={heart} /> {c.charity.learnMore}</a></div>
     <p class="give-note">{c.charity.note}</p>
   </div>
 </section>
@@ -471,8 +472,19 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
   const sc = document.getElementById('charityScroll');
   if (sc) {
     const step = () => Math.min(sc.clientWidth * 0.85, 352);
-    document.querySelector('.ch-arrow.prev')?.addEventListener('click', () => sc.scrollBy({ left: -step(), behavior: 'smooth' }));
-    document.querySelector('.ch-arrow.next')?.addEventListener('click', () => sc.scrollBy({ left: step(), behavior: 'smooth' }));
+    const prev = document.querySelector('.ch-arrow.prev');
+    const next = document.querySelector('.ch-arrow.next');
+    prev?.addEventListener('click', () => sc.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next?.addEventListener('click', () => sc.scrollBy({ left: step(), behavior: 'smooth' }));
+    const updateArrows = () => {
+      const atStart = sc.scrollLeft <= 8;
+      const atEnd = sc.scrollLeft + sc.clientWidth >= sc.scrollWidth - 8;
+      prev?.classList.toggle('is-hidden', atStart);
+      next?.classList.toggle('is-hidden', atEnd);
+    };
+    sc.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
   }
 
   const form = document.getElementById('sellForm');
