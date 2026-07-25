@@ -7,7 +7,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{font-family:var(--font);background:var(--page);color:var(--ink);-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--page);color:var(--ink);-webkit-font-smoothing:antialiased;font-variant-ligatures:none;font-feature-settings:"liga" 0,"dlig" 0}
 img{display:block;max-width:100%}
 a{color:inherit}
 
