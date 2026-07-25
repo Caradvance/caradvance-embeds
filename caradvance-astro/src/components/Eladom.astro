@@ -152,7 +152,7 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
       <div class="sf-blocktitle sf-blocktitle-mt">Ár és időzítés</div>
       <div class="sf-grid">
         <label class="sf-field"><span>Mennyiért adnád el? (Ft)</span>
-          <input id="f-price" type="number" min="0" step="50000" placeholder="pl. 8 500 000" />
+          <input id="f-price" type="text" inputmode="numeric" autocomplete="off" placeholder="pl. 8 500 000" />
         </label>
         <label class="sf-field"><span>Ár rugalmassága</span>
           <select id="f-flex">
@@ -545,7 +545,12 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
       ngoEl.textContent = fmt(fee * 0.3);
       noteEl.textContent = 'A bizományi díjunk 30%-át a választott szervezetnek ajánljuk fel.';
     };
-    priceEl?.addEventListener('input', updateCalc);
+    const formatPrice = () => {
+      const digits = (priceEl.value || '').replace(/\D/g, '');
+      priceEl.value = digits ? digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : '';
+      updateCalc();
+    };
+    priceEl?.addEventListener('input', formatPrice);
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
