@@ -189,5 +189,32 @@
 .sf-ngo-s{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.45}
 .sf-submit-row{margin-top:22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .sf-submit-note{font-size:13px;color:var(--muted)}
+/* élő díj + felajánlás kalkulátor */
+.sf-calc{margin-top:16px;border:1.5px solid #F0D5D9;background:linear-gradient(180deg,#FDF3F4,#fff);border-radius:16px;padding:18px 20px}
+.sf-calc-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:560px){.sf-calc-cols{grid-template-columns:1fr;gap:12px}}
+.sf-calc-lbl{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.sf-calc-val{font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-.02em;color:var(--navy);margin-top:4px;line-height:1.15}
+.sf-calc-val.red{color:var(--red)}
+.sf-calc-note{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
+.sf-calc-note.warn{color:var(--red);font-weight:700}
+
+/* így dolgozunk + díjszabás */
+.howwe-grid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:820px){.howwe-grid{grid-template-columns:1fr}}
+.howwe-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 10px 26px rgba(8,8,10,.05)}
+.howwe-num,.howwe-ico{width:52px;height:52px;border-radius:14px;background:var(--navy);color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.howwe-card h4{margin:0 0 8px;font-size:18px;font-weight:800;letter-spacing:-.01em}
+.howwe-card p{margin:0;font-size:14.5px;line-height:1.55;color:var(--muted)}
+.fee-wrap{margin-top:36px;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:0 14px 34px rgba(8,8,10,.06);padding:30px;max-width:820px;margin-left:auto;margin-right:auto}
+.fee-head h3{margin:0 0 8px;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.fee-head p{margin:0 0 20px;font-size:14.5px;line-height:1.55;color:var(--muted)}
+.fee-table{width:100%;border-collapse:collapse}
+.fee-table th{text-align:left;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9aa0ad;padding:10px 16px;border-bottom:2px solid var(--line)}
+.fee-table td{padding:15px 16px;font-size:15.5px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--line)}
+.fee-table td:last-child{color:var(--red)}
+.fee-table tr:last-child td{border-bottom:0}
+.fee-min{color:var(--muted);font-weight:600;font-size:13px}
+.fee-note{margin:16px 0 0;font-size:13.5px;color:var(--muted);font-style:italic}
 @media(max-width:860px){.sf-grid,.sf-grid.sf-2,.sf-grid.sf-3{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.sf-grid,.sf-grid.sf-2,.sf-grid.sf-3{grid-template-columns:1fr}.sf{padding:20px}}
