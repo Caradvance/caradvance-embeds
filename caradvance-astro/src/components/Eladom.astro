@@ -276,7 +276,7 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
       <table class="fee-table">
         <thead><tr><th>Árkategória</th><th>Jutalék</th><th>Minimum jutalék</th></tr></thead>
         <tbody>
-          <tr><td><span class="fh-range" data-min="0" data-max="15000"></span><span class="fe">0 – 15 000 €</span></td><td>5,0%</td><td><span class="fh-min" data-min="500"></span><span class="fe">≈ 500 €</span></td></tr>
+          <tr><td><span class="fh-range" data-min="0" data-max="15000" data-huf-min="4000000"></span><span class="fe">0 – 15 000 €</span></td><td>5,0%</td><td><span class="fh-min" data-min="500"></span><span class="fe">≈ 500 €</span></td></tr>
           <tr><td><span class="fh-range" data-min="15000" data-max="35000"></span><span class="fe">15 001 – 35 000 €</span></td><td>4,5%</td><td><span class="fh-min" data-min="750"></span><span class="fe">≈ 750 €</span></td></tr>
           <tr><td><span class="fh-range" data-min="35000" data-max="60000"></span><span class="fe">35 001 – 60 000 €</span></td><td>4,0%</td><td><span class="fh-min" data-min="1400"></span><span class="fe">≈ 1 400 €</span></td></tr>
           <tr><td><span class="fh-range" data-min="60000" data-max="100000"></span><span class="fe">60 001 – 100 000 €</span></td><td>3,5%</td><td><span class="fh-min" data-min="2400"></span><span class="fe">≈ 2 400 €</span></td></tr>
@@ -650,7 +650,8 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
       if (el) el.textContent = Math.round(EURHUF).toLocaleString('hu-HU');
       document.querySelectorAll('.fh-range').forEach((s) => {
         const mn = parseFloat(s.dataset.min), mx = s.dataset.max ? parseFloat(s.dataset.max) : null;
-        if (mx) s.textContent = (mn === 0 ? '0' : numM(mn * EURHUF)) + ' – ' + numM(mx * EURHUF) + ' M Ft';
+        const hufMin = s.dataset.hufMin ? parseFloat(s.dataset.hufMin) : mn * EURHUF;
+        if (mx) s.textContent = numM(hufMin) + ' – ' + numM(mx * EURHUF) + ' M Ft';
         else s.textContent = numM(mn * EURHUF) + ' M Ft felett';
       });
       document.querySelectorAll('.fh-min').forEach((s) => {
