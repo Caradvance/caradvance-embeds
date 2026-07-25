@@ -41,6 +41,8 @@ export interface EladomContent {
     items: { title: string; text: string; highlight?: boolean }[];
   };
   closing: { title: string; text: string; cta: string };
+  seo: { eyebrow: string; title: string; paras: string[] };
+  faq: { eyebrow: string; title: string; intro: string; items: { q: string; a: string }[] };
 }
 
 const BASE = 'https://caradvance.hu';
@@ -157,6 +159,31 @@ const hu: EladomContent = {
     title: 'Add el az autód — tegyünk jót együtt',
     text: 'Küldd el pár adatát, és jelentkezünk egy reális árajánlattal. A többit mi intézzük — profin, gyorsan, egy jó ügyért.',
     cta: 'Eladnám az autóm',
+  },
+  seo: {
+    eyebrow: 'Jó tudni',
+    title: 'Autó eladása egyszerűen — bizományos értékesítéssel, országosan',
+    paras: [
+      'Ha az autód eladása a cél, a Caradvance bizományos autóértékesítése a legkényelmesebb út: profi fotó és videó, hirdetés a Használtautó.hu-n és a mobile.de-n, az érdeklődőkkel pedig mi tárgyalunk helyetted — te csak átveszed a vételárat. A használt autó eladása így gyors, biztonságos és átlátható, Budapesten, Solymáron és országos kiszolgálással.',
+      'Sokakat foglalkoztat az autó eladás menete és a papírmunka. Nálunk a teljes ügyintézést átvállaljuk: adásvételi szerződés, az autó eladásának bejelentése (akár online, a kormányablaknál vagy ügyfélkapun keresztül), valamint az autó eladás utáni teendők — például a kötelező biztosítás felmondása és az autó átírása a vevő nevére — mind a mi dolgunk.',
+      'Az autó eladása utáni adózásban is segítünk eligazodni: magánszemélyként, nem üzletszerű eladás esetén jellemzően nem keletkezik adófizetési kötelezettség, de a saját helyzetedről érdemes könyvelővel vagy a NAV tájékoztatójából megbizonyosodni. Akár magánszemélyként, akár céges autót adnál el, végigkísérünk a teljes folyamaton.',
+      'A bizományos értékesítés mellett a gyors autófelvásárlás is szóba jöhet, ha azonnal pénzre van szükséged — tapasztalatunk szerint azonban a bizományos eladással érhető el a legjobb ár. Több mint 5000 eladott autó és 5,0-s Google-értékelés áll mögöttünk, és minden eladás jutalékának egy jelentős részét magyar jótékonysági szervezeteknek ajánljuk fel.',
+    ],
+  },
+  faq: {
+    eyebrow: 'GY.I.K.',
+    title: 'Gyakori kérdések az autó eladásáról',
+    intro: 'A leggyakoribb kérdések a használt autó eladásáról, a folyamatról, a bejelentésről és az ügyintézésről.',
+    items: [
+      { q: 'Hogyan zajlik az autó eladása bizományban?', a: 'Felmérjük és reális piaci áron beárazzuk az autót, profi fotót és mozgóképes videót készítünk, meghirdetjük a Használtautó.hu-n és a mobile.de-n, kezeljük az érdeklődőket és helyetted tárgyalunk. A sikeres eladás után átveszed a vételárat — a teljes papírmunkát, az adásvételi szerződést és az átírást mi intézzük.' },
+      { q: 'Hogyan kell bejelenteni az autó eladását?', a: 'Az adásvételt a szerződés megkötésétől számított 15 napon belül be kell jelenteni. Ez megtehető személyesen a kormányablaknál, vagy online, ügyfélkapun keresztül. Bizományos értékesítés esetén az autó eladásának bejelentését is intézzük helyetted, így neked nem kell a hivatallal foglalkoznod.' },
+      { q: 'Mik a teendők az autó eladása után?', a: 'Eladás után érdemes felmondani a kötelező biztosítást (és a casco-t), gondoskodni az autó átírásáról a vevő nevére, valamint leadni a forgalmi engedélyt és a törzskönyvet a vevőnek. A biztosítás felmondását az adásvételi szerződés igazolja. Nálunk ezeket az autó eladás utáni teendőket is átvállaljuk.' },
+      { q: 'Kell adót fizetni az autó eladása után?', a: 'A személygépkocsi magánszemélyként, nem üzletszerű módon történő eladása a legtöbb esetben nem jár adófizetési kötelezettséggel — különösen, ha nem nyereséggel értékesíted. Az adózás a konkrét helyzettől függ, ezért a saját esetedről érdemes könyvelővel vagy a NAV tájékoztatójából tájékozódni. Minden összeget átláthatóan rögzítünk.' },
+      { q: 'El lehet adni az autót törzskönyv nélkül?', a: 'Törzskönyv nélkül is eladható az autó, de a törzskönyv pótlását érdemes még az eladás előtt elintézni, mert a vevő és az átírás szempontjából fontos okmány. Ha hiányzik valamelyik dokumentum, segítünk a pótlásában is.' },
+      { q: 'Mi a különbség a bizományos értékesítés és az autófelvásárlás között?', a: 'Az autófelvásárlásnál azonnal, de jellemzően alacsonyabb áron veszik meg az autót. A bizományos értékesítésnél mi adjuk el helyetted, valós piaci áron — ez néhány héttel több időt vehet igénybe, cserébe általában jóval magasabb végösszeget hoz. Mi a bizományos eladásra fókuszálunk, mert így jársz a legjobban.' },
+      { q: 'Mennyi a jutalék, és mennyi idő alatt adjátok el az autót?', a: 'A jutalék az autó értékétől függ (a részletes sávokat feljebb, a díjtáblázatban találod), és tartalmazza a teljes szolgáltatást a fotózástól a hirdetésen át a teljes ügyintézésig. Az eladás átlagosan néhány hét, a kereslettől és az ártól függően. A jutalék egy jelentős részét magyar jótékony szervezeteknek ajánljuk fel.' },
+      { q: 'Magánszemélyként és céges autót is el tudok adni nálatok?', a: 'Igen. Magánszemélyként és cégként is ránk bízhatod az autó eladását. A céges autó eladásának bejelentését, az áfás számlázást és a kapcsolódó ügyintézést is kezeljük — mindezt átláthatóan, szabályos szerződéssel.' },
+    ],
   },
 };
 
