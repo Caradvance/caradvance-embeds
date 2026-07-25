@@ -28,9 +28,8 @@
 .ngo-track::-webkit-scrollbar-thumb{background:#d9dee7;border-radius:4px}
 .sl-ngo{flex:0 0 auto;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;height:56px;padding:8px 12px;background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:0 4px 12px rgba(8,8,10,.07);overflow:hidden}
 .sl-ngo img{max-height:100%;max-width:150px;width:auto;object-fit:contain;display:block}
-/* SOS Gyermekfalvak: teljes kék csempe, keretig */
-.sl-ngo-full{padding:0;border:0}
-.sl-ngo-full img{height:56px;max-height:none;width:auto;max-width:none}
+/* SOS Gyermekfalvak: azonos méret, de kék háttér (nincs fehér rés) */
+.sl-ngo-sos{background:#009DE0;border-color:#009DE0}
 .platforms{margin-top:56px;text-align:center}
 .platforms .plabel{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#9aa0ad;margin-bottom:22px}
 .platforms .row{display:flex;align-items:center;justify-content:center;gap:34px;flex-wrap:wrap}
