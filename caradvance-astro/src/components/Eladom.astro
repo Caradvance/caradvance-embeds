@@ -36,6 +36,17 @@ const ILLO: Record<string, string> = {
   shield: '<svg viewBox="0 0 320 152" preserveAspectRatio="xMidYMid slice"><path d="M228 30 280 47v36c0 32-21 55-52 65-31-10-52-33-52-65V47z" fill="#fff" fill-opacity=".95"/><path d="M228 76c-4.5-5.5-14-3-14 4.4 0 6 8.6 11.4 14 14.6 5.4-3.2 14-8.6 14-14.6 0-7.4-9.5-9.9-14-4.4z" fill="#4b5563"/></svg>',
 };
 
+// Small per-topic glyph for the card corner badge (24x24, uses currentColor)
+const CORNER: Record<string, string> = {
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-5h5v5"/></svg>',
+  food: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16"/><path d="M20 11a8 8 0 0 1-16 0"/><path d="M12 4v3"/></svg>',
+  tent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 3.5 20h17z"/><path d="M12 4v16"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.8-4.3-9-8.6C1.4 8.9 3 5.5 6.2 5.5c1.9 0 3.2 1.1 4.6 2.9 1.4-1.8 2.7-2.9 4.6-2.9 3.2 0 4.8 3.4 3.2 6.9-2.2 4.3-8.6 8.6-8.6 8.6z"/></svg>',
+  paw: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="10.5" r="1.9"/><circle cx="9.5" cy="7" r="1.9"/><circle cx="14.5" cy="7" r="1.9"/><circle cx="18.5" cy="10.5" r="1.9"/><path d="M12 12.2c-2.6 0-4.6 1.9-4.6 4.1 0 1.7 1.6 2.6 4.6 2.6s4.6-.9 4.6-2.6c0-2.2-2-4.1-4.6-4.1z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 6.5v11M6.5 12h11"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.4 8-7 10-3.6-2-7-5-7-10V6z"/></svg>',
+};
+
 const FEATURE_ICONS: Record<string, string> = {
   video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
   reach: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0 1 7-7M12 19a7 7 0 0 0 7-7"/></svg>',
@@ -318,9 +329,9 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
           <div class="ch-card">
             <div class="ch-head" style={`background:${o.color}`}>
               {o.photo
-                ? <Fragment><img class="ch-photo" src={o.photo} alt="" aria-hidden="true" loading="lazy" /><span class="ch-scrim" style={`background:${o.color}`}></span></Fragment>
+                ? <Fragment><img class="ch-photo" src={o.photo} alt="" aria-hidden="true" decoding="async" /><span class="ch-scrim" style={`background:${o.color}`}></span></Fragment>
                 : <span class="ch-illo" set:html={ILLO[o.icon]}></span>}
-              <span class="ch-corner"><Fragment set:html={heart} /></span>
+              <span class="ch-corner"><Fragment set:html={CORNER[o.icon] || heart} /></span>
               <span class="ch-tag">{o.tag}</span>
             </div>
             <div class="ch-body"><div class={`ch-logo${o.name.startsWith('SOS') ? ' ch-logo-sos' : ''}`}><img src={o.name.startsWith('SOS') ? '/sos-badge.png' : o.logo} alt={o.name} /></div><h4>{o.name}</h4><p>{o.text}</p></div>
