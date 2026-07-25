@@ -90,6 +90,25 @@
 .ch-more a:hover{background:var(--red);transform:translateY(-1px)}
 .ch-more a svg{width:16px;height:16px}
 
+/* CSAPAT / team card */
+.team-card{display:grid;grid-template-columns:330px 1fr;max-width:940px;margin:40px auto 0;background:#fff;border:1px solid var(--line);border-radius:28px;overflow:hidden;box-shadow:0 26px 64px rgba(8,8,10,.12);position:relative}
+.team-card::before{content:"";position:absolute;inset:0;border-radius:28px;padding:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(226,0,26,.06)}
+.tc-photo{position:relative;background:linear-gradient(165deg,#eef1f6,#dfe4ec);min-height:360px}
+.tc-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(226,0,26,.06))}
+.tc-photo img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.tc-body{padding:40px 44px;display:flex;flex-direction:column}
+.tc-role{align-self:flex-start;background:#FBE9EC;color:var(--red);font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border-radius:999px}
+.tc-name{font-size:clamp(26px,3vw,32px);font-weight:800;letter-spacing:-.02em;margin:16px 0 12px}
+.tc-flags{display:flex;gap:8px;margin-bottom:18px}
+.tc-flag{width:31px;height:22px;border-radius:5px;background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(11,11,13,.12),0 2px 5px rgba(0,0,0,.12)}
+.tc-bio{font-size:15.5px;line-height:1.64;color:var(--muted);margin:0 0 20px}
+.tc-quote{margin:0 0 24px;border-left:4px solid var(--red);background:var(--page);border-radius:0 14px 14px 0;padding:15px 20px;font-style:italic;font-size:15.5px;color:var(--ink);line-height:1.55}
+.tc-contact{display:flex;flex-wrap:wrap;gap:12px;margin-top:auto}
+.tc-chip{display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:12px 20px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14.5px;transition:border-color .15s,color .15s,transform .15s,box-shadow .15s}
+.tc-chip:hover{border-color:var(--red);color:var(--red);transform:translateY(-1px);box-shadow:0 8px 20px rgba(226,0,26,.12)}
+.tc-chip svg{width:17px;height:17px;color:var(--red);flex:0 0 auto}
+@media(max-width:760px){.team-card{grid-template-columns:1fr}.tc-photo{min-height:320px}.tc-body{padding:30px 26px}.tc-contact{flex-direction:column;align-items:stretch}.tc-chip{justify-content:center}}
+
 /* SEO (Jó tudni) + FAQ */
 .jotudni{background:var(--page)}
 .seo-wrap{max-width:900px}
