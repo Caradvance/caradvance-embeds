@@ -47,7 +47,7 @@ const hu: HomeContent = {
   charity: {
     eyebrow: 'Jótékonyság',
     title: 'Minden eladott autóval jót teszünk',
-    text: 'Hisszük, hogy a sikernek akkor van igazi értéke, ha másokkal is megosztjuk. Ezért a használtautó-eladások jutalékának jelentős részét magyar nonprofit szervezeteknek ajánljuk fel — és minden autó videójában megmutatjuk, hova kerül a támogatás.',
+    text: 'Hisszük, hogy a sikernek akkor van igazi értéke, ha másokkal is megosztjuk. Ezért a használtautó-eladások jutalékának 30%-át magyar nonprofit szervezeteknek ajánljuk fel — méghozzá különleges módon: a 30% felét (15%) az autó eladója, a másik felét (15%) a vevő irányítja a hozzá legközelebb álló ügyre. Így az eladás mindkét fél számára valódi, személyes jó cselekedet lesz.',
     cta: 'Add el az autód — tegyünk jót együtt',
     logos: [
       `${BASE}/sos-gyermekfalvak-magyarorszag.webp`, `${BASE}/magyar-elelmiszerbank-egyesulet.webp`,

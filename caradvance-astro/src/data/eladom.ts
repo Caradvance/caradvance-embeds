@@ -61,7 +61,7 @@ const hu: EladomContent = {
     intro: 'Nálunk az eladás nem csak rólad szól. A jutalékunk egy jelentős részét magyar jótékony szervezeteknek ajánljuk fel — így minden értékesített autó mögött ott egy jó ügy is.',
     bigNum: '30', bigUnit: '%', bigLabel: 'Jutalék jótékony célra',
     cardTitle: 'Minden sikeres eladásból visszaadunk a közösségnek',
-    cardText: 'Amikor ránk bízod az autód eladását, a jutalékunk egy meghatározott része egy magyar jótékony szervezethez kerül. A bemutatóvideóban azt is megmutatjuk, melyik ügyet támogatja épp a Te autód — átláthatóan, valódi hatással.',
+    cardText: 'A jutalékunk 30%-át jótékony célra fordítjuk — és a döntés a tiéd is: a 30% felét (15%) te, az eladó irányítod a választott szervezethez, a másik 15%-ról pedig az autó vevője dönt. Két ember, két jó döntés, dupla hatás — átláthatóan.',
     cardCta: 'Átlátható felajánlás minden eladás után',
     orgs: [
       { tag: 'Gyerekek & családok', color: 'linear-gradient(160deg,#2f6b4f,#1d4a37)', logo: `${BASE}/sos-gyermekfalvak-magyarorszag.webp`, icon: 'house', name: 'SOS Gyermekfalu Magyarország', text: 'Otthont, biztonságot és szerető családi környezetet ad olyan gyerekeknek, akik nem nevelkedhetnek a saját családjukban.', url: 'https://www.sos.hu', photo: 'https://images.unsplash.com/photo-1756982477606-f943be86ca36?auto=format&fit=crop&w=900&q=72' },
