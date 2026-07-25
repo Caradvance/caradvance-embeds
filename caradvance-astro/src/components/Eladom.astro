@@ -170,6 +170,13 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
           </select>
         </label>
       </div>
+      <div class="sf-calc" id="sfCalc" hidden>
+        <div class="sf-calc-cols">
+          <div class="sf-calc-item"><div class="sf-calc-lbl">Bizományi díjunk</div><div class="sf-calc-val" id="calcFee">—</div></div>
+          <div class="sf-calc-item"><div class="sf-calc-lbl">Ebből jótékony célra (a díj 30%-a)</div><div class="sf-calc-val red" id="calcNgo">—</div></div>
+        </div>
+        <div class="sf-calc-note" id="calcNote"></div>
+      </div>
 
       <div class="sf-compare">
         <div class="sf-compare-t">Nézd meg a hasonló autók árait</div>
@@ -206,6 +213,51 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
         <span class="sf-submit-note">Kötelezettségmentes. Hamarosan jelentkezünk az ársávval.</span>
       </div>
     </form>
+  </div>
+</section>
+
+<!-- ÍGY DOLGOZUNK + DÍJSZABÁS -->
+<section class="section howwe" id="hogyan-dolgozunk">
+  <div class="wrap center">
+    <span class="eyebrow">Így dolgozunk</span>
+    <h2 class="sec-title">Minőség a darabszám helyett</h2>
+    <p class="sec-intro">Kis, elkötelezett csapat vagyunk — nem a mennyiség hajt minket. Ezért nem vállalunk el minden autót, cserébe amit igen, arra a teljes figyelmünk jut.</p>
+  </div>
+  <div class="wrap">
+    <div class="howwe-grid">
+      <div class="howwe-card">
+        <div class="howwe-num">10</div>
+        <h4>Egyszerre csak 10 autó</h4>
+        <p>Mindig maximum 10 autó van nálunk a folyamatban. Így minden autó és minden ügyfél megkapja a személyes, valódi odafigyelést.</p>
+      </div>
+      <div class="howwe-card">
+        <div class="howwe-ico">★</div>
+        <h4>Válogatunk — a Te érdekedben</h4>
+        <p>Nem a darabszámra megyünk. A minőségre és a valódi eredményre koncentrálunk, ezért nem tudunk mindenkit elvállalni.</p>
+      </div>
+      <div class="howwe-card">
+        <div class="howwe-ico">⌂</div>
+        <h4>Nincs bemutatóterem</h4>
+        <p>Az autókat az irodánk mellett mutatjuk meg az érdeklődőknek. Ha szeretnéd, az autód nálad maradhat — csak akkor hozod el, amikor konkrét vevő érkezik rá.</p>
+      </div>
+    </div>
+
+    <div class="fee-wrap">
+      <div class="fee-head">
+        <h3>Bizományi díjszabás</h3>
+        <p>Átlátható, sávos díj — az elért vételár alapján. A díjunk <b>30%-át</b> minden sikeres eladás után a Te választott jótékony szervezetednek ajánljuk fel.</p>
+      </div>
+      <table class="fee-table">
+        <thead><tr><th>Elért vételár</th><th>Bizományi díj</th></tr></thead>
+        <tbody>
+          <tr><td>4 – 6 M Ft</td><td>8% <span class="fee-min">(minimum 390 000 Ft)</span></td></tr>
+          <tr><td>6 – 10 M Ft</td><td>6%</td></tr>
+          <tr><td>10 – 15 M Ft</td><td>5%</td></tr>
+          <tr><td>15 M Ft felett</td><td>egyedi megállapodás (3–4%)</td></tr>
+        </tbody>
+      </table>
+      <p class="fee-note">Jelenleg 4 millió Ft alatti értékű autókkal nem foglalkozunk.</p>
+    </div>
   </div>
 </section>
 
@@ -458,6 +510,42 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
     };
     makeSel?.addEventListener('change', () => { fillModels(); updateCompare(); });
     modelSel?.addEventListener('change', updateCompare);
+
+    // Élő bizományi díj + jótékony felajánlás kalkulátor
+    const fmt = (n) => Math.round(n).toLocaleString('hu-HU') + ' Ft';
+    const priceEl = document.getElementById('f-price');
+    const calc = document.getElementById('sfCalc');
+    const feeEl = document.getElementById('calcFee');
+    const ngoEl = document.getElementById('calcNgo');
+    const noteEl = document.getElementById('calcNote');
+    const updateCalc = () => {
+      if (!calc) return;
+      const p = parseInt((priceEl.value || '').replace(/\D/g, ''), 10) || 0;
+      if (!p) { calc.hidden = true; return; }
+      calc.hidden = false;
+      noteEl.className = 'sf-calc-note';
+      if (p < 4000000) {
+        feeEl.textContent = '—'; ngoEl.textContent = '—';
+        noteEl.className = 'sf-calc-note warn';
+        noteEl.textContent = '4 millió Ft alatti autókkal jelenleg sajnos nem tudunk foglalkozni.';
+        return;
+      }
+      if (p >= 15000000) {
+        const lo = p * 0.03, hi = p * 0.04;
+        feeEl.textContent = fmt(lo) + ' – ' + fmt(hi);
+        ngoEl.textContent = fmt(lo * 0.3) + ' – ' + fmt(hi * 0.3);
+        noteEl.textContent = 'Egyedi megállapodás (3–4%). A díj 30%-a a választott szervezetet támogatja.';
+        return;
+      }
+      let fee, pct;
+      if (p < 6000000) { fee = Math.max(p * 0.08, 390000); pct = '8% (min. 390 000 Ft)'; }
+      else if (p < 10000000) { fee = p * 0.06; pct = '6%'; }
+      else { fee = p * 0.05; pct = '5%'; }
+      feeEl.textContent = fmt(fee) + ' · ' + pct;
+      ngoEl.textContent = fmt(fee * 0.3);
+      noteEl.textContent = 'A bizományi díjunk 30%-át a választott szervezetnek ajánljuk fel.';
+    };
+    priceEl?.addEventListener('input', updateCalc);
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
