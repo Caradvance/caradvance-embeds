@@ -44,6 +44,13 @@ const FEATURE_ICONS: Record<string, string> = {
   shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
   heart: heart,
 };
+
+const makes = ['Audi','BMW','Mercedes-Benz','Volkswagen','Porsche','Toyota','Ford','Opel','Škoda','Volvo','Land Rover','Range Rover','Lexus','Tesla','Hyundai','Kia','Renault','Peugeot','Citroën','Mazda','Nissan','Honda','Suzuki','Fiat','SEAT','Cupra','Mini','Jaguar','Alfa Romeo','Dacia','Egyéb'];
+const years = Array.from({ length: 2026 - 1995 + 1 }, (_, i) => 2026 - i);
+const fuels = ['Benzin','Dízel','Hibrid','Plug-in hibrid','Elektromos','LPG/Benzin'];
+const gears = ['Manuális','Automata'];
+const bodies = ['Ferdehátú','Sedan/Limuzin','Kombi','Coupé','Kabrió','SUV/Terepjáró','Egyterű','Pickup'];
+const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
 ---
 <!-- HERO -->
 <section class="hero">
@@ -88,6 +95,102 @@ const FEATURE_ICONS: Record<string, string> = {
         </span>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ÉRTÉKBECSLÉS / ADATLAP -->
+<section class="section" id="ertekbecsles" style="padding-top:12px">
+  <div class="wrap center">
+    <span class="eyebrow">Ingyenes &amp; kötelezettségmentes</span>
+    <h2 class="sec-title">Mondd el, milyen autód van</h2>
+    <p class="sec-intro">Add meg az autód főbb adatait, és személyre szabott, reális eladási ársávot küldünk — a Használtautó.hu és a mobile.de hasonló hirdetéseivel összevetve. Néhány adat is elég a kezdéshez.</p>
+  </div>
+  <div class="wrap">
+    <form class="sf" id="sellForm">
+      <div class="sf-grid">
+        <label class="sf-field"><span>Márka</span>
+          <select id="f-make" required>
+            <option value="" disabled selected>Válassz…</option>
+            {makes.map((m) => <option>{m}</option>)}
+          </select>
+        </label>
+        <label class="sf-field"><span>Modell</span>
+          <input id="f-model" type="text" placeholder="pl. X5, A4, Passat" />
+        </label>
+        <label class="sf-field"><span>Évjárat</span>
+          <select id="f-year">
+            <option value="" disabled selected>Válassz…</option>
+            {years.map((y) => <option>{y}</option>)}
+          </select>
+        </label>
+        <label class="sf-field"><span>Futásteljesítmény (km)</span>
+          <input id="f-km" type="number" min="0" step="1000" placeholder="pl. 120000" />
+        </label>
+      </div>
+      <div class="sf-grid sf-2">
+        <label class="sf-field"><span>Mennyiért adnád el? (Ft)</span>
+          <input id="f-price" type="number" min="0" step="50000" placeholder="pl. 8 500 000" />
+        </label>
+        <label class="sf-field"><span>Ár rugalmassága</span>
+          <select id="f-flex">
+            <option value="" disabled selected>Válassz…</option>
+            <option>Fix ár</option>
+            <option>Kis mértékben alkuképes</option>
+            <option>Alkuképes</option>
+            <option>Nincs elképzelésem — segítsetek</option>
+          </select>
+        </label>
+      </div>
+
+      <details class="sf-more">
+        <summary><span>Részletes adatok megadása</span><span class="sf-chev">⌄</span></summary>
+        <div class="sf-grid sf-3">
+          <label class="sf-field"><span>Üzemanyag</span><select id="f-fuel"><option value="" disabled selected>Válassz…</option>{fuels.map((x) => <option>{x}</option>)}</select></label>
+          <label class="sf-field"><span>Váltó</span><select id="f-gear"><option value="" disabled selected>Válassz…</option>{gears.map((x) => <option>{x}</option>)}</select></label>
+          <label class="sf-field"><span>Teljesítmény (LE)</span><input id="f-power" type="number" min="0" placeholder="pl. 249" /></label>
+          <label class="sf-field"><span>Karosszéria</span><select id="f-body"><option value="" disabled selected>Válassz…</option>{bodies.map((x) => <option>{x}</option>)}</select></label>
+          <label class="sf-field"><span>Állapot</span><select id="f-cond"><option value="" disabled selected>Válassz…</option>{conds.map((x) => <option>{x}</option>)}</select></label>
+          <label class="sf-field"><span>Szín</span><input id="f-color" type="text" placeholder="pl. metálszürke" /></label>
+        </div>
+        <label class="sf-field sf-full"><span>Megjegyzés, felszereltség, extrák</span><textarea id="f-notes" rows="3" placeholder="pl. vezetett szervizkönyv, téli-nyári gumi, tetőablak, sérülésmentes…"></textarea></label>
+        <a class="sf-mobile-link" href="https://www.mobile.de/s/auto?dam=false&vc=Car" target="_blank" rel="noopener">Még részletesebb adatlap a mobile.de-n →</a>
+      </details>
+
+      <div class="sf-compare">
+        <div class="sf-compare-t">Nézd meg a hasonló autók árait</div>
+        <div class="sf-compare-btns">
+          <a id="cmp-hu" class="sf-cmp" href="https://www.hasznaltauto.hu/szemelyauto" target="_blank" rel="noopener">Hasonló autók a Használtautó.hu-n →</a>
+          <a id="cmp-mobile" class="sf-cmp" href="https://www.mobile.de/s/auto?dam=false&vc=Car" target="_blank" rel="noopener">Hasonló autók a mobile.de-n →</a>
+        </div>
+        <p class="sf-note">Az adataid alapján a két legnagyobb piac (Használtautó.hu + mobile.de) aktuális hirdetéseivel összevetve küldünk egy reális eladási ársávot.</p>
+      </div>
+
+      <div class="sf-ngo">
+        <div class="sf-ngo-head">
+          <div class="sf-ngo-badge">30%</div>
+          <div>
+            <div class="sf-ngo-t">Válaszd ki, melyik ügyet támogatod</div>
+            <div class="sf-ngo-s">A jutalékunk 30%-át a Te választott szervezetednek ajánljuk fel — minden sikeres eladás után.</div>
+          </div>
+        </div>
+        <select id="f-ngo" class="sf-field-select">
+          <option value="" disabled selected>Válassz szervezetet…</option>
+          {c.charity.orgs.map((o) => <option>{o.name}</option>)}
+          <option>Bízom a CarAdvance választásában</option>
+        </select>
+      </div>
+
+      <div class="sf-grid sf-3" style="margin-top:20px">
+        <label class="sf-field"><span>Neved</span><input id="f-name" type="text" placeholder="Teljes név" required /></label>
+        <label class="sf-field"><span>E-mail</span><input id="f-email" type="email" placeholder="pelda@email.hu" required /></label>
+        <label class="sf-field"><span>Telefonszám</span><input id="f-phone" type="tel" placeholder="+36 …" /></label>
+      </div>
+
+      <div class="sf-submit-row">
+        <button type="submit" class="btn btn-primary" id="sellSubmit">Elküldöm az adatokat →</button>
+        <span class="sf-submit-note">Kötelezettségmentes. Hamarosan jelentkezünk az ársávval.</span>
+      </div>
+    </form>
   </div>
 </section>
 
@@ -271,5 +374,46 @@ const FEATURE_ICONS: Record<string, string> = {
     const step = () => Math.min(sc.clientWidth * 0.85, 352);
     document.querySelector('.ch-arrow.prev')?.addEventListener('click', () => sc.scrollBy({ left: -step(), behavior: 'smooth' }));
     document.querySelector('.ch-arrow.next')?.addEventListener('click', () => sc.scrollBy({ left: step(), behavior: 'smooth' }));
+  }
+
+  const form = document.getElementById('sellForm');
+  if (form) {
+    const val = (id) => (document.getElementById(id)?.value || '').trim();
+    const slug = (s) => s.toLowerCase()
+      .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ö/g, 'o').replace(/ő/g, 'o').replace(/ú/g, 'u').replace(/ü/g, 'u').replace(/ű/g, 'u').replace(/ä/g, 'a')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const updateCompare = () => {
+      const mk = val('f-make'), md = val('f-model');
+      const hu = document.getElementById('cmp-hu');
+      const mo = document.getElementById('cmp-mobile');
+      if (hu && mk && mk !== 'Egyéb') {
+        let u = 'https://www.hasznaltauto.hu/szemelyauto/' + slug(mk);
+        if (md) u += '/' + slug(md);
+        hu.href = u;
+      }
+      if (mo && (mk || md)) {
+        mo.href = 'https://suchen.mobile.de/fahrzeuge/search.html?dam=false&isSearchRequest=true&ref=quickSearch&s=Car&sb=rel&vc=Car&q=' + encodeURIComponent(((mk === 'Egyéb' ? '' : mk) + ' ' + md).trim());
+      }
+    };
+    document.getElementById('f-make')?.addEventListener('change', updateCompare);
+    document.getElementById('f-model')?.addEventListener('input', updateCompare);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rows = [
+        ['Márka', val('f-make')], ['Modell', val('f-model')], ['Évjárat', val('f-year')],
+        ['Futásteljesítmény (km)', val('f-km')], ['Kért ár (Ft)', val('f-price')], ['Ár rugalmassága', val('f-flex')],
+        ['Üzemanyag', val('f-fuel')], ['Váltó', val('f-gear')], ['Teljesítmény (LE)', val('f-power')],
+        ['Karosszéria', val('f-body')], ['Állapot', val('f-cond')], ['Szín', val('f-color')],
+        ['Megjegyzés', val('f-notes')], ['Támogatott szervezet', val('f-ngo')],
+        ['Név', val('f-name')], ['E-mail', val('f-email')], ['Telefon', val('f-phone')],
+      ].filter(([, v]) => v);
+      const title = (val('f-make') + ' ' + val('f-model')).trim() + (val('f-year') ? ' (' + val('f-year') + ')' : '');
+      const subject = 'Autó eladás – ' + (title || 'érdeklődés');
+      const body = 'Szeretném eladni az autómat a CarAdvance-en keresztül. Az adataim:\n\n'
+        + rows.map(([k, v]) => k + ': ' + v).join('\n')
+        + '\n\nKérlek, küldjetek egy személyre szabott eladási ársávot. Köszönöm!';
+      window.location.href = 'mailto:info@caradvance.hu?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    });
   }
 </script>
