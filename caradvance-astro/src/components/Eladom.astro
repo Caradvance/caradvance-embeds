@@ -63,6 +63,32 @@ const gears = ['Manuális','Automata'];
 const bodies = ['Ferdehátú','Sedan/Limuzin','Kombi','Coupé','Kabrió','SUV/Terepjáró','Egyterű','Pickup'];
 const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
 const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hónapon belül','Mielőbb','Nagyon sürgős (2 héten belül)'];
+
+const faqJsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: c.faq.items.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+const serviceJsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Bizományos autóértékesítés — Caradvance',
+  serviceType: 'Használt autó bizományos értékesítése és felvásárlása',
+  areaServed: { '@type': 'Country', name: 'Magyarország' },
+  url: 'https://www.caradvance.hu/eladom/',
+  provider: {
+    '@type': 'AutoDealer',
+    name: 'Caradvance Hungary (BH Group Zrt.)',
+    image: 'https://caradvance.hu/caradvance-logo.webp',
+    telephone: '+36 30 233 6060',
+    email: 'info@caradvance.hu',
+    address: { '@type': 'PostalAddress', streetAddress: 'Ibolya utca 12.', addressLocality: 'Solymár', postalCode: '2083', addressCountry: 'HU' },
+  },
+};
 ---
 <!-- HERO -->
 <section class="hero">
@@ -471,6 +497,34 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
     </div>
   </div>
 </section>
+
+<!-- SEO / JÓ TUDNI -->
+<section class="section jotudni">
+  <div class="wrap seo-wrap">
+    <span class="eyebrow">{c.seo.eyebrow}</span>
+    <h2 class="sec-title">{c.seo.title}</h2>
+    {c.seo.paras.map((p) => <p class="seo-p">{p}</p>)}
+  </div>
+</section>
+
+<!-- GYIK / FAQ -->
+<section class="section" id="gyik" style="padding-top:26px">
+  <div class="wrap center">
+    <span class="eyebrow">{c.faq.eyebrow}</span>
+    <h2 class="sec-title">{c.faq.title}</h2>
+    <p class="sec-intro" style="margin:0 auto">{c.faq.intro}</p>
+  </div>
+  <div class="wrap">
+    <div class="faq-list">
+      {c.faq.items.map((f) => (
+        <details class="faq-item"><summary>{f.q}</summary><div class="ans">{f.a}</div></details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonld)}></script>
+<script type="application/ld+json" is:inline set:html={JSON.stringify(serviceJsonld)}></script>
 
 <!-- ZÁRÓ CTA -->
 <section class="close-cta">
