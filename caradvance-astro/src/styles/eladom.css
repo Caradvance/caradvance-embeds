@@ -72,14 +72,18 @@
 .ch-card{flex:0 0 332px;scroll-snap-align:start;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 14px 32px rgba(8,8,10,.06)}
 @media(max-width:560px){.ch-card{flex-basis:84%}}
 .ch-head{height:152px;position:relative;display:flex;align-items:flex-end;padding:16px;overflow:hidden}
-.ch-illo{position:absolute;inset:0;pointer-events:none}
+.ch-illo{position:absolute;inset:0;pointer-events:none;z-index:1}
 .ch-illo svg{width:100%;height:100%;display:block}
-.ch-corner{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:11px;background:rgba(0,0,0,.22);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;color:#fff}
+.ch-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.ch-scrim{position:absolute;inset:0;z-index:1;opacity:.62;mix-blend-mode:multiply;pointer-events:none}
+.ch-corner{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:11px;background:rgba(0,0,0,.22);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;color:#fff;z-index:2}
 .ch-corner svg{width:18px;height:18px}
 .ch-tag{position:relative;z-index:2;background:rgba(0,0,0,.4);color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 13px;border-radius:999px;backdrop-filter:blur(3px)}
 .ch-body{padding:22px 22px 0;flex:1}
 .ch-logo{display:inline-flex;align-items:center;justify-content:center;height:66px;padding:10px 16px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 14px rgba(8,8,10,.07);margin-bottom:16px}
 .ch-logo img{max-height:100%;max-width:160px;width:auto;object-fit:contain;display:block}
+.ch-logo-sos{background:#009DE0;border-color:#009DE0;padding:0;overflow:hidden}
+.ch-logo-sos img{max-width:none;height:100%;width:auto}
 .ch-card h4{font-size:19px;font-weight:800;letter-spacing:-.01em;margin:0 0 12px;line-height:1.2}
 .ch-card p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}
 .ch-foot{margin-top:18px;padding:16px 22px;border-top:1px solid var(--line)}
