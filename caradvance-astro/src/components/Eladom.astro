@@ -139,7 +139,27 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
           <select id="f-fuel"><option value="" disabled selected>Válassz…</option>{fuels.map((x) => <option>{x}</option>)}</select>
         </label>
         <label class="sf-field"><span>Szín</span>
-          <input id="f-color" type="text" placeholder="pl. metálszürke" />
+          <select id="f-color">
+            <option value="" disabled selected>Válassz…</option>
+            <optgroup label="Fehér"><option>Fehér</option><option>Törtfehér</option></optgroup>
+            <option>Fekete</option>
+            <option>Ezüst</option>
+            <optgroup label="Szürke"><option>Szürke</option><option>Világosszürke</option><option>Sötétszürke</option></optgroup>
+            <optgroup label="Kék"><option>Kék</option><option>Világoskék</option><option>Sötétkék</option><option>Óceánkék</option><option>Ibolyakék</option></optgroup>
+            <option>Piros</option>
+            <option>Bordó</option>
+            <option>Bíborvörös</option>
+            <optgroup label="Zöld"><option>Zöld</option><option>Világoszöld</option><option>Sötétzöld</option><option>Olajzöld</option></optgroup>
+            <optgroup label="Sárga"><option>Sárga</option><option>Narancssárga</option><option>Citromsárga</option><option>Aranysárga</option></optgroup>
+            <option>Narancs</option>
+            <optgroup label="Barna"><option>Barna</option><option>Világosbarna</option><option>Sötétbarna</option></optgroup>
+            <option>Bézs</option>
+            <option>Arany</option>
+            <option>Pezsgő</option>
+            <option>Lila</option>
+            <option>Rózsaszín</option>
+            <option>Terep</option>
+          </select>
         </label>
         <label class="sf-field"><span>Állapot</span>
           <select id="f-cond"><option value="" disabled selected>Válassz…</option>{conds.map((x) => <option>{x}</option>)}</select>
@@ -450,11 +470,40 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
       .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ö/g, 'o').replace(/ő/g, 'o').replace(/ú/g, 'u').replace(/ü/g, 'u').replace(/ű/g, 'u').replace(/ä/g, 'a')
       .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     const MODELS = {
-      'Audi': ['A1','A3','A4','A5','A6','A7','A8','Q2','Q3','Q4 e-tron','Q5','Q7','Q8','TT','R8','e-tron','e-tron GT','RS3','RS4','RS6','S3','S4','S5'],
-      'BMW': ['1-es','2-es','3-as','4-es','5-ös','6-os','7-es','8-as','X1','X2','X3','X4','X5','X6','X7','Z4','i3','i4','i5','i7','iX','iX1','iX3','M2','M3','M4','M5','M8'],
-      'Mercedes-Benz': ['A-osztály','B-osztály','C-osztály','E-osztály','S-osztály','CLA','CLS','GLA','GLB','GLC','GLE','GLS','G-osztály','SL','SLC','AMG GT','EQA','EQB','EQC','EQE','EQS','V-osztály','Vito'],
-      'Volkswagen': ['up!','Polo','Golf','Passat','Arteon','Tiguan','Touareg','T-Roc','T-Cross','Taigo','Touran','Sharan','Caddy','Transporter','ID.3','ID.4','ID.5','ID.7','Jetta','Scirocco'],
-      'Porsche': ['911','718 Cayman','718 Boxster','Cayenne','Macan','Panamera','Taycan'],
+      'Audi': {
+        'A sorozat': ['A1','A2','A3','A3 Sportback','A4','A4 Allroad','A5','A5 Sportback','A6','A6 Allroad','A7','A8'],
+        'Q sorozat': ['Q2','Q3','Q3 Sportback','Q4 e-tron','Q5','Q5 Sportback','Q7','Q8'],
+        'Sport / elektromos': ['TT','TTS','TT RS','R8','e-tron','e-tron GT','Q8 e-tron'],
+        'S / RS': ['S1','S3','S4','S5','S6','S7','S8','SQ5','SQ7','SQ8','RS3','RS4','RS5','RS6','RS7','RS Q3','RS Q8'],
+      },
+      'BMW': {
+        '1-es / 2-es': ['114','116','118','120','123','125','128','130','135','M135','214','216','218','220','225','228','230','235','240','M235','M240'],
+        '3-as / 4-es': ['316','318','320','323','325','328','330','335','340','M340','418','420','425','428','430','435','440','M440'],
+        '5-ös / 6-os': ['518','520','523','525','528','530','535','540','545','550','M550','620','628','630','635','640','645','650'],
+        '7-es / 8-as': ['725','728','730','735','740','745','750','760','840','850','M850'],
+        'X (SUV)': ['X1','X2','X3','X4','X5','X6','X7','XM'],
+        'Z / i / M': ['Z1','Z3','Z4','Z8','i3','i4','i5','i7','i8','iX','iX1','iX3','M2','M3','M4','M5','M8','X3 M','X4 M','X5 M','X6 M'],
+      },
+      'Mercedes-Benz': {
+        'A / B-osztály': ['A 140','A 150','A 160','A 170','A 180','A 190','A 200','A 210','A 220','A 250','A 35 AMG','A 45 AMG','B 150','B 160','B 170','B 180','B 200','B 220','B 250'],
+        'C-osztály': ['C 160','C 180','C 200','C 220','C 230','C 240','C 250','C 270','C 280','C 300','C 320','C 350','C 400','C 43 AMG','C 63 AMG'],
+        'E-osztály': ['E 200','E 220','E 240','E 250','E 260','E 270','E 280','E 300','E 320','E 350','E 400','E 420','E 430','E 450','E 500','E 53 AMG','E 63 AMG'],
+        'S-osztály': ['S 280','S 300','S 320','S 350','S 400','S 420','S 450','S 500','S 550','S 560','S 600','S 63 AMG','S 65 AMG'],
+        'CLA / CLS / CLK': ['CLA 180','CLA 200','CLA 220','CLA 250','CLA 45 AMG','CLS 250','CLS 350','CLS 400','CLS 500','CLK 200','CLK 240','CLK 320','CLK 500'],
+        'GLA–GLS / ML / GLK / G': ['GLA 200','GLA 220','GLA 250','GLB 200','GLB 220','GLC 200','GLC 220','GLC 250','GLC 300','GLC 350','GLE 300','GLE 350','GLE 400','GLE 450','GLS 350','GLS 400','GLS 450','ML 250','ML 320','ML 350','GLK 220','GLK 320','G 320','G 350','G 500','G 63 AMG'],
+        'SL / SLK / SLC / GT': ['SL 350','SL 500','SL 600','SLK 200','SLK 250','SLK 350','SLC 200','SLC 300','AMG GT'],
+        'V / Vito / Sprinter': ['V 220','V 250','V 300','Vito 110','Vito 111','Vito 114','Vito 116','Sprinter'],
+        'EQ (elektromos)': ['EQA','EQB','EQC','EQE','EQS','EQV'],
+        'Klasszikus': ['170S','170V','190','200','220','230','250','280','300','420 SE','500 SE','600'],
+      },
+      'Volkswagen': {
+        'Kompakt': ['up!','Fox','Lupo','Polo','Golf','Golf Plus','Golf Sportsvan','Scirocco','Beetle','New Beetle'],
+        'Limuzin': ['Jetta','Bora','Vento','Passat','Passat CC','CC','Arteon','Phaeton','Eos'],
+        'SUV': ['T-Cross','T-Roc','Taigo','Tiguan','Tiguan Allspace','Touareg'],
+        'Egyterű / haszon': ['Touran','Sharan','Caddy','Transporter','Multivan','Amarok'],
+        'ID. (elektromos)': ['ID.3','ID.4','ID.5','ID.7','ID. Buzz'],
+      },
+      'Porsche': ['911','718 Cayman','718 Boxster','Cayman','Boxster','Cayenne','Cayenne Coupé','Macan','Panamera','Taycan','924','928','944','968'],
       'Toyota': ['Aygo X','Yaris','Yaris Cross','Corolla','Corolla Cross','C-HR','RAV4','Camry','Prius','Highlander','Land Cruiser','Hilux','Proace','bZ4X','Supra'],
       'Ford': ['Fiesta','Focus','Mondeo','Puma','Kuga','EcoSport','Edge','Explorer','Mustang','Mustang Mach-E','Galaxy','S-Max','Transit','Ranger','Tourneo'],
       'Opel': ['Corsa','Astra','Insignia','Mokka','Crossland','Grandland','Combo','Zafira','Vivaro','Adam','Karl','Meriva'],
@@ -484,13 +533,23 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
     const makeSel = document.getElementById('f-make');
     const modelSel = document.getElementById('f-model');
     const fillModels = () => {
-      const list = MODELS[makeSel.value] || [];
+      const data = MODELS[makeSel.value];
+      const has = !!data && (Array.isArray(data) ? data.length : Object.keys(data).length);
       modelSel.innerHTML = '';
       const ph = document.createElement('option');
       ph.value = ''; ph.disabled = true; ph.selected = true;
-      ph.textContent = list.length ? 'Válassz modellt…' : 'Nincs lista — írd a Típusjelbe';
+      ph.textContent = has ? 'Válassz modellt…' : 'Nincs lista — írd a Típusjelbe';
       modelSel.appendChild(ph);
-      list.forEach((m) => { const o = document.createElement('option'); o.textContent = m; modelSel.appendChild(o); });
+      const addOpt = (parent, m) => { const o = document.createElement('option'); o.textContent = m; parent.appendChild(o); };
+      if (Array.isArray(data)) {
+        data.forEach((m) => addOpt(modelSel, m));
+      } else if (data) {
+        Object.keys(data).forEach((grp) => {
+          const og = document.createElement('optgroup'); og.label = grp;
+          data[grp].forEach((m) => addOpt(og, m));
+          modelSel.appendChild(og);
+        });
+      }
       const other = document.createElement('option'); other.textContent = 'Egyéb (nincs a listában)'; modelSel.appendChild(other);
       modelSel.disabled = false;
     };
