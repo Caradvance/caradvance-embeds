@@ -1,5 +1,6 @@
 ---
 import '../styles/eladom.css';
+import SplitGive from './SplitGive.astro';
 import { localizedPath, type Locale } from '../i18n/utils';
 import { eladomContent } from '../data/eladom';
 
@@ -131,6 +132,16 @@ const jsonld = {
     <div class="jot-step"><div class="jot-num">2</div><h3>Átláthatóan rögzítjük</h3><p>A támogatás összegét minden eladásnál egyedileg, írásban rögzítjük. Nincs rejtett feltétel — pontosan látod, mekkora felajánlás áll az autód eladása mögött.</p></div>
     <div class="jot-step"><div class="jot-num">3</div><h3>Megmutatjuk, kihez jut</h3><p>A profi bemutatóvideóban és itt az oldalon is látod, melyik szervezetet és melyik célt támogatja épp a te eladásod. A jó ügy nemcsak megtörténik — látszik is.</p></div>
   </div>
+</section>
+
+<!-- KETTEN DÖNTÖTÖK: 15% + 15% -->
+<section class="section jot-alt" id="dontes">
+  <div class="wrap center">
+    <span class="eyebrow">Ketten döntötök</span>
+    <h2 class="sec-title">A 30%-ról nem mi döntünk — hanem ti</h2>
+    <p class="sec-intro" style="margin:0 auto">A jutalékunk 30%-a jótékony célra megy, de hogy pontosan hová, azt közösen döntitek el. A 30% fele a tiéd: te, az eladó választod ki, melyik szervezetet és projektet támogassa az autód eladása. A másik 15%-ról az autó vevője, az új tulajdonos dönt. Egy autó, két ember, két jó döntés — dupla hatással.</p>
+  </div>
+  <div class="wrap"><SplitGive /></div>
 </section>
 
 <!-- PROJEKTEK / CÉLOK -->

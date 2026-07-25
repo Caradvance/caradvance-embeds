@@ -1,5 +1,6 @@
 ---
 import '../styles/eladom.css';
+import SplitGive from './SplitGive.astro';
 import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
 import type { UIKey } from '../i18n/ui';
 import { eladomContent } from '../data/eladom';
@@ -347,6 +348,7 @@ const serviceJsonld = {
         <a class="give-pill" href="#folyamat"><Fragment set:html={heart} /> {c.charity.cardCta}</a>
       </div>
     </div>
+    <SplitGive />
     <div class="charity-wrap">
       <button class="ch-arrow prev" type="button" aria-label="Előző"><Fragment set:html={chevL} /></button>
       <button class="ch-arrow next" type="button" aria-label="Következő"><Fragment set:html={chevR} /></button>

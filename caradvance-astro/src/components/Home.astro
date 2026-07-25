@@ -1,6 +1,7 @@
 ---
 import '../styles/eladom.css';
 import '../styles/home.css';
+import SplitGive from './SplitGive.astro';
 import { useTranslations, localizedPath, type Locale } from '../i18n/utils';
 import { homeContent } from '../data/home';
 const { lang } = Astro.props as { lang: Locale };
@@ -64,7 +65,10 @@ const c = homeContent(lang);
     <span class="eyebrow">{c.charity.eyebrow}</span>
     <h2 class="sec-title">{c.charity.title}</h2>
     <p class="sec-intro">{c.charity.text}</p>
-    <div style="margin-top:22px"><a class="btn btn-primary" href={localizedPath(lang, '/eladom')}>{c.charity.cta}</a></div>
+  </div>
+  <div class="wrap"><SplitGive /></div>
+  <div class="wrap center">
+    <div style="margin-top:30px"><a class="btn btn-primary" href={localizedPath(lang, '/jotekonysag')}>{c.charity.cta}</a></div>
     <div class="clogos">{c.charity.logos.map((l) => <img src={l} alt="" />)}</div>
   </div>
 </section>
