@@ -5,6 +5,7 @@ const { lang, path = '/' } = Astro.props as { lang: Locale; path?: string };
 
 const home = localizedPath(lang, '/');
 const eladom = localizedPath(lang, '/eladom');
+const jotekonysag = localizedPath(lang, '/jotekonysag');
 const autoink = localizedPath(lang, '/autoink/');
 
 // Menu mirrors the real caradvance.hu landing-page header exactly.
@@ -19,7 +20,7 @@ const menu = [
     { t: 'Finanszírozás – lízing', href: '#' }, { t: 'Előnyök', href: '#' },
   ]},
   { label: 'Bizományos értékesítés', items: [
-    { t: 'Eladom az autómat', href: eladom }, { t: 'Jótékonyság', href: eladom + '#jotekonysag' },
+    { t: 'Eladom az autómat', href: eladom }, { t: 'Jótékonyság', href: jotekonysag },
     { t: 'Értékesítési folyamat', href: eladom + '#folyamat' }, { t: 'Gyakori kérdések', href: eladom + '#gyik' },
   ]},
   { label: 'Import', items: [
