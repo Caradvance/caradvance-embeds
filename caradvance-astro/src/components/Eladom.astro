@@ -95,7 +95,9 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
             <img class="sl-soc" src="/youtube.png" alt="YouTube" />
           </div>}
           {i === 3 && <div class="stat-logos lg-ngo"><div class="ngo-track">
-            {c.charity.orgs.map((o) => <span class={o.name.startsWith('SOS') ? 'sl-ngo sl-ngo-full' : 'sl-ngo'}><img src={o.logo} alt={o.name} /></span>)}
+            {c.charity.orgs.map((o) => o.name.startsWith('SOS')
+              ? <span class="sl-ngo sl-ngo-sos"><img src="/sos-gyermekfalvak.jpg" alt={o.name} /></span>
+              : <span class="sl-ngo"><img src={o.logo} alt={o.name} /></span>)}
           </div></div>}
         </div>
       ))}
