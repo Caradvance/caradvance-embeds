@@ -317,14 +317,16 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
         {c.charity.orgs.map((o) => (
           <div class="ch-card">
             <div class="ch-head" style={`background:${o.color}`}>
-              <span class="ch-illo" set:html={ILLO[o.icon]}></span>
+              {o.photo
+                ? <Fragment><img class="ch-photo" src={o.photo} alt="" aria-hidden="true" loading="lazy" /><span class="ch-scrim" style={`background:${o.color}`}></span></Fragment>
+                : <span class="ch-illo" set:html={ILLO[o.icon]}></span>}
               <span class="ch-corner"><Fragment set:html={heart} /></span>
               <span class="ch-tag">{o.tag}</span>
             </div>
-            <div class="ch-body"><div class="ch-logo"><img src={o.logo} alt={o.name} /></div><h4>{o.name}</h4><p>{o.text}</p></div>
+            <div class="ch-body"><div class={`ch-logo${o.name.startsWith('SOS') ? ' ch-logo-sos' : ''}`}><img src={o.name.startsWith('SOS') ? '/sos-gyermekfalvak.jpg' : o.logo} alt={o.name} /></div><h4>{o.name}</h4><p>{o.text}</p></div>
             <div class="ch-foot">
               <div class="ch-support"><Fragment set:html={heart} /> {c.charity.supports}</div>
-              <a class="ch-link" href="#">{c.charity.orgLink} <Fragment set:html={arrow} /></a>
+              <a class="ch-link" href={o.url} target="_blank" rel="noopener noreferrer">{c.charity.orgLink} <Fragment set:html={arrow} /></a>
             </div>
           </div>
         ))}
