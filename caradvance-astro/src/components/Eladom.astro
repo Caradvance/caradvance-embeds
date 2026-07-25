@@ -77,24 +77,26 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
 <section class="section" style="padding-top:24px">
   <div class="wrap">
     <div class="stats">
-      {c.stats.map((s) => (
-        <div class="stat"><div class="num">{s.num}<span>{s.unit}</span></div><div class="lbl">{s.label}</div></div>
+      {c.stats.map((s, i) => (
+        <div class="stat">
+          <div class="num">{s.num}<span>{s.unit}</span></div>
+          <div class="lbl">{s.label}</div>
+          <div class="stat-logos">
+            {i === 0 && <img class="sl-brand" src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance" />}
+            {i === 1 && (<Fragment>
+              <img class="sl-mkt" src="/hasznaltauto-hu-dark.png" alt="Használtautó.hu" />
+              <img class="sl-mkt" src="/mobile-de-mark.png" alt="mobile.de" />
+            </Fragment>)}
+            {i === 2 && (<Fragment>
+              <img class="sl-soc" src="https://caradvance.hu/facebook.webp" alt="Facebook" />
+              <img class="sl-soc" src="https://caradvance.hu/instagram.webp" alt="Instagram" />
+              <img class="sl-soc" src="https://caradvance.hu/tiktok.webp" alt="TikTok" />
+              <img class="sl-soc" src="/youtube.svg" alt="YouTube" />
+            </Fragment>)}
+            {i === 3 && c.charity.orgs.map((o) => <img class="sl-ngo" src={o.logo} alt={o.name} />)}
+          </div>
+        </div>
       ))}
-    </div>
-    <div class="platforms">
-      <div class="plabel">{c.platformsLabel}</div>
-      <div class="row">
-        <img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance" />
-        <img src="https://caradvance.hu/hasznaltauto-hu.webp" alt="Használtautó.hu" />
-        <img src="https://caradvance.hu/mobile-de.webp" alt="mobile.de" />
-        <span class="divider"></span>
-        <span class="socials">
-          <img src="https://caradvance.hu/facebook.webp" alt="Facebook" />
-          <img src="https://caradvance.hu/instagram.webp" alt="Instagram" />
-          <img src="https://caradvance.hu/tiktok.webp" alt="TikTok" />
-          <img src="https://caradvance.hu/youtube.webp" alt="YouTube" onerror="this.style.display='none'" />
-        </span>
-      </div>
     </div>
   </div>
 </section>
