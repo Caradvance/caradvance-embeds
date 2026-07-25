@@ -127,7 +127,7 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
           <input id="f-km" type="number" min="0" step="1000" placeholder="pl. 120000" />
         </label>
       </div>
-      <div class="sf-grid sf-2">
+      <div class="sf-grid">
         <label class="sf-field"><span>Mennyiért adnád el? (Ft)</span>
           <input id="f-price" type="number" min="0" step="50000" placeholder="pl. 8 500 000" />
         </label>
@@ -144,7 +144,7 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
 
       <details class="sf-more">
         <summary><span>Részletes adatok megadása</span><span class="sf-chev">⌄</span></summary>
-        <div class="sf-grid sf-3">
+        <div class="sf-grid">
           <label class="sf-field"><span>Üzemanyag</span><select id="f-fuel"><option value="" disabled selected>Válassz…</option>{fuels.map((x) => <option>{x}</option>)}</select></label>
           <label class="sf-field"><span>Váltó</span><select id="f-gear"><option value="" disabled selected>Válassz…</option>{gears.map((x) => <option>{x}</option>)}</select></label>
           <label class="sf-field"><span>Teljesítmény (LE)</span><input id="f-power" type="number" min="0" placeholder="pl. 249" /></label>
@@ -153,7 +153,6 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
           <label class="sf-field"><span>Szín</span><input id="f-color" type="text" placeholder="pl. metálszürke" /></label>
         </div>
         <label class="sf-field sf-full"><span>Megjegyzés, felszereltség, extrák</span><textarea id="f-notes" rows="3" placeholder="pl. vezetett szervizkönyv, téli-nyári gumi, tetőablak, sérülésmentes…"></textarea></label>
-        <a class="sf-mobile-link" href="https://www.mobile.de/s/auto?dam=false&vc=Car" target="_blank" rel="noopener">Még részletesebb adatlap a mobile.de-n →</a>
       </details>
 
       <div class="sf-compare">
@@ -180,7 +179,7 @@ const conds = ['Kiváló','Jó','Átlagos','Felújítandó'];
         </select>
       </div>
 
-      <div class="sf-grid sf-3" style="margin-top:20px">
+      <div class="sf-grid" style="margin-top:20px">
         <label class="sf-field"><span>Neved</span><input id="f-name" type="text" placeholder="Teljes név" required /></label>
         <label class="sf-field"><span>E-mail</span><input id="f-email" type="email" placeholder="pelda@email.hu" required /></label>
         <label class="sf-field"><span>Telefonszám</span><input id="f-phone" type="tel" placeholder="+36 …" /></label>
