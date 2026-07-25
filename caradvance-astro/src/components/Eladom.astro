@@ -274,15 +274,15 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
         <p>Átlátható, sávos díj — az elért vételár alapján, euróban. A díjunk <b>30%-át</b> minden sikeres eladás után a Te választott jótékony szervezetednek ajánljuk fel.</p>
       </div>
       <table class="fee-table">
-        <thead><tr><th>Árkategória (EUR)</th><th>Jutalék</th><th>Minimum jutalék</th></tr></thead>
+        <thead><tr><th>Árkategória</th><th>Jutalék</th><th>Minimum jutalék</th></tr></thead>
         <tbody>
-          <tr><td>0 – 15 000 €</td><td>5,0%</td><td>500 €<span class="fh" data-min="500"></span></td></tr>
-          <tr><td>15 001 – 35 000 €</td><td>4,5%</td><td>750 €<span class="fh" data-min="750"></span></td></tr>
-          <tr><td>35 001 – 60 000 €</td><td>4,0%</td><td>1 400 €<span class="fh" data-min="1400"></span></td></tr>
-          <tr><td>60 001 – 100 000 €</td><td>3,5%</td><td>2 400 €<span class="fh" data-min="2400"></span></td></tr>
-          <tr><td>100 001 – 150 000 €</td><td>3,0%</td><td>3 500 €<span class="fh" data-min="3500"></span></td></tr>
-          <tr><td>150 001 – 200 000 €</td><td>2,5%</td><td>4 500 €<span class="fh" data-min="4500"></span></td></tr>
-          <tr><td>200 000 € felett</td><td>2,0%</td><td>5 000 €<span class="fh" data-min="5000"></span></td></tr>
+          <tr><td><span class="fh-range" data-min="0" data-max="15000"></span><span class="fe">0 – 15 000 €</span></td><td>5,0%</td><td><span class="fh-min" data-min="500"></span><span class="fe">≈ 500 €</span></td></tr>
+          <tr><td><span class="fh-range" data-min="15000" data-max="35000"></span><span class="fe">15 001 – 35 000 €</span></td><td>4,5%</td><td><span class="fh-min" data-min="750"></span><span class="fe">≈ 750 €</span></td></tr>
+          <tr><td><span class="fh-range" data-min="35000" data-max="60000"></span><span class="fe">35 001 – 60 000 €</span></td><td>4,0%</td><td><span class="fh-min" data-min="1400"></span><span class="fe">≈ 1 400 €</span></td></tr>
+          <tr><td><span class="fh-range" data-min="60000" data-max="100000"></span><span class="fe">60 001 – 100 000 €</span></td><td>3,5%</td><td><span class="fh-min" data-min="2400"></span><span class="fe">≈ 2 400 €</span></td></tr>
+          <tr><td><span class="fh-range" data-min="100000" data-max="150000"></span><span class="fe">100 001 – 150 000 €</span></td><td>3,0%</td><td><span class="fh-min" data-min="3500"></span><span class="fe">≈ 3 500 €</span></td></tr>
+          <tr><td><span class="fh-range" data-min="150000" data-max="200000"></span><span class="fe">150 001 – 200 000 €</span></td><td>2,5%</td><td><span class="fh-min" data-min="4500"></span><span class="fe">≈ 4 500 €</span></td></tr>
+          <tr><td><span class="fh-range" data-min="200000"></span><span class="fe">200 000 € felett</span></td><td>2,0%</td><td><span class="fh-min" data-min="5000"></span><span class="fe">≈ 5 000 €</span></td></tr>
         </tbody>
       </table>
       <p class="fee-rate">Napi árfolyam: 1 € = <b id="eurHuf">…</b> Ft. A forint összegek tájékoztató jellegűek, a napi EUR/HUF árfolyam szerint.</p>
@@ -640,16 +640,21 @@ const urgencies = ['Ráérek — a legjobb áron szeretném eladni','1–2 hóna
       const r = feeForEur(eur);
       const feeHuf = r.fee * EURHUF;
       const pctTxt = (r.pct * 100).toLocaleString('hu-HU', { minimumFractionDigits: 1 }) + '%';
-      feeEl.innerHTML = fmtEur(r.fee) + '<span class="cv-sub">≈ ' + fmtHuf(feeHuf) + ' · ' + pctTxt + '</span>';
-      ngoEl.innerHTML = fmtEur(r.fee * 0.3) + '<span class="cv-sub">≈ ' + fmtHuf(feeHuf * 0.3) + '</span>';
+      feeEl.innerHTML = fmtHuf(feeHuf) + '<span class="cv-sub">≈ ' + fmtEur(r.fee) + ' · ' + pctTxt + '</span>';
+      ngoEl.innerHTML = fmtHuf(feeHuf * 0.3) + '<span class="cv-sub">≈ ' + fmtEur(r.fee * 0.3) + '</span>';
       noteEl.textContent = 'A bizományi díjunk 30%-át a választott szervezetnek ajánljuk fel — a napi EUR/HUF árfolyam szerint.';
     };
+    const numM = (n) => (n / 1e6).toLocaleString('hu-HU', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     const applyRate = () => {
       const el = document.getElementById('eurHuf');
       if (el) el.textContent = Math.round(EURHUF).toLocaleString('hu-HU');
-      document.querySelectorAll('.fh').forEach((s) => {
-        const min = parseFloat(s.dataset.min);
-        if (!isNaN(min)) s.textContent = ' (≈ ' + fmtHuf(min * EURHUF) + ')';
+      document.querySelectorAll('.fh-range').forEach((s) => {
+        const mn = parseFloat(s.dataset.min), mx = s.dataset.max ? parseFloat(s.dataset.max) : null;
+        if (mx) s.textContent = (mn === 0 ? '0' : numM(mn * EURHUF)) + ' – ' + numM(mx * EURHUF) + ' M Ft';
+        else s.textContent = numM(mn * EURHUF) + ' M Ft felett';
+      });
+      document.querySelectorAll('.fh-min').forEach((s) => {
+        s.textContent = fmtHuf(parseFloat(s.dataset.min) * EURHUF);
       });
       updateCalc();
     };
