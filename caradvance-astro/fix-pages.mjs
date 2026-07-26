@@ -33,8 +33,8 @@ function fix(p) {
   h = h.replace(/href="#">Gyakori kérdések</g, 'href="/gyakori-kerdesek">Gyakori kérdések<');
   // add the "Bizományos autóink" submenu item (added later, missing from the old build)
   if (!h.includes('>Bizományos autóink<')) {
-    h = h.replace(/<a class="ddi" href="\/eladom">Eladom az autómat<\/a>/g, '<a class="ddi" href="#">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a>');
-    h = h.replace(/<a href="\/eladom">Eladom az autómat<\/a>/g, '<a href="#">Bizományos autóink</a><a href="/eladom">Eladom az autómat</a>');
+    h = h.replace(/<a class="ddi" href="\/eladom">Eladom az autómat<\/a>/g, '<a class="ddi" href="/bizomanyos">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a>');
+    h = h.replace(/<a href="\/eladom">Eladom az autómat<\/a>/g, '<a href="/bizomanyos">Bizományos autóink</a><a href="/eladom">Eladom az autómat</a>');
   }
   fs.writeFileSync(p, h);
 }
