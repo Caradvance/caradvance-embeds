@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "mkdir -p public/autoink public/auto && cp -r ../autoink/. public/autoink/ && cp -r ../auto/. public/auto/ && astro build",
+    "build": "node fix-pages.mjs && astro build",
     "preview": "astro preview"
   },
   "dependencies": {
