@@ -366,7 +366,7 @@ html.ca-ok #ca-gate{display:none}
   function card(car){
     var p=B.PROJECTS[car.seller]||B.PROJECTS.sos;
     var side=B.ftOf(B.sideEur(car.eur));
-    var media=car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="ph" style="display:none">fotó hamarosan</span>':'<span class="ph" style="display:flex">fotó hamarosan</span>';
+    var media=car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" decoding="async" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="ph" style="display:none">fotó hamarosan</span>':'<span class="ph" style="display:flex">fotó hamarosan</span>';
     var specs=[car.km,car.teljesitmeny,car.valto,car.uzemanyag].filter(Boolean).join(' · ');
     return '<a class="card" href="/bizomanyos-auto/?m='+encodeURIComponent(B.slugify(car.modell))+'">'
       +'<div class="media">'+media+'</div>'
