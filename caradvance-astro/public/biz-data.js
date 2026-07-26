@@ -42,7 +42,9 @@ window.BIZ = (function () {
     if(!rows||!rows.length) return [];
     var head=rows[0].map(function(h){return String(h).trim().toLowerCase();});
     var idx={}; head.forEach(function(h,i){idx[h]=i;});
-    if(idx['modell']==null) return [];
+    // only accept a real 'bizomanyos' tab (has a seller column); otherwise gviz may
+    // have returned the default 'autok' tab for a non-existent sheet name -> use fallback.
+    if(idx['modell']==null || (idx['seller_ngo']==null && idx['seller']==null)) return [];
     var out=[];
     for(var r=1;r<rows.length;r++){var row=rows[r]; if(!row||!row.length)continue;
       var g=function(n){var j=idx[n];return j==null?'':String(row[j]||'').trim();};
