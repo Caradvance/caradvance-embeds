@@ -44,9 +44,11 @@ const { lang, path = '/', title, description = '' } = Astro.props as {
   .cac,.cac *{box-sizing:border-box}
   .cac{--a:#d10a17;--a2:#ef2530;--ink:#131316;--mut:#63636a;--sf:#fff;--sf2:#f6f6f7;--ln:#e6e6e9;--ln2:#d7d7db;--usr:#151519;--bot:#f0f0f2;--wa:#1faf52;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   @media (prefers-color-scheme:dark){.cac{--a:#ff2b38;--a2:#ff5560;--ink:#f0f0f2;--mut:#9aa0a8;--sf:#161619;--sf2:#1d1d21;--ln:#262629;--ln2:#34343a;--usr:#d10a17;--bot:#202024;--wa:#25d366}}
-  .cac-launch{position:fixed;right:24px;bottom:22px;z-index:2147483000;display:flex;align-items:center;gap:10px;cursor:pointer;border:none;background:var(--a);color:#fff;padding:13px 20px 13px 16px;border-radius:999px;font-size:14.5px;font-weight:650;box-shadow:0 20px 45px -18px rgba(120,10,10,.5);transition:transform .18s,opacity .2s}
+  .cac-launch{position:fixed;right:20px;bottom:20px;z-index:2147483000;display:flex;align-items:center;gap:9px;cursor:pointer;border:none;background:var(--a);color:#fff;padding:13px 18px;border-radius:999px;font-size:14.5px;font-weight:650;box-shadow:0 20px 45px -18px rgba(120,10,10,.5);transition:transform .18s,opacity .2s}
+  .cac-launch .cac-lt{white-space:nowrap}
   .cac-launch:hover{transform:translateY(-2px)}
   .cac-launch.hid{opacity:0;transform:scale(.8) translateY(10px);pointer-events:none}
+  @media (max-width:560px){.cac-launch{right:14px;bottom:14px;padding:0;width:54px;height:54px;justify-content:center;gap:0;border-radius:50%}.cac-launch .cac-lt{display:none}}
   .cac-w{position:fixed;right:22px;bottom:18px;z-index:2147483000;width:416px;max-width:calc(100vw - 28px);height:min(680px,calc(100vh - 28px));background:var(--sf);border:1px solid var(--ln);border-radius:18px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;color:var(--ink);transform-origin:bottom right;transition:transform .22s cubic-bezier(.2,.9,.3,1.2),opacity .18s}
   .cac-w.cl{opacity:0;transform:scale(.9) translateY(14px);pointer-events:none}
   .cac-hd{flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 12px 12px 15px;background:linear-gradient(160deg,color-mix(in srgb,var(--a) 15%,var(--sf)),var(--sf));border-bottom:1px solid var(--ln)}
@@ -92,7 +94,7 @@ const { lang, path = '/', title, description = '' } = Astro.props as {
   var waSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.11 3.22 5.1 4.51.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35zM12 2a10 10 0 0 0-8.55 15.2L2 22l4.94-1.3A10 10 0 1 0 12 2z"/></svg>';
 
   wrap.innerHTML =
-    '<button class="cac-launch" id="cacL">' + carSvg + ' Kérdésed van? Segítek</button>' +
+    '<button class="cac-launch" id="cacL" aria-label="Kérdése van? Segítek">' + carSvg + '<span class="cac-lt">Segítek</span></button>' +
     '<section class="cac-w cl" id="cacW" role="dialog" aria-label="CarAdvance asszisztens">' +
       '<header class="cac-hd"><div class="cac-br">' +
         '<img class="cac-lg" src="' + LOGO + '" alt="CarAdvance" onerror="this.outerHTML=\'<div class=&quot;cac-lgt&quot;>Car<span>Advance</span></div>\'">' +
