@@ -45,6 +45,10 @@ function fix(p) {
   if (p.indexOf('public/auto/') === 0 && h.indexOf('/rent-widget.js') < 0) {
     h = h.replace('</body>', '<script src="/rent-widget.js"></script></body>');
   }
+  // inject the CarAdvance chat widget on every generator page
+  if (h.indexOf('/caradvance-chat.js') < 0) {
+    h = h.replace('</body>', '<script src="/caradvance-chat.js" defer></script></body>');
+  }
   fs.writeFileSync(p, h);
 }
 
