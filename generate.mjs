@@ -508,6 +508,7 @@ ${body}
 ${footerHtml(rel)}
 ${NAV_SCRIPT}
 ${FX_SCRIPT}
+<script src="/caradvance-chat.js" defer></script>
 </body></html>`;
 }
 

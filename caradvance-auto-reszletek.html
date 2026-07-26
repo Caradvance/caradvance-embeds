@@ -554,6 +554,7 @@ function go(){if(fired)return;fired=true;var f=(document.fonts&&document.fonts.r
   f.then(function(){setTimeout(function(){try{window.focus();window.print();}catch(e){}},300);});}
 window.onafterprint=function(){setTimeout(function(){window.close();},300);};
 if(!n)return go();im.forEach(function(x){if(x.complete){if(++c===n)go();}else{x.onload=x.onerror=function(){if(++c===n)go();};}});setTimeout(go,7000);});<\/script>
+  <script src="/caradvance-chat.js" defer></script>
 </body></html>`;
 }
 function genPDF(){

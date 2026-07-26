@@ -542,4 +542,5 @@ fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
  .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();var rv=document.getElementById('ratev');if(rv)rv.textContent=R;}}).catch(function(){});
 })();
 </script>
+  <script src="/caradvance-chat.js" defer></script>
 </body></html>
