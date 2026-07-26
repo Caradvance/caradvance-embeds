@@ -278,7 +278,7 @@ html.ca-ok #ca-gate{display:none}
 #ca-gate .err{color:#ff8a8a;font-size:14px;margin-top:16px;min-height:18px;font-weight:600}</style>
 <style id="preview-ungate">#ca-gate{display:none!important}html,body{overflow:auto!important}</style></head><body class="">
 <div id="ca-gate"><div class="box">
-  <img src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance">
+  <img src="/caradvance-logo-white.webp" alt="CarAdvance">
   <h1>Hamarosan indul</h1>
   <p>Weboldalunk még építés alatt áll. Ha rendelkezel belépési kóddal, itt megtekintheted az előnézetet.</p>
   <form onsubmit="return caGate(event)"><input id="ca-code" type="password" placeholder="Belépési kód" autocomplete="off" autofocus><button type="submit">Belépés</button></form>
@@ -286,7 +286,7 @@ html.ca-ok #ca-gate{display:none}
 </div></div>
 <script>function caGate(e){e.preventDefault();var v=(document.getElementById('ca-code').value||'').trim();if(v==="CarAdvance2027"){try{localStorage.setItem('ca_ok',v);}catch(_){}document.documentElement.classList.add('ca-ok');}else{document.getElementById('ca-err').textContent='Hibás kód, próbáld újra.';}return false;}</script>
 <div class="ca-navwrap"><nav class="ca-nav" aria-label="Főmenü">
-  <a class="brand" href="/"><img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
+  <a class="brand" href="/"><img src="/caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
   <ul class="menu"><li class="navitem"><button class="navlink" type="button">Prémium autóbérlés<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Bérelhető autóink</a><a class="ddi" href="#">Új autó bérlése</a><a class="ddi" href="#">Rövid távú bérlés</a><a class="ddi" href="#">Hosszú távú bérlés</a><a class="ddi" href="#">Flotta kezelés</a><a class="ddi" href="#">Feltételek</a></div></div></li><li class="navitem"><button class="navlink" type="button">Megvásárolható autóink<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="/autoink/">Autóink</a><a class="ddi" href="#">Egyedi autó rendelés</a><a class="ddi" href="#">Finanszírozás – lízing</a><a class="ddi" href="#">Előnyök</a></div></div></li><li class="navitem"><button class="navlink" type="button">Bizományos értékesítés<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="/bizomanyos">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a><a class="ddi" href="/jotekonysag">Jótékonyság</a><a class="ddi" href="/ertekesitesi-folyamat">Értékesítési folyamat</a><a class="ddi" href="/gyakori-kerdesek">Gyakori kérdések</a></div></div></li><li class="navitem"><button class="navlink" type="button">Import<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Autó rendelés</a><a class="ddi" href="#">Beszerzési folyamat</a><a class="ddi" href="#">Előnyök</a><a class="ddi" href="#">Referenciák</a></div></div></li><li class="navitem"><button class="navlink" type="button">Rólunk<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Miért mi?</a><a class="ddi" href="#">Caradvance Németország</a><a class="ddi" href="#">Caradvance Magyarország</a><a class="ddi" href="#">Referenciák</a><a class="ddi" href="#">Partnereink</a><a class="ddi" href="#">Media</a><a class="ddi" href="#">Blog</a></div></div></li></ul>
   <div class="navright">
     <a class="kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
@@ -421,7 +421,7 @@ html.ca-ok #ca-gate{display:none}
 })();
 </script>
 <footer class="footer"><div class="footer-in">
-  <div><img class="brand" src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133">
+  <div><img class="brand" src="/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133">
     <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
   <div><h4>Menü</h4>
     <a href="/autoink/">Megvásárolható autóink</a>
