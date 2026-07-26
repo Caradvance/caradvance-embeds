@@ -30,7 +30,7 @@ function fix(p) {
   h = h.replace(/href="#">Eladom az autómat</g, 'href="/eladom">Eladom az autómat<');
   h = h.replace(/href="#">Jótékonyság</g, 'href="/jotekonysag">Jótékonyság<');
   h = h.replace(/href="#">Értékesítési folyamat</g, 'href="/ertekesitesi-folyamat">Értékesítési folyamat<');
-  h = h.replace(/href="#">Gyakori kérdések</g, 'href="/eladom#gyik">Gyakori kérdések<');
+  h = h.replace(/href="#">Gyakori kérdések</g, 'href="/gyakori-kerdesek">Gyakori kérdések<');
   // add the "Bizományos autóink" submenu item (added later, missing from the old build)
   if (!h.includes('>Bizományos autóink<')) {
     h = h.replace(/<a class="ddi" href="\/eladom">Eladom az autómat<\/a>/g, '<a class="ddi" href="#">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a>');
