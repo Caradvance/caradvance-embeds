@@ -368,7 +368,7 @@ html.ca-ok #ca-gate{display:none}
     var side=B.ftOf(B.sideEur(car.eur));
     var media=car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" decoding="async" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="ph" style="display:none">fotó hamarosan</span>':'<span class="ph" style="display:flex">fotó hamarosan</span>';
     var specs=[car.km,car.teljesitmeny,car.valto,car.uzemanyag].filter(Boolean).join(' · ');
-    return '<a class="card" href="/bizomanyos-auto/?m='+encodeURIComponent(B.slugify(car.modell))+'">'
+    return '<a class="card" href="/auto/'+B.slugify(car.modell)+'/">'
       +'<div class="media">'+media+'</div>'
       +'<div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">'+esc(car.evjarat)+'</span></div>'
       +'<h3 class="title">'+esc(car.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
