@@ -1,6 +1,9 @@
 // Injects a compact "supported cause" (seller 15% + buyer 15%) widget into the
 // right-hand column of a /auto/<slug>/ car page, IF the car is in the bizományos list.
 (function () {
+  // ONLY show this widget when the car is opened from the Bizományos értékesítés
+  // flow (links carry ?biz=1). It must never appear on Megvásárolható autóink cars.
+  if (location.search.indexOf('biz=1') < 0) return;
   var m = location.pathname.match(/\/auto\/([^\/]+)\/?$/);
   if (!m) return;
   var slug = m[1];
