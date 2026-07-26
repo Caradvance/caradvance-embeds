@@ -36,6 +36,10 @@ function fix(p) {
     h = h.replace(/<a class="ddi" href="\/eladom">Eladom az autómat<\/a>/g, '<a class="ddi" href="/bizomanyos">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a>');
     h = h.replace(/<a href="\/eladom">Eladom az autómat<\/a>/g, '<a href="/bizomanyos">Bizományos autóink</a><a href="/eladom">Eladom az autómat</a>');
   }
+  // inject the consignment "supported cause" widget on /auto/<slug>/ car pages
+  if (p.indexOf('public/auto/') === 0 && h.indexOf('/biz-widget.js') < 0) {
+    h = h.replace('</body>', '<script src="/biz-widget.js"></script></body>');
+  }
   fs.writeFileSync(p, h);
 }
 
