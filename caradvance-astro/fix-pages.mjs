@@ -56,6 +56,8 @@ function fix(p) {
   if (h.indexOf('/caradvance-chat.js') < 0) {
     h = h.replace('</body>', '<script src="/caradvance-chat.js" defer></script></body>');
   }
+  // raise the floating nav (was too low)
+  h = h.replace(/padding:32px 14px 0/g, 'padding:12px 14px 0');
   fs.writeFileSync(p, h);
 }
 
