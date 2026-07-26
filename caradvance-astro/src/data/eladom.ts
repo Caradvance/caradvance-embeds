@@ -45,7 +45,7 @@ export interface EladomContent {
   faq: { eyebrow: string; title: string; intro: string; items: { q: string; a: string }[] };
 }
 
-const BASE = 'https://caradvance.hu';
+const BASE = 'https://www.caradvance.hu';
 
 const hu: EladomContent = {
   stats: [
