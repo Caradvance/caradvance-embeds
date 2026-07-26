@@ -50,6 +50,9 @@ window.RENT = (function () {
         if((g(row,'aktiv')||'').toLowerCase()==='nem')continue;
         var ri=rentInfo(modell, g(row,'marka'), g(row,'karosszeria'));
         if(!ri) continue;
+        // only CarAdvance's own fleet is rentable — exclude WeGa/partner cars
+        var _forras=(g(row,'forras')||'').toLowerCase(), _sajat=(g(row,'sajat')||'').toLowerCase();
+        if(_forras && _forras!=='caradvance' && _sajat!=='igen') continue;
         out.push({
           modell:modell, marka:g(row,'marka'), karosszeria:g(row,'karosszeria'),
           km:g(row,'km'), teljesitmeny:g(row,'teljesitmeny'), valto:g(row,'valto'),
