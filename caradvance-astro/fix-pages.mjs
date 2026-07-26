@@ -58,6 +58,7 @@ function fix(p) {
   }
   // raise the floating nav (was too low)
   h = h.replace(/padding:32px 14px 0/g, 'padding:12px 14px 0');
+  h = h.split('https://caradvance.hu/').join('https://www.caradvance.hu/');
   fs.writeFileSync(p, h);
 }
 
