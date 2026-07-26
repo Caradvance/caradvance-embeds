@@ -40,6 +40,9 @@
     function fmt(v) { return B.fmtFt(v); }
     var opts = B.ORDER.map(function (k) { return '<option value="' + k + '">' + B.PROJECTS[k].name + '</option>'; }).join('');
     var el = document.createElement('div'); el.className = 'panel bw-panel';
+    // insert as the SECOND panel — right after the price panel
+    var kids = [].slice.call(side.children);
+    var priceP = kids.filter(function (ch) { return /Ajánlatkérés|NETTÓ ÁR/.test(ch.textContent); })[0] || side.firstElementChild;
     el.innerHTML =
       '<div class="bw-h">Egy autó, két jó ügy ♥</div>'
       + '<div class="bw-sub">A jutalékunk 30%-a jótékony célra megy — 15% az eladó, 15% a vevő döntése.</div>'
@@ -52,7 +55,8 @@
       + '<div class="bw-sec"><div class="bw-tag buyer">A vevő döntése · 15%</div>'
         + '<select class="bw-select" id="bwsel">' + opts + '</select>'
         + '<div id="bwbuyer"></div></div>';
-    side.appendChild(el);
+    if (priceP && priceP.nextSibling) side.insertBefore(el, priceP.nextSibling);
+    else side.appendChild(el);
 
     var sel = el.querySelector('#bwsel'), view = el.querySelector('#bwbuyer');
     function showBuyer(k) {
