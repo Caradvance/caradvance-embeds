@@ -278,7 +278,7 @@ html.ca-ok #ca-gate{display:none}
 #ca-gate .err{color:#ff8a8a;font-size:14px;margin-top:16px;min-height:18px;font-weight:600}</style>
 <style id="preview-ungate">#ca-gate{display:none!important}html,body{overflow:auto!important}</style></head><body class="">
 <div id="ca-gate"><div class="box">
-  <img src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance">
+  <img src="/caradvance-logo-white.webp" alt="CarAdvance">
   <h1>Hamarosan indul</h1>
   <p>Weboldalunk még építés alatt áll. Ha rendelkezel belépési kóddal, itt megtekintheted az előnézetet.</p>
   <form onsubmit="return caGate(event)"><input id="ca-code" type="password" placeholder="Belépési kód" autocomplete="off" autofocus><button type="submit">Belépés</button></form>
@@ -286,7 +286,7 @@ html.ca-ok #ca-gate{display:none}
 </div></div>
 <script>function caGate(e){e.preventDefault();var v=(document.getElementById('ca-code').value||'').trim();if(v==="CarAdvance2027"){try{localStorage.setItem('ca_ok',v);}catch(_){}document.documentElement.classList.add('ca-ok');}else{document.getElementById('ca-err').textContent='Hibás kód, próbáld újra.';}return false;}</script>
 <div class="ca-navwrap"><nav class="ca-nav" aria-label="Főmenü">
-  <a class="brand" href="/"><img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
+  <a class="brand" href="/"><img src="/caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
   <ul class="menu"><li class="navitem"><button class="navlink" type="button">Prémium autóbérlés<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Bérelhető autóink</a><a class="ddi" href="#">Új autó bérlése</a><a class="ddi" href="#">Rövid távú bérlés</a><a class="ddi" href="#">Hosszú távú bérlés</a><a class="ddi" href="#">Flotta kezelés</a><a class="ddi" href="#">Feltételek</a></div></div></li><li class="navitem"><button class="navlink" type="button">Megvásárolható autóink<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="/autoink/">Autóink</a><a class="ddi" href="#">Egyedi autó rendelés</a><a class="ddi" href="#">Finanszírozás – lízing</a><a class="ddi" href="#">Előnyök</a></div></div></li><li class="navitem"><button class="navlink" type="button">Bizományos értékesítés<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a><a class="ddi" href="/jotekonysag">Jótékonyság</a><a class="ddi" href="/ertekesitesi-folyamat">Értékesítési folyamat</a><a class="ddi" href="/gyakori-kerdesek">Gyakori kérdések</a></div></div></li><li class="navitem"><button class="navlink" type="button">Import<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Autó rendelés</a><a class="ddi" href="#">Beszerzési folyamat</a><a class="ddi" href="#">Előnyök</a><a class="ddi" href="#">Referenciák</a></div></div></li><li class="navitem"><button class="navlink" type="button">Rólunk<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Miért mi?</a><a class="ddi" href="#">Caradvance Németország</a><a class="ddi" href="#">Caradvance Magyarország</a><a class="ddi" href="#">Referenciák</a><a class="ddi" href="#">Partnereink</a><a class="ddi" href="#">Media</a><a class="ddi" href="#">Blog</a></div></div></li></ul>
   <div class="navright">
     <a class="kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
@@ -298,10 +298,10 @@ html.ca-ok #ca-gate{display:none}
 </div>
 <!-- HERO -->
 <section class="hero">
-  <video class="video-bg" autoplay muted loop playsinline preload="auto" poster="https://caradvance.hu/caradvance-hero-x5-poster.jpg"><source src="https://caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4"></video>
+  <video class="video-bg" autoplay muted loop playsinline preload="auto" poster="/caradvance-hero-x5-poster.jpg"><source src="/caradvance-hero-x5.mp4" type="video/mp4"></video>
   <div class="overlay"></div>
   <div class="inner">
-    <img class="brand-logo" src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance — the automotive people" width="403" height="133">
+    <img class="brand-logo" src="/caradvance-logo-white.webp" alt="CarAdvance — the automotive people" width="403" height="133">
     <h1>Gyakori kérdések —<br>a bizományos értékesítésről</h1>
     <p class="sub">Minden, amit az autód bizományos eladásáról tudni érdemes: az eladás menete, a jogi és pénzügyi részletek, valamint a jótékonyság. Válaszd ki a témát, vagy keress rá közvetlenül — és ha nem találod a választ, egy hívás vagy e-mail elég.</p>
     <div class="cta-row"><a class="btn btn-primary" href="/eladom#ertekbecsles">Eladnám az autóm</a><a class="btn btn-white" href="#kategoriak">Kérdések böngészése</a></div>
@@ -402,13 +402,13 @@ html.ca-ok #ca-gate{display:none}
     <details class="faq-item"><summary>Mi ez a 15%+15% felosztás?</summary><div class="faq-a">A 30%-ról közösen döntötök: a felét (15%) te, az eladó irányítod a választott szervezethez, a másik 15%-ról pedig az autó vevője dönt. Egy autó, két ember, két jó döntés — dupla hatással. Erről bővebben a <a href="/jotekonysag">jótékonyság</a> oldalon olvashatsz.</div></details>
     <details class="faq-item"><summary>Mely szervezeteket támogatjátok?</summary><div class="faq-a">Hét magyar szervezetet — gyerekek, családok, betegek, rászorulók és állatok ügyeiért:
       <div class="faq-orgs">
-        <a class="faq-org" href="https://www.sos.hu" target="_blank" rel="noopener"><span class="fo-logo fo-sos"><img src="https://www.caradvance.hu/sos-badge.png" alt="SOS Gyermekfalu Magyarország" loading="lazy"></span><span class="fo-name">SOS Gyermekfalu Magyarország</span></a>
-        <a class="faq-org" href="https://www.elelmiszerbank.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="https://caradvance.hu/magyar-elelmiszerbank-egyesulet.webp" alt="Magyar Élelmiszerbank Egyesület" loading="lazy"></span><span class="fo-name">Magyar Élelmiszerbank Egyesület</span></a>
-        <a class="faq-org" href="https://www.batortabor.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="https://caradvance.hu/bator-tabor.webp" alt="Bátor Tábor Alapítvány" loading="lazy"></span><span class="fo-name">Bátor Tábor Alapítvány</span></a>
-        <a class="faq-org" href="https://www.maltai.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="https://caradvance.hu/magyar-maltai-szeretetszolgalat.webp" alt="Magyar Máltai Szeretetszolgálat" loading="lazy"></span><span class="fo-name">Magyar Máltai Szeretetszolgálat</span></a>
-        <a class="faq-org" href="https://www.rexalapitvany.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="https://caradvance.hu/rex-kutyaotthon-alapitvany.webp" alt="Rex Kutyaotthon Alapítvány" loading="lazy"></span><span class="fo-name">Rex Kutyaotthon Alapítvány</span></a>
-        <a class="faq-org" href="https://heimpalkorhaz.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="https://caradvance.hu/heim-pal-orszagos-gyermekgyogyaszati-intezet.webp" alt="Heim Pál Gyermekgyógyászati Intézet" loading="lazy"></span><span class="fo-name">Heim Pál Gyermekgyógyászati Intézet</span></a>
-        <a class="faq-org" href="https://patent.org.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="https://caradvance.hu/patent-egyesulet.webp" alt="PATENT Egyesület" loading="lazy"></span><span class="fo-name">PATENT Egyesület</span></a>
+        <a class="faq-org" href="https://www.sos.hu" target="_blank" rel="noopener"><span class="fo-logo fo-sos"><img src="/sos-badge.png" alt="SOS Gyermekfalu Magyarország" loading="lazy"></span><span class="fo-name">SOS Gyermekfalu Magyarország</span></a>
+        <a class="faq-org" href="https://www.elelmiszerbank.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="/magyar-elelmiszerbank-egyesulet.webp" alt="Magyar Élelmiszerbank Egyesület" loading="lazy"></span><span class="fo-name">Magyar Élelmiszerbank Egyesület</span></a>
+        <a class="faq-org" href="https://www.batortabor.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="/bator-tabor.webp" alt="Bátor Tábor Alapítvány" loading="lazy"></span><span class="fo-name">Bátor Tábor Alapítvány</span></a>
+        <a class="faq-org" href="https://www.maltai.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="/magyar-maltai-szeretetszolgalat.webp" alt="Magyar Máltai Szeretetszolgálat" loading="lazy"></span><span class="fo-name">Magyar Máltai Szeretetszolgálat</span></a>
+        <a class="faq-org" href="https://www.rexalapitvany.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="/rex-kutyaotthon-alapitvany.webp" alt="Rex Kutyaotthon Alapítvány" loading="lazy"></span><span class="fo-name">Rex Kutyaotthon Alapítvány</span></a>
+        <a class="faq-org" href="https://heimpalkorhaz.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="/heim-pal-orszagos-gyermekgyogyaszati-intezet.webp" alt="Heim Pál Gyermekgyógyászati Intézet" loading="lazy"></span><span class="fo-name">Heim Pál Gyermekgyógyászati Intézet</span></a>
+        <a class="faq-org" href="https://patent.org.hu" target="_blank" rel="noopener"><span class="fo-logo"><img src="/patent-egyesulet.webp" alt="PATENT Egyesület" loading="lazy"></span><span class="fo-name">PATENT Egyesület</span></a>
       </div>
       Bővebben az egyes szervezetekről és a támogatott projektekről a <a href="/jotekonysag">jótékonyság</a> oldalon olvashatsz.</div></details>
     <details class="faq-item"><summary>Honnan tudom, hogy tényleg eljut a támogatás?</summary><div class="faq-a">A támogatás összegét minden eladásnál egyedileg, írásban rögzítjük, és a profi bemutatóvideóban is megmutatjuk, melyik szervezetet és célt támogatja épp a te eladásod. A jó ügy nemcsak megtörténik — látszik is.</div></details>
@@ -512,7 +512,7 @@ fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'}).t
 <script>(function(){try{var items=[].slice.call(document.querySelectorAll('.faq-item'));var faqs=items.map(function(it){return{"@type":"Question","name":it.querySelector('summary').textContent.trim(),"acceptedAnswer":{"@type":"Answer","text":it.querySelector('.faq-a').textContent.trim()}};});var ld={"@context":"https://schema.org","@type":"FAQPage","mainEntity":faqs};var s=document.createElement('script');s.type='application/ld+json';s.textContent=JSON.stringify(ld);document.head.appendChild(s);}catch(e){}})();</script>
 <script>(function(){var els=[].slice.call(document.querySelectorAll('.reveal'));function showAll(){els.forEach(function(e){e.classList.add('in');});}if('IntersectionObserver' in window){var o=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');o.unobserve(x.target);}});},{threshold:0.06,rootMargin:'0px 0px -5% 0px'});els.forEach(function(e){o.observe(e);});setTimeout(showAll,1500);}else{showAll();}})();</script>
 <footer class="footer"><div class="footer-in">
-  <div><img class="brand" src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133">
+  <div><img class="brand" src="/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133">
     <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
   <div><h4>Menü</h4>
     <a href="/autoink/">Megvásárolható autóink</a>
