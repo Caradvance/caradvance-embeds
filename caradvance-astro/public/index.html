@@ -276,7 +276,43 @@ html.ca-ok #ca-gate{display:none}
 #ca-gate input::placeholder{color:#9aa4b2}
 #ca-gate button{background:#E2001A;color:#fff;border:0;border-radius:12px;padding:14px 24px;font-weight:800;font-size:16px;cursor:pointer}
 #ca-gate .err{color:#ff8a8a;font-size:14px;margin-top:16px;min-height:18px;font-weight:600}</style>
-<style id="preview-ungate">#ca-gate{display:none!important}html,body{overflow:auto!important}</style></head><body class="">
+<style id="preview-ungate">#ca-gate{display:none!important}html,body{overflow:auto!important}</style><style id="biz-home-css">
+#biz-home-grid .card{display:flex;flex-direction:column;overflow:hidden}
+#biz-home-grid .bizcard-link{display:flex;flex-direction:column;text-decoration:none;color:inherit}
+#biz-home-grid .media{position:relative;aspect-ratio:16/10;background:#EDEFF3;overflow:hidden}
+#biz-home-grid .media img{width:100%;height:100%;object-fit:cover;display:block}
+#biz-home-grid .media .ph{display:flex;align-items:center;justify-content:center;height:100%;color:#9AA7B8;font-size:13px}
+#biz-home-grid .body{padding:14px 16px 0;display:flex;flex-direction:column}
+#biz-home-grid .meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+#biz-home-grid .meta .cond{background:#EEF1F6;border-radius:999px;padding:3px 10px;font-weight:700}
+#biz-home-grid .title{font-size:16px;font-weight:800;color:var(--navy);line-height:1.25;min-height:44px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
+#biz-home-grid .specs{font-size:13px;color:var(--muted);margin:6px 0}
+#biz-home-grid .pricerow{display:flex;align-items:baseline;gap:8px;margin:8px 0 2px}
+#biz-home-grid .price{font-size:20px;font-weight:800;color:var(--navy)}
+#biz-home-grid .peur{font-size:13px;color:var(--muted);font-weight:600}
+.biz-donate{padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.biz-inner{display:flex;align-items:center;gap:10px;background:#F4F7FB;border:1px solid var(--line);border-radius:12px;padding:9px 11px;min-height:58px}
+.biz-inner .bd-logo,.bb-c .bd-logo{width:40px;height:36px;flex:0 0 auto;border-radius:8px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.biz-inner .bd-logo.blue,.bb-c .bd-logo.blue{background:#009DE0;border-color:#009DE0}
+.biz-inner .bd-logo img,.bb-c .bd-logo img{max-width:32px;max-height:26px;object-fit:contain}
+.biz-inner .bd-txt{flex:1;min-width:0}
+.biz-inner .bd-l{display:block;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:1px}
+.biz-inner .bd-org{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.2}
+.biz-inner .bd-amt{flex:0 0 auto;text-align:right}
+.biz-inner .bd-amt b{display:block;font-size:13.5px;color:var(--red);font-weight:800;white-space:nowrap}
+.biz-inner .bd-amt span{font-size:10px;color:var(--muted);font-weight:700}
+.biz-buyer{background:rgba(30,60,114,.05);border:1px solid rgba(30,60,114,.16);border-radius:12px;padding:10px 11px}
+.biz-buyer .bb-l{display:block;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1e3c72;margin-bottom:6px}
+.biz-buyer .bb-select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:12.5px;background:#fff;color:var(--ink);cursor:pointer}
+.biz-buyer .bb-chosen{margin-top:8px}
+.bb-c{display:flex;align-items:center;gap:9px}
+.bb-c .bb-cn{flex:1;min-width:0;font-size:12px;font-weight:700;color:var(--navy);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bb-c .bb-ca{flex:0 0 auto;font-size:13px;font-weight:800;color:#1e3c72;white-space:nowrap}
+.biz-total{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;border-radius:11px;padding:10px 13px}
+.biz-total .bt-l{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.82)}
+.biz-total b{font-size:16px;font-weight:800}
+.biz-total .bt-s{display:block;font-size:9.5px;color:rgba(255,255,255,.6);font-weight:600;text-align:right}
+</style></head><body class="">
 <div id="ca-gate"><div class="box">
   <img src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance">
   <h1>Hamarosan indul</h1>
@@ -312,8 +348,8 @@ html.ca-ok #ca-gate{display:none}
 <section class="wrap" id="autoink">
   <div class="autok-head"><div><span class="feyebrow">Kínálat</span><h2>Autóink</h2></div>
     <div class="autok-tabs" role="tablist">
-      <button class="autok-tab" data-tab="berelheto" type="button">Bérelhető autók</button>
-      <button class="autok-tab on" data-tab="elado" type="button">Eladó autók</button>
+      <button class="autok-tab" data-tab="berelheto" type="button">Bérelhető</button>
+      <button class="autok-tab on" data-tab="elado" type="button">Eladó</button><button class="autok-tab" data-tab="bizomanyos" type="button">Bizományos</button>
     </div>
   </div>
   <div class="autok-panel on" id="panel-elado">
@@ -334,7 +370,7 @@ html.ca-ok #ca-gate{display:none}
   <div class="pricerow" data-eur="136134" data-net="136134"><span class="price" data-main>49 290 000 Ft</span><span class="peur">136 134 €</span></div>
   <span class="cbtn">Részletek</span></div></a></div>
     <div class="autok-more"><a class="btn btn-red" href="/autoink/">Összes eladó autónk →</a></div>
-  </div>
+  </div><div class="autok-panel" id="panel-bizomanyos"><div class="grid" id="biz-home-grid"></div><div class="autok-more"><a class="btn btn-red" href="/bizomanyos">Összes bizományos autónk →</a></div></div>
   <div class="autok-panel" id="panel-berelheto">
     <div style="text-align:center;padding:52px 24px;background:#fff;border:1px solid var(--line);border-radius:18px"><p style="color:var(--muted);font-size:16.5px;max-width:460px;margin:0 auto 20px">Bérelhető prémium autóink hamarosan itt is elérhetők lesznek. Addig is szívesen adunk személyre szabott bérlési ajánlatot.</p><a class="btn btn-red" href="mailto:info@caradvance.hu?subject=Aut%C3%B3b%C3%A9rl%C3%A9s%20%C3%A9rdekl%C5%91d%C3%A9s">Kérj bérlési ajánlatot</a></div>
   </div>
@@ -499,4 +535,46 @@ fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
  .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();var rv=document.getElementById('ratev');if(rv)rv.textContent=R;}}).catch(function(){});
 })();
 </script>
-</body></html>
+<script src="/biz-data.js"></script>
+<script>
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function init(){
+    var B=window.BIZ; if(!B) return;
+    var grid=document.getElementById('biz-home-grid'); if(!grid) return;
+    var TARGET=['volkswagen-golf-gti-clubsport-s-abt-370ps-19-1of400','bmw-x2-xdrive20d-m-pro-black-beige-pano-hud-full','bmw-x7-m50d-m-sport-pro-22-b-w'];
+    function chosen(p,ft){return '<div class="bb-c"><span class="bd-logo'+(p.blue?' blue':'')+'"><img src="'+esc(p.logo)+'" alt=""></span><span class="bb-cn">'+esc(p.name)+'</span><b class="bb-ca">~'+esc(B.fmtFt(ft))+'</b></div>';}
+    function card(car){
+      var sp=B.PROJECTS[car.seller]||B.PROJECTS.sos;
+      var side=B.ftOf(B.sideEur(car.eur));
+      var total=B.ftOf(B.totalDonationEur(car.eur));
+      var slug=B.slugify(car.modell);
+      var media=car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" decoding="async" referrerpolicy="no-referrer">':'<span class="ph">fotó</span>';
+      var specs=[car.km,car.teljesitmeny,car.valto,car.uzemanyag].filter(Boolean).join(' · ');
+      var def=B.ORDER.filter(function(k){return k!==car.seller;})[0]||B.ORDER[0];
+      var opts=B.ORDER.map(function(k){return '<option value="'+k+'"'+(k===def?' selected':'')+'>'+esc(B.PROJECTS[k].name)+'</option>';}).join('');
+      return '<div class="card bizcard">'
+        +'<a class="bizcard-link" href="/auto/'+slug+'/?biz=1"><div class="media">'+media+'</div>'
+        +'<div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">'+esc(car.evjarat)+'</span></div>'
+        +'<h3 class="title">'+esc(car.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
+        +'<div class="pricerow"><span class="price">'+esc(B.fmtFt(B.ftOf(car.eur)))+'</span><span class="peur">'+car.eur.toLocaleString('hu-HU')+' €</span></div></div></a>'
+        +'<div class="biz-donate">'
+          +'<div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
+            +'<span class="bd-txt"><span class="bd-l">Támogatott ügy · eladó 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
+            +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
+          +'<div class="biz-buyer"><span class="bb-l">A vevő döntése · 15%</span>'
+            +'<select class="bb-select" data-side="'+side+'">'+opts+'</select>'
+            +'<div class="bb-chosen">'+chosen(B.PROJECTS[def],side)+'</div></div>'
+          +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
+        +'</div></div>';
+    }
+    grid.addEventListener('change',function(e){var sel=e.target.closest('.bb-select');if(!sel)return;var p=B.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyer').querySelector('.bb-chosen');if(box)box.innerHTML=chosen(p,+sel.getAttribute('data-side')||0);});
+    B.loadRate(function(){ B.loadCars(function(cars){
+      var pick=TARGET.map(function(sl){for(var i=0;i<cars.length;i++){if(B.slugify(cars[i].modell)===sl)return cars[i];}return null;}).filter(Boolean);
+      if(pick.length<3) pick=cars.slice(0,3);
+      grid.innerHTML=pick.map(card).join('');
+    });});
+  }
+  if(window.BIZ) init(); else { var iv=setInterval(function(){ if(window.BIZ){clearInterval(iv);init();} },60); setTimeout(function(){clearInterval(iv);},6000); }
+})();
+</script></body></html>
