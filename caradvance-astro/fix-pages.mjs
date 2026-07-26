@@ -31,6 +31,7 @@ function fix(p) {
   h = h.replace(/href="#">Jótékonyság</g, 'href="/jotekonysag">Jótékonyság<');
   h = h.replace(/href="#">Értékesítési folyamat</g, 'href="/ertekesitesi-folyamat">Értékesítési folyamat<');
   h = h.replace(/href="#">Gyakori kérdések</g, 'href="/gyakori-kerdesek">Gyakori kérdések<');
+  h = h.replace(/href="#">Bérelhető autóink</g, 'href="/berelheto">Bérelhető autóink<');
   // add the "Bizományos autóink" submenu item (added later, missing from the old build)
   if (!h.includes('>Bizományos autóink<')) {
     h = h.replace(/<a class="ddi" href="\/eladom">Eladom az autómat<\/a>/g, '<a class="ddi" href="/bizomanyos">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a>');
@@ -39,6 +40,10 @@ function fix(p) {
   // inject the consignment "supported cause" widget on /auto/<slug>/ car pages
   if (p.indexOf('public/auto/') === 0 && h.indexOf('/biz-widget.js') < 0) {
     h = h.replace('</body>', '<script src="/biz-widget.js"></script></body>');
+  }
+  // inject the rental "bérlési ajánlat" widget on /auto/<slug>/ car pages
+  if (p.indexOf('public/auto/') === 0 && h.indexOf('/rent-widget.js') < 0) {
+    h = h.replace('</body>', '<script src="/rent-widget.js"></script></body>');
   }
   fs.writeFileSync(p, h);
 }
