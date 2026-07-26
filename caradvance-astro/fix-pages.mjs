@@ -12,6 +12,13 @@ function cp(src, dst) {
 cp('../autoink', 'public/autoink');
 cp('../auto', 'public/auto');
 
+// copy root static assets (logo, hero videos, images) so the site is self-contained
+for (const f of fs.readdirSync('..')) {
+  if (/\.(webp|png|jpe?g|mp4|svg|ico|gif)$/i.test(f)) {
+    try { if (fs.statSync('../' + f).isFile()) fs.copyFileSync('../' + f, 'public/' + f); } catch (e) {}
+  }
+}
+
 function walk(dir) {
   if (!fs.existsSync(dir)) return;
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -24,7 +31,7 @@ function walk(dir) {
 function fix(p) {
   let h = fs.readFileSync(p, 'utf8');
   // relative assets (../logo.webp, ../../hero.mp4, favicon, ...) -> absolute
-  h = h.replace(/"(?:\.\.\/)+([A-Za-z0-9._-]*\.(?:webp|png|jpe?g|mp4|ico|svg))"/g, '"https://caradvance.hu/$1"');
+  h = h.replace(/"(?:\.\.\/)+([A-Za-z0-9._-]*\.(?:webp|png|jpe?g|mp4|ico|svg))"/g, '"/$1"');
   // menu links that were dead placeholders in the old build
   h = h.replace(/href="\.\.\/autoink\/"/g, 'href="/autoink/"');
   h = h.replace(/href="#">Eladom az autómat</g, 'href="/eladom">Eladom az autómat<');
