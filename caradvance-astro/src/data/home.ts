@@ -2,7 +2,7 @@
 // Hungarian baseline. Add per-locale overrides in byLocale, or wire to the Sheet.
 import type { Locale } from '../i18n/utils';
 
-const BASE = 'https://caradvance.hu';
+const BASE = 'https://www.caradvance.hu';
 
 export interface HomeContent {
   stats: { num: string; unit: string; label: string }[];
