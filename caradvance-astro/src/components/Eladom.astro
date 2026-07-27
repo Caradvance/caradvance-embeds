@@ -720,6 +720,7 @@ const serviceJsonld = {
     };
     makeSel?.addEventListener('change', () => { fillModels(); updateCompare(); });
     modelSel?.addEventListener('change', updateCompare);
+    ['f-year','f-km','f-fuel'].forEach(function(id){ var e=document.getElementById(id); if(e){ e.addEventListener('change', updateCompare); e.addEventListener('input', updateCompare); } });
 
     // Élő bizományi díj + jótékony felajánlás kalkulátor
     let EURHUF = 400;
