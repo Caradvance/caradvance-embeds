@@ -160,6 +160,14 @@ const faqJsonld = {
           </label>
         </div>
         <p class="kw-hint">Tipp: minél rugalmasabb a keret és az időzítés, annál jobb ár-érték arányú autót tudunk találni.</p>
+        <div class="kw-compare" style="margin-top:18px">
+          <div class="kw-compare-t">Nézd meg a piaci ársávot — mennyiért kaphatók hasonló autók</div>
+          <div class="kw-pricelinks">
+            <div class="kw-pricerow"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" /><a id="cmp-mobile-lo" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=up" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-mobile-hi" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=down" target="_blank" rel="noopener">Legdrágábbak →</a></div>
+            <div class="kw-pricerow"><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" /><a id="cmp-as24-lo" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=0" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-as24-hi" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=1" target="_blank" rel="noopener">Legdrágábbak →</a></div>
+          </div>
+          <p class="kw-note">Kattints — a hasonló autókat a legolcsóbbtól a legdrágábbig rendezve látod a piacon, így felméred a valós ársávot.</p>
+        </div>
       </div>
 
       <!-- STEP 3 -->
@@ -278,6 +286,9 @@ const faqJsonld = {
   .kw-cmp{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#141519;font-weight:700;font-size:14px;text-decoration:none;padding:11px 16px;border-radius:11px}
   .kw-cmp img{height:18px;width:auto;border-radius:3px}
   .kw-cmp:hover{filter:brightness(.96)}
+  .kw-pricelinks{display:flex;flex-direction:column;gap:10px}
+  .kw-pricerow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kw-pricerow>img{height:22px;width:auto;border-radius:4px}
   .kw-note{font-size:12.5px;color:#9aa7b8;line-height:1.5;margin:14px 0 0}
   .kw-hint{font-size:13px;color:var(--muted);background:#F7F9FC;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:16px}
   .kw-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
@@ -470,6 +481,8 @@ const faqJsonld = {
       if(fm[fuel]) mp += '&ft=' + fm[fuel];
       if(budgetEur) mp += '&p=%3A' + budgetEur;
       mo.href = mp;
+      var mlo=document.getElementById('cmp-mobile-lo'); if(mlo) mlo.href = mp + '&sb=p&od=up';
+      var mhi=document.getElementById('cmp-mobile-hi'); if(mhi) mhi.href = mp + '&sb=p&od=down';
     }
     // AutoScout24
     var as = document.getElementById('cmp-as24');
@@ -478,7 +491,7 @@ const faqJsonld = {
       if(mk) base += '/' + slug(mk);
       if(mk && md) base += '/' + slug(md);
       var p = [];
-      p.push('sort=standard'); p.push('desc=0'); p.push('cy=D'); p.push('atype=C');
+      p.push('cy=D'); p.push('atype=C');
       if(yf) p.push('fregfrom=' + yf);
       if(yt) p.push('fregto=' + yt);
       if(kf) p.push('kmfrom=' + kf);
@@ -486,7 +499,9 @@ const faqJsonld = {
       if(budgetEur) p.push('priceto=' + budgetEur);
       var af = {'Benzin':'B','Dízel':'D','Elektromos':'E','LPG/Benzin':'2','Hibrid':'3','Plug-in hibrid':'3'};
       if(af[fuel]) p.push('fuel=' + af[fuel]);
-      as.href = base + '?' + p.join('&');
+      as.href = base + '?' + p.concat(['sort=standard','desc=0']).join('&');
+      var alo=document.getElementById('cmp-as24-lo'); if(alo) alo.href = base + '?' + p.concat(['sort=price','desc=0']).join('&');
+      var ahi=document.getElementById('cmp-as24-hi'); if(ahi) ahi.href = base + '?' + p.concat(['sort=price','desc=1']).join('&');
     }
   };
 
