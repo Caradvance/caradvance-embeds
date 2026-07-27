@@ -367,6 +367,8 @@ document.getElementById('todoInput').addEventListener('keydown',function(e){if(e
 document.getElementById('globalSearch').addEventListener('input',renderFeed);
 function renderAll(){renderKpis();renderFeed();renderPipeSummary();renderBadges();LINES.forEach(renderBoard);renderClients();renderTodos();loadDesk();}
 renderAll();
+
+;(function(){var CA_CONFIG={API:""};if(!CA_CONFIG.API)return;var base=CA_CONFIG.API.charAt(CA_CONFIG.API.length-1)==="/"?CA_CONFIG.API.slice(0,-1):CA_CONFIG.API;function m(r){return {id:r.id,line:r.line||r["Üzletág"],stage:r.stage||r["Fázis"],ch:r.ch||r["Csatorna"],name:r.name||r["Név"],phone:r.phone||r["Telefon"],email:r.email||r["E-mail"],car:r.car||r["Autó"],price:+(r.price||r["Kért ár / keret (Ft)"]||0),note:r.note||r["Megjegyzés"],when:r.when||""};}try{fetch(base+"/api/megkeresesek",{headers:{Accept:"application/json"}}).then(function(x){return x.json();}).then(function(j){var a=Array.isArray(j)?j:(j.items||j.rows||[]);if(a&&a.length){data=a.map(m);renderAll();}}).catch(function(){});}catch(e){}})();
 </script>
 </body>
 </html>
