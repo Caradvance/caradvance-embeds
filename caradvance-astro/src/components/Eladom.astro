@@ -91,6 +91,7 @@ const serviceJsonld = {
   },
 };
 ---
+<script is:inline src="/car-market-ids.js"></script>
 <!-- HERO -->
 <section class="hero">
   <video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-x5-poster.jpg">
@@ -705,7 +706,16 @@ const serviceJsonld = {
         hu.href = u;
       }
       if (mo && (mk || md)) {
-        mo.href = 'https://suchen.mobile.de/fahrzeuge/search.html?dam=false&isSearchRequest=true&ref=quickSearch&s=Car&sb=rel&vc=Car&q=' + encodeURIComponent(((mk === 'Egyéb' ? '' : mk) + ' ' + md).trim());
+        var mkRaw = val('f-make');
+        var makeId = (window.CA_MMK||{})[mkRaw];
+        var mUrl = 'https://suchen.mobile.de/fahrzeuge/search.html?dam=false&isSearchRequest=true&s=Car&vc=Car';
+        if (makeId) { var modelId = ((window.CA_MMM||{})[mkRaw]||{})[md] || ''; mUrl += '&ms=' + makeId + '%3B' + modelId + '%3B%3B'; }
+        else { var q = ((mk === 'Egyéb' ? '' : mk) + ' ' + md).trim(); if (q) mUrl += '&q=' + encodeURIComponent(q); }
+        var yrv = val('f-year'); if (yrv) mUrl += '&fr=' + yrv + '%3A' + yrv;
+        var kmv = (val('f-km')||'').replace(/[^0-9]/g,''); if (kmv) { mUrl += '&ml=' + Math.max(0,Math.round(kmv*0.7)) + '%3A' + Math.round(kmv*1.3); }
+        var fmm = {'Benzin':'PETROL','Dízel':'DIESEL','Hibrid':'HYBRID','Plug-in hibrid':'HYBRID_PLUGIN','Elektromos':'ELECTRICITY','LPG/Benzin':'LPG'};
+        var fuu = val('f-fuel'); if (fmm[fuu]) mUrl += '&ft=' + fmm[fuu];
+        mo.href = mUrl;
       }
     };
     makeSel?.addEventListener('change', () => { fillModels(); updateCompare(); });
