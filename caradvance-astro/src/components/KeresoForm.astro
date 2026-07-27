@@ -225,6 +225,7 @@ const faqJsonld = {
         <div id="compBox" class="sf-grid" hidden style="margin-top:18px">
           <label class="sf-field"><span>Cégnév</span><input id="b-cname" type="text" placeholder="Kft. / Zrt. …" /></label>
           <label class="sf-field"><span>Adószám</span><input id="b-tax" type="text" placeholder="pl. 12345678-2-13" /></label>
+          <label class="sf-field"><span>Közösségi (EU) adószám <small style="font-weight:600;color:var(--muted)">(nettó, EU-s vételhez)</small></span><input id="b-euvat" type="text" placeholder="pl. HU12345678" /></label>
           <label class="sf-field"><span>Kapcsolattartó</span><input id="b-contact" type="text" placeholder="Név" /></label>
           <label class="sf-field"><span>E-mail</span><input id="b-cemail" type="email" placeholder="ceg@pelda.hu" /></label>
           <label class="sf-field"><span>Telefonszám</span><input id="b-cphone" type="tel" placeholder="+36 …" /></label>
@@ -246,6 +247,7 @@ const faqJsonld = {
 </section>
 
 <style>
+  [hidden]{display:none !important}
   .kw{max-width:960px;margin:34px auto 0}
   .kw-head{margin-bottom:26px}
   .kw-steps{display:flex;gap:6px;margin-bottom:14px}
@@ -502,7 +504,7 @@ const faqJsonld = {
       ['Vásárló típusa', radioVal('who')]
     ];
     if(comp){
-      rows.push(['Cégnév', val('b-cname')], ['Adószám', val('b-tax')], ['Kapcsolattartó', val('b-contact')], ['E-mail', val('b-cemail')], ['Telefon', val('b-cphone')], ['Székhely', val('b-caddr')]);
+      rows.push(['Cégnév', val('b-cname')], ['Adószám', val('b-tax')], ['Közösségi (EU) adószám', val('b-euvat')], ['Kapcsolattartó', val('b-contact')], ['E-mail', val('b-cemail')], ['Telefon', val('b-cphone')], ['Székhely', val('b-caddr')]);
     } else {
       rows.push(['Név', val('b-name')], ['E-mail', val('b-email')], ['Telefon', val('b-phone')], ['Város', val('b-city')]);
     }
