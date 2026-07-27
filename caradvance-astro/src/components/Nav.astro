@@ -73,6 +73,16 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
 <script>
   const wrap = document.querySelector('.ca-navwrap');
   if (wrap) {
+    /* click-to-open dropdowns (works on touch/trackpad) */
+    wrap.querySelectorAll('.menu .navitem .navlink').forEach(function(btn){
+      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation();
+        var li = btn.closest('.navitem'); var wasOpen = li.classList.contains('open');
+        wrap.querySelectorAll('.menu .navitem').forEach(function(x){ x.classList.remove('open'); });
+        if (!wasOpen) li.classList.add('open');
+      });
+    });
+    document.addEventListener('click', function(){ wrap.querySelectorAll('.menu .navitem').forEach(function(x){ x.classList.remove('open'); }); });
+
     const burger = wrap.querySelector('.burger');
     burger && burger.addEventListener('click', () => wrap.classList.toggle('open'));
     wrap.querySelectorAll('.m-accbtn').forEach((b) =>
