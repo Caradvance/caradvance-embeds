@@ -1,5 +1,6 @@
 ---
 import { type Locale } from '../i18n/utils';
+import '../styles/eladom.css';
 const { lang } = Astro.props as { lang: Locale };
 
 const benefits = [
@@ -49,19 +50,22 @@ const faqJson = {
 };
 ---
 <section class="imp">
-  <div class="imp-hero">
-    <video class="imp-hero-vid" autoplay muted loop playsinline poster="https://www.caradvance.hu/caradvance-hero-x5-poster.jpg"><source src="https://www.caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4"></video>
-    <div class="imp-wrap">
-      <img class="imp-partners-img" src="https://www.caradvance.hu/partner-logos.png" alt="CarAdvance · Használtautó.hu · mobile.de">
-      <h1>Hozd haza álmaid autóját — <span>mi mindent elintézünk</span></h1>
-      <p class="imp-lead">Nagyobb választék, jobb állapotú autók és kedvezőbb ár a német piacról. Te megmondod, mit szeretnél — mi megkeressük, leinformáljuk, behozzuk és kulcsrakészen, a nevedre írt forgalmival adjuk át.</p>
-      <div class="imp-cta">
-        <a class="imp-btn red" href="#rendeles">Autót rendelek</a>
-        <a class="imp-btn ghost" href="#folyamat">Hogyan működik?</a>
-      </div>
-      <a class="imp-scroll" href="#miert">GÖRGESS<span>⌄</span></a>
+  <section class="hero">
+  <video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-x5-poster.jpg">
+    <source src="https://www.caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4" />
+  </video>
+  <div class="scrim"></div>
+  <div class="inner">
+    <div class="partners"><img class="partner-strip" src="/partner-logos.png" alt="CarAdvance · Használtautó.hu · mobile.de" /></div>
+    <h1>Hozd haza álmaid autóját —<br /><span class="accent">mi mindent elintézünk</span></h1>
+    <p class="sub sub-wide">Nagyobb választék, jobb állapotú autók és kedvezőbb ár a német piacról. Te megmondod, mit szeretnél — mi megkeressük, leinformáljuk, behozzuk és kulcsrakészen, a nevedre írt forgalmival adjuk át.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#rendeles">Autót rendelek</a>
+      <a class="btn btn-white" href="#folyamat">Hogyan működik?</a>
     </div>
   </div>
+  <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+</section>
 
   <div class="imp-wrap">
     <div class="imp-head"><span class="imp-tag">Miért a német piac?</span><h2>Nagyobb választék, jobb állapotú autók</h2><p>A német piacon nemcsak több autó közül választhatsz, hanem jellemzően jobb állapotúak is: gondosabb karbantartás, kevesebb futott kilométer és kiváló utak állnak mögöttük.</p></div>
