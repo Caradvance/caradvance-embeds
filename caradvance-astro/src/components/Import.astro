@@ -1,6 +1,7 @@
 ---
 import { type Locale } from '../i18n/utils';
 import '../styles/eladom.css';
+import KeresoForm from './KeresoForm.astro';
 const { lang } = Astro.props as { lang: Locale };
 
 const benefits = [
@@ -77,6 +78,8 @@ const faqJson = {
     </div></div>
   </section>
 
+  <KeresoForm lang={lang} />
+
   <div class="imp-wrap">
     <div class="imp-head"><span class="imp-tag">Miért a német piac?</span><h2>Nagyobb választék, jobb állapotú autók</h2><p>A német piacon nemcsak több autó közül választhatsz, hanem jellemzően jobb állapotúak is: gondosabb karbantartás, kevesebb futott kilométer és kiváló utak állnak mögöttük.</p></div>
     <div class="imp-grid3">
@@ -142,25 +145,7 @@ const faqJson = {
       <div class="imp-team-note"><b>Mögöttünk a németországi Caradvance GmbH 10 fős csapata 🇩🇪</b><span>Német kollégáink közvetlen hozzáférést biztosítanak a piac teljes kínálatához és a helyi ügyintézéshez — így minden behozatal a forrásnál, helyben indul.</span></div>
     </div>
 
-    <div class="imp-head" id="rendeles"><span class="imp-tag">Ingyenes &amp; kötelezettségmentes</span><h2>Autó rendelés — mondd el, mit keresel</h2><p>Add meg, milyen autót szeretnél behozatni. Csapatunk felveszi veled a kapcsolatot, és személyre szabott ajánlatot ad — árral és várható idővel.</p></div>
-    <form class="imp-form" id="importForm">
-      <div class="imp-f-grid">
-        <label>Márka<input name="marka" placeholder="pl. BMW, Volkswagen"></label>
-        <label>Modell<input name="modell" placeholder="pl. 320d Touring, Caddy"></label>
-        <label>Évjárat (-tól)<input name="evjarat" placeholder="pl. 2021"></label>
-        <label>Üzemanyag<select name="uzemanyag"><option value="">Válassz…</option><option>Benzin</option><option>Dízel</option><option>Hibrid</option><option>Elektromos</option></select></label>
-        <label>Max. futásteljesítmény (km)<input name="km" inputmode="numeric" placeholder="pl. 100000"></label>
-        <label>Keret (€ vagy Ft)<input name="keret" placeholder="pl. 25 000 € / 10 000 000 Ft"></label>
-      </div>
-      <label class="full">Megjegyzés, kívánságok (felszereltség, szín, extrák)<textarea name="megjegyzes" rows="3" placeholder="pl. automata, vonóhorog, tolatókamera, világos belső…"></textarea></label>
-      <div class="imp-f-grid">
-        <label>Neved<input name="nev" placeholder="Teljes név"></label>
-        <label>Telefon<input name="telefon" placeholder="+36…"></label>
-        <label>E-mail<input name="email" type="email" placeholder="nev@pelda.hu"></label>
-      </div>
-      <button type="submit" class="imp-btn red big">Elküldöm a rendelést →</button>
-      <p class="imp-note">Az adatok elküldésével felveszed velünk a kapcsolatot — az ajánlatkérés ingyenes és nem kötelez semmire.</p>
-    </form>
+
 
     <div class="imp-head" id="gyik"><span class="imp-tag">GYIK</span><h2>Gyakori kérdések</h2><p>A leggyakoribb kérdések a németországi autóimportról — a megrendeléstől az átadásig.</p></div>
     <div class="imp-faq">
