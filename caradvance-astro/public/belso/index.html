@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>CarAdvance — Belső irányítópult</title>
+<link rel="icon" href="https://www.caradvance.hu/favicon.ico?v=2">
+<style>
+  :root{
+    --red:#E2001A;--navy:#22447d;--ink:#1a1d23;--muted:#8a93a2;--faint:#aab1bd;
+    --line:#ECEEF2;--line2:#F2F4F7;--bg:#FBFCFD;--card:#fff;--sidebar:#101216;
+    --good:#128a63;--warn:#a97b1a;--bad:#c0392b;
+    --shadow:0 1px 2px rgba(20,28,44,.03);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
+  svg.i{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .side{width:244px;flex:0 0 244px;background:var(--sidebar);color:#e7e9ee;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .side .brand{padding:22px 22px 18px;display:flex;align-items:center;gap:10px}
+  .side .brand img{height:26px;width:auto;display:block}
+  .side .brand .fb{font-weight:800;font-size:17px;letter-spacing:.01em}
+  .side .brand .fb span{color:var(--red)}
+  .side .lbl{font-size:10.5px;color:#727a8a;padding:0 22px 10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+  .nav{display:flex;flex-direction:column;gap:1px;padding:4px 12px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:#aeb5c2;text-decoration:none;font-size:13.5px;font-weight:600;cursor:pointer;transition:background .12s,color .12s}
+  .nav a:hover{background:#1a1d23;color:#fff}
+  .nav a.active{background:#22252c;color:#fff}
+  .nav a .badge{margin-left:auto;background:#2f333c;color:#cfd4dd;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px}
+  .nav a.active .badge{background:var(--red);color:#fff}
+  .side .foot{margin-top:auto;padding:16px 22px;border-top:1px solid #1d2026;font-size:12px;color:#727a8a;line-height:1.5}
+  .side .foot b{color:#c7ccd6;font-weight:700}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(251,252,253,.82);backdrop-filter:blur(10px);display:flex;align-items:center;gap:14px;padding:16px 30px;border-bottom:1px solid var(--line)}
+  .topbar h1{font-size:18px;margin:0;font-weight:800;letter-spacing:-.01em}
+  .topbar .search{margin-left:10px;flex:1;max-width:320px;position:relative}
+  .topbar .search input{width:100%;font:inherit;font-size:13.5px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:#fff;outline:none}
+  .topbar .search input:focus{border-color:#d3d8e0}
+  .topbar .ai{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:600;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+  .topbar .ai .pulse{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(18,138,99,.5);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(18,138,99,.45)}70%{box-shadow:0 0 0 6px rgba(18,138,99,0)}100%{box-shadow:0 0 0 0 rgba(18,138,99,0)}}
+  .btn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-weight:700;font-size:13px;border:0;border-radius:9px;padding:9px 15px;cursor:pointer;text-decoration:none;white-space:nowrap;transition:filter .12s,background .12s}
+  .btn.red{background:var(--red);color:#fff}.btn.red:hover{filter:brightness(.93)}
+  .btn.dark{background:var(--ink);color:#fff}.btn.dark:hover{filter:brightness(1.15)}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{border-color:#d3d8e0}
+  .btn.sm{padding:7px 12px;font-size:12.5px}
+  .content{padding:26px 30px 64px;max-width:1200px;width:100%}
+  .view{display:none}.view.active{display:block;animation:fade .18s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 22px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:17px 18px;box-shadow:var(--shadow)}
+  .kpi .lab{font-size:12px;color:var(--muted);font-weight:600}
+  .kpi .num{font-size:29px;font-weight:800;margin-top:8px;line-height:1;letter-spacing:-.02em}
+  .kpi .sub{font-size:11.5px;color:var(--faint);margin-top:7px}
+  .kpi .num.red{color:var(--red)}.kpi .num.navy{color:var(--navy)}.kpi .num.good{color:var(--good)}
+  .section-h{display:flex;align-items:center;gap:10px;margin:24px 0 13px}
+  .section-h h2{font-size:15px;margin:0;font-weight:800;letter-spacing:-.01em}
+  .section-h .sp{flex:1}
+  .grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
+  @media(max-width:1000px){.grid2{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+  .panel .ph{padding:15px 17px;border-bottom:1px solid var(--line2);font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
+  .panel .pb{padding:7px 8px}
+  .feed-item{display:flex;align-items:center;gap:13px;padding:11px 12px;border-radius:9px}
+  .feed-item:hover{background:var(--line2)}
+  .chip-ch{width:34px;height:34px;flex:0 0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#f3f5f8;color:#7a8291}
+  .chip-ch svg.i{width:16px;height:16px}
+  .feed-item .txt{min-width:0;flex:1}
+  .feed-item .t1{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .feed-item .t2{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.02em;padding:3px 9px 3px 8px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;background:#f3f5f8;color:#5b6472}
+  .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--faint)}
+  .tag.berles::before{background:#3a63b0}.tag.eladas::before{background:#128a63}
+  .tag.import::before{background:#c07a1e}.tag.bizomanyos::before{background:#7a3ea8}
+  .feed-item .when{font-size:11px;color:var(--faint);white-space:nowrap}
+  .board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(236px,1fr);gap:13px;overflow-x:auto;padding:3px 2px 12px}
+  .col{background:var(--line2);border-radius:12px;padding:11px 11px 4px}
+  .col h3{font-size:12px;margin:2px 3px 11px;font-weight:700;color:#6a7280;display:flex;align-items:center;gap:7px}
+  .col h3 .cnt{background:#e4e7ec;border-radius:999px;padding:0 7px;font-size:11px;color:#6a7280}
+  .deal{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:9px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .12s,transform .06s}
+  .deal:hover{border-color:#d3d8e0}
+  .deal:active{transform:scale(.995)}
+  .deal .d1{font-size:13px;font-weight:800}
+  .deal .d2{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.35}
+  .deal .drow{display:flex;align-items:center;gap:8px;margin-top:10px}
+  .deal .drow .chn{color:#9aa2ae}
+  .deal .price{font-size:12.5px;font-weight:800;color:var(--navy);margin-left:auto}
+  .prog{height:4px;border-radius:999px;background:#edf0f4;margin-top:11px;overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--navy);border-radius:999px}
+  .deal .stg{font-size:10.5px;color:var(--faint);margin-top:6px}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;font-size:13px;padding:11px 14px;border-bottom:1px solid var(--line2)}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  tbody tr:last-child td{border-bottom:0}
+  tr:hover td{background:var(--line2)}
+  .desk{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.desk{grid-template-columns:1fr}}
+  .desk .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+  .comps input,.ask input,.fac{font:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;text-align:right;outline:none}
+  .comps input{width:100px;margin:0 6px 6px 0}
+  .result{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:13px}
+  .verdict{font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--faint)}
+  .v-good{color:var(--good)}.v-good .dot{background:var(--good)}
+  .v-warn{color:var(--warn)}.v-warn .dot{background:var(--warn)}
+  .v-bad{color:var(--bad)}.v-bad .dot{background:var(--bad)}
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:12.5px;margin-top:4px}
+  .kv .k{color:var(--muted)}
+  .suggest{margin-top:10px;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .suggest b{color:var(--navy)}
+  .todo{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line2)}
+  .todo input[type=checkbox]{width:16px;height:16px;accent-color:var(--red)}
+  .todo.done .lbl{text-decoration:line-through;color:var(--faint)}
+  .todo .lbl{flex:1;font-size:13.5px}
+  .todo .x{color:var(--faint);cursor:pointer;font-size:16px;line-height:1}
+  .todo .x:hover{color:var(--bad)}
+  .addrow{display:flex;gap:8px;padding:13px}
+  .addrow input{flex:1;font:inherit;font-size:13.5px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;outline:none}
+  .ai-note{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-left:3px solid var(--navy);border-radius:10px;padding:13px 15px;font-size:12.5px;color:#4a5261;line-height:1.5}
+  .ai-note b{color:var(--ink);font-weight:700}
+  .ai-note .ico{color:var(--navy);margin-top:1px}
+  .modal{position:fixed;inset:0;background:rgba(16,18,22,.45);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+  .modal.open{display:flex}
+  .modal .m{background:#fff;border-radius:15px;width:470px;max-width:100%;max-height:90vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.25)}
+  .modal .mh{padding:16px 18px;border-bottom:1px solid var(--line2);font-weight:800;display:flex;align-items:center;font-size:15px}
+  .modal .mh .x{margin-left:auto;cursor:pointer;color:var(--muted);font-size:20px}
+  .modal .mb{padding:16px 18px;display:grid;gap:12px}
+  .fld label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
+  .fld input,.fld select,.fld textarea{width:100%;font:inherit;font-size:13.5px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;outline:none}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .mfoot{padding:14px 18px;border-top:1px solid var(--line2);display:flex;justify-content:flex-end;gap:8px}
+  .hint{font-size:11.5px;color:var(--faint)}
+</style>
+</head>
+<body>
+<aside class="side">
+  <div class="brand">
+    <img src="https://www.caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="fb" style="display:none">Car<span>Advance</span></span>
+  </div>
+  <div class="lbl">Belső irányítópult</div>
+  <nav class="nav" id="nav"></nav>
+  <div class="foot">Bejelentkezve<br><b>info@caradvance.hu</b></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <h1 id="viewTitle">Áttekintés</h1>
+    <div class="search"><input id="globalSearch" type="search" placeholder="Keresés — név, autó, ügy…"></div>
+    <div class="ai" title="Az AI-asszisztens automatikusan feldolgozza az új megkereséseket"><span class="pulse"></span> AI-feldolgozás aktív</div>
+    <button class="btn red" onclick="openAdd()">Új bejegyzés</button>
+  </div>
+  <div class="content">
+    <section class="view active" id="v-overview">
+      <div class="kpis" id="kpis"></div>
+      <div class="ai-note" style="margin-bottom:20px">
+        <span class="ico" id="aiIco"></span>
+        <div><b>AI-asszisztens.</b> Minden új e-mail, chatbot-üzenet és űrlap automatikusan a megfelelő fülre kerül, kategorizálva (üzletág + fázis); eladási megkereséseknél árazási javaslat is készül. Hívás és WhatsApp: az „Új bejegyzés” gombbal rögzíthető.</div>
+      </div>
+      <div class="grid2">
+        <div class="panel"><div class="ph">Beérkező feed <span class="hint" style="margin-left:auto;font-weight:500">minden csatorna</span></div><div class="pb" id="feed"></div></div>
+        <div class="panel"><div class="ph">Fázisok üzletáganként</div><div class="pb" id="pipeSummary" style="padding:15px 17px"></div></div>
+      </div>
+    </section>
+    <section class="view" id="v-eladas">
+      <div class="section-h"><h2>Eladási megkeresések</h2></div>
+      <div class="board" id="board-eladas"></div>
+      <div class="section-h" style="margin-top:26px"><h2>Árazó asztal</h2></div>
+      <div class="ai-note" style="margin-bottom:14px"><span class="ico" id="aiIco2"></span><div>Nyisd meg a versenytárs-találatokat egy kattintással, írd be az árakat — az AI kiszámolja a piaci értéket, a javasolt árat és a becsült eladási időt.</div></div>
+      <div id="deskWrap"></div>
+    </section>
+    <section class="view" id="v-import"><div class="section-h"><h2>Import folyamat</h2></div><div class="board" id="board-import"></div></section>
+    <section class="view" id="v-berles"><div class="section-h"><h2>Bérlési megkeresések</h2></div><div class="board" id="board-berles"></div></section>
+    <section class="view" id="v-bizomanyos"><div class="section-h"><h2>Bizományos értékesítés</h2></div><div class="board" id="board-bizomanyos"></div></section>
+    <section class="view" id="v-teendok">
+      <div class="section-h"><h2>Teendők</h2></div>
+      <div class="panel" style="max-width:640px"><div class="addrow"><input id="todoInput" placeholder="Új teendő… (Enter)"><button class="btn dark sm" onclick="addTodo()">Hozzáad</button></div><div id="todoList"></div></div>
+    </section>
+    <section class="view" id="v-ugyfelek">
+      <div class="section-h"><h2>Ügyfelek</h2></div>
+      <div class="panel"><table><thead><tr><th>Név</th><th>Típus</th><th>Telefon</th><th>E-mail</th><th>Ország</th></tr></thead><tbody id="clientRows"></tbody></table></div>
+    </section>
+  </div>
+</div>
+<div class="modal" id="addModal">
+  <div class="m">
+    <div class="mh">Új bejegyzés <span class="x" onclick="closeAdd()">×</span></div>
+    <div class="mb">
+      <div class="row2">
+        <div class="fld"><label>Csatorna</label><select id="a-ch"><option>Hívás</option><option>WhatsApp</option><option>E-mail</option><option>Chatbot</option><option>Űrlap</option><option>Kézi</option></select></div>
+        <div class="fld"><label>Üzletág</label><select id="a-line"><option>Eladás</option><option>Import</option><option>Bérlés</option><option>Bizományos</option></select></div>
+      </div>
+      <div class="fld"><label>Név</label><input id="a-name" placeholder="Ügyfél neve"></div>
+      <div class="row2">
+        <div class="fld"><label>Telefon</label><input id="a-phone" placeholder="+36…"></div>
+        <div class="fld"><label>E-mail</label><input id="a-email" placeholder="nev@pelda.hu"></div>
+      </div>
+      <div class="fld"><label>Autó</label><input id="a-car" placeholder="pl. BMW X5 2021"></div>
+      <div class="fld"><label>Kért ár / keret (Ft)</label><input id="a-price" inputmode="numeric" placeholder="pl. 18000000"></div>
+      <div class="fld"><label>Megjegyzés</label><textarea id="a-note" rows="2" placeholder="Rövid jegyzet…"></textarea></div>
+      <div class="hint">A bejegyzés a megfelelő fülre kerül. (Éles rendszerben egyben a Notionbe és a feedbe is.)</div>
+    </div>
+    <div class="mfoot"><button class="btn ghost" onclick="closeAdd()">Mégse</button><button class="btn red" onclick="saveAdd()">Mentés</button></div>
+  </div>
+</div>
+<script>
+var P={
+  overview:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+  eladas:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 3 12V4a1 1 0 0 1 1-1h8a2 2 0 0 1 1.4.6l7.2 7.2a2 2 0 0 1 0 2.6z"/><circle cx="7.5" cy="7.5" r="1.2"/>',
+  import:'<path d="M3 17h13V6a1 1 0 0 0-1-1H3z"/><path d="M16 9h3.5L22 12v5h-6"/><circle cx="6.5" cy="18.5" r="1.7"/><circle cx="17.5" cy="18.5" r="1.7"/>',
+  berles:'<circle cx="7.5" cy="15.5" r="3.5"/><path d="m10.5 12.5 7-7"/><path d="m14 6 2 2"/><path d="m17 3 3 3"/>',
+  bizomanyos:'<path d="M7 8H4v9h3"/><path d="M17 16h3V7h-3"/><path d="M7 15l3 2.5a2 2 0 0 0 2.5 0L18 13"/><path d="M17 8s-2-2-4-2-3 1-4 2-2 1-2 1"/>',
+  teendok:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m8 12 3 3 5-6"/>',
+  ugyfelek:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6"/><path d="M17.5 20a5.5 5.5 0 0 0-3-4.9"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+  whatsapp:'<path d="M20.5 11.5a8 8 0 0 1-11.7 7.1L4 20l1.4-4.7A8 8 0 1 1 20.5 11.5z"/>',
+  phone:'<path d="M21 16.5v2.5a2 2 0 0 1-2.2 2 18 18 0 0 1-7.8-2.8 17.5 17.5 0 0 1-5.4-5.4A18 18 0 0 1 2.8 5 2 2 0 0 1 4.8 3H7a2 2 0 0 1 2 1.7c.1.9.3 1.7.6 2.5a2 2 0 0 1-.5 2L8 10.3a14 14 0 0 0 5.7 5.7l1.1-1.1a2 2 0 0 1 2-.5c.8.3 1.6.5 2.5.6A2 2 0 0 1 21 16.5z"/>',
+  chatbot:'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21l4-4"/><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/>',
+  form:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 16h4"/>',
+  kezi:'<path d="M12 20h9"/><path d="M16.5 3.5a2 2 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M18 18l-2.5-2.5M6 18l2.5-2.5M18 6l-2.5 2.5"/>'
+};
+function ic(n){return '<svg class="i" viewBox="0 0 24 24">'+(P[n]||'')+'</svg>';}
+var CH_IC={'E-mail':'mail','WhatsApp':'whatsapp','Hívás':'phone','Chatbot':'chatbot','Űrlap':'form','Kézi':'kezi'};
+var LINES=['Eladás','Import','Bérlés','Bizományos'];
+var STAGES={
+  'Eladás':['Új','Egyeztetés','Ajánlat','Folyamatban','Lezárva – sikeres'],
+  'Import':['Érdeklődés','Igény pontosítva','Autó keresése','Kiválasztva','Megrendelve','Szállítás','Vám / forgalomba','Átadva'],
+  'Bérlés':['Új','Egyeztetés','Ajánlat','Aktív bérlés','Lezárva'],
+  'Bizományos':['Új','Árazás','Bizományba véve','Hirdetve','Eladva']
+};
+var data=[
+  {id:1,line:'Import',stage:'Igény pontosítva',ch:'E-mail',name:'Szabó Gábor',phone:'+36 30 555 1234',email:'szabo.gabor@example.com',car:'BMW M3 Touring 2023 Competition',price:32000000,note:'Németországból importálná, 30–40e km, szürke.',when:'2 órája'},
+  {id:2,line:'Eladás',stage:'Új',ch:'Űrlap',name:'Kovács Péter',phone:'+36 30 111 2233',email:'kovacs.peter@example.com',car:'BMW X5 xDrive30d 2021, 86 000 km',price:18500000,note:'Vezetett szervizkönyv, M-sport, panoráma.',when:'4 órája'},
+  {id:3,line:'Bérlés',stage:'Ajánlat',ch:'WhatsApp',name:'Tóth Kft.',phone:'+36 20 444 5566',email:'',car:'BMW X6 – hosszú távú bérlés',price:0,note:'2000 km/hó, 12 hónap.',when:'tegnap'},
+  {id:4,line:'Bizományos',stage:'Bizományba véve',ch:'Hívás',name:'Nagy Anna',phone:'+36 20 777 8899',email:'',car:'Audi A6 Avant 2019',price:11500000,note:'Bizományba adná, jótékony ügy: állatmenhely.',when:'tegnap'},
+  {id:5,line:'Import',stage:'Érdeklődés',ch:'Chatbot',name:'Kis Balázs',phone:'',email:'kis.balazs@example.com',car:'Porsche Macan GTS',price:28000000,note:'Chatbotból jött, árat kért.',when:'ma reggel'},
+  {id:6,line:'Eladás',stage:'Ajánlat',ch:'E-mail',name:'Horváth Éva',phone:'+36 70 222 3311',email:'horvath.eva@example.com',car:'Mercedes GLC 2020',price:14900000,note:'Árajánlatot vár.',when:'ma'}
+];
+var clients=[
+  {name:'Szabó Gábor',type:'Import',phone:'+36 30 555 1234',email:'szabo.gabor@example.com',country:'Magyarország'},
+  {name:'Kovács Péter',type:'Eladó',phone:'+36 30 111 2233',email:'kovacs.peter@example.com',country:'Magyarország'},
+  {name:'Tóth Kft.',type:'Bérlő',phone:'+36 20 444 5566',email:'',country:'Magyarország'},
+  {name:'Nagy Anna',type:'Eladó',phone:'+36 20 777 8899',email:'',country:'Magyarország'}
+];
+var todos=[{t:'Szabó Gábor – M3 Touring ajánlat összeállítása',done:false},{t:'Kovács Péter X5 – árazás véglegesítése',done:false},{t:'Tóth Kft. bérleti szerződés kiküldése',done:true}];
+var NAV=[['overview','Áttekintés'],['eladas','Eladás'],['import','Import'],['berles','Bérlés'],['bizomanyos','Bizományos'],['teendok','Teendők'],['ugyfelek','Ügyfelek']];
+document.getElementById('nav').innerHTML=NAV.map(function(n,i){
+  var b=['eladas','import','berles','bizomanyos'].indexOf(n[0])>=0?'<span class="badge" data-badge="'+n[1]+'"></span>':'';
+  return '<a data-v="'+n[0]+'" class="'+(i===0?'active':'')+'">'+ic(n[0])+' <span>'+n[1]+'</span>'+b+'</a>';
+}).join('');
+document.getElementById('aiIco').innerHTML=ic('spark');
+document.getElementById('aiIco2').innerHTML=ic('spark');
+function ft(n){return n?Math.round(n).toLocaleString('hu-HU')+' Ft':'—';}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function slug(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function lineClass(l){return {'Eladás':'eladas','Import':'import','Bérlés':'berles','Bizományos':'bizomanyos'}[l];}
+function huLink(car){var p=(car||'').split(/\s+/);var mk=p[0]||'',md=p[1]||'';if(!mk)return null;var u='https://www.hasznaltauto.hu/szemelyauto/'+slug(mk);if(md)u+='/'+slug(md);return u;}
+function mobLink(car){var q=(car||'').split(',')[0];if(!q)return null;return 'https://suchen.mobile.de/fahrzeuge/search.html?dam=false&isSearchRequest=true&ref=quickSearch&s=Car&sb=rel&vc=Car&q='+encodeURIComponent(q);}
+function go(v){
+  document.querySelectorAll('.nav a').forEach(function(a){a.classList.toggle('active',a.dataset.v===v);});
+  document.querySelectorAll('.view').forEach(function(s){s.classList.toggle('active',s.id==='v-'+v);});
+  var t={overview:'Áttekintés',eladas:'Eladás',import:'Import',berles:'Bérlés',bizomanyos:'Bizományos',teendok:'Teendők',ugyfelek:'Ügyfelek'};
+  document.getElementById('viewTitle').textContent=t[v];
+}
+document.getElementById('nav').addEventListener('click',function(e){var a=e.target.closest('a[data-v]');if(a)go(a.dataset.v);});
+function renderKpis(){
+  var open=data.filter(function(d){return !/Lezárva|Átadva|Eladva/.test(d.stage);}).length;
+  var offer=data.filter(function(d){return d.stage==='Ajánlat';}).length;
+  var imp=data.filter(function(d){return d.line==='Import'&&!/Átadva/.test(d.stage);}).length;
+  document.getElementById('kpis').innerHTML=[
+    ['Nyitott megkeresés',open,'red','minden üzletág'],
+    ['Ajánlatra vár',offer,'navy','sürgős'],
+    ['Import folyamatban',imp,'navy','aktív ügyek'],
+    ['Lezárt e hónapban',3,'good','+1 az előző héthez']
+  ].map(function(k){return '<div class="kpi"><div class="lab">'+k[0]+'</div><div class="num '+k[2]+'">'+k[1]+'</div><div class="sub">'+k[3]+'</div></div>';}).join('');
+}
+function renderFeed(){
+  var q=(document.getElementById('globalSearch').value||'').toLowerCase();
+  var rows=data.filter(function(d){return !q||(d.name+' '+d.car+' '+d.line).toLowerCase().indexOf(q)>=0;});
+  document.getElementById('feed').innerHTML=rows.map(function(d){
+    return '<div class="feed-item"><div class="chip-ch" title="'+esc(d.ch)+'">'+ic(CH_IC[d.ch]||'kezi')+'</div>'
+      +'<div class="txt"><div class="t1">'+esc(d.name)+' — '+esc(d.car)+'</div><div class="t2">'+esc(d.note||'')+'</div></div>'
+      +'<span class="tag '+lineClass(d.line)+'">'+d.line+'</span><span class="when">'+esc(d.when)+'</span></div>';
+  }).join('')||'<div style="padding:16px;color:#8a93a2">Nincs találat.</div>';
+}
+function renderPipeSummary(){
+  document.getElementById('pipeSummary').innerHTML=LINES.map(function(l){
+    var items=data.filter(function(d){return d.line===l;}),by={};items.forEach(function(d){by[d.stage]=(by[d.stage]||0)+1;});
+    var chips=STAGES[l].map(function(s){var n=by[s]||0;return '<span style="font-size:11px;padding:2px 8px;border-radius:999px;background:'+(n?'#eef3fb':'#f3f5f8')+';color:'+(n?'#22447d':'#aab1bd')+';font-weight:600">'+s+' '+n+'</span>';}).join(' ');
+    return '<div style="margin-bottom:15px"><div style="margin-bottom:7px"><span class="tag '+lineClass(l)+'">'+l+'</span></div><div style="display:flex;flex-wrap:wrap;gap:6px">'+chips+'</div></div>';
+  }).join('');
+}
+function dealCard(d){
+  var st=STAGES[d.line],idx=st.indexOf(d.stage),prog=Math.round((idx+1)/st.length*100);
+  return '<div class="deal" onclick="if(\''+d.line+'\'===\'Eladás\'){go(\'eladas\');loadDesk('+d.id+');}">'
+    +'<div class="d1">'+esc(d.name)+'</div><div class="d2">'+esc(d.car)+'</div>'
+    +'<div class="drow"><span class="chn">'+ic(CH_IC[d.ch]||'kezi')+'</span>'+(d.price?'<span class="price">'+ft(d.price)+'</span>':'')+'</div>'
+    +'<div class="prog"><i style="width:'+prog+'%"></i></div><div class="stg">'+(idx+1)+'/'+st.length+' · '+esc(d.stage)+'</div></div>';
+}
+function renderBoard(line){
+  var el=document.getElementById('board-'+lineClass(line));if(!el)return;
+  el.innerHTML=STAGES[line].map(function(s){
+    var items=data.filter(function(d){return d.line===line&&d.stage===s;});
+    return '<div class="col"><h3>'+s+' <span class="cnt">'+items.length+'</span></h3>'+items.map(dealCard).join('')+'</div>';
+  }).join('');
+}
+function renderClients(){
+  document.getElementById('clientRows').innerHTML=clients.map(function(c){
+    var lc=c.type==='Eladó'?'eladas':c.type==='Bérlő'?'berles':c.type==='Import'?'import':'bizomanyos';
+    return '<tr><td><b>'+esc(c.name)+'</b></td><td><span class="tag '+lc+'">'+esc(c.type)+'</span></td><td>'+esc(c.phone||'—')+'</td><td>'+esc(c.email||'—')+'</td><td>'+esc(c.country)+'</td></tr>';
+  }).join('');
+}
+function renderTodos(){
+  document.getElementById('todoList').innerHTML=todos.map(function(t,i){
+    return '<div class="todo '+(t.done?'done':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="todos['+i+'].done=this.checked;renderTodos()"><span class="lbl">'+esc(t.t)+'</span><span class="x" onclick="todos.splice('+i+',1);renderTodos()">×</span></div>';
+  }).join('')||'<div style="padding:14px;color:#8a93a2">Nincs teendő.</div>';
+}
+function renderBadges(){document.querySelectorAll('[data-badge]').forEach(function(b){var l=b.getAttribute('data-badge'),n=data.filter(function(d){return d.line===l&&!/Lezárva|Átadva|Eladva/.test(d.stage);}).length;b.textContent=n;b.style.display=n?'':'none';});}
+function loadDesk(id){
+  var d=data.find(function(x){return x.id===id;})||data.find(function(x){return x.line==='Eladás';});
+  var hu=huLink(d.car),mob=mobLink(d.car);
+  document.getElementById('deskWrap').innerHTML=
+    '<div class="desk"><div class="box"><div style="font-weight:800;margin-bottom:6px">'+esc(d.name)+' — '+esc(d.car)+'</div>'
+    +'<div class="hint" style="margin-bottom:12px">Kért ár: <b style="color:#22447d">'+ft(d.price)+'</b></div>'
+    +(hu?'<a class="btn dark sm" target="_blank" href="'+hu+'">Használtautó.hu ↗</a> ':'')
+    +(mob?'<a class="btn dark sm" target="_blank" href="'+mob+'">mobile.de ↗</a>':'')
+    +'<div style="margin-top:15px;font-size:12px;color:#8a93a2">Versenytárs-árak (Ft):</div>'
+    +'<div class="comps" style="margin-top:7px">'+[1,2,3,4,5].map(function(){return '<input inputmode="numeric" placeholder="ár" oninput="recalc()">';}).join('')+'</div>'
+    +'<div style="font-size:12px;color:#8a93a2">Piaci korrekció: <input class="fac" style="width:60px" value="0.93" oninput="recalc()"> ×</div></div>'
+    +'<div class="box"><div class="result"><div class="verdict"><span class="dot"></span><span class="vtext">Add meg a versenytárs-árakat…</span></div>'
+    +'<div class="kv"><div><span class="k">Medián</span><br><b class="s-med">–</b></div><div><span class="k">Reális érték</span><br><b class="s-real">–</b></div><div><span class="k">Ügyfél ára</span><br><b>'+ft(d.price)+'</b></div><div><span class="k">Minta</span><br><b class="s-n">0</b></div></div>'
+    +'<div class="suggest">Javasolt ár: <b class="s-suggest">–</b> · Becsült eladási idő: <b class="s-time">–</b></div></div>'
+    +'<button class="btn red sm" style="margin-top:12px" onclick="alert(\'Éles rendszerben: AI árajánlat e-mail az ügyfélnek.\')">AI árajánlat készítése</button></div></div>';
+  window.__ask=d.price;recalc();
+}
+function median(a){if(!a.length)return NaN;a=a.slice().sort(function(x,y){return x-y;});var m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2;}
+function recalc(){
+  var w=document.getElementById('deskWrap');if(!w.querySelector('.comps'))return;
+  var comps=[].slice.call(w.querySelectorAll('.comps input')).map(function(i){return parseInt((i.value||'').replace(/\D/g,''),10);}).filter(function(n){return n>0;});
+  var fac=parseFloat((w.querySelector('.fac').value||'').replace(',','.'))||0.93;
+  var med=median(comps),real=med*fac,ask=window.__ask||0;
+  w.querySelector('.s-med').textContent=isNaN(med)?'–':ft(med);
+  w.querySelector('.s-real').textContent=isNaN(real)?'–':ft(real);
+  w.querySelector('.s-n').textContent=comps.length;
+  var sug=isNaN(real)?NaN:Math.round(real*1.04/10000)*10000;
+  w.querySelector('.s-suggest').textContent=isNaN(sug)?'–':ft(sug);
+  var ve=w.querySelector('.verdict'),vt=w.querySelector('.vtext'),te=w.querySelector('.s-time');ve.className='verdict';
+  if(isNaN(real)||!ask){vt.textContent=comps.length?'Nincs ügyfélár':'Add meg a versenytárs-árakat…';te.textContent='–';return;}
+  var r=ask/real;te.textContent=r<=0.95?'~1–3 hét':r<=1.05?'~4–6 hét':r<=1.15?'~7–10 hét':'10+ hét';
+  if(r<=1.02){ve.classList.add('v-good');vt.textContent='Jó ár — gyorsan eladható';}
+  else if(r<=1.10){ve.classList.add('v-warn');vt.textContent='Kissé magas';}
+  else{ve.classList.add('v-bad');vt.textContent='Túlárazott';}
+}
+function openAdd(){document.getElementById('addModal').classList.add('open');}
+function closeAdd(){document.getElementById('addModal').classList.remove('open');}
+function saveAdd(){
+  var g=function(id){return document.getElementById(id).value;};var line=g('a-line');
+  data.unshift({id:Date.now(),line:line,stage:STAGES[line][0],ch:g('a-ch'),name:g('a-name')||'Névtelen',phone:g('a-phone'),email:g('a-email'),car:g('a-car'),price:parseInt((g('a-price')||'').replace(/\D/g,''),10)||0,note:g('a-note'),when:'most'});
+  ['a-name','a-phone','a-email','a-car','a-price','a-note'].forEach(function(id){document.getElementById(id).value='';});
+  closeAdd();renderAll();go(lineClass(line));
+}
+function addTodo(){var v=document.getElementById('todoInput').value.trim();if(!v)return;todos.push({t:v,done:false});document.getElementById('todoInput').value='';renderTodos();}
+document.getElementById('todoInput').addEventListener('keydown',function(e){if(e.key==='Enter')addTodo();});
+document.getElementById('globalSearch').addEventListener('input',renderFeed);
+function renderAll(){renderKpis();renderFeed();renderPipeSummary();renderBadges();LINES.forEach(renderBoard);renderClients();renderTodos();loadDesk();}
+renderAll();
+</script>
+</body>
+</html>
