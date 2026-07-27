@@ -494,6 +494,24 @@ const faqJsonld = {
   ['b-model','b-year-from','b-year-to','b-km-from','b-km-to','b-fuel','b-budget','b-cur'].forEach(function(id){
     var e=document.getElementById(id); if(e) e.addEventListener('input', updateCompare); if(e) e.addEventListener('change', updateCompare);
   });
+
+  // Range constraints: "ig" >= "tól" (and vice versa) for évjárat and km
+  function onFromChange(fromId,toId){
+    var f=document.getElementById(fromId), t=document.getElementById(toId); if(!f||!t) return;
+    var fv=f.value?Number(f.value):null;
+    [].slice.call(t.options).forEach(function(o){ if(o.value==='') return; var bad=(fv!=null && Number(o.value)<fv); o.hidden=bad; o.disabled=bad; });
+    if(fv!=null && t.value && Number(t.value)<fv) t.value='';
+  }
+  function onToChange(fromId,toId){
+    var f=document.getElementById(fromId), t=document.getElementById(toId); if(!f||!t) return;
+    var tv=t.value?Number(t.value):null;
+    [].slice.call(f.options).forEach(function(o){ if(o.value==='') return; var bad=(tv!=null && Number(o.value)>tv); o.hidden=bad; o.disabled=bad; });
+    if(tv!=null && f.value && Number(f.value)>tv) f.value='';
+  }
+  var yf2=document.getElementById('b-year-from'); if(yf2) yf2.addEventListener('change',function(){ onFromChange('b-year-from','b-year-to'); });
+  var yt2=document.getElementById('b-year-to'); if(yt2) yt2.addEventListener('change',function(){ onToChange('b-year-from','b-year-to'); });
+  var kf2=document.getElementById('b-km-from'); if(kf2) kf2.addEventListener('change',function(){ onFromChange('b-km-from','b-km-to'); });
+  var kt2=document.getElementById('b-km-to'); if(kt2) kt2.addEventListener('change',function(){ onToChange('b-km-from','b-km-to'); });
   fetch('https://open.er-api.com/v6/latest/EUR').then(function(r){return r.json();}).then(function(d){ if(d&&d.rates&&d.rates.HUF) EURHUF=d.rates.HUF; updateCompare(); }).catch(function(){ updateCompare(); });
 
   // thousand separators
