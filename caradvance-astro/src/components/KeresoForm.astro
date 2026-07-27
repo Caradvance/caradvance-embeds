@@ -73,10 +73,10 @@ const faqJsonld = {
             <select id="b-year-to"><option value="" selected>Mindegy</option>{years.map((y) => <option>{y}</option>)}</select>
           </label>
           <label class="sf-field"><span>Futásteljesítmény — tól (km)</span>
-            <input id="b-km-from" type="number" min="0" step="1000" placeholder="pl. 0" />
+            <select id="b-km-from"><option value="">Mindegy</option><option value="5000">5 000 km</option><option value="10000">10 000 km</option><option value="20000">20 000 km</option><option value="30000">30 000 km</option><option value="40000">40 000 km</option><option value="50000">50 000 km</option><option value="60000">60 000 km</option><option value="70000">70 000 km</option><option value="80000">80 000 km</option><option value="90000">90 000 km</option><option value="100000">100 000 km</option><option value="125000">125 000 km</option><option value="150000">150 000 km</option><option value="175000">175 000 km</option><option value="200000">200 000 km</option></select>
           </label>
           <label class="sf-field"><span>Futásteljesítmény — ig (km)</span>
-            <input id="b-km-to" type="number" min="0" step="1000" placeholder="pl. 60000" />
+            <select id="b-km-to"><option value="">Mindegy</option><option value="5000">5 000 km</option><option value="10000">10 000 km</option><option value="20000">20 000 km</option><option value="30000">30 000 km</option><option value="40000">40 000 km</option><option value="50000">50 000 km</option><option value="60000">60 000 km</option><option value="70000">70 000 km</option><option value="80000">80 000 km</option><option value="90000">90 000 km</option><option value="100000">100 000 km</option><option value="125000">125 000 km</option><option value="150000">150 000 km</option><option value="175000">175 000 km</option><option value="200000">200 000 km</option></select>
           </label>
         </div>
         <div class="sf-grid">
@@ -365,6 +365,13 @@ const faqJsonld = {
     if(!n) return 0;
     return cur === '€' ? n : Math.round(n / EURHUF);
   };
+  var MOBILE_MAKE = {"Abarth":"140","Alfa Romeo":"900","Aston Martin":"1700","Audi":"1900","Bentley":"3100","BMW":"3500","BYD":"31953","Cadillac":"4700","Chevrolet":"5600","Chrysler":"5700","Citroën":"5900","Cupra":"3","Dacia":"6600","Dodge":"7700","DS":"235","Ferrari":"8600","Fiat":"8800","Ford":"9000","Honda":"11000","Hyundai":"11600","Infiniti":"11650","Isuzu":"11900","Jaguar":"12400","Jeep":"12600","Kia":"13200","Lada":"14400","Lamborghini":"14600","Lancia":"14700","Land Rover":"14800","Lexus":"15200","Maserati":"16600","Mazda":"16800","Mercedes-Benz":"17200","MG":"17300","Mini":"17500","Mitsubishi":"17700","Nissan":"18700","Opel":"19000","Peugeot":"19300","Porsche":"20100","Range Rover":"14800","Renault":"20700","Rover":"21700","Saab":"21800","SEAT":"22500","Škoda":"22900","Smart":"23000","Subaru":"23500","Suzuki":"23600","Tesla":"135","Toyota":"24100","Volkswagen":"25200","Volvo":"25100"};
+  var MOBILE_MODEL = {
+    "BMW":{"114":"73","116":"2","118":"3","120":"4","123":"59","125":"61","128":"328","130":"5","135":"58","216":"106","218":"90","220":"84","225":"91","228":"104","230":"125","316":"8","318":"9","320":"10","323":"11","325":"13","328":"14","330":"15","335":"56","340":"118","418":"115","420":"80","425":"102","428":"81","430":"83","435":"82","440":"120","518":"16","520":"17","523":"18","525":"20","528":"21","530":"22","535":"23","540":"24","545":"25","550":"26","628":"27","630":"28","635":"30","640":"68","645":"31","650":"32","725":"33","728":"34","730":"35","735":"37","740":"38","745":"39","750":"40","760":"41","840":"42","850":"43","X1":"6","X2":"129","X3":"48","X4":"92","X5":"49","X6":"60","X7":"143","XM":"338","Z1":"50","Z3":"51","Z4":"52","Z8":"54","i3":"79","i4":"330","i5":"341","i7":"336","i8":"89","iX":"331","iX1":"337","iX3":"329","M2":"117","M3":"45","M4":"93","M5":"46","M8":"154","M135":"69","M235":"85","M440":"335","M550":"86","X3 M":"145","X4 M":"146","X5 M":"53","X6 M":"62"},
+    "Audi":{"80":"5","90":"6","100":"2","200":"3","A1":"25","A2":"7","A3":"8","A4":"9","A4 Allroad":"33","A5":"31","A6":"10","A6 Allroad":"12","A7":"34","A8":"11","Q2":"45","Q3":"37","Q4 e-tron":"61","Q5":"32","Q7":"15","Q8":"46","TT":"23","TTS":"4","TT RS":"35","R8":"29","e-tron":"50","e-tron GT":"58","Q8 e-tron":"65","S1":"42","S3":"19","S4":"20","S5":"30","S6":"21","S7":"38","S8":"22","SQ5":"39","SQ7":"44","SQ8":"54","RS3":"36","RS4":"27","RS5":"17","RS6":"28","RS7":"40"},
+    "Volkswagen":{"up!":"11","Fox":"13","Lupo":"21","Polo":"27","Golf":"14","Golf Plus":"55","Golf Sportsvan":"40","Scirocco":"29","Beetle":"10","New Beetle":"24","Jetta":"16","Bora":"6","Passat":"25","Passat CC":"4","CC":"19","Arteon":"64","Phaeton":"26","Eos":"41","T-Cross":"75","T-Roc":"65","Taigo":"86","Tiguan":"54","Tiguan Allspace":"66","Touareg":"36","Touran":"37","Sharan":"30","Caddy":"9","Amarok":"5","ID.3":"81","ID.4":"82","ID.5":"93","ID.7":"97","ID. Buzz":"94"},
+    "Porsche":{"Cayman":"19","Boxster":"16","Cayenne":"18","Macan":"22","Panamera":"4","Taycan":"30","924":"10","928":"11","944":"12","968":"15"}
+  };
   var updateCompare = function(){
     var mk = val('b-make'); if(mk==='Egyéb') mk='';
     var md = val('b-model'); if(md.indexOf('Egyéb')===0) md='';
@@ -376,16 +383,21 @@ const faqJsonld = {
     // mobile.de
     var mo = document.getElementById('cmp-mobile');
     if(mo){
-      var mp = 'https://suchen.mobile.de/fahrzeuge/search.html?dam=false&isSearchRequest=true&ref=quickSearch&s=Car&sb=rel&vc=Car';
-      var q = ((mk?mk:'')+' '+(md?md:'')).trim();
-      if(q) mp += '&q=' + encodeURIComponent(q);
-      if(yf) mp += '&minFirstRegistrationDate=' + yf + '-01-01';
-      if(yt) mp += '&maxFirstRegistrationDate=' + yt + '-12-31';
-      if(kf) mp += '&minMileage=' + kf;
-      if(kt) mp += '&maxMileage=' + kt;
-      if(budgetEur) mp += '&maxPrice=' + budgetEur;
+      var mp = 'https://suchen.mobile.de/fahrzeuge/search.html?dam=false&isSearchRequest=true&s=Car&vc=Car';
+      var mkRaw = val('b-make');
+      var makeId = MOBILE_MAKE[mkRaw];
+      if(makeId){
+        var modelId = (MOBILE_MODEL[mkRaw]||{})[md] || '';
+        mp += '&ms=' + makeId + '%3B' + modelId + '%3B%3B';
+      } else {
+        var q = ((mk?mk:'')+' '+(md?md:'')).trim();
+        if(q) mp += '&q=' + encodeURIComponent(q);
+      }
+      if(yf||yt) mp += '&fr=' + (yf||'') + '%3A' + (yt||'');
+      if(kf||kt) mp += '&ml=' + (kf||'') + '%3A' + (kt||'');
       var fm = {'Benzin':'PETROL','Dízel':'DIESEL','Hibrid':'HYBRID','Plug-in hibrid':'HYBRID_PLUGIN','Elektromos':'ELECTRICITY','LPG/Benzin':'LPG'};
-      if(fm[fuel]) mp += '&fuels=' + fm[fuel];
+      if(fm[fuel]) mp += '&ft=' + fm[fuel];
+      if(budgetEur) mp += '&p=%3A' + budgetEur;
       mo.href = mp;
     }
     // AutoScout24
