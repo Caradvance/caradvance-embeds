@@ -311,7 +311,7 @@ function parseCSV(t) {
 
 async function getRate() {
   const apis = [
-    ["https://api.frankfurter.app/latest?from=EUR&to=HUF", (d) => d?.rates?.HUF],
+    ["https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF", (d) => d?.rates?.HUF],
     ["https://open.er-api.com/v6/latest/EUR", (d) => d?.rates?.HUF],
   ];
   for (const [url, pick] of apis) {
@@ -467,7 +467,7 @@ function up(e){var eur=+e.getAttribute('data-eur')||0,net=+e.getAttribute('data-
  var cE=e.querySelector('[data-cross]'); if(cE&&save>0)cE.textContent=f(gross);
  var sE=e.querySelector('[data-save]'); if(sE&&save>0)sE.textContent='−'+f(save);}
 function all(){document.querySelectorAll('[data-eur]').forEach(up);}
-fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
+fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-store'})
  .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();var rv=document.getElementById('ratev');if(rv)rv.textContent=R;}}).catch(function(){});
 })();
 </script>`;
