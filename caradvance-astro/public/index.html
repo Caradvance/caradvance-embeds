@@ -134,7 +134,7 @@ img{max-width:100%}
 .autok-tab{border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;color:var(--ink);padding:10px 20px;border-radius:999px;cursor:pointer;transition:.2s}
 .autok-tab.on{background:var(--navy);color:#fff}
 .autok-tab:not(.on):hover{background:#F0F3F8}
-.autok-panel{display:none}.autok-panel.on{display:block}
+.autok-panel{display:none}.autok-panel.on{display:block}.cw{position:relative;margin:10px auto 0;min-height:440px;max-width:1140px}.cw-track{position:relative;height:100%;min-height:440px}.cw-item{position:absolute;top:0;left:50%;width:min(360px,86vw);transition:transform .45s cubic-bezier(.22,.61,.36,1),opacity .45s;will-change:transform,opacity}.cw-item .card{margin:0}.cw-arrow{position:absolute;top:40%;transform:translateY(-50%);z-index:300;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:#fff;box-shadow:0 10px 26px rgba(8,8,10,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;color:var(--navy);transition:.15s}.cw-arrow:hover{background:var(--navy);color:#fff}.cw-prev{left:1%}.cw-next{right:1%}@media(max-width:560px){.cw-item{width:86vw}.cw-arrow{width:40px;height:40px;font-size:22px;top:36%}}
 .autok-more{text-align:center;margin-top:24px}
 .rate-note{margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center}
 
@@ -369,26 +369,9 @@ html.ca-ok #ca-gate{display:none}
       <button class="autok-tab on" data-tab="elado" type="button">Eladó</button><button class="autok-tab" data-tab="bizomanyos" type="button">Bizományos</button>
     </div>
   </div>
-  <div class="autok-panel on" id="panel-elado">
-    <div class="grid"><a class="card" href="/auto/bmw-x5-xdrive30d-m-sport-pro-panorama-22-m-lm-head-up-afas/"><div class="media"><img src="https://img.hasznaltautocdn.com/2048x1536/23351824/29222239.jpg" alt="BMW X5 xDrive30d M Sport Pro Panoráma 22 M LM Head-Up ÁFÁS" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="feat">Kiemelt</span></div>
-  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">05/2025</span></div>
-  <h3 class="title">BMW X5 xDrive30d M Sport Pro Panoráma 22 M LM Head-Up ÁFÁS</h3>
-  <div class="specs">15 800 km · 298 LE · Automata · Dízel</div>
-  <div class="pricerow" data-eur="70035" data-net="70035"><span class="price" data-main>25 360 000 Ft</span><span class="peur">70 035 €</span></div>
-  <span class="cbtn">Részletek</span></div></a><a class="card" href="/auto/bmw-x2-xdrive20d-m-sport-pro-20-h-k/"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/0e/0ec9c853-8245-4d9f-8cbd-b8220e7db89e?rule=mo-1600" alt="BMW X2 xDrive20d M Sport Pro &quot;20&quot; H&amp;K" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="feat">Kiemelt</span></div>
-  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">11/2025</span></div>
-  <h3 class="title">BMW X2 xDrive20d M Sport Pro &quot;20&quot; H&amp;K</h3>
-  <div class="specs">17.900 km · 163 LE · Automata · Dízel</div>
-  <div class="pricerow" data-eur="43277" data-net="43277"><span class="price" data-main>15 670 000 Ft</span><span class="peur">43 277 €</span></div>
-  <span class="cbtn">Részletek</span></div></a><a class="card" href="/auto/porsche-911-carrera-gts-approved-3-jahre-voll-leder/"><div class="media"><img src="https://img.classistatic.de/api/v1/mo-prod/images/75/7544b234-738e-482f-842a-32ba0b12a195?rule=mo-1600" alt="Porsche 911 Carrera GTS APPROVED*3*JAHRE/ VOLL LEDER" loading="lazy" referrerpolicy="no-referrer"><span class="ph" style="display:none">fotó hamarosan</span><span class="feat">Kiemelt</span></div>
-  <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">12/2023</span></div>
-  <h3 class="title">Porsche 911 Carrera GTS APPROVED*3*JAHRE/ VOLL LEDER</h3>
-  <div class="specs">19.000 km · 480 LE · Automata · Benzin</div>
-  <div class="pricerow" data-eur="136134" data-net="136134"><span class="price" data-main>49 290 000 Ft</span><span class="peur">136 134 €</span></div>
-  <span class="cbtn">Részletek</span></div></a></div>
-    <div class="autok-more"><a class="btn btn-red" href="/autoink/">Összes eladó autónk →</a></div>
-  </div><div class="autok-panel" id="panel-bizomanyos"><div class="grid" id="biz-home-grid"></div><div class="autok-more"><a class="btn btn-red" href="/bizomanyos">Összes bizományos autónk →</a></div></div>
-  <div class="autok-panel" id="panel-berelheto"><div class="grid" id="rent-home-grid"></div><div class="autok-more"><a class="btn btn-red" href="/berelheto">Összes bérelhető autónk →</a></div></div>
+  <div class="autok-panel on" id="panel-elado"><div class="cw" id="cw-elado"><button class="cw-arrow cw-prev" type="button" aria-label="Előző">‹</button><div class="cw-track"></div><button class="cw-arrow cw-next" type="button" aria-label="Következő">›</button></div><div class="autok-more"><a class="btn btn-red" href="/autoink/">Összes eladó autónk →</a></div></div>
+  <div class="autok-panel" id="panel-berelheto"><div class="cw" id="cw-berelheto"><button class="cw-arrow cw-prev" type="button" aria-label="Előző">‹</button><div class="cw-track"></div><button class="cw-arrow cw-next" type="button" aria-label="Következő">›</button></div><div class="autok-more"><a class="btn btn-red" href="/berelheto">Összes bérelhető autónk →</a></div></div>
+  <div class="autok-panel" id="panel-bizomanyos"><div class="cw" id="cw-bizomanyos"><button class="cw-arrow cw-prev" type="button" aria-label="Előző">‹</button><div class="cw-track"></div><button class="cw-arrow cw-next" type="button" aria-label="Következő">›</button></div><div class="autok-more"><a class="btn btn-red" href="/bizomanyos">Összes bizományos autónk →</a></div></div>
   <div class="rate-note">A feltüntetett árak nettó árak (áfa nélkül). A forint árak élő árfolyammal számolódnak, óránként frissülnek (1 € = <span id="ratev">362</span> Ft).</div>
 </section>
 <div class="cah">
@@ -621,4 +604,80 @@ fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
   if(window.RENT) init(); else { var iv=setInterval(function(){ if(window.RENT){clearInterval(iv);init();} },60); setTimeout(function(){clearInterval(iv);},6000); }
 })();
 </script><script>(function(){var w=document.querySelector('.ca-navwrap');if(!w)return;/*click-to-open*/w.querySelectorAll('.menu .navitem .navlink').forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var li=b.closest('.navitem');var o=li.classList.contains('open');w.querySelectorAll('.menu .navitem').forEach(function(x){x.classList.remove('open');});if(!o)li.classList.add('open');});});document.addEventListener('click',function(){w.querySelectorAll('.menu .navitem').forEach(function(x){x.classList.remove('open');});});})();</script>
+<script>
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  var RATE=362;
+  function keyDate(c){var s=String(c.hozzaadva||'').slice(0,10).replace(/[^0-9]/g,'');if(s)return s;var m=String(c.evjarat||'').match(/(\d{4})/);return m?m[1]:'0';}
+  function newest(a,b){return keyDate(b).localeCompare(keyDate(a));}
+  function pick(cars,flags){ if(!flags) return cars.slice(0,6); var k=cars.filter(function(c){return c.kiemelt;}); var r=cars.filter(function(c){return !c.kiemelt;}).sort(newest); return k.concat(r).slice(0,6); }
+  function chosen(p,ft){var B=window.BIZ;return '<div class="bb-c"><span class="bd-logo'+(p.blue?' blue':'')+'"><img src="'+esc(p.logo)+'" alt=""></span><span class="bb-cn">'+esc(p.name)+'</span><b class="bb-ca">~'+esc(B.fmtFt(ft))+'</b></div>';}
+
+  function saleCard(c){var R=window.RENT,slug=R.slugify(c.modell);var huf=Math.ceil(c.eur*RATE/10000)*10000;
+    var media=c.img?'<img src="'+esc(c.img)+'" alt="'+esc(c.modell)+'" loading="lazy" referrerpolicy="no-referrer">':'<span class="ph">fotó hamarosan</span>';
+    var specs=[c.km,c.teljesitmeny,c.valto,c.uzemanyag].filter(Boolean).join(' · ');
+    return '<div class="cw-item"><a class="card" href="/auto/'+slug+'/"><div class="media">'+media+'<span class="feat">Kiemelt</span></div>'
+      +'<div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">'+esc(c.evjarat)+'</span></div>'
+      +'<h3 class="title">'+esc(c.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
+      +'<div class="pricerow"><span class="price">'+esc(R.fmtFt(huf))+'</span><span class="peur">'+Math.round(c.eur).toLocaleString('hu-HU')+' €</span></div>'
+      +'<span class="cbtn">Részletek</span></div></a></div>';}
+
+  function rentCard(c){var R=window.RENT,slug=R.slugify(c.modell),ft=R.ftOf(c.rent.price),kft=R.ftOf(c.rent.kaution);
+    var media=c.img?'<img src="'+esc(c.img)+'" alt="'+esc(c.modell)+'" loading="lazy" referrerpolicy="no-referrer">':'<span class="ph">fotó hamarosan</span>';
+    var specs=[c.km,c.teljesitmeny,c.valto,c.uzemanyag].filter(Boolean).join(' · ');
+    return '<div class="cw-item"><a class="card" href="/auto/'+slug+'/?rent=1"><div class="media">'+media+'<span class="feat">Kiemelt</span></div>'
+      +'<div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">'+esc(c.evjarat)+'</span></div>'
+      +'<h3 class="title">'+esc(c.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
+      +'<div class="rentrow"><span class="rprice">'+esc(R.fmtFt(ft))+'<small> /hó</small></span><span class="reur">'+c.rent.price.toLocaleString('hu-HU')+' € /hó</span></div>'
+      +'<div class="kaucio">Kaució: <b>'+esc(R.fmtFt(kft))+'</b> · '+c.rent.kaution.toLocaleString('hu-HU')+' €</div></div></a></div>';}
+
+  function bizCard(car){var B=window.BIZ;var sp=B.PROJECTS[car.seller]||B.PROJECTS.sos;var side=B.ftOf(B.sideEur(car.eur));var total=B.ftOf(B.totalDonationEur(car.eur));var slug=B.slugify(car.modell);
+    var media=car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" decoding="async" referrerpolicy="no-referrer">':'<span class="ph">fotó</span>';
+    var specs=[car.km,car.teljesitmeny,car.valto,car.uzemanyag].filter(Boolean).join(' · ');
+    var def=B.ORDER.filter(function(k){return k!==car.seller;})[0]||B.ORDER[0];
+    var opts=B.ORDER.map(function(k){return '<option value="'+k+'"'+(k===def?' selected':'')+'>'+esc(B.PROJECTS[k].name)+'</option>';}).join('');
+    return '<div class="cw-item"><div class="card bizcard">'
+      +'<a class="bizcard-link" href="/auto/'+slug+'/?biz=1"><div class="media">'+media+'<span class="feat">Kiemelt</span></div>'
+      +'<div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">'+esc(car.evjarat)+'</span></div>'
+      +'<h3 class="title">'+esc(car.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
+      +'<div class="pricerow"><span class="price">'+esc(B.fmtFt(B.ftOf(car.eur)))+'</span><span class="peur">'+car.eur.toLocaleString('hu-HU')+' €</span></div></div></a>'
+      +'<div class="biz-donate"><div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
+        +'<span class="bd-txt"><span class="bd-l">Támogatott ügy · eladó 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
+        +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
+        +'<div class="biz-buyer"><span class="bb-l">A vevő döntése · 15%</span><select class="bb-select" data-side="'+side+'">'+opts+'</select>'
+        +'<div class="bb-chosen">'+chosen(B.PROJECTS[def],side)+'</div></div>'
+        +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
+      +'</div></div></div>';}
+
+  function coverflow(root){var track=root.querySelector('.cw-track');var items=[].slice.call(track.children);var n=items.length;if(!n)return null;var active=0,swiped=false;
+    function layout(){for(var i=0;i<n;i++){var it=items[i];var raw=i-active;if(raw>n/2)raw-=n;if(raw<-n/2)raw+=n;var ar=Math.abs(raw);
+      var sc=ar===0?1:(ar===1?0.84:0.68);var op=ar===0?1:(ar===1?0.62:(ar===2?0.3:0));
+      it.style.transform='translateX(calc(-50% + '+(raw*60)+'%)) scale('+sc+')';it.style.opacity=op;it.style.zIndex=String(100-ar);it.style.pointerEvents=ar>2?'none':'auto';it.classList.toggle('cw-c',ar===0);}
+      var h=items[active].offsetHeight;if(h)root.style.height=h+'px';}
+    function go(d){active=(active+d+n)%n;layout();}
+    var pv=root.querySelector('.cw-prev'),nx=root.querySelector('.cw-next');
+    if(pv)pv.addEventListener('click',function(){go(-1);});if(nx)nx.addEventListener('click',function(){go(1);});
+    track.addEventListener('click',function(e){if(swiped){swiped=false;e.preventDefault();return;}var it=e.target.closest('.cw-item');if(!it)return;var idx=items.indexOf(it);if(idx>=0&&idx!==active){e.preventDefault();active=idx;layout();}});
+    var sx=null;track.addEventListener('pointerdown',function(e){sx=e.clientX;});
+    track.addEventListener('pointerup',function(e){if(sx==null)return;var dx=e.clientX-sx;if(Math.abs(dx)>40){swiped=true;go(dx<0?1:-1);}sx=null;});
+    layout();window.addEventListener('resize',layout);setTimeout(layout,400);window.addEventListener('load',layout);return {layout:layout};}
+
+  var CW={};
+  function build(id,html){var root=document.getElementById(id);if(!root)return;root.querySelector('.cw-track').innerHTML=html;CW[id]=coverflow(root);}
+  document.querySelectorAll('.autok-tab').forEach(function(t){t.addEventListener('click',function(){setTimeout(function(){var id='cw-'+t.dataset.tab;if(CW[id])CW[id].layout();},40);});});
+  document.addEventListener('change',function(e){var sel=e.target.closest&&e.target.closest('.bb-select');if(!sel||!window.BIZ)return;var p=window.BIZ.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyer').querySelector('.bb-chosen');if(box)box.innerHTML=chosen(p,+sel.getAttribute('data-side')||0);});
+
+  function whenObj(name,cb){if(window[name])cb();else{var iv=setInterval(function(){if(window[name]){clearInterval(iv);cb();}},60);setTimeout(function(){clearInterval(iv);},8000);}}
+  function loadAllData(){
+    whenObj('RENT',function(){window.RENT.loadRate(function(){RATE=window.RENT.getRate()||RATE;var rn=document.getElementById('ratev');if(rn)rn.textContent=Math.round(RATE);
+      window.RENT.loadAll(function(sale){build('cw-elado',pick(sale,true).map(saleCard).join(''));});
+      window.RENT.loadCars(function(rent){build('cw-berelheto',pick(rent,true).map(rentCard).join(''));});});});
+    whenObj('BIZ',function(){window.BIZ.loadRate(function(){window.BIZ.loadCars(function(biz){build('cw-bizomanyos',pick(biz,false).map(bizCard).join(''));});});});
+  }
+  loadAllData();
+  setInterval(loadAllData,3600000);
+})();
+
+</script>
+
 </body></html>
