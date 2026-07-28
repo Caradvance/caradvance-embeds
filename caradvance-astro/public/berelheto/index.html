@@ -1,4 +1,9 @@
-<!doctype html><html lang="hu"><head><link rel="icon" href="/favicon.ico?v=2" sizes="any"><link rel="apple-touch-icon" href="/favicon.ico?v=2">
+<!doctype html><html lang="hu"><head>
+<script>
+/* gviz CSV export is broken for this sheet; transparently route sheet reads through the reliable JSON export */
+(function(){if(window.__gvizJsonShim)return;window.__gvizJsonShim=1;var _f=window.fetch;window.fetch=function(u,o){var s=(typeof u==="string")?u:(u&&u.url)||"";if(/gviz\/tq/.test(s)&&/out:csv/.test(s)){var ju=s.replace("out:csv","out:json");if(!/[?&]sheet=/.test(ju))ju+="&sheet=autok";if(!/[?&]headers=/.test(ju))ju+="&headers=1";return _f(ju,o).then(function(r){return r.text();}).then(function(t){var j=JSON.parse(t.replace(/^[^{]*\{/,"{").replace(/\}[^}]*$/,"}"));function val(c){if(!c)return "";var v=c.v;if(typeof v==="string"&&/^Date\(/.test(v))return c.f!=null?c.f:v;if(v==null)return c.f!=null?c.f:"";return v;}function esc(v){v=(v==null)?"":String(v);return '"'+v.replace(/"/g,'""')+'"';}var cols=j.table.cols.map(function(c){return c.label||"";});var lines=[cols.map(esc).join(",")];j.table.rows.forEach(function(row){lines.push(row.c.map(function(c){return esc(val(c));}).join(","));});return new Response(lines.join("\n"),{status:200,headers:{"Content-Type":"text/csv"}});});}return _f.apply(this,arguments);};})();
+</script>
+<link rel="icon" href="/favicon.ico?v=2" sizes="any"><link rel="apple-touch-icon" href="/favicon.ico?v=2">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bérelhető autóink — CarAdvance</title>
 <meta name="description" content="Prémium autók Németországból: megvásárolható autók, prémium autóbérlés, import és bizományos értékesítés. Átlátható árak, garancia.">
