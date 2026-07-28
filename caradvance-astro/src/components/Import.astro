@@ -86,43 +86,6 @@ const faqJson = {
       {benefits.map(([t, d]) => (<div class="imp-card"><h3>{t}</h3><p>{d}</p></div>))}
     </div>
 
-    <div class="imp-head" id="kalkulator"><span class="imp-tag">Import kalkulátor</span><h2>Számold ki az importált autó árát</h2><p>Add meg az autó német (bruttó) árát és a szállítási távolságot — megmutatjuk a magyarországi forgalomba helyezéssel együtt fizetendő, tájékoztató végösszeget, tételesen.</p></div>
-    <div class="imp-calc">
-      <div class="imp-calc-in">
-        <label>Autó ára Németországban (bruttó, €)<input id="c-eur" type="text" inputmode="numeric" value="19790"></label>
-        <label>Szállítási távolság (km)<input id="c-km" type="text" inputmode="numeric" value="1100"></label>
-        <label>EUR/HUF árfolyam<input id="c-rate" type="text" inputmode="numeric" value="365"></label>
-      </div>
-      <div class="imp-calc-out">
-        <div class="imp-row"><span>Gépjármű ára (magyar áfás ár)</span><b id="o-car">–</b></div>
-        <div class="imp-row"><span>Regisztrációs adó</span><b id="o-reg">–</b></div>
-        <div class="imp-row"><span>Műszaki vizsga (gyorsított)</span><b id="o-mv">–</b></div>
-        <div class="imp-row"><span>Eredetvizsga</span><b id="o-ev">–</b></div>
-        <div class="imp-row"><span>Vagyonszerzési illeték</span><b id="o-ill">–</b></div>
-        <div class="imp-row"><span>Forgalmi, rendszám, törzskönyv</span><b id="o-forg">–</b></div>
-        <div class="imp-row"><span>Szállítási költség</span><b id="o-sz">–</b></div>
-        <div class="imp-row"><span>Ügyintézési díj</span><b id="o-ugy">–</b></div>
-        <div class="imp-row total"><span>Forgalomba helyezéssel, összesen</span><b id="o-total">–</b></div>
-        <p class="imp-note">Tájékoztató kalkuláció magánszemély részére, az érvényben lévő hatósági díjakkal. A regisztrációs adó és az illeték az autó korától és teljesítményétől függ — a pontos összeget egyedi ajánlatban adjuk meg. Új gépjármű behozatalánál a 27% magyar áfa fizetendő.</p>
-      </div>
-    </div>
-
-    <div class="imp-head"><span class="imp-tag">Mennyit spórolhatsz?</span><h2>27% helyett csak 19% áfa</h2><p>Magánszemélyként a németországi Caradvance GmbH-tól 19% német áfával vásárolsz — a 27% magyar áfa helyett. Még a szolgáltatási díjunkkal együtt is sokat spórolsz.</p></div>
-    <div class="imp-afa">
-      <div class="imp-afa-h"><div class="car">Példa: BMW 320d Touring<small>2022 · automata · ~40 000 km</small></div></div>
-      <table>
-        <thead><tr><th>Tétel</th><th>🇭🇺 27% Magyarországon</th><th class="hl">🇩🇪 19% Caradvance GmbH-tól</th></tr></thead>
-        <tbody>
-          <tr><td>Nettó autóár</td><td>10 945 000 Ft</td><td class="hl">9 000 000 Ft</td></tr>
-          <tr><td>Forgalmi adó</td><td>+2 955 000 Ft</td><td class="hl">+1 710 000 Ft</td></tr>
-          <tr><td>Bruttó vételár</td><td>13 900 000 Ft</td><td class="hl">10 710 000 Ft</td></tr>
-          <tr><td>Caradvance szolgáltatás (behozatal, teljes ügyintézés)</td><td>—</td><td class="hl">+550 000 Ft</td></tr>
-          <tr class="tot"><td>Amit ténylegesen fizetsz</td><td>13 900 000 Ft</td><td class="hl">11 260 000 Ft</td></tr>
-        </tbody>
-      </table>
-      <div class="imp-save">A Te megtakarításod ezen az autón<b>2 640 000 Ft <small>≈ 19%</small></b></div>
-    </div>
-
     <div class="imp-head"><span class="imp-tag">Egyedül vagy velünk?</span><h2>Miért ne vágj bele egyedül?</h2><p>Németországból autót hozni egyedül időigényes és tele van buktatóval. Így néz ki a kettő egymás mellett — a kockázatoktól a nyugodt végeredményig.</p></div>
     <div class="imp-cmp">
       <div class="imp-cmp-h"><span>Szempont</span><span>Ha egyedül vágsz bele</span><span class="hl">A Caradvance-szel</span></div>
@@ -256,46 +219,4 @@ const faqJson = {
   .imp-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
 </style>
 
-<script is:inline>
-(function(){
-  var IMPORT_ENDPOINT = "";
-  function ft(n){ return Math.round(n).toLocaleString('hu-HU') + ' Ft'; }
-  function num(id){ var v=(document.getElementById(id).value||'').replace(/[^0-9]/g,''); return v?parseInt(v,10):0; }
-  var FEES = { reg:67500, mv:100000, ev:25000, ill:58500, forg:24000, ugy:400000, kmft:317.5 };
-  function calc(){
-    var eur=num('c-eur'), km=num('c-km'), rate=num('c-rate')||365;
-    var car=eur*rate, sz=Math.round(km*FEES.kmft);
-    var total=car+FEES.reg+FEES.mv+FEES.ev+FEES.ill+FEES.forg+sz+FEES.ugy;
-    var set=function(id,v){ var el=document.getElementById(id); if(el) el.textContent=ft(v); };
-    set('o-car',car); set('o-reg',FEES.reg); set('o-mv',FEES.mv); set('o-ev',FEES.ev);
-    set('o-ill',FEES.ill); set('o-forg',FEES.forg); set('o-sz',sz); set('o-ugy',FEES.ugy); set('o-total',total);
-  }
-  ['c-eur','c-km','c-rate'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('input',calc); });
-  calc();
-  var form=document.getElementById('importForm');
-  if(form){
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      var d={}; [].slice.call(form.querySelectorAll('input,select,textarea')).forEach(function(el){ if(el.name) d[el.name]=el.value; });
-      if(IMPORT_ENDPOINT){
-        fetch(IMPORT_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)})
-          .then(function(){ alert('Köszönjük! A rendelésed megérkezett — hamarosan jelentkezünk.'); form.reset(); })
-          .catch(function(){ alert('Küldés sikertelen — kérjük írj a import@caradvance.de címre.'); });
-        return;
-      }
-      var body='Autó rendelés (import):%0D%0A'
-        +'Márka: '+encodeURIComponent(d.marka||'')+'%0D%0A'
-        +'Modell: '+encodeURIComponent(d.modell||'')+'%0D%0A'
-        +'Évjárattól: '+encodeURIComponent(d.evjarat||'')+'%0D%0A'
-        +'Üzemanyag: '+encodeURIComponent(d.uzemanyag||'')+'%0D%0A'
-        +'Max km: '+encodeURIComponent(d.km||'')+'%0D%0A'
-        +'Keret: '+encodeURIComponent(d.keret||'')+'%0D%0A'
-        +'Megjegyzés: '+encodeURIComponent(d.megjegyzes||'')+'%0D%0A%0D%0A'
-        +'Név: '+encodeURIComponent(d.nev||'')+'%0D%0A'
-        +'Telefon: '+encodeURIComponent(d.telefon||'')+'%0D%0A'
-        +'E-mail: '+encodeURIComponent(d.email||'');
-      window.location.href='mailto:import@caradvance.de?subject='+encodeURIComponent('Autó rendelés – '+(d.marka||'')+' '+(d.modell||''))+'&body='+body;
-    });
-  }
-})();
-</script>
+
