@@ -88,3 +88,6 @@ gives every branch its own preview URL, so you can review the whole thing before
   self-contained build, drop them into `public/` and switch the paths to `/…`.
 - This scaffold intentionally ports 2 pages to prove the pattern end-to-end. The remaining ~26
   pages follow the same structure.
+
+
+<!-- build: refresh www after sheet-driven rebuild (2026-07-28) -->
