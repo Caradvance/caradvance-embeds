@@ -21,7 +21,7 @@ import path from "node:path";
 
 // ---------------------------------------------------------------- config
 const SHEET_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv";
+  "https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:json&sheet=autok&headers=1";
 // Absolute base used for <link rel=canonical>, OG tags and sitemap.
 // After you point caradvance.hu at GitHub Pages, change this to "https://caradvance.hu".
 const SITE_BASE = (process.env.SITE_BASE || "https://caradvance.hu").replace(/\/$/, "");
@@ -278,6 +278,18 @@ const isActive = (c) => {
 };
 const isOwn = (c) => (c.sajat || "").toLowerCase() === "igen";
 const specStr = (c) => [c.km, c.valto, c.uzemanyag].filter(Boolean).join(" · ");
+
+// gviz CSV export is unreliable for this sheet (rows collapse on quoted inch-marks); read the JSON export and convert to CSV.
+function gvizJsonToCsv(raw) {
+  var a = raw.indexOf("{"), b = raw.lastIndexOf("}");
+  var j = JSON.parse(raw.slice(a, b + 1));
+  function val(c) { if (!c) return ""; var v = c.v; if (typeof v === "string" && v.slice(0, 5) === "Date(") return c.f != null ? c.f : v; if (v == null) return c.f != null ? c.f : ""; return v; }
+  function esc(v) { return '"' + String(v == null ? "" : v).split('"').join('""') + '"'; }
+  var cols = j.table.cols.map(function (c) { return c.label || ""; });
+  var lines = [cols.map(esc).join(",")];
+  j.table.rows.forEach(function (row) { lines.push(row.c.map(function (c) { return esc(val(c)); }).join(",")); });
+  return lines.join("\n");
+}
 
 // CSV parser (quoted fields, embedded newlines)
 function parseCSV(t) {
@@ -1432,7 +1444,7 @@ async function main() {
   const csvArg = args.includes("--csv") ? args[args.indexOf("--csv") + 1] : null;
   let csv;
   if (csvArg) { csv = await fs.readFile(csvArg, "utf8"); console.log("Using local CSV:", csvArg); }
-  else { console.log("Fetching sheet…"); csv = await (await fetch(SHEET_CSV_URL, { cache: "no-store" })).text(); }
+  else { console.log("Fetching sheet…"); const raw = await (await fetch(SHEET_CSV_URL, { cache: "no-store" })).text(); csv = gvizJsonToCsv(raw); }
   const cars = parseCSV(csv);
   for (const ec of EXTRA_CARS) if (!cars.some((c) => slugify(c.modell) === slugify(ec.modell))) cars.push(ec);
   const rate = await getRate();
