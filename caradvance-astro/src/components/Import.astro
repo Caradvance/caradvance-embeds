@@ -62,7 +62,7 @@ const faqJson = {
     <p class="sub sub-wide" style="max-width:900px">Nagyobb választék, jobb állapotú autók és kedvezőbb ár a német piacról — mi megkeressük, behozzuk és kulcsrakészen, a nevedre írt forgalmival adjuk&nbsp;át.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#rendeles">Autót rendelek</a>
-      <a class="btn btn-white" href="#folyamat">Hogyan működik?</a>
+      <a class="btn btn-white" href="/beszerzesi-folyamat">Hogyan működik?</a>
     </div>
   </div>
   <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
@@ -81,20 +81,10 @@ const faqJson = {
   <KeresoForm lang={lang} />
 
   <div class="imp-wrap">
-    <div class="imp-head"><span class="imp-tag">Miért a német piac?</span><h2>Nagyobb választék, jobb állapotú autók</h2><p>A német piacon nemcsak több autó közül választhatsz, hanem jellemzően jobb állapotúak is: gondosabb karbantartás, kevesebb futott kilométer és kiváló utak állnak mögöttük.</p></div>
-    <div class="imp-grid3">
-      {benefits.map(([t, d]) => (<div class="imp-card"><h3>{t}</h3><p>{d}</p></div>))}
-    </div>
-
     <div class="imp-head"><span class="imp-tag">Egyedül vagy velünk?</span><h2>Miért ne vágj bele egyedül?</h2><p>Németországból autót hozni egyedül időigényes és tele van buktatóval. Így néz ki a kettő egymás mellett — a kockázatoktól a nyugodt végeredményig.</p></div>
     <div class="imp-cmp">
       <div class="imp-cmp-h"><span>Szempont</span><span>Ha egyedül vágsz bele</span><span class="hl">A Caradvance-szel</span></div>
       {compare.map(([s, a, b]) => (<div class="imp-cmp-r"><span class="s">{s}</span><span class="a">✕ {a}</span><span class="b">✓ {b}</span></div>))}
-    </div>
-
-    <div class="imp-head" id="folyamat"><span class="imp-tag">Hogyan működik az autó import?</span><h2>Hét lépés a tökéletes autóig</h2><p>Az igényed jelzését követően egy professzionális csapattagunk felveszi veled a kapcsolatot, és onnantól mindent intézünk.</p></div>
-    <div class="imp-steps">
-      {steps.map(([t, d], i) => (<div class="imp-step"><span class="n">{i + 1}</span><div><h3>{t}</h3><p>{d}</p></div></div>))}
     </div>
 
     <div class="imp-head"><span class="imp-tag">Csapatunk</span><h2>Ismerd meg, kik intézik a behozatalod</h2><p>Nem egy űrlappal beszélsz, hanem valódi szakemberekkel, akik végigkísérnek a teljes folyamaton — a kiválasztástól a kulcsátadásig.</p></div>
