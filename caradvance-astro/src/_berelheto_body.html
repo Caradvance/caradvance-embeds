@@ -1,0 +1,208 @@
+
+<div id="ca-gate"><div class="box">
+  <img src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance">
+  <h1>Hamarosan indul</h1>
+  <p>Weboldalunk még építés alatt áll. Ha rendelkezel belépési kóddal, itt megtekintheted az előnézetet.</p>
+  <form onsubmit="return caGate(event)"><input id="ca-code" type="password" placeholder="Belépési kód" autocomplete="off" autofocus><button type="submit">Belépés</button></form>
+  <div class="err" id="ca-err"></div>
+</div></div>
+<script>function caGate(e){e.preventDefault();var v=(document.getElementById('ca-code').value||'').trim();if(v==="CarAdvance2027"){try{localStorage.setItem('ca_ok',v);}catch(_){}document.documentElement.classList.add('ca-ok');}else{document.getElementById('ca-err').textContent='Hibás kód, próbáld újra.';}return false;}</script>
+<div class="ca-navwrap"><nav class="ca-nav" aria-label="Főmenü">
+  <a class="brand" href=""><img src="https://caradvance.hu/caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
+  <ul class="menu"><li class="navitem"><button class="navlink" type="button">Prémium autóbérlés<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Bérelhető autóink</a><a class="ddi" href="#">Új autó bérlése</a><a class="ddi" href="#">Rövid távú bérlés</a><a class="ddi" href="#">Hosszú távú bérlés</a><a class="ddi" href="#">Flotta kezelés</a><a class="ddi" href="#">Feltételek</a></div></div></li><li class="navitem"><button class="navlink" type="button">Megvásárolható autóink<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="autoink/">Autóink</a><a class="ddi" href="#">Egyedi autó rendelés</a><a class="ddi" href="#">Finanszírozás – lízing</a><a class="ddi" href="#">Előnyök</a></div></div></li><li class="navitem"><button class="navlink" type="button">Bizományos értékesítés<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="/bizomanyos">Bizományos autóink</a><a class="ddi" href="/eladom">Eladom az autómat</a><a class="ddi" href="/jotekonysag">Jótékonyság</a><a class="ddi" href="/ertekesitesi-folyamat">Értékesítési folyamat</a><a class="ddi" href="/gyakori-kerdesek">Gyakori kérdések</a></div></div></li><li class="navitem"><button class="navlink" type="button">Import<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Autó rendelés</a><a class="ddi" href="#">Beszerzési folyamat</a><a class="ddi" href="#">Előnyök</a><a class="ddi" href="#">Referenciák</a></div></div></li><li class="navitem"><button class="navlink" type="button">Rólunk<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner"><a class="ddi" href="#">Miért mi?</a><a class="ddi" href="#">Caradvance Németország</a><a class="ddi" href="#">Caradvance Magyarország</a><a class="ddi" href="#">Referenciák</a><a class="ddi" href="#">Partnereink</a><a class="ddi" href="#">Media</a><a class="ddi" href="#">Blog</a></div></div></li></ul>
+  <div class="navright">
+    <a class="kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
+    <div class="lang"><button class="langbtn" type="button" aria-label="Nyelvváltás"><span class="navflag" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span><span class="lchev"></span></button><div class="langmenu"><a class="langopt" href=""><span class="lf" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span><span>Magyar</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/gb.png)"></span><span>English</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/de.png)"></span><span>Deutsch</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/fr.png)"></span><span>Français</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/sk.png)"></span><span>Slovenčina</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/cz.png)"></span><span>Čeština</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/pl.png)"></span><span>Polski</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/ua.png)"></span><span>Українська</span></a><a class="langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/cn.png)"></span><span>中文</span></a></div></div>
+    <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobilepanel"><div class="m-acc"><button class="m-accbtn" type="button">Prémium autóbérlés<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Bérelhető autóink</a><a href="#">Új autó bérlése</a><a href="#">Rövid távú bérlés</a><a href="#">Hosszú távú bérlés</a><a href="#">Flotta kezelés</a><a href="#">Feltételek</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Megvásárolható autóink<span class="m-plus">+</span></button><div class="m-sub"><a href="autoink/">Autóink</a><a href="#">Egyedi autó rendelés</a><a href="#">Finanszírozás – lízing</a><a href="#">Előnyök</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Bizományos értékesítés<span class="m-plus">+</span></button><div class="m-sub"><a href="/bizomanyos">Bizományos autóink</a><a href="/eladom">Eladom az autómat</a><a href="/jotekonysag">Jótékonyság</a><a href="/ertekesitesi-folyamat">Értékesítési folyamat</a><a href="/gyakori-kerdesek">Gyakori kérdések</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Import<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Autó rendelés</a><a href="#">Beszerzési folyamat</a><a href="#">Előnyök</a><a href="#">Referenciák</a></div></div><div class="m-acc"><button class="m-accbtn" type="button">Rólunk<span class="m-plus">+</span></button><div class="m-sub"><a href="#">Miért mi?</a><a href="#">Caradvance Németország</a><a href="#">Caradvance Magyarország</a><a href="#">Referenciák</a><a href="#">Partnereink</a><a href="#">Media</a><a href="#">Blog</a></div></div><a class="m-kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a><div class="m-langtitle">Nyelv</div><div class="m-langs"><a class="m-langopt" href=""><span class="lf" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span><span>Magyar</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/gb.png)"></span><span>English</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/de.png)"></span><span>Deutsch</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/fr.png)"></span><span>Français</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/sk.png)"></span><span>Slovenčina</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/cz.png)"></span><span>Čeština</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/pl.png)"></span><span>Polski</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/ua.png)"></span><span>Українська</span></a><a class="m-langopt" href="#"><span class="lf" style="background-image:url(https://flagcdn.com/w80/cn.png)"></span><span>中文</span></a></div></div>
+</div>
+
+<section class="wrap" id="rentk" style="padding-top:104px">
+  <nav class="crumb" aria-label="Breadcrumb"><a href="/">Főoldal</a> <span>›</span> <span>Bérelhető autóink</span></nav>
+  <div class="autok-head"><div><span class="feyebrow">Prémium autóbérlés</span><h2>Bérelhető autóink</h2></div></div>
+  <p class="rent-lead">Prémium BMW flottánk hosszú távú bérlésre. A feltüntetett havi díjak <strong>2000 km/hó</strong> futásteljesítményre vonatkoznak, nettó árak. Minden autóhoz egyszeri <strong>kaució</strong> tartozik.</p>
+
+  <div class="rent-filters">
+    <input id="rq" type="search" placeholder="Keresés (pl. X5, X6, dízel)…" autocomplete="off">
+    <select id="rf-marka"><option value="">Minden márka</option></select>
+    <select id="rf-kar"><option value="">Minden karosszéria</option></select>
+    <select id="rf-uz"><option value="">Minden üzemanyag</option></select>
+  </div>
+  <div class="cat-count" id="rentcount">Autók betöltése…</div>
+  <div class="grid" id="rentgrid"></div>
+  <div id="rentempty" class="cat-empty" style="display:none">Nincs a szűrésnek megfelelő autó.</div>
+  <div class="rate-note">A havi díjak nettó árak, 2000 km/hó futásteljesítménnyel. A forint összegek a napi EUR/HUF árfolyammal, tájékoztató jelleggel számolódnak (1 € = <span id="rentrate">362</span> Ft).</div>
+</section>
+
+<style>
+.crumb{font-size:13.5px;color:var(--muted);margin:0 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none}.crumb a:hover{color:var(--red)}
+.rent-lead{font-size:16.5px;color:var(--muted);max-width:820px;margin:0 0 20px;line-height:1.6}
+.rent-lead strong{color:var(--navy)}
+.cat-count{font-size:14px;color:var(--muted);font-weight:600;margin:0 0 16px}
+.cat-empty{text-align:center;padding:44px 24px;color:var(--muted);font-size:16px}
+.rent-filters{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 18px}
+.rent-filters input,.rent-filters select{font-family:inherit;font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:none}
+.rent-filters input{flex:1;min-width:220px}
+.rent-filters input:focus,.rent-filters select:focus{border-color:var(--red)}
+@media(max-width:520px){.rent-filters input{min-width:100%}}
+
+#rentgrid .card{display:flex;flex-direction:column;overflow:hidden}
+#rentgrid .media{position:relative;aspect-ratio:4/3;background:transparent;overflow:hidden}
+#rentgrid .media img{width:100%;height:100%;object-fit:contain;display:block}
+#rentgrid .media .ph{display:flex;align-items:center;justify-content:center;height:100%;color:#9AA7B8;font-size:13px}
+#rentgrid .media .rtag{position:absolute;top:12px;right:12px;background:var(--navy);color:#fff;font-size:11px;font-weight:800;letter-spacing:.03em;padding:4px 10px;border-radius:999px}
+#rentgrid .body{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
+#rentgrid .meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+#rentgrid .meta .cond{background:#EEF1F6;border-radius:999px;padding:3px 10px;font-weight:700}
+#rentgrid .title{font-size:16px;font-weight:800;color:var(--navy);line-height:1.25;min-height:44px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
+#rentgrid .specs{font-size:13px;color:var(--muted);margin:6px 0 10px}
+#rentgrid .rentrow{display:flex;align-items:baseline;gap:8px;margin-top:auto}
+#rentgrid .rprice{font-size:21px;font-weight:800;color:var(--navy)}
+#rentgrid .rprice small{font-size:13px;font-weight:700;color:var(--muted)}
+#rentgrid .reur{font-size:13px;color:var(--muted);font-weight:600}
+#rentgrid .kaucio{margin-top:8px;font-size:12.5px;font-weight:600;color:var(--muted);background:#F4F7FB;border:1px solid var(--line);border-radius:9px;padding:7px 10px}
+#rentgrid .kaucio b{color:var(--navy);font-weight:800}
+</style>
+
+<script>
+// Shared data + helpers for the rental (bérelhető) pages.
+// Rental cars = the active for-sale cars from the caradvance-autok sheet whose model
+// matches a GREEN-marked model in the CarAdvance GmbH price list. Each gets a monthly
+// rental price (2000 km/month tier) and a Kaution (deposit), both net EUR.
+window.RENT = (function () {
+  var RATE = 362; // EUR->HUF fallback; updated live from frankfurter
+  var JURL = 'https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:json&sheet=autok&headers=1';
+
+  function slugify(m){return String(m||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  function ftOf(eur){ return Math.round(eur*RATE); }
+  function fmtFt(v){ return Math.round(v).toLocaleString('hu-HU')+' Ft'; }
+  function setRate(r){ RATE=r; }
+  function getRate(){ return RATE; }
+
+  // Green price list (EUR net): monthly price at 2000 km/month + Kaution (deposit).
+  // Returns {cat, price, kaution} for a rentable model, or null.
+  function rentInfo(modell, marka, kar){
+    var s=(modell||'').toLowerCase(), br=(marka||'').toLowerCase(); kar=(kar||'').toLowerCase();
+    var isTour = /touring|kombi/.test(kar) || /touring/.test(s);
+    if(br.indexOf('bmw')<0 && br.indexOf('mini')<0) return null;
+    if(br.indexOf('mini')>=0){ if(/jcw|john cooper/.test(s)) return {cat:'Mini JCW',price:1198.4,kaution:3000}; return null; }
+    // BMW
+    if(/\bx7\b/.test(s)) return null;                                   // X7 not offered
+    if(/\bx1\b|\bx2\b|\bx4\b/.test(s)) return null;                      // X1/X2/X4 not offered
+    if(/\bx3\b/.test(s)) return {cat:'X3',price:1398.6,kaution:5000};
+    if(/\bx5\b/.test(s)){ if(/x5\s*m\b/.test(s)||/x5\s*m\s*comp/.test(s)) return null; return {cat:'X5',price:1762.6,kaution:7500}; }
+    if(/\bx6\b/.test(s)){ if(/x6\s*m\s*comp/.test(s)||/x6\s*m\b(?!\s*60|60)/.test(s)) return null; return {cat:'X6',price:1818.6,kaution:7500}; }
+    if(/\bm5\b|i5\s*m60/.test(s)) return {cat:'M5',price:1998.75,kaution:10000};
+    if(/\bm3\b/.test(s)) return isTour?{cat:'M3 Touring',price:1888.65,kaution:7500}:{cat:'M3 Lim',price:1888.65,kaution:7500};
+    if(/\bm2\b/.test(s)) return {cat:'M2 Coupé',price:1402.2,kaution:5000};
+    if(/\bm4\b/.test(s)) return null;                                   // M4 not green
+    if(/\b5\s?er\b|\b5\d\d\b|\bi5\b/.test(s)) return isTour?{cat:'5er Touring',price:1598.4,kaution:7500}:{cat:'5er Limuzin',price:1598.4,kaution:7500};
+    if(/\b3\s?er\b|\b3\d\d\b/.test(s)) return isTour?{cat:'3er Touring',price:1348.5,kaution:5000}:{cat:'3er Limuzin',price:1348.5,kaution:5000};
+    if(/\b4\s?er\b|\b4\d\d\b/.test(s)){ if(/cabrio|convertible/.test(s)) return null; return {cat:'4er Coupé',price:1498.5,kaution:5000}; }
+    return null;
+  }
+
+  function parseCSV(t){var rows=[],row=[],cur='',q=false,i=0,c;for(;i<t.length;i++){c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){cur+='"';i++;}else q=false;}else cur+=c;}else{if(c=='"')q=true;else if(c==','){row.push(cur);cur='';}else if(c=='\n'){row.push(cur);rows.push(row);row=[];cur='';}else if(c=='\r'){}else cur+=c;}}if(cur!==''||row.length){row.push(cur);rows.push(row);}return rows;}
+
+  // load the sheet, keep only active + rentable cars, attach rent info; then cb(cars)
+  function loadCars(cb){
+    fetch(JURL,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+      var s=t.replace(/^[^(]*\(/,'').replace(/\);?\s*$/,'');
+      var d=JSON.parse(s);
+      var cols=((d.table&&d.table.cols)||[]).map(function(c){return String(c.label||'').trim().toLowerCase();});
+      var ix={};cols.forEach(function(l,i){if(l)ix[l]=i;});
+      var rows=(d.table&&d.table.rows)||[]; var out=[];
+      for(var r=0;r<rows.length;r++){ var row=rows[r]; if(!row||!row.c)continue;
+        var g=function(n){var j=ix[n];if(j==null)return'';var c=row.c[j];return (c&&c.v!=null)?String(c.v).trim():'';};
+        var modell=g('modell'); if(!modell)continue;
+        if((g('aktiv')||'').toLowerCase()==='nem')continue;
+        var ri=rentInfo(modell,g('marka'),g('karosszeria')); if(!ri)continue;
+        var gal=g('galeria'); var img=g('kep_url')||(gal?gal.split(/[,\n]/)[0].trim():'');
+        out.push({modell:modell,marka:g('marka'),karosszeria:g('karosszeria'),km:g('km'),teljesitmeny:g('teljesitmeny'),valto:g('valto'),uzemanyag:g('uzemanyag'),evjarat:g('evjarat'),hajtas:g('hajtas'),img:img,kiemelt:(g('kiemelt')||'').toLowerCase()==='igen',rent:ri});
+      }
+      cb(out);
+    }).catch(function(){ cb([]); });
+  }
+  function loadRate(cb){
+    fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
+      .then(function(r){return r.json();}).then(function(d){ if(d&&d.rates&&d.rates.HUF) setRate(d.rates.HUF); if(cb)cb(); })
+      .catch(function(){ if(cb)cb(); });
+  }
+
+  return { slugify:slugify, ftOf:ftOf, fmtFt:fmtFt, setRate:setRate, getRate:getRate, rentInfo:rentInfo, loadCars:loadCars, loadRate:loadRate };
+})();
+
+</script>
+<script>
+(function(){
+  var R=window.RENT, grid=document.getElementById('rentgrid'), countEl=document.getElementById('rentcount'), emptyEl=document.getElementById('rentempty');
+  var qI=document.getElementById('rq'), mS=document.getElementById('rf-marka'), kS=document.getElementById('rf-kar'), uS=document.getElementById('rf-uz');
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function card(car){
+    var slug=R.slugify(car.modell);
+    var ft=R.ftOf(car.rent.price), keur=car.rent.kaution, kft=R.ftOf(keur);
+    var media=car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" decoding="async" referrerpolicy="no-referrer"><span class="rtag">'+esc(car.rent.cat)+'</span>':'<span class="ph">fotó hamarosan</span><span class="rtag">'+esc(car.rent.cat)+'</span>';
+    var specs=[car.km,car.teljesitmeny,car.valto,car.uzemanyag].filter(Boolean).join(' · ');
+    return '<a class="card" href="/auto/'+slug+'/?rent=1">'
+      +'<div class="media">'+media+'</div>'
+      +'<div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">'+esc(car.evjarat)+'</span></div>'
+      +'<h3 class="title">'+esc(car.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
+      +'<div class="rentrow"><span class="rprice">'+esc(R.fmtFt(ft))+'<small> /hó</small></span><span class="reur">'+car.rent.price.toLocaleString('hu-HU')+' € /hó</span></div>'
+      +'<div class="kaucio">Kaució: <b>'+esc(R.fmtFt(kft))+'</b> · '+keur.toLocaleString('hu-HU')+' €</div>'
+      +'</div></a>';
+  }
+  var ALL=[];
+  function fillSel(sel,vals){vals.sort();vals.forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});}
+  function apply(){
+    var q=(qI.value||'').toLowerCase().trim(),m=mS.value,k=kS.value,u=uS.value,n=0,html='';
+    for(var i=0;i<ALL.length;i++){var c=ALL[i];
+      if(m&&c.marka!==m)continue;if(k&&c.karosszeria!==k)continue;if(u&&c.uzemanyag!==u)continue;
+      if(q&&(c.modell+' '+c.marka+' '+c.uzemanyag+' '+c.karosszeria+' '+c.rent.cat).toLowerCase().indexOf(q)<0)continue;
+      html+=card(c);n++;}
+    grid.innerHTML=html; countEl.textContent=n+' autó'; emptyEl.style.display=n?'none':'block';
+  }
+  [qI,mS,kS,uS].forEach(function(el){el.addEventListener('input',apply);el.addEventListener('change',apply);});
+  R.loadRate(function(){ var rv=document.getElementById('rentrate'); if(rv)rv.textContent=Math.round(R.getRate());
+    R.loadCars(function(cars){ ALL=cars;
+      var mk={},kr={},uz={}; cars.forEach(function(c){if(c.marka)mk[c.marka]=1;if(c.karosszeria)kr[c.karosszeria]=1;if(c.uzemanyag)uz[c.uzemanyag]=1;});
+      fillSel(mS,Object.keys(mk));fillSel(kS,Object.keys(kr));fillSel(uS,Object.keys(uz));
+      apply();
+    });
+  });
+})();
+</script>
+
+<footer class="footer"><div class="footer-in">
+  <div><img class="brand" src="https://caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133">
+    <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
+  <div><h4>Menü</h4>
+    <a href="autoink/">Megvásárolható autóink</a>
+    <a href="#berles">Prémium autóbérlés</a>
+    <a href="#bizomany">Bizományos értékesítés</a>
+    <a href="#import">Import</a></div>
+  <div><h4>Kapcsolat</h4>
+    <a href="mailto:info@caradvance.hu">info@caradvance.hu</a>
+    <a href="#rolunk">Rólunk</a></div>
+</div><div class="copy">© 2026 CarAdvance · BH Group</div></footer>
+<script>
+(function(){var w=document.querySelector('.ca-navwrap');if(!w)return;
+var b=w.querySelector('.burger');if(b)b.addEventListener('click',function(){w.classList.toggle('open');});
+w.querySelectorAll('.m-accbtn').forEach(function(x){x.addEventListener('click',function(){x.parentElement.classList.toggle('open');});});
+var lang=w.querySelector('.lang'),lb=w.querySelector('.langbtn');if(lb)lb.addEventListener('click',function(e){e.stopPropagation();lang.classList.toggle('open');});document.addEventListener('click',function(){if(lang)lang.classList.remove('open');});})();
+</script>
+<script>
+(function(){var R=402;
+function up(e){var eur=+e.getAttribute('data-eur')||0,net=+e.getAttribute('data-net')||0;
+ var main=Math.ceil(eur*R/10000)*10000, gross=Math.ceil((net||eur/1.19)*1.27*R/10000)*10000, save=gross-main;
+ var f=function(v){return v.toLocaleString('hu-HU')+' Ft'};
+ var mE=e.querySelector('[data-main]'); if(mE)mE.textContent=f(main);
+ var cE=e.querySelector('[data-cross]'); if(cE&&save>0)cE.textContent=f(gross);
+ var sE=e.querySelector('[data-save]'); if(sE&&save>0)sE.textContent='−'+f(save);}
+function all(){document.querySelectorAll('[data-eur]').forEach(up);}
+fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
+ .then(function(r){return r.json()}).then(function(d){if(d&&d.rates&&d.rates.HUF){R=Math.round(d.rates.HUF);all();var rv=document.getElementById('ratev');if(rv)rv.textContent=R;}}).catch(function(){});
+})();
+</script>
