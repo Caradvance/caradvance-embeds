@@ -1,0 +1,152 @@
+---
+import '../styles/eladom.css';
+import type { Locale } from '../i18n/utils';
+const { lang } = Astro.props as { lang: Locale };
+
+const compare = [
+  ['Keresés a német piacon', 'Órák böngészése, nyelvi akadály, megbízható szűrés nélkül', 'A teljes piacot átnézzük helyetted'],
+  ['Az autó leinformálása', 'Rejtett kár vagy tekert km-óra kockázata', 'Nemzetközi adatbázisból ellenőrizzük'],
+  ['Helyszíni bevizsgálás', 'Utazol Németországba, vagy látatlanban veszel', 'Szakértőnk a helyszínen átvizsgálja'],
+  ['Tárgyalás, kommunikáció', 'Németül kell alkudnod, hátrányból', 'Helyetted tárgyalunk, anyanyelvi szinten'],
+  ['Szállítás', 'Magadnak intézed, sokszor biztosítás nélkül', 'Profi speditőr, magas értékű biztosítással'],
+  ['Honosítás és ügyintézés', 'Eredetvizsga, vizsga, okmányiroda — sorban állás, buktatók', 'A teljes hivatalos ügyintézést átvállaljuk'],
+  ['Rejtett költségek', 'Váratlan tételek, árfolyamkockázat', 'Előre, tételesen látod a költségeket'],
+  ['Garancia és jótállás', 'Probléma esetén egyedül, akár ügyvéddel a külföldi eladóval szemben', 'Kötelező 1 éves jótállást adunk, biztosításkötésben is segítünk'],
+  ['Időráfordítás', 'Hetek, akár hónapok utánajárás', 'Mindössze 5–14 nap'],
+];
+
+const stats = [
+  ['5–14 nap', 'a teljes folyamat'],
+  ['0', 'utazás Németországba'],
+  ['1 év', 'kötelező jótállás'],
+  ['100%', 'ügyintézést átvállalunk'],
+];
+
+const serviceJson = {
+  '@context': 'https://schema.org', '@type': 'Service',
+  name: 'Autóimport Németországból — Caradvance',
+  serviceType: 'Kulcsrakész autóimport: keresés, leinformálás, bevizsgálás, szállítás, honosítás és ügyintézés',
+  areaServed: { '@type': 'Country', name: 'Magyarország' },
+  url: 'https://www.caradvance.hu/egyedul-vagy-velunk/',
+  provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', telephone: '+36 30 233 6060', email: 'import@caradvance.de' },
+};
+---
+<section class="ev">
+  <section class="hero">
+    <video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-x5-poster.jpg">
+      <source src="https://www.caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4" />
+    </video>
+    <div class="scrim"></div>
+    <div class="inner">
+      <div class="partners" style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap">
+        <img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:34px;width:auto;display:block;border-radius:6px" />
+        <img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:34px;width:auto;display:block;border-radius:6px" />
+      </div>
+      <h1>Egyedül vagy velünk? —<br /><span class="accent">te döntöd el, mennyi kockázat éri meg</span></h1>
+      <p class="sub sub-wide" style="max-width:900px">Németországból autót hozni egyedül időigényes és tele van buktatóval. Nézd meg a kettőt egymás mellett — a kockázatoktól a nyugodt&nbsp;végeredményig.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="/auto-rendeles#rendeles">Bízd ránk</a>
+        <a class="btn btn-white" href="/beszerzesi-folyamat">Hogyan működik?</a>
+      </div>
+    </div>
+    <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+  </section>
+
+  <section class="section" style="padding-top:56px">
+    <div class="wrap center">
+      <span class="eyebrow">Egyedül vagy velünk?</span>
+      <h2 class="sec-title">Miért ne vágj bele egyedül?</h2>
+      <p class="sec-intro">Ugyanaz az autó, két teljesen más út odáig. Balra a kockázatok, jobbra a nyugodt, kulcsrakész megoldás.</p>
+    </div>
+
+    <div class="wrap ev-wrap">
+      <div class="ev-table">
+        <div class="ev-row ev-head">
+          <div class="ev-aspect ev-hl">Szempont</div>
+          <div class="ev-col ev-alone"><span class="ev-tag">Ha egyedül vágsz bele</span></div>
+          <div class="ev-col ev-with"><span class="ev-tag">A Caradvance-szel</span><span class="ev-badge">Ajánlott</span></div>
+        </div>
+        {compare.map(([s, a, b], i) => (
+          <div class="ev-row">
+            <div class="ev-aspect"><span class="ev-num">{String(i + 1).padStart(2, '0')}</span><span>{s}</span></div>
+            <div class="ev-cell ev-alone">
+              <span class="ev-ic ev-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></span>
+              <span>{a}</span>
+            </div>
+            <div class="ev-cell ev-with">
+              <span class="ev-ic ev-c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></span>
+              <span>{b}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="wrap ev-stats">
+      {stats.map(([n, l]) => (<div class="ev-stat"><b>{n}</b><span>{l}</span></div>))}
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="ev-cta">
+        <div>
+          <h2>A nehezét bízd ránk.</h2>
+          <p>Mondd el, milyen autót keresel — a kereséstől a kulcsrakész átadásig mindent mi intézünk.</p>
+        </div>
+        <a class="btn btn-white" href="/auto-rendeles#rendeles">Autót rendelek →</a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(serviceJson)}></script>
+</section>
+
+<style>
+  .ev{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--green:#12885B}
+  .ev-wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  .ev-table{border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(8,8,10,.10);border:1px solid var(--line);background:#fff}
+  .ev-row{display:grid;grid-template-columns:1.05fr 1.35fr 1.35fr;align-items:stretch}
+  .ev-row + .ev-row .ev-aspect,.ev-row + .ev-row .ev-cell{border-top:1px solid var(--line)}
+  .ev-head{background:#f7f9fc}
+  .ev-aspect,.ev-cell,.ev-col{padding:16px 20px;display:flex;align-items:center;gap:12px}
+  .ev-aspect{font-weight:800;font-size:15px;color:var(--ink)}
+  .ev-hl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .ev-num{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:9px;background:#eef2f8;color:var(--muted);font-size:12px;font-weight:800;flex:0 0 auto}
+  .ev-col{position:relative;justify-content:flex-start}
+  .ev-tag{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+  .ev-col.ev-alone .ev-tag{color:var(--muted)}
+  .ev-col.ev-with .ev-tag{color:var(--red)}
+  .ev-badge{position:absolute;top:-11px;right:16px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;box-shadow:0 6px 16px rgba(226,0,26,.35)}
+  .ev-cell{font-size:14px;line-height:1.45}
+  .ev-cell.ev-alone{color:var(--muted)}
+  .ev-cell.ev-with{color:var(--ink);font-weight:600;background:#fdf1f2}
+  .ev-head .ev-with{background:#fde7e9}
+  .ev-ic{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-top:1px}
+  .ev-ic svg{width:14px;height:14px}
+  .ev-x{background:#fdecec;color:#d33}
+  .ev-c{background:#e4f5ee;color:var(--green)}
+  .ev-row:not(.ev-head):hover .ev-aspect,.ev-row:not(.ev-head):hover .ev-cell.ev-alone{background:#fafbfd}
+  .ev-row:not(.ev-head):hover .ev-cell.ev-with{background:#fce9eb}
+
+  .ev-stats{max-width:1080px;margin:28px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .ev-stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 18px;text-align:center}
+  .ev-stat b{display:block;font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--red)}
+  .ev-stat span{display:block;margin-top:4px;color:var(--muted);font-size:13px;font-weight:600}
+
+  .ev-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .ev-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
+  .ev-cta p{color:#cfd6e2;margin:0;font-size:15px;max-width:560px}
+
+  @media(max-width:820px){
+    .ev-table{border:0;box-shadow:none;background:transparent}
+    .ev-row{grid-template-columns:1fr;background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:14px;box-shadow:0 10px 26px rgba(8,8,10,.06);overflow:hidden}
+    .ev-row.ev-head{display:none}
+    .ev-row + .ev-row .ev-aspect,.ev-row + .ev-row .ev-cell{border-top:0}
+    .ev-aspect{background:#f7f9fc;border-bottom:1px solid var(--line)}
+    .ev-cell{align-items:flex-start}
+    .ev-cell.ev-with{background:#fdf1f2}
+    .ev-stats{grid-template-columns:repeat(2,1fr)}
+    .ev-cta{padding:26px 22px}
+  }
+</style>
