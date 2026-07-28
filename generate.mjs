@@ -399,13 +399,24 @@ img{max-width:100%}
 .footer .copy{border-top:1px solid rgba(255,255,255,.12);text-align:center;padding:16px;font-size:12.5px;color:#8b95a7}
 `;
 
+// "Új" badge for cars added within the last 14 days (hozzaadva column, ISO date).
+function isNew(c) {
+  const s = String(c.hozzaadva || "").trim(); if (!s) return false;
+  const d = new Date(s.slice(0, 10)); if (isNaN(+d)) return false;
+  const days = (Date.now() - d.getTime()) / 86400000; return days >= -1 && days <= 14;
+}
+function ujBadge(c, abs) {
+  if (!isNew(c)) return "";
+  const st = abs ? "position:absolute;top:12px;left:12px;" : "display:inline-block;vertical-align:middle;margin-right:8px;";
+  return '<span style="' + st + 'background:#1DA851;color:#fff;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;z-index:3">Új</span>';
+}
 function navHtml(rel) {
   const cat = rel + "autoink/";
   const items = [
-    ["Prémium autóbérlés", [["Bérelhető autóink", "#"], ["Új autó bérlése", "#"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
+    ["Prémium autóbérlés", [["Bérelhető autóink", "/berelheto"], ["Új autó bérlése", "#"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
     ["Megvásárolható autóink", [["Autóink", cat], ["Egyedi autó rendelés", "#"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
-    ["Bizományos értékesítés", [["Eladom az autómat", "#"], ["Jótékonyság", "#"], ["Értékesítési folyamat", "#"], ["Gyakori kérdések", "#"]]],
-    ["Import", [["Autó rendelés", "#"], ["Beszerzési folyamat", "#"], ["Előnyök", "#"], ["Referenciák", "#"]]],
+    ["Bizományos értékesítés", [["Bizományos autóink", "/bizomanyos"], ["Eladom az autómat", "/eladom"], ["Jótékonyság", "/jotekonysag"], ["Értékesítési folyamat", "/ertekesitesi-folyamat"], ["Gyakori kérdések", "/gyakori-kerdesek"]]],
+    ["Import", [["Autó rendelés", "/auto-rendeles"], ["Beszerzési folyamat", "/beszerzesi-folyamat"], ["Előnyök", "/elonyok"], ["Egyedül vagy velünk?", "/egyedul-vagy-velunk"], ["Referenciák", "#"]]],
     ["Rólunk", [["Miért mi?", "#"], ["Caradvance Németország", "#"], ["Caradvance Magyarország", "#"], ["Referenciák", "#"], ["Partnereink", "#"], ["Media", "#"], ["Blog", "#"]]],
   ];
   const langs = [
@@ -580,7 +591,7 @@ function carCard(c, rate, rel) {
     : `<span class="ph">fotó hamarosan</span>`;
   const cross = p.save > 0 ? `<span class="pcross" data-cross>${fmtHUF(p.huGross)}</span>` : "";
   const save = p.save > 0 ? `<span class="psave" data-save>−${fmtHUF(p.save)}</span>` : "";
-  return `<a class="card" href="${attr(href)}" data-marka="${attr(c.marka || "")}" data-kar="${attr(c.karosszeria || "")}" data-uz="${attr(c.uzemanyag || "")}"><div class="media">${img}${badge}</div>
+  return `<a class="card" href="${attr(href)}" data-marka="${attr(c.marka || "")}" data-kar="${attr(c.karosszeria || "")}" data-uz="${attr(c.uzemanyag || "")}"><div class="media">${img}${badge}${ujBadge(c, true)}</div>
   <div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
   <h3 class="title">${esc((c.modell || "").trim())}</h3>
   <div class="specs">${esc(specStr(c))}</div>
@@ -1367,7 +1378,7 @@ table{width:100%;border-collapse:collapse}td{padding:11px 4px;border-bottom:1px 
     <aside class="side">
       <div class="panel">
         <div class="badge"><span class="cond">Használt</span><span class="year">${esc(c.evjarat || "")}</span></div>
-        <div class="ptitle">${esc(title)}</div>
+        <div class="ptitle">${ujBadge(c, false)}${esc(title)}</div>
         <div data-eur="${p.eur}" data-net="${nEur(c.vetel_eur_netto)}">
           <div class="plabel">Nettó ár</div>
           <div class="price" data-main>${fmtHUF(p.main)}</div>
