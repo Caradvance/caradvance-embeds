@@ -555,7 +555,7 @@ const faqJsonld = {
   var nextBtn = document.getElementById('kwNext');
   var subBtn = document.getElementById('kwSubmit');
   var count = document.getElementById('kwCount');
-  var render = function(){
+  var render = function(doScroll){
     panels.forEach(function(p){ p.hidden = (parseInt(p.getAttribute('data-step'),10) !== step); });
     dots.forEach(function(d){ var n=parseInt(d.getAttribute('data-dot'),10); d.classList.toggle('active', n===step); d.classList.toggle('done', n<step); });
     bar.style.width = (step/TOTAL*100) + '%';
@@ -563,8 +563,7 @@ const faqJsonld = {
     prevBtn.style.visibility = step===1 ? 'hidden' : 'visible';
     nextBtn.hidden = step===TOTAL;
     subBtn.hidden = step!==TOTAL;
-    var top = form.getBoundingClientRect().top + window.pageYOffset - 90;
-    window.scrollTo({ top: top, behavior: 'smooth' });
+    if(doScroll){ var top = form.getBoundingClientRect().top + window.pageYOffset - 90; window.scrollTo({ top: top, behavior: 'smooth' }); }
   };
   var validateStep = function(){
     if(step===1 && !val('b-make')){ alert('Kérlek, válaszd ki legalább a márkát.'); return false; }
@@ -575,8 +574,8 @@ const faqJsonld = {
     }
     return true;
   };
-  nextBtn.addEventListener('click', function(){ if(!validateStep()) return; if(step<TOTAL){ step++; render(); } });
-  prevBtn.addEventListener('click', function(){ if(step>1){ step--; render(); } });
+  nextBtn.addEventListener('click', function(){ if(!validateStep()) return; if(step<TOTAL){ step++; render(true); } });
+  prevBtn.addEventListener('click', function(){ if(step>1){ step--; render(true); } });
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
