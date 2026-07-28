@@ -93,3 +93,5 @@ gives every branch its own preview URL, so you can review the whole thing before
 <!-- build: refresh www after sheet-driven rebuild (2026-07-28) -->
 
 <!-- build refresh: nav links + side images + Uj label -->
+
+<!-- build: carousel + live FX endpoint -->
