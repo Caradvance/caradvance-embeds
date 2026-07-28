@@ -63,9 +63,8 @@
 
 <script>
 (function(){
-  var JURL="https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:json&sheet=autok";
+  var JURL="https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:json&sheet=autok&headers=1";
   var R=402;
-  var COL={modell:0,marka:1,karosszeria:2,km:3,teljesitmeny:4,valto:5,uzemanyag:6,evjarat:7,hajtas:8,berlet_eur:9,vetel_eur:10,vetel_eur_netto:11,kep_url:12,kiemelt:13,felszereltseg:14,galeria:15,aktiv:16,hozzaadva:17};
   function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
   function slugify(m){return String(m||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
   function driveImg(u){u=String(u||"").trim();if(!u)return"";var m=u.match(/\/d\/([-\w]{20,})/)||u.match(/[?&]id=([-\w]{20,})/);if(m)return"https://lh3.googleusercontent.com/d/"+m[1]+"=w1200";if(/^[-\w]{25,}$/.test(u))return"https://lh3.googleusercontent.com/d/"+u+"=w1200";return u;}
@@ -97,18 +96,19 @@
     grid.innerHTML=html;countEl.textContent=n+' autó';emptyEl.style.display=n?'none':'block';
   }
   function fillSelect(sel,vals){vals.sort();for(var i=0;i<vals.length;i++){var o=document.createElement('option');o.value=vals[i];o.textContent=vals[i];sel.appendChild(o);}}
-  function render(rows){
+  function render(rows,idx){
     var mk={},kr={},uz={};
+    function cell(row,name){var j=idx[name];if(j==null)return'';var c=row.c[j];return (c&&c.v!=null)?String(c.v).trim():'';}
     for(var r=0;r<rows.length;r++){var row=rows[r];if(!row||!row.c)continue;
-      var g=function(i){var cell=row.c[i];return (cell&&cell.v!=null)?String(cell.v).trim():'';};
-      if(g(COL.aktiv).toLowerCase()!=='igen')continue;
-      var modell=g(COL.modell);if(!modell)continue;
-      var netto=parseFloat((g(COL.vetel_eur_netto)||'').replace(/[^\d.]/g,''));
-      var gross=parseFloat((g(COL.vetel_eur)||'').replace(/[^\d.]/g,''));
+      var g=function(n){return cell(row,n);};
+      if(g('aktiv').toLowerCase()!=='igen')continue;
+      var modell=g('modell');if(!modell)continue;
+      var netto=parseFloat((g('vetel_eur_netto')||'').replace(/[^\d.]/g,''));
+      var gross=parseFloat((g('vetel_eur')||'').replace(/[^\d.]/g,''));
       var eurNet=isFinite(netto)&&netto>0?netto:(isFinite(gross)&&gross>0?gross:0);
-      var gal=g(COL.galeria);var galArr=gal?gal.split(/[,\n]/).map(function(s){return driveImg(s.trim());}).filter(Boolean):[];
-      var img=driveImg(g(COL.kep_url))||galArr[0]||'';
-      var car={modell:modell,marka:g(COL.marka),karosszeria:g(COL.karosszeria),km:g(COL.km),teljesitmeny:g(COL.teljesitmeny),valto:g(COL.valto),uzemanyag:g(COL.uzemanyag),evjarat:g(COL.evjarat),hajtas:g(COL.hajtas),eurNet:eurNet,kiemelt:!!g(COL.kiemelt),uj:daysSince(g(COL.hozzaadva))<14,img:img,slug:slugify(modell)};
+      var gal=g('galeria');var galArr=gal?gal.split(/[,\n]/).map(function(s){return driveImg(s.trim());}).filter(Boolean):[];
+      var img=driveImg(g('kep_url'))||galArr[0]||'';
+      var car={modell:modell,marka:g('marka'),karosszeria:g('karosszeria'),km:g('km'),teljesitmeny:g('teljesitmeny'),valto:g('valto'),uzemanyag:g('uzemanyag'),evjarat:g('evjarat'),hajtas:g('hajtas'),eurNet:eurNet,kiemelt:!!g('kiemelt'),uj:daysSince(g('hozzaadva'))<14,img:img,slug:slugify(modell)};
       ALL.push(car);
       if(car.marka)mk[car.marka]=1;if(car.karosszeria)kr[car.karosszeria]=1;if(car.uzemanyag)uz[car.uzemanyag]=1;
     }
@@ -120,10 +120,12 @@
   function load(){
     fetch(JURL,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var s=t.replace(/^[^(]*\(/,'').replace(/\);?\s*$/,'');
-      var data=JSON.parse(s);
-      var rows=(data&&data.table&&data.table.rows)||[];
+      var d=JSON.parse(s);
+      var cols=((d.table&&d.table.cols)||[]).map(function(c){return String(c.label||'').trim().toLowerCase();});
+      var idx={};cols.forEach(function(l,i){if(l)idx[l]=i;});
+      var rows=(d.table&&d.table.rows)||[];
       if(!rows.length){countEl.textContent='Az autólista jelenleg nem elérhető.';return;}
-      render(rows);
+      render(rows,idx);
     }).catch(function(){countEl.textContent='Az autólista jelenleg nem elérhető. Kérlek, próbáld újra később.';});
   }
   fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
