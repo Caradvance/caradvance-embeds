@@ -67,7 +67,7 @@ window.BIZ = (function () {
     }).catch(function(){ cb(CARS); });
   }
   function loadRate(cb){
-    fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
+    fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-store'})
       .then(function(r){return r.json();}).then(function(d){if(d&&d.rates&&d.rates.HUF)setRate(d.rates.HUF); if(cb)cb();})
       .catch(function(){ if(cb)cb(); });
   }
