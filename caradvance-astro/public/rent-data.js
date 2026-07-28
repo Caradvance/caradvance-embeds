@@ -79,11 +79,36 @@ window.RENT = (function () {
       cb(out);
     }).catch(function(){ cb([]); });
   }
+  // ALL active sale cars (for homepage Eladó carousel): hero image + kiemelt + newest.
+  function loadAll(cb){
+    fetch(SHEET_CSV,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+      var rows=parseCSV(t); if(!rows.length){ cb([]); return; }
+      var head=rows[0].map(function(h){return String(h).trim().toLowerCase();});
+      var ix={}; head.forEach(function(h,i){ix[h]=i;});
+      function g(row,n){var j=ix[n];return j==null?'':String(row[j]||'').trim();}
+      function num(v){return parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;}
+      var out=[];
+      for(var r=1;r<rows.length;r++){ var row=rows[r]; if(!row||!row.length)continue;
+        var modell=g(row,'modell'); if(!modell)continue;
+        if((g(row,'aktiv')||'').toLowerCase()==='nem')continue;
+        out.push({
+          modell:modell, marka:g(row,'marka'), karosszeria:g(row,'kazosszeria'),
+          km:g(row,'km'), teljesitmeny:g(row,'teljesitmeny'), valto:g(row,'valto'),
+          uzemanyag:g(row,'uzemanyag'), evjarat:g(row,'evjarat'), hajtas:g(row,'hajtas'),
+          eur:num(g(row,'vetel_eur')), net:num(g(row,'vetel_eur_netto')),
+          img:sideImg(modell,g(row,'kep_url'),g(row,'galeria')),
+          kiemelt:(g(row,'kiemelt')||'').toLowerCase()==='igen', hozzaadva:g(row,'hozzaadva')
+        });
+      }
+      cb(out);
+    }).catch(function(){ cb([]); });
+  }
+
   function loadRate(cb){
     fetch('https://api.frankfurter.app/latest?from=EUR&to=HUF',{cache:'no-store'})
       .then(function(r){return r.json();}).then(function(d){ if(d&&d.rates&&d.rates.HUF) setRate(d.rates.HUF); if(cb)cb(); })
       .catch(function(){ if(cb)cb(); });
   }
 
-  return { slugify:slugify, ftOf:ftOf, fmtFt:fmtFt, setRate:setRate, getRate:getRate, rentInfo:rentInfo, loadCars:loadCars, loadRate:loadRate };
+  return { slugify:slugify, ftOf:ftOf, fmtFt:fmtFt, setRate:setRate, getRate:getRate, rentInfo:rentInfo, loadCars:loadCars, loadAll:loadAll, heroImg:sideImg, loadRate:loadRate };
 })();
