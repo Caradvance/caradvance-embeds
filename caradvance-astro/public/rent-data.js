@@ -7,6 +7,18 @@ window.RENT = (function () {
   var SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv';
 
   function slugify(m){return String(m||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  var MAIN_PICK = {"bmw-x7-m50d-m-sport-pro-22-b-w": "fe568239", "bmw-x2-xdrive20d-m-sport-pro-20-h-k": "0ec9c853", "bmw-x6-m60i-xdrive-full-option-carbon-m-sitze": "b71ffd45", "bmw-i5-m60-xdrive-i5m60-xdrive": "c2e8e425", "bmw-x5-xdrive30d": "905fe271", "bmw-x6-xdrive30d-m-sport-pro": "c6b0483d", "bmw-x5-xdrive30d-m-sport-pro-luft-22": "7cc9ba26", "porsche-911-carrera-4-gts-approved-3-jahre-voll-leder": "44ce52eb", "bmw-m4-comp-cabrio-20-carbon-driv-assist-prof-h-k": "2182e56e", "bmw-x7-xdrive40d-m-sport-pro-23-luft-h-k": "64574841", "bmw-x5-xdrive40d-m-sport-pro-full-option": "a3dc7592", "bmw-x6-xdrive30d-m-sport-pro-individual-22": "921b1d29", "bmw-x6-xdrive30d-m-sport-pro-luft-22": "a05d3035", "bmw-x5-xdrive30d-m-sport-pro-22-luft": "db6ae02a", "bmw-x5-xdrive30d-m-sport-pro-22": "c32a177b", "bmw-x5-m-competition-21-22": "4783b10e", "porsche-911-carrera-gts-approved-3-jahre-voll-leder": "7544b234", "bmw-x6-xdrive30d-m-sport-pro-22-individual": "87861b10", "bmw-x7-xdrive40d-m-sport-pro-22": "2ad119b8", "porsche-panamera-gts-standheizung-allradlenkung-ptv-pano": "c25bffa2", "bmw-x7-40d-british-racing-green-brown-b-w-full": "252375f1"};
+  function sideImg(modell, kep, galeria){
+    var slug=slugify(modell);
+    var list=String(galeria||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
+    var all=[], main=(kep||'').trim()||list[0]||'';
+    if(main) all.push(main);
+    for(var i=0;i<list.length;i++){ if(list[i] && all.indexOf(list[i])<0) all.push(list[i]); }
+    var pick=MAIN_PICK[slug];
+    if(pick){ var idx=-1; for(var j=0;j<all.length;j++){ if(all[j].indexOf(pick)>=0){idx=j;break;} } if(idx>0){ all.unshift(all.splice(idx,1)[0]); } }
+    else if(all.length>1 && /classistatic|mo-prod/.test(all[0])){ all.unshift(all.splice(1,1)[0]); }
+    return all[0]||'';
+  }
   function ftOf(eur){ return Math.round(eur*RATE); }
   function fmtFt(v){ return Math.round(v).toLocaleString('hu-HU')+' Ft'; }
   function setRate(r){ RATE=r; }
@@ -57,7 +69,7 @@ window.RENT = (function () {
           modell:modell, marka:g(row,'marka'), karosszeria:g(row,'karosszeria'),
           km:g(row,'km'), teljesitmeny:g(row,'teljesitmeny'), valto:g(row,'valto'),
           uzemanyag:g(row,'uzemanyag'), evjarat:g(row,'evjarat'), hajtas:g(row,'hajtas'),
-          img:g(row,'kep_url'), kiemelt:(g(row,'kiemelt')||'').toLowerCase()==='igen',
+          img:sideImg(modell,g(row,'kep_url'),g(row,'galeria')), hozzaadva:g(row,'hozzaadva'), kiemelt:(g(row,'kiemelt')||'').toLowerCase()==='igen',
           rent:ri
         });
       }
