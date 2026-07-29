@@ -172,7 +172,7 @@ const { lang = 'hu' } = Astro.props;
     {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Dízel',from:39350},
   ];
 
-  var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin'];
+  var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel'];
   function slug(c){ return c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel]); }
   function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
