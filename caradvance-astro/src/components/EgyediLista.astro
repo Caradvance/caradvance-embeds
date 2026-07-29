@@ -11,7 +11,7 @@ const { lang = 'hu' } = Astro.props;
     <div class="egl-filters">
       <input type="text" id="eglQ" class="egl-search" placeholder="Keresés (pl. X5, iX)…" />
       <div class="egl-sel"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option></select></div>
-      <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>SUV</option><option>Limuzin</option><option>Touring</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option></select></div>
+      <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>Kompakt</option><option>Limuzin</option><option>Touring</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option><option>Egyterű</option><option>SUV</option><option>SUV Coupé</option></select></div>
       <div class="egl-sel"><select id="eglFuel"><option value="">Minden üzemanyag</option><option>Benzin</option><option>Dízel</option><option>Hibrid</option><option>Elektromos</option></select></div>
     </div>
 
@@ -73,27 +73,66 @@ const { lang = 'hu' } = Astro.props;
   var EUR = function(eur){ return new Intl.NumberFormat('de-DE').format(eur) + ' €'; };
   var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
 
-  // one entry per model + fuel variant (photo shared per model key)
   var CARS = [
-    {key:'x3', name:'BMW X3', body:'SUV',     fuel:'Benzin',     from:60300},
-    {key:'x3', name:'BMW X3', body:'SUV',     fuel:'Dízel',      from:62800},
-    {key:'x3', name:'BMW X3', body:'SUV',     fuel:'Hibrid',     from:66900},
-    {key:'x7', name:'BMW X7', body:'SUV',     fuel:'Benzin',     from:106500},
-    {key:'x7', name:'BMW X7', body:'SUV',     fuel:'Dízel',      from:108500},
-    {key:'xm', name:'BMW XM', body:'SUV',     fuel:'Hibrid',     from:135500},
-    {key:'ix', name:'BMW iX', body:'SUV',     fuel:'Elektromos', from:83500},
-    {key:'ix2',name:'BMW iX2',body:'SUV',     fuel:'Elektromos', from:51000},
-    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Benzin',     from:47000},
-    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Dízel',      from:51500},
-    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Hibrid',     from:63300},
-    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Benzin',     from:60000},
-    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Dízel',      from:62300},
-    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Hibrid',     from:66700},
-    {key:'m5', name:'BMW M5', body:'Limuzin', fuel:'Hibrid',     from:145200},
-    {key:'m3', name:'BMW M3', body:'Limuzin', fuel:'Benzin',     from:96500},
-    {key:'i5', name:'BMW i5', body:'Limuzin', fuel:'Elektromos', from:70900},
-    {key:'i7', name:'BMW i7', body:'Limuzin', fuel:'Elektromos', from:121400},
-    {key:'i4', name:'BMW i4', body:'Gran Coupé', fuel:'Elektromos', from:58200}
+    {key:'1er',name:'BMW 1-es',body:'Kompakt',fuel:'Benzin',from:34250},
+    {key:'1er',name:'BMW 1-es',body:'Kompakt',fuel:'Dízel',from:39350},
+    {key:'2erc',name:'BMW 2-es Coupé',body:'Coupé',fuel:'Benzin',from:46300},
+    {key:'2erc',name:'BMW 2-es Coupé',body:'Coupé',fuel:'Dízel',from:53400},
+    {key:'2ergc',name:'BMW 2-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',from:37750},
+    {key:'2ergc',name:'BMW 2-es Gran Coupé',body:'Gran Coupé',fuel:'Dízel',from:42850},
+    {key:'2erat',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Benzin',from:36750},
+    {key:'2erat',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Dízel',from:42450},
+    {key:'2erat',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Hibrid',from:49150},
+    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Benzin',from:47000},
+    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Dízel',from:51500},
+    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Hibrid',from:63300},
+    {key:'3ert',name:'BMW 3-as Touring',body:'Touring',fuel:'Benzin',from:48300},
+    {key:'3ert',name:'BMW 3-as Touring',body:'Touring',fuel:'Dízel',from:52800},
+    {key:'3ert',name:'BMW 3-as Touring',body:'Touring',fuel:'Hibrid',from:64600},
+    {key:'4erc',name:'BMW 4-es Coupé',body:'Coupé',fuel:'Benzin',from:53900},
+    {key:'4erc',name:'BMW 4-es Coupé',body:'Coupé',fuel:'Dízel',from:56700},
+    {key:'4ergc',name:'BMW 4-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',from:53900},
+    {key:'4ergc',name:'BMW 4-es Gran Coupé',body:'Gran Coupé',fuel:'Dízel',from:56800},
+    {key:'4ercab',name:'BMW 4-es Cabrio',body:'Cabrio',fuel:'Benzin',from:61400},
+    {key:'4ercab',name:'BMW 4-es Cabrio',body:'Cabrio',fuel:'Dízel',from:64300},
+    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Benzin',from:60000},
+    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Dízel',from:62300},
+    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Hibrid',from:66700},
+    {key:'5ert',name:'BMW 5-ös Touring',body:'Touring',fuel:'Benzin',from:62000},
+    {key:'5ert',name:'BMW 5-ös Touring',body:'Touring',fuel:'Dízel',from:64000},
+    {key:'5ert',name:'BMW 5-ös Touring',body:'Touring',fuel:'Hibrid',from:68700},
+    {key:'7er',name:'BMW 7-es',body:'Limuzin',fuel:'Benzin',from:117900},
+    {key:'7er',name:'BMW 7-es',body:'Limuzin',fuel:'Hibrid',from:122000},
+    {key:'i4',name:'BMW i4',body:'Gran Coupé',fuel:'Elektromos',from:58200},
+    {key:'i5',name:'BMW i5',body:'Limuzin',fuel:'Elektromos',from:70900},
+    {key:'i5t',name:'BMW i5 Touring',body:'Touring',fuel:'Elektromos',from:72900},
+    {key:'i7',name:'BMW i7',body:'Limuzin',fuel:'Elektromos',from:121400},
+    {key:'m2',name:'BMW M2',body:'Coupé',fuel:'Benzin',from:81300},
+    {key:'m3',name:'BMW M3',body:'Limuzin',fuel:'Benzin',from:96500},
+    {key:'m3t',name:'BMW M3 Touring',body:'Touring',fuel:'Benzin',from:96500},
+    {key:'m4',name:'BMW M4',body:'Coupé',fuel:'Benzin',from:98500},
+    {key:'m4cab',name:'BMW M4 Cabrio',body:'Cabrio',fuel:'Benzin',from:114100},
+    {key:'m5',name:'BMW M5',body:'Limuzin',fuel:'Hibrid',from:145200},
+    {key:'x1',name:'BMW X1',body:'SUV',fuel:'Benzin',from:45100},
+    {key:'x1',name:'BMW X1',body:'SUV',fuel:'Dízel',from:47700},
+    {key:'x1',name:'BMW X1',body:'SUV',fuel:'Hibrid',from:51600},
+    {key:'ix1',name:'BMW iX1',body:'SUV',fuel:'Elektromos',from:49400},
+    {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Benzin',from:48600},
+    {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Dízel',from:49200},
+    {key:'ix2',name:'BMW iX2',body:'SUV Coupé',fuel:'Elektromos',from:51000},
+    {key:'x3',name:'BMW X3',body:'SUV',fuel:'Benzin',from:60300},
+    {key:'x3',name:'BMW X3',body:'SUV',fuel:'Dízel',from:62800},
+    {key:'x3',name:'BMW X3',body:'SUV',fuel:'Hibrid',from:66900},
+    {key:'ix3',name:'BMW iX3',body:'SUV',fuel:'Elektromos',from:63400},
+    {key:'x5',name:'BMW X5',body:'SUV',fuel:'Benzin',from:99750},
+    {key:'x5',name:'BMW X5',body:'SUV',fuel:'Dízel',from:95750},
+    {key:'x5',name:'BMW X5',body:'SUV',fuel:'Hibrid',from:96500},
+    {key:'x6',name:'BMW X6',body:'SUV Coupé',fuel:'Benzin',from:102800},
+    {key:'x6',name:'BMW X6',body:'SUV Coupé',fuel:'Dízel',from:98100},
+    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Benzin',from:106500},
+    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Dízel',from:108500},
+    {key:'xm',name:'BMW XM',body:'SUV',fuel:'Hibrid',from:135500},
+    {key:'ix',name:'BMW iX',body:'SUV',fuel:'Elektromos',from:83500}
   ];
 
   function slug(c){ return c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel]); }
