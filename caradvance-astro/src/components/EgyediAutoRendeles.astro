@@ -367,7 +367,7 @@ const { lang = 'hu' } = Astro.props;
     var el=$('ecfgColors');
     el.innerHTML = COLORS.map(function(c,i){
       return '<div class="ecfg-color'+(i===state.color?' sel':'')+'" data-i="'+i+'">'+
-        '<span class="ecfg-sw" style="background:'+c.hex+'"></span><span>'+c.n+(ã.p?' +'+EUR(c.p):'')+'</span></div>';
+        '<span class="ecfg-sw" style="background:'+c.hex+'"></span><span>'+c.n+(c.p?' +'+EUR(c.p):'')+'</span></div>';
     }).join('');
     Array.prototype.forEach.call(el.children,function(d){ d.onclick=function(){ state.color=+d.dataset.i; renderAll(); }; });
   }
