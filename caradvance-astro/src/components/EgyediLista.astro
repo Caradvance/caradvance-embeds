@@ -42,6 +42,7 @@ const { lang = 'hu' } = Astro.props;
   .egl-sel select:focus{outline:none;border-color:#c9d3e3;}
   .egl-count{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:16px;}
   .egl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .egl-new{position:absolute;left:14px;top:14px;background:var(--red);color:#fff;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;letter-spacing:.05em;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.18);}
   .egl-section{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800;color:var(--ink);margin:26px 0 2px;letter-spacing:-.01em;}
   .egl-section:first-child{margin-top:0;}
   .egl-section .dot{width:13px;height:13px;border-radius:50%;flex:0 0 auto;}
@@ -171,6 +172,7 @@ const { lang = 'hu' } = Astro.props;
     {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Dízel',from:39350},
   ];
 
+  var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin'];
   function slug(c){ return c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel]); }
   function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
@@ -178,7 +180,7 @@ const { lang = 'hu' } = Astro.props;
     var a=document.createElement('a');
     a.className='egl-card'; a.href='/egyedi-auto-rendeles/'+slug(c);
     a.innerHTML =
-      '<div class="egl-media"><img src="/bmw/'+c.key+'.webp?v=6" alt="'+c.name+'" loading="lazy"/>'+
+      '<div class="egl-media">'+(NEW.indexOf(slug(c))>-1?'<span class="egl-new">ÚJ</span>':'')+'<img src="/bmw/'+c.key+'.webp?v=6" alt="'+c.name+'" loading="lazy"/>'+
         '<div class="egl-fuels"><span class="egl-fuel" style="background:'+(FUELC[c.fuel]||'#5A6B82')+'">'+c.fuel+'</span></div>'+(isM(c)?'<img class="egl-m" src="/bmw/m-logo.webp?v=1" alt="M"/>':'')+'</div>'+
       '<div class="egl-body">'+
         '<div class="egl-meta"><span class="egl-pill">Új autó</span><span class="egl-year">2026 · Németország</span></div>'+
