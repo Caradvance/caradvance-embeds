@@ -62,7 +62,7 @@ const _rebuild='rebuild-nudge-1';
   .egl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
   .egl-brand{display:inline-flex;align-items:center;}
   .egl-bmw{height:34px;width:auto;position:relative;z-index:2;}
-  .egl-mlogo{height:22px;width:auto;margin-right:-6px;position:relative;z-index:1;}
+  .egl-mlogo{height:20px;width:auto;margin-left:8px;}
   .egl-year{font-size:13.5px;color:var(--muted);}
   .egl-name{font-size:19px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;}
   .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px;}
@@ -186,7 +186,7 @@ const _rebuild='rebuild-nudge-1';
       '<div class="egl-media">'+(NEW.indexOf(slug(c))>-1?'<span class="egl-new">ÚJ</span>':'')+'<img src="/bmw/'+c.key+'.webp?v=6" alt="'+c.name+'" loading="lazy"/>'+
         '<div class="egl-fuels"><span class="egl-fuel" style="background:'+(FUELC[c.fuel]||'#5A6B82')+'">'+c.fuel+'</span></div>'+'</div>'+
       '<div class="egl-body">'+
-        '<div class="egl-meta"><span class="egl-brand">'+(isM(c)?'<img class="egl-mlogo" src="/bmw/m-logo.webp?v=1" alt="M"/>':'')+'<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=1" alt="BMW"/></span><span class="egl-year">2026 · Németország</span></div>'+
+        '<div class="egl-meta"><span class="egl-brand"><img class="egl-bmw" src="/bmw/bmw-logo.webp?v=1" alt="BMW"/>'+(isM(c)?'<img class="egl-mlogo" src="/bmw/m-logo.webp?v=1" alt="M"/>':'')+'</span><span class="egl-year">2026 · Németország</span></div>'+
         '<div class="egl-name">'+c.name+'</div>'+
         '<div class="egl-specs">'+specLine(c)+'</div>'+
         '<div class="egl-price"><b>'+HUF(c.from)+'</b><span class="eur">'+EUR(c.from)+'</span><span class="tol">-tól</span></div>'+
