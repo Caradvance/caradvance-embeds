@@ -76,8 +76,8 @@ const { lang = 'hu' } = Astro.props;
 
   var CARS = [
     {key:'ix',name:'BMW iX',body:'SUV',fuel:'Elektromos',from:83500},
-    {key:'ix',name:'BMW iX M',body:'SUV',fuel:'Elektromos',from:126500},
-    {key:'ix',name:'BMW iX5',body:'SUV',fuel:'Elektromos',from:100000},
+    {key:'ixm',name:'BMW iX M',body:'SUV',fuel:'Elektromos',from:126500},
+    {key:'ix5',name:'BMW iX5',body:'SUV',fuel:'Elektromos',from:100000},
     {key:'ix3',name:'BMW iX3',body:'SUV',fuel:'Elektromos',from:63400},
     {key:'ix2',name:'BMW iX2',body:'SUV Coupé',fuel:'Elektromos',from:51000},
     {key:'ix1',name:'BMW iX1',body:'SUV',fuel:'Elektromos',from:49400},
@@ -174,7 +174,7 @@ const { lang = 'hu' } = Astro.props;
     var a=document.createElement('a');
     a.className='egl-card'; a.href='/egyedi-auto-rendeles/'+slug(c);
     a.innerHTML =
-      '<div class="egl-media"><img src="/bmw/'+c.key+'.webp?v=5" alt="'+c.name+'" loading="lazy"/>'+
+      '<div class="egl-media"><img src="/bmw/'+c.key+'.webp?v=6" alt="'+c.name+'" loading="lazy"/>'+
         '<div class="egl-fuels"><span class="egl-fuel" style="background:'+(FUELC[c.fuel]||'#5A6B82')+'">'+c.fuel+'</span></div>'+(isM(c)?'<img class="egl-m" src="/bmw/m-logo.webp?v=1" alt="M"/>':'')+'</div>'+
       '<div class="egl-body">'+
         '<div class="egl-meta"><span class="egl-pill">Új autó</span><span class="egl-year">2026 · Németország</span></div>'+
