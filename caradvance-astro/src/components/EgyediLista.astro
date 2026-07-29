@@ -141,7 +141,7 @@ const { lang = 'hu' } = Astro.props;
     var a=document.createElement('a');
     a.className='egl-card'; a.href='/egyedi-auto-rendeles/'+slug(c);
     a.innerHTML =
-      '<div class="egl-media"><img src="/bmw/'+c.key+'.webp" alt="'+c.name+'" loading="lazy"/>'+
+      '<div class="egl-media"><img src="/bmw/'+c.key+'.webp?v=4" alt="'+c.name+'" loading="lazy"/>'+
         '<div class="egl-fuels"><span class="egl-fuel" style="background:'+(FUELC[c.fuel]||'#5A6B82')+'">'+c.fuel+'</span></div></div>'+
       '<div class="egl-body">'+
         '<div class="egl-meta"><span class="egl-pill">Új autó</span><span class="egl-year">2026 · Németország</span></div>'+
