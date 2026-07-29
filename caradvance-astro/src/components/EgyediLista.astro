@@ -47,8 +47,9 @@ const { lang = 'hu' } = Astro.props;
   .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;
     display:flex;flex-direction:column;transition:.18s;text-decoration:none;color:inherit;}
   .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.10);transform:translateY(-3px);}
-  .egl-media{position:relative;background:#fff;aspect-ratio:16/11;display:flex;align-items:center;justify-content:center;padding:10px;}
+  .egl-media{position:relative;background:#fff;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;padding:6px 14px 0;}
   .egl-media img{width:100%;height:100%;object-fit:contain;}
+  .egl-fuel{position:absolute;top:14px;right:14px;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12);}
   .egl-badge{position:absolute;top:14px;right:14px;background:var(--red);color:#fff;font-size:12px;
     font-weight:700;padding:6px 14px;border-radius:100px;}
   .egl-body{padding:16px 20px 20px;}
@@ -72,6 +73,7 @@ const { lang = 'hu' } = Astro.props;
   var HUF = function(eur){ return new Intl.NumberFormat('hu-HU').format(Math.round(eur*FX)) + ' Ft'; };
   var EUR = function(eur){ return new Intl.NumberFormat('de-DE').format(eur) + ' €'; };
 
+  var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
   var MODELS = [
     { key:'x3', name:'BMW X3', body:'SUV',    fuels:['Benzin','Dízel','Hibrid'], from:57900 },
     { key:'x7', name:'BMW X7', body:'SUV',    fuels:['Dízel','Benzin'],          from:108900 },
@@ -93,7 +95,7 @@ const { lang = 'hu' } = Astro.props;
     a.className='egl-card'; a.href='/egyedi-auto-rendeles/'+m.key;
     var src='/bmw/'+m.key+'.webp';
     a.innerHTML =
-      '<div class="egl-media"><img src="'+src+'" alt="'+m.name+'" loading="lazy"/></div>'+
+      '<div class="egl-media"><img src="'+src+'" alt="'+m.name+'" loading="lazy"/><span class="egl-fuel" style="background:'+(FUELC[m.fuels[0]]||'#5A6B82')+'">'+m.fuels[0]+'</span></div>'+
       '<div class="egl-body">'+
         '<div class="egl-meta"><span class="egl-pill">Új autó</span><span class="egl-year">2026 · Németország</span></div>'+
         '<div class="egl-name">'+m.name+'</div>'+
