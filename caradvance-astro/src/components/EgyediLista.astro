@@ -11,11 +11,11 @@ const { lang = 'hu' } = Astro.props;
     <div class="egl-filters">
       <input type="text" id="eglQ" class="egl-search" placeholder="Keresés (pl. X5, iX)…" />
       <div class="egl-sel"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option></select></div>
-      <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>SUV</option><option>Limuzin</option><option>Coupé</option></select></div>
+      <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>SUV</option><option>Limuzin</option><option>Touring</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option></select></div>
       <div class="egl-sel"><select id="eglFuel"><option value="">Minden üzemanyag</option><option>Benzin</option><option>Dízel</option><option>Hibrid</option><option>Elektromos</option></select></div>
     </div>
 
-    <div class="egl-count" id="eglCount">12 modell</div>
+    <div class="egl-count" id="eglCount"></div>
     <div class="egl-grid" id="eglGrid"></div>
   </div>
 </section>
@@ -37,7 +37,7 @@ const { lang = 'hu' } = Astro.props;
   .egl-search:focus{outline:none;border-color:#c9d3e3;}
   .egl-sel{position:relative;}
   .egl-sel select{appearance:none;-webkit-appearance:none;background:#fff;border:1px solid var(--line);
-    border-radius:12px;padding:14px 42px 14px 18px;font-size:15px;color:var(--ink);font-family:inherit;cursor:pointer;min-width:180px;}
+    border-radius:12px;padding:14px 42px 14px 18px;font-size:15px;color:var(--ink);font-family:inherit;cursor:pointer;min-width:170px;}
   .egl-sel::after{content:'⌄';position:absolute;right:16px;top:50%;transform:translateY(-60%);color:var(--muted);pointer-events:none;font-size:16px;}
   .egl-sel select:focus{outline:none;border-color:#c9d3e3;}
   .egl-count{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:16px;}
@@ -47,12 +47,10 @@ const { lang = 'hu' } = Astro.props;
   .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;
     display:flex;flex-direction:column;transition:.18s;text-decoration:none;color:inherit;}
   .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.10);transform:translateY(-3px);}
-  .egl-media{position:relative;background:#fff;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;padding:6px 14px 0;}
-  .egl-media img{width:100%;height:100%;object-fit:contain;}
+  .egl-media{position:relative;background:#fff;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;padding:10px;}
+  .egl-media img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;margin:0 auto;display:block;}
   .egl-fuels{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
   .egl-fuel{color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12);}
-  .egl-badge{position:absolute;top:14px;right:14px;background:var(--red);color:#fff;font-size:12px;
-    font-weight:700;padding:6px 14px;border-radius:100px;}
   .egl-body{padding:16px 20px 20px;}
   .egl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
   .egl-pill{background:#eef2f8;color:var(--navy);font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:100px;}
@@ -73,35 +71,44 @@ const { lang = 'hu' } = Astro.props;
   var FX = 361;
   var HUF = function(eur){ return new Intl.NumberFormat('hu-HU').format(Math.round(eur*FX)) + ' Ft'; };
   var EUR = function(eur){ return new Intl.NumberFormat('de-DE').format(eur) + ' €'; };
-
   var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
-  var MODELS = [
-    { key:'x3', name:'BMW X3', body:'SUV',    fuels:['Benzin','Dízel','Hibrid'], from:57900 },
-    { key:'x7', name:'BMW X7', body:'SUV',    fuels:['Dízel','Benzin'],          from:108900 },
-    { key:'xm', name:'BMW XM', body:'SUV',    fuels:['Hibrid'],                  from:135500 },
-    { key:'ix', name:'BMW iX', body:'SUV',    fuels:['Elektromos'],              from:83500 },
-    { key:'ix2',name:'BMW iX2',body:'SUV',    fuels:['Elektromos'],              from:51000 },
-    { key:'3er',name:'BMW 3-as',body:'Limuzin',fuels:['Benzin','Dízel','Hibrid'],from:52900 },
-    { key:'5er',name:'BMW 5-ös',body:'Limuzin',fuels:['Benzin','Dízel','Hibrid'],from:57900 },
-    { key:'m5', name:'BMW M5', body:'Limuzin',fuels:['Hibrid'],                  from:145200 },
-    { key:'m3', name:'BMW M3', body:'Limuzin',fuels:['Benzin'],                  from:96500 },
-    { key:'i5', name:'BMW i5', body:'Limuzin',fuels:['Elektromos'],              from:70900 },
-    { key:'i7', name:'BMW i7', body:'Limuzin',fuels:['Elektromos'],              from:121400 },
-    { key:'i4', name:'BMW i4', body:'Coupé',  fuels:['Elektromos'],              from:58200 }
+
+  // one entry per model + fuel variant (photo shared per model key)
+  var CARS = [
+    {key:'x3', name:'BMW X3', body:'SUV',     fuel:'Benzin',     from:60300},
+    {key:'x3', name:'BMW X3', body:'SUV',     fuel:'Dízel',      from:62800},
+    {key:'x3', name:'BMW X3', body:'SUV',     fuel:'Hibrid',     from:66900},
+    {key:'x7', name:'BMW X7', body:'SUV',     fuel:'Benzin',     from:106500},
+    {key:'x7', name:'BMW X7', body:'SUV',     fuel:'Dízel',      from:108500},
+    {key:'xm', name:'BMW XM', body:'SUV',     fuel:'Hibrid',     from:135500},
+    {key:'ix', name:'BMW iX', body:'SUV',     fuel:'Elektromos', from:83500},
+    {key:'ix2',name:'BMW iX2',body:'SUV',     fuel:'Elektromos', from:51000},
+    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Benzin',     from:47000},
+    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Dízel',      from:51500},
+    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Hibrid',     from:63300},
+    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Benzin',     from:60000},
+    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Dízel',      from:62300},
+    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Hibrid',     from:66700},
+    {key:'m5', name:'BMW M5', body:'Limuzin', fuel:'Hibrid',     from:145200},
+    {key:'m3', name:'BMW M3', body:'Limuzin', fuel:'Benzin',     from:96500},
+    {key:'i5', name:'BMW i5', body:'Limuzin', fuel:'Elektromos', from:70900},
+    {key:'i7', name:'BMW i7', body:'Limuzin', fuel:'Elektromos', from:121400},
+    {key:'i4', name:'BMW i4', body:'Gran Coupé', fuel:'Elektromos', from:58200}
   ];
 
-  function specLine(m){ return m.body + ' · Automata · ' + m.fuels.join('/'); }
-  function card(m){
+  function slug(c){ return c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel]); }
+  function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
+  function card(c){
     var a=document.createElement('a');
-    a.className='egl-card'; a.href='/egyedi-auto-rendeles/'+m.key;
-    var src='/bmw/'+m.key+'.webp';
+    a.className='egl-card'; a.href='/egyedi-auto-rendeles/'+slug(c);
     a.innerHTML =
-      '<div class="egl-media"><img src="'+src+'" alt="'+m.name+'" loading="lazy"/><div class="egl-fuels">'+m.fuels.map(function(fu){return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>';}).join('')+'</div></div>'+
+      '<div class="egl-media"><img src="/bmw/'+c.key+'.webp" alt="'+c.name+'" loading="lazy"/>'+
+        '<div class="egl-fuels"><span class="egl-fuel" style="background:'+(FUELC[c.fuel]||'#5A6B82')+'">'+c.fuel+'</span></div></div>'+
       '<div class="egl-body">'+
         '<div class="egl-meta"><span class="egl-pill">Új autó</span><span class="egl-year">2026 · Németország</span></div>'+
-        '<div class="egl-name">'+m.name+'</div>'+
-        '<div class="egl-specs">'+specLine(m)+'</div>'+
-        '<div class="egl-price"><b>'+HUF(m.from)+'</b><span class="eur">'+EUR(m.from)+'</span><span class="tol">-tól</span></div>'+
+        '<div class="egl-name">'+c.name+'</div>'+
+        '<div class="egl-specs">'+specLine(c)+'</div>'+
+        '<div class="egl-price"><b>'+HUF(c.from)+'</b><span class="eur">'+EUR(c.from)+'</span><span class="tol">-tól</span></div>'+
         '<span class="egl-btn">Részletek</span>'+
       '</div>';
     return a;
@@ -111,15 +118,15 @@ const { lang = 'hu' } = Astro.props;
   var q=document.getElementById('eglQ'), fb=document.getElementById('eglBody'), ff=document.getElementById('eglFuel'), fbr=document.getElementById('eglBrand');
   function render(){
     var qq=(q.value||'').toLowerCase(), b=fb.value, f=ff.value, br=fbr.value;
-    var list=MODELS.filter(function(m){
-      if(qq && m.name.toLowerCase().indexOf(qq)===-1) return false;
-      if(b && m.body!==b) return false;
-      if(f && m.fuels.indexOf(f)===-1) return false;
+    var list=CARS.filter(function(c){
+      if(qq && c.name.toLowerCase().indexOf(qq)===-1) return false;
+      if(b && c.body!==b) return false;
+      if(f && c.fuel!==f) return false;
       if(br && br!=='BMW') return false;
       return true;
     });
     grid.innerHTML='';
-    list.forEach(function(m){ grid.appendChild(card(m)); });
+    list.forEach(function(c){ grid.appendChild(card(c)); });
     document.getElementById('eglCount').textContent = list.length + ' modell';
   }
   [q,fb,ff,fbr].forEach(function(el){ el.addEventListener('input',render); el.addEventListener('change',render); });
