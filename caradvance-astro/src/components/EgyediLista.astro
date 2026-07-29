@@ -56,7 +56,7 @@ const { lang = 'hu' } = Astro.props;
   .egl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
   .egl-pill{background:#eef2f8;color:var(--navy);font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:100px;}
   .egl-year{font-size:13.5px;color:var(--muted);}
-  .egl-name{font-size:25px;font-weight:800;color:var(--navy);margin:0 0 14px;line-height:1.15;}
+  .egl-name{font-size:19px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;}
   .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px;}
   .egl-price{display:flex;align-items:baseline;gap:9px;margin-bottom:16px;flex-wrap:wrap;}
   .egl-price b{font-size:23px;font-weight:800;color:var(--ink);}
@@ -179,6 +179,7 @@ const { lang = 'hu' } = Astro.props;
       '<div class="egl-body">'+
         '<div class="egl-meta"><span class="egl-pill">Új autó</span><span class="egl-year">2026 · Németország</span></div>'+
         '<div class="egl-name">'+c.name+'</div>'+
+        '<div class="egl-specs">'+specLine(c)+'</div>'+
         '<div class="egl-price"><b>'+HUF(c.from)+'</b><span class="eur">'+EUR(c.from)+'</span><span class="tol">-tól</span></div>'+
         '<span class="egl-btn">Részletek</span>'+
       '</div>';
