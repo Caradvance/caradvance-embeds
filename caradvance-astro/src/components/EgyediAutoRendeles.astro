@@ -1,0 +1,453 @@
+---
+const { lang = 'hu' } = Astro.props;
+---
+<section class="ecfg">
+  <div class="ecfg-in">
+
+    <!-- Hero -->
+    <header class="ecfg-hero">
+      <span class="ecfg-kicker">Egyedi autó rendelés</span>
+      <h1>Állítsd össze álmaid BMW-jét — mi behozzuk Németországból</h1>
+      <p>Válaszd ki a modellt, a motorizációt, a színt, a felniket és a felszereltséget, mi pedig
+        kulcsrakészen, magyar okmányokkal, forgalomba helyezve szállítjuk. A konfiguráció végén
+        egyetlen kattintással kérhetsz személyre szabott, kötelezettség nélküli ajánlatot.</p>
+    </header>
+
+    <!-- Configurator -->
+    <div class="ecfg-grid">
+
+      <!-- Left: live preview -->
+      <div class="ecfg-stage">
+        <div class="ecfg-canvas" id="ecfgCanvas"></div>
+        <div class="ecfg-stage-foot">
+          <div class="ecfg-model">
+            <div class="ecfg-model-name" id="ecfgModelName">BMW X5</div>
+            <div class="ecfg-model-sub" id="ecfgModelSub">xDrive40d</div>
+          </div>
+          <div class="ecfg-price">
+            <span class="ecfg-price-label">Kalkulált német listaár</span>
+            <span class="ecfg-price-val" id="ecfgPrice">—</span>
+          </div>
+        </div>
+        <p class="ecfg-price-note">Tájékoztató német nettó/bruttó listaár. A végleges, kulcsrakész
+          magyar árat (import, ÁFA, forgalomba helyezés, garancia) egyedi ajánlatban adjuk meg.</p>
+      </div>
+
+      <!-- Right: options -->
+      <div class="ecfg-panel">
+
+        <div class="ecfg-block">
+          <h3>1. Modell</h3>
+          <div class="ecfg-models" id="ecfgModels"></div>
+        </div>
+
+        <div class="ecfg-block">
+          <h3>2. Motorizáció</h3>
+          <div class="ecfg-opts" id="ecfgEngines"></div>
+        </div>
+
+        <div class="ecfg-block">
+          <h3>3. Felszereltségi szint</h3>
+          <div class="ecfg-opts" id="ecfgTrims"></div>
+        </div>
+
+        <div class="ecfg-block">
+          <h3>4. Külső szín</h3>
+          <div class="ecfg-colors" id="ecfgColors"></div>
+        </div>
+
+        <div class="ecfg-block">
+          <h3>5. Könnyűfém keréktárcsa</h3>
+          <div class="ecfg-opts" id="ecfgWheels"></div>
+        </div>
+
+        <div class="ecfg-block">
+          <h3>6. Kárpit</h3>
+          <div class="ecfg-opts" id="ecfgInterior"></div>
+        </div>
+
+        <div class="ecfg-block">
+          <h3>7. Belső díszléc</h3>
+          <div class="ecfg-opts" id="ecfgTrimStrip"></div>
+        </div>
+
+        <div class="ecfg-block">
+          <h3>8. Csomagok és extrák</h3>
+          <div class="ecfg-packs" id="ecfgPacks"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Summary + request -->
+    <div class="ecfg-summary" id="ecfgSummary">
+      <div class="ecfg-sum-list">
+        <h3>Összegzés</h3>
+        <ul id="ecfgSumList"></ul>
+        <div class="ecfg-sum-total">
+          <span>Összesen (tájékoztató)</span>
+          <strong id="ecfgSumTotal">—</strong>
+        </div>
+      </div>
+      <form class="ecfg-request" id="ecfgForm">
+        <h3>Kérj személyre szabott ajánlatot</h3>
+        <p>Elküldjük neked a konfigurációd kulcsrakész magyar árát, elérhetőségét és a következő lépéseket.</p>
+        <div class="ecfg-frow">
+          <input type="text" id="ecfgName" placeholder="Név" required />
+          <input type="tel" id="ecfgPhone" placeholder="Telefonszám" required />
+        </div>
+        <input type="email" id="ecfgEmail" placeholder="E-mail cím" required />
+        <textarea id="ecfgMsg" rows="3" placeholder="Megjegyzés (opcionális)"></textarea>
+        <button type="submit" class="ecfg-btn">Ajánlatkérés elküldése</button>
+        <span class="ecfg-form-note">A gombra kattintva megnyílik a leveleződ a konfiguráció részleteivel,
+          címzett: info@caradvance.hu</span>
+      </form>
+    </div>
+
+    <!-- How it works -->
+    <div class="ecfg-how">
+      <h2>Hogyan zajlik az egyedi rendelés?</h2>
+      <div class="ecfg-how-grid">
+        <div class="ecfg-how-card"><span class="ecfg-num">1</span><h4>Konfiguráció</h4><p>Összeállítod a kívánt autót, és elküldöd az ajánlatkérést.</p></div>
+        <div class="ecfg-how-card"><span class="ecfg-num">2</span><h4>Ajánlat</h4><p>24 órán belül kulcsrakész magyar árat és elérhető darabokat küldünk.</p></div>
+        <div class="ecfg-how-card"><span class="ecfg-num">3</span><h4>Beszerzés</h4><p>Német partnereinktől lekötjük és ellenőrizzük a pontosan ilyen autót.</p></div>
+        <div class="ecfg-how-card"><span class="ecfg-num">4</span><h4>Átadás</h4><p>Behozzuk, okmányoztatjuk, forgalomba helyezzük — te átveszed.</p></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .ecfg{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--navy:#0F1B2D;
+    background:#fff;color:var(--ink);padding:56px 20px 72px;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
+  .ecfg-in{max-width:1180px;margin:0 auto;}
+  .ecfg-hero{max-width:820px;margin:0 auto 40px;text-align:center;}
+  .ecfg-kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--red);background:rgba(226,0,26,.08);
+    padding:6px 14px;border-radius:100px;margin-bottom:16px;}
+  .ecfg-hero h1{font-size:34px;line-height:1.15;font-weight:800;margin:0 0 14px;color:var(--navy);}
+  .ecfg-hero p{font-size:16px;line-height:1.6;color:var(--muted);margin:0;}
+
+  .ecfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;}
+  @media (max-width:900px){.ecfg-grid{grid-template-columns:1fr;}}
+
+  /* Stage */
+  .ecfg-stage{position:sticky;top:90px;background:linear-gradient(180deg,#f6f8fc 0%,#eef2f8 100%);
+    border:1px solid var(--line);border-radius:22px;padding:22px;}
+  @media (max-width:900px){.ecfg-stage{position:static;}}
+  .ecfg-canvas{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;}
+  .ecfg-canvas svg{width:100%;height:100%;}
+  .ecfg-stage-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;
+    margin-top:8px;padding-top:16px;border-top:1px solid var(--line);}
+  .ecfg-model-name{font-size:22px;font-weight:800;color:var(--navy);line-height:1.1;}
+  .ecfg-model-sub{font-size:14px;color:var(--muted);margin-top:3px;}
+  .ecfg-price{text-align:right;}
+  .ecfg-price-label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .ecfg-price-val{font-size:24px;font-weight:800;color:var(--red);}
+  .ecfg-price-note{font-size:11.5px;line-height:1.5;color:var(--muted);margin:12px 0 0;}
+
+  /* Panel */
+  .ecfg-block{margin-bottom:24px;}
+  .ecfg-block h3{font-size:14px;font-weight:700;letter-spacing:.02em;color:var(--navy);
+    margin:0 0 12px;text-transform:uppercase;}
+  .ecfg-models{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  @media (max-width:520px){.ecfg-models{grid-template-columns:repeat(3,1fr);}}
+  .ecfg-model-btn{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 6px;
+    font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s;text-align:center;}
+  .ecfg-model-btn:hover{border-color:#c9d3e3;}
+  .ecfg-model-btn.sel{border-color:var(--red);background:rgba(226,0,26,.05);color:var(--red);}
+
+  .ecfg-opts{display:flex;flex-wrap:wrap;gap:8px;}
+  .ecfg-opt{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 13px;
+    font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;transition:.15s;display:flex;
+    align-items:center;gap:8px;}
+  .ecfg-opt:hover{border-color:#c9d3e3;}
+  .ecfg-opt.sel{border-color:var(--red);background:rgba(226,0,26,.05);}
+  .ecfg-opt .pl{font-size:12px;color:var(--muted);font-weight:600;}
+  .ecfg-opt.sel .pl{color:var(--red);}
+
+  .ecfg-colors{display:flex;flex-wrap:wrap;gap:12px;}
+  .ecfg-color{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;width:70px;}
+  .ecfg-sw{width:44px;height:44px;border-radius:50%;border:2px solid #fff;
+    box-shadow:0 0 0 1.5px var(--line);transition:.15s;}
+  .ecfg-color.sel .ecfg-sw{box-shadow:0 0 0 2.5px var(--red);}
+  .ecfg-color span{font-size:10.5px;line-height:1.25;text-align:center;color:var(--muted);}
+  .ecfg-color.sel span{color:var(--ink);font-weight:600;}
+
+  .ecfg-packs{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  @media (max-width:520px){.ecfg-packs{grid-template-columns:1fr;}}
+  .ecfg-pack{border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;cursor:pointer;
+    transition:.15s;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .ecfg-pack:hover{border-color:#c9d3e3;}
+  .ecfg-pack.sel{border-color:var(--red);background:rgba(226,0,26,.05);}
+  .ecfg-pack .pn{font-size:13px;font-weight:600;}
+  .ecfg-pack .pp{font-size:12px;color:var(--muted);white-space:nowrap;}
+  .ecfg-pack.sel .pp{color:var(--red);}
+  .ecfg-pack .chk{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);
+    flex:0 0 18px;display:flex;align-items:center;justify-content:center;}
+  .ecfg-pack.sel .chk{background:var(--red);border-color:var(--red);}
+  .ecfg-pack.sel .chk::after{content:'';width:5px;height:9px;border:2px solid #fff;border-top:0;
+    border-left:0;transform:rotate(45deg) translateY(-1px);}
+
+  /* Summary */
+  .ecfg-summary{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:44px;
+    background:var(--navy);border-radius:22px;padding:30px;color:#fff;}
+  @media (max-width:900px){.ecfg-summary{grid-template-columns:1fr;}}
+  .ecfg-sum-list h3,.ecfg-request h3{font-size:18px;font-weight:800;margin:0 0 14px;}
+  .ecfg-sum-list ul{list-style:none;margin:0;padding:0;}
+  .ecfg-sum-list li{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;
+    padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);color:#cfd8e6;}
+  .ecfg-sum-list li b{color:#fff;font-weight:600;}
+  .ecfg-sum-list li span{white-space:nowrap;color:#fff;}
+  .ecfg-sum-total{display:flex;justify-content:space-between;align-items:center;margin-top:16px;
+    font-size:15px;color:#cfd8e6;}
+  .ecfg-sum-total strong{font-size:26px;color:#fff;}
+  .ecfg-request p{font-size:13px;color:#b9c4d6;margin:0 0 16px;line-height:1.5;}
+  .ecfg-frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:520px){.ecfg-frow{grid-template-columns:1fr;}}
+  .ecfg-request input,.ecfg-request textarea{width:100%;box-sizing:border-box;background:rgba(255,255,255,.08);
+    border:1.5px solid rgba(255,255,255,.18);border-radius:10px;padding:12px 14px;color:#fff;
+    font-size:14px;margin-bottom:10px;font-family:inherit;}
+  .ecfg-request input::placeholder,.ecfg-request textarea::placeholder{color:#8fa0b8;}
+  .ecfg-request input:focus,.ecfg-request textarea:focus{outline:none;border-color:var(--red);}
+  .ecfg-btn{width:100%;background:var(--red);color:#fff;border:0;border-radius:10px;padding:14px;
+    font-size:15px;font-weight:700;cursor:pointer;transition:.15s;}
+  .ecfg-btn:hover{border-color:#50017;}
+  .ecfg-form-note{display:block;font-size:11px;color:#8fa0b8;margin-top:10px;text-align:center;}
+
+  /* How */
+  .ecfg-how{margin-top:56px;text-align:center;}
+  .ecfg-how h2{font-size:26px;font-weight:800;color:var(--navy);margin:0 0 28px;}
+  .ecfg-how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media (max-width:760px){.ecfg-how-grid{grid-template-columns:repeat(2,1fr);}}
+  .ecfg-how-card{border:1px solid var(--line);border-radius:16px;padding:24px 18px;text-align:left;}
+  .ecfg-num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+    border-radius:9px;background:var(--navy);color:#fff;font-weight:800;font-size:15px;margin-bottom:12px;}
+  .ecfg-how-card h4{font-size:16px;font-weight:700;color:var(--navy);margin:0 0 6px;}
+  .ecfg-how-card p{font-size:13.5px;color:var(--muted);margin:0;line-height:1.55;}
+</style>
+
+<script is:inline>
+(function(){
+  var EUR = function(n){ return new Intl.NumberFormat('de-DE').format(n) + ' €'; };
+
+  var MODELS = [
+    { key:'x3',  name:'BMW X3',  body:'suv',    engines:[
+      {n:'xDrive20',p:57900},{n:'30e xDrive (PHEV)',p:66900},{n:'M50 xDrive',p:72900}] },
+    { key:'x5',  name:'BMW X5',  body:'suv',    engines:[
+      {n:'xDrive40d',p:82900},{n:'50e xDrive (PHEV)',p:86900},{n:'M60i xDrive',p:113900}] },
+    { key:'x6',  name:'BMW X6',  body:'coupe',  engines:[
+      {n:'xDrive40i M Sport',p:89900},{n:'M60i xDrive',p:116900}] },
+    { key:'x7',  name:'BMW X7',  body:'suv',    engines:[
+      {n:'xDrive40d',p:108900},{n:'M60i xDrive',p:142900}] },
+    { key:'3er', name:'BMW 3-as',body:'sedan',  engines:[
+      {n:'320d',p:52900},{n:'330e (PHEV)',p:63300},{n:'M340d xDrive',p:72900}] },
+    { key:'5er', name:'BMW 5-ös',body:'sedan',  engines:[
+      {n:'520d',p:57900},{n:'530e (PHEV)',p:66700},{n:'540d xDrive',p:72900}] },
+    { key:'m5',  name:'BMW M5',  body:'sedan',  engines:[
+      {n:'M5 Limousine',p:145200}] },
+    { key:'i5',  name:'BMW i5',  body:'sedan',  engines:[
+      {n:'eDrive40',p:70900},{n:'M60 xDrive',p:100200}] },
+    { key:'i7',  name:'BMW i7',  body:'sedan',  engines:[
+      {n:'eDrive50',p:121400},{n:'M70 xDrive',p:182400}] },
+    { key:'ix',  name:'BMW iX',  body:'suv',    engines:[
+      {n:'xDrive45',p:83500},{n:'M70 xDrive',p:126500}] }
+  ];
+
+  var TRIMS = [
+    {n:'Alap',p:0}, {n:'xLine',p:1500,suv:true}, {n:'M Sport',p:3500}, {n:'M Sport Pro',p:5500}
+  ];
+  var COLORS = [
+    {n:'Alpinfehér',hex:'#ECECEC',p:0},
+    {n:'Fekete',hex:'#0B0B0D',p:0},
+    {n:'Skyscraper szürke',hex:'#6C7075',p:1200},
+    {n:'Ásványfehér',hex:'#E7E4DE',p:1200},
+    {n:'Karbonfekete',hex:'#171A21',p:1200},
+    {n:'Tanzanit kék',hex:'#26314A',p:1200},
+    {n:'M Portimao kék',hex:'#1552B0',p:1500},
+    {n:'Aventurin vörös',hex:'#5A121B',p:1500},
+    {n:'Frozen Deep Grey (Individual)',hex:'#3A3E44',p:3500}
+  ];
+  var WHEELS = [
+    {n:'19" könnyűfém',p:0},{n:'20" M könnyűfém',p:1200},
+    {n:'21" M könnyűfém',p:2100},{n:'22" M könnyűfém',p:2900}
+  ];
+  var INTERIOR = [
+    {n:'Sensatec – fekete',p:0},{n:'Vernasca bőr – fekete',p:1800},
+    {n:'Vernasca bőr – cognac',p:1800},{n:'Merino bőr – oyster',p:3900}
+  ];
+  var TRIMSTRIP = [
+    {n:'Alumínium',p:0},{n:'Hasított fa',p:400},{n:'Zongoralakk fekete',p:400},{n:'Karbon',p:900}
+  ];
+  var PACKS = [
+    {n:'M Sport csomag',p:4500},{n:'Innovációs csomag (HUD, gesztus)',p:2900},
+    {n:'Komfort csomag (szellőső ülés, kormányfűtés)',p:1900},
+    {n:'Vezetéstámogató Professional',p:1700},
+    {n:'Harman Kardon hangrendszer',p:1100},{n:'Panorámatető',p:1400},
+    {n:'Vonóhorog',p:1100},{n:'Nyári + téli kerékszett',p:1900}
+  ];
+
+  var state = { model:MODELS[1], engine:0, trim:0, color:0, wheel:0, interior:0, trimstrip:0, packs:{} };
+
+  function shade(hex, amt){
+    var c=hex.replace('#',''); if(c.length===3){c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];}
+    var r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),b=parseInt(c.substr(4,2),16);
+    r=Math.max(0,Math.min(255,r+amt));g=Math.max(0,Math.min(255,g+amt));b=Math.max(0,Math.min(255,b+amt));
+    return 'rgb('+r+','+g+','+b+')';
+  }
+  function carSVG(body, hex, wheelIdx){
+    var top = shade(hex, 26), bot = shade(hex, -26);
+    var rim = wheelIdx>=2 ? 6 : 5;
+    var roof;
+    if(body==='suv')   roof='M120,150 L175,92 C195,74 230,66 265,66 L470,66 C505,66 545,78 575,100 L640,150';
+    else if(body==='coupe') roof='M120,150 L180,96 C205,74 245,66 290,66 L470,66 C512,70 560,96 600,132 L640,150';
+    else              roof='M120,152 L180,110 C210,86 250,78 300,78 L455,78 C505,80 545,104 585,140 L640,152';
+    var bodyH = body==='sedan' ? 152 : 150;
+    var g = 'ecfgGrad';
+    function wheel(cx){
+      var spokes='';
+      for(var i=0;i<rim;i++){var a=(Math.PI*2/rim)*i;spokes+='<line x1="'+cx+'" y1="205" x2="'+(cx+Math.cos(a)*22).toFixed(1)+'" y2="'+(205+Math.sin(a)*22).toFixed(1)+'" stroke="#c7ccd4" stroke-width="4"/>';}
+      return '<circle cx="'+cx+'" cy="205" r="34" fill="#15181d"/>'+
+             '<circle cx="'+cx+'" cy="205" r="24" fill="#e9ecf1"/>'+spokes+
+             '<circle cx="'+cx+'" cy="205" r="9" fill="#aeb6c1"/>';
+    }
+    return '<svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg">'+
+      '<defs><linearGradient id="'+g+'" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="'+top+'"/><stop offset="0.5" stop-color="'+hex+'"/>'+
+        '<stop offset="1" stop-color="'+bot+'"/></linearGradient></defs>'+
+      '<ellipse cx="360" cy="243" rx="290" ry="12" fill="rgba(15,27,45,.10)"/>'+
+      '<path d="M40,'+bodyH+' C40,'+(bodyH-6)+' 46,150 60,148 '+
+        (roof.replace('M120,','L120,'))+
+        ' C665,150 690,168 690,188 L690,205 C690,214 684,220 675,220 L636,220 '+
+        'A38,38 0 0,0 484,220 L236,220 A38,38 0 0,0 84,220 L60,220 '+
+        'C48,220 40,212 40,200 Z" fill="url(#'+g+')" stroke="'+bot+'" stroke-width="1"/>'+
+      '<path d="'+roof+' C620,150 470,150 470,150 L245,150 C245,150 150,150 128,150 Z" '+
+        'fill="#2a3340" opacity="0.9" transform="translate(6,4)"/>'+
+      '<path d="M70,168 L650,168" stroke="'+top+'" stroke-width="2" opacity=".6"/>'+
+      '<path d="M665,168 L688,172 L688,182 L664,180 Z" fill="#eef3fb"/>'+
+      '<rect x="676" y="184" width="10" height="16" rx="2" fill="#0f1b2d" opacity=".55"/>'+
+      wheel(160)+wheel(560)+
+    '</svg>';
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  function renderModels(){
+    $('ecfgModels').innerHTML = MODELS.map(function(m,i){
+      return '<button class="ecfg-model-btn'+(m.key===state.model.key?' sel':'')+'" data-i="'+i+'">'+m.name+'</button>';
+    }).join('');
+    Array.prototype.forEach.call($('ecfgModels').children, function(b){
+      b.onclick=function(){ state.model=MODELS[+b.dataset.i]; state.engine=0; renderAll(); };
+    });
+  }
+  function optBtn(list, sel, cb){
+    return list.map(function(o,i){
+      var pl = o.p? '<span class="pl">+'+EUR(o.p)+'</span>' : (o.p===0?'<span class="pl">alap</span>':'');
+      return '<button class="ecfg-opt'+(i===sel?' sel':'')+'" data-i="'+i+'">'+o.n+' '+pl+'</button>';
+    }).join('');
+  }
+  function wire(el, cb){
+    Array.prototype.forEach.call(el.children, function(b){ b.onclick=function(){ cb(+b.dataset.i); renderAll(); }; });
+  }
+  function renderEngines(){
+    var el=$('ecfgEngines');
+    el.innerHTML = state.model.engines.map(function(o,i){
+      return '<button class="ecfg-opt'+(i===state.engine?' sel':'')+'" data-i="'+i+'">'+o.n+' <span class="pl">'+EUR(o.p)+'</span></button>';
+    }).join('');
+    wire(el, function(i){ state.engine=i; });
+  }
+  function renderTrims(){
+    var list=TRIMS.filter(function(t){ return !t.suv || state.model.body==='suv' || state.model.body==='coupe'; });
+    state._trims=list;
+    var el=$('ecfgTrims'); el.innerHTML=optBtn(list, state.trim); wire(el,function(i){state.trim=i;});
+  }
+  function renderColors(){
+    var el=$('ecfgColors');
+    el.innerHTML = COLORS.map(function(c,i){
+      return '<div class="ecfg-color'+(i===state.color?' sel':'')+'" data-i="'+i+'">'+
+        '<span class="ecfg-sw" style="background:'+c.hex+'"></span><span>'+c.n+(ã.p?' +'+EUR(c.p):'')+'</span></div>';
+    }).join('');
+    Array.prototype.forEach.call(el.children,function(d){ d.onclick=function(){ state.color=+d.dataset.i; renderAll(); }; });
+  }
+  function renderSimple(id, list, key){
+    var el=$(id); el.innerHTML=optBtn(list, state[key]); wire(el,function(i){state[key]=i;});
+  }
+  function renderPacks(){
+    var el=$('ecfgPacks');
+    el.innerHTML = PACKS.map(function(p,i){
+      var on=!!state.packs[i];
+      return '<div class="ecfg-pack'+(on?' sel':'')+'" data-i="'+i+'"><span class="chk"></span>'+
+        '<span class="pn">'+p.n+'</span><span class="pp">+'+EUR(p.p)+'</span></div>';
+    }).join('');
+    Array.prototype.forEach.call(el.children,function(d){
+      d.onclick=function(){ var i=+d.dataset.i; if(state.packs[i]) delete state.packs[i]; else state.packs[i]=true; renderAll(); };
+    });
+  }
+  function total(){
+    var t = state.model.engines[state.engine].p;
+    t += (state._trims[state.trim]||{p:0}).p;
+    t += COLORS[state.color].p + WHEELS[state.wheel].p + INTERIOR[state.interior].p + TRIMSTRIP[state.trimstrip].p;
+    Object.keys(state.packs).forEach(function(i){ t += PACKS[i].p; });
+    return t;
+  }
+  function renderStage(){
+    $('ecfgCanvas').innerHTML = carSVG(state.model.body, COLORS[state.color].hex, state.wheel);
+    $('ecfgModelName').textContent = state.model.name;
+    $('ecfgModelSub').textContent = state.model.engines[state.engine].n;
+    $('ecfgPrice').textContent = EUR(total());
+  }
+  function renderSummary(){
+    var rows=[
+      ['Modell', state.model.name+' '+state.model.engines[state.engine].n],
+      ['Felszereltség', (state._trims[state.trim]||{}).n],
+      ['Külső szín', COLORS[state.color].n],
+      ['Keréktárcsa', WHEELS[state.wheel].n],
+      ['Kárpit', INTERIOR[state.interior].n],
+      ['Díszléc', TRIMSTRIP[state.trimstrip].n]
+    ];
+    Object.keys(state.packs).forEach(function(i){ rows.push(['Csomag', PACKS[i].n]); });
+    $('ecfgSumList').innerHTML = rows.map(function(r){
+      return '<li><b>'+r[0]+'</b><span>'+r[1]+'</span></li>';
+    }).join('');
+    $('ecfgSumTotal').textContent = EUR(total());
+  }
+  function renderAll(){
+    renderModels(); renderEngines(); renderTrims(); renderColors();
+    renderSimple('ecfgWheels', WHEELS, 'wheel');
+    renderSimple('ecfgInterior', INTERIOR, 'interior');
+    renderSimple('ecfgTrimStrip', TRIMSTRIP, 'trimstrip');
+    renderPacks(); renderStage(); renderSummary();
+  }
+
+  function submit(e){
+    e.preventDefault();
+    var name=$('ecfgName').value, phone=$('ecfgPhone').value, email=$('ecfgEmail').value, msg=$('ecfgMsg').value;
+    var L=[];
+    L.push('Modell: '+state.model.name+' '+state.model.engines[state.engine].n);
+    L.push('Felszereltségi szint: '+(state._trims[state.trim]||{}).n);
+    L.push('Külső szín: '+COLORS[state.color].n);
+    L.push('Keréktárcsa: '+WHEELS[state.wheel].n);
+    L.push('Kárpit: '+INTERIOR[state.interior].n);
+    L.push('Belső díszléc: '+TRIMSTRIP[state.trimstrip].n);
+    var pk=Object.keys(state.packs).map(function(i){return PACKS[i].n;});
+    L.push('Csomagok: '+(pk.length?pk.join(', '):'—'));
+    L.push('Kalkulált német listaár: '+EUR(total()));
+    L.push('');
+    L.push('Név: '+name);
+    L.push('Telefon: '+phone);
+    L.push('E-mail: '+email);
+    if(msg) L.push('Megjegyzés: '+msg);
+    var subject='Egyedi autó rendelés – '+state.model.name+' '+state.model.engines[state.engine].n;
+    var body=L.join('\n');
+    window.location.href='mailto:info@caradvance.hu?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    renderAll();
+    $('ecfgForm').addEventListener('submit', submit);
+  });
+  if(document.readyState!=='loading'){ renderAll(); var f=$('ecfgForm'); if(f) f.addEventListener('submit',submit); }
+})();
+</script>
