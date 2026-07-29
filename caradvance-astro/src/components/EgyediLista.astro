@@ -42,6 +42,10 @@ const { lang = 'hu' } = Astro.props;
   .egl-sel select:focus{outline:none;border-color:#c9d3e3;}
   .egl-count{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:16px;}
   .egl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .egl-section{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800;color:var(--ink);margin:26px 0 2px;letter-spacing:-.01em;}
+  .egl-section:first-child{margin-top:0;}
+  .egl-section .dot{width:13px;height:13px;border-radius:50%;flex:0 0 auto;}
+  .egl-section .cnt{font-size:14px;font-weight:600;color:var(--muted);}
   @media (max-width:900px){.egl-grid{grid-template-columns:repeat(2,1fr);}}
   @media (max-width:600px){.egl-grid{grid-template-columns:1fr;}}
   .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;
@@ -198,7 +202,16 @@ const { lang = 'hu' } = Astro.props;
       return true;
     });
     grid.innerHTML='';
-    list.forEach(function(c){ grid.appendChild(card(c)); });
+    var order=['Elektromos','Hibrid','Benzin','Dízel'];
+    order.forEach(function(fuel){
+      var group=list.filter(function(c){return c.fuel===fuel;});
+      if(!group.length) return;
+      var h=document.createElement('div');
+      h.className='egl-section';
+      h.innerHTML='<span class="dot" style="background:'+(FUELC[fuel]||'#5A6B82')+'"></span>'+fuel+' <span class="cnt">'+group.length+' modell</span>';
+      grid.appendChild(h);
+      group.forEach(function(c){ grid.appendChild(card(c)); });
+    });
     document.getElementById('eglCount').textContent = list.length + ' modell';
   }
   [q,fb,ff,fbr].forEach(function(el){ el.addEventListener('input',render); el.addEventListener('change',render); });
