@@ -181,6 +181,8 @@
   .cand-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;min-height:18px}
   .cand-chip{font-size:10.5px;background:var(--line2);color:#6a7280;border-radius:999px;padding:2px 8px;white-space:nowrap}
   .cand-chip.dist{background:var(--red-tint);color:var(--red);font-weight:700}
+  .cand-chip.rating{background:#fff3d6;color:#8a6d1d;font-weight:700}
+  .cand-dealer{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .cand-row2{display:flex;align-items:center;gap:10px;margin-top:7px}
   .cand-price-input{width:104px;border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:12.5px;font-weight:800;color:var(--red);text-align:right}
   .cand-price-input::placeholder{color:#c2c8d1;font-weight:500}
@@ -783,7 +785,7 @@ function loadImportDesk(id){
     '<div class="desk"><div class="box">'
     +'<div style="font-weight:800;margin-bottom:6px">'+esc(d.name)+' — '+esc(d.car)+'</div>'
     +'<div class="hint" style="margin-bottom:12px">Keret: <b style="color:#22447d">'+ft(d.price)+'</b>'+(d.note?' · '+esc(d.note):'')+'</div>'
-    +(mob?'<a class="btn dark sm" target="_blank" href="'+mob+'">Keresés a mobile.de-n ↗</a>':'<div class="hint">Nincs elég adat a kereséshez — add meg az autó típusát.</div>')
+    +(mob?('<a class="btn dark sm" target="_blank" href="'+mob+'">Keresés a mobile.de-n ↗</a><div class="hint" style="margin-top:6px">A böngésző-bővítménnyel egy új fülön nyílik meg, majd a találatok beolvasása után magától bezáródik.</div>'):'<div class="hint">Nincs elég adat a kereséshez — add meg az autó típusát.</div>')
     +'<div style="margin-top:15px;font-size:12px;color:#8a93a2">Talált jelöltek (a mobile.de keresésből automatikusan, a CarAdvance böngésző-bővítménnyel — ellenőrizd, mielőtt küldöd):</div>'
     +'<div id="impCandGrid" class="cand-grid"></div>'
     +'<div id="impAutoStatus" class="hint" style="margin-top:8px"></div></div>'
@@ -799,9 +801,15 @@ function candChips(c){
   if(c.ez)chips.push('EZ '+c.ez);
   if(c.km)chips.push(c.km+' km');
   if(c.ps)chips.push(c.ps+' PS');
-  if(c.distanceKm!=null)return chips.map(function(x){return '<span class="cand-chip">'+esc(x)+'</span>';}).join('')
-    +'<span class="cand-chip dist">'+Math.round(c.distanceKm)+' km Budapesttől</span>';
-  return chips.map(function(x){return '<span class="cand-chip">'+esc(x)+'</span>';}).join('');
+  var html=chips.map(function(x){return '<span class="cand-chip">'+esc(x)+'</span>';}).join('');
+  if(c.rating&&c.rating.score)html+='<span class="cand-chip rating">★ '+esc(c.rating.score)+(c.rating.count?' ('+c.rating.count+')':'')+'</span>';
+  if(c.distanceKm!=null)html+='<span class="cand-chip dist">'+Math.round(c.distanceKm)+' km Budapesttől</span>';
+  return html;
+}
+function candDealerLine(c){
+  var dealer=c.dealer||'',city=(c.location&&c.location.city)||'';
+  if(!dealer&&!city)return '';
+  return '<div class="cand-dealer">'+esc(dealer)+(dealer&&city?' · ':'')+esc(city)+'</div>';
 }
 function candCardHtml(i){
   var c=(window.__importCandData||[])[i]||{};
@@ -812,6 +820,7 @@ function candCardHtml(i){
     +'<div class="cand-body">'
     +'<div class="cand-label">'+esc(IMP_LABELS[i])+'</div>'
     +'<input class="imp-title cand-title-input" data-i="'+i+'" placeholder="pl. BMW X5 xDrive30d, 2021, 80e km" value="'+esc(c.title||'')+'">'
+    +candDealerLine(c)
     +'<div class="cand-meta">'+candChips(c)+'</div>'
     +'<div class="cand-row2">'
     +'<input class="imp-price cand-price-input" data-i="'+i+'" inputmode="numeric" placeholder="ár (EUR)" value="'+esc(c.price||'')+'" oninput="recalcImport()">'
@@ -854,7 +863,7 @@ function applyImportResults(jobId,results){
   var picks=rankCandidates(d,results);
   window.__importCandData=picks.map(function(p){
     if(!p)return null;
-    return {title:candTitle(p),price:p.price||'',km:p.km,ez:p.ez,ps:p.ps,url:p.url,image:p.image,location:p.location||null,distanceKm:null};
+    return {title:candTitle(p),price:p.price||'',km:p.km,ez:p.ez,ps:p.ps,url:p.url,image:p.image,location:p.location||null,dealer:(p.location&&p.location.dealer)||null,rating:p.rating||null,distanceKm:null};
   });
   window.__importPickIdx=null;
   renderImportCandGrid();
