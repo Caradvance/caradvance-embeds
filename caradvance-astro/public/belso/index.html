@@ -135,7 +135,55 @@
 </style>
 </head>
 <body>
-<div id="cagate" style="position:fixed;inset:0;background:#101216;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif"><div style="background:#17181c;border:1px solid #2a2c33;border-radius:14px;padding:26px;width:300px;max-width:calc(100vw - 32px);text-align:center;color:#fff"><div style="font-weight:800;font-size:17px">CarAdvance</div><div style="font-size:12px;color:#8b93a7;margin:4px 0 16px">Munkatársi belépés</div><input id="cagate-pw" type="password" placeholder="Jelszó" autocomplete="current-password" style="width:100%;padding:11px;border-radius:9px;border:1px solid #2a2c33;background:#0f1013;color:#fff;outline:none;font-size:15px"><button id="cagate-btn" style="width:100%;margin-top:11px;padding:11px;border:0;border-radius:9px;background:#E2001A;color:#fff;font-weight:800;font-size:15px;cursor:pointer">Belépés</button><div id="cagate-err" style="color:#ff7a7a;font-size:12px;margin-top:9px;min-height:15px"></div></div></div><script>(function(){function ok(){sessionStorage.setItem("cagate","1");var g=document.getElementById("cagate");if(g)g.remove();}if(sessionStorage.getItem("cagate")==="1"){ok();}else{var b=document.getElementById("cagate-btn"),p=document.getElementById("cagate-pw");function t(){if(p.value==="caradvance2026"){ok();}else{document.getElementById("cagate-err").textContent="Hibás jelszó";}}b.addEventListener("click",t);p.addEventListener("keydown",function(e){if(e.key==="Enter")t();});p.focus();}})();</script>
+<div id="loginGate" style="position:fixed;inset:0;background:#101216;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">
+  <div style="background:#17181c;border:1px solid #2a2c33;border-radius:14px;padding:28px;width:320px;max-width:calc(100vw - 32px);color:#fff">
+    <div style="text-align:center;font-weight:800;font-size:17px">CarAdvance</div>
+    <div style="text-align:center;font-size:12px;color:#8b93a7;margin:4px 0 18px">Munkatársi belépés</div>
+    <label style="display:block;font-size:11px;color:#8b93a7;margin-bottom:5px">E-mail</label>
+    <input id="lg-email" type="email" placeholder="nev@caradvance.hu" autocomplete="username" style="width:100%;padding:11px;border-radius:9px;border:1px solid #2a2c33;background:#0f1013;color:#fff;outline:none;font-size:14px;margin-bottom:12px">
+    <label style="display:block;font-size:11px;color:#8b93a7;margin-bottom:5px">Jelszó</label>
+    <div style="position:relative">
+      <input id="lg-pw" type="password" placeholder="Jelszó" autocomplete="current-password" style="width:100%;padding:11px;padding-right:44px;border-radius:9px;border:1px solid #2a2c33;background:#0f1013;color:#fff;outline:none;font-size:14px">
+      <button type="button" id="lg-toggle" style="position:absolute;right:5px;top:5px;bottom:5px;width:36px;border:0;border-radius:6px;background:transparent;color:#8b93a7;cursor:pointer;font-size:13px;font-weight:700">MUTAT</button>
+    </div>
+    <button id="lg-btn" style="width:100%;margin-top:14px;padding:11px;border:0;border-radius:9px;background:#E2001A;color:#fff;font-weight:800;font-size:15px;cursor:pointer">Belépés</button>
+    <div id="lg-err" style="color:#ff7a7a;font-size:12px;margin-top:9px;min-height:15px;text-align:center"></div>
+    <div style="text-align:center;font-size:11.5px;color:#666e7d;margin-top:6px">Elfelejtette a jelszavát? Kérjen újat az adminisztrátortól.</div>
+  </div>
+</div>
+<script>
+(function(){
+  var gate=document.getElementById('loginGate');
+  var emailEl=document.getElementById('lg-email'),pwEl=document.getElementById('lg-pw'),btn=document.getElementById('lg-btn'),err=document.getElementById('lg-err'),toggle=document.getElementById('lg-toggle');
+  toggle.addEventListener('click',function(){
+    var show=pwEl.type==='password';
+    pwEl.type=show?'text':'password';
+    toggle.textContent=show?'ELREJT':'MUTAT';
+  });
+  function showGate(msg){gate.style.display='flex';if(msg)err.textContent=msg;pwEl.value='';}
+  function hideGate(){gate.style.display='none';}
+  window.CA_showLogin=showGate;
+  window.CA_hideLogin=hideGate;
+  function doLogin(){
+    err.textContent='';
+    var email=emailEl.value.trim(),pw=pwEl.value;
+    if(!email||!pw){err.textContent='Add meg az e-mailt és a jelszót.';return;}
+    btn.disabled=true;btn.textContent='Belépés…';
+    fetch('/api/belso/login',{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify({email:email,password:pw})})
+      .then(function(r){return r.json().catch(function(){return {};}).then(function(j){return {ok:r.ok,body:j};});})
+      .then(function(res){
+        btn.disabled=false;btn.textContent='Belépés';
+        if(!res.ok){err.textContent=(res.body&&res.body.error)||'Hibás bejelentkezés.';return;}
+        hideGate();
+        window.CA_boot&&window.CA_boot();
+      })
+      .catch(function(){btn.disabled=false;btn.textContent='Belépés';err.textContent='Hálózati hiba.';});
+  }
+  btn.addEventListener('click',doLogin);
+  pwEl.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+  emailEl.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();pwEl.focus();}});
+})();
+</script>
 <aside class="side">
   <div class="brand">
     <img src="https://www.caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
@@ -143,7 +191,7 @@
   </div>
   <div class="lbl">Belső irányítópult</div>
   <nav class="nav" id="nav"></nav>
-  <div class="foot">Bejelentkezve<br><b>info@caradvance.hu</b></div>
+  <div class="foot">Bejelentkezve<br><b id="curUserLabel">…</b><br><span id="curUserRole"></span> · <a id="logoutBtn" href="#" style="color:#c7ccd6">Kilépés</a></div>
 </aside>
 <div class="main">
   <div class="topbar">
@@ -197,6 +245,25 @@
     <section class="view" id="v-ugyfelek">
       <div class="section-h"><h2>Ügyfelek</h2></div>
       <div class="panel"><table><thead><tr><th>Név</th><th>Típus</th><th>Telefon</th><th>E-mail</th><th>Ország</th></tr></thead><tbody id="clientRows"></tbody></table></div>
+    </section>
+    <section class="view" id="v-felhasznalok">
+      <div class="section-h"><h2>Felhasználók</h2></div>
+      <div class="panel" style="max-width:720px;margin-bottom:18px">
+        <div class="ph">Új felhasználó hozzáadása</div>
+        <div class="pb" style="padding:16px 17px;display:grid;gap:10px">
+          <div class="row2">
+            <div class="fld"><label>Név</label><input id="u-name" placeholder="Teljes név"></div>
+            <div class="fld"><label>E-mail</label><input id="u-email" placeholder="nev@caradvance.hu"></div>
+          </div>
+          <div class="row2">
+            <div class="fld"><label>Szerepkör</label><select id="u-role"><option value="sales_manager">Sales manager</option><option value="admin">Admin</option></select></div>
+            <div class="fld"><label>Ideiglenes jelszó</label><input id="u-pw" placeholder="min. 8 karakter"></div>
+          </div>
+          <div><button class="btn red sm" onclick="createUser()">Létrehozás</button></div>
+          <div id="u-err" class="hint" style="color:#c0392b"></div>
+        </div>
+      </div>
+      <div class="panel"><table><thead><tr><th>Név</th><th>E-mail</th><th>Szerepkör</th><th>Létrehozva</th><th></th></tr></thead><tbody id="userRows"></tbody></table></div>
     </section>
   </div>
 </div>
@@ -253,26 +320,21 @@ var STAGES={
   'Bérlés':['Új','Egyeztetés','Ajánlat','Aktív bérlés','Lezárva'],
   'Bizományos':['Új','Árazás','Bizományba véve','Hirdetve','Eladva']
 };
-var data=[
-  {id:1,line:'Import',stage:'Igény pontosítva',ch:'E-mail',name:'Szabó Gábor',phone:'+36 30 555 1234',email:'szabo.gabor@example.com',car:'BMW M3 Touring 2023 Competition',price:32000000,note:'Németországból importálná, 30–40e km, szürke.',when:'2 órája'},
-  {id:2,line:'Eladás',stage:'Új',ch:'Űrlap',name:'Kovács Péter',phone:'+36 30 111 2233',email:'kovacs.peter@example.com',car:'BMW X5 xDrive30d 2021, 86 000 km',price:18500000,note:'Vezetett szervizkönyv, M-sport, panoráma.',when:'4 órája'},
-  {id:3,line:'Bérlés',stage:'Ajánlat',ch:'WhatsApp',name:'Tóth Kft.',phone:'+36 20 444 5566',email:'',car:'BMW X6 – hosszú távú bérlés',price:0,note:'2000 km/hó, 12 hónap.',when:'tegnap'},
-  {id:4,line:'Bizományos',stage:'Bizományba véve',ch:'Hívás',name:'Nagy Anna',phone:'+36 20 777 8899',email:'',car:'Audi A6 Avant 2019',price:11500000,note:'Bizományba adná, jótékony ügy: állatmenhely.',when:'tegnap'},
-  {id:5,line:'Import',stage:'Érdeklődés',ch:'Chatbot',name:'Kis Balázs',phone:'',email:'kis.balazs@example.com',car:'Porsche Macan GTS',price:28000000,note:'Chatbotból jött, árat kért.',when:'ma reggel'},
-  {id:6,line:'Eladás',stage:'Ajánlat',ch:'E-mail',name:'Horváth Éva',phone:'+36 70 222 3311',email:'horvath.eva@example.com',car:'Mercedes GLC 2020',price:14900000,note:'Árajánlatot vár.',when:'ma'}
-];
-var clients=[
-  {name:'Szabó Gábor',type:'Import',phone:'+36 30 555 1234',email:'szabo.gabor@example.com',country:'Magyarország'},
-  {name:'Kovács Péter',type:'Eladó',phone:'+36 30 111 2233',email:'kovacs.peter@example.com',country:'Magyarország'},
-  {name:'Tóth Kft.',type:'Bérlő',phone:'+36 20 444 5566',email:'',country:'Magyarország'},
-  {name:'Nagy Anna',type:'Eladó',phone:'+36 20 777 8899',email:'',country:'Magyarország'}
-];
-var todos=[{t:'Szabó Gábor – M3 Touring ajánlat összeállítása',done:false},{t:'Kovács Péter X5 – árazás véglegesítése',done:false},{t:'Tóth Kft. bérleti szerződés kiküldése',done:true}];
+var data=[];
+var clients=[];
+var todos=[];
+var currentUser=null;
+var allUsers=[];
 var NAV=[['overview','Áttekintés'],['eladas','Eladás'],['import','Import'],['berles','Bérlés'],['bizomanyos','Bizományos'],['teendok','Teendők'],['ugyfelek','Ügyfelek']];
-document.getElementById('nav').innerHTML=NAV.map(function(n,i){
-  var b=['eladas','import','berles','bizomanyos'].indexOf(n[0])>=0?'<span class="badge" data-badge="'+n[1]+'"></span>':'';
-  return '<a data-v="'+n[0]+'" class="'+(i===0?'active':'')+'">'+ic(n[0])+' <span>'+n[1]+'</span>'+b+'</a>';
-}).join('');
+function renderNav(){
+  var items=NAV.slice();
+  if(currentUser&&currentUser.role==='admin')items=items.concat([['felhasznalok','Felhasználók']]);
+  document.getElementById('nav').innerHTML=items.map(function(n,i){
+    var b=['eladas','import','berles','bizomanyos'].indexOf(n[0])>=0?'<span class="badge" data-badge="'+n[1]+'"></span>':'';
+    return '<a data-v="'+n[0]+'" class="'+(i===0?'active':'')+'">'+ic(n[0])+' <span>'+n[1]+'</span>'+b+'</a>';
+  }).join('');
+}
+renderNav();
 document.getElementById('aiIco').innerHTML=ic('spark');
 document.getElementById('aiIco2').innerHTML=ic('spark');
 document.getElementById('aiIco3').innerHTML=ic('spark');
@@ -285,7 +347,7 @@ function mobLink(car,jobId){var q=(car||'').split(',')[0];if(!q)return null;var 
 function go(v){
   document.querySelectorAll('.nav a').forEach(function(a){a.classList.toggle('active',a.dataset.v===v);});
   document.querySelectorAll('.view').forEach(function(s){s.classList.toggle('active',s.id==='v-'+v);});
-  var t={overview:'Áttekintés',eladas:'Eladás',import:'Import',berles:'Bérlés',bizomanyos:'Bizományos',teendok:'Teendők',ugyfelek:'Ügyfelek'};
+  var t={overview:'Áttekintés',eladas:'Eladás',import:'Import',berles:'Bérlés',bizomanyos:'Bizományos',teendok:'Teendők',ugyfelek:'Ügyfelek',felhasznalok:'Felhasználók'};
   document.getElementById('viewTitle').textContent=t[v];
 }
 document.getElementById('nav').addEventListener('click',function(e){var a=e.target.closest('a[data-v]');if(a)go(a.dataset.v);});
@@ -331,6 +393,7 @@ function onColDrop(e){
   if(!d||d.line!==line||d.stage===newStage)return;
   d.stage=newStage;
   renderBoard(line);renderBadges();renderPipeSummary();renderKpis();
+  apiFetch('/deals/'+id,{method:'PATCH',body:{stage:newStage}}).catch(function(){});
 }
 function renderBoard(line){
   var el=document.getElementById('board-'+lineClass(line));if(!el)return;
@@ -346,9 +409,20 @@ function renderClients(){
   }).join('');
 }
 function renderTodos(){
-  document.getElementById('todoList').innerHTML=todos.map(function(t,i){
-    return '<div class="todo '+(t.done?'done':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="todos['+i+'].done=this.checked;renderTodos()"><span class="lbl">'+esc(t.t)+'</span><span class="x" onclick="todos.splice('+i+',1);renderTodos()">×</span></div>';
+  document.getElementById('todoList').innerHTML=todos.map(function(t){
+    return '<div class="todo '+(t.done?'done':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+t.id+',this.checked)"><span class="lbl">'+esc(t.t)+'</span><span class="x" onclick="deleteTodo('+t.id+')">×</span></div>';
   }).join('')||'<div style="padding:14px;color:#8a93a2">Nincs teendő.</div>';
+}
+function toggleTodo(id,checked){
+  var t=todos.find(function(x){return x.id===id;});
+  if(t)t.done=checked;
+  renderTodos();
+  apiFetch('/todos/'+id,{method:'PATCH',body:{done:checked}}).catch(function(){});
+}
+function deleteTodo(id){
+  todos=todos.filter(function(x){return x.id!==id;});
+  renderTodos();
+  apiFetch('/todos/'+id,{method:'DELETE'}).catch(function(){});
 }
 function renderBadges(){document.querySelectorAll('[data-badge]').forEach(function(b){var l=b.getAttribute('data-badge'),n=data.filter(function(d){return d.line===l&&!/Lezárva|Átadva|Eladva/.test(d.stage);}).length;b.textContent=n;b.style.display=n?'':'none';});}
 function jumpToDesk(id,line){
@@ -378,6 +452,7 @@ function openClientModal(id){
     +'</div>'
     +'<div class="fld"><label>Fázis</label><select id="cm-stage" onchange="applyStageChange()">'+stageOptions+'</select></div>'
     +'<div class="fld" style="margin-top:10px"><label>Megjegyzés</label><textarea id="cm-note" rows="2" oninput="cmNoteInput(this.value)">'+esc(d.note||'')+'</textarea></div>'
+    +(currentUser&&currentUser.role==='admin'?('<div class="fld" style="margin-top:10px"><label>Hozzárendelve</label><select onchange="assignDeal(this)">'+assignOptionsHtml(d.assigned_to)+'</select></div>'):'')
     +(related.length?('<div style="margin-top:16px"><div class="hint" style="margin-bottom:6px">Egyéb ügyei ennél az ügyfélnél ('+related.length+'):</div>'
       +related.map(function(r){return '<div style="font-size:12.5px;padding:7px 0;border-top:1px solid var(--line2)"><span class="tag '+lineClass(r.line)+'">'+r.line+'</span> '+esc(r.car)+' · '+esc(r.stage)+(r.price?' · '+ft(r.price):'')+'</div>';}).join('')
       +'</div>'):'')
@@ -390,10 +465,28 @@ function applyStageChange(){
   if(!d||!sel||sel.value===d.stage)return;
   d.stage=sel.value;
   renderBoard(d.line);renderBadges();renderPipeSummary();renderKpis();
+  apiFetch('/deals/'+id,{method:'PATCH',body:{stage:d.stage}}).catch(function(){});
 }
+var __noteTimer=null;
 function cmNoteInput(v){
   var id=window.__curClientDealId,d=data.find(function(x){return x.id===id;});
   if(d){d.note=v;renderFeed();}
+  clearTimeout(__noteTimer);
+  __noteTimer=setTimeout(function(){apiFetch('/deals/'+id,{method:'PATCH',body:{note:v}}).catch(function(){});},600);
+}
+function assignOptionsHtml(current){
+  var opts='<option value=""'+(!current?' selected':'')+'>— nincs hozzárendelve —</option>';
+  (allUsers||[]).filter(function(u){return u.role==='sales_manager';}).forEach(function(u){
+    opts+='<option value="'+u.id+'"'+(String(current)===String(u.id)?' selected':'')+'>'+esc(u.name)+'</option>';
+  });
+  return opts;
+}
+function assignDeal(sel){
+  var id=window.__curClientDealId;
+  var val=sel.value?parseInt(sel.value,10):null;
+  apiFetch('/admin/assign',{method:'POST',body:{type:'deal',id:id,assigned_to:val}}).then(function(){
+    var d=data.find(function(x){return x.id===id;});if(d)d.assigned_to=val;
+  }).catch(function(){alert('Nem sikerült a hozzárendelés.');});
 }
 function loadDesk(id){
   var d=data.find(function(x){return x.id===id;})||data.find(function(x){return x.line==='Eladás';});
@@ -521,17 +614,111 @@ function openAdd(){document.getElementById('addModal').classList.add('open');}
 function closeAdd(){document.getElementById('addModal').classList.remove('open');}
 function saveAdd(){
   var g=function(id){return document.getElementById(id).value;};var line=g('a-line');
-  data.unshift({id:Date.now(),line:line,stage:STAGES[line][0],ch:g('a-ch'),name:g('a-name')||'Névtelen',phone:g('a-phone'),email:g('a-email'),car:g('a-car'),price:parseInt((g('a-price')||'').replace(/\D/g,''),10)||0,note:g('a-note'),when:'most'});
-  ['a-name','a-phone','a-email','a-car','a-price','a-note'].forEach(function(id){document.getElementById(id).value='';});
-  closeAdd();renderAll();go(lineClass(line));
+  var payload={line:line,stage:STAGES[line][0],ch:g('a-ch'),name:g('a-name')||'Névtelen',phone:g('a-phone'),email:g('a-email'),car:g('a-car'),price:parseInt((g('a-price')||'').replace(/\D/g,''),10)||0,note:g('a-note'),when_text:'most'};
+  apiFetch('/deals',{method:'POST',body:payload}).then(function(r){
+    var local={id:r.id,when:'most',assigned_to:null};
+    for(var k in payload)if(k!=='when_text')local[k]=payload[k];
+    data.unshift(local);
+    ['a-name','a-phone','a-email','a-car','a-price','a-note'].forEach(function(id){document.getElementById(id).value='';});
+    closeAdd();renderAll();go(lineClass(line));
+  }).catch(function(){alert('Nem sikerült menteni az új bejegyzést.');});
 }
-function addTodo(){var v=document.getElementById('todoInput').value.trim();if(!v)return;todos.push({t:v,done:false});document.getElementById('todoInput').value='';renderTodos();}
+function addTodo(){
+  var v=document.getElementById('todoInput').value.trim();if(!v)return;
+  document.getElementById('todoInput').value='';
+  apiFetch('/todos',{method:'POST',body:{t:v}}).then(function(r){
+    todos.push({id:r.id,t:v,done:false,assigned_to:null});
+    renderTodos();
+  }).catch(function(){alert('Nem sikerült menteni a teendőt.');});
+}
 document.getElementById('todoInput').addEventListener('keydown',function(e){if(e.key==='Enter')addTodo();});
 document.getElementById('globalSearch').addEventListener('input',renderFeed);
-function renderAll(){renderKpis();renderFeed();renderPipeSummary();renderBadges();LINES.forEach(renderBoard);renderClients();renderTodos();loadDesk();loadImportDesk();}
-renderAll();
+function renderAll(){renderKpis();renderFeed();renderPipeSummary();renderBadges();LINES.forEach(renderBoard);renderClients();renderTodos();loadDesk();loadImportDesk();if(currentUser&&currentUser.role==='admin')renderUsers();}
 
-;(function(){var CA_CONFIG={API:""};if(!CA_CONFIG.API)return;var base=CA_CONFIG.API.charAt(CA_CONFIG.API.length-1)==="/"?CA_CONFIG.API.slice(0,-1):CA_CONFIG.API;function m(r){return {id:r.id,line:r.line||r["Üzletág"],stage:r.stage||r["Fázis"],ch:r.ch||r["Csatorna"],name:r.name||r["Név"],phone:r.phone||r["Telefon"],email:r.email||r["E-mail"],car:r.car||r["Autó"],price:+(r.price||r["Kért ár / keret (Ft)"]||0),note:r.note||r["Megjegyzés"],when:r.when||""};}try{fetch(base+"/api/megkeresesek",{headers:{Accept:"application/json"}}).then(function(x){return x.json();}).then(function(j){var a=Array.isArray(j)?j:(j.items||j.rows||[]);if(a&&a.length){data=a.map(m);renderAll();}}).catch(function(){});}catch(e){}})();
+// ---- Auth-aware API layer ----
+function apiFetch(path,opts){
+  opts=opts||{};
+  var init={method:opts.method||'GET',headers:{'content-type':'application/json'},credentials:'same-origin'};
+  if(opts.body!==undefined)init.body=JSON.stringify(opts.body);
+  return fetch('/api/belso'+path,init).then(function(r){
+    return r.json().catch(function(){return {};}).then(function(j){
+      if(r.status===401){window.CA_showLogin&&window.CA_showLogin();throw {status:401,error:j.error};}
+      if(!r.ok)throw {status:r.status,error:j.error||'Hiba történt.'};
+      return j;
+    });
+  });
+}
+function normDeal(r){
+  return {id:r.id,line:r.line,stage:r.stage,ch:r.ch,name:r.name,phone:r.phone,email:r.email,car:r.car,price:r.price||0,note:r.note||'',when:r.when_text||'',assigned_to:r.assigned_to};
+}
+
+// ---- Admin: user management ----
+function renderUsers(){
+  var el=document.getElementById('userRows');if(!el)return;
+  el.innerHTML=(allUsers||[]).map(function(u){
+    var isSelf=currentUser&&u.id===currentUser.id;
+    return '<tr><td><b>'+esc(u.name)+'</b></td><td>'+esc(u.email)+'</td><td>'+esc(u.role==='admin'?'Admin':'Sales manager')+'</td><td>'+esc((u.created_at||'').slice(0,10))+'</td>'
+      +'<td style="white-space:nowrap"><button class="btn ghost sm" onclick="resetUserPassword('+u.id+')">Új jelszó</button> '
+      +(isSelf?'':'<button class="btn ghost sm" onclick="deleteUser('+u.id+')">Törlés</button>')+'</td></tr>';
+  }).join('')||'<tr><td colspan="5" style="color:#8a93a2">Nincs felhasználó.</td></tr>';
+}
+function loadUsers(){return apiFetch('/admin/users').then(function(r){allUsers=r.users;renderUsers();}).catch(function(){});}
+function createUser(){
+  var email=document.getElementById('u-email').value.trim();
+  var name=document.getElementById('u-name').value.trim();
+  var role=document.getElementById('u-role').value;
+  var pw=document.getElementById('u-pw').value;
+  var errEl=document.getElementById('u-err');errEl.textContent='';
+  if(!email||!name||!pw){errEl.textContent='Minden mező kötelező.';return;}
+  if(pw.length<8){errEl.textContent='A jelszó legyen legalább 8 karakter.';return;}
+  apiFetch('/admin/users',{method:'POST',body:{email:email,name:name,role:role,password:pw}}).then(function(){
+    ['u-email','u-name','u-pw'].forEach(function(id){document.getElementById(id).value='';});
+    return loadUsers();
+  }).catch(function(e){errEl.textContent=(e&&e.error)||'Nem sikerült létrehozni.';});
+}
+function resetUserPassword(id){
+  var pw=prompt('Add meg az új jelszót ennek a felhasználónak (min. 8 karakter):');
+  if(!pw)return;
+  if(pw.length<8){alert('A jelszó legyen legalább 8 karakter.');return;}
+  apiFetch('/admin/users/'+id+'/reset-password',{method:'POST',body:{password:pw}}).then(function(){alert('Jelszó frissítve.');}).catch(function(){alert('Nem sikerült frissíteni a jelszót.');});
+}
+function deleteUser(id){
+  if(!confirm('Biztosan törlöd ezt a felhasználót? A hozzá rendelt ügyek/ügyfelek felszabadulnak.'))return;
+  apiFetch('/admin/users/'+id,{method:'DELETE'}).then(function(){return loadUsers();}).catch(function(){alert('Nem sikerült törölni.');});
+}
+
+// ---- Boot: called after a successful login, or on page load if a session cookie is already valid ----
+function CA_boot(){
+  return apiFetch('/me').then(function(r){
+    currentUser=r.user;
+    document.getElementById('curUserLabel').textContent=currentUser.name;
+    document.getElementById('curUserRole').textContent=currentUser.role==='admin'?'Admin':'Sales manager';
+    renderNav();
+    var tasks=[apiFetch('/deals'),apiFetch('/clients'),apiFetch('/todos')];
+    if(currentUser.role==='admin')tasks.push(apiFetch('/admin/users'));
+    return Promise.all(tasks);
+  }).then(function(results){
+    data=(results[0].deals||[]).map(normDeal);
+    clients=results[1].clients||[];
+    todos=results[2].todos||[];
+    if(results[3])allUsers=results[3].users||[];
+    renderAll();
+  }).catch(function(e){
+    if(!e||e.status!==401)console.error(e);
+  });
+}
+window.CA_boot=CA_boot;
+document.getElementById('logoutBtn').addEventListener('click',function(e){
+  e.preventDefault();
+  apiFetch('/logout',{method:'POST'}).catch(function(){}).then(function(){location.reload();});
+});
+
+// On page load: silently check for an existing valid session (no error flash if not logged in).
+(function(){
+  fetch('/api/belso/me',{credentials:'same-origin'}).then(function(r){
+    if(r.ok){window.CA_hideLogin&&window.CA_hideLogin();CA_boot();}
+  }).catch(function(){});
+})();
 </script>
 </body>
 </html>
