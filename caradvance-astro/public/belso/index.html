@@ -200,6 +200,12 @@
     </section>
   </div>
 </div>
+<div class="modal" id="clientModal">
+  <div class="m">
+    <div class="mh">Ügyfél adatlap <span class="x" onclick="closeClientModal()">×</span></div>
+    <div class="mb" id="clientModalBody"></div>
+  </div>
+</div>
 <div class="modal" id="addModal">
   <div class="m">
     <div class="mh">Új bejegyzés <span class="x" onclick="closeAdd()">×</span></div>
@@ -312,16 +318,25 @@ function renderPipeSummary(){
 }
 function dealCard(d){
   var st=STAGES[d.line],idx=st.indexOf(d.stage),prog=Math.round((idx+1)/st.length*100);
-  return '<div class="deal" onclick="dealClick(\''+d.line+'\','+d.id+')">'
+  return '<div class="deal" draggable="true" data-id="'+d.id+'" ondragstart="event.dataTransfer.setData(\'text/plain\',String('+d.id+'))" onclick="openClientModal('+d.id+')">'
     +'<div class="d1">'+esc(d.name)+'</div><div class="d2">'+esc(d.car)+'</div>'
     +'<div class="drow"><span class="chn">'+ic(CH_IC[d.ch]||'kezi')+'</span>'+(d.price?'<span class="price">'+ft(d.price)+'</span>':'')+'</div>'
     +'<div class="prog"><i style="width:'+prog+'%"></i></div><div class="stg">'+(idx+1)+'/'+st.length+' · '+esc(d.stage)+'</div></div>';
+}
+function onColDrop(e){
+  e.preventDefault();
+  var id=parseInt(e.dataTransfer.getData('text/plain'),10);
+  var col=e.currentTarget,newStage=col.getAttribute('data-stage'),line=col.getAttribute('data-line');
+  var d=data.find(function(x){return x.id===id;});
+  if(!d||d.line!==line||d.stage===newStage)return;
+  d.stage=newStage;
+  renderBoard(line);renderBadges();renderPipeSummary();renderKpis();
 }
 function renderBoard(line){
   var el=document.getElementById('board-'+lineClass(line));if(!el)return;
   el.innerHTML=STAGES[line].map(function(s){
     var items=data.filter(function(d){return d.line===line&&d.stage===s;});
-    return '<div class="col"><h3>'+s+' <span class="cnt">'+items.length+'</span></h3>'+items.map(dealCard).join('')+'</div>';
+    return '<div class="col" data-stage="'+esc(s)+'" data-line="'+esc(line)+'" ondragover="event.preventDefault()" ondrop="onColDrop(event)"><h3>'+s+' <span class="cnt">'+items.length+'</span></h3>'+items.map(dealCard).join('')+'</div>';
   }).join('');
 }
 function renderClients(){
@@ -336,9 +351,49 @@ function renderTodos(){
   }).join('')||'<div style="padding:14px;color:#8a93a2">Nincs teendő.</div>';
 }
 function renderBadges(){document.querySelectorAll('[data-badge]').forEach(function(b){var l=b.getAttribute('data-badge'),n=data.filter(function(d){return d.line===l&&!/Lezárva|Átadva|Eladva/.test(d.stage);}).length;b.textContent=n;b.style.display=n?'':'none';});}
-function dealClick(line,id){
-  if(line==='Eladás'){go('eladas');loadDesk(id);}
-  else if(line==='Import'){go('import');loadImportDesk(id);}
+function jumpToDesk(id,line){
+  closeClientModal();
+  go(lineClass(line));
+  if(line==='Eladás')loadDesk(id);
+  else if(line==='Import')loadImportDesk(id);
+}
+function openClientModal(id){
+  var d=data.find(function(x){return x.id===id;});
+  if(!d)return;
+  window.__curClientDealId=id;
+  var related=data.filter(function(x){
+    return x.id!==d.id&&((d.phone&&x.phone===d.phone)||(d.email&&x.email===d.email)||((!d.phone&&!d.email)&&x.name===d.name));
+  });
+  var st=STAGES[d.line];
+  var stageOptions=st.map(function(s){return '<option value="'+esc(s)+'"'+(s===d.stage?' selected':'')+'>'+esc(s)+'</option>';}).join('');
+  var hasDesk=d.line==='Eladás'||d.line==='Import';
+  document.getElementById('clientModalBody').innerHTML=
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><div style="font-weight:800;font-size:16px">'+esc(d.name)+'</div><span class="tag '+lineClass(d.line)+'">'+d.line+'</span></div>'
+    +'<div class="hint" style="margin-bottom:14px">'+esc(d.car)+(d.price?' · '+ft(d.price):'')+'</div>'
+    +'<div class="kv" style="margin-bottom:14px">'
+    +'<div><span class="k">Telefon</span><br>'+(d.phone?'<a href="tel:'+esc(d.phone)+'">'+esc(d.phone)+'</a>':'—')+'</div>'
+    +'<div><span class="k">E-mail</span><br>'+(d.email?'<a href="mailto:'+esc(d.email)+'">'+esc(d.email)+'</a>':'—')+'</div>'
+    +'<div><span class="k">Csatorna</span><br>'+esc(d.ch)+'</div>'
+    +'<div><span class="k">Beérkezett</span><br>'+esc(d.when||'—')+'</div>'
+    +'</div>'
+    +'<div class="fld"><label>Fázis</label><select id="cm-stage" onchange="applyStageChange()">'+stageOptions+'</select></div>'
+    +'<div class="fld" style="margin-top:10px"><label>Megjegyzés</label><textarea id="cm-note" rows="2" oninput="cmNoteInput(this.value)">'+esc(d.note||'')+'</textarea></div>'
+    +(related.length?('<div style="margin-top:16px"><div class="hint" style="margin-bottom:6px">Egyéb ügyei ennél az ügyfélnél ('+related.length+'):</div>'
+      +related.map(function(r){return '<div style="font-size:12.5px;padding:7px 0;border-top:1px solid var(--line2)"><span class="tag '+lineClass(r.line)+'">'+r.line+'</span> '+esc(r.car)+' · '+esc(r.stage)+(r.price?' · '+ft(r.price):'')+'</div>';}).join('')
+      +'</div>'):'')
+    +(hasDesk?('<div style="margin-top:16px"><button class="btn dark sm" onclick="jumpToDesk('+d.id+',\''+d.line+'\')">Megnyitás az asztalon</button></div>'):'');
+  document.getElementById('clientModal').classList.add('open');
+}
+function closeClientModal(){document.getElementById('clientModal').classList.remove('open');}
+function applyStageChange(){
+  var id=window.__curClientDealId,d=data.find(function(x){return x.id===id;}),sel=document.getElementById('cm-stage');
+  if(!d||!sel||sel.value===d.stage)return;
+  d.stage=sel.value;
+  renderBoard(d.line);renderBadges();renderPipeSummary();renderKpis();
+}
+function cmNoteInput(v){
+  var id=window.__curClientDealId,d=data.find(function(x){return x.id===id;});
+  if(d){d.note=v;renderFeed();}
 }
 function loadDesk(id){
   var d=data.find(function(x){return x.id===id;})||data.find(function(x){return x.line==='Eladás';});
