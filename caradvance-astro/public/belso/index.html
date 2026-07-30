@@ -8,69 +8,120 @@
 <link rel="icon" href="https://www.caradvance.hu/favicon.ico?v=2">
 <style>
   :root{
-    --red:#E2001A;--navy:#22447d;--ink:#1a1d23;--muted:#8a93a2;--faint:#aab1bd;
-    --line:#ECEEF2;--line2:#F2F4F7;--bg:#FBFCFD;--card:#fff;--sidebar:#101216;
+    --red:#E2001A;--red-dk:#b8000f;--red-tint:#fdeceb;--red-tint2:#f8c9c9;
+    --navy:#22447d;--ink:#161922;--muted:#6b7280;--faint:#9aa2b0;
+    --line:#ECEEF2;--line2:#F5F6F8;--bg:#F6F7FB;--card:#fff;--sidebar:#fff;
     --good:#128a63;--warn:#a97b1a;--bad:#c0392b;
-    --shadow:0 1px 2px rgba(20,28,44,.03);
+    --shadow:0 1px 2px rgba(20,28,44,.04),0 1px 10px rgba(20,28,44,.04);
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
   svg.i{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
-  .side{width:244px;flex:0 0 244px;background:var(--sidebar);color:#e7e9ee;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
-  .side .brand{padding:22px 22px 18px;display:flex;align-items:center;gap:10px}
-  .side .brand img{height:26px;width:auto;display:block}
-  .side .brand .fb{font-weight:800;font-size:17px;letter-spacing:.01em}
+  .side{width:248px;flex:0 0 248px;background:var(--sidebar);color:var(--ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid var(--line)}
+  .side .brand{padding:20px 20px 16px;display:flex;align-items:center;gap:10px}
+  .side .brand .mark{width:36px;height:36px;border-radius:11px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:0 0 auto}
+  .side .brand .fb{font-weight:800;font-size:16.5px;letter-spacing:-.01em;color:var(--ink)}
   .side .brand .fb span{color:var(--red)}
-  .side .lbl{font-size:10.5px;color:#727a8a;padding:0 22px 10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+  .side .lbl{font-size:10.5px;color:var(--faint);padding:6px 20px 10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
   .nav{display:flex;flex-direction:column;gap:1px;padding:4px 12px}
-  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:#aeb5c2;text-decoration:none;font-size:13.5px;font-weight:600;cursor:pointer;transition:background .12s,color .12s}
-  .nav a:hover{background:#1a1d23;color:#fff}
-  .nav a.active{background:#22252c;color:#fff}
-  .nav a .badge{margin-left:auto;background:#2f333c;color:#cfd4dd;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#5b6472;text-decoration:none;font-size:13.5px;font-weight:600;cursor:pointer;transition:background .12s,color .12s}
+  .nav a:hover{background:var(--line2);color:var(--ink)}
+  .nav a.active{background:var(--red-tint);color:var(--red)}
+  .nav a .badge{margin-left:auto;background:var(--line2);color:#6b7280;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px}
   .nav a.active .badge{background:var(--red);color:#fff}
-  .side .foot{margin-top:auto;padding:16px 22px;border-top:1px solid #1d2026;font-size:12px;color:#727a8a;line-height:1.5}
-  .side .foot b{color:#c7ccd6;font-weight:700}
+  .side .foot{margin-top:auto;padding:16px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--faint);text-align:center}
   .main{flex:1;min-width:0;display:flex;flex-direction:column}
-  .topbar{position:sticky;top:0;z-index:20;background:rgba(251,252,253,.82);backdrop-filter:blur(10px);display:flex;align-items:center;gap:14px;padding:16px 30px;border-bottom:1px solid var(--line)}
-  .topbar h1{font-size:18px;margin:0;font-weight:800;letter-spacing:-.01em}
-  .topbar .search{margin-left:10px;flex:1;max-width:320px;position:relative}
-  .topbar .search input{width:100%;font:inherit;font-size:13.5px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:#fff;outline:none}
-  .topbar .search input:focus{border-color:#d3d8e0}
-  .topbar .ai{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:600;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px}
-  .topbar .ai .pulse{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(18,138,99,.5);animation:pulse 2.4s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(18,138,99,.45)}70%{box-shadow:0 0 0 6px rgba(18,138,99,0)}100%{box-shadow:0 0 0 0 rgba(18,138,99,0)}}
-  .btn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-weight:700;font-size:13px;border:0;border-radius:9px;padding:9px 15px;cursor:pointer;text-decoration:none;white-space:nowrap;transition:filter .12s,background .12s}
+  .topbar{position:sticky;top:0;z-index:20;background:#fff;display:flex;align-items:center;gap:12px;padding:14px 30px;border-bottom:1px solid var(--line)}
+  .icon-btn{width:38px;height:38px;flex:0 0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--line2);border:0;color:#5b6472;cursor:pointer;position:relative;transition:background .12s}
+  .icon-btn:hover{background:var(--line)}
+  .icon-btn .dot-badge{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid #fff}
+  .topbar .search{flex:1;max-width:340px;position:relative}
+  .topbar .search input{width:100%;font:inherit;font-size:13.5px;padding:10px 44px 10px 14px;border:1px solid transparent;border-radius:11px;background:var(--line2);outline:none}
+  .topbar .search input:focus{background:#fff;border-color:var(--line)}
+  .topbar .search .sbtn{position:absolute;right:4px;top:4px;bottom:4px;width:32px;border-radius:8px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .topbar .search .sbtn svg.i{width:15px;height:15px}
+  .tb-spacer{flex:1}
+  .profile{display:flex;align-items:center;gap:10px;cursor:pointer;position:relative;padding:4px 8px 4px 4px;border-radius:11px;transition:background .12s}
+  .profile:hover{background:var(--line2)}
+  .avatar-circle{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex:0 0 auto}
+  .profile .pinfo{display:flex;flex-direction:column;line-height:1.3}
+  .profile .pinfo b{font-size:13px;font-weight:700}
+  .profile .pinfo span{font-size:11px;color:var(--muted)}
+  .profile .chev{color:var(--faint);flex:0 0 auto}
+  .pdrop{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(20,28,44,.14);min-width:160px;padding:6px;display:none;z-index:80}
+  .pdrop.open{display:block}
+  .pdrop a{display:block;padding:9px 11px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:13px;font-weight:600}
+  .pdrop a:hover{background:var(--line2)}
+  .btn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-weight:700;font-size:13px;border:0;border-radius:10px;padding:9px 15px;cursor:pointer;text-decoration:none;white-space:nowrap;transition:filter .12s,background .12s}
   .btn.red{background:var(--red);color:#fff}.btn.red:hover{filter:brightness(.93)}
   .btn.dark{background:var(--ink);color:#fff}.btn.dark:hover{filter:brightness(1.15)}
   .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{border-color:#d3d8e0}
   .btn.sm{padding:7px 12px;font-size:12.5px}
-  .content{padding:26px 30px 64px;max-width:1200px;width:100%}
+  .content{padding:24px 30px 64px;max-width:1280px;width:100%}
   .view{display:none}.view.active{display:block;animation:fade .18s ease}
   @keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 22px}
-  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:17px 18px;box-shadow:var(--shadow)}
-  .kpi .lab{font-size:12px;color:var(--muted);font-weight:600}
-  .kpi .num{font-size:29px;font-weight:800;margin-top:8px;line-height:1;letter-spacing:-.02em}
-  .kpi .sub{font-size:11.5px;color:var(--faint);margin-top:7px}
-  .kpi .num.red{color:var(--red)}.kpi .num.navy{color:var(--navy)}.kpi .num.good{color:var(--good)}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+  .page-head h1{font-size:22px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em}
+  .page-head .crumb{font-size:12.5px;color:var(--muted)}
+  .page-head .crumb b{color:var(--ink);font-weight:700}
+  .ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 22px}
+  .ov-grid .g-c1{grid-column:1;grid-row:1}
+  .ov-grid .g-c2{grid-column:1;grid-row:2}
+  .ov-grid .g-c3{grid-column:2;grid-row:1}
+  .ov-grid .g-c4{grid-column:2;grid-row:2}
+  .ov-grid .g-c5{grid-column:3;grid-row:1/3}
+  .ov-grid .g-c6{grid-column:4;grid-row:1/3}
+  @media(max-width:1100px){.ov-grid{grid-template-columns:repeat(2,1fr)}.ov-grid .g-c1,.ov-grid .g-c2,.ov-grid .g-c3,.ov-grid .g-c4,.ov-grid .g-c5,.ov-grid .g-c6{grid-column:auto;grid-row:auto}}
+  @media(max-width:640px){.ov-grid{grid-template-columns:1fr}}
+  .stat{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:18px 19px;display:flex;flex-direction:column}
+  .stat .sh{display:flex;align-items:center;justify-content:space-between}
+  .stat .stitle{font-size:13px;font-weight:700;color:var(--muted)}
+  .stat .sbig{font-size:27px;font-weight:800;margin-top:9px;line-height:1;letter-spacing:-.02em}
+  .stat .strend{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;margin-top:8px}
+  .stat .strend .sub2{color:var(--faint);font-weight:500}
+  .stat.tall{grid-row:span 2}
+  .stat .stitle-row{display:flex;align-items:center;gap:11px;margin-bottom:2px}
+  .stat .sicon{width:36px;height:36px;border-radius:11px;background:var(--red-tint);color:var(--red);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .stat .ssub{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .mbars{display:flex;align-items:flex-end;gap:5px;height:44px;margin-top:10px}
+  .mbars i{flex:1;border-radius:4px 4px 2px 2px;background:var(--red-tint2);display:block}
+  .mbars i.hi{background:var(--red)}
+  .donut-ring{width:100px;height:100px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;position:relative}
+  .donut-ring::after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+  .donut-ring .dc{position:relative;z-index:1;text-align:center}
+  .donut-ring .dc b{display:block;font-size:16px;font-weight:800}
+  .donut-ring .dc span{font-size:9.5px;color:var(--muted)}
+  .legend-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid var(--line2);font-size:12.5px}
+  .legend-row:first-child{border-top:0}
+  .legend-row .ld{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .legend-row .lname{flex:1;color:var(--muted)}
+  .legend-row .lval{font-weight:800}
+  .seg-bar{height:9px;border-radius:999px;overflow:hidden;display:flex;background:var(--line2);margin-top:12px}
+  .seg-bar span{height:100%}
+  .seg-pcts{display:flex;font-size:11.5px;font-weight:800;margin-top:12px}
+  .seg-pcts b{flex:1;text-align:left}
+  .donut-wrap{display:flex;align-items:center;gap:16px;margin-top:8px}
+  .donut-legend{flex:1;display:flex;flex-direction:column;min-width:0}
+  .kpis{display:none}
   .section-h{display:flex;align-items:center;gap:10px;margin:24px 0 13px}
   .section-h h2{font-size:15px;margin:0;font-weight:800;letter-spacing:-.01em}
   .section-h .sp{flex:1}
   .grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
   @media(max-width:1000px){.grid2{grid-template-columns:1fr}}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+  .ov-bottom{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:18px}
+  @media(max-width:1100px){.ov-bottom{grid-template-columns:1fr}}
+  .panel{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
   .panel .ph{padding:15px 17px;border-bottom:1px solid var(--line2);font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
   .panel .pb{padding:7px 8px}
   .feed-item{display:flex;align-items:center;gap:13px;padding:11px 12px;border-radius:9px}
   .feed-item:hover{background:var(--line2)}
-  .chip-ch{width:34px;height:34px;flex:0 0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#f3f5f8;color:#7a8291}
+  .chip-ch{width:34px;height:34px;flex:0 0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--line2);color:#7a8291}
   .chip-ch svg.i{width:16px;height:16px}
   .feed-item .txt{min-width:0;flex:1}
   .feed-item .t1{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .feed-item .t2{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-  .tag{font-size:10.5px;font-weight:700;letter-spacing:.02em;padding:3px 9px 3px 8px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;background:#f3f5f8;color:#5b6472}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.02em;padding:3px 9px 3px 8px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;background:var(--line2);color:#5b6472}
   .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--faint)}
   .tag.berles::before{background:#3a63b0}.tag.eladas::before{background:#128a63}
   .tag.import::before{background:#c07a1e}.tag.bizomanyos::before{background:#7a3ea8}
@@ -79,16 +130,16 @@
   .col{background:var(--line2);border-radius:12px;padding:11px 11px 4px}
   .col h3{font-size:12px;margin:2px 3px 11px;font-weight:700;color:#6a7280;display:flex;align-items:center;gap:7px}
   .col h3 .cnt{background:#e4e7ec;border-radius:999px;padding:0 7px;font-size:11px;color:#6a7280}
-  .deal{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:9px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .12s,transform .06s}
+  .deal{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:9px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .12s,transform .06s}
   .deal:hover{border-color:#d3d8e0}
   .deal:active{transform:scale(.995)}
   .deal .d1{font-size:13px;font-weight:800}
   .deal .d2{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.35}
   .deal .drow{display:flex;align-items:center;gap:8px;margin-top:10px}
   .deal .drow .chn{color:#9aa2ae}
-  .deal .price{font-size:12.5px;font-weight:800;color:var(--navy);margin-left:auto}
-  .prog{height:4px;border-radius:999px;background:#edf0f4;margin-top:11px;overflow:hidden}
-  .prog i{display:block;height:100%;background:var(--navy);border-radius:999px}
+  .deal .price{font-size:12.5px;font-weight:800;color:var(--red);margin-left:auto}
+  .prog{height:4px;border-radius:999px;background:var(--line2);margin-top:11px;overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--red);border-radius:999px}
   .deal .stg{font-size:10.5px;color:var(--faint);margin-top:6px}
   table{width:100%;border-collapse:collapse}
   th,td{text-align:left;font-size:13px;padding:11px 14px;border-bottom:1px solid var(--line2)}
@@ -97,10 +148,10 @@
   tr:hover td{background:var(--line2)}
   .desk{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:900px){.desk{grid-template-columns:1fr}}
-  .desk .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+  .desk .box{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow)}
   .comps input,.ask input,.fac{font:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;text-align:right;outline:none}
   .comps input{width:100px;margin:0 6px 6px 0}
-  .result{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:13px}
+  .result{background:var(--line2);border-radius:11px;padding:13px}
   .verdict{font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
   .dot{width:9px;height:9px;border-radius:50%;background:var(--faint)}
   .v-good{color:var(--good)}.v-good .dot{background:var(--good)}
@@ -109,7 +160,7 @@
   .kv{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:12.5px;margin-top:4px}
   .kv .k{color:var(--muted)}
   .suggest{margin-top:10px;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
-  .suggest b{color:var(--navy)}
+  .suggest b{color:var(--red)}
   .todo{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line2)}
   .todo input[type=checkbox]{width:16px;height:16px;accent-color:var(--red)}
   .todo.done .lbl{text-decoration:line-through;color:var(--faint)}
@@ -118,12 +169,12 @@
   .todo .x:hover{color:var(--bad)}
   .addrow{display:flex;gap:8px;padding:13px}
   .addrow input{flex:1;font:inherit;font-size:13.5px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;outline:none}
-  .ai-note{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-left:3px solid var(--navy);border-radius:10px;padding:13px 15px;font-size:12.5px;color:#4a5261;line-height:1.5}
+  .ai-note{display:flex;gap:11px;align-items:flex-start;background:#fff;border-left:3px solid var(--red);border-radius:12px;padding:13px 15px;font-size:12.5px;color:#4a5261;line-height:1.5;box-shadow:var(--shadow)}
   .ai-note b{color:var(--ink);font-weight:700}
-  .ai-note .ico{color:var(--navy);margin-top:1px}
+  .ai-note .ico{color:var(--red);margin-top:1px}
   .modal{position:fixed;inset:0;background:rgba(16,18,22,.45);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
   .modal.open{display:flex}
-  .modal .m{background:#fff;border-radius:15px;width:470px;max-width:100%;max-height:90vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.25)}
+  .modal .m{background:#fff;border-radius:16px;width:470px;max-width:100%;max-height:90vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.25)}
   .modal .mh{padding:16px 18px;border-bottom:1px solid var(--line2);font-weight:800;display:flex;align-items:center;font-size:15px}
   .modal .mh .x{margin-left:auto;cursor:pointer;color:var(--muted);font-size:20px}
   .modal .mb{padding:16px 18px;display:grid;gap:12px}
@@ -186,41 +237,65 @@
 </script>
 <aside class="side">
   <div class="brand">
-    <img src="https://www.caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-    <span class="fb" style="display:none">Car<span>Advance</span></span>
+    <span class="mark">CA</span>
+    <span class="fb">Car<span>Advance</span></span>
   </div>
   <div class="lbl">Belső irányítópult</div>
   <nav class="nav" id="nav"></nav>
-  <div class="foot">Bejelentkezve<br><b id="curUserLabel">…</b><br><span id="curUserRole"></span> · <a id="logoutBtn" href="#" style="color:#c7ccd6">Kilépés</a></div>
+  <div class="foot">CarAdvance CRM &middot; v1.0</div>
 </aside>
 <div class="main">
   <div class="topbar">
-    <h1 id="viewTitle">Áttekintés</h1>
-    <div class="search"><input id="globalSearch" type="search" placeholder="Keresés — név, autó, ügy…"></div>
-    <div class="ai" title="Az AI-asszisztens automatikusan feldolgozza az új megkereséseket"><span class="pulse"></span> AI-feldolgozás aktív</div>
-    <button class="btn red" onclick="openAdd()">Új bejegyzés</button>
+    <button class="icon-btn" title="Áttekintés" onclick="go('overview')"><svg class="i" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.5V20h12V9.5"/></svg></button>
+    <div class="search">
+      <input id="globalSearch" type="search" placeholder="Keresés — név, autó, ügy…">
+      <span class="sbtn"><svg class="i" viewBox="0 0 24 24" stroke="#fff"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+    </div>
+    <div class="tb-spacer"></div>
+    <button class="icon-btn" title="Téma (hamarosan)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+    <button class="icon-btn" title="Üzenetek (hamarosan)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg></button>
+    <button class="icon-btn" title="Értesítések (hamarosan)"><svg class="i" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot-badge"></span></button>
+    <div class="profile" id="profileToggle">
+      <span class="avatar-circle" id="avatarCircle">–</span>
+      <div class="pinfo"><b id="curUserLabel">…</b><span id="curUserRole"></span></div>
+      <span class="chev"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="m6 9 6 6 6-6"/></svg></span>
+      <div class="pdrop" id="profileDrop"><a id="logoutBtn" href="#">Kilépés</a></div>
+    </div>
   </div>
   <div class="content">
     <section class="view active" id="v-overview">
+      <div class="page-head">
+        <div><h1>Áttekintés</h1><div class="crumb">Irányítópult <span>/</span> <b id="viewTitle">Áttekintés</b></div></div>
+        <button class="btn red" onclick="openAdd()">Új bejegyzés</button>
+      </div>
       <div class="kpis" id="kpis"></div>
+      <div class="ov-grid" id="ovGrid">
+        <div class="stat g-c1" id="stOpen"></div>
+        <div class="stat g-c2" id="stConv"></div>
+        <div class="stat g-c3" id="stOffer"></div>
+        <div class="stat g-c4" id="stClients"></div>
+        <div class="stat tall g-c5" id="stPipeline"></div>
+        <div class="stat tall g-c6" id="stRate"></div>
+      </div>
       <div class="ai-note" style="margin-bottom:20px">
         <span class="ico" id="aiIco"></span>
         <div><b>AI-asszisztens.</b> Minden új e-mail, chatbot-üzenet és űrlap automatikusan a megfelelő fülre kerül, kategorizálva (üzletág + fázis); eladási megkereséseknél árazási javaslat is készül. Hívás és WhatsApp: az „Új bejegyzés” gombbal rögzíthető.</div>
       </div>
-      <div class="grid2">
+      <div class="ov-bottom">
         <div class="panel"><div class="ph">Beérkező feed <span class="hint" style="margin-left:auto;font-weight:500">minden csatorna</span></div><div class="pb" id="feed"></div></div>
-        <div class="panel"><div class="ph">Fázisok üzletáganként</div><div class="pb" id="pipeSummary" style="padding:15px 17px"></div></div>
+        <div class="panel"><div class="ph">Megkeresések üzletáganként</div><div class="pb" id="donutLines" style="padding:15px 17px"></div></div>
+        <div class="panel"><div class="ph">Érték üzletáganként</div><div class="pb" id="donutValue" style="padding:15px 17px"></div></div>
       </div>
     </section>
     <section class="view" id="v-eladas">
-      <div class="section-h"><h2>Eladási megkeresések</h2></div>
+      <div class="page-head"><div><h1>Eladási megkeresések</h1><div class="crumb">Irányítópult <span>/</span> <b>Eladási megkeresések</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
       <div class="board" id="board-eladas"></div>
       <div class="section-h" style="margin-top:26px"><h2>Árazó asztal</h2></div>
       <div class="ai-note" style="margin-bottom:14px"><span class="ico" id="aiIco2"></span><div>Nyisd meg a versenytárs-találatokat egy kattintással, írd be az árakat — az AI kiszámolja a piaci értéket, a javasolt árat és a becsült eladási időt.</div></div>
       <div id="deskWrap"></div>
     </section>
     <section class="view" id="v-import">
-      <div class="section-h"><h2>Import folyamat</h2></div>
+      <div class="page-head"><div><h1>Import folyamat</h1><div class="crumb">Irányítópult <span>/</span> <b>Import folyamat</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
       <div class="board" id="board-import"></div>
       <div class="section-h" style="margin-top:26px"><h2>Autókeresés — jelöltek</h2></div>
       <!--
@@ -236,18 +311,18 @@
       <div class="ai-note" style="margin-bottom:14px"><span class="ico" id="aiIco3"></span><div>Nyisd meg a mobile.de keresést a jelölt autóra, majd rögzítsd a legolcsóbb, az átlagos és 3 hasonló találatot. Válaszd ki a javasolt autót, és egy kattintással kiküldheted az ajánlatot e-mailben.</div></div>
       <div id="importDeskWrap"></div>
     </section>
-    <section class="view" id="v-berles"><div class="section-h"><h2>Bérlési megkeresések</h2></div><div class="board" id="board-berles"></div></section>
-    <section class="view" id="v-bizomanyos"><div class="section-h"><h2>Bizományos értékesítés</h2></div><div class="board" id="board-bizomanyos"></div></section>
+    <section class="view" id="v-berles"><div class="page-head"><div><h1>Bérlési megkeresések</h1><div class="crumb">Irányítópult <span>/</span> <b>Bérlési megkeresések</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div><div class="board" id="board-berles"></div></section>
+    <section class="view" id="v-bizomanyos"><div class="page-head"><div><h1>Bizományos értékesítés</h1><div class="crumb">Irányítópult <span>/</span> <b>Bizományos értékesítés</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div><div class="board" id="board-bizomanyos"></div></section>
     <section class="view" id="v-teendok">
-      <div class="section-h"><h2>Teendők</h2></div>
+      <div class="page-head"><div><h1>Teendők</h1><div class="crumb">Irányítópult <span>/</span> <b>Teendők</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
       <div class="panel" style="max-width:640px"><div class="addrow"><input id="todoInput" placeholder="Új teendő… (Enter)"><button class="btn dark sm" onclick="addTodo()">Hozzáad</button></div><div id="todoList"></div></div>
     </section>
     <section class="view" id="v-ugyfelek">
-      <div class="section-h"><h2>Ügyfelek</h2></div>
+      <div class="page-head"><div><h1>Ügyfelek</h1><div class="crumb">Irányítópult <span>/</span> <b>Ügyfelek</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
       <div class="panel"><table><thead><tr><th>Név</th><th>Típus</th><th>Telefon</th><th>E-mail</th><th>Ország</th></tr></thead><tbody id="clientRows"></tbody></table></div>
     </section>
     <section class="view" id="v-felhasznalok">
-      <div class="section-h"><h2>Felhasználók</h2></div>
+      <div class="page-head"><div><h1>Felhasználók</h1><div class="crumb">Irányítópult <span>/</span> <b>Felhasználók</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
       <div class="panel" style="max-width:720px;margin-bottom:18px">
         <div class="ph">Új felhasználó hozzáadása</div>
         <div class="pb" style="padding:16px 17px;display:grid;gap:10px">
@@ -351,16 +426,68 @@ function go(v){
   document.getElementById('viewTitle').textContent=t[v];
 }
 document.getElementById('nav').addEventListener('click',function(e){var a=e.target.closest('a[data-v]');if(a)go(a.dataset.v);});
+var LINE_COLORS={'Eladás':'#128a63','Import':'#c07a1e','Bérlés':'#3a63b0','Bizományos':'#7a3ea8'};
+var pipelineLine='Eladás';
+function conicDonut(segments){
+  var total=segments.reduce(function(s,x){return s+x.value;},0);
+  if(!total)return 'conic-gradient(var(--line2) 0 100%)';
+  var acc=0,parts=[];
+  segments.forEach(function(s){
+    var start=acc/total*360,seg=s.value/total*360;acc+=s.value;
+    parts.push(s.color+' '+start.toFixed(1)+'deg '+(start+seg).toFixed(1)+'deg');
+  });
+  return 'conic-gradient('+parts.join(',')+')';
+}
+function donutCard(segments,centerBig,centerSub){
+  var total=segments.reduce(function(s,x){return s+x.value;},0);
+  var legend=segments.map(function(s){
+    var pct=total?Math.round(s.value/total*100):0;
+    return '<div class="legend-row"><span class="ld" style="background:'+s.color+'"></span><span class="lname">'+esc(s.label)+'</span><span class="lval">'+pct+'%</span></div>';
+  }).join('');
+  return '<div class="donut-wrap"><div class="donut-ring" style="background:'+conicDonut(segments)+'"><div class="dc"><b>'+centerBig+'</b><span>'+esc(centerSub)+'</span></div></div><div class="donut-legend">'+legend+'</div></div>';
+}
+function miniBars(values){
+  var max=Math.max.apply(null,values.concat([1]));
+  return '<div class="mbars">'+values.map(function(v){var h=Math.max(6,Math.round(v/max*44));return '<i style="height:'+h+'px" title="'+v+'"></i>';}).join('')+'</div>';
+}
+function ftShort(n){
+  n=n||0;
+  if(n>=1000000)return (n/1000000).toFixed(1).replace(/\.0$/,'')+'M Ft';
+  if(n>=1000)return Math.round(n/1000)+'e Ft';
+  return n+' Ft';
+}
 function renderKpis(){
+  var total=data.length;
   var open=data.filter(function(d){return !/Lezárva|Átadva|Eladva/.test(d.stage);}).length;
   var offer=data.filter(function(d){return d.stage==='Ajánlat';}).length;
-  var imp=data.filter(function(d){return d.line==='Import'&&!/Átadva/.test(d.stage);}).length;
-  document.getElementById('kpis').innerHTML=[
-    ['Nyitott megkeresés',open,'red','minden üzletág'],
-    ['Ajánlatra vár',offer,'navy','sürgős'],
-    ['Import folyamatban',imp,'navy','aktív ügyek'],
-    ['Lezárt e hónapban',3,'good','+1 az előző héthez']
-  ].map(function(k){return '<div class="kpi"><div class="lab">'+k[0]+'</div><div class="num '+k[2]+'">'+k[1]+'</div><div class="sub">'+k[3]+'</div></div>';}).join('');
+  var closed=data.filter(function(d){return /Lezárva|Átadva|Eladva/.test(d.stage);}).length;
+  var convPct=total?Math.round(closed/total*100):0;
+  var perLineOpen=LINES.map(function(l){return data.filter(function(d){return d.line===l&&!/Lezárva|Átadva|Eladva/.test(d.stage);}).length;});
+  var byType={};clients.forEach(function(c){byType[c.type]=(byType[c.type]||0)+1;});
+  var clientCounts=['Eladó','Import','Bérlő','Bizományos'].map(function(t){return byType[t]||0;});
+
+  document.getElementById('stOpen').innerHTML=
+    '<div class="sh"><span class="stitle">Nyitott megkeresés</span></div>'
+    +'<div class="sbig">'+open+'</div>'
+    +'<div class="strend"><span class="sub2">minden üzletág &middot; '+total+' összesen</span></div>'
+    +miniBars(perLineOpen);
+
+  document.getElementById('stOffer').innerHTML=
+    '<div class="sh"><span class="stitle">Ajánlatra vár</span></div>'
+    +'<div class="sbig">'+offer+'</div>'
+    +'<div class="strend"><span class="sub2">sürgős</span></div>'
+    +miniBars(perLineOpen);
+
+  document.getElementById('stConv').innerHTML=donutCard(
+    [{label:'Lezárva',value:closed,color:'var(--good)'},{label:'Nyitott',value:open,color:'var(--red-tint2)'}],
+    convPct+'%','konverzió'
+  );
+
+  document.getElementById('stClients').innerHTML=
+    '<div class="sh"><span class="stitle">Ügyfelek száma</span></div>'
+    +'<div class="sbig">'+clients.length+'</div>'
+    +'<div class="strend"><span class="sub2">összes rögzített ügyfél</span></div>'
+    +miniBars(clientCounts);
 }
 function renderFeed(){
   var q=(document.getElementById('globalSearch').value||'').toLowerCase();
@@ -372,11 +499,39 @@ function renderFeed(){
   }).join('')||'<div style="padding:16px;color:#8a93a2">Nincs találat.</div>';
 }
 function renderPipeSummary(){
-  document.getElementById('pipeSummary').innerHTML=LINES.map(function(l){
-    var items=data.filter(function(d){return d.line===l;}),by={};items.forEach(function(d){by[d.stage]=(by[d.stage]||0)+1;});
-    var chips=STAGES[l].map(function(s){var n=by[s]||0;return '<span style="font-size:11px;padding:2px 8px;border-radius:999px;background:'+(n?'#eef3fb':'#f3f5f8')+';color:'+(n?'#22447d':'#aab1bd')+';font-weight:600">'+s+' '+n+'</span>';}).join(' ');
-    return '<div style="margin-bottom:15px"><div style="margin-bottom:7px"><span class="tag '+lineClass(l)+'">'+l+'</span></div><div style="display:flex;flex-wrap:wrap;gap:6px">'+chips+'</div></div>';
-  }).join('');
+  var l=pipelineLine,items=data.filter(function(d){return d.line===l;}),total=items.length,by={};
+  items.forEach(function(d){by[d.stage]=(by[d.stage]||0)+1;});
+  var stColors=['#22447d','#3a63b0','#5f86c9','#8aa6d6','#b9c8e6','#128a63','#c07a1e','#7a3ea8'];
+  var segs=STAGES[l].map(function(s,i){return {label:s,value:by[s]||0,color:stColors[i%stColors.length]};});
+  var bar=segs.map(function(s){var pct=total?(s.value/total*100):0;return '<span style="width:'+pct+'%;background:'+s.color+'"></span>';}).join('');
+  var legend=segs.map(function(s){return '<div class="legend-row"><span class="ld" style="background:'+s.color+'"></span><span class="lname">'+esc(s.label)+'</span><span class="lval">'+s.value+'</span></div>';}).join('');
+  var opts=LINES.map(function(x){return '<option value="'+x+'"'+(x===l?' selected':'')+'>'+x+'</option>';}).join('');
+  document.getElementById('stPipeline').innerHTML=
+    '<div class="stitle-row"><span class="sicon">'+ic(lineClass(l))+'</span><div><div class="stitle" style="color:var(--ink);font-size:14px">Fázis állapot</div><div class="ssub">Folyamat lebontása üzletáganként</div></div></div>'
+    +'<select onchange="pipelineLine=this.value;renderPipeSummary()" style="margin-top:12px;width:100%;font:inherit;font-size:12.5px;padding:8px 10px;border:1px solid var(--line);border-radius:9px">'+opts+'</select>'
+    +'<div class="seg-bar">'+bar+'</div>'
+    +'<div style="margin-top:6px">'+legend+'</div>';
+}
+function renderClosedRate(){
+  var total=data.length,closed=data.filter(function(d){return /Lezárva|Átadva|Eladva/.test(d.stage);}).length;
+  var pct=total?Math.round(closed/total*100):0;
+  document.getElementById('stRate').innerHTML=
+    '<div class="stitle-row"><span class="sicon">'+ic('teendok')+'</span><div><div class="stitle" style="color:var(--ink);font-size:14px">Zárási arány</div><div class="ssub">Lezárt / összes megkeresés</div></div></div>'
+    +'<div class="sbig" style="margin-top:14px">'+pct+'%</div>'
+    +'<div class="strend"><span class="sub2">'+closed+' lezárva '+total+'-ból</span></div>'
+    +'<div style="margin-top:14px">'+LINES.map(function(l){
+        var lt=data.filter(function(d){return d.line===l;}).length;
+        var lc=data.filter(function(d){return d.line===l&&/Lezárva|Átadva|Eladva/.test(d.stage);}).length;
+        var pctL=lt?Math.round(lc/lt*100):0;
+        return '<div class="legend-row"><span class="ld" style="background:'+LINE_COLORS[l]+'"></span><span class="lname">'+l+'</span><span class="lval">'+pctL+'%</span></div>';
+      }).join('')+'</div>';
+}
+function renderDonuts(){
+  var byCount=LINES.map(function(l){return {label:l,value:data.filter(function(d){return d.line===l;}).length,color:LINE_COLORS[l]};});
+  document.getElementById('donutLines').innerHTML=donutCard(byCount,data.length,'összesen');
+  var byValue=LINES.map(function(l){return {label:l,value:data.filter(function(d){return d.line===l;}).reduce(function(s,d){return s+(d.price||0);},0),color:LINE_COLORS[l]};});
+  var totalValue=byValue.reduce(function(s,x){return s+x.value;},0);
+  document.getElementById('donutValue').innerHTML=donutCard(byValue,ftShort(totalValue),'össz. érték');
 }
 function dealCard(d){
   var st=STAGES[d.line],idx=st.indexOf(d.stage),prog=Math.round((idx+1)/st.length*100);
@@ -633,7 +788,7 @@ function addTodo(){
 }
 document.getElementById('todoInput').addEventListener('keydown',function(e){if(e.key==='Enter')addTodo();});
 document.getElementById('globalSearch').addEventListener('input',renderFeed);
-function renderAll(){renderKpis();renderFeed();renderPipeSummary();renderBadges();LINES.forEach(renderBoard);renderClients();renderTodos();loadDesk();loadImportDesk();if(currentUser&&currentUser.role==='admin')renderUsers();}
+function renderAll(){renderKpis();renderFeed();renderPipeSummary();renderClosedRate();renderDonuts();renderBadges();LINES.forEach(renderBoard);renderClients();renderTodos();loadDesk();loadImportDesk();if(currentUser&&currentUser.role==='admin')renderUsers();}
 
 // ---- Auth-aware API layer ----
 function apiFetch(path,opts){
@@ -693,6 +848,7 @@ function CA_boot(){
     currentUser=r.user;
     document.getElementById('curUserLabel').textContent=currentUser.name;
     document.getElementById('curUserRole').textContent=currentUser.role==='admin'?'Admin':'Sales manager';
+    document.getElementById('avatarCircle').textContent=(currentUser.name||'?').trim().charAt(0).toUpperCase();
     renderNav();
     var tasks=[apiFetch('/deals'),apiFetch('/clients'),apiFetch('/todos')];
     if(currentUser.role==='admin')tasks.push(apiFetch('/admin/users'));
@@ -712,6 +868,11 @@ document.getElementById('logoutBtn').addEventListener('click',function(e){
   e.preventDefault();
   apiFetch('/logout',{method:'POST'}).catch(function(){}).then(function(){location.reload();});
 });
+document.getElementById('profileToggle').addEventListener('click',function(e){
+  e.stopPropagation();
+  document.getElementById('profileDrop').classList.toggle('open');
+});
+document.addEventListener('click',function(){document.getElementById('profileDrop').classList.remove('open');});
 
 // On page load: silently check for an existing valid session (no error flash if not logged in).
 (function(){
