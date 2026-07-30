@@ -1,0 +1,8 @@
+name = "caradvance-belso-api"
+main = "worker.js"
+compatibility_date = "2026-07-30"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "caradvance-belso-db"
+database_id = "17bac04f-24e7-463a-80d0-d2d27cdc1d46"
