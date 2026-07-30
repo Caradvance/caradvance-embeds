@@ -334,6 +334,234 @@ async function handleAdminAssign(request, env) {
   return json({ ok: true });
 }
 
+// ---------- OAuth integrations (Gmail / Outlook / Google Calendar) ----------
+// Requires Cloudflare Pages encrypted env vars: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+// MS_CLIENT_ID, MS_CLIENT_SECRET, MS_TENANT_ID. Until those are set, the /oauth/* and
+// /mail and /calendar endpoints return a clear "not configured" error instead of failing oddly.
+
+function oauthStateCookie(state) {
+  return `ca_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
+}
+function clearOauthStateCookie() {
+  return `ca_oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
+async function ensureFreshToken(env, account) {
+  const now = Date.now();
+  const expiresAt = account.expires_at ? new Date(account.expires_at + 'Z').getTime() : 0;
+  if (expiresAt - now > 60000) return account.access_token;
+  if (account.provider === 'google') {
+    const res = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET,
+        refresh_token: account.refresh_token, grant_type: 'refresh_token'
+      })
+    });
+    const j = await res.json();
+    if (!res.ok) throw new Error('Google token megújítás sikertelen: ' + JSON.stringify(j));
+    const newExpires = new Date(Date.now() + (j.expires_in || 3600) * 1000).toISOString().slice(0, 19);
+    await env.DB.prepare(`UPDATE oauth_accounts SET access_token = ?, expires_at = ? WHERE id = ?`)
+      .bind(j.access_token, newExpires, account.id).run();
+    return j.access_token;
+  }
+  if (account.provider === 'microsoft') {
+    const res = await fetch(`https://login.microsoftonline.com/${env.MS_TENANT_ID}/oauth2/v2.0/token`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: env.MS_CLIENT_ID, client_secret: env.MS_CLIENT_SECRET,
+        refresh_token: account.refresh_token, grant_type: 'refresh_token',
+        scope: 'offline_access Mail.Read Calendars.Read User.Read'
+      })
+    });
+    const j = await res.json();
+    if (!res.ok) throw new Error('Microsoft token megújítás sikertelen: ' + JSON.stringify(j));
+    const newExpires = new Date(Date.now() + (j.expires_in || 3600) * 1000).toISOString().slice(0, 19);
+    if (j.refresh_token) {
+      await env.DB.prepare(`UPDATE oauth_accounts SET access_token = ?, refresh_token = ?, expires_at = ? WHERE id = ?`)
+        .bind(j.access_token, j.refresh_token, newExpires, account.id).run();
+    } else {
+      await env.DB.prepare(`UPDATE oauth_accounts SET access_token = ?, expires_at = ? WHERE id = ?`)
+        .bind(j.access_token, newExpires, account.id).run();
+    }
+    return j.access_token;
+  }
+  throw new Error('Ismeretlen szolgáltató.');
+}
+
+async function handleGoogleStart(request, env) {
+  const { error } = await requireAdmin(request, env);
+  if (error) return error;
+  if (!env.GOOGLE_CLIENT_ID) return json({ error: 'A Google integráció nincs beállítva (hiányzó GOOGLE_CLIENT_ID).' }, 500);
+  const state = randomHex(16);
+  const redirectUri = new URL(request.url).origin + '/api/belso/oauth/google/callback';
+  const scope = encodeURIComponent('https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email');
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(env.GOOGLE_CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&access_type=offline&prompt=consent&scope=${scope}&state=${state}`;
+  return new Response(null, { status: 302, headers: { Location: authUrl, 'Set-Cookie': oauthStateCookie(state) } });
+}
+
+async function handleGoogleCallback(request, env) {
+  const user = await getSessionUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Csak admin jogosultsággal.' }, 403);
+  const url = new URL(request.url);
+  const code = url.searchParams.get('code');
+  const state = url.searchParams.get('state');
+  const cookies = parseCookies(request);
+  if (!code || !state || state !== cookies['ca_oauth_state']) return json({ error: 'Érvénytelen OAuth állapot.' }, 400);
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) return json({ error: 'A Google integráció nincs beállítva.' }, 500);
+  const redirectUri = url.origin + '/api/belso/oauth/google/callback';
+  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ code, client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET, redirect_uri: redirectUri, grant_type: 'authorization_code' })
+  });
+  const tokenJ = await tokenRes.json();
+  if (!tokenRes.ok) return json({ error: 'Google token csere sikertelen.', detail: tokenJ }, 500);
+  const uiRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: 'Bearer ' + tokenJ.access_token } });
+  const uiJ = await uiRes.json();
+  const email = (uiJ.email || '').toLowerCase();
+  if (!email) return json({ error: 'Nem sikerült lekérni az e-mail címet.' }, 500);
+  const expiresAt = new Date(Date.now() + (tokenJ.expires_in || 3600) * 1000).toISOString().slice(0, 19);
+  const existing = await env.DB.prepare(`SELECT id, refresh_token FROM oauth_accounts WHERE provider = 'google' AND email = ?`).bind(email).first();
+  const refreshToken = tokenJ.refresh_token || (existing && existing.refresh_token) || null;
+  if (existing) {
+    await env.DB.prepare(`UPDATE oauth_accounts SET access_token = ?, refresh_token = ?, expires_at = ?, scope = ?, connected_by = ? WHERE id = ?`)
+      .bind(tokenJ.access_token, refreshToken, expiresAt, tokenJ.scope || '', user.id, existing.id).run();
+  } else {
+    await env.DB.prepare(`INSERT INTO oauth_accounts (provider,email,access_token,refresh_token,expires_at,scope,connected_by) VALUES ('google',?,?,?,?,?,?)`)
+      .bind(email, tokenJ.access_token, refreshToken, expiresAt, tokenJ.scope || '', user.id).run();
+  }
+  return new Response(null, { status: 302, headers: { Location: '/belso/?integracio=google_ok', 'Set-Cookie': clearOauthStateCookie() } });
+}
+
+async function handleMicrosoftStart(request, env) {
+  const { error } = await requireAdmin(request, env);
+  if (error) return error;
+  if (!env.MS_CLIENT_ID || !env.MS_TENANT_ID) return json({ error: 'A Microsoft integráció nincs beállítva (hiányzó MS_CLIENT_ID / MS_TENANT_ID).' }, 500);
+  const state = randomHex(16);
+  const redirectUri = new URL(request.url).origin + '/api/belso/oauth/microsoft/callback';
+  const scope = encodeURIComponent('offline_access Mail.Read Calendars.Read User.Read');
+  const authUrl = `https://login.microsoftonline.com/${env.MS_TENANT_ID}/oauth2/v2.0/authorize?client_id=${encodeURIComponent(env.MS_CLIENT_ID)}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
+  return new Response(null, { status: 302, headers: { Location: authUrl, 'Set-Cookie': oauthStateCookie(state) } });
+}
+
+async function handleMicrosoftCallback(request, env) {
+  const user = await getSessionUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Csak admin jogosultsággal.' }, 403);
+  const url = new URL(request.url);
+  const code = url.searchParams.get('code');
+  const state = url.searchParams.get('state');
+  const cookies = parseCookies(request);
+  if (!code || !state || state !== cookies['ca_oauth_state']) return json({ error: 'Érvénytelen OAuth állapot.' }, 400);
+  if (!env.MS_CLIENT_ID || !env.MS_CLIENT_SECRET || !env.MS_TENANT_ID) return json({ error: 'A Microsoft integráció nincs beállítva.' }, 500);
+  const redirectUri = url.origin + '/api/belso/oauth/microsoft/callback';
+  const tokenRes = await fetch(`https://login.microsoftonline.com/${env.MS_TENANT_ID}/oauth2/v2.0/token`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ code, client_id: env.MS_CLIENT_ID, client_secret: env.MS_CLIENT_SECRET, redirect_uri: redirectUri, grant_type: 'authorization_code', scope: 'offline_access Mail.Read Calendars.Read User.Read' })
+  });
+  const tokenJ = await tokenRes.json();
+  if (!tokenRes.ok) return json({ error: 'Microsoft token csere sikertelen.', detail: tokenJ }, 500);
+  const meRes = await fetch('https://graph.microsoft.com/v1.0/me', { headers: { Authorization: 'Bearer ' + tokenJ.access_token } });
+  const meJ = await meRes.json();
+  const email = (meJ.mail || meJ.userPrincipalName || '').toLowerCase();
+  if (!email) return json({ error: 'Nem sikerült lekérni az e-mail címet.' }, 500);
+  const expiresAt = new Date(Date.now() + (tokenJ.expires_in || 3600) * 1000).toISOString().slice(0, 19);
+  const existing = await env.DB.prepare(`SELECT id, refresh_token FROM oauth_accounts WHERE provider = 'microsoft' AND email = ?`).bind(email).first();
+  const refreshToken = tokenJ.refresh_token || (existing && existing.refresh_token) || null;
+  if (existing) {
+    await env.DB.prepare(`UPDATE oauth_accounts SET access_token = ?, refresh_token = ?, expires_at = ?, scope = ?, connected_by = ? WHERE id = ?`)
+      .bind(tokenJ.access_token, refreshToken, expiresAt, tokenJ.scope || '', user.id, existing.id).run();
+  } else {
+    await env.DB.prepare(`INSERT INTO oauth_accounts (provider,email,access_token,refresh_token,expires_at,scope,connected_by) VALUES ('microsoft',?,?,?,?,?,?)`)
+      .bind(email, tokenJ.access_token, refreshToken, expiresAt, tokenJ.scope || '', user.id).run();
+  }
+  return new Response(null, { status: 302, headers: { Location: '/belso/?integracio=microsoft_ok', 'Set-Cookie': clearOauthStateCookie() } });
+}
+
+async function handleListIntegrations(request, env) {
+  const { error } = await requireAdmin(request, env);
+  if (error) return error;
+  const rows = await env.DB.prepare(`SELECT id, provider, email, created_at FROM oauth_accounts ORDER BY id`).all();
+  return json({ accounts: rows.results });
+}
+
+async function handleDeleteIntegration(request, env, id) {
+  const { error } = await requireAdmin(request, env);
+  if (error) return error;
+  await env.DB.prepare(`DELETE FROM oauth_accounts WHERE id = ?`).bind(id).run();
+  return json({ ok: true });
+}
+
+async function handleGetMail(request, env) {
+  const { error } = await requireAdmin(request, env);
+  if (error) return error;
+  const accounts = (await env.DB.prepare(`SELECT * FROM oauth_accounts WHERE provider IN ('google','microsoft')`).all()).results;
+  if (!accounts.length) return json({ mail: [], connected: [] });
+  const all = [];
+  for (const acc of accounts) {
+    try {
+      const token = await ensureFreshToken(env, acc);
+      if (acc.provider === 'google') {
+        const listRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=20&labelIds=INBOX', { headers: { Authorization: 'Bearer ' + token } });
+        const listJ = await listRes.json();
+        if (!listRes.ok) throw new Error('Gmail lista hiba: ' + JSON.stringify(listJ));
+        for (const m of (listJ.messages || [])) {
+          const mr = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`, { headers: { Authorization: 'Bearer ' + token } });
+          const mj = await mr.json();
+          const headers = {};
+          ((mj.payload && mj.payload.headers) || []).forEach(h => { headers[h.name] = h.value; });
+          all.push({ account: acc.email, provider: 'google', id: m.id, from: headers.From || '', subject: headers.Subject || '(nincs tárgy)', snippet: mj.snippet || '', date: headers.Date || '' });
+        }
+      } else if (acc.provider === 'microsoft') {
+        const listRes = await fetch('https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=20&$select=from,subject,bodyPreview,receivedDateTime', { headers: { Authorization: 'Bearer ' + token } });
+        const listJ = await listRes.json();
+        if (!listRes.ok) throw new Error('Outlook lista hiba: ' + JSON.stringify(listJ));
+        (listJ.value || []).forEach(m => {
+          all.push({ account: acc.email, provider: 'microsoft', id: m.id, from: (m.from && m.from.emailAddress && m.from.emailAddress.address) || '', subject: m.subject || '(nincs tárgy)', snippet: m.bodyPreview || '', date: m.receivedDateTime || '' });
+        });
+      }
+    } catch (e) {
+      all.push({ account: acc.email, provider: acc.provider, error: String((e && e.message) || e) });
+    }
+  }
+  all.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  return json({ mail: all, connected: accounts.map(a => ({ provider: a.provider, email: a.email })) });
+}
+
+async function handleGetCalendar(request, env) {
+  const { error } = await requireAdmin(request, env);
+  if (error) return error;
+  const accounts = (await env.DB.prepare(`SELECT * FROM oauth_accounts WHERE provider = 'google'`).all()).results;
+  if (!accounts.length) return json({ events: [], connected: [] });
+  const events = [];
+  const timeMin = new Date().toISOString();
+  const timeMax = new Date(Date.now() + 30 * 86400 * 1000).toISOString();
+  for (const acc of accounts) {
+    try {
+      const token = await ensureFreshToken(env, acc);
+      const calUrl = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&singleEvents=true&orderBy=startTime&maxResults=50`;
+      const r = await fetch(calUrl, { headers: { Authorization: 'Bearer ' + token } });
+      const j = await r.json();
+      if (!r.ok) throw new Error('Calendar hiba: ' + JSON.stringify(j));
+      (j.items || []).forEach(ev => {
+        events.push({
+          account: acc.email, id: ev.id, summary: ev.summary || '(nincs cím)',
+          start: (ev.start && (ev.start.dateTime || ev.start.date)) || '',
+          end: (ev.end && (ev.end.dateTime || ev.end.date)) || '',
+          allDay: !!(ev.start && ev.start.date)
+        });
+      });
+    } catch (e) {
+      events.push({ account: acc.email, error: String((e && e.message) || e) });
+    }
+  }
+  events.sort((a, b) => new Date(a.start || 0) - new Date(b.start || 0));
+  return json({ events, connected: accounts.map(a => ({ provider: a.provider, email: a.email })) });
+}
+
 // ---------- Router (Cloudflare Pages Function) ----------
 
 export async function onRequest(context) {
@@ -373,6 +601,16 @@ export async function onRequest(context) {
       m = path.match(/^\/admin\/users\/(\d+)$/);
       if (m && method === 'DELETE') return await handleAdminDeleteUser(request, env, m[1]);
       if (path === '/admin/assign' && method === 'POST') return await handleAdminAssign(request, env);
+
+      if (path === '/oauth/google/start' && method === 'GET') return await handleGoogleStart(request, env);
+      if (path === '/oauth/google/callback' && method === 'GET') return await handleGoogleCallback(request, env);
+      if (path === '/oauth/microsoft/start' && method === 'GET') return await handleMicrosoftStart(request, env);
+      if (path === '/oauth/microsoft/callback' && method === 'GET') return await handleMicrosoftCallback(request, env);
+      if (path === '/integrations' && method === 'GET') return await handleListIntegrations(request, env);
+      m = path.match(/^\/integrations\/(\d+)$/);
+      if (m && method === 'DELETE') return await handleDeleteIntegration(request, env, m[1]);
+      if (path === '/mail' && method === 'GET') return await handleGetMail(request, env);
+      if (path === '/calendar' && method === 'GET') return await handleGetCalendar(request, env);
 
     return json({ error: 'Not found' }, 404);
   } catch (e) {
