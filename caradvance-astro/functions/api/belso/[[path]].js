@@ -247,6 +247,18 @@ async function handleUpdateTodo(request, env, id) {
   return json({ ok: true });
 }
 
+async function handleDeleteTodo(request, env, id) {
+  const user = await getSessionUser(request, env);
+  if (!user) return json({ error: 'Nincs bejelentkezve.' }, 401);
+  const todo = await env.DB.prepare(`SELECT * FROM todos WHERE id = ?`).bind(id).first();
+  if (!todo) return json({ error: 'Nem található.' }, 404);
+  if (user.role !== 'admin' && todo.assigned_to !== null && todo.assigned_to !== user.id) {
+    return json({ error: 'Nincs jogosultság.' }, 403);
+  }
+  await env.DB.prepare(`DELETE FROM todos WHERE id = ?`).bind(id).run();
+  return json({ ok: true });
+}
+
 // ---------- Admin: user management ----------
 
 async function requireAdmin(request, env) {
@@ -352,6 +364,7 @@ export async function onRequest(context) {
       if (path === '/todos' && method === 'POST') return await handleCreateTodo(request, env);
       m = path.match(/^\/todos\/(\d+)$/);
       if (m && method === 'PATCH') return await handleUpdateTodo(request, env, m[1]);
+      if (m && method === 'DELETE') return await handleDeleteTodo(request, env, m[1]);
 
       if (path === '/admin/users' && method === 'GET') return await handleAdminListUsers(request, env);
       if (path === '/admin/users' && method === 'POST') return await handleAdminCreateUser(request, env);
