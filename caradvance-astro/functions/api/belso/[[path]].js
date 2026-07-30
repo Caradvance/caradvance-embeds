@@ -168,6 +168,53 @@ async function handleUpdateDeal(request, env, id) {
   return json({ ok: true });
 }
 
+// ---------- Geocode (distance from Budapest for import candidates) ----------
+// Nominatim (OpenStreetMap) lookup runs server-side so we can send a proper
+// identifying User-Agent (required by Nominatim's usage policy) and keep the
+// caradvance-mobilede-extension itself free of any external API host
+// permissions — it only needs to read the listing's postal code / country
+// off the page. Requires a logged-in session but no particular role.
+const BUDAPEST_LAT = 47.4979;
+const BUDAPEST_LON = 19.0402;
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+async function handleGeocode(request, env) {
+  const user = await getSessionUser(request, env);
+  if (!user) return json({ error: 'Nincs bejelentkezve.' }, 401);
+  const url = new URL(request.url);
+  const postal = (url.searchParams.get('postal') || '').trim();
+  const country = (url.searchParams.get('country') || 'DE').trim().toLowerCase();
+  const q = (url.searchParams.get('q') || '').trim();
+  if (!postal && !q) return json({ error: 'Hiányzó cím.' }, 400);
+
+  const params = new URLSearchParams({ format: 'json', limit: '1' });
+  if (postal) { params.set('postalcode', postal); params.set('country', country); }
+  else { params.set('q', q); }
+
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+      headers: {
+        'User-Agent': 'CarAdvance-CRM/1.0 (info@caradvance.hu, internal import tool)',
+        'Accept-Language': 'hu,de,en'
+      }
+    });
+    if (!resp.ok) return json({ error: 'Geokódolás sikertelen.' }, 502);
+    const rows = await resp.json().catch(() => []);
+    if (!rows || !rows.length) return json({ error: 'Cím nem található.' }, 404);
+    const lat = parseFloat(rows[0].lat), lon = parseFloat(rows[0].lon);
+    const distanceKm = Math.round(haversineKm(BUDAPEST_LAT, BUDAPEST_LON, lat, lon));
+    return json({ lat, lon, distanceKm });
+  } catch (e) {
+    return json({ error: 'Geokódolási hiba.' }, 502);
+  }
+}
+
 // ---------- Clients ----------
 
 async function handleGetClients(request, env) {
@@ -611,6 +658,8 @@ export async function onRequest(context) {
       if (m && method === 'DELETE') return await handleDeleteIntegration(request, env, m[1]);
       if (path === '/mail' && method === 'GET') return await handleGetMail(request, env);
       if (path === '/calendar' && method === 'GET') return await handleGetCalendar(request, env);
+
+      if (path === '/geocode' && method === 'GET') return await handleGeocode(request, env);
 
     return json({ error: 'Not found' }, 404);
   } catch (e) {
