@@ -215,6 +215,34 @@ async function handleGeocode(request, env) {
   }
 }
 
+// ---------- FX (EUR -> HUF, for showing an approximate forint price next to the
+// mobile.de EUR price on import candidate cards) ----------
+// Uses Frankfurter (ECB reference rates, free, no key, updated on ECB business days) —
+// fine for an informational estimate, not for anything transactional. Cached at the
+// edge for an hour so we don't hit the upstream API on every single page load.
+async function handleFx(request, env) {
+  const user = await getSessionUser(request, env);
+  if (!user) return json({ error: 'Nincs bejelentkezve.' }, 401);
+  // `caches` is a Cloudflare Workers runtime global — guard its use so this endpoint
+  // also runs fine under plain Node (e.g. our local test suite).
+  const cache = (typeof caches !== 'undefined') ? caches.default : null;
+  const cacheKey = 'https://internal.cache/fx-eur-huf';
+  let cached = cache ? await cache.match(cacheKey) : null;
+  if (cached) return cached;
+  try {
+    const resp = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF');
+    if (!resp.ok) return json({ error: 'Árfolyam lekérés sikertelen.' }, 502);
+    const j = await resp.json();
+    const rate = j && j.rates && j.rates.HUF;
+    if (!rate) return json({ error: 'Nincs HUF árfolyam.' }, 502);
+    const out = json({ rate, date: j.date || null }, 200, { 'Cache-Control': 'public, max-age=3600' });
+    if (cache) await cache.put(cacheKey, out.clone());
+    return out;
+  } catch (e) {
+    return json({ error: 'Árfolyam lekérési hiba.' }, 502);
+  }
+}
+
 // ---------- Clients ----------
 
 async function handleGetClients(request, env) {
@@ -660,6 +688,7 @@ export async function onRequest(context) {
       if (path === '/calendar' && method === 'GET') return await handleGetCalendar(request, env);
 
       if (path === '/geocode' && method === 'GET') return await handleGeocode(request, env);
+      if (path === '/fx' && method === 'GET') return await handleFx(request, env);
 
     return json({ error: 'Not found' }, 404);
   } catch (e) {
