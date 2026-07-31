@@ -6,6 +6,13 @@ const SESSION_DAYS = 30;
 const PBKDF2_ITER = 100000;
 const KEY_LEN = 32;
 
+// TEMPORARY TEST OVERRIDE — while the offer-email flow is being tried out, every
+// offer email is redirected to this address instead of the real client, so no
+// client ever receives a test message. The real client address is still shown
+// in the subject/body so it's clear who it was "for". Set to null (or delete
+// this override in handleSendOffer below) to resume sending to real clients.
+const OFFER_TEST_FORWARD_EMAIL = 'marc.nemethy@bhgeu.com';
+
 function json(obj, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(obj), {
     status,
@@ -259,7 +266,14 @@ async function handleSendOffer(request, env, dealId) {
     });
   }
   try {
-    await sendGmail(env, sender, { to: deal.email, subject: `Ajánlat — ${deal.car || 'CarAdvance'}`, html: buildOfferEmailHtml({ clientName: deal.name, car: deal.car, link }) });
+    // TEMPORARY: forward to the test address instead of the real client while this
+    // flow is being tried out (see OFFER_TEST_FORWARD_EMAIL above) — the subject
+    // still names the real client/deal so it's clear what it would have said.
+    const sendTo = OFFER_TEST_FORWARD_EMAIL || deal.email;
+    const subject = OFFER_TEST_FORWARD_EMAIL
+      ? `[TESZT — ${deal.email}] Ajánlat — ${deal.car || 'CarAdvance'}`
+      : `Ajánlat — ${deal.car || 'CarAdvance'}`;
+    await sendGmail(env, sender, { to: sendTo, subject, html: buildOfferEmailHtml({ clientName: deal.name, car: deal.car, link }) });
     return json({ ok: true, token, link, sent: true });
   } catch (e) {
     return json({ ok: true, token, link, sent: false, reason: String((e && e.message) || e) });
