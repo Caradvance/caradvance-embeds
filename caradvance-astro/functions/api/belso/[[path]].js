@@ -26,6 +26,14 @@ function randomHex(nBytes) {
   crypto.getRandomValues(arr);
   return bytesToHex(arr);
 }
+// Base64url-encodes a UTF-8 string (Hungarian names/accents included) — used for
+// building the raw RFC 2822 message the Gmail API expects for users.messages.send.
+function base64UrlEncodeUtf8(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 
 async function pbkdf2Hex(password, saltHex) {
   const enc = new TextEncoder();
@@ -166,6 +174,96 @@ async function handleUpdateDeal(request, env, id) {
   vals.push(id);
   await env.DB.prepare(`UPDATE deals SET ${sets.join(', ')} WHERE id = ?`).bind(...vals).run();
   return json({ ok: true });
+}
+
+// ---------- Client car-selection offer (send + track response) ----------
+// Sends the up-to-5 import candidate cards to the client as a link to a public,
+// unauthenticated page (caradvance.hu/ajanlat/?t=<token>) where they tick 1-2
+// cars and submit — no reply email, no login. The token + a snapshot of the
+// candidates shown are stored in offer_tokens; the client's pick is written back
+// onto deals.client_picks_json / client_responded_at by functions/api/offer/[[path]].js
+// once they submit, so it shows up automatically back here in the CRM.
+function buildOfferEmailHtml({ clientName, car, link }) {
+  const safe = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:32px 0;">
+<tr><td align="center">
+<table width="480" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;">
+  <tr><td style="background:#E2001A;padding:20px 28px;">
+    <span style="color:#fff;font-size:18px;font-weight:800;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">CarAdvance</span>
+  </td></tr>
+  <tr><td style="padding:28px;">
+    <p style="margin:0 0 12px;color:#1c2430;font-size:15px;">Kedves ${safe(clientName) || 'Ügyfelünk'}!</p>
+    <p style="margin:0 0 22px;color:#4a5568;font-size:14px;line-height:1.6;">
+      Az Ön keresésének megfelelően${car ? ' (' + safe(car) + ')' : ''} összeállítottuk a legjobb ajánlatokat.
+      Kattintson a gombra, tekintse át a talált autókat, és válassza ki, melyik egy vagy kettő érdekli — nem kell rá válaszolnia e-mailben, elég egy kattintás.
+    </p>
+    <table cellpadding="0" cellspacing="0"><tr><td style="border-radius:8px;background:#E2001A;">
+      <a href="${safe(link)}" style="display:inline-block;padding:13px 26px;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">Ajánlat megtekintése és kiválasztása</a>
+    </td></tr></table>
+    <p style="margin:22px 0 0;color:#9aa2ad;font-size:12px;">Ha a gomb nem működik, másolja be ezt a linket a böngészőbe: ${safe(link)}</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+}
+async function sendGmail(env, account, { to, subject, html }) {
+  const token = await ensureFreshToken(env, account);
+  const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
+  const raw = [
+    `From: ${account.email}`,
+    `To: ${to}`,
+    `Subject: ${encodedSubject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/html; charset="UTF-8"`,
+    `Content-Transfer-Encoding: 7bit`,
+    '',
+    html
+  ].join('\r\n');
+  const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json' },
+    body: JSON.stringify({ raw: base64UrlEncodeUtf8(raw) })
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error('Gmail küldési hiba: ' + JSON.stringify(j));
+  return j;
+}
+async function handleSendOffer(request, env, dealId) {
+  const user = await getSessionUser(request, env);
+  if (!user) return json({ error: 'Nincs bejelentkezve.' }, 401);
+  const deal = await env.DB.prepare(`SELECT * FROM deals WHERE id = ?`).bind(dealId).first();
+  if (!deal) return json({ error: 'Nem található.' }, 404);
+  if (user.role !== 'admin' && deal.assigned_to !== user.id) return json({ error: 'Nincs jogosultság.' }, 403);
+  if (!deal.email) return json({ error: 'Az ügyfélnek nincs megadva e-mail címe.' }, 400);
+
+  const b = await request.json().catch(() => ({}));
+  const picks = Array.isArray(b.picks) ? b.picks.filter(p => p && p.title && p.price > 0).slice(0, 5) : [];
+  if (!picks.length) return json({ error: 'Nincs érvényes jelölt autó a küldéshez — adj meg legalább egy címet és árat.' }, 400);
+
+  const token = randomHex(20);
+  await env.DB.prepare(
+    `INSERT INTO offer_tokens (token, deal_id, client_name, car, candidates_json, created_by) VALUES (?,?,?,?,?,?)`
+  ).bind(token, dealId, deal.name || '', deal.car || '', JSON.stringify(picks), user.id).run();
+
+  const origin = new URL(request.url).origin;
+  const link = `${origin}/ajanlat/?t=${token}`;
+
+  const accounts = (await env.DB.prepare(`SELECT * FROM oauth_accounts WHERE provider = 'google'`).all()).results;
+  const sender = accounts.find(a => (a.scope || '').includes('gmail.send'));
+  if (!sender) {
+    return json({
+      ok: true, token, link, sent: false,
+      reason: 'A csatlakoztatott Google fióknak nincs küldési joga — csatlakoztasd újra az Integrációk oldalon (Google), vagy küldd el a linket kézzel.'
+    });
+  }
+  try {
+    await sendGmail(env, sender, { to: deal.email, subject: `Ajánlat — ${deal.car || 'CarAdvance'}`, html: buildOfferEmailHtml({ clientName: deal.name, car: deal.car, link }) });
+    return json({ ok: true, token, link, sent: true });
+  } catch (e) {
+    return json({ ok: true, token, link, sent: false, reason: String((e && e.message) || e) });
+  }
 }
 
 // ---------- Geocode (distance from Budapest for import candidates) ----------
@@ -472,7 +570,7 @@ async function handleGoogleStart(request, env) {
   if (!env.GOOGLE_CLIENT_ID) return json({ error: 'A Google integráció nincs beállítva (hiányzó GOOGLE_CLIENT_ID).' }, 500);
   const state = randomHex(16);
   const redirectUri = new URL(request.url).origin + '/api/belso/oauth/google/callback';
-  const scope = encodeURIComponent('https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email');
+  const scope = encodeURIComponent('https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email');
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(env.GOOGLE_CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&access_type=offline&prompt=consent&scope=${scope}&state=${state}`;
   return new Response(null, { status: 302, headers: { Location: authUrl, 'Set-Cookie': oauthStateCookie(state) } });
 }
@@ -657,6 +755,8 @@ export async function onRequest(context) {
       if (path === '/deals' && method === 'POST') return await handleCreateDeal(request, env);
       let m = path.match(/^\/deals\/(\d+)$/);
       if (m && method === 'PATCH') return await handleUpdateDeal(request, env, m[1]);
+      m = path.match(/^\/deals\/(\d+)\/send-offer$/);
+      if (m && method === 'POST') return await handleSendOffer(request, env, m[1]);
 
       if (path === '/clients' && method === 'GET') return await handleGetClients(request, env);
       if (path === '/clients' && method === 'POST') return await handleCreateClient(request, env);
