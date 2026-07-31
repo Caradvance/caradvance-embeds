@@ -5,7 +5,7 @@ const { lang } = Astro.props as { lang: Locale };
 
 const steps = [
 ['Kutatás', 'Nálunk nincs időnyomás: annyi időt szánsz a keresésre és a döntésre, amennyi csak jólesik. Nézelődj nyugodtan a hatalmas német használtautó-piacon, hasonlítsd össze a márkákat, típusokat és felszereltségeket, és formáld meg magadban, pontosan milyen autóra vágysz — akár egy konkrét modell van a fejedben, akár egyelőre csak egy irány. Nincs siettetés, nincs nyomás: akkor lépsz tovább, amikor te készen állsz rá.'],
-['Kiválasztás', 'Amikor megvan a kiszemelt autó — vagy legalább körvonalazódott, mit szeretnél —, itt az idő, hogy elindítsd a folyamatot. Keresd fel az oldalunkat, és töltsd ki az Autó rendelés űrlapot: írd le a márkát, típust, évjáratot, futásteljesítményt és minden fontos részletet, ami számít neked. Amint elküldted az űrlapot, megkapjuk a kérésedet, és onnantól mi visszük tovább a folyamatot.'],
+['Kiválasztás', 'Amikor megvan a kiszemelt autó — vagy legalább körvonalazódott, mit szeretnél —, itt az idő, hogy elindítsd a keresést. Nyisd meg az Autó kereső űrlapunkat, és add meg benne a márkát, típust, évjáratot, futásteljesítményt és minden fontos részletet, ami számít neked. Amint elküldted, megkapjuk a kérésedet, és onnantól mi visszük tovább a folyamatot.'],
 ['Ajánlatok', 'Végigpásztázzuk a partnerplatformjainkat — mobile.de és társai —, illetve az aktuális egyedi ajánlatainkat, és összeállítunk neked 5 találatot: a legolcsóbbat, egy átlagáras opciót és 3 továbbit, ami leginkább illik a kéréseidhez. A listát emailben küldjük, ahonnan az oldalunkon választhatsz 1-2 autót — vagy jelzed, ha egyik sem az igazi, és küldünk 5 újat.'],
 ['Leinformálás', 'Nemzetközi adatbázisokból ellenőrzünk minden részletet — kártörténet, valós futásteljesítmény, előélet —, hogy biztosan tiszta múltú, megbízható autót vegyél.'],
 ['Helyszíni bevizsgálás', 'Szakértő kollégánk személyesen, a helyszínen nézi át a kiszemelt autót, és minden lényeges részletről egyeztet veled, mielőtt döntenél.'],
@@ -102,7 +102,13 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <h3>{t}</h3>
 <p>{d}</p>
 {i === 1 && (
-<a class="pf-cta" href="/auto-rendeles#rendeles">Autót rendelek →</a>
+<a class="pf-cta" href="/auto-rendeles#rendeles">Autó kereső indítása →</a>
+)}
+{i === 2 && (
+<div class="pf-partners">
+<img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" />
+<img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" />
+</div>
 )}
 </div>
 {i < steps.length - 1 && (<span class="pf-gap">{gaps[i]}</span>)}
@@ -181,6 +187,8 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 .pf-gap{position:absolute;left:21px;bottom:0;transform:translate(-50%,50%);z-index:2;background:#fff;border:1px solid var(--line);color:var(--navy);font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
 a.pf-cta{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-weight:700;font-size:14px;color:#fff;background:var(--red);padding:8px 16px;border-radius:999px;text-decoration:none}
 a.pf-cta:hover{opacity:.9}
+.pf-partners{display:flex;align-items:center;gap:14px;margin-top:12px;flex-wrap:wrap}
+.pf-partners img{height:28px;width:auto;display:block;border-radius:6px}
 .pf-incl{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
 @media(max-width:640px){.pf-incl{grid-template-columns:1fr}}
 .pf-inclitem{display:flex;align-items:flex-start;gap:10px;font-size:15px;font-weight:600;color:var(--ink)}
