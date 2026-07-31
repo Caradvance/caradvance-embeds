@@ -176,29 +176,37 @@
   .suggest{margin-top:10px;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
   .suggest b{color:var(--red)}
   .cand-grid{display:grid;gap:10px;margin-top:8px}
-  .cand-card{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;transition:border-color .12s,box-shadow .12s}
+  .cand-card{position:relative;display:flex;align-items:stretch;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:border-color .12s,box-shadow .12s}
   .cand-card:hover{border-color:#d3d8e0}
   .cand-card.picked{border-color:var(--red);box-shadow:0 0 0 2px var(--red-tint)}
-  .cand-thumb{width:80px;height:60px;border-radius:8px;background:var(--line2);flex:none;display:flex;align-items:center;justify-content:center;color:#b7bec9;overflow:hidden}
+  .cand-block{padding:10px 12px;display:flex;flex-direction:column;min-width:0}
+  .cand-block+.cand-block{border-left:1px solid var(--line2)}
+  .cand-block-photo{flex:none;width:112px;justify-content:center;align-items:center}
+  .cand-block-car{flex:1.35}
+  .cand-block-dealer{flex:1;background:#fafbfc}
+  .cand-thumb{width:100%;height:78px;border-radius:8px;background:var(--line2);display:flex;align-items:center;justify-content:center;color:#b7bec9;overflow:hidden}
   .cand-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .cand-thumb svg.i{width:26px;height:26px}
-  .cand-body{flex:1;min-width:0;padding-top:1px}
-  .cand-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin-bottom:3px}
+  .cand-thumb svg.i{width:24px;height:24px}
+  .cand-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin-bottom:5px}
   .cand-title-input{width:100%;border:none;background:transparent;font-size:13px;font-weight:800;padding:1px 0;color:#1c2430}
   .cand-title-input::placeholder{color:#b7bec9;font-weight:500}
   .cand-title-input:focus{outline:none}
-  .cand-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;min-height:18px}
+  .cand-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;min-height:18px}
   .cand-chip{font-size:10.5px;background:var(--line2);color:#6a7280;border-radius:999px;padding:2px 8px;white-space:nowrap}
-  .cand-chip.dist{background:var(--red-tint);color:var(--red);font-weight:700}
-  .cand-chip.rating{background:#fff3d6;color:#8a6d1d;font-weight:700}
-  .cand-dealer{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .cand-row2{display:flex;align-items:center;gap:10px;margin-top:7px}
-  .cand-price-input{width:104px;border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:12.5px;font-weight:800;color:var(--red);text-align:right}
+  .cand-price-row{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:9px}
+  .cand-price-input{width:92px;border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:12.5px;font-weight:800;color:var(--red);text-align:right}
   .cand-price-input::placeholder{color:#c2c8d1;font-weight:500}
-  .cand-link{font-size:11.5px;color:#6a7280;text-decoration:none;margin-left:auto;font-weight:600;white-space:nowrap}
+  .cand-huf{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap}
+  .cand-dealer-name{font-size:13px;font-weight:800;color:#1c2430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cand-stars{display:flex;align-items:center;gap:1px;margin-top:5px;font-size:14px;line-height:1;color:#e0a300;letter-spacing:1px}
+  .cand-stars .empty{color:#dfe3e8}
+  .cand-stars .num{font-size:10.5px;color:var(--muted);font-weight:700;margin-left:5px;letter-spacing:normal}
+  .cand-loc{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .cand-dist{display:inline-block;margin-top:6px;font-size:10.5px;background:var(--red-tint);color:var(--red);font-weight:700;border-radius:999px;padding:2px 8px;width:fit-content}
+  .cand-link{font-size:11.5px;color:#6a7280;text-decoration:none;font-weight:600;margin-top:auto;padding-top:9px;display:inline-block}
   .cand-link:hover{text-decoration:underline;color:var(--red)}
-  .cand-pick{display:flex;flex-direction:column;align-items:center;gap:5px;flex:none;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--faint);cursor:pointer;padding-top:2px}
-  .cand-pick input{accent-color:var(--red);width:16px;height:16px}
+  .cand-pick{position:absolute;top:8px;right:8px;z-index:1;display:flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--faint);cursor:pointer;background:#fff;padding:3px 8px;border-radius:999px;border:1px solid var(--line2)}
+  .cand-pick input{accent-color:var(--red);width:14px;height:14px}
   .cand-pick input:checked ~ span{color:var(--red)}
   .todo{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line2)}
   .todo input[type=checkbox]{width:16px;height:16px;accent-color:var(--red)}
@@ -804,38 +812,69 @@ function loadImportDesk(id){
     +'<button class="btn red sm" style="margin-top:12px" onclick="sendImportOffer('+d.id+')">Ajánlat küldése e-mailben</button></div></div>';
   renderImportCandGrid();
   recalcImport();
+  ensureFxRate();
 }
 function candChips(c){
   var chips=[];
   if(c.ez)chips.push('EZ '+c.ez);
   if(c.km)chips.push(c.km+' km');
   if(c.ps)chips.push(c.ps+' PS');
-  var html=chips.map(function(x){return '<span class="cand-chip">'+esc(x)+'</span>';}).join('');
-  if(c.rating&&c.rating.score)html+='<span class="cand-chip rating">★ '+esc(c.rating.score)+(c.rating.count?' ('+c.rating.count+')':'')+'</span>';
-  if(c.distanceKm!=null)html+='<span class="cand-chip dist">'+Math.round(c.distanceKm)+' km Budapesttől</span>';
+  return chips.map(function(x){return '<span class="cand-chip">'+esc(x)+'</span>';}).join('');
+}
+// Visual star rating (filled ★ / empty ★ in a muted color) for the dealer block,
+// rounded to the nearest whole star for a clean glyph display, plus the exact
+// decimal score (and review count, if known) alongside it in small print.
+function renderStars(rating){
+  if(!rating||!rating.score)return '';
+  var score=parseFloat(rating.score)||0;
+  var full=Math.max(0,Math.min(5,Math.round(score)));
+  var html='<div class="cand-stars">';
+  for(var i=0;i<5;i++)html+=(i<full?'★':'<span class="empty">★</span>');
+  html+='<span class="num">'+esc(rating.score)+(rating.count?' ('+rating.count+')':'')+'</span></div>';
   return html;
 }
-function candDealerLine(c){
-  var dealer=c.dealer||'',city=(c.location&&c.location.city)||'';
-  if(!dealer&&!city)return '';
-  return '<div class="cand-dealer">'+esc(dealer)+(dealer&&city?' · ':'')+esc(city)+'</div>';
+// Block 2: car photo — kept separate so the card reads left-to-right as
+// photo / car details / dealership, matching how a mobile.de listing itself is laid out.
+function candPhotoBlock(c){
+  var thumb=c.image?('<img src="'+esc(c.image)+'" alt="">'):ic('import');
+  return '<div class="cand-block cand-block-photo"><div class="cand-thumb">'+thumb+'</div></div>';
+}
+// Block 2: car details — title, spec chips, and the editable EUR price with its
+// computed HUF equivalent (once /api/belso/fx has returned a rate).
+function candCarBlock(c,i){
+  var huf=(c.price&&window.__eurHufRate)?('≈ '+ft(c.price*window.__eurHufRate)):'';
+  return '<div class="cand-block cand-block-car">'
+    +'<div class="cand-label">'+esc(IMP_LABELS[i])+'</div>'
+    +'<input class="imp-title cand-title-input" data-i="'+i+'" placeholder="pl. BMW X5 xDrive30d, 2021, 80e km" value="'+esc(c.title||'')+'">'
+    +'<div class="cand-meta">'+candChips(c)+'</div>'
+    +'<div class="cand-price-row">'
+    +'<input class="imp-price cand-price-input" data-i="'+i+'" inputmode="numeric" placeholder="ár (EUR)" value="'+esc(c.price||'')+'" oninput="recalcImport();updateCandHuf('+i+')">'
+    +'<span class="cand-huf" id="cand-huf-'+i+'">'+huf+'</span>'
+    +'</div></div>';
+}
+// Block 3: dealership — name, star rating, location, distance from Budapest, listing link.
+function candDealerBlock(c,i){
+  var dealer=c.dealer||'';
+  var city=(c.location&&c.location.city)||'';
+  var country=(c.location&&c.location.country)||'';
+  var locLine=[city,(country&&country!=='DE')?country:''].filter(Boolean).join(', ');
+  return '<div class="cand-block cand-block-dealer">'
+    +'<div class="cand-label">Kereskedő</div>'
+    +(dealer?'<div class="cand-dealer-name">'+esc(dealer)+'</div>':'<div class="cand-dealer-name" style="color:#c2c8d1;font-weight:600">Nincs adat</div>')
+    +renderStars(c.rating)
+    +(locLine?'<div class="cand-loc">'+esc(locLine)+'</div>':'')
+    +(c.distanceKm!=null?'<div class="cand-dist">'+Math.round(c.distanceKm)+' km Budapesttől</div>':'')
+    +(c.url?'<a class="cand-link" target="_blank" href="'+esc(c.url)+'">Megnyitás a mobile.de-n ↗</a>':'')
+    +'</div>';
 }
 function candCardHtml(i){
   var c=(window.__importCandData||[])[i]||{};
   var picked=window.__importPickIdx===i;
-  var thumb=c.image?('<img src="'+esc(c.image)+'" alt="">'):ic('import');
   return '<div class="cand-card'+(picked?' picked':'')+'" data-i="'+i+'">'
-    +'<div class="cand-thumb">'+thumb+'</div>'
-    +'<div class="cand-body">'
-    +'<div class="cand-label">'+esc(IMP_LABELS[i])+'</div>'
-    +'<input class="imp-title cand-title-input" data-i="'+i+'" placeholder="pl. BMW X5 xDrive30d, 2021, 80e km" value="'+esc(c.title||'')+'">'
-    +candDealerLine(c)
-    +'<div class="cand-meta">'+candChips(c)+'</div>'
-    +'<div class="cand-row2">'
-    +'<input class="imp-price cand-price-input" data-i="'+i+'" inputmode="numeric" placeholder="ár (EUR)" value="'+esc(c.price||'')+'" oninput="recalcImport()">'
-    +(c.url?'<a class="cand-link" target="_blank" href="'+esc(c.url)+'">Megnyitás a mobile.de-n ↗</a>':'')
-    +'</div></div>'
     +'<label class="cand-pick"><input type="radio" name="imp-pick" class="imp-pick" data-i="'+i+'"'+(picked?' checked':'')+' onchange="pickImportCand('+i+')"><span>Ajánljuk</span></label>'
+    +candPhotoBlock(c)
+    +candCarBlock(c,i)
+    +candDealerBlock(c,i)
     +'</div>';
 }
 function renderImportCandGrid(){
@@ -848,9 +887,30 @@ function pickImportCand(i){
     el.classList.toggle('picked',parseInt(el.getAttribute('data-i'),10)===i);
   });
 }
-function refreshCandMeta(i){
-  var el=document.querySelector('#impCandGrid .cand-card[data-i="'+i+'"] .cand-meta');
-  if(el)el.innerHTML=candChips((window.__importCandData||[])[i]||{});
+// Re-renders a single card in place (used once an async geocode result comes back
+// with a distance, since that touches the dealership block, not just the chips).
+function refreshCandCard(i){
+  var el=document.querySelector('#impCandGrid .cand-card[data-i="'+i+'"]');
+  if(el)el.outerHTML=candCardHtml(i);
+}
+// Updates just the HUF-equivalent label next to a price field as the person types,
+// without re-rendering (and losing focus on) the whole card.
+function updateCandHuf(i){
+  var input=document.querySelector('.imp-price[data-i="'+i+'"]');
+  var span=document.getElementById('cand-huf-'+i);
+  if(!input||!span)return;
+  var price=parseInt((input.value||'').replace(/\D/g,''),10);
+  span.textContent=(price&&window.__eurHufRate)?('≈ '+ft(price*window.__eurHufRate)):'';
+}
+// Fetches the EUR->HUF rate once per session and re-renders the candidate grid so
+// every card's HUF-equivalent label picks it up (silently does nothing if it fails —
+// the EUR price is still shown either way).
+function ensureFxRate(){
+  if(window.__eurHufRate||window.__eurHufRateLoading)return;
+  window.__eurHufRateLoading=true;
+  apiFetch('/fx').then(function(r){
+    if(r&&r.rate){window.__eurHufRate=r.rate;renderImportCandGrid();}
+  }).catch(function(){}).then(function(){window.__eurHufRateLoading=false;});
 }
 function rankCandidates(d,results){
   var valid=(results||[]).filter(function(r){return r&&r.price>0;});
@@ -859,7 +919,9 @@ function rankCandidates(d,results){
   var cheapest=sorted[0];
   var avgPrice=valid.reduce(function(s,r){return s+r.price;},0)/valid.length;
   var byAvgDist=valid.slice().sort(function(a,b){return Math.abs(a.price-avgPrice)-Math.abs(b.price-avgPrice);});
-  var average=byAvgDist.find(function(r){return r!==cheapest;})||byAvgDist[0];
+  // If there's only one distinct valid result, leave "Átlagos" empty (manual entry)
+  // rather than showing the same cheapest car twice under a different label.
+  var average=byAvgDist.find(function(r){return r!==cheapest;})||null;
   var rest=valid.filter(function(r){return r!==cheapest&&r!==average;});
   var similar=rest.slice().sort(function(a,b){return Math.abs(a.price-avgPrice)-Math.abs(b.price-avgPrice);});
   return[cheapest,average,similar[0],similar[1],similar[2]];
@@ -890,7 +952,7 @@ function geocodeImportCandidates(){
     c._geocoding=true;
     var qs='postal='+encodeURIComponent(c.location.postal)+'&country='+encodeURIComponent(c.location.country||'DE');
     apiFetch('/geocode?'+qs).then(function(r){
-      if(r&&r.distanceKm!=null){c.distanceKm=r.distanceKm;refreshCandMeta(i);}
+      if(r&&r.distanceKm!=null){c.distanceKm=r.distanceKm;refreshCandCard(i);}
     }).catch(function(){}).then(function(){c._geocoding=false;});
   });
 }
