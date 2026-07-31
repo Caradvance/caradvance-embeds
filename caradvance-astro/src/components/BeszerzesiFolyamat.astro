@@ -4,7 +4,8 @@ import type { Locale } from '../i18n/utils';
 const { lang } = Astro.props as { lang: Locale };
 
 const steps = [
-['Kutatás és kiválasztás', 'Pontosan azt az autót keressük meg, amit szeretnél — akár egy konkrét márka, típus és felszereltség lebeg a szemed előtt, akár egyelőre csak az irány van meg, mi eligazodunk helyetted a hatalmas német használtautó-piacon. Végigpásztázzuk a kereskedői és magánhirdetéseket, hogy megtaláljuk a hozzád illő, megbízható autót valós piaci áron — feleslegesen felturbózott, sérült vagy futásteljesítmény-csavart példányok nélkül. Ha már tudod, milyen autót szeretnél Németországból behozatni, ne várj tovább: töltsd ki az Autó rendelés űrlapunkat, és mi azonnal elindítjuk érted a keresést és a teljes autóimport-folyamatot.'],
+['Kutatás', 'Nálunk nincs időnyomás: annyi időt szánsz a keresésre és a döntésre, amennyire szükséged van. Amíg te tájékozódsz és gondolkodsz, mi végigpásztázzuk a hatalmas német használtautó-piacot — kereskedői és magánhirdetéseket egyaránt —, hogy segítsünk eligazodni a kínálatban, akár egy konkrét márka és típus, akár egyelőre csak egy irány van meg benned. Kérdezz nyugodtan, kérj tanácsot: a cél az, hogy magabiztosan dönthess, amikor te készen állsz rá.'],
+['Kiválasztás', 'Amikor megvan a kiszemelt autó, pontosan azt választjuk ki neked, ami valóban megfelel az igényeidnek — megbízható, valós piaci áron, felesleges kompromisszumok nélkül. Ha már tudod, milyen autót szeretnél Németországból behozatni, töltsd ki az Autó rendelés űrlapunkat, és mi azonnal elindítjuk érted a teljes autóimport-folyamatot.'],
 ['Leinformálás', 'Nemzetközi adatbázisokból ellenőrzünk minden részletet — kártörténet, valós futásteljesítmény, előélet —, hogy biztosan tiszta múltú, megbízható autót vegyél.'],
 ['Helyszíni bevizsgálás', 'Szakértő kollégánk személyesen, a helyszínen nézi át a kiszemelt autót, és minden lényeges részletről egyeztet veled, mielőtt döntenél.'],
 ['Ártárgyalás', 'Anyanyelvi szinten, a piac ismeretében tárgyalunk helyetted az eladóval — így a legjobb áron és feltételekkel köthetjük meg az üzletet.'],
@@ -75,7 +76,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:34px;width:auto;display:block;border-radius:6px" />
 <img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:34px;width:auto;display:block;border-radius:6px" />
 </div>
-<h1>Hogyan működik az autóimport? —<br /><span class="accent">nyolc lépés a tökéletes autóig</span></h1>
+<h1>Hogyan működik az autóimport? —<br /><span class="accent">kilenc lépés a tökéletes autóig</span></h1>
 <p class="sub sub-wide" style="max-width:900px">Az igényed jelzésétől a kulcsrakész átadásig mindent mi intézünk — leinformálás, bevizsgálás, szállítás, honosítás és a teljes papírmunka. Te csak átveszed az&nbsp;autót.</p>
 <div class="cta-row">
 <a class="btn btn-primary" href="/auto-rendeles#rendeles">Autót rendelek</a>
@@ -99,7 +100,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <div class="pf-b">
 <h3>{t}</h3>
 <p>{d}</p>
-{i === 0 && (
+{i === 1 && (
 <a class="pf-cta" href="/auto-rendeles#rendeles">Autót rendelek →</a>
 )}
 </div>
@@ -144,7 +145,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <div class="wrap pf-seo">
 <span class="eyebrow">Jó tudni</span>
 <h2 class="pf-seo-h">A német autó behozatal menete — mire számíts?</h2>
-<p>Sokakban felmerül, pontosan hogyan zajlik az <strong>autó behozatal Németországból</strong>, és mekkora a <span class="kw">német autó behozatal költsége</span>. A folyamat nyolc jól elkülöníthető lépésből áll: keresés, leinformálás, helyszíni bevizsgálás, ártárgyalás, szállítás, vám- és áfaügyintézés, honosítás és kulcsrakész átadás.</p>
+<p>Sokakban felmerül, pontosan hogyan zajlik az <strong>autó behozatal Németországból</strong>, és mekkora a <span class="kw">német autó behozatal költsége</span>. A folyamat kilenc jól elkülöníthető lépésből áll: kutatás, kiválasztás, leinformálás, helyszíni bevizsgálás, ártárgyalás, szállítás, vám- és áfaügyintézés, honosítás és kulcsrakész átadás.</p>
 <p>A <strong>német autó behozatal menete</strong> papíron egyszerűnek tűnik, de a részletek — regisztrációs adó, eredetvizsga, műszaki vizsga, okmányiroda — sok időt és utánajárást igényelnek. A teljes <span class="kw">külföldi autó behozatal ügyintézését</span> átvállaljuk, és minden költséget előre, tételesen rögzítünk.</p>
 <p>Egy <strong>német autó behozatal kalkulátor</strong> csak becslést ad; mi konkrét, egyedi ajánlatot készítünk a kiválasztott autóra — az áron nincs meglepetés, a folyamat pedig jellemzően 5–14 nap alatt lezajlik.</p>
 </div>
