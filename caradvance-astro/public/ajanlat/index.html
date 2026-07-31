@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>CarAdvance — Az Ön ajánlata</title>
+<style>
+  :root{
+    --red:#E2001A;--red-dk:#b8000f;--red-tint:#fdeceb;
+    --ink:#161922;--muted:#6b7280;--faint:#9aa2b0;
+    --line:#ECEEF2;--line2:#F5F6F8;--bg:#F6F7FB;
+    --shadow:0 1px 2px rgba(20,28,44,.04),0 1px 10px rgba(20,28,44,.04);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  header{background:var(--red);padding:16px 20px;}
+  header .brand{color:#fff;font-weight:800;font-size:18px;letter-spacing:.01em}
+  main{max-width:760px;margin:0 auto;padding:24px 16px 60px}
+  .intro{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .intro h1{font-size:17px;margin:0 0 8px}
+  .intro p{margin:0;color:var(--muted);font-size:13.5px}
+  .cand-grid{display:grid;gap:12px}
+  .cand-card{position:relative;display:flex;align-items:stretch;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .cand-card:hover{border-color:#d3d8e0}
+  .cand-card.picked{border-color:var(--red);box-shadow:0 0 0 2px var(--red-tint)}
+  .cand-block{padding:12px 14px;display:flex;flex-direction:column;min-width:0}
+  .cand-block+.cand-block{border-left:1px solid var(--line2)}
+  .cand-block-photo{flex:none;width:120px;justify-content:center;align-items:center}
+  .cand-block-car{flex:1.35}
+  .cand-block-dealer{flex:1;background:#fafbfc}
+  .cand-thumb{width:100%;height:82px;border-radius:8px;background:var(--line2);display:flex;align-items:center;justify-content:center;color:#b7bec9;overflow:hidden}
+  .cand-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .cand-title{font-size:13.5px;font-weight:800;color:var(--ink);margin-bottom:6px}
+  .cand-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .cand-chip{font-size:10.5px;background:var(--line2);color:#6a7280;border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .cand-price{margin-top:auto;font-size:16px;font-weight:800;color:var(--red)}
+  .cand-huf{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+  .cand-dealer-name{font-size:13px;font-weight:800;color:var(--ink)}
+  .cand-stars{display:flex;align-items:center;gap:1px;margin-top:5px;font-size:14px;line-height:1;color:#e0a300;letter-spacing:1px}
+  .cand-stars .empty{color:#dfe3e8}
+  .cand-stars .num{font-size:10.5px;color:var(--muted);font-weight:700;margin-left:5px;letter-spacing:normal}
+  .cand-loc{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .cand-dist{display:inline-block;margin-top:6px;font-size:10.5px;background:var(--red-tint);color:var(--red);font-weight:700;border-radius:999px;padding:2px 8px;width:fit-content}
+  .cand-link{font-size:11.5px;color:#6a7280;text-decoration:none;font-weight:600;margin-top:auto;padding-top:9px;display:inline-block}
+  .cand-link:hover{text-decoration:underline;color:var(--red)}
+  .cand-check{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:6px;border:2px solid var(--faint);background:#fff;display:flex;align-items:center;justify-content:center}
+  .cand-card.picked .cand-check{border-color:var(--red);background:var(--red)}
+  .cand-check svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;visibility:hidden}
+  .cand-card.picked .cand-check svg{visibility:visible}
+  .actions{position:sticky;bottom:0;margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .actions .hint{font-size:12.5px;color:var(--muted)}
+  .btn{appearance:none;border:none;border-radius:8px;padding:12px 22px;font-size:14px;font-weight:700;cursor:pointer;background:var(--red);color:#fff;white-space:nowrap}
+  .btn:hover{background:var(--red-dk)}
+  .btn:disabled{background:#dfe3e8;color:#9aa2b0;cursor:default}
+  .state{background:#fff;border:1px solid var(--line);border-radius:12px;padding:36px 24px;text-align:center;box-shadow:var(--shadow)}
+  .state h2{margin:0 0 8px;font-size:17px}
+  .state p{color:var(--muted);margin:0}
+  .state .picked-list{margin:18px auto 0;max-width:420px;text-align:left}
+  .err{color:var(--red);font-size:13px;margin-top:10px;min-height:18px}
+  a.plain{color:var(--red)}
+</style>
+</head>
+<body>
+<header><span class="brand">CarAdvance</span></header>
+<main id="app">
+  <div class="state"><p>Betöltés…</p></div>
+</main>
+<script>
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function ft(n){return n?Math.round(n).toLocaleString('hu-HU')+' Ft':'';}
+  function renderStars(rating){
+    if(!rating||!rating.score)return'';
+    var score=parseFloat(rating.score)||0;
+    var full=Math.max(0,Math.min(5,Math.round(score)));
+    var html='<div class="cand-stars">';
+    for(var i=0;i<5;i++)html+=(i<full?'★':'<span class="empty">★</span>');
+    html+='<span class="num">'+esc(rating.score)+(rating.count?' ('+rating.count+')':'')+'</span></div>';
+    return html;
+  }
+  var qs=new URLSearchParams(location.search);
+  var token=qs.get('t')||'';
+  var app=document.getElementById('app');
+  var eurHufRate=null;
+  var picked=[]; // indices into candidates, max 2
+
+  function apiGet(path){return fetch(path).then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j;});});}
+  function apiPost(path,body){return fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j;});});}
+
+  function candCardHtml(c,i){
+    var isPicked=picked.indexOf(i)>=0;
+    var thumb=c.image?('<img src="'+esc(c.image)+'" alt="">'):'';
+    var huf=(c.price&&eurHufRate)?('≈ '+ft(c.price*eurHufRate)):'';
+    var chips=[];
+    if(c.ez)chips.push('EZ '+c.ez);
+    if(c.km)chips.push(c.km+' km');
+    if(c.ps)chips.push(c.ps+' PS');
+    var dealer=(c.dealer||(c.location&&c.location.dealer))||'';
+    var city=(c.location&&c.location.city)||'';
+    var country=(c.location&&c.location.country)||'';
+    var locLine=[city,(country&&country!=='DE')?country:''].filter(Boolean).join(', ');
+    return '<div class="cand-card'+(isPicked?' picked':'')+'" data-i="'+i+'">'
+      +'<div class="cand-check"><svg viewBox="0 0 24 24"><polyline points="4 13 9 18 20 6"></polyline></svg></div>'
+      +'<div class="cand-block cand-block-photo"><div class="cand-thumb">'+thumb+'</div></div>'
+      +'<div class="cand-block cand-block-car">'
+      +'<div class="cand-title">'+esc(c.title||'Autó')+'</div>'
+      +'<div class="cand-meta">'+chips.map(function(x){return '<span class="cand-chip">'+esc(x)+'</span>';}).join('')+'</div>'
+      +'<div class="cand-price">'+(c.price?Number(c.price).toLocaleString('hu-HU')+' €':'')+'</div>'
+      +(huf?'<div class="cand-huf">'+huf+'</div>':'')
+      +'</div>'
+      +'<div class="cand-block cand-block-dealer">'
+      +(dealer?'<div class="cand-dealer-name">'+esc(dealer)+'</div>':'<div class="cand-dealer-name" style="color:#c2c8d1;font-weight:600">Nincs adat</div>')
+      +renderStars(c.rating)
+      +(locLine?'<div class="cand-loc">'+esc(locLine)+'</div>':'')
+      +(c.distanceKm!=null?'<div class="cand-dist">'+Math.round(c.distanceKm)+' km Budapesttől</div>':'')
+      +(c.url?'<a class="cand-link" target="_blank" href="'+esc(c.url)+'" onclick="event.stopPropagation()">Megnyitás a mobile.de-n ↗</a>':'')
+      +'</div>'
+      +'</div>';
+  }
+
+  function renderPickedSummary(list){
+    return '<div class="picked-list">'+list.map(function(c){
+      var dealer=(c.dealer||(c.location&&c.location.dealer))||'';
+      return '<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>'+esc(c.title||'')+'</b> — '+(c.price?Number(c.price).toLocaleString('hu-HU')+' €':'')+(dealer?' · '+esc(dealer):'')+'</div>';
+    }).join('')+'</div>';
+  }
+
+  function renderAlreadyResponded(data){
+    app.innerHTML='<div class="state"><h2>Köszönjük, megkaptuk a választását!</h2><p>Az Ön által kiválasztott autó'+(data.selected.length>1?'k':'')+':</p>'
+      +renderPickedSummary(data.selected)
+      +'<p style="margin-top:16px">Kollégánk hamarosan felveszi Önnel a kapcsolatot.</p></div>';
+  }
+
+  function bindCardClicks(){
+    document.querySelectorAll('#grid .cand-card').forEach(function(el){
+      el.addEventListener('click',function(){
+        var i=parseInt(el.getAttribute('data-i'),10);
+        var idx=picked.indexOf(i);
+        if(idx>=0){picked.splice(idx,1);}
+        else{
+          if(picked.length>=2)picked.shift(); // keep at most the 2 most recent picks
+          picked.push(i);
+        }
+        document.querySelectorAll('#grid .cand-card').forEach(function(c2){
+          c2.classList.toggle('picked',picked.indexOf(parseInt(c2.getAttribute('data-i'),10))>=0);
+        });
+        var btn=document.getElementById('submitBtn');
+        btn.disabled=picked.length===0;
+        document.getElementById('hint').textContent=picked.length?('Kiválasztva: '+picked.length+' / 2'):'Válasszon ki legalább 1, legfeljebb 2 autót.';
+      });
+    });
+  }
+
+  function renderOffer(data){
+    var candidates=data.candidates||[];
+    app.innerHTML=
+      '<div class="intro"><h1>Kedves '+esc(data.clientName||'Ügyfelünk')+'!</h1>'
+      +'<p>Az Ön keresésének megfelelően'+(data.car?' ('+esc(data.car)+')':'')+' az alábbi autókat találtuk. Válasszon ki <b>1 vagy 2 autót</b>, amelyik érdekli, majd kattintson a "Kiválasztom" gombra.</p></div>'
+      +'<div class="cand-grid" id="grid">'+candidates.map(candCardHtml).join('')+'</div>'
+      +'<div class="actions"><span class="hint" id="hint">Válasszon ki legalább 1, legfeljebb 2 autót.</span>'
+      +'<button class="btn" id="submitBtn" disabled>Kiválasztom</button></div>'
+      +'<div class="err" id="err"></div>';
+
+    bindCardClicks();
+
+    document.getElementById('submitBtn').addEventListener('click',function(){
+      var btn=this;
+      btn.disabled=true;btn.textContent='Küldés…';
+      apiPost('/api/offer/'+token+'/select',{picks:picked}).then(function(r){
+        renderAlreadyResponded({selected:r.selected});
+      }).catch(function(e){
+        btn.disabled=false;btn.textContent='Kiválasztom';
+        document.getElementById('err').textContent=(e&&e.error)||'Nem sikerült elküldeni a választást. Próbálja újra.';
+      });
+    });
+
+    // Best-effort HUF price hint — purely informational, page still works fine without it.
+    // Re-rendering the grid loses the picked/unpicked classes, so re-apply them and
+    // rebind clicks rather than assuming nothing was selected yet.
+    apiGet('/api/offer/fx').then(function(r){
+      if(!r||!r.rate)return;
+      eurHufRate=r.rate;
+      var grid=document.getElementById('grid');
+      if(!grid)return;
+      grid.innerHTML=candidates.map(candCardHtml).join('');
+      bindCardClicks();
+    }).catch(function(){});
+  }
+
+  if(!token){
+    app.innerHTML='<div class="state"><h2>Hiányzó vagy érvénytelen hivatkozás.</h2><p>Kérjük, használja az e-mailben kapott linket.</p></div>';
+    return;
+  }
+  apiGet('/api/offer/'+token).then(function(data){
+    if(data.responded){renderAlreadyResponded(data);}
+    else{renderOffer(data);}
+  }).catch(function(e){
+    app.innerHTML='<div class="state"><h2>Ez a link nem érvényes.</h2><p>'+esc((e&&e.error)||'Kérjük, keresse fel az e-mailben kapott linket, vagy vegye fel velünk a kapcsolatot.')+'</p></div>';
+  });
+})();
+</script>
+</body>
+</html>
