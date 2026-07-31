@@ -806,13 +806,32 @@ function loadImportDesk(id){
     +'<div style="margin-top:15px;font-size:12px;color:#8a93a2">Talált jelöltek (a mobile.de keresésből automatikusan, a CarAdvance böngésző-bővítménnyel — ellenőrizd, mielőtt küldöd):</div>'
     +'<div id="impCandGrid" class="cand-grid"></div>'
     +'<div id="impAutoStatus" class="hint" style="margin-top:8px"></div></div>'
-    +'<div class="box"><div class="result"><div style="font-weight:800;margin-bottom:8px">Összegzés</div>'
+    +'<div class="box">'
+    +renderClientPicks(d)
+    +'<div class="result"><div style="font-weight:800;margin-bottom:8px">Összegzés</div>'
     +'<div class="kv"><div><span class="k">Legolcsóbb</span><br><b class="i-min">–</b></div><div><span class="k">Átlagár</span><br><b class="i-avg">–</b></div><div><span class="k">Minta</span><br><b class="i-n">0</b></div><div><span class="k">Keret</span><br><b>'+ft(d.price)+'</b></div></div>'
-    +'<div class="suggest">Jelöld be, melyik autót ajánljuk az ügyfélnek, majd küldd ki az ajánlatot.</div></div>'
-    +'<button class="btn red sm" style="margin-top:12px" onclick="sendImportOffer('+d.id+')">Ajánlat küldése e-mailben</button></div></div>';
+    +'<div class="suggest">Az alábbi gombra kattintva az ügyfél e-mailben kap egy linket, ahol a talált autók közül 1-2-t kiválaszthat — nem kell rá válaszolnia, elég egy kattintás. A választása automatikusan megjelenik itt.</div></div>'
+    +'<button class="btn red sm" id="sendOfferBtn" style="margin-top:12px" onclick="sendImportOffer('+d.id+')">Ajánlat küldése e-mailben</button>'
+    +'<div id="sendOfferStatus" class="hint" style="margin-top:8px"></div></div></div>';
   renderImportCandGrid();
   recalcImport();
   ensureFxRate();
+}
+// Shows the client's response (picked via the public /ajanlat/ page) directly on
+// the Import desk, once it's come back — so the sales team doesn't have to go
+// looking for it separately.
+function renderClientPicks(d){
+  if(!d.client_picks_json)return'';
+  var picks;try{picks=JSON.parse(d.client_picks_json)||[];}catch(e){picks=[];}
+  if(!picks.length)return'';
+  var when=d.client_responded_at?new Date(d.client_responded_at+'Z').toLocaleString('hu-HU'):'';
+  return '<div style="border:1px solid var(--red);background:var(--red-tint);border-radius:10px;padding:12px;margin-bottom:14px">'
+    +'<div style="font-weight:800;color:var(--red);margin-bottom:6px">Az ügyfél választása'+(when?' · '+esc(when):'')+'</div>'
+    +picks.map(function(p){
+      var dealer=(p.dealer||(p.location&&p.location.dealer))||'';
+      return '<div style="font-size:12.5px;margin-bottom:3px">'+esc(p.title||'')+' — <b>'+(p.price?Number(p.price).toLocaleString('hu-HU')+' €':'')+'</b>'+(dealer?' · '+esc(dealer):'')+'</div>';
+    }).join('')
+    +'</div>';
 }
 function candChips(c){
   var chips=[];
@@ -969,20 +988,35 @@ function recalcImport(){
   w.querySelector('.i-avg').textContent=prices.length?Math.round(prices.reduce(function(a,b){return a+b;},0)/prices.length).toLocaleString('hu-HU')+' €':'–';
   w.querySelector('.i-n').textContent=prices.length;
 }
+// Sends the client a link to the public /ajanlat/ page (see functions/api/offer/)
+// where they tick 1-2 of the found candidate cars and submit — no reply e-mail
+// needed. We send every candidate that has at least a title and a price, not just
+// whichever one the "Ajánljuk" radio highlighted, since the whole point of this
+// flow is that the CLIENT picks from the options, not us pre-choosing for them.
 function sendImportOffer(id){
   var d=data.find(function(x){return x.id===id;});if(!d)return;
-  var grid=document.getElementById('impCandGrid');
-  var picked=grid.querySelector('.imp-pick:checked');
-  var idx=picked?parseInt(picked.getAttribute('data-i'),10):null;
-  var title=idx!=null?(grid.querySelector('.imp-title[data-i="'+idx+'"]').value||'').trim():'';
-  var price=idx!=null?(grid.querySelector('.imp-price[data-i="'+idx+'"]').value||'').trim():'';
-  if(!title||!price){alert('Előbb válassz ki egy autót a rádiógombbal, és add meg az árát.');return;}
   if(!d.email){alert('Nincs e-mail cím rögzítve ehhez az ügyfélhez.');return;}
-  var cand=idx!=null?(window.__importCandData||[])[idx]:null;
-  var linkLine=cand&&cand.url?('\nLink: '+cand.url):'';
-  var subject='CarAdvance ajánlat – '+d.car;
-  var body='Kedves '+d.name+'!\n\nMegtaláltuk az Önnek megfelelő autót:\n\n'+title+'\nÁr: '+price+' EUR'+linkLine+'\n\nHa megfelel, jelezze, és elkészítjük a szerződést.\n\nÜdvözlettel,\nCarAdvance csapat';
-  location.href='mailto:'+encodeURIComponent(d.email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  var picks=(window.__importCandData||[]).filter(function(c){return c&&c.title&&c.price>0;});
+  if(!picks.length){alert('Nincs érvényes jelölt autó — tölts ki legalább egy címet és árat a jelöltek között.');return;}
+  var btn=document.getElementById('sendOfferBtn');
+  var st=document.getElementById('sendOfferStatus');
+  if(btn){btn.disabled=true;btn.textContent='Küldés…';}
+  if(st)st.textContent='';
+  apiFetch('/deals/'+id+'/send-offer',{method:'POST',body:{picks:picks}}).then(function(r){
+    if(btn){btn.disabled=false;btn.textContent='Ajánlat küldése e-mailben';}
+    if(!st)return;
+    if(r.sent){
+      st.innerHTML='<span style="color:#1f8a4c;font-weight:700">Elküldve!</span> Az ügyfél e-mailt kapott a választáshoz — a válasza automatikusan megjelenik itt, ha megérkezik.';
+    }else{
+      var subject='CarAdvance ajánlat – '+(d.car||'');
+      var body='Kedves '+(d.name||'')+'!\n\nAz alábbi linken választhat a talált autók közül:\n'+r.link+'\n\nÜdvözlettel,\nCarAdvance csapat';
+      var mailto='mailto:'+encodeURIComponent(d.email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+      st.innerHTML='<span style="color:var(--red);font-weight:700">Nem sikerült automatikusan elküldeni</span>'+(r.reason?(' — '+esc(r.reason)):'')+'<br>Küldd el kézzel: <a href="'+esc(mailto)+'">e-mail megnyitása</a> vagy <a href="'+esc(r.link)+'" target="_blank">link megnyitása</a>.';
+    }
+  }).catch(function(e){
+    if(btn){btn.disabled=false;btn.textContent='Ajánlat küldése e-mailben';}
+    if(st)st.innerHTML='<span style="color:var(--red)">Hiba történt: '+esc((e&&e.error)||'ismeretlen hiba')+'</span>';
+  });
 }
 function openAdd(){document.getElementById('addModal').classList.add('open');}
 function closeAdd(){document.getElementById('addModal').classList.remove('open');}
@@ -1023,7 +1057,7 @@ function apiFetch(path,opts){
   });
 }
 function normDeal(r){
-  return {id:r.id,line:r.line,stage:r.stage,ch:r.ch,name:r.name,phone:r.phone,email:r.email,car:r.car,price:r.price||0,note:r.note||'',when:r.when_text||'',assigned_to:r.assigned_to};
+  return {id:r.id,line:r.line,stage:r.stage,ch:r.ch,name:r.name,phone:r.phone,email:r.email,car:r.car,price:r.price||0,note:r.note||'',when:r.when_text||'',assigned_to:r.assigned_to,client_picks_json:r.client_picks_json||null,client_responded_at:r.client_responded_at||null};
 }
 
 // ---- Admin: user management ----
