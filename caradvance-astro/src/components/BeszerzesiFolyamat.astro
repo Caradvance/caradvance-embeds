@@ -10,6 +10,7 @@ const steps = [
 ['Ellenőrzés', 'Kapcsolatba lépünk az eladóval, és bekérünk minden szükséges információt, hogy leellenőrizzük az autó előéletét — a szervizkönyvét és esetleges sérüléseit.'],
 ['Ártárgyalás', 'Sok esetben a hirdetett ár már fix, és nincs mozgástér — de ahol van rá esély, ott anyanyelvi szinten, a piac ismeretében megpróbáljuk a legjobb árat és feltételeket kialkudni az eladóval.'],
 ['Árajánlat', 'Elkészítjük a végleges, tételes árajánlatot: az autó ára, regisztrációs adó, műszaki vizsga, eredetvizsga, vagyonszerzési illeték, forgalmi, rendszám és törzskönyv, valamint a szállítási és ügyintézési költség — minden tétel forintban, előre rögzítve, rejtett költségek nélkül.'],
+['Szerződés és előleg', 'Elküldjük a szerződést, valamint a bankszámlaadatokat — attól függően, hogy a német vagy a magyar Caradvance céggel bonyolítod le a vásárlást. Ezt követően a vételár 30%-ának előlegét kérjük, a szerződésmintát pedig aláírás előtt előre megtekintheted.'],
 ['Logisztika és szállítás', 'Profi szállítópartnerünkkel és magas értékű biztosítással hozzuk haza az autót — biztonságban, egészen az ajtódig.'],
 ['Honosítás és vizsgáztatás', 'A teljes hivatalos ügyintézést átvállaljuk: vám- és áfaügyintézés, eredetvizsga, műszaki vizsga, okmányiroda, honosítás — gyorsan és gördülékenyen.'],
 ['Biztosítás és garancia', 'KGFB, Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, és 1 év jótállást vállalunk, hogy nyugodt szívvel ülj a volán mögé.'],
@@ -77,7 +78,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:34px;width:auto;display:block;border-radius:6px" />
 <img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:34px;width:auto;display:block;border-radius:6px" />
 </div>
-<h1>Hogyan működik az autóimport? —<br /><span class="accent">tíz lépés a tökéletes autóig</span></h1>
+<h1>Hogyan működik az autóimport? —<br /><span class="accent">tizenegy lépés a tökéletes autóig</span></h1>
 <p class="sub sub-wide" style="max-width:900px">Az igényed jelzésétől a kulcsrakész átadásig mindent mi intézünk — leinformálás, bevizsgálás, szállítás, honosítás és a teljes papírmunka. Te csak átveszed az&nbsp;autót.</p>
 <div class="cta-row">
 <a class="btn btn-primary" href="/auto-rendeles#rendeles">Autót rendelek</a>
@@ -109,6 +110,9 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" />
 <img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" />
 </div>
+)}
+{i === 6 && (
+<a class="pf-cta" href="#">Szerződésminta megtekintése →</a>
 )}
 </div>
 {i < steps.length - 1 && ![0, 1, 2, 3, 4].includes(i) && (<span class="pf-gap">{gaps[i]}</span>)}
@@ -152,7 +156,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <div class="wrap pf-seo">
 <span class="eyebrow">Jó tudni</span>
 <h2 class="pf-seo-h">A német autó behozatal menete — mire számíts?</h2>
-<p>Sokakban felmerül, pontosan hogyan zajlik az <strong>autó behozatal Németországból</strong>, és mekkora a <span class="kw">német autó behozatal költsége</span>. A folyamat tíz jól elkülöníthető lépésből áll: kutatás, kiválasztás, ajánlatok, ellenőrzés, ártárgyalás, árajánlat, szállítás, vám- és áfaügyintézés, honosítás és kulcsrakész átadás.</p>
+<p>Sokakban felmerül, pontosan hogyan zajlik az <strong>autó behozatal Németországból</strong>, és mekkora a <span class="kw">német autó behozatal költsége</span>. A folyamat tizenegy jól elkülöníthető lépésből áll: kutatás, kiválasztás, ajánlatok, ellenőrzés, ártárgyalás, árajánlat, szerződéskötés és előleg, szállítás, vám- és áfaügyintézés, honosítás és kulcsrakész átadás.</p>
 <p>A <strong>német autó behozatal menete</strong> papíron egyszerűnek tűnik, de a részletek — regisztrációs adó, eredetvizsga, műszaki vizsga, okmányiroda — sok időt és utánajárást igényelnek. A teljes <span class="kw">külföldi autó behozatal ügyintézését</span> átvállaljuk, és minden költséget előre, tételesen rögzítünk.</p>
 <p>Egy <strong>német autó behozatal kalkulátor</strong> csak becslést ad; mi konkrét, egyedi ajánlatot készítünk a kiválasztott autóra — az áron nincs meglepetés, a folyamat pedig jellemzően 5–14 nap alatt lezajlik.</p>
 </div>
