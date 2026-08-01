@@ -16,17 +16,6 @@ const steps = [
 ['Biztosítás és garancia', 'KGFB, Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, és 1 év jótállást vállalunk, hogy nyugodt szívvel ülj a volán mögé.'],
 ['Kulcsrakész átadás', 'Kulcsrakészen, minden papírral és a nevedre írt forgalmival adjuk át — onnantól már csak vezetned kell.'],
 ];
-function randomGap() {
-const units = [
-{ unit: 'perc', min: 10, max: 50 },
-{ unit: 'óra', min: 1, max: 6 },
-{ unit: 'nap', min: 1, max: 3 },
-];
-const u = units[Math.floor(Math.random() * units.length)];
-const val = Math.floor(Math.random() * (u.max - u.min + 1)) + u.min;
-return `~${val} ${u.unit}`;
-}
-const gaps = steps.slice(0, -1).map(() => randomGap());
 const includes = [
 'Autó felkutatása a teljes német piacon',
 'Nemzetközi leinformálás (kártörténet, valós km)',
@@ -115,7 +104,6 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <a class="pf-cta" href="#">Szerződésminta megtekintése →</a>
 )}
 </div>
-{i < steps.length - 1 && ![0, 1, 2, 3, 4].includes(i) && (<span class="pf-gap">{gaps[i]}</span>)}
 </div>
 ))}
 </div>
