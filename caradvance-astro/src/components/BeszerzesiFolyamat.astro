@@ -17,21 +17,10 @@ const steps = [
 ['Biztosítás és garancia', 'Kötelező gépjármű-felelősségbiztosítás (KGFB), Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, hogy nyugodt szívvel ülj a volán mögé.'],
 ['Kulcsrakész átadás', 'Kulcsrakészen, minden papírral és a nevedre írt forgalmival adjuk át — onnantól már csak vezetned kell.'],
 ];
-const includes = [
-'Autó felkutatása a teljes német piacon',
-'Nemzetközi leinformálás (kártörténet, valós km)',
-'Helyszíni, szakértői bevizsgálás',
-'Ártárgyalás anyanyelvi szinten',
-'Szállítás magas értékű biztosítással',
-'Vám- és áfaügyintézés',
-'Eredetvizsga',
-'Műszaki vizsga',
-'Honosítás és okmányiroda',
-'Forgalomba helyezés a nevedre',
-'1 év jótállás',
-];
+const inclLeft = steps.slice(0, 6).map(([t]) => t);
+const inclRight = steps.slice(6, 12).map(([t]) => t);
 const faqs = [
-['Mennyi ideig tart a teljes folyamat?', 'A kiválasztástól a kulcsrakész átadásig jellemzően 5–14 nap, az adott autótól és az ügyintézéstől függően. Az igényed jelzése után azonnal munkába állunk, és végig tájékoztatunk a folyamat állásáról.'],
+['Mennyi ideig tart a teljes folyamat?', 'A kiválasztástól a kulcsrakész átadásig jellemzően 10–21 nap, az adott autótól és az ügyintézéstől függően. Az igényed jelzése után azonnal munkába állunk, és végig tájékoztatunk a folyamat állásáról.'],
 ['Kell személyesen kimennem Németországba?', 'Nem. Mi felkutatjuk, leinformáljuk, a helyszínen bevizsgáljuk és haza is hozzuk az autót — neked csak át kell venned a nevedre írt, forgalomba helyezett járművet itthon.'],
 ['Mi történik, ha a bevizsgáláskor hibát találunk?', 'Ha az autó nem felel meg az elvárásoknak, nem vásároljuk meg — inkább keresünk egy jobb darabot. A helyszíni, szakértői ellenőrzés pontosan ezt a kockázatot zárja ki, még a döntés előtt.'],
 ['Milyen költségekkel kell számolnom?', 'Az autó ára mellett: regisztrációs adó, műszaki vizsga, eredetvizsga, vagyonszerzési illeték, forgalmi/rendszám/törzskönyv, szállítás és ügyintézési díj. Minden tételt előre, átláthatóan, egyedi ajánlatban rögzítünk — rejtett költségek nélkül.'],
@@ -119,11 +108,16 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 </div>
 <div class="wrap pf-wrap">
 <div class="pf-incl">
-{includes.map((x) => (<div class="pf-inclitem"><span class="pf-check">✓</span><span>{x}</span></div>))}
+<div class="pf-inclcol">
+{inclLeft.map((t, i) => (<div class="pf-inclitem"><span class="pf-inclnum">{i + 1}</span><span>{t}</span></div>))}
+</div>
+<div class="pf-inclcol">
+{inclRight.map((t, i) => (<div class="pf-inclitem"><span class="pf-inclnum">{i + 7}</span><span>{t}</span></div>))}
+</div>
 </div>
 <div class="pf-time">
-<div><b>5–14 nap</b><span>a kiválasztástól a kulcsrakész átadásig</span></div>
-<div><b>1 év</b><span>jótállás minden behozott autóra</span></div>
+<div><b>10–21 nap</b><span>a kiválasztástól a kulcsrakész átadásig</span></div>
+<div><b>0 kockázat</b><span>minden ellenőrzést és bevizsgálást mi végzünk el helyetted</span></div>
 <div><b>0 utazás</b><span>neked — mindent mi intézünk helyben</span></div>
 </div>
 </div>
@@ -147,7 +141,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <h2 class="pf-seo-h">A német autó behozatal menete — mire számíts?</h2>
 <p>Sokakban felmerül, pontosan hogyan zajlik az <strong>autó behozatal Németországból</strong>, és mekkora a <span class="kw">német autó behozatal költsége</span>. A folyamat tizenkét jól elkülöníthető lépésből áll: kutatás, kiválasztás, ajánlatok, ellenőrzés, ártárgyalás, árajánlat, szerződéskötés és előleg, szállítás, megtekintés és egyenlegrendezés, vám- és áfaügyintézés, honosítás és kulcsrakész átadás.</p>
 <p>A <strong>német autó behozatal menete</strong> papíron egyszerűnek tűnik, de a részletek — regisztrációs adó, eredetvizsga, műszaki vizsga, okmányiroda — sok időt és utánajárást igényelnek. A teljes <span class="kw">külföldi autó behozatal ügyintézését</span> átvállaljuk, és minden költséget előre, tételesen rögzítünk.</p>
-<p>Egy <strong>német autó behozatal kalkulátor</strong> csak becslést ad; mi konkrét, egyedi ajánlatot készítünk a kiválasztott autóra — az áron nincs meglepetés, a folyamat pedig jellemzően 5–14 nap alatt lezajlik.</p>
+<p>Egy <strong>német autó behozatal kalkulátor</strong> csak becslést ad; mi konkrét, egyedi ajánlatot készítünk a kiválasztott autóra — az áron nincs meglepetés, a folyamat pedig jellemzően 10–21 nap alatt lezajlik.</p>
 </div>
 </section>
 
@@ -182,10 +176,12 @@ a.pf-cta{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-wei
 a.pf-cta:hover{opacity:.9}
 .pf-partners{display:flex;align-items:center;gap:14px;margin-top:12px;flex-wrap:wrap}
 .pf-partners img{height:28px;width:auto;display:block;border-radius:6px}
-.pf-incl{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.pf-incl{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
 @media(max-width:640px){.pf-incl{grid-template-columns:1fr}}
+.pf-inclcol{display:flex;flex-direction:column;gap:12px}
 .pf-inclitem{display:flex;align-items:flex-start;gap:10px;font-size:15px;font-weight:600;color:var(--ink)}
 .pf-check{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:#e8f7ee;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-top:1px}
+.pf-inclnum{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-top:1px}
 .pf-time{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
 @media(max-width:640px){.pf-time{grid-template-columns:1fr}}
 .pf-time>div{background:#0B0B0D;color:#fff;border-radius:16px;padding:20px;text-align:center}
