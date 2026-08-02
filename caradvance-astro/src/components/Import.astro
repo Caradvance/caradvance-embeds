@@ -5,215 +5,211 @@ import KeresoForm from './KeresoForm.astro';
 const { lang } = Astro.props as { lang: Locale };
 
 const benefits = [
-  ['Hatalmas választék', 'Sokszorosa a hazai kínálatnak — a teljes német piactérből keresünk, így nagyobb az esély a tökéletes darabra.'],
-  ['Jobb állapotú autók', 'A német autók jellemzően kevésbé koptatottak és gondozottabbak, mint az azonos korú hazai darabok.'],
-  ['Kiváló úthálózat', 'A jó minőségű utak kímélik a futóművet és a karosszériát — kevesebb rejtett kopás, hosszabb élettartam.'],
-  ['Rendszeres karbantartás', 'Erős szervizkultúra: a tulajdonosok gyakrabban viszik átvizsgálásra az autót, így a műszaki állapot is megbízhatóbb.'],
-  ['Alacsonyabb futás', 'Sok autó kevesebbet és kíméletesebben futott a hazai átlagnál — a kor mögött gyakran sokkal jobb valós állapot van.'],
-  ['Dokumentált múlt', 'Vezetett szervizkönyv és átlátható előélet — pontosan tudod, mit veszel, meglepetések nélkül.'],
+['Hatalmas választék', 'Sokszorosa a hazai kínálatnak — a teljes német piactérből keresünk, így nagyobb az esély a tökéletes darabra.'],
+['Jobb állapotú autók', 'A német autók jellemzően kevésbé koptatottak és gondozottabbak, mint az azonos korú hazai darabok.'],
+['Kiváló úthálózat', 'A jó minőségű utak kímélik a futóművet és a karosszériát — kevesebb rejtett kopás, hosszabb élettartam.'],
+['Rendszeres karbantartás', 'Erős szervizkultúra: a tulajdonosok gyakrabban viszik átvizsgálásra az autót, így a műszaki állapot is megbízhatóbb.'],
+['Alacsonyabb futás', 'Sok autó kevesebbet és kíméletesebben futott a hazai átlagnál — a kor mögött gyakran sokkal jobb valós állapot van.'],
+['Dokumentált múlt', 'Vezetett szervizkönyv és átlátható előélet — pontosan tudod, mit veszel, meglepetések nélkül.'],
 ];
 
 const compare = [
-  ['Keresés a német piacon', 'Órák böngészése, nyelvi akadály, megbízható szűrés nélkül', 'A teljes piacot átnézzük helyetted'],
-  ['Az autó leinformálása', 'Rejtett kár vagy tekert km-óra kockázata', 'Nemzetközi adatbázisból ellenőrizzük'],
-  ['Helyszíni bevizsgálás', 'Utazol Németországba, vagy látatlanban veszel', 'Szakértőnk a helyszínen átvizsgálja'],
-  ['Tárgyalás, kommunikáció', 'Németül kell alkudnod, hátrányból', 'Helyetted tárgyalunk, anyanyelvi szinten'],
-  ['Szállítás', 'Magadnak intézed, sokszor biztosítás nélkül', 'Profi speditőr, magas értékű biztosítással'],
-  ['Honosítás és ügyintézés', 'Eredetvizsga, vizsga, okmányiroda — sorban állás, buktatók', 'A teljes hivatalos ügyintézést átvállaljuk'],
-  ['Rejtett költségek', 'Váratlan tételek, árfolyamkockázat', 'Előre, tételesen látod a költségeket'],
-  ['Garancia és jótállás', 'Probléma esetén egyedül, akár ügyvéddel a külföldi eladóval szemben', 'Kötelező 1 éves jótállást adunk, biztosításkötésben is segítünk'],
-  ['Időráfordítás', 'Hetek, akár hónapok utánajárás', 'Mindössze 5–14 nap'],
+['Keresés a német piacon', 'Órák böngészése, nyelvi akadály, megbízható szűrés nélkül', 'A teljes piacot átnézzük helyetted'],
+['Az autó leinformálása', 'Rejtett kár vagy tekert km-óra kockázata', 'Nemzetközi adatbázisból ellenőrizzük'],
+['Helyszíni bevizsgálás', 'Utazol Németországba, vagy látatlanban veszel', 'Szakértőnk a helyszínen átvizsgálja'],
+['Tárgyalás, kommunikáció', 'Németül kell alkudnod, hátrányból', 'Helyetted tárgyalunk, anyanyelvi szinten'],
+['Szállítás', 'Magadnak intézed, sokszor biztosítás nélkül', 'Profi speditőr, magas értékű biztosítással'],
+['Honosítás és ügyintézés', 'Eredetvizsga, vizsga, okmányiroda — sorban állás, buktatók', 'A teljes hivatalos ügyintézést átvállaljuk'],
+['Rejtett költségek', 'Váratlan tételek, árfolyamkockázat', 'Előre, tételesen látod a költségeket'],
+['Garancia és jótállás', 'Probléma esetén egyedül, akár ügyvéddel a külföldi eladóval szemben', 'Kötelező 1 éves jótállást adunk, biztosításkötésben is segítünk'],
+['Időráfordítás', 'Hetek, akár hónapok utánajárás', 'Mindössze 5–14 nap'],
 ];
 
 const steps = [
-  ['Kutatás és kiválasztás', 'Pontosan azt az autót keressük meg, amire vágysz — és ha még csak az irány van meg, abban is segítünk eligazodni a hatalmas német kínálatban.'],
-  ['Leinformálás', 'Nemzetközi adatbázisokból ellenőrzünk minden részletet, hogy biztosan tiszta múltú, megbízható autót vegyél — meglepetések nélkül.'],
-  ['Helyszíni bevizsgálás', 'Szakértő kollégánk személyesen, a helyszínen nézi át a kiszemelt autót, és minden lényeges részletről egyeztet veled, mielőtt döntenél.'],
-  ['Logisztika és szállítás', 'Profi szállítópartnerünkkel és magas értékű biztosítással hozzuk haza az autót — biztonságban, egészen az ajtódig.'],
-  ['Honosítás és vizsgáztatás', 'A teljes hivatalos ügyintézést átvállaljuk: műszaki vizsga, okmányiroda, honosítás — gyorsan és gördülékenyen.'],
-  ['Biztosítás és garancia', 'KGFB, Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, hogy nyugodt szívvel ülj a volán mögé.'],
-  ['Kulcsrakész átadás', 'Kulcsrakészen, minden papírral és a nevedre írt forgalmival adjuk át — onnantól már csak vezetned kell.'],
+['Kutatás és kiválasztás', 'Pontosan azt az autót keressük meg, amire vágysz — és ha még csak az irány van meg, abban is segítünk eligazodni a hatalmas német kínálatban.'],
+['Leinformálás', 'Nemzetközi adatbázisokból ellenőrzünk minden részletet, hogy biztosan tiszta múltú, megbízható autót vegyél — meglepetések nélkül.'],
+['Helyszíni bevizsgálás', 'Szakértő kollégánk személyesen, a helyszínen nézi át a kiszemelt autót, és minden lényeges részletről egyeztet veled, mielőtt döntenél.'],
+['Logisztika és szállítás', 'Profi szállítópartnerünkkel és magas értékű biztosítással hozzuk haza az autót — biztonságban, egészen az ajtódig.'],
+['Honosítás és vizsgáztatás', 'A teljes hivatalos ügyintézést átvállaljuk: műszaki vizsga, okmányiroda, honosítás — gyorsan és gördülékenyen.'],
+['Biztosítás és garancia', 'KGFB, Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, hogy nyugodt szívvel ülj a volán mögé.'],
+['Kulcsrakész átadás', 'Kulcsrakészen, minden papírral és a nevedre írt forgalmival adjuk át — onnantól már csak vezetned kell.'],
 ];
 
 const faqs = [
-  ['Hogyan indul el az importfolyamat?', 'Töltsd ki az „Autó rendelés” űrlapot, vagy írj nekünk — felvesszük veled a kapcsolatot, pontosítjuk az igényt, és megkezdjük a keresést a német piacon.'],
-  ['Mi van, ha még nincs konkrét autó a fejemben?', 'Nem gond — elég, ha a márka, típus, keret vagy a felhasználási cél megvan. Segítünk eligazodni és több konkrét ajánlatot mutatunk.'],
-  ['Mennyi előleget kell fizetni?', 'Az autó lefoglalásához általában előleg szükséges, a végleges egyedi ajánlatban pontosan rögzítjük az összes feltételt.'],
-  ['Mennyi ideig tart a teljes folyamat?', 'A kiválasztástól a kulcsrakész átadásig jellemzően 5–14 nap, az adott autótól és ügyintézéstől függően.'],
-  ['Milyen ügyintézés tartozik a behozatalhoz?', 'A teljes folyamat: szállítás, vám- és áfaügyintézés, eredetvizsga, műszaki vizsga, honosítás, okmányiroda, forgalomba helyezés — mindent mi intézünk.'],
-  ['Milyen költségekkel kell számolnom?', 'Az autó ára mellett: regisztrációs adó, műszaki vizsga, eredetvizsga, vagyonszerzési illeték, forgalmi/rendszám/törzskönyv, szállítás és ügyintézési díj. A kalkulátorunkban tételesen látod.'],
-  ['Kapok garanciát a behozott autóra?', 'Igen — magánszemélyként kötelező 1 éves jótállást adunk, és a biztosítás (KGFB, Casco) megkötésében is segítünk.'],
+['Hogyan indul el az importfolyamat?', 'Töltsd ki az „Autó rendelés” űrlapot, vagy írj nekünk — felvesszük veled a kapcsolatot, pontosítjuk az igényt, és megkezdjük a keresést a német piacon.'],
+['Mi van, ha még nincs konkrét autó a fejemben?', 'Nem gond — elég, ha a márka, típus, keret vagy a felhasználási cél megvan. Segítünk eligazodni és több konkrét ajánlatot mutatunk.'],
+['Mennyi előleget kell fizetni?', 'Az autó lefoglalásához általában előleg szükséges, a végleges egyedi ajánlatban pontosan rögzítjük az összes feltételt.'],
+['Mennyi ideig tart a teljes folyamat?', 'A kiválasztástól a kulcsrakész átadásig jellemzően 5–14 nap, az adott autótól és ügyintézéstől függően.'],
+['Milyen ügyintézés tartozik a behozatalhoz?', 'A teljes folyamat: szállítás, vám- és áfaügyintézés, eredetvizsga, műszaki vizsga, honosítás, okmányiroda, forgalomba helyezés — mindent mi intézünk.'],
+['Milyen költségekkel kell számolnom?', 'Az autó ára mellett: regisztrációs adó, műszaki vizsga, eredetvizsga, vagyonszerzési illeték, forgalmi/rendszám/törzskönyv, szállítás és ügyintézési díj. A kalkulátorunkban tételesen látod.'],
+['Kapok garanciát a behozott autóra?', 'Igen — magánszemélyként kötelező 1 éves jótállást adunk, és a biztosítás (KGFB, Casco) megkötésében is segítünk.'],
 ];
 
 const faqJson = {
-  '@context': 'https://schema.org', '@type': 'FAQPage',
-  mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+'@context': 'https://schema.org', '@type': 'FAQPage',
+mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
 };
 ---
 <section class="imp">
-  <section class="hero">
-  <video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-x5-poster.jpg">
-    <source src="https://www.caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4" />
-  </video>
-  <div class="scrim"></div>
-  <div class="inner">
-    <div class="partners" style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:34px;width:auto;display:block;border-radius:6px" /><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:34px;width:auto;display:block;border-radius:6px" /></div>
-    <h1>Hozd haza álmaid autóját —<br /><span class="accent">mi mindent elintézünk</span></h1>
-    <p class="sub sub-wide" style="max-width:900px">Nagyobb választék, jobb állapotú autók és kedvezőbb ár a német piacról — mi megkeressük, behozzuk és kulcsrakészen, a nevedre írt forgalmival adjuk&nbsp;át.</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="#rendeles">Autót rendelek</a>
-      <a class="btn btn-white" href="/beszerzesi-folyamat">Hogyan működik?</a>
-    </div>
-  </div>
-  <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+<section class="hero">
+<video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-beszerzesi-poster.jpg">
+<source src="https://www.caradvance.hu/caradvance-hero-beszerzesi.mp4" type="video/mp4" />
+</video>
+<div class="scrim"></div>
+<div class="inner">
+<div class="partners" style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:34px;width:auto;display:block;border-radius:6px" /><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:34px;width:auto;display:block;border-radius:6px" /></div>
+<h1>Hozd haza álmaid autóját —<br /><span class="accent">mi mindent elintézünk</span></h1>
+<p class="sub sub-wide" style="max-width:900px">Nagyobb választék, jobb állapotú autók és kedvezőbb ár a német piacról — mi megkeressük, behozzuk és kulcsrakészen, a nevedre írt forgalmival adjuk&nbsp;át.</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="#rendeles">Autót rendelek</a>
+<a class="btn btn-white" href="/beszerzesi-folyamat">Hogyan működik?</a>
+</div>
+</div>
+<button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
 </section>
 
-  <section class="section" style="padding:30px 0 0">
-    <div class="wrap"><div class="stats">
-      <div class="stat"><div class="stat-top"><div class="num">23<span> év</span></div><div class="lbl">Megbízható partner — a Caradvance GmbH 2003 óta</div></div><div class="stat-logos lg-1"><img class="sl-brand" src="https://www.caradvance.hu/caradvance-logo.webp" alt="CarAdvance" /></div></div>
-      <div class="stat"><div class="stat-top"><div class="num" style="font-size:26px;white-space:normal;line-height:1.15">Prémium<span> márkák</span></div><div class="lbl">Külön kapcsolataink és kedvezőbb áraink ezekhez a márkákhoz:</div></div><div class="stat-logos" style="gap:14px;flex-wrap:wrap"><img src="/brand-bmw.png" alt="BMW" style="height:30px;width:auto;display:block" /><img src="/brand-audi.png" alt="Audi" style="height:17px;width:auto;display:block" /><img src="/brand-mercedes.png" alt="Mercedes-Benz" style="height:30px;width:auto;display:block" /><img src="/brand-porsche.png" alt="Porsche" style="height:32px;width:auto;display:block" /></div></div>
-      <div class="stat"><div class="stat-top"><div class="num">2<span> piactér</span></div><div class="lbl">Innen szerezzük be az autókat Németországból</div></div><div class="stat-logos lg-2" style="flex-direction:column;gap:10px"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:24px;width:auto;border-radius:5px" /><div style="display:flex;gap:16px;align-items:center;justify-content:center"><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:32px;width:auto;border-radius:4px" /></div></div></div>
-      <div class="stat"><div class="stat-top"><div class="num" style="font-size:30px;line-height:1.05">Hitel &amp;<span> lízing</span></div><div class="lbl">Partnereink kedvező finanszírozást és lízinget kínálnak</div></div><div class="stat-logos" style="flex-direction:column;gap:9px"><img src="/euroleasing.png" alt="Euroleasing" style="height:20px;width:auto" onerror="this.style.display='none'" /><img src="/merkantil-bank.png" alt="Merkantil Bank" style="height:22px;width:auto" onerror="this.style.display='none'" /></div></div>
-      
-    </div></div>
-  </section>
+<section class="section" style="padding:30px 0 0">
+<div class="wrap"><div class="stats">
+<div class="stat"><div class="stat-top"><div class="num">23<span> év</span></div><div class="lbl">Megbízható partner — a Caradvance GmbH 2003 óta</div></div><div class="stat-logos lg-1"><img class="sl-brand" src="https://www.caradvance.hu/caradvance-logo.webp" alt="CarAdvance" /></div></div>
+<div class="stat"><div class="stat-top"><div class="num" style="font-size:26px;white-space:normal;line-height:1.15">Prémium<span> márkák</span></div><div class="lbl">Külön kapcsolataink és kedvezőbb áraink ezekhez a márkákhoz:</div></div><div class="stat-logos" style="gap:14px;flex-wrap:wrap"><img src="/brand-bmw.png" alt="BMW" style="height:30px;width:auto;display:block" /><img src="/brand-audi.png" alt="Audi" style="height:17px;width:auto;display:block" /><img src="/brand-mercedes.png" alt="Mercedes-Benz" style="height:30px;width:auto;display:block" /><img src="/brand-porsche.png" alt="Porsche" style="height:32px;width:auto;display:block" /></div></div>
+<div class="stat"><div class="stat-top"><div class="num">2<span> piactér</span></div><div class="lbl">Innen szerezzük be az autókat Németországból</div></div><div class="stat-logos lg-2" style="flex-direction:column;gap:10px"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:24px;width:auto;border-radius:5px" /><div style="display:flex;gap:16px;align-items:center;justify-content:center"><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:32px;width:auto;border-radius:4px" /></div></div></div>
+<div class="stat"><div class="stat-top"><div class="num" style="font-size:30px;line-height:1.05">Hitel &amp;<span> lízing</span></div><div class="lbl">Partnereink kedvező finanszírozást és lízinget kínálnak</div></div><div class="stat-logos" style="flex-direction:column;gap:9px"><img src="/euroleasing.png" alt="Euroleasing" style="height:20px;width:auto" onerror="this.style.display='none'" /><img src="/merkantil-bank.png" alt="Merkantil Bank" style="height:22px;width:auto" onerror="this.style.display='none'" /></div></div>
 
-  <KeresoForm lang={lang} />
+</div></div>
+</section>
 
-  <div class="imp-wrap">
-    <div class="imp-seo">
-      <span class="imp-tag">Jó tudni</span>
-      <h2 class="imp-seo-h">Autó rendelés Németországból — a teljes import egy kézből</h2>
-      <p>Ha pontosan tudod, milyen autót keresel, nem kell órákat böngészned a német piactereken: bízd ránk az <strong>autó rendelést</strong>. A teljes <span class="kw">autóimport Németországból</span> folyamatát átvállaljuk — kereséstől a leinformáláson és bevizsgáláson át a kulcsrakész átadásig.</p>
-      <p>Az <strong>egyedi autó rendelés</strong> nálad azt jelenti, hogy megadod a paramétereket, mi pedig a teljes német kínálatból kikeressük a hozzád illő darabot. Az <span class="kw">autó behozatal Németországból</span> árát előre, tételesen rögzítjük — regisztrációs adó, szállítás, honosítás és ügyintézés, meglepetések nélkül.</p>
-      <p>Magánszemélyként akár 19%-os német áfával vásárolhatsz a müncheni Caradvance GmbH-tól, és minden behozott <strong>német használtautó</strong> mögött 1 év jótállás áll. Töltsd ki a rendelési űrlapot, és a többit intézzük.</p>
-    </div>
+<KeresoForm lang={lang} />
 
-    <div class="imp-head"><span class="imp-tag">Csapatunk</span><h2>Ismerd meg, kik intézik a behozatalod</h2><p>Nem egy űrlappal beszélsz, hanem valódi szakemberekkel, akik végigkísérnek a teljes folyamaton — a kiválasztástól a kulcsátadásig.</p></div>
-    <div class="imp-team">
-      <div class="imp-team-card">
-        <span class="role">Import igazgató</span>
-        <h3>Tóth Károly</h3>
-        <p>Károly irányítja a teljes importfolyamatot, és ő tartja a napi kapcsolatot német partnerünkkel, a Caradvance GmbH-val. Több évtizedes autós tapasztalattal vigyáz arra, hogy minden behozatal gördülékenyen menjen.</p>
-        <div class="imp-team-c"><a href="mailto:import@caradvance.de">✉ import@caradvance.de</a><a href="tel:+36302146989">☎ +36 30 214 6989</a></div>
-      </div>
-      <div class="imp-team-note"><b>Mögöttünk a németországi Caradvance GmbH 10 fős csapata 🇩🇪</b><span>Német kollégáink közvetlen hozzáférést biztosítanak a piac teljes kínálatához és a helyi ügyintézéshez — így minden behozatal a forrásnál, helyben indul.</span></div>
-    </div>
+<div class="imp-wrap">
+<div class="imp-seo">
+<span class="imp-tag">Jó tudni</span>
+<h2 class="imp-seo-h">Autó rendelés Németországból — a teljes import egy kézből</h2>
+<p>Ha pontosan tudod, milyen autót keresel, nem kell órákat böngészned a német piactereken: bízd ránk az <strong>autó rendelést</strong>. A teljes <span class="kw">autóimport Németországból</span> folyamatát átvállaljuk — kereséstől a leinformáláson és bevizsgáláson át a kulcsrakész átadásig.</p>
+<p>Az <strong>egyedi autó rendelés</strong> nálad azt jelenti, hogy megadod a paramétereket, mi pedig a teljes német kínálatból kikeressük a hozzád illő darabot. Az <span class="kw">autó behozatal Németországból</span> árát előre, tételesen rögzítjük — regisztrációs adó, szállítás, honosítás és ügyintézés, meglepetések nélkül.</p>
+<p>Magánszemélyként akár 19%-os német áfával vásárolhatsz a müncheni Caradvance GmbH-tól, és minden behozott <strong>német használtautó</strong> mögött 1 év jótállás áll. Töltsd ki a rendelési űrlapot, és a többit intézzük.</p>
+</div>
 
+<div class="imp-head"><span class="imp-tag">Csapatunk</span><h2>Ismerd meg, kik intézik a behozatalod</h2><p>Nem egy űrlappal beszélsz, hanem valódi szakemberekkel, akik végigkísérnek a teljes folyamaton — a kiválasztástól a kulcsátadásig.</p></div>
+<div class="imp-team">
+<div class="imp-team-card">
+<span class="role">Import igazgató</span>
+<h3>Tóth Károly</h3>
+<p>Károly irányítja a teljes importfolyamatot, és ő tartja a napi kapcsolatot német partnerünkkel, a Caradvance GmbH-val. Több évtizedes autós tapasztalattal vigyáz arra, hogy minden behozatal gördülékenyen menjen.</p>
+<div class="imp-team-c"><a href="mailto:import@caradvance.de">✉ import@caradvance.de</a><a href="tel:+36302146989">☎ +36 30 214 6989</a></div>
+</div>
+<div class="imp-team-note"><b>Mögöttünk a németországi Caradvance GmbH 10 fős csapata 🇩🇪</b><span>Német kollégáink közvetlen hozzáférést biztosítanak a piac teljes kínálatához és a helyi ügyintézéshez — így minden behozatal a forrásnál, helyben indul.</span></div>
+</div>
 
+<div class="imp-head" id="gyik"><span class="imp-tag">GYIK</span><h2>Gyakori kérdések</h2><p>A leggyakoribb kérdések a németországi autóimportról — a megrendeléstől az átadásig.</p></div>
+<div class="imp-faq">
+{faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}
+</div>
+</div>
 
-    <div class="imp-head" id="gyik"><span class="imp-tag">GYIK</span><h2>Gyakori kérdések</h2><p>A leggyakoribb kérdések a németországi autóimportról — a megrendeléstől az átadásig.</p></div>
-    <div class="imp-faq">
-      {faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}
-    </div>
-  </div>
-
-  <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
 </section>
 
 <style>
-  .imp{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB}
-  .imp-wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-  .imp-hero{background:#0B0B0D;color:#fff;padding:120px 0 72px;position:relative;text-align:center;overflow:hidden}
-  .imp-hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
-  .imp-partners-img{height:46px;width:auto;display:block;margin:0 auto 26px;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}
-  .imp-scroll{display:inline-flex;flex-direction:column;align-items:center;gap:1px;margin-top:32px;color:#cfd6e2;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
-  .imp-scroll span{font-size:20px;line-height:1}
-  .imp-hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(11,11,13,.55),rgba(11,11,13,.8))}
-  .imp-hero .imp-wrap{position:relative;z-index:2}
-  .imp-partners{display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;margin-bottom:26px;opacity:.95}
-  .imp-partners img{height:26px;width:auto;filter:brightness(0) invert(1);opacity:.9}
-  .imp-partners img.imp-lg{height:30px;filter:none}
-  .imp-eyebrow{display:inline-block;background:rgba(226,0,26,.16);color:#ff8a97;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 15px;border-radius:999px}
-  .imp-hero h1{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.08;margin:16px auto 14px;max-width:900px;letter-spacing:-.02em}
-  .imp-hero h1 span{color:var(--red)}
-  .imp-lead{color:#cfd6e2;font-size:17px;line-height:1.6;max-width:720px;margin:0 auto 26px}
-  .imp-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .imp-btn{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px;padding:14px 24px;border-radius:999px;text-decoration:none;cursor:pointer;border:0}
-  .imp-btn.red{background:var(--red);color:#fff}.imp-btn.red:hover{filter:brightness(.94)}
-  .imp-btn.ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.5)}
-  .imp-btn.big{width:100%;justify-content:center;font-size:16px;padding:16px}
-  .imp-head{text-align:center;max-width:760px;margin:72px auto 30px}
-  .imp-tag{display:inline-block;background:#fdeaec;color:var(--red);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:14px}
-  .imp-head h2{font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-.02em;margin:0 0 12px;color:var(--ink)}
-  .imp-head p{color:var(--muted);font-size:16px;line-height:1.6;margin:0}
-  .imp-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  @media(max-width:820px){.imp-grid3{grid-template-columns:1fr}}
-  .imp-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
-  .imp-card h3{font-size:17px;font-weight:800;margin:0 0 8px}
-  .imp-card p{color:var(--muted);font-size:14px;line-height:1.55;margin:0}
-  .imp-calc{display:grid;grid-template-columns:340px 1fr;gap:20px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
-  @media(max-width:820px){.imp-calc{grid-template-columns:1fr}}
-  .imp-calc-in{display:flex;flex-direction:column;gap:14px}
-  .imp-calc-in label{font-size:13px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;gap:6px}
-  .imp-calc-in input{font:inherit;font-size:16px;font-weight:700;color:var(--ink);padding:12px 14px;border:1px solid var(--line);border-radius:11px;outline:none}
-  .imp-calc-in input:focus{border-color:var(--red)}
-  .imp-calc-out{background:var(--bg);border-radius:14px;padding:16px 18px}
-  .imp-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px;color:var(--muted)}
-  .imp-row b{color:var(--ink);font-weight:700;white-space:nowrap}
-  .imp-row.total{border-bottom:0;border-top:2px solid var(--ink);margin-top:6px;padding-top:14px;font-size:16px;color:var(--ink);font-weight:800}
-  .imp-row.total b{color:var(--red);font-size:20px}
-  .imp-note{font-size:12px;color:var(--muted);line-height:1.5;margin:12px 0 0}
-  .imp-afa{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
-  .imp-afa-h{padding:18px 20px;border-bottom:1px solid var(--line)}
-  .imp-afa-h .car{font-weight:800;font-size:18px}
-  .imp-afa-h .car small{display:block;color:var(--muted);font-weight:600;font-size:13px;margin-top:3px}
-  .imp-afa table{width:100%;border-collapse:collapse}
-  .imp-afa th,.imp-afa td{text-align:right;padding:13px 20px;font-size:14px;border-bottom:1px solid var(--line)}
-  .imp-afa th:first-child,.imp-afa td:first-child{text-align:left;color:var(--muted)}
-  .imp-afa thead th{font-size:12px;color:var(--muted);font-weight:700}
-  .imp-afa .hl{background:#fdf0f1}
-  .imp-afa thead th.hl{color:var(--red)}
-  .imp-afa tr.tot td{font-weight:800;color:var(--ink)}
-  .imp-save{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#0B0B0D;color:#fff;padding:18px 22px;font-weight:700}
-  .imp-save b{font-size:26px;font-weight:800}.imp-save b small{font-size:15px;color:#9aa7b8;font-weight:700}
-  .imp-cmp{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
-  .imp-cmp-h,.imp-cmp-r{display:grid;grid-template-columns:1.1fr 1.4fr 1.4fr;gap:0}
-  .imp-cmp-h{background:#f7f9fc;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-  .imp-cmp-h span,.imp-cmp-r span{padding:14px 18px;border-bottom:1px solid var(--line)}
-  .imp-cmp-h .hl,.imp-cmp-r .b{background:#fdf0f1}
-  .imp-cmp-h .hl{color:var(--red)}
-  .imp-cmp-r .s{font-weight:800;font-size:14px}
-  .imp-cmp-r .a{color:var(--muted);font-size:13.5px}
-  .imp-cmp-r .b{color:var(--ink);font-size:13.5px;font-weight:600}
-  @media(max-width:820px){.imp-cmp-h{display:none}.imp-cmp-r{grid-template-columns:1fr;border-bottom:1px solid var(--line);padding:8px 0}.imp-cmp-r span{border-bottom:0;padding:8px 16px}.imp-cmp-r .s{padding-top:14px}}
-  .imp-steps{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:820px){.imp-steps{grid-template-columns:1fr}}
-  .imp-step{display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
-  .imp-step .n{flex:0 0 auto;width:40px;height:40px;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:17px}
-  .imp-step:last-child .n{background:var(--red)}
-  .imp-step h3{font-size:16px;font-weight:800;margin:2px 0 6px}
-  .imp-step p{color:var(--muted);font-size:14px;line-height:1.55;margin:0}
-  .imp-team{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}
-  @media(max-width:820px){.imp-team{grid-template-columns:1fr}}
-  .imp-team-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
-  .imp-team-card .role{display:inline-block;background:#fdeaec;color:var(--red);font-weight:800;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
-  .imp-team-card h3{font-size:22px;font-weight:800;margin:12px 0 8px}
-  .imp-team-card p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 14px}
-  .imp-team-c{display:flex;gap:18px;flex-wrap:wrap}
-  .imp-team-c a{color:var(--red);font-weight:700;text-decoration:none;font-size:14px}
-  .imp-team-note{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
-  .imp-team-note b{display:block;font-size:15px;margin-bottom:8px}
-  .imp-team-note span{color:var(--muted);font-size:14px;line-height:1.6}
-  .imp-form{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;max-width:820px;margin:0 auto}
-  .imp-f-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-  @media(max-width:640px){.imp-f-grid{grid-template-columns:1fr}}
-  .imp-form label{font-size:13px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;gap:6px}
-  .imp-form label.full{margin-bottom:14px}
-  .imp-form input,.imp-form select,.imp-form textarea{font:inherit;font-size:15px;color:var(--ink);padding:11px 13px;border:1px solid var(--line);border-radius:11px;outline:none;background:#fff}
-  .imp-form input:focus,.imp-form select:focus,.imp-form textarea:focus{border-color:var(--red)}
-  .imp-faq{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-bottom:40px}
-  .imp-faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
-  .imp-faq summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
-  .imp-faq summary::-webkit-details-marker{display:none}
-  .imp-faq .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
-  .imp-faq details[open] .pl{transform:rotate(45deg)}
-  .imp-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
-  .imp-seo{max-width:820px;margin:0 auto;text-align:left}
-  .imp-seo-h{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:10px 0 18px}
-  .imp-seo p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 16px}
-  .imp-seo strong{color:var(--ink);font-weight:700}
-  .imp-seo .kw{color:var(--red);font-weight:700}
+.imp{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB}
+.imp-wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.imp-hero{background:#0B0B0D;color:#fff;padding:120px 0 72px;position:relative;text-align:center;overflow:hidden}
+.imp-hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.imp-partners-img{height:46px;width:auto;display:block;margin:0 auto 26px;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}
+.imp-scroll{display:inline-flex;flex-direction:column;align-items:center;gap:1px;margin-top:32px;color:#cfd6e2;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
+.imp-scroll span{font-size:20px;line-height:1}
+.imp-hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(11,11,13,.55),rgba(11,11,13,.8))}
+.imp-hero .imp-wrap{position:relative;z-index:2}
+.imp-partners{display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;margin-bottom:26px;opacity:.95}
+.imp-partners img{height:26px;width:auto;filter:brightness(0) invert(1);opacity:.9}
+.imp-partners img.imp-lg{height:30px;filter:none}
+.imp-eyebrow{display:inline-block;background:rgba(226,0,26,.16);color:#ff8a97;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 15px;border-radius:999px}
+.imp-hero h1{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.08;margin:16px auto 14px;max-width:900px;letter-spacing:-.02em}
+.imp-hero h1 span{color:var(--red)}
+.imp-lead{color:#cfd6e2;font-size:17px;line-height:1.6;max-width:720px;margin:0 auto 26px}
+.imp-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.imp-btn{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px;padding:14px 24px;border-radius:999px;text-decoration:none;cursor:pointer;border:0}
+.imp-btn.red{background:var(--red);color:#fff}.imp-btn.red:hover{filter:brightness(.94)}
+.imp-btn.ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.5)}
+.imp-btn.big{width:100%;justify-content:center;font-size:16px;padding:16px}
+.imp-head{text-align:center;max-width:760px;margin:72px auto 30px}
+.imp-tag{display:inline-block;background:#fdeaec;color:var(--red);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:14px}
+.imp-head h2{font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-.02em;margin:0 0 12px;color:var(--ink)}
+.imp-head p{color:var(--muted);font-size:16px;line-height:1.6;margin:0}
+.imp-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.imp-grid3{grid-template-columns:1fr}}
+.imp-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
+.imp-card h3{font-size:17px;font-weight:800;margin:0 0 8px}
+.imp-card p{color:var(--muted);font-size:14px;line-height:1.55;margin:0}
+.imp-calc{display:grid;grid-template-columns:340px 1fr;gap:20px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+@media(max-width:820px){.imp-calc{grid-template-columns:1fr}}
+.imp-calc-in{display:flex;flex-direction:column;gap:14px}
+.imp-calc-in label{font-size:13px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.imp-calc-in input{font:inherit;font-size:16px;font-weight:700;color:var(--ink);padding:12px 14px;border:1px solid var(--line);border-radius:11px;outline:none}
+.imp-calc-in input:focus{border-color:var(--red)}
+.imp-calc-out{background:var(--bg);border-radius:14px;padding:16px 18px}
+.imp-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px;color:var(--muted)}
+.imp-row b{color:var(--ink);font-weight:700;white-space:nowrap}
+.imp-row.total{border-bottom:0;border-top:2px solid var(--ink);margin-top:6px;padding-top:14px;font-size:16px;color:var(--ink);font-weight:800}
+.imp-row.total b{color:var(--red);font-size:20px}
+.imp-note{font-size:12px;color:var(--muted);line-height:1.5;margin:12px 0 0}
+.imp-afa{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.imp-afa-h{padding:18px 20px;border-bottom:1px solid var(--line)}
+.imp-afa-h .car{font-weight:800;font-size:18px}
+.imp-afa-h .car small{display:block;color:var(--muted);font-weight:600;font-size:13px;margin-top:3px}
+.imp-afa table{width:100%;border-collapse:collapse}
+.imp-afa th,.imp-afa td{text-align:right;padding:13px 20px;font-size:14px;border-bottom:1px solid var(--line)}
+.imp-afa th:first-child,.imp-afa td:first-child{text-align:left;color:var(--muted)}
+.imp-afa thead th{font-size:12px;color:var(--muted);font-weight:700}
+.imp-afa .hl{background:#fdf0f1}
+.imp-afa thead th.hl{color:var(--red)}
+.imp-afa tr.tot td{font-weight:800;color:var(--ink)}
+.imp-save{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#0B0B0D;color:#fff;padding:18px 22px;font-weight:700}
+.imp-save b{font-size:26px;font-weight:800}.imp-save b small{font-size:15px;color:#9aa7b8;font-weight:700}
+.imp-cmp{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.imp-cmp-h,.imp-cmp-r{display:grid;grid-template-columns:1.1fr 1.4fr 1.4fr;gap:0}
+.imp-cmp-h{background:#f7f9fc;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.imp-cmp-h span,.imp-cmp-r span{padding:14px 18px;border-bottom:1px solid var(--line)}
+.imp-cmp-h .hl,.imp-cmp-r .b{background:#fdf0f1}
+.imp-cmp-h .hl{color:var(--red)}
+.imp-cmp-r .s{font-weight:800;font-size:14px}
+.imp-cmp-r .a{color:var(--muted);font-size:13.5px}
+.imp-cmp-r .b{color:var(--ink);font-size:13.5px;font-weight:600}
+@media(max-width:820px){.imp-cmp-h{display:none}.imp-cmp-r{grid-template-columns:1fr;border-bottom:1px solid var(--line);padding:8px 0}.imp-cmp-r span{border-bottom:0;padding:8px 16px}.imp-cmp-r .s{padding-top:14px}}
+.imp-steps{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.imp-steps{grid-template-columns:1fr}}
+.imp-step{display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+.imp-step .n{flex:0 0 auto;width:40px;height:40px;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:17px}
+.imp-step:last-child .n{background:var(--red)}
+.imp-step h3{font-size:16px;font-weight:800;margin:2px 0 6px}
+.imp-step p{color:var(--muted);font-size:14px;line-height:1.55;margin:0}
+.imp-team{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}
+@media(max-width:820px){.imp-team{grid-template-columns:1fr}}
+.imp-team-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.imp-team-card .role{display:inline-block;background:#fdeaec;color:var(--red);font-weight:800;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.imp-team-card h3{font-size:22px;font-weight:800;margin:12px 0 8px}
+.imp-team-card p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 14px}
+.imp-team-c{display:flex;gap:18px;flex-wrap:wrap}
+.imp-team-c a{color:var(--red);font-weight:700;text-decoration:none;font-size:14px}
+.imp-team-note{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+.imp-team-note b{display:block;font-size:15px;margin-bottom:8px}
+.imp-team-note span{color:var(--muted);font-size:14px;line-height:1.6}
+.imp-form{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;max-width:820px;margin:0 auto}
+.imp-f-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:640px){.imp-f-grid{grid-template-columns:1fr}}
+.imp-form label{font-size:13px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.imp-form label.full{margin-bottom:14px}
+.imp-form input,.imp-form select,.imp-form textarea{font:inherit;font-size:15px;color:var(--ink);padding:11px 13px;border:1px solid var(--line);border-radius:11px;outline:none;background:#fff}
+.imp-form input:focus,.imp-form select:focus,.imp-form textarea:focus{border-color:var(--red)}
+.imp-faq{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-bottom:40px}
+.imp-faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.imp-faq summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.imp-faq summary::-webkit-details-marker{display:none}
+.imp-faq .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.imp-faq details[open] .pl{transform:rotate(45deg)}
+.imp-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+.imp-seo{max-width:820px;margin:0 auto;text-align:left}
+.imp-seo-h{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:10px 0 18px}
+.imp-seo p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 16px}
+.imp-seo strong{color:var(--ink);font-weight:700}
+.imp-seo .kw{color:var(--red);font-weight:700}
 </style>
-
-
