@@ -17,8 +17,6 @@ const steps = [
 ['Biztosítás és garancia', 'Kötelező gépjármű-felelősségbiztosítás (KGFB), Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, hogy nyugodt szívvel ülj a volán mögé.'],
 ['Kulcsrakész átadás', 'Kulcsrakészen, minden papírral és a nevedre írt forgalmival adjuk át — onnantól már csak vezetned kell.'],
 ];
-const inclLeft = steps.slice(0, 6).map(([t]) => t);
-const inclRight = steps.slice(6, 12).map(([t]) => t);
 const faqs = [
 ['Mennyi ideig tart a teljes folyamat?', 'A kiválasztástól a kulcsrakész átadásig jellemzően 10–21 nap, az adott autótól és az ügyintézéstől függően. Az igényed jelzése után azonnal munkába állunk, és végig tájékoztatunk a folyamat állásáról.'],
 ['Kell személyesen kimennem Németországba?', 'Nem. Mi felkutatjuk, leinformáljuk, a helyszínen bevizsgáljuk és haza is hozzuk az autót — neked csak át kell venned a nevedre írt, forgalomba helyezett járművet itthon.'],
@@ -96,24 +94,6 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 </div>
 </div>
 ))}
-</div>
-</div>
-</section>
-
-<section class="section" style="padding-top:8px">
-<div class="wrap center">
-<span class="eyebrow">Amit átvállalunk</span>
-<h2 class="sec-title">Az egész folyamat — egy kézből</h2>
-<p class="sec-intro">A keresestől a forgalomba helyezésig minden lépést mi kezelünk, hogy neked ne kelljen se utazgatnod, se hivatalt járnod.</p>
-</div>
-<div class="wrap pf-wrap">
-<div class="pf-incl">
-<div class="pf-inclcol">
-{inclLeft.map((t, i) => (<div class="pf-inclitem"><span class="pf-inclnum">{i + 1}</span><span>{t}</span></div>))}
-</div>
-<div class="pf-inclcol">
-{inclRight.map((t, i) => (<div class="pf-inclitem"><span class="pf-inclnum">{i + 7}</span><span>{t}</span></div>))}
-</div>
 </div>
 <div class="pf-time">
 <div><b>10–21 nap</b><span>a kiválasztástól a kulcsrakész átadásig — ez az általános időtartam, de sok tényezőtől függ: mennyire rugalmas a kereskedő, akitől az autót vesszük, a papírmunka és a jogi ügyintézés, maga a logisztika, valamint hogy a magyarországi hivatali ügyintézés mennyire gyorsan halad. A folyamat minden lépéséről tájékoztatunk.</span></div>
