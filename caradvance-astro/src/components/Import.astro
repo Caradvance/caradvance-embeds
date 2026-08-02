@@ -93,10 +93,12 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 <div class="imp-team">
 <div class="imp-team-card">
 <img class="imp-team-photo" src="/toth-karoly.webp" alt="Tóth Károly"/>
+<div class="imp-team-info">
 <span class="role">Import igazgató</span>
 <h3>Tóth Károly</h3>
 <p>Károly irányítja a teljes importfolyamatot, és ő tartja a napi kapcsolatot német partnerünkkel, a Caradvance GmbH-val. Több évtizedes autós tapasztalattal vigyáz arra, hogy minden behozatal gördülékenyen menjen.</p>
 <div class="imp-team-c"><a href="mailto:import@caradvance.de">✉ import@caradvance.de</a><a href="tel:+36302146989">☎ +36 30 214 6989</a></div>
+</div>
 </div>
 <div class="imp-team-note"><b>Mögöttünk a németországi Caradvance GmbH 10 fős csapata 🇩🇪</b><span>Német kollégáink közvetlen hozzáférést biztosítanak a piac teljes kínálatához és a helyi ügyintézéshez — így minden behozatal a forrásnál, helyben indul.</span></div>
 </div>
@@ -183,10 +185,11 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 .imp-step:last-child .n{background:var(--red)}
 .imp-step h3{font-size:16px;font-weight:800;margin:2px 0 6px}
 .imp-step p{color:var(--muted);font-size:14px;line-height:1.55;margin:0}
-.imp-team{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}
+.imp-team{display:flex;flex-direction:column;gap:16px;}
 @media(max-width:820px){.imp-team{grid-template-columns:1fr}}
-.imp-team-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
-.imp-team-photo{width:170px;height:200px;object-fit:cover;object-position:50% 8%;border-radius:16px;display:block;margin:0 0 18px;border:1px solid var(--line);}
+.imp-team-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;gap:24px;align-items:flex-start;}
+.imp-team-photo{width:170px;height:200px;object-fit:cover;object-position:50% 8%;border-radius:16px;display:block;margin:0;border:1px solid var(--line);flex:0 0 auto;}
+.imp-team-info{flex:1;min-width:0;}
 .imp-team-card .role{display:inline-block;background:#fdeaec;color:var(--red);font-weight:800;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
 .imp-team-card h3{font-size:22px;font-weight:800;margin:12px 0 8px}
 .imp-team-card p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 14px}
