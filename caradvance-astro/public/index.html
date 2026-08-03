@@ -334,7 +334,7 @@ html.ca-ok #ca-gate{display:none}
 .cw-item{position:static !important;transform:none !important;width:auto !important;min-width:0 !important;opacity:1 !important;left:auto !important;top:auto !important;margin:0 !important;}
 .cw-item:nth-child(n+4){display:none !important;}
 .cw-arrow{display:none !important;}
-@media(max-width:860px){.cw-track{grid-template-columns:1fr !important;}}
+@media(max-width:860px){.cw-track{display:flex !important;grid-template-columns:none !important;overflow-x:auto !important;scroll-snap-type:x mandatory !important;-webkit-overflow-scrolling:touch !important;gap:14px !important;padding-bottom:6px !important;scrollbar-width:none !important;}.cw-track::-webkit-scrollbar{display:none !important;}.cw-item{flex:0 0 86% !important;scroll-snap-align:center !important;}}
 .cw-item{height:auto !important;display:flex !important;}
 .cw-item>.card,.cw-item a.card{display:flex !important;flex-direction:column !important;width:100% !important;height:100% !important;}
 .card .body{display:flex !important;flex-direction:column !important;flex:1 1 auto !important;}
