@@ -47,6 +47,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to publish."
           else
-            git commit -m "Rebuild site from sheet [skip ci]"
+            git commit -m "Rebuild site from sheet"
             git push
           fi
