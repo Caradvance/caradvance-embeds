@@ -1,0 +1,152 @@
+---
+import Base from '../layouts/Base.astro';
+const lang = 'hu';
+---
+<Base lang={lang} path="/kapcsolat" title="Kapcsolat — CarAdvance" description="Lépj kapcsolatba a CarAdvance csapatával. Válaszd ki a megyédet a térképen, és megmutatjuk, ki a személyes kapcsolattartód. Iroda: 2083 Solymár, Ibolya utca 12.">
+<div class="kap">
+  <div class="kap-head">
+    <h1>Kapcsolat</h1>
+    <p>Válaszd ki a megyédet a térképen — megmutatjuk, ki a kapcsolattartód.</p>
+  </div>
+
+  <div class="kap-hero">
+    <div class="kap-mapwrap">
+      <div class="kap-maptitle">Magyarország — kattints a megyédre</div>
+      <div class="kap-hoverlbl" id="kap-hoverlbl"></div>
+      <svg class="kap-map" id="kap-map" viewBox="10 40 1025 650" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Magyarország megyetérkép"></svg>
+      <div class="kap-legend">
+        <span><span class="kap-dot" style="background:#2563EB"></span>Bajzáth Balázs — nyugati régió</span>
+        <span><span class="kap-dot" style="background:#E2001A"></span>Vadnai Zsombor — keleti régió</span>
+      </div>
+    </div>
+    <div class="kap-panel" id="kap-panel"></div>
+  </div>
+
+  <div class="kap-sec-title">A csapat</div>
+  <p class="kap-sec-sub">Bárkit közvetlenül is elérhetsz.</p>
+  <div class="kap-team" id="kap-team"></div>
+</div>
+
+<style is:global>
+.kap{max-width:1180px;margin:0 auto;padding:40px 20px 64px;color:#141519;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,Arial,sans-serif}
+.kap *{box-sizing:border-box}
+.kap-head{text-align:center;margin-bottom:26px}
+.kap-head h1{font-size:38px;margin:0 0 8px;letter-spacing:-.02em}
+.kap-head p{margin:0;color:#5A6B82;font-size:17px}
+.kap-hero{display:grid;grid-template-columns:1.25fr .95fr;gap:26px;align-items:start;background:#F4F7FB;border:1px solid #E6EAF1;border-radius:22px;padding:22px}
+.kap-mapwrap{position:relative}
+.kap-maptitle{font-weight:700;font-size:15px;margin:2px 4px 10px;color:#5A6B82}
+.kap-map{width:100%;height:auto;display:block}
+.kap-map .county{stroke:#fff;stroke-width:1.1;cursor:pointer;transition:fill .12s}
+.kap-map .county[data-rep="balazs"]{fill:#DCE7FB}
+.kap-map .county[data-rep="zsombor"]{fill:#FBDCDF}
+.kap-map .county[data-rep="balazs"]:hover{fill:#9FBEF5}
+.kap-map .county[data-rep="zsombor"]:hover{fill:#F3A6AD}
+.kap-map .county.sel[data-rep="balazs"]{fill:#2563EB}
+.kap-map .county.sel[data-rep="zsombor"]{fill:#E2001A}
+.kap-map .county.sel{stroke:#fff;stroke-width:1.6}
+.kap-legend{display:flex;gap:18px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.kap-legend span{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#5A6B82;font-weight:600}
+.kap-dot{width:13px;height:13px;border-radius:50%}
+.kap-hoverlbl{position:absolute;top:8px;right:8px;background:#fff;border:1px solid #E6EAF1;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(20,21,25,.08);opacity:0;transition:opacity .12s;pointer-events:none}
+.kap-hoverlbl.on{opacity:1}
+.kap-panel{background:#fff;border:1px solid #E6EAF1;border-radius:18px;padding:22px;min-height:340px;box-shadow:0 10px 30px rgba(20,21,25,.05)}
+.kap-panel .kap-kicker{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5A6B82}
+.kap-avatar{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:26px;flex-shrink:0;overflow:hidden}
+.kap-avatar img{width:100%;height:100%;object-fit:cover}
+.kap-prow{display:flex;gap:16px;align-items:center;margin:14px 0 4px}
+.kap-pname{font-size:22px;font-weight:800;line-height:1.1}
+.kap-prole{font-weight:800;font-size:13px;letter-spacing:.05em;text-transform:uppercase;margin-top:3px}
+.kap-region-badge{display:inline-block;margin:14px 0 6px;font-size:14px;color:#5A6B82}
+.kap-region-badge b{color:#141519}
+.kap-chips{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.kap-chip{display:inline-flex;align-items:center;gap:9px;background:#EEF3F9;border:1px solid #E6EAF1;border-radius:12px;padding:10px 13px;font-size:14.5px;font-weight:600;text-decoration:none;color:#141519;width:fit-content}
+.kap-chip .ic{opacity:.7}
+.kap-langs{margin-top:12px;font-size:20px;letter-spacing:2px}
+.kap-default .mini{display:flex;gap:12px;margin-top:16px}
+.kap-mini{flex:1;background:#EEF3F9;border:1px solid #E6EAF1;border-radius:14px;padding:12px;text-align:center}
+.kap-mini .a{width:44px;height:44px;border-radius:50%;margin:0 auto 8px;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.kap-mini .n{font-weight:800;font-size:14px;color:#141519}
+.kap-mini .r{font-size:12px;color:#5A6B82}
+.kap-sec-title{text-align:center;font-size:26px;font-weight:800;margin:52px 0 6px;letter-spacing:-.01em}
+.kap-sec-sub{text-align:center;color:#5A6B82;margin:0 0 26px}
+.kap-team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.kap-card{background:#fff;border:1px solid #E6EAF1;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(20,21,25,.05);display:flex;flex-direction:column}
+.kap-photo{height:230px;background:linear-gradient(135deg,#eef2f8,#e2e8f2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.kap-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.kap-photo .ph{width:96px;height:96px;border-radius:50%;color:#fff;font-weight:800;font-size:34px;display:flex;align-items:center;justify-content:center}
+.kap-card .body{padding:20px;display:flex;flex-direction:column;flex:1}
+.kap-card .nm{font-size:20px;font-weight:800;text-align:center}
+.kap-card .rl{text-align:center;font-weight:800;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:#E2001A;margin:6px 0 12px}
+.kap-card .bio{color:#5A6B82;text-align:center;font-size:14.5px;line-height:1.5;flex:1}
+.kap-card .cc{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.kap-flags{font-size:16px;margin-left:6px;letter-spacing:1px}
+@media(max-width:900px){.kap-hero{grid-template-columns:1fr}.kap-team{grid-template-columns:1fr}.kap-head h1{font-size:30px}}
+</style>
+
+<script is:inline>
+(function(){
+var COUNTIES = {
+"nograd":"M604,147L611,153L594,164L601,181L593,194L571,199L575,211L566,204L558,224L545,226L545,238L523,252L515,224L466,219L444,196L454,181L442,172L521,165L529,140L544,131L568,142L568,150L584,148L584,156L604,147z",
+"heves":"M538,239L550,272L573,272L582,255L598,254L603,276L616,279L614,272L629,268L657,308L711,258L683,244L663,206L673,198L664,189L670,167L662,149L651,162L643,156L635,163L610,151L594,164L601,181L593,194L571,199L575,211L566,204L558,224L538,239z",
+"jnsz":"M711,258L715,250L723,269L745,276L751,344L726,367L727,383L705,392L706,416L669,421L665,441L652,451L636,443L629,452L615,450L601,440L618,435L615,427L625,418L616,411L623,403L608,373L615,357L599,346L597,322L562,296L567,285L549,282L550,272L573,272L582,255L598,254L603,276L616,279L614,272L630,268L642,295L661,308L711,258z",
+"budapest":"M459,270L442,277L445,316L465,314L473,325L502,302L500,290L459,270z",
+"pest":"M618,394L598,408L583,401L576,413L553,401L540,374L500,397L504,381L492,372L463,393L438,385L441,342L417,314L422,302L408,284L418,257L433,260L432,248L444,246L438,227L418,212L417,190L428,175L453,179L444,196L464,218L515,224L522,252L532,240L541,246L549,282L567,285L563,296L599,326L599,346L615,357L608,373L618,394zM459,270L442,277L445,316L465,314L473,325L502,302L500,290L459,270z",
+"fejer":"M408,277L422,302L417,314L441,342L435,378L449,397L442,431L399,468L387,447L373,458L349,440L334,445L339,355L313,340L311,327L334,298L352,313L370,294L386,296L379,280L408,277z",
+"veszprem":"M331,410L315,406L291,417L286,427L218,453L203,421L190,414L190,400L168,388L189,379L187,339L201,326L185,303L212,303L219,294L229,307L235,297L267,297L275,311L264,326L271,341L280,321L296,315L300,327L315,331L313,340L339,355L341,397L331,410z",
+"tolna":"M337,447L321,459L308,501L313,524L305,530L314,538L313,550L320,556L319,548L333,543L331,531L351,527L365,557L358,571L379,554L391,577L424,594L441,551L431,486L454,467L441,432L401,468L387,447L373,458L349,440L337,447z",
+"ke":"M290,317L293,239L350,243L401,237L421,223L439,228L444,246L432,248L433,260L418,257L408,277L377,281L386,296L370,294L352,313L334,298L311,327L290,317z",
+"gyms":"M185,303L166,311L167,299L150,311L137,300L112,305L108,288L117,279L109,261L76,250L101,232L120,237L124,249L141,241L142,248L174,244L163,211L174,208L176,188L197,178L245,223L291,241L296,281L289,285L289,316L271,341L264,326L275,311L267,297L235,297L229,307L219,294L212,303L185,303z",
+"vas":"M168,384L152,405L132,401L123,412L101,412L81,439L61,443L60,456L58,427L25,421L52,391L84,394L74,388L87,384L78,373L88,366L78,364L72,351L83,334L79,305L137,300L150,311L167,299L166,311L184,304L201,326L187,339L189,379L168,384z",
+"zala":"M134,540L143,551L158,546L158,524L181,520L195,455L218,453L203,421L190,414L190,400L168,388L158,387L152,405L132,401L123,412L101,412L81,439L61,443L61,458L69,461L63,471L83,502L134,540z",
+"somogy":"M237,629L203,628L175,578L148,565L135,544L156,548L158,524L182,520L195,455L229,452L286,427L291,417L328,409L336,448L321,459L308,501L313,524L305,530L315,552L296,550L292,566L278,572L259,568L245,619L260,645L249,649L237,629z",
+"baranya":"M424,638L432,613L413,609L419,594L391,578L379,554L356,570L365,557L351,527L331,531L333,543L319,548L320,556L296,550L290,568L265,572L262,566L247,606L247,630L261,638L249,649L281,666L330,663L367,674L403,636L421,644L424,638z",
+"bk":"M556,578L551,543L584,533L588,515L570,502L586,492L594,498L602,488L596,460L611,441L602,438L618,435L623,403L611,396L598,408L583,401L568,412L540,374L500,397L504,381L492,372L463,393L447,387L441,439L454,467L431,486L441,551L412,605L432,613L423,634L453,634L468,609L475,618L497,620L537,579L556,578z",
+"csongrad":"M664,443L691,451L686,478L694,502L685,530L696,539L713,532L718,570L699,588L679,575L673,585L656,580L642,591L605,578L568,586L548,560L551,543L584,533L588,515L570,502L586,492L594,498L602,488L596,460L609,445L629,452L636,443L649,451L664,443z",
+"bekes":"M740,357L726,367L724,386L705,392L706,416L669,421L662,430L665,441L691,451L688,536L713,532L718,555L763,561L769,548L780,547L784,526L799,518L791,504L797,480L813,477L815,462L827,460L827,432L838,425L850,392L814,406L784,392L792,363L747,347L740,357z",
+"hb":"M911,265L905,249L894,257L881,235L866,249L837,236L824,224L824,192L784,200L768,188L758,197L751,234L719,262L745,276L747,347L792,363L784,392L820,408L865,371L885,313L898,306L896,280L911,265z",
+"szszb":"M905,92L899,109L875,125L808,140L803,172L763,171L759,187L784,200L824,192L824,224L837,236L866,249L881,235L894,257L903,248L914,264L930,232L953,229L955,216L988,219L1020,180L1012,173L1013,154L1008,146L975,150L958,118L940,122L924,86L905,92z",
+"baz":"M622,154L606,147L618,128L641,127L670,67L697,59L716,56L758,74L805,53L829,68L847,102L903,93L899,109L875,125L808,140L801,173L763,171L751,234L726,259L683,244L663,206L673,198L664,189L670,167L665,151L635,163L622,154z"
+};
+var NAME={nograd:"Nógrád",heves:"Heves",jnsz:"Jász-Nagykun-Szolnok",budapest:"Budapest",pest:"Pest",fejer:"Fejér",veszprem:"Veszprém",tolna:"Tolna",ke:"Komárom-Esztergom",gyms:"Győr-Moson-Sopron",vas:"Vas",zala:"Zala",somogy:"Somogy",baranya:"Baranya",bk:"Bács-Kiskun",csongrad:"Csongrád-Csanád",bekes:"Békés",hb:"Hajdú-Bihar",szszb:"Szabolcs-Szatmár-Bereg",baz:"Borsod-Abaúj-Zemplén"};
+var REGION={balazs:["gyms","vas","zala","somogy","veszprem","fejer","ke","tolna","baranya","pest","budapest","nograd"],zsombor:["baz","heves","jnsz","hb","szszb","bk","bekes","csongrad"]};
+var REPS={
+ balazs:{name:"Bajzáth Balázs",role:"Sales Manager",email:"sales@caradvance.hu",phone:"+36 30 094 2081",langs:"🇭🇺 🇬🇧",color:"#2563EB",ini:"BB"},
+ zsombor:{name:"Vadnai Zsombor",role:"Sales Manager",email:"media@caradvance.hu",phone:"+36 30 094 2105",langs:"🇭🇺 🇬🇧",color:"#E2001A",ini:"VZ"}
+};
+function repOf(id){return REGION.balazs.indexOf(id)>=0?"balazs":"zsombor";}
+var svg=document.getElementById('kap-map');
+Object.keys(COUNTIES).forEach(function(id){
+  var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d',COUNTIES[id]);p.setAttribute('class','county');
+  p.setAttribute('data-id',id);p.setAttribute('data-rep',repOf(id));
+  svg.appendChild(p);
+});
+var hl=document.getElementById('kap-hoverlbl');
+svg.addEventListener('mousemove',function(e){if(e.target.classList.contains('county')){hl.textContent=NAME[e.target.getAttribute('data-id')];hl.classList.add('on');}});
+svg.addEventListener('mouseleave',function(){hl.classList.remove('on');});
+svg.addEventListener('click',function(e){if(e.target.classList.contains('county'))select(e.target.getAttribute('data-id'));});
+var panel=document.getElementById('kap-panel');
+function mini(k){var r=REPS[k];return '<div class="kap-mini"><div class="a" style="background:'+r.color+'">'+r.ini+'</div><div class="n">'+r.name+'</div><div class="r">'+r.role+'</div></div>';}
+function renderDefault(){panel.innerHTML='<div class="kap-default"><div class="kap-kicker">Kapcsolattartók</div><p style="font-size:16px;margin:10px 0 0">Kattints a térképen a megyédre, és megmutatjuk, ki a személyes kapcsolattartód.</p><div class="mini">'+mini('balazs')+mini('zsombor')+'</div></div>';}
+function select(id){
+  Array.prototype.forEach.call(svg.querySelectorAll('.county'),function(p){p.classList.toggle('sel',p.getAttribute('data-id')===id);});
+  var r=REPS[repOf(id)];
+  panel.innerHTML='<div class="kap-kicker">A kapcsolattartód</div><div class="kap-prow"><div class="kap-avatar" style="background:'+r.color+'">'+r.ini+'</div><div><div class="kap-pname">'+r.name+'</div><div class="kap-prole" style="color:'+r.color+'">'+r.role+'</div></div></div><div class="kap-region-badge">Az Ön megyéje: <b>'+NAME[id]+'</b></div><div class="kap-chips"><a class="kap-chip" href="mailto:'+r.email+'"><span class="ic">✉</span>'+r.email+'</a><a class="kap-chip" href="tel:'+r.phone.replace(/\s/g,'')+'"><span class="ic">✆</span>'+r.phone+'</a></div><div class="kap-langs">'+r.langs+'</div>';
+}
+renderDefault();
+var TEAM=[
+ {ini:"TK",name:"Tóth Károly",role:"Import igazgató",flags:"🇭🇺 🇩🇪 🇬🇧 🇫🇷",color:"#111827",img:"https://www.caradvance.hu/toth-karoly.webp",bio:"A Caradvance motorja: a német piaci kapcsolatok és a teljes importfolyamat felügyelete tartozik hozzá.",chips:[["✉","import@caradvance.hu","mailto:import@caradvance.hu"],["✆","+36 30 214 6989","tel:+36302146989"],["✉","import@caradvance.de","mailto:import@caradvance.de"],["✆","+49 151 299108377","tel:+49151299108377"]]},
+ {ini:"BB",name:"Bajzáth Balázs",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#2563EB",bio:"Az első hívástól az átadásig ő a kapcsolattartód: ajánlatok, ügyintézés, minden kereskedelmi kérdés.",chips:[["✉","sales@caradvance.hu","mailto:sales@caradvance.hu"],["✆","+36 30 094 2081","tel:+36300942081"]]},
+ {ini:"VZ",name:"Vadnai Zsombor",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#E2001A",bio:"A keleti régió kapcsolattartója, és profi fotókat, videókat készít minden eladásra kerülő autóról.",chips:[["✉","media@caradvance.hu","mailto:media@caradvance.hu"],["✆","+36 30 094 2105","tel:+36300942105"]]},
+ {ini:"CA",name:"A Caradvance iroda",role:"Háttércsapat · Ügyintézés",flags:"",color:"#5A6B82",bio:"Náluk fut össze minden papírmunka: adminisztráció, honosítás, okmányirodai ügyintézés — hogy neked ezzel ne kelljen foglalkoznod.",chips:[["🕘","H–P 9:00–17:00",""],["📍","2083 Solymár, Ibolya utca 12.",""],["✉","info@caradvance.hu","mailto:info@caradvance.hu"],["✆","+36 30 233 6060","tel:+36302336060"]]},
+ {ini:"NM",name:"Némethy Marc",role:"CEO",flags:"",color:"#111827",bio:"A Caradvance Hungary vezetője — ő fogja össze a magyar és a német csapat munkáját, és felel azért, hogy minden ígéretünket be is tartsuk.",chips:[]}
+];
+document.getElementById('kap-team').innerHTML=TEAM.map(function(t){
+  var chips=t.chips.map(function(c){var inner='<span class="ic">'+c[0]+'</span>'+c[1];return c[2]?'<a class="kap-chip" href="'+c[2]+'">'+inner+'</a>':'<span class="kap-chip">'+inner+'</span>';}).join('');
+  var photo=t.img?'<img src="'+t.img+'" alt="'+t.name+'" loading="lazy">':'<div class="ph" style="background:'+t.color+'">'+t.ini+'</div>';
+  return '<div class="kap-card"><div class="kap-photo">'+photo+'</div><div class="body"><div class="nm">'+t.name+(t.flags?'<span class="kap-flags">'+t.flags+'</span>':'')+'</div><div class="rl">'+t.role+'</div><div class="bio">'+t.bio+'</div>'+(chips?'<div class="cc">'+chips+'</div>':'')+'</div></div>';
+}).join('');
+})();
+</script>
+</Base>
