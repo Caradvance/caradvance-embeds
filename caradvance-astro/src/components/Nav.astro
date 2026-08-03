@@ -46,7 +46,7 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
     ))}
   </ul>
   <div class="navright">
-    <a class="kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
+    <a class="kapcsolat" href="/kapcsolat">Kapcsolat</a>
     <div class="lang"><button class="langbtn" type="button" aria-label="Nyelvváltás"><span class="navflag" style={`background-image:url(${flagUrl(lang)})`}></span><span class="lchev"></span></button><div class="langmenu">
       {localeList.map((loc) => (
         <a class="langopt" href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
@@ -61,7 +61,7 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
       {m.items.map((it) => <a href={it.href}>{it.t}</a>)}
     </div></div>
   ))}
-  <a class="m-kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
+  <a class="m-kapcsolat" href="/kapcsolat">Kapcsolat</a>
   <div class="m-langtitle">Nyelv</div>
   <div class="m-langs">
     {localeList.map((loc) => (
