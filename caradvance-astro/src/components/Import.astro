@@ -43,6 +43,11 @@ const faqs = [
 ['Milyen ügyintézés tartozik a behozatalhoz?', 'A teljes folyamat: szállítás, vám- és áfaügyintézés, eredetvizsga, műszaki vizsga, honosítás, okmányiroda, forgalomba helyezés — mindent mi intézünk.'],
 ['Milyen költségekkel kell számolnom?', 'Az autó ára mellett: regisztrációs adó, műszaki vizsga, eredetvizsga, vagyonszerzési illeték, forgalmi/rendszám/törzskönyv, szállítás és ügyintézési díj. A kalkulátorunkban tételesen látod.'],
 ['Kapok garanciát a behozott autóra?', 'Igen — magánszemélyként kötelező 1 éves jótállást adunk, és a biztosítás (KGFB, Casco) megkötésében is segítünk.'],
+['Mennyi ideig tart egy autó behozatala Németországból?', 'A kiválasztott autótól függően általában 1–3 hét: a német piaci keresés és bevizsgálás után elszállítjuk, elvégezzük a honosítást és a magyar forgalomba helyezést.'],
+['Mennyibe kerül a német autó behozatala és honosítása?', 'Az árat előre, tételesen kiszámoljuk: vételár, szállítás, regisztrációs adó, vizsga és a teljes ügyintézés — így pontosan tudod a végösszeget, rejtett költségek nélkül. Kérj német autó behozatal kalkulációt.'],
+['Milyen autókat tudtok behozni Németországból?', 'Szinte bármilyen német használtautót vagy új autót: a teljes német kínálatból keresünk a megadott paramétereid alapján, prémium márkáktól a családi modellekig.'],
+['Ti intézitek a külföldi autó behozatal ügyintézését és a honosítást?', 'Igen, a teljes külföldi autó behozatal ügyintézést átvállaljuk: adásvétel, szállítás, regisztrációs adó, műszaki vizsga és a magyar okmányok — kulcsrakészen kapod az autót.'],
+['Kapok áfás számlát a német vásárlásról?', 'Igen, magánszemélyként is vásárolhatsz 19%-os német áfával a müncheni Caradvance GmbH-tól, és áfás számlát adunk a behozott német használtautóról.'],
 ];
 
 const faqJson = {
@@ -81,13 +86,6 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 <KeresoForm lang={lang} />
 
 <div class="imp-wrap">
-<div class="imp-seo">
-<span class="imp-tag">Jó tudni</span>
-<h2 class="imp-seo-h">Autó rendelés Németországból — a teljes import egy kézből</h2>
-<p>Ha pontosan tudod, milyen autót keresel, nem kell órákat böngészned a német piactereken: bízd ránk az <strong>autó rendelést</strong>. A teljes <span class="kw">autóimport Németországból</span> folyamatát átvállaljuk — kereséstől a leinformáláson és bevizsgáláson át a kulcsrakész átadásig.</p>
-<p>Az <strong>egyedi autó rendelés</strong> nálad azt jelenti, hogy megadod a paramétereket, mi pedig a teljes német kínálatból kikeressük a hozzád illő darabot. Az <span class="kw">autó behozatal Németországból</span> árát előre, tételesen rögzítjük — regisztrációs adó, szállítás, honosítás és ügyintézés, meglepetések nélkül.</p>
-<p>Magánszemélyként akár 19%-os német áfával vásárolhatsz a müncheni Caradvance GmbH-tól, és minden behozott <strong>német használtautó</strong> mögött 1 év jótállás áll. Töltsd ki a rendelési űrlapot, és a többit intézzük.</p>
-</div>
 
 <div class="imp-head"><span class="imp-tag">Csapatunk</span><h2>Ismerd meg, kik intézik a behozatalod</h2><p>Nem egy űrlappal beszélsz, hanem valódi szakemberekkel, akik végigkísérnek a teljes folyamaton — a kiválasztástól a kulcsátadásig.</p></div>
 <div class="imp-team">
@@ -112,9 +110,17 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 <div class="imp-faq">
 {faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}
 </div>
+<div class="imp-seo">
+<span class="imp-tag">Jó tudni</span>
+<h2 class="imp-seo-h">Autó rendelés Németországból — a teljes import egy kézből</h2>
+<p>Ha pontosan tudod, milyen autót keresel, nem kell órákat böngészned a német piactereken: bízd ránk az <strong>autó rendelést</strong>. A teljes <span class="kw">autóimport Németországból</span> folyamatát átvállaljuk — kereséstől a leinformáláson és bevizsgáláson át a kulcsrakész átadásig.</p>
+<p>Az <strong>egyedi autó rendelés</strong> nálad azt jelenti, hogy megadod a paramétereket, mi pedig a teljes német kínálatból kikeressük a hozzád illő darabot. Az <span class="kw">autó behozatal Németországból</span> árát előre, tételesen rögzítjük — regisztrációs adó, szállítás, honosítás és ügyintézés, meglepetések nélkül.</p>
+<p>Magánszemélyként akár 19%-os német áfával vásárolhatsz a müncheni Caradvance GmbH-tól, és minden behozott <strong>német használtautó</strong> mögött 1 év jótállás áll. Töltsd ki a rendelési űrlapot, és a többit intézzük.</p>
+</div>
 </div>
 
 <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify({'@context':'https://schema.org','@type':'Service',name:'Autó rendelés és import Németországból',serviceType:'Autóimport, behozatal és honosítás',areaServed:'HU',provider:{'@type':'Organization',name:'CarAdvance',url:'https://www.caradvance.hu'},description:'Teljes körű autóimport Németországból: keresés, bevizsgálás, szállítás, regisztrációs adó, honosítás és kulcsrakész átadás.'})}></script>
 </section>
 
 <style>
