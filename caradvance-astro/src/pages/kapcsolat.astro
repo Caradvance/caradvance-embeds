@@ -111,8 +111,8 @@ var COUNTIES = {
 var NAME={nograd:"Nógrád",heves:"Heves",jnsz:"Jász-Nagykun-Szolnok",budapest:"Budapest",pest:"Pest",fejer:"Fejér",veszprem:"Veszprém",tolna:"Tolna",ke:"Komárom-Esztergom",gyms:"Győr-Moson-Sopron",vas:"Vas",zala:"Zala",somogy:"Somogy",baranya:"Baranya",bk:"Bács-Kiskun",csongrad:"Csongrád-Csanád",bekes:"Békés",hb:"Hajdú-Bihar",szszb:"Szabolcs-Szatmár-Bereg",baz:"Borsod-Abaúj-Zemplén"};
 var REGION={balazs:["gyms","vas","zala","somogy","veszprem","fejer","ke","tolna","baranya","pest","budapest","nograd"],zsombor:["baz","heves","jnsz","hb","szszb","bk","bekes","csongrad"]};
 var REPS={
- balazs:{name:"Bajzáth Balázs",role:"Sales Manager",email:"sales@caradvance.hu",phone:"+36 30 094 2081",langs:"🇭🇺 🇬🇧",color:"#2563EB",ini:"BB",img:"https://www.caradvance.hu/bajzath-balazs.webp?v=2"},
- zsombor:{name:"Vadnai Zsombor",role:"Sales Manager",email:"media@caradvance.hu",phone:"+36 30 094 2105",langs:"🇭🇺 🇬🇧",color:"#E2001A",ini:"VZ",img:"https://www.caradvance.hu/vadnai-zsombor.webp?v=2"}
+ balazs:{name:"Bajzáth Balázs",role:"Sales Manager",email:"sales@caradvance.hu",phone:"+36 30 094 2081",langs:"🇭🇺 🇬🇧",color:"#2563EB",ini:"BB",img:"https://www.caradvance.hu/bajzath-balazs.webp?v=3"},
+ zsombor:{name:"Vadnai Zsombor",role:"Sales Manager",email:"media@caradvance.hu",phone:"+36 30 094 2105",langs:"🇭🇺 🇬🇧",color:"#E2001A",ini:"VZ",img:"https://www.caradvance.hu/vadnai-zsombor.webp?v=3"}
 };
 function repOf(id){return REGION.balazs.indexOf(id)>=0?"balazs":"zsombor";}
 var svg=document.getElementById('kap-map');
@@ -137,8 +137,8 @@ function select(id){
 renderDefault();
 var TEAM=[
  {ini:"TK",name:"Tóth Károly",role:"Import igazgató",flags:"🇭🇺 🇩🇪 🇬🇧 🇫🇷",color:"#111827",img:"https://www.caradvance.hu/toth-karoly.webp",bio:"A Caradvance motorja: a német piaci kapcsolatok és a teljes importfolyamat felügyelete tartozik hozzá.",chips:[["✉","import@caradvance.hu","mailto:import@caradvance.hu"],["✆","+36 30 214 6989","tel:+36302146989"],["✉","import@caradvance.de","mailto:import@caradvance.de"],["✆","+49 151 299108377","tel:+49151299108377"]]},
- {ini:"BB",name:"Bajzáth Balázs",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#2563EB",img:"https://www.caradvance.hu/bajzath-balazs.webp?v=2",bio:"Az első hívástól az átadásig ő a kapcsolattartód: ajánlatok, ügyintézés, minden kereskedelmi kérdés.",chips:[["✉","sales@caradvance.hu","mailto:sales@caradvance.hu"],["✆","+36 30 094 2081","tel:+36300942081"]]},
- {ini:"VZ",name:"Vadnai Zsombor",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#E2001A",img:"https://www.caradvance.hu/vadnai-zsombor.webp?v=2",bio:"A keleti régió kapcsolattartója, és profi fotókat, videókat készít minden eladásra kerülő autóról.",chips:[["✉","media@caradvance.hu","mailto:media@caradvance.hu"],["✆","+36 30 094 2105","tel:+36300942105"]]},
+ {ini:"BB",name:"Bajzáth Balázs",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#2563EB",img:"https://www.caradvance.hu/bajzath-balazs.webp?v=3",bio:"Az első hívástól az átadásig ő a kapcsolattartód: ajánlatok, ügyintézés, minden kereskedelmi kérdés.",chips:[["✉","sales@caradvance.hu","mailto:sales@caradvance.hu"],["✆","+36 30 094 2081","tel:+36300942081"]]},
+ {ini:"VZ",name:"Vadnai Zsombor",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#E2001A",img:"https://www.caradvance.hu/vadnai-zsombor.webp?v=3",bio:"A keleti régió kapcsolattartója, és profi fotókat, videókat készít minden eladásra kerülő autóról.",chips:[["✉","media@caradvance.hu","mailto:media@caradvance.hu"],["✆","+36 30 094 2105","tel:+36300942105"]]},
  {ini:"CA",name:"A Caradvance iroda",role:"Háttércsapat · Ügyintézés",flags:"",color:"#5A6B82",img:"https://www.caradvance.hu/caradvance-iroda.webp",bio:"Náluk fut össze minden papírmunka: adminisztráció, honosítás, okmányirodai ügyintézés — hogy neked ezzel ne kelljen foglalkoznod.",chips:[["🕘","H–P 9:00–17:00",""],["📍","2083 Solymár, Ibolya utca 12.",""],["✉","info@caradvance.hu","mailto:info@caradvance.hu"],["✆","+36 30 233 6060","tel:+36302336060"]]},
  {ini:"NM",name:"Némethy Marc",role:"CEO",flags:"",color:"#111827",img:"https://www.caradvance.hu/nemethy-marc.webp",bio:"A Caradvance Hungary vezetője — ő fogja össze a magyar és a német csapat munkáját, és felel azért, hogy minden ígéretünket be is tartsuk.",chips:[]}
 ];
