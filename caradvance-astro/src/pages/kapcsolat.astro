@@ -9,6 +9,8 @@ const lang = 'hu';
     <p>Válaszd ki a megyédet a térképen — megmutatjuk, ki a kapcsolattartód.</p>
   </div>
 
+  <div class="kap-office" id="kap-office"></div>
+
   <div class="kap-hero">
     <div class="kap-mapwrap">
       <div class="kap-maptitle">Magyarország — kattints a megyédre</div>
@@ -24,7 +26,7 @@ const lang = 'hu';
 
   <div class="kap-sec-title">A csapat</div>
   <p class="kap-sec-sub">Bárkit közvetlenül is elérhetsz.</p>
-  <div class="kap-team" id="kap-team"></div>
+  <div class="kap-team-scroll"><div class="kap-team" id="kap-team"></div></div>
 </div>
 
 <style is:inline>
@@ -70,8 +72,18 @@ const lang = 'hu';
 .kap-mini .r{font-size:12px;color:#5A6B82}
 .kap-sec-title{text-align:center;font-size:26px;font-weight:800;margin:52px 0 6px;letter-spacing:-.01em}
 .kap-sec-sub{text-align:center;color:#5A6B82;margin:0 0 26px}
-.kap-team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.kap-card{background:#fff;border:1px solid #E6EAF1;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(20,21,25,.05);display:flex;flex-direction:column}
+.kap-office{display:grid;grid-template-columns:300px 1fr;background:#fff;border:1px solid #E6EAF1;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(20,21,25,.05);margin:0 0 34px}
+.kap-office-photo{background:linear-gradient(135deg,#eef2f8,#e2e8f2);overflow:hidden;min-height:230px}
+.kap-office-photo img{width:100%;height:100%;object-fit:cover}
+.kap-office-body{padding:26px 30px}
+.kap-office-name{font-size:22px;font-weight:800}
+.kap-office-role{font-weight:800;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:#E2001A;margin:6px 0 12px}
+.kap-office-bio{color:#5A6B82;font-size:15px;line-height:1.55;margin:0 0 16px}
+.kap-office-chips{display:flex;flex-wrap:wrap;gap:8px}
+.kap-team-scroll{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -20px;padding:4px 20px 12px}
+.kap-team-scroll::-webkit-scrollbar{display:none}
+.kap-team{display:flex;gap:20px;width:max-content}
+.kap-card{flex:0 0 300px;scroll-snap-align:start;background:#fff;border:1px solid #E6EAF1;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(20,21,25,.05);display:flex;flex-direction:column}
 .kap-photo{aspect-ratio:4/5;background:linear-gradient(135deg,#eef2f8,#e2e8f2);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .kap-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
 .kap-photo .ph{width:96px;height:96px;border-radius:50%;color:#fff;font-weight:800;font-size:34px;display:flex;align-items:center;justify-content:center}
@@ -81,7 +93,7 @@ const lang = 'hu';
 .kap-card .bio{color:#5A6B82;text-align:center;font-size:14.5px;line-height:1.5;flex:1}
 .kap-card .cc{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
 .kap-flags{font-size:16px;margin-left:6px;letter-spacing:1px}
-@media(max-width:900px){.kap-hero{grid-template-columns:1fr}.kap-team{grid-template-columns:1fr}.kap-head h1{font-size:30px}}
+@media(max-width:900px){.kap-hero{grid-template-columns:1fr}.kap-office{grid-template-columns:1fr}.kap-head h1{font-size:30px}}
 </style>
 
 <script is:inline>
@@ -138,10 +150,10 @@ renderDefault();
 var TEAM=[
  {ini:"TK",name:"Tóth Károly",role:"Import igazgató",flags:"🇭🇺 🇩🇪 🇬🇧 🇫🇷",color:"#111827",img:"https://www.caradvance.hu/toth-karoly.webp",bio:"A Caradvance motorja: a német piaci kapcsolatok és a teljes importfolyamat felügyelete tartozik hozzá.",chips:[["✉","import@caradvance.hu","mailto:import@caradvance.hu"],["✆","+36 30 214 6989","tel:+36302146989"],["✉","import@caradvance.de","mailto:import@caradvance.de"],["✆","+49 151 299108377","tel:+49151299108377"]]},
  {ini:"BB",name:"Bajzáth Balázs",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#2563EB",img:"https://www.caradvance.hu/bajzath-balazs.webp?v=4",bio:"Az első hívástól az átadásig ő a kapcsolattartód: ajánlatok, ügyintézés, minden kereskedelmi kérdés.",chips:[["✉","sales@caradvance.hu","mailto:sales@caradvance.hu"],["✆","+36 30 094 2081","tel:+36300942081"]]},
- {ini:"VZ",name:"Vadnai Zsombor",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#E2001A",img:"https://www.caradvance.hu/vadnai-zsombor.webp?v=4",bio:"A keleti régió kapcsolattartója, és profi fotókat, videókat készít minden eladásra kerülő autóról.",chips:[["✉","media@caradvance.hu","mailto:media@caradvance.hu"],["✆","+36 30 094 2105","tel:+36300942105"]]},
- {ini:"CA",name:"A Caradvance iroda",role:"Háttércsapat · Ügyintézés",flags:"",color:"#5A6B82",img:"https://www.caradvance.hu/caradvance-iroda.webp?v=4",bio:"Náluk fut össze minden papírmunka: adminisztráció, honosítás, okmányirodai ügyintézés — hogy neked ezzel ne kelljen foglalkoznod.",chips:[["🕘","H–P 9:00–17:00",""],["📍","2083 Solymár, Ibolya utca 12.",""],["✉","info@caradvance.hu","mailto:info@caradvance.hu"],["✆","+36 30 233 6060","tel:+36302336060"]]},
- {ini:"NM",name:"Némethy Marc",role:"CEO",flags:"",color:"#111827",img:"https://www.caradvance.hu/nemethy-marc.webp?v=4",bio:"A Caradvance Hungary vezetője — ő fogja össze a magyar és a német csapat munkáját, és felel azért, hogy minden ígéretünket be is tartsuk.",chips:[]}
+ {ini:"VZ",name:"Vadnai Zsombor",role:"Sales Manager",flags:"🇭🇺 🇬🇧",color:"#E2001A",img:"https://www.caradvance.hu/vadnai-zsombor.webp?v=4",bio:"A keleti régió kapcsolattartója, és profi fotókat, videókat készít minden eladásra kerülő autóról.",chips:[["✉","media@caradvance.hu","mailto:media@caradvance.hu"],["✆","+36 30 094 2105","tel:+36300942105"]]}, {ini:"NM",name:"Némethy Marc",role:"CEO",flags:"",color:"#111827",img:"https://www.caradvance.hu/nemethy-marc.webp?v=4",bio:"A Caradvance Hungary vezetője — ő fogja össze a magyar és a német csapat munkáját, és felel azért, hogy minden ígéretünket be is tartsuk.",chips:[]}
 ];
+var OFFICE={img:"https://www.caradvance.hu/caradvance-iroda.webp?v=4",name:"A Caradvance iroda",role:"Háttércsapat · Ügyintézés",bio:"Náluk fut össze minden papírmunka: adminisztráció, honosítás, okmányirodai ügyintézés — hogy neked ezzel ne kelljen foglalkoznod.",chips:[["🕘","H–P 9:00–17:00",""],["📍","2083 Solymár, Ibolya utca 12.",""],["✉","info@caradvance.hu","mailto:info@caradvance.hu"],["✆","+36 30 233 6060","tel:+36302336060"]]};
+(function(o){var ch=o.chips.map(function(c){var inner='<span class="ic">'+c[0]+'</span>'+c[1];return c[2]?'<a class="kap-chip" href="'+c[2]+'">'+inner+'</a>':'<span class="kap-chip">'+inner+'</span>';}).join('');document.getElementById('kap-office').innerHTML='<div class="kap-office-photo"><img src="'+o.img+'" alt="'+o.name+'"></div><div class="kap-office-body"><div class="kap-office-name">'+o.name+'</div><div class="kap-office-role">'+o.role+'</div><p class="kap-office-bio">'+o.bio+'</p><div class="kap-office-chips">'+ch+'</div></div>';})(OFFICE);
 document.getElementById('kap-team').innerHTML=TEAM.map(function(t){
   var chips=t.chips.map(function(c){var inner='<span class="ic">'+c[0]+'</span>'+c[1];return c[2]?'<a class="kap-chip" href="'+c[2]+'">'+inner+'</a>':'<span class="kap-chip">'+inner+'</span>';}).join('');
   var photo=t.img?'<img src="'+t.img+'" alt="'+t.name+'" loading="lazy">':'<div class="ph" style="background:'+t.color+'">'+t.ini+'</div>';
