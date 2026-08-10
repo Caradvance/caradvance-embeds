@@ -5,7 +5,7 @@ const { lang } = Astro.props as { lang: Locale };
 
 const compare = [
 ['Keresés a német piacon', 'Órák böngészése, nyelvi akadály, megbízható szűrés nélkül', 'A teljes piacot átnézzük helyetted'],
-['Az autó leinformálása', 'Rejtett kár vagy tekert km-óra kockázata', 'Nemzetközi adatbázisból ellenőrizzük'],
+['Az autó leinformálása', 'Rejtett kár vagy tekert km-óra kockázata', 'Nemzetközi adatbázisból ellenőrizzük¹'],
 ['Helyszíni bevizsgálás', 'Utazol Németországba, vagy látatlanban veszel', 'Szakértőnk a helyszínen átvizsgálja'],
 ['Tárgyalás, kommunikáció', 'Németül kell alkudnod, hátrányból', 'Helyetted tárgyalunk, anyanyelvi szinten'],
 ['Szállítás', 'Magadnak intézed, sokszor biztosítás nélkül', 'Profi speditőr, magas értékű biztosítással'],
@@ -96,6 +96,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <div class="wrap ev-stats">
 {stats.map(([n, l]) => (<div class="ev-stat"><b>{n}</b><span>{l}</span></div>))}
 </div>
+<p class="ev-note">¹ Fontos megjegyezni, hogy nem minden autó szerepel a nemzetközi adatbázisban, így a leinformálás néhány esetben korlátozott lehet.</p>
 </section>
 
 <section class="section" style="padding-top:8px">
@@ -165,6 +166,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 .ev-stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 18px;text-align:center}
 .ev-stat b{display:block;font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--red)}
 .ev-stat span{display:block;margin-top:4px;color:var(--muted);font-size:13px;font-weight:600}
+.ev-note{max-width:1080px;margin:16px auto 0;padding:0 20px;color:var(--muted);font-size:12.5px;line-height:1.5}
 
 .ev-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .ev-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
