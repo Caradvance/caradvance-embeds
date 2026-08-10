@@ -7,8 +7,8 @@ const IMG = 'https://www.caradvance.hu/';
 const benefits = [
 { t: '14× nagyobb választék', img: IMG + 'hatalmas-valasztek-vs.webp',
 d: 'Minek beérni a maradékkal? A német mobile.de-n most 1 521 554 autó közül válogathatsz — több mint tizennégyszer annyi, mint a magyar használtautó.hu 105 254 hirdetése. Nálunk a teljes német kínálat a tiéd: pontosan azt a márkát, felszereltséget, színt és árat találjuk meg, amit megálmodtál — nem csak azt, ami épp itthon elérhető. Ritka felszereltség, különleges szín vagy nehezen fellelhető modell? A hatalmas kínálatból szinte biztosan megtaláljuk a megfelelőt.' },
-{ t: 'Jobb állapotú autók', img: IMG + 'piros-bmw-x6-m-premium-autoberles.webp',
-d: 'A német autók jellemzően kevésbé koptatottak és gondozottabbak, mint az azonos korú hazai darabok. Rendszeres gondoskodás, minőségi üzemanyag és alkatrészek — az eredmény egy megbízhatóbb, hosszabb élettartamú autó, ugyanazért a pénzért.' },
+{ t: 'Ápolt, jobb állapotú autók', img: IMG + 'jobb-allapotu-autok-vs.webp',
+d: 'A német tulajdonosok igényesen bánnak az autóikkal: rendszeres szerviz, minőségi üzemanyag és gondos használat. Ugyanaz a modell, ugyanannyi év — mégis ápoltabb, feszesebb és kevésbé elhasznált, mint a hazai átlag. A behozott autó így megbízhatóbb és tovább szolgál, miközben ugyanannyiért, sokszor kevesebbért a tiéd lehet. Kevesebb rejtett hiba, kevesebb utólagos költség, több nyugodt kilométer.' },
 { t: 'Jobb utak, kevesebb kopás', img: IMG + 'kivalo-uthalozat-vs.webp',
 d: 'Németország úthálózata Európa egyik legjobbja: sima aszfalt, alig kátyú, kevés téli só. Az itt futott autók futóműve, gumija és karosszériája sokkal kevesebbet szenvedett — kevesebb a rejtett kopás és a korrózió. A magyar utak kátyúi és sózott telei ezzel szemben olyan károkat okoznak, amelyek gyakran csak évekkel később ütnek vissza. Egy németországi autó ezért nem csak papíron, hanem a valóságban is jobb állapotban van — és tovább szolgál.' },
 { t: 'Rendszeres karbantartás', img: IMG + 'bmw-m3-touring-premium-auto-eladas.webp',
@@ -120,7 +120,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 .el{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
 .el-wrap{max-width:1080px;margin:0 auto;padding:0 20px}
 .zz{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;padding:34px 0}
-.zz:first-child,.zz:nth-child(3){align-items:start}
+.zz:first-child,.zz:nth-child(2),.zz:nth-child(3){align-items:start}
 .zz + .zz{border-top:1px solid var(--line)}
 .zz.flip .zz-media{order:2}
 .zz-media{border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(8,8,10,.12);background:linear-gradient(135deg,#1a1d23,#3a3f4a);aspect-ratio:16/10}
