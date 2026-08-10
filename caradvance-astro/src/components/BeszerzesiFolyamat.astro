@@ -5,12 +5,12 @@ const { lang } = Astro.props as { lang: Locale };
 
 const steps = [
 ['Kutatás és kiválasztás', 'Pontosan azt az autót keressük meg, amit szeretnél — akár egy konkrét márka, típus és felszereltség lebeg a szemed előtt, akár egyelőre csak az irány van meg, mi eligazodunk helyetted a hatalmas német használtautó-piacon. Végigpásztázzuk a kereskedői és magánhirdetéseket, hogy megtaláljuk a hozzád illő, megbízható autót valós piaci áron — feleslegesen felturbózott, sérült vagy futásteljesítmény-csavart példányok nélkül. Ha már tudod, milyen autót szeretnél Németországból behozatni, ne várj tovább: töltsd ki az Autó rendelés űrlapunkat, és mi azonnal elindítjuk érted a keresést és a teljes autóimport-folyamatot.'],
-['Leinformálás', 'Nemzetközi adatbázisokból ellenőrzünk minden részletet — kártörténet, valós futásteljesítmény, előélet —, hogy biztosan tiszta múltú, megbízható autót vegyél.¹'],
-['Helyszíni bevizsgálás', 'Szakértő kollégánk személyesen, a helyszínen nézi át a kiszemelt autót, és minden lényeges részletről egyeztet veled, mielőtt döntenél.²'],
+['Leinformálás', 'Nemzetközi adatbázisokból ellenőrzünk minden részletet — kártörténet, valós futásteljesítmény, előélet —, hogy biztosan tiszta múltú, megbízható autót vegyél.'],
+['Helyszíni bevizsgálás', 'Szakértő kollégánk személyesen, a helyszínen nézi át a kiszemelt autót, és minden lényeges részletről egyeztet veled, mielőtt döntenél.'],
 ['Ártárgyalás', 'Anyanyelvi szinten, a piac ismeretében tárgyalunk helyetted az eladóval — így a legjobb áron és feltételekkel köthetjük meg az üzletet.'],
-['Logisztika és szállítás', 'Profi szállítópartnerünkkel és magas értékű biztosítással hozzuk haza az autót — biztonságban, egészen az ajtódig.³'],
+['Logisztika és szállítás', 'Profi szállítópartnerünkkel és magas értékű biztosítással hozzuk haza az autót — biztonságban, egészen az ajtódig.'],
 ['Honosítás és vizsgáztatás', 'A teljes hivatalos ügyintézést átvállaljuk: vám- és áfaügyintézés, eredetvizsga, műszaki vizsga, okmányiroda, honosítás — gyorsan és gördülékenyen.'],
-['Biztosítás és garancia', 'KGFB, Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, és 1 év jótállást vállalunk, hogy nyugodt szívvel ülj a volán mögé.⁴'],
+['Biztosítás és garancia', 'KGFB, Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, és 1 év jótállást vállalunk, hogy nyugodt szívvel ülj a volán mögé.'],
 ['Kulcsrakész átadás', 'Kulcsrakészen, minden papírral és a nevedre írt forgalmival adjuk át — onnantól már csak vezetned kell.'],
 ];
 function randomGap() {
@@ -121,11 +121,10 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 {includes.map((x) => (<div class="pf-inclitem"><span class="pf-check">✓</span><span>{x}</span></div>))}
 </div>
 <div class="pf-time">
-<div><b>5–14 nap⁵</b><span>a kiválasztástól a kulcsrakész átadásig</span></div>
-<div><b>1 év⁴</b><span>jótállás minden behozott autóra</span></div>
+<div><b>5–14 nap</b><span>a kiválasztástól a kulcsrakész átadásig</span></div>
+<div><b>1 év</b><span>jótállás minden behozott autóra</span></div>
 <div><b>0 utazás</b><span>neked — mindent mi intézünk helyben</span></div>
 </div>
-<p class="pf-note">¹ Fontos megjegyezni, hogy nem minden autó szerepel a nemzetközi adatbázisban, így a leinformálás néhány esetben korlátozott lehet.<br />² Bizonyos esetekben a helyszíni bevizsgálás különböző okokból nem lehetséges; ilyenkor az átvizsgálás a szállítást követően, itthon, Magyarországon történik meg.<br />³ Egyes esetekben az autót saját lábán, közúton hozzuk Magyarországra, hogy magunk is teszteljük, és menet közben kiszűrjük az esetleges hibákat.<br />⁴ A jótállás nem terjed ki azokra az autókra, amelyek megvásárlását nem javasoljuk — jellemzően a 8 évnél idősebb vagy 150 000 km-nél többet futott járművekre; ezekért felelősséget nem vállalunk.<br />⁵ Mindent megteszünk, hogy a lehető leggyorsabban átadjuk az autót, azonban a kereskedő, a szállítás vagy a hivatalos ügyintézés miatt egyes esetekben a folyamat a tervezettnél tovább tarthat.</p>
 </div>
 </section>
 
@@ -189,7 +188,6 @@ a.pf-cta:hover{opacity:.9}
 .pf-time>div{background:#0B0B0D;color:#fff;border-radius:16px;padding:20px;text-align:center}
 .pf-time b{display:block;font-size:26px;font-weight:800;color:#fff}
 .pf-time span{color:#9aa7b8;font-size:13.5px}
-.pf-note{max-width:900px;margin:16px auto 0;padding:0 20px;color:var(--muted);font-size:12.5px;line-height:1.5}
 .pf-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .pf-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
 .pf-cta p{color:#cfd6e2;margin:0;font-size:15px;max-width:560px}
