@@ -6,7 +6,7 @@ const { lang } = Astro.props as { lang: Locale };
 const compare = [
 ['Keresés a német piacon', 'Órák böngészése, nyelvi akadály, megbízható szűrés nélkül', 'A teljes piacot átnézzük helyetted'],
 ['Az autó leinformálása', 'Rejtett kár vagy tekert km-óra kockázata', 'Nemzetközi adatbázisból ellenőrizzük¹'],
-['Helyszíni bevizsgálás', 'Utazol Németországba, vagy látatlanban veszel', 'Szakértőnk a helyszínen átvizsgálja'],
+['Helyszíni bevizsgálás', 'Utazol Németországba, vagy látatlanban veszel', 'Szakértőnk a helyszínen átvizsgálja²'],
 ['Tárgyalás, kommunikáció', 'Németül kell alkudnod, hátrányból', 'Helyetted tárgyalunk, anyanyelvi szinten'],
 ['Szállítás', 'Magadnak intézed, sokszor biztosítás nélkül', 'Profi speditőr, magas értékű biztosítással'],
 ['Honosítás és ügyintézés', 'Eredetvizsga, vizsga, okmányiroda — sorban állás, buktatók', 'A teljes hivatalos ügyintézést átvállaljuk'],
@@ -96,7 +96,7 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <div class="wrap ev-stats">
 {stats.map(([n, l]) => (<div class="ev-stat"><b>{n}</b><span>{l}</span></div>))}
 </div>
-<p class="ev-note">¹ Fontos megjegyezni, hogy nem minden autó szerepel a nemzetközi adatbázisban, így a leinformálás néhány esetben korlátozott lehet.</p>
+<p class="ev-note">¹ Fontos megjegyezni, hogy nem minden autó szerepel a nemzetközi adatbázisban, így a leinformálás néhány esetben korlátozott lehet.<br />² Bizonyos esetekben a helyszíni bevizsgálás különböző okokból nem lehetséges; ilyenkor az átvizsgálás a szállítást követően, itthon, Magyarországon történik meg.</p>
 </section>
 
 <section class="section" style="padding-top:8px">
