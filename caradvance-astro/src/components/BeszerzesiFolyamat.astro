@@ -7,14 +7,14 @@ const steps = [
 ['Kutatás', 'Nálunk nincs időnyomás: annyi időt szánsz a keresésre és a döntésre, amennyi csak jólesik. Nézelődj nyugodtan a hatalmas német használtautó-piacon, hasonlítsd össze a márkákat, típusokat és felszereltségeket, és formáld meg magadban, pontosan milyen autóra vágysz — akár egy konkrét modell van a fejedben, akár egyelőre csak egy irány. Nincs siettetés, nincs nyomás: akkor lépsz tovább, amikor te készen állsz rá.'],
 ['Kiválasztás', 'Amikor megvan a kiszemelt autó — vagy legalább körvonalazódott, mit szeretnél —, itt az idő, hogy elindítsd a keresést. Nyisd meg az Autó kereső űrlapunkat, és add meg benne a márkát, típust, évjáratot, futásteljesítményt és minden fontos részletet, ami számít neked. Amint elküldted, megkapjuk a kérésedet, és onnantól mi visszük tovább a folyamatot.'],
 ['Ajánlatok', 'Végigpásztázzuk a partnerplatformjainkat — mobile.de és társai —, illetve az aktuális egyedi ajánlatainkat, és összeállítunk neked 5 találatot: a legolcsóbbat, egy átlagáras opciót és 3 továbbit, ami leginkább illik a kéréseidhez. A listát emailben küldjük, ahonnan az oldalunkon választhatsz 1-2 autót — vagy jelzed, ha egyik sem az igazi, és küldünk 5 újat.'],
-['Ellenőrzés', 'Kapcsolatba lépünk az eladóval, és bekérünk minden szükséges információt, hogy leellenőrizzük az autó előéletét — a szervizkönyvét és esetleges sérüléseit.'],
+['Ellenőrzés', 'Kapcsolatba lépünk az eladóval, és bekérünk minden szükséges információt, hogy leellenőrizzük az autó előéletét — a szervizkönyvét és esetleges sérüléseit.¹'],
 ['Ártárgyalás', 'Sok esetben a hirdetett ár már fix, és nincs mozgástér — de ahol van rá esély, ott anyanyelvi szinten, a piac ismeretében megpróbáljuk a legjobb árat és feltételeket kialkudni az eladóval.'],
 ['Árajánlat', 'Elkészítjük a végleges, tételes árajánlatot: az autó ára, regisztrációs adó, műszaki vizsga, eredetvizsga, vagyonszerzési illeték, forgalmi, rendszám és törzskönyv, valamint a szállítási és ügyintézési költség — minden tétel forintban, előre rögzítve, rejtett költségek nélkül.'],
 ['Szerződés és előleg', 'Elküldjük a szerződést, valamint a bankszámlaadatokat — attól függően, hogy a német vagy a magyar Caradvance céggel bonyolítod le a vásárlást. Ezt követően a vételár 30%-ának előlegét kérjük, a szerződésmintát pedig aláírás előtt előre megtekintheted.'],
-['Logisztika és szállítás', 'Megvásároljuk az autót a kereskedőtől, elintézzük a szükséges dokumentációt, majd profi szállítópartnerünkkel és magas értékű biztosítással hazahozzuk Magyarországra — biztonságban, egészen az ajtódig.'],
+['Logisztika és szállítás', 'Megvásároljuk az autót a kereskedőtől, elintézzük a szükséges dokumentációt, majd profi szállítópartnerünkkel és magas értékű biztosítással hazahozzuk Magyarországra — biztonságban, egészen az ajtódig.²'],
 ['Megtekintés és egyenleg', 'Amikor az autó megérkezett, ha szeretnéd, nyugodtan megnézheted és leellenőrizheted mindenben — csak ezután kerül sor a vételár fennmaradó 70%-ának rendezésére, a végleges átadás pedig ezt követően történik.'],
 ['Honosítás és vizsgáztatás', 'A teljes hivatalos ügyintézést átvállaljuk: vám- és áfaügyintézés, eredetvizsga, műszaki vizsga, okmányiroda, honosítás — gyorsan és gördülékenyen.'],
-['Biztosítás és garancia', 'Kötelező gépjármű-felelősségbiztosítás (KGFB), Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, hogy nyugodt szívvel ülj a volán mögé.'],
+['Biztosítás és garancia', 'Kötelező gépjármű-felelősségbiztosítás (KGFB), Casco és használtautó-garancia — összeállítjuk a megfelelő védelmet, hogy nyugodt szívvel ülj a volán mögé.³'],
 ['Kulcsrakész átadás', 'Kulcsrakészen, minden papírral és a nevedre írt forgalmival adjuk át — onnantól már csak vezetned kell.'],
 ];
 const faqs = [
@@ -96,12 +96,13 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 ))}
 </div>
 <div class="pf-time">
-<div class="pf-time-n">10–21 nap</div>
+<div class="pf-time-n">10–21 nap⁴</div>
 <div class="pf-b pf-time-b">
 <h3>Kiválasztástól a kulcsrakész átadásig</h3>
 <p>Ez az általános időtartam, de sok tényezőtől függ: mennyire rugalmas a kereskedő, akitől az autót vesszük, a papírmunka és a jogi ügyintézés, maga a logisztika, valamint hogy a magyarországi hivatali ügyintézés mennyire gyorsan halad. A folyamat minden lépéséről tájékoztatunk.</p>
 </div>
 </div>
+<p class="pf-note">¹ Fontos megjegyezni, hogy nem minden autó szerepel a nemzetközi adatbázisban, így a leinformálás néhány esetben korlátozott lehet.<br />² Egyes esetekben az autót saját lábán, közúton hozzuk Magyarországra, hogy magunk is teszteljük, és menet közben kiszűrjük az esetleges hibákat.<br />³ A jótállás nem terjed ki azokra az autókra, amelyek megvásárlását nem javasoljuk — jellemzően a 8 évnél idősebb vagy 150 000 km-nél többet futott járművekre; ezekért felelősséget nem vállalunk.<br />⁴ Mindent megteszünk, hogy a lehető leggyorsabban átadjuk az autót, azonban a kereskedő, a szállítás vagy a hivatalos ügyintézés miatt egyes esetekben a folyamat a tervezettnél tovább tarthat.</p>
 </div>
 </section>
 
@@ -167,6 +168,7 @@ a.pf-cta:hover{opacity:.9}
 .pf-time{display:flex;gap:20px;margin-top:16px;align-items:stretch}
 .pf-time-n{flex:0 0 auto;width:200px;background:var(--red);color:#fff;border-radius:20px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:26px;font-weight:800;padding:20px;line-height:1.25}
 .pf-time-b{display:flex;flex-direction:column;justify-content:center}
+.pf-note{max-width:900px;margin:16px auto 0;padding:0 20px;color:var(--muted);font-size:12.5px;line-height:1.5}
 @media(max-width:640px){.pf-time{flex-direction:column}.pf-time-n{width:auto}}
 .pf-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .pf-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
