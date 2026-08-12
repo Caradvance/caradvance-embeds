@@ -91,12 +91,13 @@ const _rebuild='rebuild-nudge-2';
   var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
 
   var MINIS = [
-    {brand:'MINI',key:'cooper',name:'MINI Cooper',body:'Ferdehátú',fuel:'Benzin',img:'/cooper.webp?v=1',logo:'mini'},
-    {brand:'MINI',key:'coopers',name:'MINI Cooper S',body:'Ferdehátú',fuel:'Benzin',img:'/cooper-s.webp?v=1',logo:'mini'},
-    {brand:'MINI',key:'coopercab',name:'MINI Cooper Cabrio',body:'Kabrió',fuel:'Benzin',img:'/cooper-cabrio.webp?v=1',logo:'mini'},
-    {brand:'MINI',key:'countryman',name:'MINI Countryman',body:'SUV',fuel:'Benzin',img:'/countryman.webp?v=1',logo:'mini'},
-    {brand:'MINI',key:'jcwcabrio',name:'MINI John Cooper Works Cabrio',body:'Kabrió',fuel:'Benzin',img:'/jcw-cabrio.webp?v=1',logo:'jcw'},
-    {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=1',logo:'jcw'}
+    {brand:'MINI',key:'cooper',name:'MINI Cooper',body:'Ferdehátú',fuel:'Benzin',img:'/cooper.webp?v=2',logo:'mini'},
+    {brand:'MINI',key:'coopers',name:'MINI Cooper S',body:'Ferdehátú',fuel:'Benzin',img:'/cooper-s.webp?v=2',logo:'mini'},
+    {brand:'MINI',key:'coopercab',name:'MINI Cooper Cabrio',body:'Kabrió',fuel:'Benzin',img:'/cooper-cabrio.webp?v=2',logo:'mini'},
+    {brand:'MINI',key:'countryman',name:'MINI Countryman',body:'SUV',fuel:'Benzin',img:'/countryman.webp?v=2',logo:'mini'},
+    {brand:'MINI',key:'jcwhatch',name:'MINI John Cooper Works',body:'Ferdehátú',fuel:'Benzin',img:'/jcw-hatch.webp?v=2',logo:'jcw'},
+    {brand:'MINI',key:'jcwcabrio',name:'MINI John Cooper Works Cabrio',body:'Kabrió',fuel:'Benzin',img:'/jcw-cabrio.webp?v=2',logo:'jcw'},
+    {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=2',logo:'jcw'}
   ];
 
   var CARS = MINIS.concat([
@@ -201,9 +202,9 @@ const _rebuild='rebuild-nudge-2';
     var img = c.img ? c.img : '/bmw/'+c.key+'.webp?v=6';
     var logoHtml;
     if(isMini){
-      logoHtml = '<img class="egl-minilogo" src="/mini-logo.webp?v=1" alt="MINI"/>' + (c.logo==='jcw' ? '<img class="egl-jcwlogo" src="/jcw-logo.webp?v=1" alt="John Cooper Works"/>' : '');
+      logoHtml = '<img class="egl-minilogo" src="/mini-logo.webp?v=2" alt="MINI"/>' + (c.logo==='jcw' ? '<img class="egl-jcwlogo" src="/jcw-logo.webp?v=2" alt="John Cooper Works"/>' : '');
     } else {
-      logoHtml = '<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=1" alt="BMW"/>' + (isM(c) ? '<img class="egl-mlogo" src="/bmw/m-logo.webp?v=1" alt="M"/>' : '');
+      logoHtml = '<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=2" alt="BMW"/>' + (isM(c) ? '<img class="egl-mlogo" src="/bmw/m-logo.webp?v=2" alt="M"/>' : '');
     }
     var priceHtml;
     if(isMini){
