@@ -66,7 +66,8 @@ const _rebuild='rebuild-nudge-2';
   .egl-mlogo{height:16px;width:auto;margin-left:6px;}
   .egl-jcwlogo{height:26px;width:auto;margin-left:9px;border-radius:3px;}
   .egl-year{font-size:13.5px;color:var(--muted);}
-  .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;min-height:2.4em;}
+  .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;}
+  .egl-card-mini .egl-name{min-height:2.4em;}
   .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px;}
   .egl-price{display:flex;align-items:baseline;gap:9px;margin-bottom:16px;flex-wrap:wrap;}
   .egl-price b{font-size:23px;font-weight:800;color:var(--ink);}
@@ -217,7 +218,7 @@ const _rebuild='rebuild-nudge-2';
     var href = isMini ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c);
     var newBadge = (!isMini && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var a=document.createElement('a');
-    a.className='egl-card'; a.href=href;
+    a.className='egl-card'+(isMini?' egl-card-mini':''); a.href=href;
     a.innerHTML =
       '<div class="egl-media">'+newBadge+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
         '<div class="egl-fuels"><span class="egl-fuel" style="background:'+(FUELC[c.fuel]||'#5A6B82')+'">'+c.fuel+'</span></div>'+'</div>'+
