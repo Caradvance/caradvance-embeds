@@ -93,13 +93,13 @@ const _rebuild='rebuild-nudge-2';
   var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
 
   var MINIS = [
-    {brand:'MINI',key:'coopers',name:'MINI Cooper',body:'Ferdehátú',fuel:'Benzin',img:'/cooper-s.webp?v=2',logo:'mini'},
-    {brand:'MINI',key:'cooper',name:'MINI Cooper 5 ajtós',body:'Ferdehátú',fuel:'Benzin',img:'/cooper.webp?v=2',logo:'mini'},
-    {brand:'MINI',key:'coopercab',name:'MINI Cooper Cabrio',body:'Kabrió',fuel:'Benzin',img:'/cooper-cabrio.webp?v=2',logo:'mini'},
-    {brand:'MINI',key:'countryman',name:'MINI Countryman',body:'SUV',fuel:'Benzin',img:'/countryman.webp?v=2',logo:'mini'},
-    {brand:'MINI',key:'jcwhatch',name:'MINI John Cooper Works',body:'Ferdehátú',fuel:'Benzin',img:'/jcw-hatch.webp?v=2',logo:'jcw'},
-    {brand:'MINI',key:'jcwcabrio',name:'MINI John Cooper Works Cabrio',body:'Kabrió',fuel:'Benzin',img:'/jcw-cabrio.webp?v=2',logo:'jcw'},
-    {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=2',logo:'jcw'}
+    {brand:'MINI',key:'coopers',name:'MINI Cooper',body:'Ferdehátú',fuel:'Benzin',img:'/cooper-s.webp?v=2',logo:'mini',from:26450},
+    {brand:'MINI',key:'cooper',name:'MINI Cooper 5 ajtós',body:'Ferdehátú',fuel:'Benzin',img:'/cooper.webp?v=2',logo:'mini',from:27450},
+    {brand:'MINI',key:'coopercab',name:'MINI Cooper Cabrio',body:'Kabrió',fuel:'Benzin',img:'/cooper-cabrio.webp?v=2',logo:'mini',from:32450},
+    {brand:'MINI',key:'countryman',name:'MINI Countryman',body:'SUV',fuel:'Benzin',img:'/countryman.webp?v=2',logo:'mini',from:38120},
+    {brand:'MINI',key:'jcwhatch',name:'MINI John Cooper Works',body:'Ferdehátú',fuel:'Benzin',img:'/jcw-hatch.webp?v=2',logo:'jcw',from:40950},
+    {brand:'MINI',key:'jcwcabrio',name:'MINI John Cooper Works Cabrio',body:'Kabrió',fuel:'Benzin',img:'/jcw-cabrio.webp?v=2',logo:'jcw',from:44950},
+    {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=2',logo:'jcw',from:54220}
   ];
 
   var CARS = MINIS.concat([
@@ -209,9 +209,9 @@ const _rebuild='rebuild-nudge-2';
       logoHtml = '<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=2" alt="BMW"/>' + (isM(c) ? '<img class="egl-mlogo" src="/bmw/m-logo.webp?v=2" alt="M"/>' : '');
     }
     var priceHtml;
-    if(isMini){
+    if(isMini && !c.from){
       priceHtml = '<span class="egl-soon">Ár kérésre</span>';
-    } else if(SOON.indexOf(slug(c))>-1){
+    } else if(!isMini && SOON.indexOf(slug(c))>-1){
       priceHtml = '<span class="egl-soon">Hamarosan</span>';
     } else {
       priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak. A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
