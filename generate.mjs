@@ -414,7 +414,7 @@ function navHtml(rel) {
   const cat = rel + "autoink/";
   const items = [
     ["Prémium autóbérlés", [["Bérelhető autóink", "/berelheto"], ["Új autó bérlése", "#"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
-    ["Megvásárolható autóink", [["Autóink", cat], ["Egyedi autó rendelés", "#"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
+    ["Megvásárolható autóink", [["Autóink", cat], ["Egyedi autó rendelés", "/egyedi-auto-rendeles"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
     ["Bizományos értékesítés", [["Bizományos autóink", "/bizomanyos"], ["Eladom az autómat", "/eladom"], ["Jótékonyság", "/jotekonysag"], ["Értékesítési folyamat", "/ertekesitesi-folyamat"], ["Gyakori kérdések", "/gyakori-kerdesek"]]],
     ["Import", [["Autó rendelés", "/auto-rendeles"], ["Beszerzési folyamat", "/beszerzesi-folyamat"], ["Előnyök", "/elonyok"], ["Egyedül vagy velünk?", "/egyedul-vagy-velunk"], ["Referenciák", "#"]]],
     ["Rólunk", [["Miért mi?", "#"], ["Caradvance Németország", "#"], ["Caradvance Magyarország", "#"], ["Referenciák", "#"], ["Partnereink", "#"], ["Media", "#"], ["Blog", "#"]]],
@@ -434,12 +434,12 @@ function navHtml(rel) {
   <a class="brand" href="${rel}"><img src="${rel}caradvance-logo.webp" alt="CarAdvance — the automotive people" width="403" height="133"></a>
   <ul class="menu">${desktop}</ul>
   <div class="navright">
-    <a class="kapcsolat" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a>
+    <a class="kapcsolat" href="/kapcsolat">Kapcsolat</a>
     <div class="lang"><button class="langbtn" type="button" aria-label="Nyelvváltás"><span class="navflag" style="background-image:url(https://flagcdn.com/w80/hu.png)"></span><span class="lchev"></span></button><div class="langmenu">${langMenu}</div></div>
     <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
   </div>
 </nav>
-<div class="mobilepanel">${mobile}<a class="m-kapcsolat" href="mailto:${CONTACT_EMAIL}">Kapcsolat</a><div class="m-langtitle">Nyelv</div><div class="m-langs">${mobileLangs}</div></div>
+<div class="mobilepanel">${mobile}<a class="m-kapcsolat" href="/kapcsolat">Kapcsolat</a><div class="m-langtitle">Nyelv</div><div class="m-langs">${mobileLangs}</div></div>
 </div>`;
 }
 function footerHtml(rel) {
