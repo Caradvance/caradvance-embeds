@@ -211,3 +211,23 @@
 
   ready(run);
 })();
+
+/* =========================================================================
+   Landing-page "stats" cards — mobile layout fix
+   On phones the two columns were unequal and overflowed the screen because
+   one heading ("5,0 ★ értékelés") was set to white-space:nowrap, forcing its
+   column wider than its sibling. Lock the two columns to equal halves and let
+   the headings wrap. Harmless on pages without a .stats grid.
+   ========================================================================= */
+(function () {
+  "use strict";
+  if (document.getElementById("caStatsFix")) return;
+  var s = document.createElement("style"); s.id = "caStatsFix";
+  s.textContent =
+    "@media (max-width:700px){" +
+      ".stats-in{grid-template-columns:repeat(2,minmax(0,1fr))!important;}" +
+      ".stat{min-width:0;}" +
+      ".stat .n{white-space:normal!important;overflow-wrap:anywhere;}" +
+    "}";
+  (document.head || document.documentElement).appendChild(s);
+})();
