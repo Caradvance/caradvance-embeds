@@ -311,6 +311,7 @@ const _rebuild='rebuild-nudge-2';
     document.getElementById('eglCount').textContent = list.length + ' modell';
   }
   [q,fb,ff,fbr].forEach(function(el){ el.addEventListener('input',render); el.addEventListener('change',render); });
+  try{var _qb=new URLSearchParams(location.search).get('brand'); if(_qb){ var _map={bmw:'BMW',mini:'MINI',mercedes:'MB',mb:'MB'}; fbr.value=(_map[_qb.toLowerCase()]||_qb); }}catch(e){}
   render();
   try{
     fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){

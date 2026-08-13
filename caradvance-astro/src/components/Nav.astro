@@ -16,7 +16,12 @@ const menu = [
     { t: 'Flotta kezelés', href: '#' }, { t: 'Feltételek', href: '#' },
   ]},
   { label: 'Megvásárolható autóink', items: [
-    { t: 'Autóink', href: autoink }, { t: 'Egyedi autó rendelés', href: '/egyedi-auto-rendeles' },
+    { t: 'Autóink', href: autoink },
+    { t: 'Egyedi autó rendelés', href: '/egyedi-auto-rendeles', sub: [
+      { t: 'BMW', href: '/egyedi-auto-rendeles?brand=bmw' },
+      { t: 'MINI', href: '/egyedi-auto-rendeles?brand=mini' },
+      { t: 'Mercedes', href: '/egyedi-auto-rendeles?brand=mercedes' },
+    ]},
     { t: 'Finanszírozás – lízing', href: '#' }, { t: 'Előnyök', href: '#' },
   ]},
   { label: 'Bizományos értékesítés', items: [
@@ -41,7 +46,10 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
   <ul class="menu">
     {menu.map((m) => (
       <li class="navitem"><button class="navlink" type="button">{m.label}<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner">
-        {m.items.map((it) => <a class="ddi" href={it.href}>{it.t}</a>)}
+        {m.items.map((it) => (it as any).sub
+          ? <div class="ddi-sub"><a class="ddi ddi-parent" href={it.href}>{it.t}<span class="subchev">›</span></a><div class="flyout">{(it as any).sub.map((s: any) => <a class="ddi" href={s.href}>{s.t}</a>)}</div></div>
+          : <a class="ddi" href={it.href}>{it.t}</a>
+        )}
       </div></div></li>
     ))}
   </ul>
@@ -58,7 +66,10 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
 <div class="mobilepanel">
   {menu.map((m) => (
     <div class="m-acc"><button class="m-accbtn" type="button">{m.label}<span class="m-plus">+</span></button><div class="m-sub">
-      {m.items.map((it) => <a href={it.href}>{it.t}</a>)}
+      {m.items.map((it) => (it as any).sub
+        ? <Fragment><a href={it.href}>{it.t}</a>{(it as any).sub.map((s: any) => <a class="m-subitem" href={s.href}>{s.t}</a>)}</Fragment>
+        : <a href={it.href}>{it.t}</a>
+      )}
     </div></div>
   ))}
   <a class="m-kapcsolat" href="/kapcsolat">Kapcsolat</a>
@@ -71,6 +82,24 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
 </div>
 </div>
 
+<style is:global>
+  /* Nested brand submenu under "Egyedi autó rendelés" */
+  .ca-navwrap .dd-inner .ddi-sub{position:relative;}
+  .ca-navwrap .ddi-parent{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .ca-navwrap .ddi-parent .subchev{opacity:.55;font-size:1.15em;line-height:1;transform:translateY(-1px);}
+  .ca-navwrap .ddi-sub > .flyout{
+    position:absolute;top:-6px;left:100%;min-width:170px;
+    background:#fff;border:1px solid #e8e8ea;border-radius:12px;
+    box-shadow:0 14px 34px rgba(0,0,0,.14);padding:6px;
+    display:none;z-index:70;
+  }
+  .ca-navwrap .ddi-sub:hover > .flyout,
+  .ca-navwrap .ddi-sub.open > .flyout{display:block;}
+  .ca-navwrap .ddi-sub > .flyout .ddi{white-space:nowrap;}
+  /* Mobile: brand items indented under the parent */
+  .ca-navwrap .m-sub .m-subitem{padding-left:30px;opacity:.85;font-size:.95em;}
+</style>
+
 <script>
   const wrap = document.querySelector('.ca-navwrap');
   if (wrap) {
@@ -82,7 +111,15 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
         if (!wasOpen) li.classList.add('open');
       });
     });
-    document.addEventListener('click', function(){ wrap.querySelectorAll('.menu .navitem').forEach(function(x){ x.classList.remove('open'); }); });
+    /* nested brand flyout: on touch (no hover), first tap reveals, second tap navigates */
+    wrap.querySelectorAll('.ddi-sub > .ddi-parent').forEach(function(p){
+      p.addEventListener('click', function(e){
+        var sub = p.parentElement;
+        var noHover = window.matchMedia && window.matchMedia('(hover: none)').matches;
+        if (noHover && !sub.classList.contains('open')) { e.preventDefault(); e.stopPropagation(); sub.classList.add('open'); }
+      });
+    });
+    document.addEventListener('click', function(){ wrap.querySelectorAll('.menu .navitem').forEach(function(x){ x.classList.remove('open'); wrap.querySelectorAll('.ddi-sub').forEach(function(s){ s.classList.remove('open'); }); }); });
 
     const burger = wrap.querySelector('.burger');
     burger && burger.addEventListener('click', () => wrap.classList.toggle('open'));
