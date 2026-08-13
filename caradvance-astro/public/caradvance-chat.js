@@ -231,3 +231,65 @@
     "}";
   (document.head || document.documentElement).appendChild(s);
 })();
+
+/* =========================================================================
+   COMING SOON gate — full-site holding page
+   The public sees a "Hamarosan" screen (with the hero video). You and your
+   team keep full access:
+     • Unlock a device once:  https://www.caradvance.hu/?belepes=caradvance-belso
+       (this remembers you on that browser; browse normally afterwards)
+     • Preview the holding page yourself:  https://www.caradvance.hu/?belepes=0
+   TO LAUNCH THE SITE: delete this whole block and re-upload the file.
+   ========================================================================= */
+(function () {
+  "use strict";
+  var TOKEN = "caradvance-belso";   // access key — change it if you like
+  var KEY = "ca_soon_ok";
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.has("belepes")) {
+      var v = p.get("belepes");
+      if (v === "0" || v === "stop" || v === "exit") { try { localStorage.removeItem(KEY); } catch (e) {} }
+      else if (v === TOKEN) { try { localStorage.setItem(KEY, "1"); } catch (e) {} }
+      p.delete("belepes");
+      var qs = p.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+    }
+    var ok = false; try { ok = localStorage.getItem(KEY) === "1"; } catch (e) { ok = false; }
+    if (ok) return;                 // whitelisted team member — no overlay
+  } catch (e) { return; }           // on any error, never block the site
+  if (document.getElementById("caSoon")) return;
+
+  var css = document.createElement("style");
+  css.textContent =
+    "#caSoon{position:fixed;inset:0;z-index:2147483600;overflow:hidden;background:#0b0b0d;display:flex;align-items:center;justify-content:center;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}" +
+    "#caSoon video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}" +
+    "#caSoon .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,12,.55),rgba(10,10,12,.80));}" +
+    "#caSoon .in{position:relative;z-index:2;max-width:640px;padding:32px 24px;color:#fff;}" +
+    "#caSoon img{height:54px;width:auto;margin-bottom:26px;}" +
+    "#caSoon h1{font-size:clamp(34px,6vw,60px);font-weight:800;letter-spacing:-.02em;margin:0 0 14px;}" +
+    "#caSoon p{font-size:clamp(15px,2.4vw,19px);line-height:1.6;color:#d8d8dc;margin:0 auto 26px;max-width:520px;}" +
+    "#caSoon .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}" +
+    "#caSoon a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px;}" +
+    "#caSoon a.wa{background:#25d366;color:#fff;}" +
+    "#caSoon a.tel{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.32);}";
+  document.head.appendChild(css);
+
+  var wrap = document.createElement("div");
+  wrap.id = "caSoon";
+  wrap.innerHTML =
+    '<video autoplay loop muted playsinline poster="/caradvance-hero-x5-poster.jpg"><source src="/caradvance-hero-x5.mp4" type="video/mp4"></video>' +
+    '<div class="ov"></div>' +
+    '<div class="in">' +
+      '<img src="/caradvance-logo-white.webp" alt="CarAdvance"/>' +
+      '<h1>Hamarosan</h1>' +
+      '<p>Új weboldalunk hamarosan elindul. Addig is keressen minket bizalommal — prémium autók Németországból: bérlés, vásárlás és import.</p>' +
+      '<div class="btns">' +
+        '<a class="wa" href="https://wa.me/36302336060" target="_blank" rel="noopener">WhatsApp</a>' +
+        '<a class="tel" href="tel:+36302336060">+36 30 233 6060</a>' +
+      '</div>' +
+    '</div>';
+  document.documentElement.style.overflow = "hidden";
+  (document.body || document.documentElement).appendChild(wrap);
+  var vid = wrap.querySelector("video"); if (vid && vid.play) { vid.play().catch(function () {}); }
+})();
