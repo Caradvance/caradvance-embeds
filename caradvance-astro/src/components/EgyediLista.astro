@@ -11,8 +11,8 @@ const _rebuild='rebuild-nudge-2';
 
     <div class="egl-filters">
       <input type="text" id="eglQ" class="egl-search" placeholder="Keresés (pl. X5, Cooper)…" />
-      <div class="egl-sel"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option><option>MINI</option></select></div>
-      <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>Kompakt</option><option>Limuzin</option><option>Touring</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option><option>Kabrió</option><option>Ferdehátú</option><option>Egyterű</option><option>SUV</option><option>SUV Coupé</option><option>Roadster</option></select></div>
+      <div class="egl-sel"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option><option>MINI</option><option value="MB">Mercedes-Benz</option></select></div>
+      <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>Kompakt</option><option>Limuzin</option><option>Touring</option><option>Kombi</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option><option>Kabrió</option><option>Ferdehátú</option><option>Egyterű</option><option>SUV</option><option>SUV Coupé</option><option>Roadster</option></select></div>
       <div class="egl-sel"><select id="eglFuel"><option value="">Minden üzemanyag</option><option>Benzin</option><option>Dízel</option><option>Hibrid</option><option>Elektromos</option></select></div>
     </div>
 
@@ -65,6 +65,7 @@ const _rebuild='rebuild-nudge-2';
   .egl-minilogo{height:26px;width:auto;}
   .egl-mlogo{height:16px;width:auto;margin-left:6px;}
   .egl-jcwlogo{height:19px;width:auto;margin-left:8px;}
+  .egl-mblogo{height:15px;width:auto;}
   .egl-year{font-size:13.5px;color:var(--muted);}
   .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;}
   .egl-card-mini .egl-body{display:flex;flex-direction:column;flex:1;}
@@ -102,7 +103,38 @@ const _rebuild='rebuild-nudge-2';
     {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=2',logo:'jcw',from:54220}
   ];
 
-  var CARS = MINIS.concat([
+  var MB = [
+    {brand:'MB',key:'mbs',name:'Mercedes-Benz S-Klasse',body:'Limuzin',fuel:'Benzin',img:'/mb-s.webp?v=1',logo:'mb',from:109221},
+    {brand:'MB',key:'mba',name:'Mercedes-Benz A-Klasse',body:'Limuzin',fuel:'Benzin',img:'/mb-a.webp?v=1',logo:'mb',from:32297},
+    {brand:'MB',key:'mbb',name:'Mercedes-Benz B-Klasse',body:'Egyterű',fuel:'Benzin',img:'/mb-b.webp?v=1',logo:'mb',from:35559},
+    {brand:'MB',key:'mbc',name:'Mercedes-Benz C-Klasse',body:'Limuzin',fuel:'Benzin',img:'/mb-c.webp?v=1',logo:'mb',from:42427},
+    {brand:'MB',key:'mbct',name:'Mercedes-Benz C-Klasse Kombi',body:'Kombi',fuel:'Benzin',img:'/mb-ct.webp?v=1',logo:'mb',from:46221},
+    {brand:'MB',key:'mbclec',name:'Mercedes-Benz CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-cle-coupe.webp?v=1',logo:'mb',from:49521},
+    {brand:'MB',key:'mbclecab',name:'Mercedes-Benz CLE Cabriolet',body:'Kabrió',fuel:'Benzin',img:'/mb-cle-cabrio.webp?v=1',logo:'mb',from:56814},
+    {brand:'MB',key:'mbe',name:'Mercedes-Benz E-Klasse',body:'Limuzin',fuel:'Benzin',img:'/mb-e.webp?v=1',logo:'mb',from:52586},
+    {brand:'MB',key:'mbet',name:'Mercedes-Benz E-Klasse Kombi',body:'Kombi',fuel:'Benzin',img:'/mb-et.webp?v=1',logo:'mb',from:54835},
+    {brand:'MB',key:'mbgla',name:'Mercedes-Benz GLA',body:'SUV',fuel:'Benzin',img:'/mb-gla.webp?v=1',logo:'mb',from:41685},
+    {brand:'MB',key:'mbglb',name:'Mercedes-Benz GLB',body:'SUV',fuel:'Benzin',img:'/mb-glb.webp?v=1',logo:'mb',from:46869},
+    {brand:'MB',key:'mbglc',name:'Mercedes-Benz GLC',body:'SUV',fuel:'Benzin',img:'/mb-glc.webp?v=1',logo:'mb',from:54017},
+    {brand:'MB',key:'mbglcc',name:'Mercedes-Benz GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-glc-coupe.webp?v=1',logo:'mb',from:57820},
+    {brand:'MB',key:'mbgle',name:'Mercedes-Benz GLE',body:'SUV',fuel:'Benzin',img:'/mb-gle.webp?v=1',logo:'mb',from:87461},
+    {brand:'MB',key:'mbglec',name:'Mercedes-Benz GLE Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-gle-coupe.webp?v=1',logo:'mb',from:94205},
+    {brand:'MB',key:'mbamga',name:'Mercedes-AMG A-Klasse',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-a.webp?v=1',logo:'mb',from:51177},
+    {brand:'MB',key:'mbamgc',name:'Mercedes-AMG C-Klasse',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-c.webp?v=1',logo:'mb'},
+    {brand:'MB',key:'mbamgct',name:'Mercedes-AMG C-Klasse Kombi',body:'Kombi',fuel:'Benzin',img:'/mb-amg-ct.webp?v=1',logo:'mb'},
+    {brand:'MB',key:'mbamgclec',name:'Mercedes-AMG CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-amg-cle-coupe.webp?v=1',logo:'mb',from:85674},
+    {brand:'MB',key:'mbamgclecab',name:'Mercedes-AMG CLE Cabriolet',body:'Kabrió',fuel:'Benzin',img:'/mb-amg-cle-cabrio.webp?v=1',logo:'mb',from:93092},
+    {brand:'MB',key:'mbamge',name:'Mercedes-AMG E-Klasse',body:'Limuzin',fuel:'Hibrid',img:'/mb-amg-e.webp?v=1',logo:'mb',from:98318},
+    {brand:'MB',key:'mbamget',name:'Mercedes-AMG E-Klasse Kombi',body:'Kombi',fuel:'Hibrid',img:'/mb-amg-et.webp?v=1',logo:'mb',from:100567},
+    {brand:'MB',key:'mbamggla',name:'Mercedes-AMG GLA',body:'SUV',fuel:'Benzin',img:'/mb-amg-gla.webp?v=1',logo:'mb',from:62940},
+    {brand:'MB',key:'mbamgglb',name:'Mercedes-AMG GLB',body:'SUV',fuel:'Benzin',img:'/mb-amg-glb.webp?v=1',logo:'mb'},
+    {brand:'MB',key:'mbamgglc',name:'Mercedes-AMG GLC',body:'SUV',fuel:'Benzin',img:'/mb-amg-glc.webp?v=1',logo:'mb',from:78464},
+    {brand:'MB',key:'mbamgglcc',name:'Mercedes-AMG GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-amg-glc-coupe.webp?v=1',logo:'mb',from:82519},
+    {brand:'MB',key:'mbamggle',name:'Mercedes-AMG GLE',body:'SUV',fuel:'Hibrid',img:'/mb-amg-gle.webp?v=1',logo:'mb',from:114045},
+    {brand:'MB',key:'mbamgglec',name:'Mercedes-AMG GLE Coupé',body:'SUV Coupé',fuel:'Hibrid',img:'/mb-amg-gle-coupe.webp?v=1',logo:'mb',from:120053}
+  ];
+
+  var CARS = MINIS.concat(MB).concat([
     {key:'ix',name:'BMW iX',body:'SUV',fuel:'Elektromos',from:83500},
     {key:'ixm',name:'BMW iX M',body:'SUV',fuel:'Elektromos',from:126500},
     {key:'ix5',name:'BMW iX5',body:'SUV',fuel:'Elektromos',from:100000},
@@ -201,25 +233,28 @@ const _rebuild='rebuild-nudge-2';
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
   function card(c){
     var isMini = (c.brand==='MINI');
+    var isMB = (c.brand==='MB');
     var img = c.img ? c.img : '/bmw/'+c.key+'.webp?v=6';
     var logoHtml;
-    if(isMini){
+    if(isMB){
+      logoHtml = '<img class="egl-mblogo" src="/mb-logo.webp?v=1" alt="Mercedes-Benz"/>';
+    } else if(isMini){
       logoHtml = '<img class="egl-minilogo" src="/mini-logo.webp?v=3" alt="MINI"/>' + (c.logo==='jcw' ? '<img class="egl-jcwlogo" src="/jcw-logo.webp?v=3" alt="John Cooper Works"/>' : '');
     } else {
       logoHtml = '<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=2" alt="BMW"/>' + (isM(c) ? '<img class="egl-mlogo" src="/bmw/m-logo.webp?v=2" alt="M"/>' : '');
     }
     var priceHtml;
-    if(isMini && !c.from){
+    if((isMini||isMB) && !c.from){
       priceHtml = '<span class="egl-soon">Ár kérésre</span>';
     } else if(!isMini && SOON.indexOf(slug(c))>-1){
       priceHtml = '<span class="egl-soon">Hamarosan</span>';
     } else {
       priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak. A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
     }
-    var href = isMini ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c);
-    var newBadge = (!isMini && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
+    var href = (isMini||isMB) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c);
+    var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var a=document.createElement('a');
-    a.className='egl-card'+(isMini?' egl-card-mini':''); a.href=href;
+    a.className='egl-card'+((isMini||isMB)?' egl-card-mini':''); a.href=href;
     a.innerHTML =
       '<div class="egl-media">'+newBadge+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
         '<div class="egl-fuels"><span class="egl-fuel" style="background:'+(FUELC[c.fuel]||'#5A6B82')+'">'+c.fuel+'</span></div>'+'</div>'+
@@ -253,9 +288,17 @@ const _rebuild='rebuild-nudge-2';
       grid.appendChild(mh);
       minis.forEach(function(c){ grid.appendChild(card(c)); });
     }
+    var mbs=list.filter(function(c){return c.brand==='MB';});
+    if(mbs.length){
+      var mbh=document.createElement('div');
+      mbh.className='egl-section';
+      mbh.innerHTML='<span class="dot" style="background:#00a3e0"></span>Mercedes-Benz <span class="cnt">'+mbs.length+' modell</span>';
+      grid.appendChild(mbh);
+      mbs.forEach(function(c){ grid.appendChild(card(c)); });
+    }
     var order=['Elektromos','Hibrid','Benzin','Dízel'];
     order.forEach(function(fuel){
-      var group=list.filter(function(c){return (c.brand||'BMW')!=='MINI' && c.fuel===fuel;});
+      var group=list.filter(function(c){var br2=(c.brand||'BMW'); return br2!=='MINI' && br2!=='MB' && c.fuel===fuel;});
       if(!group.length) return;
       var h=document.createElement('div');
       h.className='egl-section';
