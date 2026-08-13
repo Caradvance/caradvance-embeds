@@ -11,7 +11,8 @@ const _rebuild='rebuild-nudge-3';
 
     <div class="egl-filters">
       <input type="text" id="eglQ" class="egl-search" placeholder="Keresés (pl. X5, Cooper)…" />
-      <div class="egl-sel"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option><option>MINI</option><option value="MB">Mercedes-Benz</option></select></div>
+      <div class="egl-sel" id="eglBrandWrap"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option><option>MINI</option><option value="MB">Mercedes-Benz</option></select></div>
+      <div class="egl-sel" id="eglClassWrap" style="display:none"><select id="eglClass"><option value="">Minden osztály</option><option>A-osztály</option><option>B-osztály</option><option>C-osztály</option><option>E-osztály</option><option>S-osztály</option><option>CLE</option><option>GLA</option><option>GLB</option><option>GLC</option><option>GLE</option></select></div>
       <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>Kompakt</option><option>Limuzin</option><option>Touring</option><option>Kombi</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option><option>Kabrió</option><option>Ferdehátú</option><option>Egyterű</option><option>SUV</option><option>SUV Coupé</option><option>Roadster</option></select></div>
       <div class="egl-sel"><select id="eglFuel"><option value="">Minden üzemanyag</option><option>Benzin</option><option>Dízel</option><option>Hibrid</option><option>Elektromos</option></select></div>
     </div>
@@ -70,10 +71,10 @@ const _rebuild='rebuild-nudge-3';
   .egl-year{font-size:13.5px;color:var(--muted);}
   .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;}
   .egl-card-mini .egl-body{display:flex;flex-direction:column;flex:1;}
-  .egl-card-mini .egl-btn{margin-top:auto;}
+  .egl-card-mini .egl-price{margin-top:auto;}
   .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px;}
-  .egl-price{display:flex;align-items:baseline;gap:9px;margin-bottom:16px;flex-wrap:wrap;}
-  .egl-price b{font-size:23px;font-weight:800;color:var(--ink);}
+  .egl-price{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;flex-wrap:nowrap;white-space:nowrap;}
+  .egl-price b{font-size:21px;font-weight:800;color:var(--ink);}
   .egl-price .eur{font-size:14px;font-weight:600;color:var(--muted);}
   .egl-price .egl-soon{font-size:22px;font-weight:800;color:var(--navy);}
   .egl-price .tol{font-size:13px;color:var(--muted);font-weight:600;}
@@ -271,7 +272,13 @@ const _rebuild='rebuild-nudge-3';
   }
 
   var grid=document.getElementById('eglGrid');
-  var q=document.getElementById('eglQ'), fb=document.getElementById('eglBody'), ff=document.getElementById('eglFuel'), fbr=document.getElementById('eglBrand');
+  var q=document.getElementById('eglQ'), fb=document.getElementById('eglBody'), ff=document.getElementById('eglFuel'), fbr=document.getElementById('eglBrand'), fcls=document.getElementById('eglClass');
+
+  function mbClass(c){ var n=c.name;
+    if(/S-osztály/.test(n))return'S-osztály'; if(/A-osztály/.test(n))return'A-osztály'; if(/B-osztály/.test(n))return'B-osztály';
+    if(/C-osztály/.test(n))return'C-osztály'; if(/E-osztály/.test(n))return'E-osztály'; if(/CLE/.test(n))return'CLE';
+    if(/GLA/.test(n))return'GLA'; if(/GLB/.test(n))return'GLB'; if(/GLC/.test(n))return'GLC'; if(/GLE/.test(n))return'GLE'; return'Egyéb'; }
+  var MBORDER=['A-osztály','B-osztály','C-osztály','E-osztály','S-osztály','CLE','GLA','GLB','GLC','GLE'];
 
   var HERO={
     'BMW':{crumb:'BMW',title:'Egyedi BMW rendelés',intro:'Új BMW modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
@@ -279,6 +286,7 @@ const _rebuild='rebuild-nudge-3';
     'MB':{crumb:'Mercedes-Benz',title:'Egyedi Mercedes-Benz rendelés',intro:'Új Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
     '':{crumb:'Egyedi autó rendelés',title:'Egyedi autó rendelés',intro:'Új BMW, MINI és Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'}
   };
+  var PH={'BMW':'Keresés (pl. X5, i4)…','MINI':'Keresés (pl. Cooper, Countryman)…','MB':'Keresés (pl. E-osztály, GLC)…','':'Keresés (pl. X5, Cooper)…'};
   function applyHero(br){
     var h=HERO[br]||HERO[''];
     var t=document.getElementById('eglTitle'); if(t) t.textContent=h.title;
@@ -286,18 +294,36 @@ const _rebuild='rebuild-nudge-3';
     var fxEl=document.getElementById('eglFx'); var fx=fxEl?fxEl.textContent:'361';
     var s=document.getElementById('eglSub');
     if(s) s.innerHTML=h.intro+' Az árak tájékoztató német nettó listaárak, élő árfolyammal (1&nbsp;€ = <span id="eglFx">'+fx+'</span>&nbsp;Ft).';
+    if(q) q.placeholder = PH[br]||PH[''];
+    var bw=document.getElementById('eglBrandWrap'), cw=document.getElementById('eglClassWrap');
+    if(br==='MB'){ if(bw)bw.style.display='none'; if(cw)cw.style.display=''; }
+    else { if(bw)bw.style.display=''; if(cw)cw.style.display='none'; if(fcls)fcls.value=''; }
   }
 
   function render(){
-    var qq=(q.value||'').toLowerCase(), b=fb.value, f=ff.value, br=fbr.value;
+    var qq=(q.value||'').toLowerCase(), b=fb.value, f=ff.value, br=fbr.value, cl=(fcls?fcls.value:'');
+    var isMB=(br==='MB');
     var list=CARS.filter(function(c){
       if(qq && c.name.toLowerCase().indexOf(qq)===-1) return false;
       if(b && c.body!==b) return false;
       if(f && c.fuel!==f) return false;
       if(br && (c.brand||'BMW')!==br) return false;
+      if(isMB && cl && mbClass(c)!==cl) return false;
       return true;
     });
     grid.innerHTML='';
+    if(isMB){
+      MBORDER.forEach(function(cls){
+        var g=list.filter(function(c){return mbClass(c)===cls;});
+        if(!g.length) return;
+        var hh=document.createElement('div'); hh.className='egl-section';
+        hh.innerHTML='<span class="dot" style="background:#00a3e0"></span>'+cls+' <span class="cnt">'+g.length+' modell</span>';
+        grid.appendChild(hh);
+        g.forEach(function(c){ grid.appendChild(card(c)); });
+      });
+      document.getElementById('eglCount').textContent = list.length + ' modell';
+      return;
+    }
     var minis=list.filter(function(c){return c.brand==='MINI';});
     if(minis.length){
       var mh=document.createElement('div');
@@ -326,7 +352,7 @@ const _rebuild='rebuild-nudge-3';
     });
     document.getElementById('eglCount').textContent = list.length + ' modell';
   }
-  [q,fb,ff,fbr].forEach(function(el){ el.addEventListener('input',render); el.addEventListener('change',render); });
+  [q,fb,ff,fbr,fcls].forEach(function(el){ if(el){ el.addEventListener('input',render); el.addEventListener('change',render); } });
   fbr.addEventListener('change',function(){ applyHero(fbr.value); });
   try{var _qb=new URLSearchParams(location.search).get('brand'); if(_qb){ var _map={bmw:'BMW',mini:'MINI',mercedes:'MB',mb:'MB'}; fbr.value=(_map[_qb.toLowerCase()]||_qb); }}catch(e){}
   applyHero(fbr.value);
