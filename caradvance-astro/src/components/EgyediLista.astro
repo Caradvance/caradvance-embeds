@@ -279,6 +279,17 @@ const _rebuild='rebuild-nudge-3';
     if(/C-osztály/.test(n))return'C-osztály'; if(/E-osztály/.test(n))return'E-osztály'; if(/CLE/.test(n))return'CLE';
     if(/GLA/.test(n))return'GLA'; if(/GLB/.test(n))return'GLB'; if(/GLC/.test(n))return'GLC'; if(/GLE/.test(n))return'GLE'; return'Egyéb'; }
   var MBORDER=['A-osztály','B-osztály','C-osztály','E-osztály','S-osztály','CLE','GLA','GLB','GLC','GLE'];
+  function bmwSeries(c){ var n=c.name;
+    if(/\b1-es\b/.test(n))return'1-es'; if(/\b2-es\b|\bM2\b/.test(n))return'2-es'; if(/\b3-as\b|\bM3\b/.test(n))return'3-as';
+    if(/\b4-es\b|\bi4\b|\bM4\b/.test(n))return'4-es'; if(/\b5-ös\b|\bi5\b|\bM5\b/.test(n))return'5-ös'; if(/\b7-es\b|\bi7\b|M760/.test(n))return'7-es';
+    if(/\bXM\b/.test(n))return'XM'; if(/iX1|X1\b/.test(n))return'X1'; if(/iX2|X2\b/.test(n))return'X2'; if(/iX3|X3\b/.test(n))return'X3';
+    if(/iX5|X5\b/.test(n))return'X5'; if(/X6\b/.test(n))return'X6'; if(/X7\b/.test(n))return'X7'; if(/\biX\b/.test(n))return'iX';
+    if(/\bi3\b/.test(n))return'i3'; if(/Z4/.test(n))return'Z4'; return'Egyéb'; }
+  var BMWORDER=['1-es','2-es','3-as','4-es','5-ös','7-es','i3','iX','X1','X2','X3','X5','X6','X7','XM','Z4'];
+  function isGrouped(br){ return br==='MB'||br==='BMW'; }
+  function groupOf(c,br){ return br==='MB'?mbClass(c):(br==='BMW'?bmwSeries(c):''); }
+  function groupOrder(br){ return br==='MB'?MBORDER:(br==='BMW'?BMWORDER:[]); }
+  function classLabel(br){ return br==='MB'?'Minden osztály':(br==='BMW'?'Minden modell':''); }
 
   var HERO={
     'BMW':{crumb:'BMW',title:'Egyedi BMW rendelés',intro:'Új BMW modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
@@ -296,28 +307,31 @@ const _rebuild='rebuild-nudge-3';
     if(s) s.innerHTML=h.intro+' Az árak tájékoztató német nettó listaárak, élő árfolyammal (1&nbsp;€ = <span id="eglFx">'+fx+'</span>&nbsp;Ft).';
     if(q) q.placeholder = PH[br]||PH[''];
     var bw=document.getElementById('eglBrandWrap'), cw=document.getElementById('eglClassWrap');
-    if(br==='MB'){ if(bw)bw.style.display='none'; if(cw)cw.style.display=''; }
-    else { if(bw)bw.style.display=''; if(cw)cw.style.display='none'; if(fcls)fcls.value=''; }
+    if(isGrouped(br)){
+      if(bw)bw.style.display='none'; if(cw)cw.style.display='';
+      if(fcls){ var ord=groupOrder(br), html='<option value="">'+classLabel(br)+'</option>'; ord.forEach(function(g){ html+='<option>'+g+'</option>'; }); fcls.innerHTML=html; }
+    } else { if(bw)bw.style.display=''; if(cw)cw.style.display='none'; if(fcls)fcls.value=''; }
   }
 
   function render(){
     var qq=(q.value||'').toLowerCase(), b=fb.value, f=ff.value, br=fbr.value, cl=(fcls?fcls.value:'');
-    var isMB=(br==='MB');
+    var grouped=isGrouped(br);
     var list=CARS.filter(function(c){
       if(qq && c.name.toLowerCase().indexOf(qq)===-1) return false;
       if(b && c.body!==b) return false;
       if(f && c.fuel!==f) return false;
       if(br && (c.brand||'BMW')!==br) return false;
-      if(isMB && cl && mbClass(c)!==cl) return false;
+      if(grouped && cl && groupOf(c,br)!==cl) return false;
       return true;
     });
     grid.innerHTML='';
-    if(isMB){
-      MBORDER.forEach(function(cls){
-        var g=list.filter(function(c){return mbClass(c)===cls;});
+    if(grouped){
+      var dot=(br==='BMW')?'#0166b1':'#00a3e0';
+      groupOrder(br).forEach(function(gr){
+        var g=list.filter(function(c){return groupOf(c,br)===gr;});
         if(!g.length) return;
         var hh=document.createElement('div'); hh.className='egl-section';
-        hh.innerHTML='<span class="dot" style="background:#00a3e0"></span>'+cls+' <span class="cnt">'+g.length+' modell</span>';
+        hh.innerHTML='<span class="dot" style="background:'+dot+'"></span>'+gr+' <span class="cnt">'+g.length+' modell</span>';
         grid.appendChild(hh);
         g.forEach(function(c){ grid.appendChild(card(c)); });
       });
