@@ -18,9 +18,9 @@ const menu = [
   { label: 'Megvásárolható autóink', items: [
     { t: 'Autóink', href: autoink },
     { t: 'Egyedi autó rendelés', href: '/egyedi-auto-rendeles', sub: [
-      { t: 'BMW', href: '/egyedi-auto-rendeles?brand=bmw' },
-      { t: 'MINI', href: '/egyedi-auto-rendeles?brand=mini' },
-      { t: 'Mercedes', href: '/egyedi-auto-rendeles?brand=mercedes' },
+      { t: 'BMW', href: '/egyedi-auto-rendeles?brand=bmw', logo: '/bmw/bmw-logo.webp?v=2' },
+      { t: 'MINI', href: '/egyedi-auto-rendeles?brand=mini', logo: '/mini-logo.webp?v=3' },
+      { t: 'Mercedes', href: '/egyedi-auto-rendeles?brand=mercedes', logo: '/mb-star.webp?v=1' },
     ]},
     { t: 'Finanszírozás – lízing', href: '#' }, { t: 'Előnyök', href: '#' },
   ]},
@@ -47,7 +47,7 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
     {menu.map((m) => (
       <li class="navitem"><button class="navlink" type="button">{m.label}<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner">
         {m.items.map((it) => (it as any).sub
-          ? <div class="ddi-sub"><a class="ddi ddi-parent" href={it.href}>{it.t}<span class="subchev">›</span></a><div class="flyout">{(it as any).sub.map((s: any) => <a class="ddi" href={s.href}>{s.t}</a>)}</div></div>
+          ? <div class="ddi-sub"><a class="ddi ddi-parent" href={it.href}>{it.t}<span class="subchev">›</span></a><div class="flyout">{(it as any).sub.map((s: any) => <a class="ddi ddi-brand" href={s.href}><img class="brandlogo" src={s.logo} alt={s.t} width="22" height="22" loading="lazy"/><span>{s.t}</span></a>)}</div></div>
           : <a class="ddi" href={it.href}>{it.t}</a>
         )}
       </div></div></li>
@@ -67,7 +67,7 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
   {menu.map((m) => (
     <div class="m-acc"><button class="m-accbtn" type="button">{m.label}<span class="m-plus">+</span></button><div class="m-sub">
       {m.items.map((it) => (it as any).sub
-        ? <Fragment><a href={it.href}>{it.t}</a>{(it as any).sub.map((s: any) => <a class="m-subitem" href={s.href}>{s.t}</a>)}</Fragment>
+        ? <Fragment><a href={it.href}>{it.t}</a>{(it as any).sub.map((s: any) => <a class="m-subitem" href={s.href}><img class="brandlogo" src={s.logo} alt={s.t} width="20" height="20" loading="lazy"/><span>{s.t}</span></a>)}</Fragment>
         : <a href={it.href}>{it.t}</a>
       )}
     </div></div>
@@ -96,8 +96,11 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
   .ca-navwrap .ddi-sub:hover > .flyout,
   .ca-navwrap .ddi-sub.open > .flyout{display:block;}
   .ca-navwrap .ddi-sub > .flyout .ddi{white-space:nowrap;}
+  .ca-navwrap .ddi-brand{display:flex;align-items:center;gap:11px;}
+  .ca-navwrap .ddi-brand .brandlogo{width:22px;height:22px;object-fit:contain;flex:0 0 22px;}
   /* Mobile: brand items indented under the parent */
-  .ca-navwrap .m-sub .m-subitem{padding-left:30px;opacity:.85;font-size:.95em;}
+  .ca-navwrap .m-sub .m-subitem{display:flex;align-items:center;gap:10px;padding-left:30px;opacity:.85;font-size:.95em;}
+  .ca-navwrap .m-sub .m-subitem .brandlogo{width:20px;height:20px;object-fit:contain;flex:0 0 20px;}
 </style>
 
 <script>
