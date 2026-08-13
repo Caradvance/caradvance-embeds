@@ -124,3 +124,90 @@
   Hm.onclick = function () { row("m", "Szeretnék egy emberrel beszélni"); Ch.innerHTML = ""; row("b", "Természetesen! 🙌 Egy munkatársunk WhatsAppon azonnal segít (hétköznap 9–17h). Kattints a gombra:"); Hf.classList.add("on"); };
   L.onclick = open; X.onclick = function () { W.classList.add("cl"); L.classList.remove("hid"); };
 })();
+
+/* =========================================================================
+   CarAdvance brand submenu injector — BMW / MINI / Mercedes
+   Adds the brand sub-menu under "Egyedi autó rendelés" on every baked page
+   (homepage, car pages, section pages). Astro-built pages already include
+   the submenu, so we skip when a .ddi-sub is already present. Also repairs
+   the dead "#" link that some mobile menus use for that item.
+   ========================================================================= */
+(function () {
+  "use strict";
+  if (window.__caNavBrands) return; window.__caNavBrands = true;
+
+  var BRANDS = [
+    { t: "BMW",      href: "/egyedi-auto-rendeles?brand=bmw",      logo: "/bmw/bmw-logo.webp?v=2" },
+    { t: "MINI",     href: "/egyedi-auto-rendeles?brand=mini",     logo: "/mini-logo.webp?v=3" },
+    { t: "Mercedes", href: "/egyedi-auto-rendeles?brand=mercedes", logo: "/mb-star.webp?v=1" }
+  ];
+  var LABEL = "Egyedi autó rendelés";
+  var DEST = "/egyedi-auto-rendeles";
+
+  function ready(fn) { if (document.readyState !== "loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
+  function txt(el) { return (el.textContent || "").replace(/\s+/g, " ").trim(); }
+
+  function injectCss() {
+    if (document.getElementById("caNavBrandsCss")) return;
+    var s = document.createElement("style"); s.id = "caNavBrandsCss";
+    s.textContent =
+      ".ca-navwrap .dd-inner .ddi-sub{position:relative;}" +
+      ".ca-navwrap .ddi-parent{display:flex;align-items:center;justify-content:space-between;gap:12px;}" +
+      ".ca-navwrap .ddi-parent .subchev{opacity:.55;font-size:1.15em;line-height:1;transform:translateY(-1px);}" +
+      ".ca-navwrap .ddi-sub>.flyout{position:absolute;top:-6px;left:100%;min-width:186px;background:#fff;border:1px solid #e8e8ea;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.14);padding:6px;display:none;z-index:1000;}" +
+      ".ca-navwrap .ddi-sub:hover>.flyout,.ca-navwrap .ddi-sub.open>.flyout{display:block;}" +
+      ".ca-navwrap .ddi-brand{display:flex;align-items:center;gap:11px;white-space:nowrap;}" +
+      ".ca-navwrap .ddi-brand .brandlogo{width:22px;height:22px;object-fit:contain;flex:0 0 22px;}" +
+      ".ca-navwrap .m-sub .m-subitem{display:flex;align-items:center;gap:10px;padding-left:30px;opacity:.85;font-size:.95em;}" +
+      ".ca-navwrap .m-sub .m-subitem .brandlogo{width:20px;height:20px;object-fit:contain;flex:0 0 20px;}";
+    document.head.appendChild(s);
+  }
+
+  function brandAnchor(cls, b, sz) {
+    var a = document.createElement("a");
+    a.className = cls; a.href = b.href;
+    a.innerHTML = '<img class="brandlogo" src="' + b.logo + '" alt="' + b.t + '" width="' + sz + '" height="' + sz + '" loading="lazy"/><span>' + b.t + "</span>";
+    return a;
+  }
+
+  function run() {
+    var wrap = document.querySelector(".ca-navwrap");
+    if (!wrap) return;
+    if (wrap.querySelector(".ddi-sub")) return; // Astro pages already have it
+    injectCss();
+
+    // ---- desktop dropdown ----
+    var ddis = wrap.querySelectorAll(".dropdown .dd-inner a");
+    for (var i = 0; i < ddis.length; i++) {
+      var a = ddis[i];
+      if (txt(a) === LABEL) {
+        var sub = document.createElement("div"); sub.className = "ddi-sub";
+        var parent = document.createElement("a"); parent.className = "ddi ddi-parent";
+        parent.href = DEST; parent.innerHTML = LABEL + '<span class="subchev">›</span>';
+        var fly = document.createElement("div"); fly.className = "flyout";
+        BRANDS.forEach(function (b) { fly.appendChild(brandAnchor("ddi ddi-brand", b, 22)); });
+        sub.appendChild(parent); sub.appendChild(fly);
+        a.parentNode.replaceChild(sub, a);
+        parent.addEventListener("click", function (e) {
+          var noHover = window.matchMedia && window.matchMedia("(hover: none)").matches;
+          if (noHover && !sub.classList.contains("open")) { e.preventDefault(); e.stopPropagation(); sub.classList.add("open"); }
+        });
+        break;
+      }
+    }
+
+    // ---- mobile accordion ----
+    var msubs = wrap.querySelectorAll(".mobilepanel .m-sub a");
+    for (var j = 0; j < msubs.length; j++) {
+      var ma = msubs[j];
+      if (txt(ma) === LABEL) {
+        ma.setAttribute("href", DEST); // repair dead "#" link
+        var after = ma.nextSibling;
+        BRANDS.forEach(function (b) { ma.parentNode.insertBefore(brandAnchor("m-subitem", b, 20), after); });
+        break;
+      }
+    }
+  }
+
+  ready(run);
+})();
