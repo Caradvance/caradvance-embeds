@@ -1,12 +1,12 @@
 ---
 const { lang = 'hu' } = Astro.props;
-const _rebuild='rebuild-nudge-2';
+const _rebuild='rebuild-nudge-3';
 ---
 <section class="egl">
   <div class="egl-in">
-    <nav class="egl-crumb"><a href="/">Főoldal</a> / <span>Egyedi autó rendelés</span></nav>
-    <h1>Egyedi autó rendelés</h1>
-    <p class="egl-sub">Új BMW és MINI modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.
+    <nav class="egl-crumb"><a href="/">Főoldal</a> / <span id="eglCrumbCur">Egyedi autó rendelés</span></nav>
+    <h1 id="eglTitle">Egyedi autó rendelés</h1>
+    <p class="egl-sub" id="eglSub">Új BMW, MINI és Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.
       Az árak tájékoztató német nettó listaárak, élő árfolyammal (1&nbsp;€ = <span id="eglFx">361</span>&nbsp;Ft).</p>
 
     <div class="egl-filters">
@@ -272,6 +272,22 @@ const _rebuild='rebuild-nudge-2';
 
   var grid=document.getElementById('eglGrid');
   var q=document.getElementById('eglQ'), fb=document.getElementById('eglBody'), ff=document.getElementById('eglFuel'), fbr=document.getElementById('eglBrand');
+
+  var HERO={
+    'BMW':{crumb:'BMW',title:'Egyedi BMW rendelés',intro:'Új BMW modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
+    'MINI':{crumb:'MINI',title:'Egyedi MINI rendelés',intro:'Új MINI modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
+    'MB':{crumb:'Mercedes-Benz',title:'Egyedi Mercedes-Benz rendelés',intro:'Új Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
+    '':{crumb:'Egyedi autó rendelés',title:'Egyedi autó rendelés',intro:'Új BMW, MINI és Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'}
+  };
+  function applyHero(br){
+    var h=HERO[br]||HERO[''];
+    var t=document.getElementById('eglTitle'); if(t) t.textContent=h.title;
+    var c=document.getElementById('eglCrumbCur'); if(c) c.textContent=h.crumb;
+    var fxEl=document.getElementById('eglFx'); var fx=fxEl?fxEl.textContent:'361';
+    var s=document.getElementById('eglSub');
+    if(s) s.innerHTML=h.intro+' Az árak tájékoztató német nettó listaárak, élő árfolyammal (1&nbsp;€ = <span id="eglFx">'+fx+'</span>&nbsp;Ft).';
+  }
+
   function render(){
     var qq=(q.value||'').toLowerCase(), b=fb.value, f=ff.value, br=fbr.value;
     var list=CARS.filter(function(c){
@@ -311,7 +327,9 @@ const _rebuild='rebuild-nudge-2';
     document.getElementById('eglCount').textContent = list.length + ' modell';
   }
   [q,fb,ff,fbr].forEach(function(el){ el.addEventListener('input',render); el.addEventListener('change',render); });
+  fbr.addEventListener('change',function(){ applyHero(fbr.value); });
   try{var _qb=new URLSearchParams(location.search).get('brand'); if(_qb){ var _map={bmw:'BMW',mini:'MINI',mercedes:'MB',mb:'MB'}; fbr.value=(_map[_qb.toLowerCase()]||_qb); }}catch(e){}
+  applyHero(fbr.value);
   render();
   try{
     fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
