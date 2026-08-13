@@ -66,7 +66,7 @@ const _rebuild='rebuild-nudge-2';
   .egl-mlogo{height:16px;width:auto;margin-left:6px;}
   .egl-jcwlogo{height:19px;width:auto;margin-left:8px;}
   .egl-mblogo{height:26px;width:auto;}
-  .egl-amglogo{height:13px;width:auto;margin-left:8px;}
+  .egl-amglogo{height:9px;width:auto;margin-left:8px;}
   .egl-year{font-size:13.5px;color:var(--muted);}
   .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;}
   .egl-card-mini .egl-body{display:flex;flex-direction:column;flex:1;}
@@ -239,7 +239,7 @@ const _rebuild='rebuild-nudge-2';
     var logoHtml;
     if(isMB){
       var isAMG = /AMG/.test(c.name);
-      logoHtml = '<img class="egl-mblogo" src="/mb-star.webp?v=1" alt="Mercedes-Benz"/>' + (isAMG ? '<img class="egl-amglogo" src="/mb-logo.webp?v=1" alt="Mercedes-AMG"/>' : '');
+      logoHtml = '<img class="egl-mblogo" src="/mb-star.webp?v=1" alt="Mercedes-Benz"/>' + (isAMG ? '<img class="egl-amglogo" src="/mb-logo.webp?v=2" alt="Mercedes-AMG"/>' : '');
     } else if(isMini){
       logoHtml = '<img class="egl-minilogo" src="/mini-logo.webp?v=3" alt="MINI"/>' + (c.logo==='jcw' ? '<img class="egl-jcwlogo" src="/jcw-logo.webp?v=3" alt="John Cooper Works"/>' : '');
     } else {
