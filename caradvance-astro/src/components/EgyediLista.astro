@@ -11,7 +11,7 @@ const _rebuild='rebuild-nudge-3';
         <div class="egl-mhero-logos"><img src="/mini-hero-logo.webp" alt="Mini Cooper"/></div>
         <div class="egl-mhero-h1">Egyedi Mini Cooper rendelés</div>
         <p class="egl-mhero-sub">Új Mini Cooper és John Cooper Works modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.</p>
-        <div class="egl-mhero-filters"></div>
+        <div class="egl-mhero-cta"><a class="egl-mhero-btn red" href="/berelheto">Bérlés</a><a class="egl-mhero-btn white" href="/elonyok">Előnyök</a></div>
       </div>
       <button class="egl-mhero-scroll" type="button" onclick="window.scrollBy({top:Math.round(window.innerHeight*0.72),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
     </div>
@@ -51,8 +51,12 @@ const _rebuild='rebuild-nudge-3';
   .egl-mhero-logos img{height:78px;width:auto;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));}
   .egl-mhero-h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.35);}
   .egl-mhero-sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:600px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4);}
-  .egl-mhero-filters{max-width:1000px;margin:0 auto;}
-  .egl-mhero-filters .egl-filters{margin-bottom:0;justify-content:center;}
+  .egl-mhero-cta{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+  .egl-mhero-btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;padding:15px 32px;border-radius:999px;text-decoration:none;transition:.15s;box-shadow:0 8px 22px rgba(0,0,0,.22);}
+  .egl-mhero-btn.red{background:#e2001a;color:#fff;}
+  .egl-mhero-btn.red:hover{background:#c40017;}
+  .egl-mhero-btn.white{background:#fff;color:#0f1b2d;}
+  .egl-mhero-btn.white:hover{background:#eef0f4;}
   .egl-mhero-scroll{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.82);background:none;border:0;cursor:pointer;letter-spacing:.05em;font-size:11px;text-transform:uppercase;font-family:inherit;animation:caScrollBob 1.9s ease-in-out infinite;}
   .egl-mhero-scroll:hover{color:#fff;}
   .egl-mhero-scroll svg{width:26px;height:26px;}
@@ -67,7 +71,7 @@ const _rebuild='rebuild-nudge-3';
     border-radius:12px;padding:14px 42px 14px 18px;font-size:15px;color:var(--ink);font-family:inherit;cursor:pointer;min-width:170px;}
   .egl-sel::after{content:'⌄';position:absolute;right:16px;top:50%;transform:translateY(-60%);color:var(--muted);pointer-events:none;font-size:16px;}
   .egl-sel select:focus{outline:none;border-color:#c9d3e3;}
-  .egl-count{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:16px;}
+  .egl-count{display:none;}
   .egl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
   .egl-new{position:absolute;left:14px;top:14px;background:var(--red);color:#fff;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;letter-spacing:.05em;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.18);}
   .egl-section{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800;color:var(--ink);margin:26px 0 2px;letter-spacing:-.01em;}
@@ -76,10 +80,10 @@ const _rebuild='rebuild-nudge-3';
   .egl-section .cnt{font-size:14px;font-weight:600;color:var(--muted);}
   @media (max-width:900px){.egl-grid{grid-template-columns:repeat(2,1fr);}}
   @media (max-width:600px){.egl-grid{grid-template-columns:1fr;}}
-  .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:visible;position:relative;
     display:flex;flex-direction:column;transition:.18s;text-decoration:none;color:inherit;}
-  .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.10);transform:translateY(-3px);}
-  .egl-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:flex-end;justify-content:center;padding:6px 4px 0;}
+  .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.10);transform:translateY(-3px);z-index:30;}
+  .egl-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:flex-end;justify-content:center;padding:6px 4px 0;border-radius:20px 20px 0 0;overflow:hidden;}
   .egl-media img{max-width:78%;max-height:88%;width:auto;height:auto;object-fit:contain;margin:0 auto;display:block;}
   .egl-fuels{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
   .egl-fuel{color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12);}
@@ -278,7 +282,7 @@ const _rebuild='rebuild-nudge-3';
     } else if(!isMini && SOON.indexOf(slug(c))>-1){
       priceHtml = '<span class="egl-soon">Hamarosan</span>';
     } else {
-      priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak. A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
+      priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
     }
     var href = (isMini||isMB) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c);
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
@@ -307,10 +311,9 @@ const _rebuild='rebuild-nudge-3';
   var filtersHomeParent=filtersEl?filtersEl.parentNode:null, filtersHomeNext=document.getElementById('eglCount');
   var textHeroEls=[document.querySelector('.egl-crumb'), document.getElementById('eglTitle'), document.getElementById('eglSub')];
   function setMiniHero(br){
-    if(!mhero||!filtersEl) return;
-    var holder=mhero.querySelector('.egl-mhero-filters');
-    if(br==='MINI'){ mhero.style.display=''; holder.appendChild(filtersEl); textHeroEls.forEach(function(e){ if(e) e.style.display='none'; }); }
-    else { mhero.style.display='none'; if(filtersEl.parentNode!==filtersHomeParent) filtersHomeParent.insertBefore(filtersEl, filtersHomeNext); textHeroEls.forEach(function(e){ if(e) e.style.display=''; }); }
+    if(!mhero) return;
+    if(br==='MINI'){ mhero.style.display=''; textHeroEls.forEach(function(e){ if(e) e.style.display='none'; }); if(filtersEl) filtersEl.style.display='none'; }
+    else { mhero.style.display='none'; textHeroEls.forEach(function(e){ if(e) e.style.display=''; }); if(filtersEl) filtersEl.style.display=''; }
   }
 
   function mbClass(c){ var n=c.name;
@@ -412,10 +415,12 @@ const _rebuild='rebuild-nudge-3';
   try{var _qb=new URLSearchParams(location.search).get('brand'); if(_qb){ var _map={bmw:'BMW',mini:'MINI',mercedes:'MB',mb:'MB'}; fbr.value=(_map[_qb.toLowerCase()]||_qb); }}catch(e){}
   applyHero(fbr.value);
   render();
-  try{
+  function loadFx(){ try{
     fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
       if(d&&d.rates&&d.rates.HUF){ FX=Math.round(d.rates.HUF); var e=document.getElementById('eglFx'); if(e)e.textContent=FX; render(); }
     }).catch(function(){});
-  }catch(e){}
+  }catch(e){} }
+  loadFx();
+  setInterval(loadFx, 3600000);
 })();
 </script>
