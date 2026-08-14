@@ -226,7 +226,7 @@
     syncNavMenu(wrap, "Prémium autóbérlés",
       ["Rövid távú bérlés", "Hosszú távú bérlés", "Flotta kezelés", "Feltételek"],
       {},
-      [{ t: "Bérlési folyamat", href: "#" }, { t: "Előnyök", href: "#" }, { t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
+      [{ t: "Bérlési folyamat", href: "#" }, { t: "Előnyök", href: "/berles-elonyei" }, { t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
     syncNavMenu(wrap, "Megvásárolható autóink",
       [],
       { "Előnyök": "/vasarlas-elonyei" },
