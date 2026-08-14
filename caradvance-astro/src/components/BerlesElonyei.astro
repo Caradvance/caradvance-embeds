@@ -7,7 +7,7 @@ const IMG = 'https://www.caradvance.hu/';
 const benefits = [
 { t: 'Kiváló bérleti díj — kedvező kaució', img: IMG + 'piros-bmw-x6-m-premium-autoberles.webp',
 d: 'Az egyik legjobb ajánlat a piacon a bérleti díj és a kaució arányát tekintve. Nálunk nem kell az autó értékének 20%-át kaucióként letenned — sokkal kedvezőbb feltételekkel ülhetsz a volán mögé.' },
-{ t: 'Német új vagy alig használt autók', img: IMG + 'autoszallitas-autoimport-nemetorszagbol.webp',
+{ t: 'Német új vagy alig használt autók', img: IMG + 'berles-02-hero.webp', tall: true,
 d: 'Kizárólag német, új vagy alig használt, kifogástalan állapotú prémium autókat kínálunk bérlésre. Gondozott, megbízható darabok — pontosan olyan, amilyet szeretnél.' },
 { t: 'Félévente új autó, a te választásod', img: IMG + 'bmw-m3-touring-premium-auto-eladas.webp',
 d: 'Nem köt egyetlen modell sem: akár félévente új, általad választott autóba ülhetsz. Mindig friss modellek, mindig a saját ízlésed szerint — anélkül, hogy egy autóhoz lennél kötve.' },
@@ -44,7 +44,7 @@ d: 'A szervizköltséget és az adókat mi álljuk, ráadásul a nyári és tél
 </div>
 <div class="wrap el-wrap">
 {benefits.map((b, i) => (
-<div class={`zz${i % 2 ? ' flip' : ''}`}>
+<div class={`zz${i % 2 ? ' flip' : ''}${b.tall ? ' zz-tall' : ''}`}>
 <div class="zz-media"><img src={b.img} alt={b.t} loading="lazy" onerror="this.closest('.zz-media').classList.add('noimg')" /></div>
 <div class="zz-text">
 <span class="zz-num">{String(i + 1).padStart(2, '0')}</span>
@@ -75,6 +75,11 @@ d: 'A szervizköltséget és az adókat mi álljuk, ráadásul a nyári és tél
 .zz{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;padding:34px 0}
 .zz + .zz{border-top:1px solid var(--line)}
 .zz.flip .zz-media{order:2}
+.zz.zz-tall{align-items:stretch}
+.zz.zz-tall .zz-text{display:flex;flex-direction:column;align-items:flex-start}
+.zz.zz-tall .zz-text .zz-num{align-self:flex-start;margin-top:0}
+.zz.zz-tall .zz-text p{margin-top:auto}
+@media(max-width:820px){.zz.zz-tall .zz-text p{margin-top:12px}}
 .zz-media{border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(8,8,10,.12);background:linear-gradient(135deg,#1a1d23,#3a3f4a);aspect-ratio:16/10}
 .zz-media img{width:100%;height:100%;object-fit:cover;display:block}
 .zz-media.noimg{position:relative}
