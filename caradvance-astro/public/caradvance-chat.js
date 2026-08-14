@@ -170,6 +170,20 @@
     return a;
   }
 
+  /* caMenuSync: keep the baked-page nav menus in step with Nav.astro */
+  function applyMenu(container, isMobile, removeList, setHref, addList) {
+    if (!container) return;
+    removeList.forEach(function (rt) { [].slice.call(container.querySelectorAll("a")).forEach(function (a) { if (txt(a) === rt) a.remove(); }); });
+    Object.keys(setHref).forEach(function (t2) { [].slice.call(container.querySelectorAll("a")).forEach(function (a) { if (txt(a) === t2) a.setAttribute("href", setHref[t2]); }); });
+    addList.forEach(function (item) { var has = [].slice.call(container.querySelectorAll("a")).some(function (a) { return txt(a) === item.t; }); if (!has) { var a = document.createElement("a"); if (!isMobile) a.className = "ddi"; a.href = item.href; a.textContent = item.t; container.appendChild(a); } });
+  }
+  function syncNavMenu(wrap, label, removeList, setHref, addList) {
+    var nis = wrap.querySelectorAll(".navitem");
+    for (var i = 0; i < nis.length; i++) { var nl = nis[i].querySelector(".navlink"); if (nl && txt(nl).indexOf(label) === 0) { applyMenu(nis[i].querySelector(".dropdown .dd-inner"), false, removeList, setHref, addList); break; } }
+    var accs = wrap.querySelectorAll(".mobilepanel .m-acc");
+    for (var k = 0; k < accs.length; k++) { var b = accs[k].querySelector(".m-accbtn"); if (b && txt(b).indexOf(label) === 0) { applyMenu(accs[k].querySelector(".m-sub"), true, removeList, setHref, addList); break; } }
+  }
+
   function run() {
     var wrap = document.querySelector(".ca-navwrap");
     if (!wrap) return;
@@ -207,6 +221,16 @@
         break;
       }
     }
+
+    // ---- caMenuSync: mirror the Nav.astro menu changes onto baked pages ----
+    syncNavMenu(wrap, "Prémium autóbérlés",
+      ["Rövid távú bérlés", "Hosszú távú bérlés", "Flotta kezelés", "Feltételek"],
+      {},
+      [{ t: "Bérlési folyamat", href: "#" }, { t: "Előnyök", href: "#" }, { t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
+    syncNavMenu(wrap, "Megvásárolható autóink",
+      [],
+      { "Előnyök": "/vasarlas-elonyei" },
+      [{ t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
   }
 
   ready(run);
