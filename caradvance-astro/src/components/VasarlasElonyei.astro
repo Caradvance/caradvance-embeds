@@ -1,0 +1,92 @@
+---
+import '../styles/eladom.css';
+import type { Locale } from '../i18n/utils';
+const { lang } = Astro.props as { lang: Locale };
+
+const IMG = 'https://www.caradvance.hu/';
+const benefits = [
+{ t: 'A piac legjobb ára', img: IMG + 'piros-bmw-x6-m-premium-autoberles.webp',
+d: 'A német piacon egyszerre több százezer autó verseng a vevőkért, ami lenyomja az árakat. A teljes kínálatot átnézzük helyetted, és a lehető legjobb piaci áron szerezzük meg a kiválasztott autót — a behozatallal együtt is gyakran kedvezőbben jársz, mint itthon.' },
+{ t: 'Német új vagy alig használt autók', img: IMG + 'autoszallitas-autoimport-nemetorszagbol.webp',
+d: 'Kizárólag német, új vagy alig használt, kifogástalan állapotú autókat hozunk. Gondos karbantartás, minőségi utak és fegyelmezett szervizkultúra áll mögöttük — így ugyanazért a pénzért megbízhatóbb, hosszabb élettartamú autót kapsz.' },
+{ t: 'Végigkísérünk — az átvétel után is', img: IMG + 'bmw-m3-touring-premium-auto-eladas.webp',
+d: 'Segítünk kiválasztani a megfelelő autót, intézzük a teljes papírmunkát, és gondoskodunk mindenről, amíg a kulcsot a kezedbe nem adjuk. De nem állunk meg itt: az átvétel után is bármikor számíthatsz ránk.' },
+{ t: 'A sajátod — minden előnnyel, km-korlát nélkül', img: IMG + 'toyota-rav4-hybrid-hasznaltauto-eladas.webp',
+d: 'Az autó a tiéd, minden tulajdonosi előnnyel. Nincs kilométer-korlát: annyit vezetsz vele, amennyit csak szeretnél — semmi nem köt és semmi nem korlátoz.' },
+{ t: 'Bármikor továbbértékesítheted', img: IMG + 'caradvance-hero-x5-poster.jpg',
+d: 'Mivel a sajátod, bármikor eladhatod vagy továbbértékesítheted — nem köt hosszú távú bérleti szerződés, és nem kell a futamidő végét kivárnod. Szabadon döntesz az autód sorsáról.' },
+{ t: '19% német áfa — magánszemélyként is', img: IMG + 'bmw-m3-touring-premium-auto-eladas.webp',
+d: 'Magánszemélyként is vásárolhatsz tőlünk a müncheni Caradvance GmbH-n keresztül, akár 19%-os német áfával a hazai 27% helyett. Ez jelentős megtakarítás — az autó még kedvezőbb áron lehet a tiéd.' },
+];
+---
+<section class="el">
+<section class="hero">
+<video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-beszerzesi-poster.jpg">
+<source src="https://www.caradvance.hu/caradvance-hero-beszerzesi.mp4" type="video/mp4" />
+</video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>A vásárlás előnyei —<br /><span class="accent">miért tőlünk vedd?</span></h1>
+<p class="sub sub-wide" style="max-width:900px">Prémium német autók a legjobb piaci áron, kulcsrakész behozatallal — és a sajátodként, minden tulajdonosi előnnyel. Mutatjuk, miért éri meg tőlünk vásárolni a következő autódat.</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="/egyedi-auto-rendeles">Autók böngészése</a>
+<a class="btn btn-white" href="/kapcsolat">Kapcsolat</a>
+</div>
+</div>
+<button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+</section>
+
+<section class="section" style="padding-top:56px">
+<div class="wrap center">
+<span class="eyebrow">A vásárlás előnyei</span>
+<h2 class="sec-title">Miért érdemes tőlünk autót venni?</h2>
+<p class="sec-intro">A legjobb ártól a kulcsrakész átadásig — hat ok, amiért nálunk jó kezekben van a következő autód.</p>
+</div>
+<div class="wrap el-wrap">
+{benefits.map((b, i) => (
+<div class={`zz${i % 2 ? ' flip' : ''}`}>
+<div class="zz-media"><img src={b.img} alt={b.t} loading="lazy" onerror="this.closest('.zz-media').classList.add('noimg')" /></div>
+<div class="zz-text">
+<span class="zz-num">{String(i + 1).padStart(2, '0')}</span>
+<h3>{b.t}</h3>
+<p>{b.d}</p>
+</div>
+</div>
+))}
+</div>
+</section>
+
+<section class="section">
+<div class="wrap">
+<div class="el-cta">
+<div>
+<h2>Készen állsz? Találjuk meg a tökéletes autót.</h2>
+<p>Böngéssz a modellek között, vagy mondd el, mit keresel — a többit mi intézzük, kulcsrakészen.</p>
+</div>
+<a class="btn btn-white" href="/egyedi-auto-rendeles">Autók böngészése →</a>
+</div>
+</div>
+</section>
+</section>
+
+<style>
+.el{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
+.el-wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.zz{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;padding:34px 0}
+.zz + .zz{border-top:1px solid var(--line)}
+.zz.flip .zz-media{order:2}
+.zz-media{border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(8,8,10,.12);background:linear-gradient(135deg,#1a1d23,#3a3f4a);aspect-ratio:16/10}
+.zz-media img{width:100%;height:100%;object-fit:cover;display:block}
+.zz-media.noimg{position:relative}
+.zz-media.noimg::after{content:"CarAdvance";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:.08em;opacity:.5}
+.zz-num{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border-radius:12px;background:var(--red);color:#fff;font-weight:800;font-size:18px;letter-spacing:-.02em}
+.zz-text h3{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;margin:16px 0 12px;color:var(--ink)}
+.zz-text p{color:var(--muted);font-size:16px;line-height:1.65;margin:0}
+@media(max-width:820px){
+.zz{grid-template-columns:1fr;gap:20px;padding:26px 0}
+.zz.flip .zz-media{order:0}
+}
+.el-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.el-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
+.el-cta p{color:#cfd6e2;margin:0;font-size:15px}
+</style>
