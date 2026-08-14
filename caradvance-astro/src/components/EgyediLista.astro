@@ -165,11 +165,10 @@ const _rebuild='rebuild-nudge-3';
     {key:'3erh',name:'BMW 3-as',body:'Limuzin',fuel:'Hibrid',from:63300,hide:true},
     {key:'3erth',name:'BMW 3-as Touring',body:'Touring',fuel:'Hibrid',from:64600,hide:true},
     {key:'2erat',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Hibrid',from:49150,hide:true},
-    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Benzin',from:106500},
-    {key:'x7m',name:'BMW X7 M',body:'SUV',fuel:'Benzin',from:138000},
-    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Benzin',from:102800},
-    {key:'x6b',name:'BMW X6 M',body:'SUV Coupé',fuel:'Benzin',from:123500},
-    {key:'x6',name:'BMW X6 M Competition',body:'SUV Coupé',fuel:'Benzin',from:171900},
+    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Benzin',fuels:['Benzin','Dízel'],from:106500},
+    {key:'x7m',name:'BMW X7 M',body:'SUV',fuel:'Benzin',from:138000,hide:true},
+    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Benzin',from:102800,hide:true},
+    {key:'x6b',name:'BMW X6 M',body:'SUV Coupé',fuel:'Benzin',from:123500,hide:true},
     {key:'x5',name:'BMW X5',body:'SUV',fuel:'Benzin',from:99750,hide:true},
     {key:'x3',name:'BMW X3',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/x3mw.webp?v=6',from:60300},
     {key:'x3mw',name:'BMW X3 M',body:'SUV',fuel:'Benzin',from:85200,hide:true},
@@ -204,10 +203,11 @@ const _rebuild='rebuild-nudge-3';
     {key:'m2gc',name:'BMW 2-es Gran Coupé M',body:'Gran Coupé',fuel:'Benzin',from:60650,hide:true},
     {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Benzin',fuels:['Benzin','Dízel'],from:34250},
     {key:'1er',name:'BMW 1-es M',body:'Kompakt',fuel:'Benzin',from:57150,hide:true},
-    {key:'z4',name:'BMW Z4',body:'Roadster',fuel:'Benzin',from:49900},
-    {key:'z4m',name:'BMW Z4 M',body:'Roadster',fuel:'Benzin',from:68900},
-    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Dízel',from:108500},
-    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Dízel',from:98100},
+    {key:'z4',name:'BMW Z4',body:'Roadster',fuel:'Benzin',from:49900,hide:true},
+    {key:'z4m',name:'BMW Z4 M',body:'Roadster',fuel:'Benzin',from:68900,hide:true},
+    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Dízel',from:108500,hide:true},
+    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Dízel',fuels:['Benzin','Dízel'],from:98100},
+    {key:'x6',name:'BMW X6 M Competition',body:'SUV Coupé',fuel:'Benzin',from:171900},
     {key:'x5',name:'BMW X5',body:'SUV',fuel:'Dízel',fuels:['Benzin','Hibrid','Dízel'],from:95750},
     {key:'x3m',name:'BMW X3',body:'SUV',fuel:'Dízel',from:62800,hide:true},
     {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Dízel',from:49200,hide:true},
@@ -288,7 +288,7 @@ const _rebuild='rebuild-nudge-3';
     if(/\bXM\b/.test(n))return'XM'; if(/iX1|X1\b/.test(n))return'X1'; if(/iX2|X2\b/.test(n))return'X2'; if(/iX3|X3\b/.test(n))return'X3';
     if(/iX5|X5\b/.test(n))return'X5'; if(/X6\b/.test(n))return'X6'; if(/X7\b/.test(n))return'X7'; if(/\biX\b/.test(n))return'iX';
     if(/\bi3\b/.test(n))return'3-as'; if(/Z4/.test(n))return'Z4'; return'Egyéb'; }
-  var BMWORDER=['1-es','2-es','3-as','4-es','5-ös','7-es','iX','X1','X2','X3','X5','X6','X7','XM','Z4'];
+  var BMWORDER=['1-es','2-es','3-as','4-es','5-ös','7-es','iX','X1','X2','X3','X5','X6','X7','XM'];
   function isGrouped(br){ return br==='MB'||br==='BMW'; }
   function groupOf(c,br){ return br==='MB'?mbClass(c):(br==='BMW'?bmwSeries(c):''); }
   function groupOrder(br){ return br==='MB'?MBORDER:(br==='BMW'?BMWORDER:[]); }
