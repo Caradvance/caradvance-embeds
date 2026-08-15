@@ -12,14 +12,14 @@ const deposits = [
 ];
 
 const steps = [
-  { t: 'Válaszd ki az autót', html: 'Nézd meg a Bérelhető autóink kínálatát, vagy ha egy konkrét, még be nem hozott modellre vágysz, indítsd el az Új autó bérlése folyamatot. Döntsd el, hogy magánszemélyként vagy cégként szeretnél bérelni.', btns: [{ label: 'Bérelhető autóink →', href: '/berelheto' }, { label: 'Új autó bérlése →', href: 'https://www.caradvance.hu/beszerzesi-folyamat/#' }] },
-  { t: 'Vedd fel velünk a kapcsolatot', html: 'Válaszd ki a számodra megfelelő autót, majd írj egy e-mailt, hívj minket telefonon, vagy töltsd ki az érdeklődési űrlapot. A minimális bérlési idő minden esetben 6 hónap.', btns: [{ label: 'E-mail írása →', href: 'mailto:import@caradvance.de' }, { label: 'Hívj minket →', href: 'tel:+36302336060' }, { label: 'Érdeklődési űrlap →', href: '/kapcsolat' }] },
+  { t: 'Válaszd ki az autót', html: 'Nézd meg a Bérelhető autóink kínálatát, vagy ha egy konkrét, még be nem hozott modellre vágysz, indítsd el az Új autó bérlése folyamatot.<sup>1, 2</sup> Döntsd el, hogy magánszemélyként vagy cégként szeretnél bérelni.<sup>3</sup>', btns: [{ label: 'Bérelhető autóink →', href: '/berelheto' }, { label: 'Új autó bérlése →', href: 'https://www.caradvance.hu/beszerzesi-folyamat/#' }] },
+  { t: 'Vedd fel velünk a kapcsolatot', html: 'Válaszd ki a számodra megfelelő autót, majd írj egy e-mailt, hívj minket telefonon, vagy töltsd ki az érdeklődési űrlapot. A minimális bérlési idő minden esetben 6 hónap.<sup>4</sup>', btns: [{ label: 'Érdeklődési űrlap →', href: '/kapcsolat' }] },
   { t: 'Megküldjük az ajánlatot', html: 'Elküldjük a konkrét autóra szóló ajánlatot minden részlettel. A készlettől, az igényeidtől és attól függően, hogy teljesen új vagy újszerű autóról van szó, megadjuk a várható szállítási időt és a szerződés feltételeit.', btns: [{ label: 'Ajánlat – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Ajánlat – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
-  { t: 'Az ajánlat elfogadása és leinformálás', html: 'Ha elfogadod az ajánlatot, részletes adatokat kérünk tőled — magánszemélyként vagy cégként. Ezt követően egy gyors, előzetes ellenőrzést végzünk.' },
+  { t: 'Az ajánlat elfogadása és leinformálás', html: 'Ha elfogadod az ajánlatot, részletes adatokat kérünk tőled — magánszemélyként vagy cégként. Ezt követően egy gyors, előzetes ellenőrzést végzünk.<sup>5</sup>' },
   { t: 'Előszerződés aláírása', html: 'A besorolásodnak megfelelően megküldjük az előszerződést — magánszemélyként vagy cégként. Aláírod az előszerződést, és visszaküldöd nekünk.', btns: [{ label: 'Előszerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Előszerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
-  { t: 'Kaució befizetése', html: 'A kauciót a németországi Caradvance GmbH részére fizeted be, az autó kategóriájának megfelelő összegben. Az alábbi táblázat mutatja, melyik autóhoz mekkora kaució tartozik:', table: true },
-  { t: 'Beszerzés és szállítás', html: 'Megvásároljuk a kiválasztott autót Németországban, és házhoz szállítjuk neked.' },
-  { t: 'Átvételi ellenőrzés', html: 'Amikor az autó megérkezik, alaposan átnézzük: fotókat készítünk a külsőről, a belső térről, valamint a kilométeróra- és üzemanyagszintről. Ekkor töltjük ki az átadási jegyzőkönyvet is.', btns: [{ label: 'Átadási jegyzőkönyv →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
+  { t: 'Kaució befizetése', html: 'A kauciót a németországi Caradvance GmbH részére fizeted be, az autó kategóriájának megfelelő összegben.<sup>6</sup> Az alábbi táblázat mutatja, melyik autóhoz mekkora kaució tartozik:', table: true },
+  { t: 'Beszerzés és szállítás', html: 'Megvásároljuk a kiválasztott autót Németországban, és házhoz szállítjuk neked.<sup>7</sup>' },
+  { t: 'Átvételi ellenőrzés', html: 'Amikor az autó megérkezik, alaposan átnézzük: fotókat készítünk a külsőről, a belső térről, valamint a kilométeróra- és üzemanyagszintről. Ekkor töltjük ki az átadási jegyzőkönyvet is.<sup>8</sup>', btns: [{ label: 'Átadási jegyzőkönyv →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Végleges szerződés', html: 'Mindkét fél aláírja a végleges szerződést, amely tartalmazza az átadási jegyzőkönyvet is.', btns: [{ label: 'Végleges szerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Végleges szerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Az autó a tiéd', html: 'Az autó a következő hat hónapra a tiéd — nincs más dolgod, mint vezetni.' },
 ];
@@ -39,7 +39,7 @@ const howToJson = {
   '@context': 'https://schema.org', '@type': 'HowTo',
   name: 'Prémium autóbérlés — a bérlési folyamat',
   description: 'Hogyan bérelhetsz kulcsrakészen egy prémium német autót, lépésről lépésre.',
-  step: steps.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.t, text: s.html.replace(/<[^>]+>/g, '') })),
+  step: steps.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.t, text: s.html.replace(/<sup>.*?<\/sup>/g, '').replace(/<[^>]+>/g, '') })),
 };
 const serviceJson = {
   '@context': 'https://schema.org', '@type': 'Service',
@@ -109,12 +109,18 @@ const serviceJson = {
 <div class="bl-term-box">min. 6 hónap<span class="bl-sub">bérlési idő</span></div>
 <div class="bl-term-card">
 <h3>A következő 6 hónapra a tiéd</h3>
-<p>Az autót minimum 6 hónapra bérled, és ez idő alatt a tiéd. A futáskeret havi 2 000 vagy 3 000 km, az autótól és a választott csomagtól függően.<sup>1</sup> A számlát minden hónap 1-jén küldjük, és az adott havi díjat előre kell megfizetni.<sup>2</sup></p>
+<p>Az autót minimum 6 hónapra bérled, és ez idő alatt a tiéd. A futáskeret havi 2 000 vagy 3 000 km, az autótól és a választott csomagtól függően. A számlát minden hónap 1-jén küldjük, és az adott havi díjat előre kell megfizetni.</p>
 </div>
 </div>
 <div class="bl-notes">
-<p><sup>1</sup> A futáskeret és a pontos havi díj a szerződésben rögzített csomagtól függ; a keret túllépése esetén kilométerenkénti díjat számítunk fel.</p>
-<p><sup>2</sup> A havi bérleti díj az adott hónapra előre, a számlán feltüntetett fizetési határidőig esedékes.</p>
+<p><sup>1</sup> A Bérelhető autóink azonnal elérhetők, így a bérlés hamar elindulhat. Új autó választása esetén azonban akár 4 hónapot is igénybe vehet, amíg megkapod a járművet — előfordulhat, hogy kifejezetten a te megrendelésedre gyártják le.</p>
+<p><sup>2</sup> Fenntartjuk a jogot, hogy egyes túlzottan egyedi új autó megrendeléseket visszautasítsunk, ha az adott konfiguráció a bérlést követően nehezen értékesíthető.</p>
+<p><sup>3</sup> Magánszemélyként a bérlés a 19%-os német áfa megfizetésével jár; cégként nettó számlát állítunk ki.</p>
+<p><sup>4</sup> A bérlés indításakor eldöntöd, hogy havi 2 000 vagy 3 000 km futáskeretet szeretnél. Egyedi igény esetén ennél több kilométer is kérhető, ezt azonban a bérleti díjban arányosan érvényesítjük; a keret túllépése esetén kilométerenkénti díjat számítunk fel.</p>
+<p><sup>5</sup> A személyes, illetve céges adatokat azért kérjük, hogy hitelképességi vizsgálatot (due diligence) végezhessünk magánszemélyként vagy cégként. Fenntartjuk a jogot, hogy ügyfeleket visszautasítsunk.</p>
+<p><sup>6</sup> A kaució a legtöbb esetben fix, de fenntartjuk a jogot a módosítására, ha a hitelképesség túl alacsony, vagy azt más ok indokolja.</p>
+<p><sup>7</sup> A beszerzésről és a szállításról végig tájékoztatunk. Fontos, hogy számos külső tényező — gyártási problémák, hivatali ügyintézés, biztosítás, casco, szállítási nehézségek stb. — megnehezíti a pontos időzítést, és további csúszást okozhat. Mindent megteszünk, hogy a lehető leghamarabb megkapd az autót.</p>
+<p><sup>8</sup> Az átvételkor együtt, pontról pontra átnézzük az autó állapotát, és videó- és fotódokumentációt készítünk mindkét fél biztonsága érdekében. Ugyanez történik az autó visszaadásakor is, amikor összevetjük, keletkezett-e sérülés vagy egyéb probléma. A kisebb, könnyen kezelhető esetekre is ezért szolgál a kaució.</p>
 </div>
 </div>
 </section>
@@ -158,6 +164,7 @@ const serviceJson = {
 .pf-b h3{font-size:18px;font-weight:800;margin:0 0 6px;color:var(--ink)}
 .pf-b p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0}
 .pf-b p a{color:var(--red);font-weight:700;text-decoration:none}
+.pf-b p sup{color:var(--red);font-weight:700}
 .pf-b p a:hover{text-decoration:underline}
 .dep-table{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .dep-row{display:grid;grid-template-columns:96px 1fr;gap:0;border-top:1px solid var(--line)}
