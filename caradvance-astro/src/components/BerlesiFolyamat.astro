@@ -1,0 +1,213 @@
+---
+import '../styles/eladom.css';
+import type { Locale } from '../i18n/utils';
+const { lang } = Astro.props as { lang: Locale };
+
+// Kaució-kategóriák — a feltöltött árajánlat alapján.
+const deposits = [
+  { amount: '3 000 €', cars: 'BMW 1-es, 2-es, X1, X2 · MINI Cooper (3- és 5-ajtós, Cabrio), Countryman, JCW · Mercedes A-osztály, B-osztály' },
+  { amount: '5 000 €', cars: 'BMW M2 Coupé, 3-as (Limousine/Touring), 4-es (Coupé/Cabrio), X3 · Mercedes A-osztály AMG, C-osztály (Limousine/T-modell), CLE (Coupé/Cabrio), GLA, GLB, GLC, GLC Coupé' },
+  { amount: '7 500 €', cars: 'BMW M3 (Limousine/Touring), M4 (Coupé/Cabrio), 5-ös (Limousine/Touring), X6, X7 · Mercedes C-osztály AMG (Limousine/T-modell), CLE AMG (Coupé/Cabrio), E-osztály (Limousine/T-modell), GLA AMG, GLB AMG, GLC AMG, GLC Coupé AMG, GLE, GLE Coupé' },
+  { amount: '10 000 €', cars: 'BMW M5 (Limousine/Touring), 7-es, X6 M · Mercedes E-osztály AMG (Limousine/T-modell), GLE AMG, GLE Coupé AMG, S-osztály' },
+];
+
+const steps = [
+  { t: 'Válaszd ki az autót', html: 'Nézd meg a <a href="/berelheto">Bérelhető autóink</a> kínálatát, vagy ha egy konkrét, még be nem hozott modellre vágysz, indítsd el az <a href="/beszerzesi-folyamat/#">Új autó bérlése</a> folyamatot. Döntsd el, hogy magánszemélyként vagy cégként szeretnél bérelni.' },
+  { t: 'Vedd fel velünk a kapcsolatot', html: 'Válaszd ki a számodra megfelelő autót, majd írj egy e-mailt, hívj minket telefonon, vagy töltsd ki az <a href="/kapcsolat">érdeklődési űrlapot</a>. A minimális bérlési idő minden esetben 6 hónap.' },
+  { t: 'Megküldjük az ajánlatot', html: 'Elküldjük a konkrét autóra szóló ajánlatot minden részlettel. A készlettől, az igényeidtől és attól függően, hogy teljesen új vagy újszerű autóról van szó, megadjuk a várható szállítási időt és a szerződés feltételeit.' },
+  { t: 'Az ajánlat elfogadása és leinformálás', html: 'Ha elfogadod az ajánlatot, részletes adatokat kérünk tőled — magánszemélyként vagy cégként. Ezt követően egy gyors, előzetes ellenőrzést végzünk.' },
+  { t: 'Előszerződés aláírása', html: 'A besorolásodnak megfelelően megküldjük az <a href="/kapcsolat">előszerződést</a> — magánszemélyként vagy cégként. Aláírod az előszerződést, és visszaküldöd nekünk.' },
+  { t: 'Kaució befizetése', html: 'A kauciót a németországi Caradvance GmbH részére fizeted be, az autó kategóriájának megfelelő összegben. Az alábbi táblázat mutatja, melyik autóhoz mekkora kaució tartozik:', table: true },
+  { t: 'Beszerzés és szállítás', html: 'Megvásároljuk a kiválasztott autót Németországban, és házhoz szállítjuk neked.' },
+  { t: 'Átvételi ellenőrzés', html: 'Amikor az autó megérkezik, alaposan átnézzük: fotókat készítünk a külsőről, a belső térről, valamint a kilométeróra- és üzemanyagszintről.' },
+  { t: 'Végleges szerződés', html: 'Mindkét fél aláírja a végleges szerződést, amely tartalmazza az átadási jegyzőkönyvet is.' },
+  { t: 'Az autó a tiéd', html: 'Az autó a következő hat hónapra a tiéd — nincs más dolgod, mint vezetni.' },
+];
+
+function randomGap() {
+  const units = [
+    { unit: 'perc', min: 10, max: 50 },
+    { unit: 'óra', min: 1, max: 6 },
+    { unit: 'nap', min: 1, max: 3 },
+  ];
+  const u = units[Math.floor(Math.random() * units.length)];
+  const val = Math.floor(Math.random() * (u.max - u.min + 1)) + u.min;
+  return `~${val} ${u.unit}`;
+}
+const gaps = steps.slice(0, -1).map(() => randomGap());
+
+const includes = [
+  'Kizárólag német, új vagy alig használt prémium autók',
+  'Alacsony kaució — nem az autó értékének 20%-a',
+  'Akár félévente új, általad választott modell',
+  'A bérleti díj elszámolható költség cégként',
+  'Szervizköltség és adók — mi álljuk',
+  'Nyári és téli gumiszett tőlünk',
+];
+
+const faqs = [
+  ['Mennyi a minimális bérlési idő?', 'A minimális bérlési idő minden esetben 6 hónap. A bérlet lejártakor egyszerűen visszaadod az autót, vagy választhatsz egy új modellt.'],
+  ['Magánszemélyként és cégként is bérelhetek?', 'Igen. Már az elején eldöntheted, hogy magánszemélyként vagy cégként szeretnél bérelni — az ajánlatot, a leinformálást és az előszerződést ennek megfelelően állítjuk össze.'],
+  ['Mekkora kauciót kell fizetnem?', 'A kaució az autó kategóriájától függ: 3 000 €, 5 000 €, 7 500 € vagy 10 000 €. A pontos összeget a fenti táblázatban láthatod, és az ajánlatban is rögzítjük.'],
+  ['Kinek fizetem a kauciót?', 'A kauciót a németországi Caradvance GmbH részére fizeted be, az előszerződés aláírása után.'],
+  ['Mi van benne a bérleti díjban?', 'A szervizköltséget és az adókat mi álljuk, sőt a nyári és téli gumiszettet is tőlünk kapod. Neked csak a vezetés marad.'],
+];
+const faqJson = {
+  '@context': 'https://schema.org', '@type': 'FAQPage',
+  mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+};
+const howToJson = {
+  '@context': 'https://schema.org', '@type': 'HowTo',
+  name: 'Prémium autóbérlés — a bérlési folyamat',
+  description: 'Hogyan bérelhetsz kulcsrakészen egy prémium német autót, lépésről lépésre.',
+  step: steps.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.t, text: s.html.replace(/<[^>]+>/g, '') })),
+};
+const serviceJson = {
+  '@context': 'https://schema.org', '@type': 'Service',
+  name: 'Prémium autóbérlés — Caradvance',
+  serviceType: 'Prémium német autók bérlése kedvező feltételekkel',
+  areaServed: { '@type': 'Country', name: 'Magyarország' },
+  url: 'https://www.caradvance.hu/berlesi-folyamat/',
+  provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', telephone: '+36 30 214 6989', email: 'import@caradvance.de' },
+};
+---
+<section class="pf">
+<section class="hero">
+<video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-beszerzesi-poster.jpg">
+<source src="https://www.caradvance.hu/caradvance-hero-beszerzesi.mp4" type="video/mp4" />
+</video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>Hogyan működik a bérlés? —<br /><span class="accent">tíz lépés a saját prémium autódig</span></h1>
+<p class="sub sub-wide" style="max-width:900px">A kiválasztástól a kulcsrakész átadásig mindent mi intézünk — ajánlat, leinformálás, szerződés, beszerzés és szállítás. Te csak átveszed az autót, és a következő hat hónapra a tiéd.</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="/berelheto">Bérelhető autóink</a>
+<a class="btn btn-white" href="/berles-elonyei">A bérlés előnyei</a>
+</div>
+</div>
+<button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+</section>
+
+<section class="section" style="padding-top:56px">
+<div class="wrap center">
+<span class="eyebrow">Hogyan működik a bérlés?</span>
+<h2 class="sec-title">A bérlési folyamat, lépésről lépésre</h2>
+<p class="sec-intro">Az érdeklődésedet követően egy kollégánk felveszi veled a kapcsolatot, és onnantól kulcsrakészen mindent intézünk.</p>
+</div>
+<div class="wrap pf-wrap">
+<div class="pf-steps">
+{steps.map((s, i) => (
+<div class="pf-step">
+<div class="pf-n">{i + 1}</div>
+<div class="pf-b">
+<h3>{s.t}</h3>
+<p set:html={s.html}></p>
+{s.table && (
+<div class="dep-table">
+{deposits.map((d) => (
+<div class="dep-row">
+<div class="dep-amount">{d.amount}</div>
+<div class="dep-cars">{d.cars}</div>
+</div>
+))}
+</div>
+)}
+{i === 0 && (
+<a class="pf-cta" href="/berelheto">Bérelhető autóink →</a>
+)}
+</div>
+{i < steps.length - 1 && (<span class="pf-gap">{gaps[i]}</span>)}
+</div>
+))}
+</div>
+</div>
+</section>
+
+<section class="section" style="padding-top:8px">
+<div class="wrap center">
+<span class="eyebrow">Amit a bérlet tartalmaz</span>
+<h2 class="sec-title">Gondtalan bérlés — egy kézből</h2>
+<p class="sec-intro">A kiválasztástól a mindennapi használatig minden lényeges tétel benne van, hogy neked csak a vezetés maradjon.</p>
+</div>
+<div class="wrap pf-wrap">
+<div class="pf-incl">
+{includes.map((x) => (<div class="pf-inclitem"><span class="pf-check">✓</span><span>{x}</span></div>))}
+</div>
+<div class="pf-time">
+<div><b>6 hónap</b><span>minimális bérlési idő</span></div>
+<div><b>4 kaució-kategória</b><span>3 000 € – 10 000 € az autótól függően</span></div>
+<div><b>0 gond</b><span>szerviz, adó és gumi — mi álljuk</span></div>
+</div>
+</div>
+</section>
+
+<section class="section">
+<div class="wrap">
+<div class="pf-cta">
+<div>
+<h2>Kezdjük el — válaszd ki a következő autód.</h2>
+<p>Nézd meg a bérelhető modelljeinket, vagy mondd el, mit keresel — a többit mi intézzük.</p>
+</div>
+<a class="btn btn-white" href="/berelheto">Bérelhető autóink →</a>
+</div>
+</div>
+</section>
+
+<section class="section" style="padding-top:8px">
+<div class="wrap center">
+<span class="eyebrow">GYIK</span>
+<h2 class="sec-title">Gyakori kérdések a bérlésről</h2>
+</div>
+<div class="wrap pf-faq">
+{faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}
+</div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(howToJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(serviceJson)}></script>
+</section>
+
+<style>
+.pf{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
+.pf-wrap{max-width:900px;margin:0 auto;padding:0 20px}
+.pf-steps{display:flex;flex-direction:column;gap:0}
+.pf-step{display:flex;gap:20px;position:relative;padding:0 0 26px}
+.pf-step:not(:last-child)::before{content:"";position:absolute;left:21px;top:46px;bottom:0;width:2px;background:var(--line)}
+.pf-n{flex:0 0 auto;width:44px;height:44px;border-radius:13px;background:var(--navy);color:#fff;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.pf-step:last-child .pf-n{background:var(--red)}
+.pf-b{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 22px;flex:1;box-shadow:0 10px 30px rgba(8,8,10,.05)}
+.pf-b h3{font-size:18px;font-weight:800;margin:0 0 6px;color:var(--ink)}
+.pf-b p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0}
+.pf-b p a{color:var(--red);font-weight:700;text-decoration:none}
+.pf-b p a:hover{text-decoration:underline}
+.dep-table{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dep-row{display:grid;grid-template-columns:96px 1fr;gap:0;border-top:1px solid var(--line)}
+.dep-row:first-child{border-top:0}
+.dep-amount{background:var(--navy);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;padding:12px 8px;text-align:center}
+.dep-row:last-child .dep-amount{background:var(--red)}
+.dep-cars{padding:12px 14px;color:var(--ink);font-size:13px;line-height:1.5}
+@media(max-width:560px){.dep-row{grid-template-columns:1fr}.dep-amount{justify-content:flex-start;padding:8px 14px}}
+.pf-gap{position:absolute;left:21px;bottom:0;transform:translate(-50%,50%);z-index:2;background:#fff;border:1px solid var(--line);color:var(--navy);font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+a.pf-cta{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-weight:700;font-size:14px;color:#fff;background:var(--red);padding:8px 16px;border-radius:999px;text-decoration:none}
+a.pf-cta:hover{opacity:.9}
+.pf-incl{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+@media(max-width:640px){.pf-incl{grid-template-columns:1fr}}
+.pf-inclitem{display:flex;align-items:flex-start;gap:10px;font-size:15px;font-weight:600;color:var(--ink)}
+.pf-check{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:#e8f7ee;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-top:1px}
+.pf-time{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+@media(max-width:640px){.pf-time{grid-template-columns:1fr}}
+.pf-time>div{background:#0B0B0D;color:#fff;border-radius:16px;padding:20px;text-align:center}
+.pf-time b{display:block;font-size:26px;font-weight:800;color:#fff}
+.pf-time span{color:#9aa7b8;font-size:13.5px}
+.pf-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.pf-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
+.pf-cta p{color:#cfd6e2;margin:0;font-size:15px;max-width:560px}
+.pf-faq{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-bottom:20px}
+.pf-faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.pf-faq summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.pf-faq summary::-webkit-details-marker{display:none}
+.pf-faq .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.pf-faq details[open] .pl{transform:rotate(45deg)}
+.pf-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+</style>
