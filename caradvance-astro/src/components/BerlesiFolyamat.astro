@@ -14,13 +14,13 @@ const deposits = [
 const steps = [
   { t: 'Válaszd ki az autót', html: 'Nézd meg a Bérelhető autóink kínálatát, vagy ha egy konkrét, még be nem hozott modellre vágysz, indítsd el az Új autó bérlése folyamatot. Döntsd el, hogy magánszemélyként vagy cégként szeretnél bérelni.', btns: [{ label: 'Bérelhető autóink →', href: '/berelheto' }, { label: 'Új autó bérlése →', href: 'https://www.caradvance.hu/beszerzesi-folyamat/#' }] },
   { t: 'Vedd fel velünk a kapcsolatot', html: 'Válaszd ki a számodra megfelelő autót, majd írj egy e-mailt, hívj minket telefonon, vagy töltsd ki az érdeklődési űrlapot. A minimális bérlési idő minden esetben 6 hónap.', btns: [{ label: 'E-mail írása →', href: 'mailto:import@caradvance.de' }, { label: 'Hívj minket →', href: 'tel:+36302336060' }, { label: 'Érdeklődési űrlap →', href: '/kapcsolat' }] },
-  { t: 'Megküldjük az ajánlatot', html: 'Elküldjük a konkrét autóra szóló ajánlatot minden részlettel. A készlettől, az igényeidtől és attól függően, hogy teljesen új vagy újszerű autóról van szó, megadjuk a várható szállítási időt és a szerződés feltételeit.', btns: [{ label: 'Ajánlat – magánszemély (B2C) →', href: '#' }, { label: 'Ajánlat – cég (B2B) →', href: '#' }] },
+  { t: 'Megküldjük az ajánlatot', html: 'Elküldjük a konkrét autóra szóló ajánlatot minden részlettel. A készlettől, az igényeidtől és attól függően, hogy teljesen új vagy újszerű autóról van szó, megadjuk a várható szállítási időt és a szerződés feltételeit.', btns: [{ label: 'Ajánlat – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Ajánlat – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Az ajánlat elfogadása és leinformálás', html: 'Ha elfogadod az ajánlatot, részletes adatokat kérünk tőled — magánszemélyként vagy cégként. Ezt követően egy gyors, előzetes ellenőrzést végzünk.' },
-  { t: 'Előszerződés aláírása', html: 'A besorolásodnak megfelelően megküldjük az előszerződést — magánszemélyként vagy cégként. Aláírod az előszerződést, és visszaküldöd nekünk.', btns: [{ label: 'Előszerződés – magánszemély (B2C) →', href: '#' }, { label: 'Előszerződés – cég (B2B) →', href: '#' }] },
+  { t: 'Előszerződés aláírása', html: 'A besorolásodnak megfelelően megküldjük az előszerződést — magánszemélyként vagy cégként. Aláírod az előszerződést, és visszaküldöd nekünk.', btns: [{ label: 'Előszerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Előszerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Kaució befizetése', html: 'A kauciót a németországi Caradvance GmbH részére fizeted be, az autó kategóriájának megfelelő összegben. Az alábbi táblázat mutatja, melyik autóhoz mekkora kaució tartozik:', table: true },
   { t: 'Beszerzés és szállítás', html: 'Megvásároljuk a kiválasztott autót Németországban, és házhoz szállítjuk neked.' },
-  { t: 'Átvételi ellenőrzés', html: 'Amikor az autó megérkezik, alaposan átnézzük: fotókat készítünk a külsőről, a belső térről, valamint a kilométeróra- és üzemanyagszintről. Ekkor töltjük ki az átadási jegyzőkönyvet is.', btns: [{ label: 'Átadási jegyzőkönyv →', href: '#' }] },
-  { t: 'Végleges szerződés', html: 'Mindkét fél aláírja a végleges szerződést, amely tartalmazza az átadási jegyzőkönyvet is.', btns: [{ label: 'Végleges szerződés – magánszemély (B2C) →', href: '#' }, { label: 'Végleges szerződés – cég (B2B) →', href: '#' }] },
+  { t: 'Átvételi ellenőrzés', html: 'Amikor az autó megérkezik, alaposan átnézzük: fotókat készítünk a külsőről, a belső térről, valamint a kilométeróra- és üzemanyagszintről. Ekkor töltjük ki az átadási jegyzőkönyvet is.', btns: [{ label: 'Átadási jegyzőkönyv →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
+  { t: 'Végleges szerződés', html: 'Mindkét fél aláírja a végleges szerződést, amely tartalmazza az átadási jegyzőkönyvet is.', btns: [{ label: 'Végleges szerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Végleges szerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Az autó a tiéd', html: 'Az autó a következő hat hónapra a tiéd — nincs más dolgod, mint vezetni.' },
 ];
 
@@ -93,7 +93,7 @@ const serviceJson = {
 )}
 {s.btns && (
 <div class="pf-btns">
-{s.btns.map((b) => (<a class="pf-cta" href={b.href}>{b.label}</a>))}
+{s.btns.map((b) => (<a class="pf-lnk" href={b.href}>{b.label}</a>))}
 </div>
 )}
 </div>
@@ -167,10 +167,9 @@ const serviceJson = {
 .dep-cars{padding:12px 14px;color:var(--ink);font-size:13px;line-height:1.5}
 @media(max-width:560px){.dep-row{grid-template-columns:1fr}.dep-amount{justify-content:flex-start;padding:8px 14px}}
 .pf-gap{position:absolute;left:21px;bottom:0;transform:translate(-50%,50%);z-index:2;background:#fff;border:1px solid var(--line);color:var(--navy);font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
-a.pf-cta{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-weight:700;font-size:14px;color:#fff;background:var(--red);padding:8px 16px;border-radius:999px;text-decoration:none}
-a.pf-cta:hover{opacity:.9}
-.pf-btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-.pf-btns a.pf-cta{margin-top:0}
+a.pf-lnk{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:#fff;background:var(--red);padding:8px 16px;border-radius:999px;text-decoration:none}
+a.pf-lnk:hover{opacity:.9}
+.pf-btns{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:10px;margin-top:12px}
 .pf-incl{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
 @media(max-width:640px){.pf-incl{grid-template-columns:1fr}}
 .pf-inclitem{display:flex;align-items:flex-start;gap:10px;font-size:15px;font-weight:600;color:var(--ink)}
