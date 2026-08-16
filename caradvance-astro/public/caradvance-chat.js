@@ -330,9 +330,12 @@
     if(document.getElementById("caInqCss")) return;
     var s=document.createElement("style"); s.id="caInqCss";
     s.textContent=[
-      ".ca-inq{display:block;width:100%;text-align:center;background:#E2001A;color:#fff;font-weight:700;font-size:16px;padding:12px;border:0;border-radius:999px;cursor:pointer;font-family:inherit;margin-top:8px;transition:.15s;}",
-      "@media(hover:hover){.ca-inq:hover{background:#c40017;}}",
-      ".ca-reszlet{display:block;width:100%;text-align:center;background:#eef1f6;color:#141519;font-weight:700;font-size:16px;padding:12px;border-radius:999px;margin-top:14px;}",
+      ".ca-inq{display:block;width:100%;text-align:center;background:#eef1f6;color:#141519;font-weight:700;font-size:16px;padding:12px;border:0;border-radius:999px;cursor:pointer;font-family:inherit;margin-top:8px;transition:.15s;}",
+      ".ca-reszlet{display:block;width:100%;text-align:center;background:#eef1f6;color:#141519;font-weight:700;font-size:16px;padding:12px;border-radius:999px;margin-top:14px;transition:.15s;}",
+      "@media(hover:hover){a.card:hover .ca-inq{background:#E2001A;color:#fff;}a.card:hover .cbtn,a.card:hover .ca-reszlet{background:#0F1B2D;color:#fff;}}",
+      ".ca-cinfo{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:6px;flex:0 0 auto;vertical-align:middle;}",
+      ".ca-cinfo .ca-ctip{position:absolute;bottom:150%;right:0;left:auto;width:230px;white-space:normal;background:#0F1B2D;color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left;}",
+      ".ca-cinfo:hover .ca-ctip,.ca-cinfo:focus .ca-ctip{opacity:1;visibility:visible;}",
       ".cain-modal[aria-hidden='true']{display:none;}",
       ".cain-modal{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:flex-start;justify-content:center;padding:16px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}",
       ".cain-back{position:absolute;inset:0;background:rgba(8,12,20,.55);}",
@@ -422,9 +425,21 @@
     var ptxt=price?price.textContent.trim():(rent?rent.textContent.replace(/\s+/g," ").trim():"");
     return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:ptxt };
   }
+  function infoText(){
+    var fx="";
+    try{ var m=(document.body.textContent||"").match(/1\s*€\s*=\s*([\d\s.,]+)\s*Ft/); if(m) fx=m[1].replace(/\s+/g," ").trim(); }catch(e){}
+    return "A feltüntetett árak nettó árak (áfa nélkül). A forint árak élő árfolyammal számolódnak, óránként frissülnek"+(fx?(" (1 € = "+fx+" Ft)"):"")+". A képek illusztrációk.";
+  }
   function enhance(card){
     if(card.getAttribute("data-cainq")) return; card.setAttribute("data-cainq","1");
     var body=card.querySelector(".body"); if(!body) return;
+    var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow");
+    if(prow && !prow.querySelector(".ca-cinfo")){
+      var info=document.createElement("span"); info.className="ca-cinfo"; info.setAttribute("tabindex","0"); info.textContent="i";
+      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(); info.appendChild(tip);
+      info.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); });
+      prow.appendChild(info);
+    }
     if(!card.querySelector(".cbtn")){ var r=document.createElement("span"); r.className="ca-reszlet"; r.textContent="Részletek"; body.appendChild(r); }
     var inq=document.createElement("button"); inq.type="button"; inq.className="ca-inq"; inq.textContent="Érdeklődöm";
     inq.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); openModal(cardData(card)); });
