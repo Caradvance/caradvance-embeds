@@ -1,3 +1,20 @@
+/* ── Kill the "Hamarosan indul / Belépési kód" preview gate (site is public) ── */
+(function () {
+  "use strict";
+  try {
+    var s = document.createElement("style");
+    s.textContent = "#ca-gate{display:none!important}html,body{overflow:auto!important}";
+    (document.head || document.documentElement).appendChild(s);
+  } catch (e) {}
+  function killGate() {
+    var g = document.getElementById("ca-gate"); if (g) g.remove();
+    try { document.documentElement.style.overflow = ""; if (document.body) document.body.style.overflow = ""; } catch (e) {}
+  }
+  killGate();
+  document.addEventListener("DOMContentLoaded", killGate);
+  [0, 150, 500, 1200].forEach(function (ms) { setTimeout(killGate, ms); });
+})();
+
 (function () {
   "use strict";
   if (window.__caChatLoaded) return; window.__caChatLoaded = true;
