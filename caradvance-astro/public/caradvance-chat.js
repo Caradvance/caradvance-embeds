@@ -522,8 +522,10 @@
 
   ready(function(){
     injectCss(); scan();
-    var raf=0;
-    var mo=new MutationObserver(function(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; scan(); }); });
+    var t=0;
+    var mo=new MutationObserver(function(){ clearTimeout(t); t=setTimeout(scan, 120); });
     mo.observe(document.body||document.documentElement, {childList:true, subtree:true});
+    window.addEventListener("load", scan);
+    [400,1000,2000,3500,6000].forEach(function(ms){ setTimeout(scan, ms); });
   });
 })();
