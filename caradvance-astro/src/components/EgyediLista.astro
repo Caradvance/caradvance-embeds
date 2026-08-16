@@ -197,6 +197,12 @@ const _rebuild='rebuild-nudge-3';
   .egl-modal-headtext{position:relative;}
   .egl-modal .egl-info{position:static;}
   .egl-modal .egl-info .egl-tip{position:absolute;top:100%;left:0;right:auto;bottom:auto;width:100%;margin-top:8px;}
+  @media(max-width:560px){
+    .egl-modal-head{flex-direction:column;align-items:flex-start;gap:10px;padding-right:0;}
+    .egl-modal-head img{width:150px;height:92px;}
+    .egl-modal-headtext{width:100%;}
+    .egl-modal-head h3{font-size:20px;}
+  }
   .egl-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink);line-height:1.45;cursor:pointer;}
   .egl-consent input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;margin-top:1px;}
   .egl-consent a{color:var(--red);font-weight:700;}
