@@ -1,0 +1,4 @@
+# Cloudflare Pages headers
+# Keep the site-wide script fresh so updates show up quickly (no more 4h stale cache).
+/caradvance-chat.js
+  Cache-Control: public, max-age=60, must-revalidate
