@@ -347,7 +347,7 @@
       ".cain-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#E2001A;}",
       ".cain-head h3{font-size:20px;font-weight:800;color:#0F1B2D;margin:4px 0 4px;line-height:1.15;}",
       ".cain-sub{font-size:13.5px;color:#5A6B82;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}",
-      ".cain-sub .ca-cinfo .ca-ctip{bottom:auto;top:150%;right:auto;left:0;}",
+      ".cain-sub .ca-cinfo .ca-ctip{bottom:auto;top:150%;right:0;left:auto;max-width:min(260px,72vw);width:260px;}",
       "@media(max-width:560px){.cain-head{flex-direction:column;align-items:flex-start;padding-right:0;}}",
       ".cain-form{display:flex;flex-direction:column;gap:12px;}",
       ".cain-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}",
@@ -357,6 +357,16 @@
       ".cain-consent{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#141519;line-height:1.4;cursor:pointer;}",
       ".cain-consent input{width:18px;height:18px;accent-color:#E2001A;flex:0 0 auto;margin-top:1px;}",
       ".cain-consent a{color:#E2001A;font-weight:700;}",
+      ".cain-toggle{display:flex;gap:6px;background:#eef1f6;border-radius:12px;padding:5px;}",
+      ".cain-tgl{flex:1;border:0;background:transparent;font-family:inherit;font-weight:700;font-size:14px;color:#5A6B82;padding:11px;border-radius:9px;cursor:pointer;}",
+      ".cain-tgl.active{background:#E2001A;color:#fff;}",
+      ".cain-block{border:1px solid #E6EAF1;border-radius:14px;padding:14px 14px 12px;}",
+      ".cain-flabel{font-size:14.5px;font-weight:800;color:#141519;margin-bottom:8px;}",
+      ".cain-sublabel{font-size:13px;font-weight:800;color:#141519;margin:14px 0 2px;}",
+      ".cain-radio{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:14px;color:#141519;cursor:pointer;border-top:1px solid #E6EAF1;}",
+      ".cain-radio:first-of-type{border-top:0;}",
+      ".cain-radio input{width:18px;height:18px;accent-color:#E2001A;flex:0 0 auto;}",
+      ".cain-subblock{margin-top:8px;padding-top:6px;border-top:1px dashed #E6EAF1;}",
       ".cain-msg{display:none;font-size:14px;font-weight:600;border-radius:10px;padding:10px 12px;}",
       ".cain-msg.err{display:block;background:#fdeaec;color:#b3121f;}",
       ".cain-msg.ok{display:block;background:#e8f7ee;color:#177a3d;}",
@@ -378,6 +388,22 @@
         '<div class="cain-head"><img alt=""/><div><div class="cain-eyebrow">Érdeklődés</div><h3></h3><div class="cain-sub"></div></div></div>'+
         '<form class="cain-form" novalidate>'+
           '<input type="hidden" name="car"/>'+
+          '<input type="hidden" name="buyer" value="Magánszemély"/>'+
+          '<div class="cain-toggle"><button type="button" class="cain-tgl active" data-buyer="Magánszemély">Magánszemélyként</button><button type="button" class="cain-tgl" data-buyer="Cég">Cégként</button></div>'+
+          '<div class="cain-block">'+
+            '<div class="cain-flabel">Hogyan szeretnéd megvásárolni?</div>'+
+            '<label class="cain-radio"><input type="radio" name="mode" class="cain-mode1" value="19% német áfával, Németországból (Caradvance GmbH)"/><span class="cain-mode1lbl">19% német áfával, Németországból (Caradvance GmbH)</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="mode" value="27% magyar áfával, BH Group Zrt."/><span>27% magyar áfával, a BH Group Zrt.-n keresztül</span></label>'+
+            '<div class="cain-sublabel">Fizetés módja</div>'+
+            '<label class="cain-radio"><input type="radio" name="payment" value="Egy összegben"/><span>Egy összegben</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="payment" value="Finanszírozással"/><span>Finanszírozással</span></label>'+
+            '<div class="cain-subblock cain-fin" style="display:none">'+
+              '<div class="cain-sublabel">Finanszírozás módja</div>'+
+              '<label class="cain-radio"><input type="radio" name="financing" value="Segítséget kérek (Euro Leasing / Mercantil Bank)"/><span>Kérek segítséget — Euro Leasing vagy Mercantil Bank</span></label>'+
+              '<label class="cain-radio"><input type="radio" name="financing" value="Saját finanszírozás"/><span>Saját finanszírozásom van</span></label>'+
+            '</div>'+
+          '</div>'+
+          '<div class="cain-grid cain-company" style="display:none"><input type="text" name="company" placeholder="Cégnév *"/><input type="text" name="taxid" placeholder="Adószám"/></div>'+
           '<div class="cain-grid"><input type="text" name="lastname" placeholder="Vezetéknév *"/><input type="text" name="firstname" placeholder="Keresztnév *"/></div>'+
           '<div class="cain-grid"><input type="tel" name="phone" placeholder="Telefonszám"/><input type="email" name="email" placeholder="E-mail *"/></div>'+
           '<textarea name="message" rows="3" placeholder="Megjegyzés, kérdés…"></textarea>'+
@@ -392,10 +418,23 @@
     mForm=modal.querySelector("form"); mCar=modal.querySelector('input[name=car]'); mMsg=modal.querySelector(".cain-msg");
     modal.addEventListener("click", function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute("data-close")) closeModal(); });
     document.addEventListener("keydown", function(e){ if(e.key==="Escape" && modal.getAttribute("aria-hidden")==="false") closeModal(); });
+    [].forEach.call(modal.querySelectorAll(".cain-tgl"), function(t){ t.addEventListener("click", function(){ setBuyer(t.getAttribute("data-buyer")); }); });
+    mForm.addEventListener("change", function(e){ if(e.target && e.target.name==="payment"){ var f=modal.querySelector(".cain-fin"); if(f) f.style.display=(e.target.value==="Finanszírozással")?"":"none"; } });
     mForm.addEventListener("submit", onSubmit);
+  }
+  function setBuyer(v){
+    if(!mForm) return;
+    var be=mForm.querySelector('input[name=buyer]'); if(be) be.value=v;
+    [].forEach.call(modal.querySelectorAll(".cain-tgl"), function(t){ t.classList.toggle("active", t.getAttribute("data-buyer")===v); });
+    var isCo=(v==="Cég");
+    var comp=modal.querySelector(".cain-company"); if(comp) comp.style.display=isCo?"":"none";
+    var m1=modal.querySelector(".cain-mode1"), m1l=modal.querySelector(".cain-mode1lbl");
+    if(m1&&m1l){ var txt=isCo?"Nettó EUR-ban, Németországból (Caradvance GmbH)":"19% német áfával, Németországból (Caradvance GmbH)"; m1.value=txt; m1l.textContent=txt; }
   }
   function openModal(d){
     buildModal(); mForm.reset();
+    setBuyer("Magánszemély");
+    var fin=modal.querySelector(".cain-fin"); if(fin) fin.style.display="none";
     if(mImg){ mImg.src=d.img||""; mImg.alt=d.name||""; }
     mTitle.textContent=d.name||"";
     mSub.innerHTML="";
@@ -414,15 +453,20 @@
     e.preventDefault();
     var fd=new FormData(mForm);
     var last=(fd.get("lastname")||"").trim(), first=(fd.get("firstname")||"").trim(), email=(fd.get("email")||"").trim();
+    var buyer=fd.get("buyer"), company=(fd.get("company")||"").trim(), mode=fd.get("mode"), payment=fd.get("payment");
+    if(!mode){ showMsg("err","Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót."); return; }
+    if(!payment){ showMsg("err","Kérlek válaszd ki a fizetés módját."); return; }
+    if(payment==="Finanszírozással" && !fd.get("financing")){ showMsg("err","Kérlek válaszd ki a finanszírozás módját."); return; }
+    if(buyer==="Cég" && !company){ showMsg("err","Kérlek add meg a cég nevét."); return; }
     if(!last||!first||!email){ showMsg("err","Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed."); return; }
     if(!fd.get("consent")){ showMsg("err","Kérlek fogadd el az adatkezelési tájékoztatót."); return; }
     var btn=mForm.querySelector(".cain-submit"); btn.disabled=true; btn.textContent="Küldés…";
     fd.append("kind","Érdeklődés (készletautó)");
     fetch(INQ_API,{method:"POST",body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
       showMsg("ok","Köszönjük! Megkaptuk az érdeklődésed — hamarosan keresünk.");
-      mForm.reset(); btn.disabled=false; btn.textContent="Érdeklődés elküldése";
+      mForm.reset(); setBuyer("Magánszemély"); btn.disabled=false; btn.textContent="Érdeklődés elküldése";
     }).catch(function(){
-      var body="Autó: "+(fd.get("car")||"")+"\nNév: "+last+" "+first+"\nE-mail: "+email+"\nTelefon: "+(fd.get("phone")||"")+"\nMegjegyzés: "+(fd.get("message")||"");
+      var body="Autó: "+(fd.get("car")||"")+"\nVásárló típusa: "+(buyer||"")+"\nVásárlás módja: "+(mode||"")+"\nFizetés: "+(payment||"")+"\nFinanszírozás: "+(fd.get("financing")||"")+"\nNév: "+last+" "+first+"\nE-mail: "+email+"\nTelefon: "+(fd.get("phone")||"")+"\nCég: "+company+"\nAdószám: "+(fd.get("taxid")||"")+"\nMegjegyzés: "+(fd.get("message")||"");
       window.location.href="mailto:"+SALES_EMAIL+"?subject="+encodeURIComponent("Érdeklődés – "+(fd.get("car")||""))+"&body="+encodeURIComponent(body);
       showMsg("ok","Megnyitottuk az e-mail vázlatot az érdeklődéshez.");
       btn.disabled=false; btn.textContent="Érdeklődés elküldése";
