@@ -263,10 +263,11 @@
      • Unlock a device once:  https://www.caradvance.hu/?belepes=caradvance-belso
        (this remembers you on that browser; browse normally afterwards)
      • Preview the holding page yourself:  https://www.caradvance.hu/?belepes=0
-   TO LAUNCH THE SITE: delete this whole block and re-upload the file.
+   SITE LAUNCHED — this gate is disabled (returns immediately below).
    ========================================================================= */
 (function () {
   "use strict";
+  return; // Coming-soon gate OFF — site is public. Remove this line to re-enable.
   var TOKEN = "caradvance-belso";   // access key — change it if you like
   var KEY = "ca_soon_ok";
   try {
