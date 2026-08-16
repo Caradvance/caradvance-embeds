@@ -41,7 +41,7 @@ const _rebuild='rebuild-nudge-3';
         <div class="egl-modal-headtext">
           <div class="egl-modal-eyebrow">Autó rendelése</div>
           <h3 id="eglOrderTitle">—</h3>
-          <div class="egl-modal-sub"><span id="eglOrderSpec"></span> · <span id="eglOrderPrice"></span><span class="egl-info" id="eglOrderInfo" tabindex="0" style="display:none">i<span class="egl-tip" id="eglOrderTip"></span></span></div>
+          <div class="egl-modal-sub"><span id="eglOrderPrice"></span> <span class="egl-tol" id="eglOrderTol" style="display:none">-tól</span><span class="egl-info" id="eglOrderInfo" tabindex="0" style="display:none">i<span class="egl-tip" id="eglOrderTip"></span></span></div>
         </div>
       </div>
       <form id="eglOrderForm" class="egl-form" novalidate>
@@ -53,28 +53,30 @@ const _rebuild='rebuild-nudge-3';
         </div>
         <div class="egl-fblock" id="eglFuelBlock"></div>
         <div class="egl-fblock">
-          <div class="egl-flabel">2. Hogyan szeretnéd megvásárolni?</div>
-          <label class="egl-radio"><input type="radio" name="mode" value="Németországból (import)" /><span>Németországból (import)</span></label>
-          <label class="egl-radio"><input type="radio" name="mode" value="Magyarországról, finanszírozással" /><span>Magyarországról, finanszírozással</span></label>
-        </div>
-        <div class="egl-fblock">
-          <div class="egl-flabel">3. Kész specifikáció <span class="egl-fopt">(opcionális)</span></div>
+          <div class="egl-flabel">2. Kész specifikáció <span class="egl-fopt">(opcionális)</span></div>
           <p class="egl-fhint">Ha van kész felszereltségi listád, töltsd fel — PDF, kép vagy dokumentum.</p>
           <input type="file" name="spec" id="eglOrderFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" />
         </div>
         <div class="egl-fblock">
-          <div class="egl-flabel">4. Elérhetőséged</div>
+          <div class="egl-flabel">3. Elérhetőséged</div>
           <div class="egl-fgrid egl-company-only" id="eglCompanyFields" style="display:none">
             <input type="text" name="company" id="eglCompany" placeholder="Cégnév *" />
             <input type="text" name="taxid" placeholder="Adószám" />
           </div>
           <div class="egl-fgrid">
-            <input type="text" name="name" id="eglName" placeholder="Neved *" />
-            <input type="email" name="email" placeholder="E-mail *" />
+            <input type="text" name="lastname" id="eglLast" placeholder="Vezetéknév *" />
+            <input type="text" name="firstname" placeholder="Keresztnév *" />
             <input type="tel" name="phone" placeholder="Telefonszám" />
+            <input type="email" name="email" placeholder="E-mail *" />
           </div>
           <textarea name="message" rows="3" placeholder="Megjegyzés, kívánt felszereltség…"></textarea>
         </div>
+        <div class="egl-fblock">
+          <div class="egl-flabel">4. Hogyan szeretnéd megvásárolni?</div>
+          <label class="egl-radio"><input type="radio" name="mode" value="Németországból (import)" /><span>Németországból (import)</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" value="Magyarországról, finanszírozással" /><span>Magyarországról, finanszírozással</span></label>
+        </div>
+        <label class="egl-consent"><input type="checkbox" name="consent" id="eglConsent" /><span>Elfogadom az <a href="/adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
         <div class="egl-fmsg" id="eglOrderMsg"></div>
         <button type="submit" class="egl-fsubmit">Rendelés elküldése</button>
         <p class="egl-fnote">Az elküldés nem végleges megrendelés — felvesszük veled a kapcsolatot a részletekhez.</p>
@@ -182,7 +184,12 @@ const _rebuild='rebuild-nudge-3';
   .egl-modal-head img{width:112px;height:74px;object-fit:contain;background:#f4f7fb;border-radius:12px;flex:0 0 auto;}
   .egl-modal-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);}
   .egl-modal-head h3{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0 4px;line-height:1.15;}
-  .egl-modal-sub{font-size:13.5px;color:var(--muted);}
+  .egl-modal-sub{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .egl-modal-sub .egl-tol{font-size:13px;color:var(--muted);font-weight:600;}
+  .egl-modal .egl-info .egl-tip{bottom:auto;top:150%;left:0;right:auto;}
+  .egl-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink);line-height:1.45;cursor:pointer;}
+  .egl-consent input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;margin-top:1px;}
+  .egl-consent a{color:var(--red);font-weight:700;}
   .egl-form{display:flex;flex-direction:column;gap:18px;}
   .egl-toggle{display:flex;gap:6px;background:#eef2f8;border-radius:12px;padding:5px;}
   .egl-tgl{flex:1;border:0;background:transparent;font-family:inherit;font-weight:700;font-size:14.5px;color:var(--muted);padding:12px;border-radius:9px;cursor:pointer;transition:.15s;}
@@ -542,12 +549,14 @@ const _rebuild='rebuild-nudge-3';
     setBuyer('Magánszemély');
     var im=document.getElementById('eglOrderImg'); if(im){ im.src=d.img||''; im.alt=d.name||''; }
     var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v||''; };
-    set('eglOrderTitle',d.name); set('eglOrderSpec',d.spec); set('eglOrderPrice',d.price);
+    set('eglOrderTitle',d.name); set('eglOrderPrice',d.price);
     var cc=document.getElementById('eglOrderCar'); if(cc) cc.value=d.name||'';
-    // price info tooltip (only when a real price is shown)
-    var info=document.getElementById('eglOrderInfo'), tip=document.getElementById('eglOrderTip');
+    // price "-tól" + info tooltip (only when a real price is shown)
+    var info=document.getElementById('eglOrderInfo'), tip=document.getElementById('eglOrderTip'), tol=document.getElementById('eglOrderTol');
+    var hasPrice=/\d/.test(d.price||'') && (d.price||'').indexOf('Ft')>-1;
+    if(tol) tol.style.display=hasPrice?'':'none';
     if(info && tip){
-      if(/\d/.test(d.price||'') && (d.price||'').indexOf('Ft')>-1){
+      if(hasPrice){
         tip.innerHTML='Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.';
         info.style.display='';
       } else { info.style.display='none'; }
@@ -573,7 +582,6 @@ const _rebuild='rebuild-nudge-3';
     [].forEach.call(tgls,function(t){ t.classList.toggle('active', t.getAttribute('data-buyer')===v); });
     var isCo=(v==='Cég');
     var comp=document.getElementById('eglCompanyFields'); if(comp) comp.style.display=isCo?'':'none';
-    var nm=document.getElementById('eglName'); if(nm) nm.placeholder=isCo?'Kapcsolattartó neve *':'Neved *';
   }
   [].forEach.call(tgls,function(t){ t.addEventListener('click',function(){ setBuyer(t.getAttribute('data-buyer')); }); });
   var fuelBlock=document.getElementById('eglFuelBlock');
@@ -590,11 +598,14 @@ const _rebuild='rebuild-nudge-3';
   if(oForm){ oForm.addEventListener('submit',function(e){
     e.preventDefault();
     var fd=new FormData(oForm);
-    var name=(fd.get('name')||'').trim(), email=(fd.get('email')||'').trim(), mode=fd.get('mode');
+    var last=(fd.get('lastname')||'').trim(), first=(fd.get('firstname')||'').trim();
+    var name=(last+' '+first).trim();
+    var email=(fd.get('email')||'').trim(), mode=fd.get('mode');
     var buyer=fd.get('buyer'), company=(fd.get('company')||'').trim();
-    if(!mode){ showMsg('err','Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót.'); return; }
     if(buyer==='Cég' && !company){ showMsg('err','Kérlek add meg a cég nevét.'); return; }
-    if(!name || !email){ showMsg('err','Kérlek add meg a neved és az e-mail címed.'); return; }
+    if(!last || !first || !email){ showMsg('err','Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed.'); return; }
+    if(!mode){ showMsg('err','Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót.'); return; }
+    if(!fd.get('consent')){ showMsg('err','Kérlek fogadd el az adatkezelési tájékoztatót.'); return; }
     var btn=oForm.querySelector('.egl-fsubmit'); btn.disabled=true; btn.textContent='Küldés…';
     fetch(ORDER_API,{method:'POST',body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
       showMsg('ok','Köszönjük! Megkaptuk a rendelési igényed — hamarosan keresünk.');
