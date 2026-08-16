@@ -445,8 +445,8 @@
     return "A feltüntetett árak nettó árak (áfa nélkül). A forint árak élő árfolyammal számolódnak, óránként frissülnek"+(fx?(" (1 € = "+fx+" Ft)"):"")+".";
   }
   function enhance(card){
-    if(card.getAttribute("data-cainq")) return; card.setAttribute("data-cainq","1");
     var body=card.querySelector(".body"); if(!body) return;
+    if(body.querySelector(".ca-inq")) return;  // already has our button (re-add if carousel rebuilt it)
     var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow");
     if(prow && !prow.querySelector(".ca-cinfo")){
       var info=document.createElement("span"); info.className="ca-cinfo"; info.setAttribute("tabindex","0"); info.textContent="i";
