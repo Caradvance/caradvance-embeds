@@ -446,10 +446,35 @@ const _rebuild='rebuild-nudge-3';
   var filtersEl=document.querySelector('.egl-filters');
   var filtersHomeParent=filtersEl?filtersEl.parentNode:null, filtersHomeNext=document.getElementById('eglCount');
   var textHeroEls=[document.querySelector('.egl-crumb'), document.getElementById('eglTitle'), document.getElementById('eglSub')];
-  function setMiniHero(br){
+  function setBrandHero(br){
     if(!mhero) return;
-    if(br==='MINI'){ mhero.style.display=''; textHeroEls.forEach(function(e){ if(e) e.style.display='none'; }); if(filtersEl) filtersEl.style.display='none'; }
-    else { mhero.style.display='none'; textHeroEls.forEach(function(e){ if(e) e.style.display=''; }); if(filtersEl) filtersEl.style.display=''; }
+    var isMini=(br==='MINI'), isMB=(br==='MB');
+    if(isMini||isMB){
+      var vid=mhero.querySelector('.egl-mhero-vid'), src=vid&&vid.querySelector('source');
+      var logo=mhero.querySelector('.egl-mhero-logos img');
+      var h1=mhero.querySelector('.egl-mhero-h1'), sub=mhero.querySelector('.egl-mhero-sub');
+      if(isMB){
+        if(src) src.setAttribute('src','/mercedes-hero.mp4'); if(vid) vid.removeAttribute('poster');
+        if(logo){ logo.src='/mb-star.webp'; logo.alt='Mercedes-Benz'; }
+        if(h1) h1.textContent='Egyedi Mercedes-Benz rendelés';
+        if(sub) sub.textContent='Új Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
+        mhero.classList.add('egl-mhero-mb');
+      } else {
+        if(src) src.setAttribute('src','/mini-JCW-family-video-wide.mp4'); if(vid) vid.setAttribute('poster','/mini-jcw-hero-poster.jpg');
+        if(logo){ logo.src='/mini-hero-logo.webp'; logo.alt='Mini Cooper'; }
+        if(h1) h1.textContent='Egyedi Mini Cooper rendelés';
+        if(sub) sub.textContent='Új Mini Cooper és John Cooper Works modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
+        mhero.classList.remove('egl-mhero-mb');
+      }
+      try{ if(vid){ vid.load(); var p=vid.play&&vid.play(); if(p&&p.catch) p.catch(function(){}); } }catch(e){}
+      mhero.style.display='';
+      textHeroEls.forEach(function(e){ if(e) e.style.display='none'; });
+      if(filtersEl) filtersEl.style.display = isMini ? 'none' : '';
+    } else {
+      mhero.style.display='none';
+      textHeroEls.forEach(function(e){ if(e) e.style.display=''; });
+      if(filtersEl) filtersEl.style.display='';
+    }
   }
 
   function mbClass(c){ var n=c.name;
@@ -489,7 +514,7 @@ const _rebuild='rebuild-nudge-3';
       if(bw)bw.style.display='none'; if(cw)cw.style.display='';
       if(fcls){ var ord=groupOrder(br), html='<option value="">'+classLabel(br)+'</option>'; ord.forEach(function(g){ html+='<option>'+g+'</option>'; }); fcls.innerHTML=html; }
     } else { if(bw)bw.style.display=''; if(cw)cw.style.display='none'; if(fcls)fcls.value=''; }
-    setMiniHero(br);
+    setBrandHero(br);
   }
 
   function render(){
