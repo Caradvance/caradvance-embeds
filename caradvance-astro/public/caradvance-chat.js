@@ -317,3 +317,124 @@
   (document.body || document.documentElement).appendChild(wrap);
   var vid = wrap.querySelector("video"); if (vid && vid.play) { vid.play().catch(function () {}); }
 })();
+
+/* ── "Érdeklődöm" button + inquiry modal on catalog cards (autoink / berelheto / bizomanyos / home) ── */
+(function () {
+  if (window.__caInqLoaded) return; window.__caInqLoaded = true;
+  var INQ_API = "https://caradvance-chatbot.flat-fire-7e25.workers.dev/api/inquiry";
+  var SALES_EMAIL = "info@caradvance.hu";
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
+
+  function injectCss(){
+    if(document.getElementById("caInqCss")) return;
+    var s=document.createElement("style"); s.id="caInqCss";
+    s.textContent=[
+      ".ca-inq{display:block;width:100%;text-align:center;background:#E2001A;color:#fff;font-weight:700;font-size:16px;padding:12px;border:0;border-radius:999px;cursor:pointer;font-family:inherit;margin-top:8px;transition:.15s;}",
+      "@media(hover:hover){.ca-inq:hover{background:#c40017;}}",
+      ".ca-reszlet{display:block;width:100%;text-align:center;background:#eef1f6;color:#141519;font-weight:700;font-size:16px;padding:12px;border-radius:999px;margin-top:14px;}",
+      ".cain-modal[aria-hidden='true']{display:none;}",
+      ".cain-modal{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:flex-start;justify-content:center;padding:16px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}",
+      ".cain-back{position:absolute;inset:0;background:rgba(8,12,20,.55);}",
+      ".cain-card{position:relative;z-index:1;background:#fff;border-radius:22px;width:min(520px,100%);max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 30px 80px rgba(8,12,20,.4);padding:22px 22px 24px;margin-top:8px;}",
+      ".cain-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:10px;background:#eef1f6;color:#141519;font-size:16px;cursor:pointer;}",
+      ".cain-head{display:flex;gap:14px;align-items:center;margin-bottom:14px;padding-right:30px;}",
+      ".cain-head img{width:150px;height:92px;object-fit:contain;flex:0 0 auto;}",
+      ".cain-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#E2001A;}",
+      ".cain-head h3{font-size:20px;font-weight:800;color:#0F1B2D;margin:4px 0 4px;line-height:1.15;}",
+      ".cain-sub{font-size:13.5px;color:#5A6B82;}",
+      "@media(max-width:560px){.cain-head{flex-direction:column;align-items:flex-start;padding-right:0;}}",
+      ".cain-form{display:flex;flex-direction:column;gap:12px;}",
+      ".cain-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}",
+      "@media(max-width:460px){.cain-grid{grid-template-columns:1fr;}}",
+      ".cain-form input,.cain-form textarea{width:100%;font:inherit;font-size:14.5px;color:#141519;background:#f7f9fc;border:1.5px solid #E6EAF1;border-radius:10px;padding:11px 12px;outline:none;box-sizing:border-box;}",
+      ".cain-form input:focus,.cain-form textarea:focus{border-color:#E2001A;background:#fff;}",
+      ".cain-consent{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#141519;line-height:1.4;cursor:pointer;}",
+      ".cain-consent input{width:18px;height:18px;accent-color:#E2001A;flex:0 0 auto;margin-top:1px;}",
+      ".cain-consent a{color:#E2001A;font-weight:700;}",
+      ".cain-msg{display:none;font-size:14px;font-weight:600;border-radius:10px;padding:10px 12px;}",
+      ".cain-msg.err{display:block;background:#fdeaec;color:#b3121f;}",
+      ".cain-msg.ok{display:block;background:#e8f7ee;color:#177a3d;}",
+      ".cain-submit{background:#E2001A;color:#fff;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;}",
+      ".cain-note{font-size:12.5px;color:#5A6B82;text-align:center;margin:0;}"
+    ].join("");
+    document.head.appendChild(s);
+  }
+
+  var modal, mImg, mTitle, mSub, mCar, mForm, mMsg;
+  function showMsg(k,t){ if(mMsg){ mMsg.className="cain-msg "+k; mMsg.textContent=t; } }
+  function buildModal(){
+    if(modal) return;
+    modal=document.createElement("div"); modal.className="cain-modal"; modal.setAttribute("aria-hidden","true");
+    modal.innerHTML=
+      '<div class="cain-back" data-close></div>'+
+      '<div class="cain-card" role="dialog" aria-modal="true">'+
+        '<button class="cain-x" type="button" data-close aria-label="Bezárás">&#10005;</button>'+
+        '<div class="cain-head"><img alt=""/><div><div class="cain-eyebrow">Érdeklődés</div><h3></h3><div class="cain-sub"></div></div></div>'+
+        '<form class="cain-form" novalidate>'+
+          '<input type="hidden" name="car"/>'+
+          '<div class="cain-grid"><input type="text" name="lastname" placeholder="Vezetéknév *"/><input type="text" name="firstname" placeholder="Keresztnév *"/></div>'+
+          '<div class="cain-grid"><input type="tel" name="phone" placeholder="Telefonszám"/><input type="email" name="email" placeholder="E-mail *"/></div>'+
+          '<textarea name="message" rows="3" placeholder="Megjegyzés, kérdés…"></textarea>'+
+          '<label class="cain-consent"><input type="checkbox" name="consent"/><span>Elfogadom az <a href="/adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>'+
+          '<div class="cain-msg"></div>'+
+          '<button type="submit" class="cain-submit">Érdeklődés elküldése</button>'+
+          '<p class="cain-note">Felvesszük veled a kapcsolatot a megadott elérhetőségen.</p>'+
+        '</form>'+
+      '</div>';
+    (document.body||document.documentElement).appendChild(modal);
+    mImg=modal.querySelector(".cain-head img"); mTitle=modal.querySelector(".cain-head h3"); mSub=modal.querySelector(".cain-sub");
+    mForm=modal.querySelector("form"); mCar=modal.querySelector('input[name=car]'); mMsg=modal.querySelector(".cain-msg");
+    modal.addEventListener("click", function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute("data-close")) closeModal(); });
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && modal.getAttribute("aria-hidden")==="false") closeModal(); });
+    mForm.addEventListener("submit", onSubmit);
+  }
+  function openModal(d){
+    buildModal(); mForm.reset();
+    if(mImg){ mImg.src=d.img||""; mImg.alt=d.name||""; }
+    mTitle.textContent=d.name||""; mSub.textContent=d.price||""; mCar.value=d.name||"";
+    showMsg("","");
+    modal.setAttribute("aria-hidden","false"); document.documentElement.style.overflow="hidden";
+  }
+  function closeModal(){ modal.setAttribute("aria-hidden","true"); document.documentElement.style.overflow=""; }
+  function onSubmit(e){
+    e.preventDefault();
+    var fd=new FormData(mForm);
+    var last=(fd.get("lastname")||"").trim(), first=(fd.get("firstname")||"").trim(), email=(fd.get("email")||"").trim();
+    if(!last||!first||!email){ showMsg("err","Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed."); return; }
+    if(!fd.get("consent")){ showMsg("err","Kérlek fogadd el az adatkezelési tájékoztatót."); return; }
+    var btn=mForm.querySelector(".cain-submit"); btn.disabled=true; btn.textContent="Küldés…";
+    fd.append("kind","Érdeklődés (készletautó)");
+    fetch(INQ_API,{method:"POST",body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
+      showMsg("ok","Köszönjük! Megkaptuk az érdeklődésed — hamarosan keresünk.");
+      mForm.reset(); btn.disabled=false; btn.textContent="Érdeklődés elküldése";
+    }).catch(function(){
+      var body="Autó: "+(fd.get("car")||"")+"\nNév: "+last+" "+first+"\nE-mail: "+email+"\nTelefon: "+(fd.get("phone")||"")+"\nMegjegyzés: "+(fd.get("message")||"");
+      window.location.href="mailto:"+SALES_EMAIL+"?subject="+encodeURIComponent("Érdeklődés – "+(fd.get("car")||""))+"&body="+encodeURIComponent(body);
+      showMsg("ok","Megnyitottuk az e-mail vázlatot az érdeklődéshez.");
+      btn.disabled=false; btn.textContent="Érdeklődés elküldése";
+    });
+  }
+
+  function cardData(card){
+    var t=card.querySelector(".title"), img=card.querySelector(".media img");
+    var price=card.querySelector(".price"), rent=card.querySelector(".rentrow");
+    var ptxt=price?price.textContent.trim():(rent?rent.textContent.replace(/\s+/g," ").trim():"");
+    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:ptxt };
+  }
+  function enhance(card){
+    if(card.getAttribute("data-cainq")) return; card.setAttribute("data-cainq","1");
+    var body=card.querySelector(".body"); if(!body) return;
+    if(!card.querySelector(".cbtn")){ var r=document.createElement("span"); r.className="ca-reszlet"; r.textContent="Részletek"; body.appendChild(r); }
+    var inq=document.createElement("button"); inq.type="button"; inq.className="ca-inq"; inq.textContent="Érdeklődöm";
+    inq.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); openModal(cardData(card)); });
+    body.appendChild(inq);
+  }
+  function scan(){ [].slice.call(document.querySelectorAll("a.card")).forEach(enhance); }
+
+  ready(function(){
+    injectCss(); scan();
+    var raf=0;
+    var mo=new MutationObserver(function(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; scan(); }); });
+    mo.observe(document.body||document.documentElement, {childList:true, subtree:true});
+  });
+})();
