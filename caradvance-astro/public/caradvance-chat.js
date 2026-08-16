@@ -330,11 +330,12 @@
     if(document.getElementById("caInqCss")) return;
     var s=document.createElement("style"); s.id="caInqCss";
     s.textContent=[
-      ".ca-inq{display:block;width:100%;text-align:center;background:#eef2f8;color:#0F1B2D;font-weight:700;font-size:15px;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;margin-top:8px;transition:.15s;}",
-      ".ca-reszlet{display:block;width:100%;text-align:center;background:#eef2f8;color:#0F1B2D;font-weight:700;font-size:15px;padding:14px;border-radius:12px;margin-top:14px;transition:.15s;}",
-      "a.card .cbtn{background:#eef2f8;color:#0F1B2D;border-radius:12px;font-size:15px;padding:14px;transition:.15s;}",
+      "a.card .cbtn,.ca-inq,.ca-reszlet{display:block;width:100%;box-sizing:border-box;text-align:center;background:#eef2f8;color:#0F1B2D;font-weight:700;font-size:15px;line-height:1.3;padding:14px;border:0;border-radius:12px;font-family:inherit;transition:.15s;}",
+      ".ca-inq{cursor:pointer;margin-top:8px;}",
+      ".ca-reszlet{margin-top:14px;}",
       "@media(hover:hover){a.card:hover .ca-inq{background:#E2001A;color:#fff;}a.card:hover .cbtn,a.card:hover .ca-reszlet{background:#0F1B2D;color:#fff;}}",
       "a.card{overflow:visible;pointer-events:auto!important;}",
+      "a.card .media{border-radius:16px 16px 0 0;overflow:hidden;}",
       ".ca-cinfo{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:6px;flex:0 0 auto;vertical-align:middle;}",
       ".ca-cinfo .ca-ctip{position:absolute;bottom:150%;right:0;left:auto;width:230px;white-space:normal;background:#0F1B2D;color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left;}",
       ".ca-cinfo:hover .ca-ctip,.ca-cinfo:focus .ca-ctip{opacity:1;visibility:visible;}",
@@ -442,7 +443,7 @@
     var pspan=document.createElement("span"); pspan.textContent=d.price||""; mSub.appendChild(pspan);
     if(d.price){
       var inf=document.createElement("span"); inf.className="ca-cinfo"; inf.setAttribute("tabindex","0"); inf.textContent="i";
-      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(); inf.appendChild(tip);
+      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(d.isRent); inf.appendChild(tip);
       mSub.appendChild(inf);
     }
     mCar.value=d.name||"";
@@ -482,9 +483,9 @@
   }
   function cardData(card){
     var t=card.querySelector(".title"), img=card.querySelector(".media img");
-    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:priceOf(card) };
+    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:priceOf(card), isRent:!!card.querySelector(".rentrow") };
   }
-  function infoText(){
+  function infoText(isRent){
     var fx="";
     try{ var m=(document.body.textContent||"").match(/1\s*€\s*=\s*([\d\s.,]+)\s*Ft/); if(m) fx=m[1].replace(/\s+/g," ").trim(); }catch(e){}
     return "A feltüntetett árak nettó árak (áfa nélkül). A forint árak élő árfolyammal számolódnak, óránként frissülnek"+(fx?(" (1 € = "+fx+" Ft)"):"")+".";
@@ -492,10 +493,11 @@
   function enhance(card){
     var body=card.querySelector(".body"); if(!body) return;
     if(body.querySelector(".ca-inq")) return;  // already has our button (re-add if carousel rebuilt it)
+    var isRent=!!card.querySelector(".rentrow");
     var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow");
     if(prow && !prow.querySelector(".ca-cinfo")){
       var info=document.createElement("span"); info.className="ca-cinfo"; info.setAttribute("tabindex","0"); info.textContent="i";
-      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(); info.appendChild(tip);
+      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(isRent); info.appendChild(tip);
       info.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); });
       prow.appendChild(info);
     }
