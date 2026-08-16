@@ -31,6 +31,49 @@ const _rebuild='rebuild-nudge-3';
     <div class="egl-count" id="eglCount"></div>
     <div class="egl-grid" id="eglGrid"></div>
   </div>
+
+  <div class="egl-modal" id="eglOrder" aria-hidden="true">
+    <div class="egl-modal-back" data-close></div>
+    <div class="egl-modal-card" role="dialog" aria-modal="true" aria-labelledby="eglOrderTitle">
+      <button class="egl-modal-x" type="button" data-close aria-label="Bezárás">✕</button>
+      <div class="egl-modal-head">
+        <img id="eglOrderImg" src="" alt="" />
+        <div class="egl-modal-headtext">
+          <div class="egl-modal-eyebrow">Autó rendelése</div>
+          <h3 id="eglOrderTitle">—</h3>
+          <div class="egl-modal-sub"><span id="eglOrderSpec"></span> · <span id="eglOrderPrice"></span></div>
+        </div>
+      </div>
+      <form id="eglOrderForm" class="egl-form" novalidate>
+        <input type="hidden" name="car" id="eglOrderCar" />
+        <div class="egl-fblock">
+          <div class="egl-flabel">1. Hogyan szeretnéd megvásárolni?</div>
+          <label class="egl-radio"><input type="radio" name="mode" value="Magánszemély – Németországból (import)" /><span>Magánszemélyként, Németországból (import)</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" value="Cég – Németországból (import)" /><span>Cégként, Németországból (import)</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" value="Magánszemély – Magyarországról, finanszírozással" /><span>Magánszemélyként, Magyarországról, finanszírozással</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" value="Cég – Magyarországról, finanszírozással" /><span>Cégként, Magyarországról, finanszírozással</span></label>
+        </div>
+        <div class="egl-fblock">
+          <div class="egl-flabel">2. Kész specifikáció <span class="egl-fopt">(opcionális)</span></div>
+          <p class="egl-fhint">Ha van kész felszereltségi listád, töltsd fel — PDF, kép vagy dokumentum.</p>
+          <input type="file" name="spec" id="eglOrderFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" />
+        </div>
+        <div class="egl-fblock">
+          <div class="egl-flabel">3. Elérhetőséged</div>
+          <div class="egl-fgrid">
+            <input type="text" name="name" placeholder="Neved *" />
+            <input type="email" name="email" placeholder="E-mail *" />
+            <input type="tel" name="phone" placeholder="Telefonszám" />
+            <input type="text" name="company" placeholder="Cég (ha céges)" />
+          </div>
+          <textarea name="message" rows="3" placeholder="Megjegyzés, kívánt felszereltség…"></textarea>
+        </div>
+        <div class="egl-fmsg" id="eglOrderMsg"></div>
+        <button type="submit" class="egl-fsubmit">Rendelés elküldése</button>
+        <p class="egl-fnote">Az elküldés nem végleges megrendelés — felvesszük veled a kapcsolatot a részletekhez.</p>
+      </form>
+    </div>
+  </div>
 </section>
 
 <style is:global>
@@ -111,9 +154,49 @@ const _rebuild='rebuild-nudge-3';
   .egl-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:2px;flex:0 0 auto;}
   .egl-info .egl-tip{position:absolute;bottom:150%;right:0;left:auto;transform:none;width:230px;white-space:normal;background:var(--navy);color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left;letter-spacing:0;}
   .egl-info:hover .egl-tip,.egl-info:focus .egl-tip{opacity:1;visibility:visible;}
+  .egl-clink{display:block;text-decoration:none;color:inherit;}
+  .egl-body{padding:16px 20px 12px;}
+  .egl-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px;}
   .egl-btn{display:block;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;
-    font-size:15px;padding:14px;border-radius:12px;transition:.15s;}
-  .egl-card:hover .egl-btn{background:var(--navy);color:#fff;}
+    font-size:15px;padding:14px;border-radius:12px;transition:.15s;text-decoration:none;}
+  a.egl-btn:hover,.egl-card:hover .egl-btn{background:var(--navy);color:#fff;}
+  .egl-order{display:block;width:100%;text-align:center;background:var(--red);color:#fff;font-weight:700;
+    font-size:15px;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;transition:.15s;}
+  .egl-order:hover{background:#c40017;}
+
+  /* order modal */
+  .egl-modal[aria-hidden="true"]{display:none;}
+  .egl-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .egl-modal-back{position:absolute;inset:0;background:rgba(8,12,20,.55);backdrop-filter:blur(2px);}
+  .egl-modal-card{position:relative;z-index:1;background:#fff;border-radius:22px;width:min(560px,100%);max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(8,12,20,.4);padding:26px 26px 28px;}
+  .egl-modal-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:10px;background:#eef2f8;color:var(--navy);font-size:16px;cursor:pointer;}
+  .egl-modal-x:hover{background:#e0e6f0;}
+  .egl-modal-head{display:flex;gap:16px;align-items:center;margin-bottom:20px;padding-right:30px;}
+  .egl-modal-head img{width:112px;height:74px;object-fit:contain;background:#f4f7fb;border-radius:12px;flex:0 0 auto;}
+  .egl-modal-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);}
+  .egl-modal-head h3{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0 4px;line-height:1.15;}
+  .egl-modal-sub{font-size:13.5px;color:var(--muted);}
+  .egl-form{display:flex;flex-direction:column;gap:18px;}
+  .egl-fblock{border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;}
+  .egl-flabel{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+  .egl-fopt{font-weight:600;color:var(--muted);font-size:13px;}
+  .egl-fhint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45;}
+  .egl-radio{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:14.5px;color:var(--ink);cursor:pointer;border-top:1px solid var(--line);}
+  .egl-radio:first-of-type{border-top:0;}
+  .egl-radio input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;}
+  .egl-fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  @media(max-width:460px){.egl-fgrid{grid-template-columns:1fr;}}
+  .egl-form input[type=text],.egl-form input[type=email],.egl-form input[type=tel],.egl-form textarea{width:100%;font:inherit;font-size:14.5px;color:var(--ink);background:#f7f9fc;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;outline:none;transition:.15s;}
+  .egl-form input:focus,.egl-form textarea:focus{border-color:var(--red);background:#fff;box-shadow:0 0 0 4px rgba(226,0,26,.08);}
+  .egl-form input[type=file]{width:100%;font:inherit;font-size:13.5px;color:var(--muted);}
+  .egl-form textarea{resize:vertical;}
+  .egl-fmsg{font-size:14px;font-weight:600;display:none;border-radius:10px;padding:11px 13px;}
+  .egl-fmsg.err{display:block;background:#fdeaec;color:#b3121f;}
+  .egl-fmsg.ok{display:block;background:#e8f7ee;color:#177a3d;}
+  .egl-fsubmit{background:var(--red);color:#fff;border:0;border-radius:12px;padding:15px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;transition:.15s;}
+  .egl-fsubmit:hover{background:#c40017;}
+  .egl-fsubmit:disabled{opacity:.6;cursor:default;}
+  .egl-fnote{font-size:12.5px;color:var(--muted);text-align:center;margin:0;line-height:1.4;}
 </style>
 
 <script is:inline>
@@ -262,6 +345,7 @@ const _rebuild='rebuild-nudge-3';
   var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel'];
   function slug(c){ return c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel]); }
   function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
+  function att(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
   function card(c){
     var isMini = (c.brand==='MINI');
@@ -288,17 +372,25 @@ const _rebuild='rebuild-nudge-3';
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var fuelList = c.fuels || [c.fuel];
     var fuelBadges = fuelList.map(function(fu){ return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>'; }).join('');
-    var a=document.createElement('a');
-    a.className='egl-card'+((isMini||isMB)?' egl-card-mini':''); a.href=href;
+    var priceLine = ((isMini||isMB)&&!c.from) ? 'Ár kérésre'
+      : ((!isMini && SOON.indexOf(slug(c))>-1) ? 'Hamarosan'
+      : (HUF(net(c.from))+' · '+EUR(net(c.from))));
+    var a=document.createElement('div');
+    a.className='egl-card'+((isMini||isMB)?' egl-card-mini':'');
     a.innerHTML =
-      '<div class="egl-media">'+newBadge+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
-        '<div class="egl-fuels">'+fuelBadges+'</div>'+'</div>'+
-      '<div class="egl-body">'+
-        '<div class="egl-meta"><span class="egl-brand">'+logoHtml+'</span><span class="egl-year">2026 · Németország</span></div>'+
-        '<div class="egl-name">'+c.name+'</div>'+
-        '<div class="egl-specs">'+specLine(c)+'</div>'+
-        '<div class="egl-price">'+priceHtml+'</div>'+
-        '<span class="egl-btn">Részletek</span>'+
+      '<a class="egl-clink" href="'+href+'">'+
+        '<div class="egl-media">'+newBadge+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
+          '<div class="egl-fuels">'+fuelBadges+'</div>'+'</div>'+
+        '<div class="egl-body">'+
+          '<div class="egl-meta"><span class="egl-brand">'+logoHtml+'</span><span class="egl-year">2026 · Németország</span></div>'+
+          '<div class="egl-name">'+c.name+'</div>'+
+          '<div class="egl-specs">'+specLine(c)+'</div>'+
+          '<div class="egl-price">'+priceHtml+'</div>'+
+        '</div>'+
+      '</a>'+
+      '<div class="egl-actions">'+
+        '<a class="egl-btn" href="'+href+'">Részletek</a>'+
+        '<button class="egl-order" type="button" data-name="'+att(c.name)+'" data-img="'+att(img)+'" data-spec="'+att(specLine(c))+'" data-price="'+att(priceLine)+'">Autót rendelek</button>'+
       '</div>';
     return a;
   }
@@ -422,5 +514,46 @@ const _rebuild='rebuild-nudge-3';
   }catch(e){} }
   loadFx();
   setInterval(loadFx, 3600000);
+
+  // ---- order modal ----
+  var ORDER_API = 'https://caradvance-chatbot.flat-fire-7e25.workers.dev/api/order';
+  var SALES_EMAIL = 'import@caradvance.de';
+  var modal=document.getElementById('eglOrder');
+  var oForm=document.getElementById('eglOrderForm');
+  var oMsg=document.getElementById('eglOrderMsg');
+  function showMsg(kind,txt){ if(oMsg){ oMsg.className='egl-fmsg '+kind; oMsg.textContent=txt; } }
+  function openOrder(d){
+    var im=document.getElementById('eglOrderImg'); if(im){ im.src=d.img||''; im.alt=d.name||''; }
+    var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v||''; };
+    set('eglOrderTitle',d.name); set('eglOrderSpec',d.spec); set('eglOrderPrice',d.price);
+    var cc=document.getElementById('eglOrderCar'); if(cc) cc.value=d.name||'';
+    showMsg('','');
+    if(modal){ modal.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; }
+  }
+  function closeOrder(){ if(modal){ modal.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; } }
+  if(grid){ grid.addEventListener('click',function(e){
+    var b=e.target.closest?e.target.closest('.egl-order'):null;
+    if(!b) return; e.preventDefault();
+    openOrder({name:b.getAttribute('data-name'),img:b.getAttribute('data-img'),spec:b.getAttribute('data-spec'),price:b.getAttribute('data-price')});
+  }); }
+  if(modal){ modal.addEventListener('click',function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute('data-close')) closeOrder(); }); }
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape' && modal && modal.getAttribute('aria-hidden')==='false') closeOrder(); });
+  if(oForm){ oForm.addEventListener('submit',function(e){
+    e.preventDefault();
+    var fd=new FormData(oForm);
+    var name=(fd.get('name')||'').trim(), email=(fd.get('email')||'').trim(), mode=fd.get('mode');
+    if(!mode){ showMsg('err','Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót.'); return; }
+    if(!name || !email){ showMsg('err','Kérlek add meg a neved és az e-mail címed.'); return; }
+    var btn=oForm.querySelector('.egl-fsubmit'); btn.disabled=true; btn.textContent='Küldés…';
+    fetch(ORDER_API,{method:'POST',body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
+      showMsg('ok','Köszönjük! Megkaptuk a rendelési igényed — hamarosan keresünk.');
+      oForm.reset(); btn.disabled=false; btn.textContent='Rendelés elküldése';
+    }).catch(function(){
+      var body='Autó: '+(fd.get('car')||'')+'\nVásárlás módja: '+(mode||'')+'\nNév: '+name+'\nE-mail: '+email+'\nTelefon: '+(fd.get('phone')||'')+'\nCég: '+(fd.get('company')||'')+'\nMegjegyzés: '+(fd.get('message')||'');
+      window.location.href='mailto:'+SALES_EMAIL+'?subject='+encodeURIComponent('Autó rendelés – '+(fd.get('car')||''))+'&body='+encodeURIComponent(body);
+      showMsg('ok','Megnyitottuk az e-mail vázlatot. Ha van specifikációs fájlod, csatold az e-mailhez.');
+      btn.disabled=false; btn.textContent='Rendelés elküldése';
+    });
+  }); }
 })();
 </script>
