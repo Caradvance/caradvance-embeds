@@ -346,7 +346,8 @@
       ".cain-head img{width:150px;height:92px;object-fit:contain;flex:0 0 auto;}",
       ".cain-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#E2001A;}",
       ".cain-head h3{font-size:20px;font-weight:800;color:#0F1B2D;margin:4px 0 4px;line-height:1.15;}",
-      ".cain-sub{font-size:13.5px;color:#5A6B82;}",
+      ".cain-sub{font-size:13.5px;color:#5A6B82;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}",
+      ".cain-sub .ca-cinfo .ca-ctip{bottom:auto;top:150%;right:auto;left:0;}",
       "@media(max-width:560px){.cain-head{flex-direction:column;align-items:flex-start;padding-right:0;}}",
       ".cain-form{display:flex;flex-direction:column;gap:12px;}",
       ".cain-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}",
@@ -396,7 +397,15 @@
   function openModal(d){
     buildModal(); mForm.reset();
     if(mImg){ mImg.src=d.img||""; mImg.alt=d.name||""; }
-    mTitle.textContent=d.name||""; mSub.textContent=d.price||""; mCar.value=d.name||"";
+    mTitle.textContent=d.name||"";
+    mSub.innerHTML="";
+    var pspan=document.createElement("span"); pspan.textContent=d.price||""; mSub.appendChild(pspan);
+    if(d.price){
+      var inf=document.createElement("span"); inf.className="ca-cinfo"; inf.setAttribute("tabindex","0"); inf.textContent="i";
+      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(); inf.appendChild(tip);
+      mSub.appendChild(inf);
+    }
+    mCar.value=d.name||"";
     showMsg("","");
     modal.setAttribute("aria-hidden","false"); document.documentElement.style.overflow="hidden";
   }
@@ -420,11 +429,15 @@
     });
   }
 
+  function priceOf(card){
+    var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow");
+    if(!prow) return "";
+    var parts=[].slice.call(prow.children).filter(function(c){return !(c.classList&&c.classList.contains("ca-cinfo"));}).map(function(c){return (c.textContent||"").replace(/\s+/g," ").trim();}).filter(Boolean);
+    return parts.length?parts.join(" · "):(prow.textContent||"").replace(/\s+/g," ").trim();
+  }
   function cardData(card){
     var t=card.querySelector(".title"), img=card.querySelector(".media img");
-    var price=card.querySelector(".price"), rent=card.querySelector(".rentrow");
-    var ptxt=price?price.textContent.trim():(rent?rent.textContent.replace(/\s+/g," ").trim():"");
-    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:ptxt };
+    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:priceOf(card) };
   }
   function infoText(){
     var fx="";
