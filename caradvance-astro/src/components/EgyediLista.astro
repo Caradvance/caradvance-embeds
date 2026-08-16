@@ -73,7 +73,7 @@ const _rebuild='rebuild-nudge-3';
         </div>
         <div class="egl-fblock">
           <div class="egl-flabel">4. Hogyan szeretnéd megvásárolni?</div>
-          <label class="egl-radio"><input type="radio" name="mode" value="Nettó EUR, Németországból (Caradvance GmbH)" /><span>Nettó EUR-ban, Németországból (Caradvance GmbH)</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" id="eglMode1" value="Nettó EUR, Németországból (Caradvance GmbH)" /><span id="eglMode1Label">Nettó EUR-ban, Németországból (Caradvance GmbH)</span></label>
           <label class="egl-radio"><input type="radio" name="mode" value="27% magyar áfával, BH Group Zrt." /><span>27% magyar áfával, a BH Group Zrt.-n keresztül</span></label>
           <div class="egl-sublabel">Fizetés módja</div>
           <label class="egl-radio"><input type="radio" name="payment" value="Egy összegben" /><span>Egy összegben</span></label>
@@ -189,7 +189,7 @@ const _rebuild='rebuild-nudge-3';
   .egl-modal-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:10px;background:#eef2f8;color:var(--navy);font-size:16px;cursor:pointer;}
   .egl-modal-x:hover{background:#e0e6f0;}
   .egl-modal-head{display:flex;gap:16px;align-items:center;margin-bottom:20px;padding-right:30px;}
-  .egl-modal-head img{width:112px;height:74px;object-fit:contain;background:#f4f7fb;border-radius:12px;flex:0 0 auto;}
+  .egl-modal-head img{width:168px;height:112px;object-fit:contain;background:transparent;border-radius:12px;flex:0 0 auto;}
   .egl-modal-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);}
   .egl-modal-head h3{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0 4px;line-height:1.15;}
   .egl-modal-sub{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
@@ -595,6 +595,11 @@ const _rebuild='rebuild-nudge-3';
     [].forEach.call(tgls,function(t){ t.classList.toggle('active', t.getAttribute('data-buyer')===v); });
     var isCo=(v==='Cég');
     var comp=document.getElementById('eglCompanyFields'); if(comp) comp.style.display=isCo?'':'none';
+    var m1=document.getElementById('eglMode1'), m1l=document.getElementById('eglMode1Label');
+    if(m1 && m1l){
+      var txt=isCo?'Nettó EUR-ban, Németországból (Caradvance GmbH)':'19% német áfával, Németországból (Caradvance GmbH)';
+      m1.value=txt; m1l.textContent=txt;
+    }
   }
   [].forEach.call(tgls,function(t){ t.addEventListener('click',function(){ setBuyer(t.getAttribute('data-buyer')); }); });
   var fuelBlock=document.getElementById('eglFuelBlock');
