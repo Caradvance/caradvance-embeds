@@ -581,7 +581,7 @@
   function injectHomeCss(){
     if(document.getElementById("caHomeCss")) return;
     var st=document.createElement("style"); st.id="caHomeCss";
-    st.textContent=".ca-import .svc-media{height:140px!important}.ca-eladjuk.charity-accent{border-top:0!important}";
+    st.textContent=".ca-eladjuk.charity-accent{border-top:0!important}";
     (document.head||document.documentElement).appendChild(st);
   }
 
