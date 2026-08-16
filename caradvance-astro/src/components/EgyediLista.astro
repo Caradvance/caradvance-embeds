@@ -448,8 +448,8 @@ const _rebuild='rebuild-nudge-3';
   var textHeroEls=[document.querySelector('.egl-crumb'), document.getElementById('eglTitle'), document.getElementById('eglSub')];
   function setBrandHero(br){
     if(!mhero) return;
-    var isMini=(br==='MINI'), isMB=(br==='MB');
-    if(isMini||isMB){
+    var isMini=(br==='MINI'), isMB=(br==='MB'), isBMW=(br==='BMW');
+    if(isMini||isMB||isBMW){
       var vid=mhero.querySelector('.egl-mhero-vid'), src=vid&&vid.querySelector('source');
       var logo=mhero.querySelector('.egl-mhero-logos img');
       var h1=mhero.querySelector('.egl-mhero-h1'), sub=mhero.querySelector('.egl-mhero-sub');
@@ -459,6 +459,12 @@ const _rebuild='rebuild-nudge-3';
         if(h1) h1.textContent='Egyedi Mercedes-Benz rendelés';
         if(sub) sub.textContent='Új Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
         mhero.classList.add('egl-mhero-mb');
+      } else if(isBMW){
+        if(src) src.setAttribute('src','/caradvance-hero-x5.mp4'); if(vid) vid.setAttribute('poster','/caradvance-hero-x5-poster.jpg');
+        if(logo){ logo.src='/bmw/bmw-logo.webp'; logo.alt='BMW'; }
+        if(h1) h1.textContent='Egyedi BMW rendelés';
+        if(sub) sub.textContent='Új BMW modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
+        mhero.classList.remove('egl-mhero-mb');
       } else {
         if(src) src.setAttribute('src','/mini-JCW-family-video-wide.mp4'); if(vid) vid.setAttribute('poster','/mini-jcw-hero-poster.jpg');
         if(logo){ logo.src='/mini-hero-logo.webp'; logo.alt='Mini Cooper'; }
