@@ -330,12 +330,12 @@
     if(document.getElementById("caInqCss")) return;
     var s=document.createElement("style"); s.id="caInqCss";
     s.textContent=[
-      "a.card .cbtn,.ca-inq,.ca-reszlet{display:block;width:100%;box-sizing:border-box;text-align:center;background:#eef2f8;color:#0F1B2D;font-weight:700;font-size:15px;line-height:1.3;padding:14px;border:0;border-radius:12px;font-family:inherit;transition:.15s;}",
+      ".ca-enh .cbtn,.ca-inq,.ca-reszlet{display:block;width:100%;box-sizing:border-box;text-align:center;background:#eef2f8;color:#0F1B2D;font-weight:700;font-size:15px;line-height:1.3;padding:14px;border:0;border-radius:12px;font-family:inherit;text-decoration:none;transition:.15s;}",
       ".ca-inq{cursor:pointer;margin-top:8px;}",
       ".ca-reszlet{margin-top:14px;}",
-      "@media(hover:hover){a.card:hover .ca-inq{background:#E2001A;color:#fff;}a.card:hover .cbtn,a.card:hover .ca-reszlet{background:#0F1B2D;color:#fff;}}",
-      "a.card{overflow:visible;pointer-events:auto!important;}",
-      "a.card .media{border-radius:16px 16px 0 0;overflow:hidden;}",
+      "@media(hover:hover){.ca-enh:hover .ca-inq{background:#E2001A;color:#fff;}.ca-enh:hover .cbtn,.ca-enh:hover .ca-reszlet{background:#0F1B2D;color:#fff;}}",
+      ".ca-enh{overflow:visible;pointer-events:auto!important;}",
+      ".ca-enh .media{border-radius:16px 16px 0 0;overflow:hidden;}",
       ".ca-cinfo{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:6px;flex:0 0 auto;vertical-align:middle;}",
       ".ca-cinfo .ca-ctip{position:absolute;bottom:150%;right:0;left:auto;width:230px;white-space:normal;background:#0F1B2D;color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left;}",
       ".ca-cinfo:hover .ca-ctip,.ca-cinfo:focus .ca-ctip{opacity:1;visibility:visible;}",
@@ -443,7 +443,7 @@
     var pspan=document.createElement("span"); pspan.textContent=d.price||""; mSub.appendChild(pspan);
     if(d.price){
       var inf=document.createElement("span"); inf.className="ca-cinfo"; inf.setAttribute("tabindex","0"); inf.textContent="i";
-      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(d.isRent); inf.appendChild(tip);
+      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(d.kind); inf.appendChild(tip);
       mSub.appendChild(inf);
     }
     mCar.value=d.name||"";
@@ -481,32 +481,44 @@
     var parts=[].slice.call(prow.children).filter(function(c){return !(c.classList&&c.classList.contains("ca-cinfo"));}).map(function(c){return (c.textContent||"").replace(/\s+/g," ").trim();}).filter(Boolean);
     return parts.length?parts.join(" · "):(prow.textContent||"").replace(/\s+/g," ").trim();
   }
+  function cardKind(card){ return card.classList.contains("bizcard") ? "biz" : (card.querySelector(".rentrow") ? "rent" : "sale"); }
+  function cardHref(card){ if(card.tagName==="A") return card.getAttribute("href")||""; var l=card.querySelector('a[href*="/auto/"]'); return l?(l.getAttribute("href")||""):""; }
   function cardData(card){
     var t=card.querySelector(".title"), img=card.querySelector(".media img");
-    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:priceOf(card), isRent:!!card.querySelector(".rentrow") };
+    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:priceOf(card), kind:cardKind(card) };
   }
-  function infoText(isRent){
+  function infoText(kind){
     var fx="";
     try{ var m=(document.body.textContent||"").match(/1\s*€\s*=\s*([\d\s.,]+)\s*Ft/); if(m) fx=m[1].replace(/\s+/g," ").trim(); }catch(e){}
-    return "A feltüntetett árak nettó árak (áfa nélkül). A forint árak élő árfolyammal számolódnak, óránként frissülnek"+(fx?(" (1 € = "+fx+" Ft)"):"")+".";
+    if(kind==="biz") return "A feltüntetett ár forintban értendő, áfás ár, mivel az eladó magyarországi. Az euró ár csak tájékoztató jellegű, élő árfolyammal.";
+    var t="A feltüntetett árak nettó árak (áfa nélkül). A forint árak élő árfolyammal számolódnak, óránként frissülnek"+(fx?(" (1 € = "+fx+" Ft)"):"")+".";
+    if(kind==="rent") t+=" A bérleti díj havi 2 000 km futáskeretre vonatkozik.";
+    return t;
   }
   function enhance(card){
     var body=card.querySelector(".body"); if(!body) return;
-    if(body.querySelector(".ca-inq")) return;  // already has our button (re-add if carousel rebuilt it)
-    var isRent=!!card.querySelector(".rentrow");
     var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow");
-    if(prow && !prow.querySelector(".ca-cinfo")){
+    if(!prow) return;                       // not a car card
+    card.classList.add("ca-enh");
+    if(body.querySelector(".ca-inq")) return;
+    var kind=cardKind(card);
+    if(!prow.querySelector(".ca-cinfo")){
       var info=document.createElement("span"); info.className="ca-cinfo"; info.setAttribute("tabindex","0"); info.textContent="i";
-      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(isRent); info.appendChild(tip);
+      var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(kind); info.appendChild(tip);
       info.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); });
       prow.appendChild(info);
     }
-    if(!card.querySelector(".cbtn")){ var r=document.createElement("span"); r.className="ca-reszlet"; r.textContent="Részletek"; body.appendChild(r); }
+    if(!card.querySelector(".cbtn")){
+      var href=cardHref(card);
+      var r=href?document.createElement("a"):document.createElement("span");
+      r.className="ca-reszlet"; r.textContent="Részletek"; if(href) r.setAttribute("href",href);
+      body.appendChild(r);
+    }
     var inq=document.createElement("button"); inq.type="button"; inq.className="ca-inq"; inq.textContent="Érdeklődöm";
     inq.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); openModal(cardData(card)); });
     body.appendChild(inq);
   }
-  function scan(){ [].slice.call(document.querySelectorAll("a.card")).forEach(enhance); }
+  function scan(){ [].slice.call(document.querySelectorAll(".card")).forEach(enhance); }
 
   ready(function(){
     injectCss(); scan();
