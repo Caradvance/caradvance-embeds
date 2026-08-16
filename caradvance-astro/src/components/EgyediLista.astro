@@ -176,10 +176,12 @@ const _rebuild='rebuild-nudge-3';
   .egl-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px;}
   .egl-btn{display:block;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;
     font-size:15px;padding:14px;border-radius:12px;transition:.15s;text-decoration:none;}
-  a.egl-btn:hover,.egl-card:hover .egl-btn{background:var(--navy);color:#fff;}
   .egl-order{display:block;width:100%;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;
     font-size:15px;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;transition:.15s;}
-  .egl-card:hover .egl-order,.egl-order:hover{background:var(--red);color:#fff;}
+  @media (hover:hover){
+    a.egl-btn:hover,.egl-card:hover .egl-btn{background:var(--navy);color:#fff;}
+    .egl-card:hover .egl-order,.egl-order:hover{background:var(--red);color:#fff;}
+  }
 
   /* order modal */
   .egl-modal[aria-hidden="true"]{display:none;}
@@ -198,6 +200,8 @@ const _rebuild='rebuild-nudge-3';
   .egl-modal .egl-info{position:static;}
   .egl-modal .egl-info .egl-tip{position:absolute;top:100%;left:0;right:auto;bottom:auto;width:100%;margin-top:8px;}
   @media(max-width:560px){
+    .egl-modal{align-items:flex-start;padding:16px 12px;}
+    .egl-modal-card{max-height:calc(100dvh - 32px);padding:22px 20px 24px;}
     .egl-modal-head{flex-direction:column;align-items:flex-start;gap:10px;padding-right:0;}
     .egl-modal-head img{width:150px;height:92px;}
     .egl-modal-headtext{width:100%;}
