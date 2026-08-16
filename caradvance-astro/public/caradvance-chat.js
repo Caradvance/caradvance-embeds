@@ -575,8 +575,15 @@
     { match:/Prémium autóbérlés/, btns:[["Autóink","/berelheto","btn"],["Új autó","/beszerzesi-folyamat/#","btn btn-red"],["Folyamat","/berlesi-folyamat","btn btn-outline"],["Előnyök","/berles-elonyei","btn btn-outline"]] },
     { match:/Prémium autó eladás/, btns:[["Autóink","/autoink/","btn"],["Új autó","/egyedi-auto-rendeles","btn btn-red"],["Finanszírozás","#","btn btn-outline"],["Előnyök","/vasarlas-elonyei","btn btn-outline"]] },
     { match:/Autóimport/, btns:[["Autó rendelés","/auto-rendeles","btn"],["Folyamat","/beszerzesi-folyamat","btn btn-outline"],["Előnyök","/elonyok","btn btn-outline"],["Egyedül vagy velünk?","/egyedul-vagy-velunk","btn btn-outline"]] },
-    { match:/Használtautó-eladás|Eladjuk az autódat/, btns:[["Autóink","/bizomanyos","btn"],["Eladom az autómat","/eladom","btn btn-outline"],["Jótékonyság","/jotekonysag","btn btn-outline"],["Folyamat","/ertekesitesi-folyamat","btn btn-outline"]] }
+    { match:/Használtautó-eladás|Eladjuk az autódat/, btns:[["Autóink","/bizomanyos","btn"],["Eladom az autómat","/eladom","btn btn-red"],["Jótékonyság","/jotekonysag","btn btn-outline"],["Folyamat","/ertekesitesi-folyamat","btn btn-outline"]] }
   ];
+
+  function injectHomeCss(){
+    if(document.getElementById("caHomeCss")) return;
+    var st=document.createElement("style"); st.id="caHomeCss";
+    st.textContent=".ca-import .svc-media{height:140px!important}.ca-eladjuk.charity-accent{border-top:0!important}";
+    (document.head||document.documentElement).appendChild(st);
+  }
 
   function buildRow(btns){
     var row=document.createElement("div"); row.className="btn-row";
@@ -585,6 +592,7 @@
   }
 
   function apply(){
+    injectHomeCss();
     // 1) Add MINI logo to the "Prémium márkák" logo row (once)
     [].slice.call(document.querySelectorAll(".stat-logos")).forEach(function(row){
       var imgs=[].slice.call(row.querySelectorAll("img"));
@@ -603,6 +611,12 @@
       for(var i=0;i<SETS.length;i++){ if(SETS[i].match.test(label)){ set=SETS[i]; break; } }
       if(!set) return;
       card.setAttribute("data-cahome","1");
+      // per-block tweaks
+      if(/Autóimport/.test(label)){
+        card.classList.add("ca-import");
+        var hc=card.querySelector(".plat-heycar"); if(hc) hc.remove();
+      }
+      if(/Használtautó-eladás|Eladjuk az autódat/.test(label)){ card.classList.add("ca-eladjuk"); }
       // remove any existing button rows and any direct-child standalone .btn
       [].slice.call(card.querySelectorAll(".btn-row")).forEach(function(e){ e.remove(); });
       [].slice.call(card.children).forEach(function(ch){ if(ch.tagName==="A" && ch.classList.contains("btn")) ch.remove(); });
