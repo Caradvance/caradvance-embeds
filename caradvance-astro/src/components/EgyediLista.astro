@@ -73,8 +73,16 @@ const _rebuild='rebuild-nudge-3';
         </div>
         <div class="egl-fblock">
           <div class="egl-flabel">4. Hogyan szeretnéd megvásárolni?</div>
-          <label class="egl-radio"><input type="radio" name="mode" value="Németországból (import)" /><span>Németországból (import)</span></label>
-          <label class="egl-radio"><input type="radio" name="mode" value="Magyarországról, finanszírozással" /><span>Magyarországról, finanszírozással</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" value="Nettó EUR, Németországból (Caradvance GmbH)" /><span>Nettó EUR-ban, Németországból (Caradvance GmbH)</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" value="27% magyar áfával, BH Group Zrt." /><span>27% magyar áfával, a BH Group Zrt.-n keresztül</span></label>
+          <div class="egl-sublabel">Fizetés módja</div>
+          <label class="egl-radio"><input type="radio" name="payment" value="Egy összegben" /><span>Egy összegben</span></label>
+          <label class="egl-radio"><input type="radio" name="payment" value="Finanszírozással" /><span>Finanszírozással</span></label>
+          <div id="eglFinancing" class="egl-subblock" style="display:none">
+            <div class="egl-sublabel">Finanszírozás módja</div>
+            <label class="egl-radio"><input type="radio" name="financing" value="Segítséget kérek (Euro Leasing / Mercantil Bank)" /><span>Kérek segítséget — Euro Leasing vagy Mercantil Bank</span></label>
+            <label class="egl-radio"><input type="radio" name="financing" value="Saját finanszírozás" /><span>Saját finanszírozásom van</span></label>
+          </div>
         </div>
         <label class="egl-consent"><input type="checkbox" name="consent" id="eglConsent" /><span>Elfogadom az <a href="/adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
         <div class="egl-fmsg" id="eglOrderMsg"></div>
@@ -186,7 +194,9 @@ const _rebuild='rebuild-nudge-3';
   .egl-modal-head h3{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0 4px;line-height:1.15;}
   .egl-modal-sub{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
   .egl-modal-sub .egl-tol{font-size:13px;color:var(--muted);font-weight:600;}
-  .egl-modal .egl-info .egl-tip{bottom:auto;top:150%;left:0;right:auto;}
+  .egl-modal-headtext{position:relative;}
+  .egl-modal .egl-info{position:static;}
+  .egl-modal .egl-info .egl-tip{position:absolute;top:100%;left:0;right:auto;bottom:auto;width:100%;margin-top:8px;}
   .egl-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink);line-height:1.45;cursor:pointer;}
   .egl-consent input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;margin-top:1px;}
   .egl-consent a{color:var(--red);font-weight:700;}
@@ -198,6 +208,8 @@ const _rebuild='rebuild-nudge-3';
   .egl-flabel{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:10px;}
   .egl-fopt{font-weight:600;color:var(--muted);font-size:13px;}
   .egl-fhint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45;}
+  .egl-sublabel{font-size:13.5px;font-weight:800;color:var(--ink);margin:16px 0 2px;}
+  .egl-subblock{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);}
   .egl-radio{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:14.5px;color:var(--ink);cursor:pointer;border-top:1px solid var(--line);}
   .egl-radio:first-of-type{border-top:0;}
   .egl-radio input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;}
@@ -572,6 +584,7 @@ const _rebuild='rebuild-nudge-3';
       if(fuels.length===1) h+='<p class="egl-fhint" style="margin:10px 0 0">Ehhez a modellhez ez az egyetlen elérhető hajtás.</p>';
       fb2.innerHTML=h;
     }
+    var fin=document.getElementById('eglFinancing'); if(fin) fin.style.display='none';
     showMsg('','');
     if(modal){ modal.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; }
   }
@@ -587,6 +600,11 @@ const _rebuild='rebuild-nudge-3';
   var fuelBlock=document.getElementById('eglFuelBlock');
   if(fuelBlock){ fuelBlock.addEventListener('change',function(){
     [].forEach.call(fuelBlock.querySelectorAll('.egl-fuelopt'),function(o){ var r=o.querySelector('input'); o.classList.toggle('active', !!(r&&r.checked)); });
+  }); }
+  if(oForm){ oForm.addEventListener('change',function(e){
+    if(e.target && e.target.name==='payment'){
+      var fin=document.getElementById('eglFinancing'); if(fin) fin.style.display=(e.target.value==='Finanszírozással')?'':'none';
+    }
   }); }
   if(grid){ grid.addEventListener('click',function(e){
     var b=e.target.closest?e.target.closest('.egl-order'):null;
@@ -605,13 +623,16 @@ const _rebuild='rebuild-nudge-3';
     if(buyer==='Cég' && !company){ showMsg('err','Kérlek add meg a cég nevét.'); return; }
     if(!last || !first || !email){ showMsg('err','Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed.'); return; }
     if(!mode){ showMsg('err','Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót.'); return; }
+    var payment=fd.get('payment');
+    if(!payment){ showMsg('err','Kérlek válaszd ki a fizetés módját.'); return; }
+    if(payment==='Finanszírozással' && !fd.get('financing')){ showMsg('err','Kérlek válaszd ki a finanszírozás módját.'); return; }
     if(!fd.get('consent')){ showMsg('err','Kérlek fogadd el az adatkezelési tájékoztatót.'); return; }
     var btn=oForm.querySelector('.egl-fsubmit'); btn.disabled=true; btn.textContent='Küldés…';
     fetch(ORDER_API,{method:'POST',body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
       showMsg('ok','Köszönjük! Megkaptuk a rendelési igényed — hamarosan keresünk.');
       oForm.reset(); setBuyer('Magánszemély'); btn.disabled=false; btn.textContent='Rendelés elküldése';
     }).catch(function(){
-      var body='Autó: '+(fd.get('car')||'')+'\nÜzemanyag: '+(fd.get('fuel')||'')+'\nVásárló típusa: '+(buyer||'')+'\nVásárlás módja: '+(mode||'')+'\nNév: '+name+'\nE-mail: '+email+'\nTelefon: '+(fd.get('phone')||'')+'\nCég: '+company+'\nAdószám: '+(fd.get('taxid')||'')+'\nMegjegyzés: '+(fd.get('message')||'');
+      var body='Autó: '+(fd.get('car')||'')+'\nÜzemanyag: '+(fd.get('fuel')||'')+'\nVásárló típusa: '+(buyer||'')+'\nVásárlás módja: '+(mode||'')+'\nFizetés: '+(payment||'')+'\nFinanszírozás: '+(fd.get('financing')||'')+'\nNév: '+name+'\nE-mail: '+email+'\nTelefon: '+(fd.get('phone')||'')+'\nCég: '+company+'\nAdószám: '+(fd.get('taxid')||'')+'\nMegjegyzés: '+(fd.get('message')||'');
       window.location.href='mailto:'+SALES_EMAIL+'?subject='+encodeURIComponent('Autó rendelés – '+(fd.get('car')||''))+'&body='+encodeURIComponent(body);
       showMsg('ok','Megnyitottuk az e-mail vázlatot. Ha van specifikációs fájlod, csatold az e-mailhez.');
       btn.disabled=false; btn.textContent='Rendelés elküldése';
