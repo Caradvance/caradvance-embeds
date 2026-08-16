@@ -330,8 +330,9 @@
     if(document.getElementById("caInqCss")) return;
     var s=document.createElement("style"); s.id="caInqCss";
     s.textContent=[
-      ".ca-inq{display:block;width:100%;text-align:center;background:#eef1f6;color:#141519;font-weight:700;font-size:16px;padding:12px;border:0;border-radius:999px;cursor:pointer;font-family:inherit;margin-top:8px;transition:.15s;}",
-      ".ca-reszlet{display:block;width:100%;text-align:center;background:#eef1f6;color:#141519;font-weight:700;font-size:16px;padding:12px;border-radius:999px;margin-top:14px;transition:.15s;}",
+      ".ca-inq{display:block;width:100%;text-align:center;background:#eef2f8;color:#0F1B2D;font-weight:700;font-size:15px;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;margin-top:8px;transition:.15s;}",
+      ".ca-reszlet{display:block;width:100%;text-align:center;background:#eef2f8;color:#0F1B2D;font-weight:700;font-size:15px;padding:14px;border-radius:12px;margin-top:14px;transition:.15s;}",
+      "a.card .cbtn{background:#eef2f8;color:#0F1B2D;border-radius:12px;font-size:15px;padding:14px;transition:.15s;}",
       "@media(hover:hover){a.card:hover .ca-inq{background:#E2001A;color:#fff;}a.card:hover .cbtn,a.card:hover .ca-reszlet{background:#0F1B2D;color:#fff;}}",
       "a.card{overflow:visible;pointer-events:auto!important;}",
       ".ca-cinfo{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:6px;flex:0 0 auto;vertical-align:middle;}",
