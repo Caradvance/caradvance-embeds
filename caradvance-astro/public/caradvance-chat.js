@@ -15,6 +15,23 @@
   [0, 150, 500, 1200].forEach(function (ms) { setTimeout(killGate, ms); });
 })();
 
+/* ── Safety net: if the page's scroll-reveal script is missing/broken, force sections visible ── */
+(function () {
+  "use strict";
+  function rescue() {
+    try {
+      var reveals = document.querySelectorAll(".reveal");
+      if (!reveals.length) return;                 // page doesn't use reveal
+      if (document.querySelector(".reveal.in")) return; // reveal script is working — leave animation alone
+      var s = document.createElement("style");
+      s.textContent = ".reveal{opacity:1!important;transform:none!important}";
+      (document.head || document.documentElement).appendChild(s);
+    } catch (e) {}
+  }
+  function go() { setTimeout(rescue, 2500); setTimeout(rescue, 5000); }
+  if (document.readyState !== "loading") go(); else document.addEventListener("DOMContentLoaded", go);
+})();
+
 (function () {
   "use strict";
   if (window.__caChatLoaded) return; window.__caChatLoaded = true;
@@ -545,4 +562,54 @@
     window.addEventListener("load", scan);
     [400,1000,2000,3500,6000].forEach(function(ms){ setTimeout(scan, ms); });
   });
+})();
+
+/* ── Homepage service-block buttons + MINI brand logo (client-side, no HTML edit) ── */
+(function () {
+  "use strict";
+  if (window.__caHomeBlocks) return; window.__caHomeBlocks = true;
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
+  function txt(el){ return (el && el.textContent || "").replace(/\s+/g," ").trim(); }
+
+  var SETS = [
+    { match:/Prémium autóbérlés/, btns:[["Autóink","/berelheto","btn"],["Új autó","/beszerzesi-folyamat/#","btn btn-red"],["Folyamat","/berlesi-folyamat","btn btn-outline"],["Előnyök","/berles-elonyei","btn btn-outline"]] },
+    { match:/Prémium autó eladás/, btns:[["Autóink","/autoink/","btn"],["Új autó","/egyedi-auto-rendeles","btn btn-red"],["Finanszírozás","#","btn btn-outline"],["Előnyök","/vasarlas-elonyei","btn btn-outline"]] },
+    { match:/Autóimport/, btns:[["Autó rendelés","/auto-rendeles","btn"],["Folyamat","/beszerzesi-folyamat","btn btn-outline"],["Előnyök","/elonyok","btn btn-outline"],["Egyedül vagy velünk?","/egyedul-vagy-velunk","btn btn-outline"]] },
+    { match:/Használtautó-eladás|Eladjuk az autódat/, btns:[["Autóink","/bizomanyos","btn"],["Eladom az autómat","/eladom","btn btn-outline"],["Jótékonyság","/jotekonysag","btn btn-outline"],["Folyamat","/ertekesitesi-folyamat","btn btn-outline"]] }
+  ];
+
+  function buildRow(btns){
+    var row=document.createElement("div"); row.className="btn-row";
+    btns.forEach(function(b){ var a=document.createElement("a"); a.className=b[2]; a.href=b[1]; a.textContent=b[0]; row.appendChild(a); });
+    return row;
+  }
+
+  function apply(){
+    // 1) Add MINI logo to the "Prémium márkák" logo row (once)
+    [].slice.call(document.querySelectorAll(".stat-logos")).forEach(function(row){
+      var imgs=[].slice.call(row.querySelectorAll("img"));
+      var alts=imgs.map(function(i){ return i.getAttribute("alt"); });
+      if(alts.indexOf("BMW")>-1 && alts.indexOf("Porsche")>-1 && alts.indexOf("MINI")===-1){
+        var bmw=imgs.filter(function(i){ return i.getAttribute("alt")==="BMW"; })[0];
+        var mini=document.createElement("img"); mini.src="/mini-logo.webp"; mini.alt="MINI"; mini.loading="lazy"; mini.setAttribute("style","height:28px;width:auto");
+        if(bmw && bmw.nextSibling) row.insertBefore(mini, bmw.nextSibling); else row.appendChild(mini);
+      }
+    });
+    // 2) Rewrite the buttons of each service card, matched by its tag text
+    [].slice.call(document.querySelectorAll(".svc-grid .card.svc, .card.svc")).forEach(function(card){
+      if(card.getAttribute("data-cahome")) return;
+      var label=txt(card.querySelector(".tag")) || txt(card.querySelector("h3"));
+      var set=null;
+      for(var i=0;i<SETS.length;i++){ if(SETS[i].match.test(label)){ set=SETS[i]; break; } }
+      if(!set) return;
+      card.setAttribute("data-cahome","1");
+      // remove any existing button rows and any direct-child standalone .btn
+      [].slice.call(card.querySelectorAll(".btn-row")).forEach(function(e){ e.remove(); });
+      [].slice.call(card.children).forEach(function(ch){ if(ch.tagName==="A" && ch.classList.contains("btn")) ch.remove(); });
+      card.appendChild(buildRow(set.btns));
+    });
+  }
+
+  ready(apply);
+  [300,900,2000,4000].forEach(function(ms){ setTimeout(apply, ms); });
 })();
