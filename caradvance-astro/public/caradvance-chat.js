@@ -606,10 +606,10 @@
       row.classList.add("ca-brandrow");
       var byAlt=function(a){ return [].slice.call(row.querySelectorAll("img")).filter(function(i){ return i.getAttribute("alt")===a; })[0]; };
       var brk=function(){ var s=document.createElement("span"); s.className="ca-brk"; return s; };
-      ["BMW","Mercedes-Benz","Audi","MINI","Porsche"].forEach(function(a,idx){
+      ["BMW","Mercedes-Benz","Porsche","Audi","MINI"].forEach(function(a,idx){
         var el=byAlt(a); if(!el) return;
         row.appendChild(el);                            // move into desired order
-        if(idx===1 || idx===3) row.appendChild(brk());  // wrap after Mercedes and after MINI
+        if(idx===2) row.appendChild(brk());             // wrap after Porsche → row 2: Audi, MINI
       });
     });
     // 2) Rewrite the buttons of each service card, matched by its tag text
