@@ -1,4 +1,20 @@
-# Cloudflare Pages headers
-# Keep the site-wide script fresh so updates show up quickly (no more 4h stale cache).
+# Cloudflare Pages – cache rules for caradvance.hu
+# Cél: ne mutasson régi tartalmat. A gyakran frissülő, nem hash-elt fájlok
+# mindig újratöltődnek; az Astro hash-elt assetjei (/_astro/...) továbbra is
+# gyorsan, sokáig cache-elve maradnak.
+
+# Site-wide script – mindig a legfrissebb verzió töltődjön
 /caradvance-chat.js
-  Cache-Control: public, max-age=60, must-revalidate
+  Cache-Control: no-cache, must-revalidate
+
+# HTML oldalak – minden betöltéskor ellenőrizze a frissességet
+/*.html
+  Cache-Control: no-cache, must-revalidate
+
+# "Szép" URL-ek (pl. /, /finanszirozas-lizing/) – szintén ne cache-elődjenek sokáig
+/
+  Cache-Control: no-cache, must-revalidate
+
+# Egyéb, nem hash-elt statikus fájlok a public mappából (biztonság kedvéért rövid TTL)
+/*.js
+  Cache-Control: public, max-age=300, must-revalidate
