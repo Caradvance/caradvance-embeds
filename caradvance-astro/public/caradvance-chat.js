@@ -3,7 +3,7 @@
   "use strict";
   try {
     var s = document.createElement("style");
-    s.textContent = "#ca-gate{display:none!important}html,body{overflow:auto!important}";
+    s.textContent = "#ca-gate{display:none!important}html,body{overflow:visible!important}";
     (document.head || document.documentElement).appendChild(s);
   } catch (e) {}
   function killGate() {
