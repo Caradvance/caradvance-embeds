@@ -126,10 +126,6 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
           <div class="lk-hint lk-casco-hint">A beépített casco havidíja a személyre szabott ajánlatban szerepel.</div>
         </div>
 
-        <div class="lk-field">
-          <label>Ügyleti kamat <span class="lk-val lk-kval">9,59%</span></label>
-          <div class="lk-ratebox">Tájékoztató, rögzített kamat — a pontos kamatot és a THM-et a finanszírozó az egyedi hitelbírálat alapján határozza meg.</div>
-        </div>
       </div>
 
       <!-- Eredmény -->
@@ -145,6 +141,8 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
           <div class="lk-row lk-rego-row"><span>Regisztrációs adó</span><b class="lk-regosum">—</b></div>
           <div class="lk-row lk-marad-row"><span>Maradványérték a végén</span><b class="lk-maradsum">—</b></div>
           <div class="lk-row"><span>Futamidő</span><b class="lk-term">—</b></div>
+          <div class="lk-row"><span>Ügyleti kamat</span><b class="lk-rate">—</b></div>
+          <div class="lk-row"><span>THM <small>(tájékoztató)</small></span><b class="lk-thm">—</b></div>
           <div class="lk-row lk-total"><span>Teljes visszafizetés</span><b class="lk-sum">—</b></div>
         </div>
         <p class="lk-vatnote" style="display:none"></p>
@@ -203,6 +201,7 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
 .lk-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
 .lk-row span{color:#c4cddb}
 .lk-row b{color:#fff;font-weight:800;text-align:right}
+.lk-row small{font-size:11px;color:#8b98a9;font-weight:600}
 .lk-total{border-bottom:0;border-top:1px solid rgba(255,255,255,.18);margin-top:4px;padding-top:12px;font-size:15px}
 .lk-vatnote{color:#8fe3b8;font-size:12.5px;line-height:1.5;margin:0 0 12px;background:rgba(29,158,117,.14);border-radius:10px;padding:9px 12px}
 .lk-cta{display:block;text-align:center;background:var(--red);color:#fff;font-weight:800;font-size:15px;text-decoration:none;padding:14px;border-radius:12px;transition:.15s}
@@ -226,7 +225,7 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
     var oner=q('.lk-oner'), oval=q('.lk-oval'), onerFt=q('.lk-oner-ft');
     var futam=q('.lk-futam'), fval=q('.lk-fval');
     var marad=q('.lk-marad'), rval=q('.lk-rval'), maradWrap=q('.lk-res-wrap'), maradRow=q('.lk-marad-row');
-    var kval=q('.lk-kval'), curRate=rate0;
+    var outRate=q('.lk-rate'), outThm=q('.lk-thm'), curRate=rate0;
     var konstrHint=q('.lk-konstr-hint'), buyerHint=q('.lk-buyer-hint'), cascoHint=q('.lk-casco-hint');
     var vatNote=q('.lk-vatnote'), regRow=q('.lk-rego-row'), regSum=q('.lk-regosum');
     var konstr='nyilt', buyer='magan', casco='beepitett';
@@ -259,7 +258,9 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
       onerFt.textContent = money(down);
       fval.textContent = n+' hó ('+(n/12)+' év)';
       rval.textContent = marad.value+'%';
-      kval.textContent = String(curRate).replace('.',',')+'%';
+      var thm=(Math.pow(1+i,12)-1)*100;
+      outRate.textContent = String(curRate).replace('.',',')+'%';
+      outThm.textContent = (isFinite(thm)?thm.toFixed(1):'0').replace('.',',')+'%';
 
       outM.textContent = money(monthly)+'/hó';
       outMAlt.textContent = moneyAlt(monthly)+'/hó';
