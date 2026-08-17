@@ -263,7 +263,7 @@
       [{ t: "Bérlési folyamat", href: "/berlesi-folyamat" }, { t: "Előnyök", href: "/berles-elonyei" }, { t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
     syncNavMenu(wrap, "Megvásárolható autóink",
       [],
-      { "Előnyök": "/vasarlas-elonyei" },
+      { "Előnyök": "/vasarlas-elonyei", "Finanszírozás – lízing": "/finanszirozas-lizing" },
       [{ t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
   }
 
@@ -573,7 +573,7 @@
 
   var SETS = [
     { match:/Prémium autóbérlés/, btns:[["Autóink","/berelheto","btn"],["Új autó","/beszerzesi-folyamat/#","btn btn-red"],["Folyamat","/berlesi-folyamat","btn btn-outline"],["Előnyök","/berles-elonyei","btn btn-outline"]] },
-    { match:/Prémium autó eladás/, btns:[["Autóink","/autoink/","btn"],["Új autó","/egyedi-auto-rendeles","btn btn-red"],["Finanszírozás","#","btn btn-outline"],["Előnyök","/vasarlas-elonyei","btn btn-outline"]] },
+    { match:/Prémium autó eladás/, btns:[["Autóink","/autoink/","btn"],["Új autó","/egyedi-auto-rendeles","btn btn-red"],["Finanszírozás","/finanszirozas-lizing","btn btn-outline"],["Előnyök","/vasarlas-elonyei","btn btn-outline"]] },
     { match:/Autóimport/, btns:[["Autó rendelés","/auto-rendeles","btn"],["Folyamat","/beszerzesi-folyamat","btn btn-outline"],["Előnyök","/elonyok","btn btn-outline"],["Egyedül vagy velünk?","/egyedul-vagy-velunk","btn btn-outline"]] },
     { match:/Használtautó-eladás|Eladjuk az autódat/, btns:[["Autóink","/bizomanyos","btn"],["Eladom az autómat","/eladom","btn btn-red"],["Jótékonyság","/jotekonysag","btn btn-outline"],["Folyamat","/ertekesitesi-folyamat","btn btn-outline"]] }
   ];
