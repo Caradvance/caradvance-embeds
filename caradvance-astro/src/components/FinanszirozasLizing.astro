@@ -11,6 +11,7 @@ const partners = [
     tag: 'MBH Bankcsoport',
     href: '/finanszirozas-lizing/euro-leasing',
     accent: '#0a4d8c',
+    logo: '/euroleasing.png',
     d: 'Nyíltvégű és zártvégű pénzügyi lízing magánszemélyeknek és vállalkozásoknak, forint és euró alapon, fix vagy változó kamatozással. Igazolt euró bevétel esetén kedvezőbb euró finanszírozás is elérhető.',
     points: ['Nyíltvégű és zártvégű pénzügyi lízing', 'HUF és EUR alapú konstrukció', 'Maradványértékkel csökkenő havi részlet', 'Beépített casco és GAP biztosítás'],
   },
@@ -19,6 +20,7 @@ const partners = [
     tag: 'OTP Bankcsoport',
     href: '/finanszirozas-lizing/merkantil-bank',
     accent: '#0a7d3c',
+    logo: '/merkantil-bank.png',
     d: 'Személyre szabott gépjárműlízing új és használt autóra egyaránt, gyors bírálattal és rugalmas futamidővel. Az igényléstől a folyósításig végig szakértői támogatással.',
     points: ['Új és használt személyautó finanszírozása', 'Gyors, online kalkuláció és bírálat', 'Rugalmas futamidő és önerő', 'Kényelmes, akár helyszíni szerződéskötés'],
   },
@@ -64,7 +66,12 @@ const faqJson = {
 <div class="scrim"></div>
 <div class="inner">
 <h1>Finanszírozás és lízing —<br /><span class="accent">a te ütemedben</span></h1>
-<p class="sub sub-wide" style="max-width:900px">Nem kell egy összegben kifizetned az autót. Finanszírozó és lízing partnereinken keresztül teljes körű finanszírozást biztosítunk — nyíltvégű és zártvégű lízing, forint vagy euró alapon, kedvező feltételekkel.</p>
+<p class="sub sub-wide" style="max-width:760px">Nem kell egy összegben kifizetned az autót — finanszírozó és lízing partnereinken keresztül kulcsrakész lízinget intézünk, forint vagy euró alapon.</p>
+<div class="fl-herologos">
+<span class="fl-hl-label">Partnereink</span>
+<span class="fl-hl-chip"><img src="/euroleasing.png" alt="Euro Leasing" onerror="this.parentNode.classList.add('txt');this.replaceWith(document.createTextNode('Euro Leasing'))" /></span>
+<span class="fl-hl-chip"><img src="/merkantil-bank.png" alt="Merkantil Bank" onerror="this.parentNode.classList.add('txt');this.replaceWith(document.createTextNode('Merkantil Bank'))" /></span>
+</div>
 <div class="cta-row">
 <a class="btn btn-primary" href="#kalkulator">Havi részlet kiszámítása</a>
 <a class="btn btn-white" href="/kapcsolat">Ajánlatot kérek</a>
@@ -83,7 +90,7 @@ const faqJson = {
 <div class="wrap fl-partners">
 {partners.map((p) => (
 <a class="fl-pcard" href={p.href} style={`--pa:${p.accent}`}>
-<div class="fl-pbadge">{p.name.charAt(0)}</div>
+<div class="fl-plogo"><img src={p.logo} alt={p.name} loading="lazy" onerror={`this.style.display='none';this.parentNode.classList.add('txt');this.parentNode.textContent='${p.name}'`} /></div>
 <div class="fl-ptop">
 <span class="fl-ptag">{p.tag}</span>
 <h3>{p.name}</h3>
@@ -176,13 +183,22 @@ const faqJson = {
 <style>
 .fl{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
 .fl .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+/* Hero partner logos */
+.fl-herologos{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:18px 0 26px}
+.fl-hl-label{color:rgba(255,255,255,.8);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.fl-hl-chip{display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:12px;padding:10px 16px;height:46px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.fl-hl-chip img{max-height:26px;max-width:170px;width:auto;object-fit:contain;display:block}
+.fl-hl-chip.txt{font-weight:800;font-size:15px;color:#0f1622}
+@media(max-width:560px){.fl-hl-chip{height:40px;padding:8px 12px}.fl-hl-chip img{max-height:22px;max-width:140px}}
 /* Partner cards */
 .fl-partners{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px}
 @media(max-width:820px){.fl-partners{grid-template-columns:1fr}}
 .fl-pcard{position:relative;display:block;background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px 26px 22px;text-decoration:none;color:inherit;box-shadow:0 12px 34px rgba(8,8,10,.05);transition:.18s;overflow:hidden}
 .fl-pcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--pa)}
 .fl-pcard:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(8,8,10,.12);border-color:var(--pa)}
-.fl-pbadge{position:absolute;top:22px;right:24px;width:46px;height:46px;border-radius:13px;background:var(--pa);color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center}
+.fl-plogo{display:flex;align-items:center;height:40px;margin-bottom:16px}
+.fl-plogo img{max-height:38px;max-width:210px;width:auto;object-fit:contain;display:block}
+.fl-plogo.txt{font-weight:800;font-size:20px;color:var(--pa);letter-spacing:-.01em}
 .fl-ptag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--pa)}
 .fl-ptop h3{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:4px 0 0}
 .fl-pd{color:var(--muted);font-size:14.5px;line-height:1.6;margin:12px 0 14px}
