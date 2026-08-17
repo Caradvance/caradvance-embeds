@@ -35,7 +35,7 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         </div>
 
         <div class="lk-field">
-          <label>Finanszírozás devizaneme</label>
+          <label><span class="lk-lbl">Finanszírozás devizaneme <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Forint alapú finanszírozás bárkinek elérhető. Az euró finanszírozás igazolt euró bevétellel rendelkező vállalkozásoknak jár, jellemzően kedvezőbb kamattal.</span></span></span></label>
           <div class="lk-seg lk-deviza">
             <button type="button" class="lk-segbtn is-on" data-d="HUF">Forint alapú</button>
             <button type="button" class="lk-segbtn" data-d="EUR">Euró finanszírozás</button>
@@ -44,13 +44,35 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         </div>
 
         <div class="lk-field">
-          <label>Regisztrációs adó <span class="lk-opt">(opcionális)</span></label>
+          <label><span class="lk-lbl">Regisztrációs adó <span class="lk-opt">(opcionális)</span> <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A forgalomba helyezéskor fizetendő adó. Ha a vételár nem tartalmazza, itt add hozzá — növeli a finanszírozott összeget.</span></span></span></label>
           <input type="text" inputmode="numeric" class="lk-in lk-regado" value="0" />
           <div class="lk-hint">Ha a vételár nem tartalmazza, itt add hozzá a finanszírozott összeghez.</div>
         </div>
 
         <div class="lk-field">
-          <label>Hitelfelvevő</label>
+          <label><span class="lk-lbl">Gyártás időpontja <span class="lk-opt">(opcionális)</span> <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A jármű gyártási éve és hónapja (pl. 2020-02). Idősebb vagy használt jármű esetén a finanszírozó magasabb kamatot ajánlhat — a becslést nem módosítja.</span></span></span></label>
+          <input type="month" class="lk-in lk-gyartas" />
+          <div class="lk-hint">pl. 2020-02 — a jármű kora befolyásolhatja a felajánlott kamatot.</div>
+        </div>
+
+        <div class="lk-field">
+          <label><span class="lk-lbl">Gépjármű állapota</span></label>
+          <div class="lk-seg lk-allapot">
+            <button type="button" class="lk-segbtn is-on" data-a="uj">Új</button>
+            <button type="button" class="lk-segbtn" data-a="hasznalt">Használt</button>
+          </div>
+        </div>
+
+        <div class="lk-field">
+          <label><span class="lk-lbl">Gépjármű eredete <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Hazai: belföldön már forgalomba helyezett jármű. Import: külföldről behozott jármű — a finanszírozó eltérő feltételeket szabhat.</span></span></span></label>
+          <div class="lk-seg lk-eredet">
+            <button type="button" class="lk-segbtn is-on" data-e="hazai">Hazai</button>
+            <button type="button" class="lk-segbtn" data-e="import">Import</button>
+          </div>
+        </div>
+
+        <div class="lk-field">
+          <label><span class="lk-lbl">Hitelfelvevő <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Magánszemélyként bruttó árral számolunk. Vállalkozásként a lízingdíj tőkerészének áfája — jogszabályi feltételekkel — visszaigényelhető.</span></span></span></label>
           <div class="lk-seg lk-buyer">
             <button type="button" class="lk-segbtn is-on" data-b="magan">Magánszemély</button>
             <button type="button" class="lk-segbtn" data-b="ev">Egyéni váll.</button>
@@ -60,7 +82,7 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         </div>
 
         <div class="lk-field">
-          <label>Konstrukció</label>
+          <label><span class="lk-lbl">Konstrukció <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Nyíltvégű: a futamidő végén te döntesz a tulajdonjogról, és a maradványértékkel csökken a részlet. Zártvégű: a záró díj után automatikusan a tiéd az autó, maradványérték nélkül.</span></span></span></label>
           <div class="lk-seg lk-konstr">
             <button type="button" class="lk-segbtn is-on" data-k="nyilt">Nyíltvégű lízing</button>
             <button type="button" class="lk-segbtn" data-k="zart">Zártvégű lízing</button>
@@ -69,7 +91,7 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         </div>
 
         <div class="lk-field">
-          <label>Kamatozás típusa</label>
+          <label><span class="lk-lbl">Kamatozás típusa <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Rögzített: a kamat a teljes futamidőre fix. Változó: a kamat a piaci referenciakamathoz igazodhat a futamidő alatt.</span></span></span></label>
           <div class="lk-seg lk-kamtip">
             <button type="button" class="lk-segbtn is-on" data-kt="fix">Rögzített</button>
             <button type="button" class="lk-segbtn" data-kt="valtozo">Változó</button>
@@ -77,25 +99,25 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         </div>
 
         <div class="lk-field">
-          <label>Önerő <span class="lk-val lk-oval">20%</span></label>
-          <input type="range" class="lk-range lk-oner" min="0" max="80" step="5" value="20" />
+          <label><span class="lk-lbl">Önerő <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A vételár általad befizetett része. Nagyobb önerő kisebb finanszírozott összeget és havi részletet jelent.</span></span></span><span class="lk-val lk-oval">20%</span></label>
+          <input type="range" class="lk-range lk-oner" min="0" max="50" step="5" value="20" />
           <div class="lk-hint lk-oner-ft"></div>
         </div>
 
         <div class="lk-field">
-          <label>Futamidő <span class="lk-val lk-fval">48 hó</span></label>
+          <label><span class="lk-lbl">Futamidő <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A lízing időtartama hónapban. Hosszabb futamidő kisebb havi részletet, de több összes kamatot jelent.</span></span></span><span class="lk-val lk-fval">48 hó</span></label>
           <input type="range" class="lk-range lk-futam" min="24" max="84" step="12" value="48" />
           <div class="lk-hint">2–7 év között választható</div>
         </div>
 
         <div class="lk-field lk-res-wrap">
-          <label>Maradványérték <span class="lk-val lk-rval">30%</span></label>
+          <label><span class="lk-lbl">Maradványérték <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Csak nyíltvégű lízingnél. A futamidő végén fennmaradó érték (20–30%); csökkenti a havi részletet, de a végén rendezned kell, ha megtartod az autót.</span></span></span><span class="lk-val lk-rval">30%</span></label>
           <input type="range" class="lk-range lk-marad" min="20" max="30" step="1" value="30" />
           <div class="lk-hint">Csak nyíltvégű lízingnél — 20% és 30% között.</div>
         </div>
 
         <div class="lk-field">
-          <label>Casco biztosítás</label>
+          <label><span class="lk-lbl">Casco biztosítás <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Beépített: a casco díja a havi részletbe épül. Egyénileg kötöm: saját cascót kötsz, a díj nem része a részletnek. Cascomentes: a finanszírozó jóváhagyásától függ.</span></span></span></label>
           <div class="lk-seg lk-casco">
             <button type="button" class="lk-segbtn is-on" data-c="beepitett">Beépített</button>
             <button type="button" class="lk-segbtn" data-c="egyeni">Egyénileg kötöm</button>
@@ -164,6 +186,13 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
 .lk-range::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--red);cursor:pointer;border:3px solid #fff}
 .lk-hint{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:7px}
 .lk-ratebox{color:var(--muted);font-size:12.5px;line-height:1.5;background:#fbfcfe;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.lk-lbl{display:inline-flex;align-items:center;gap:6px}
+.lk-tip{position:relative;display:inline-flex;align-items:center;line-height:0}
+.lk-i{width:16px;height:16px;border-radius:50%;border:0;background:#c9d3e2;color:#fff;font:italic 700 11px/16px Georgia,serif;text-align:center;cursor:pointer;padding:0;flex:0 0 auto}
+.lk-i:hover{background:var(--navy)}
+.lk-tiptext{position:absolute;top:calc(100% + 9px);left:-4px;z-index:50;width:240px;max-width:72vw;background:#0f1622;color:#fff;font-size:12.5px;font-weight:600;line-height:1.5;padding:10px 12px;border-radius:10px;box-shadow:0 12px 32px rgba(8,12,20,.32);opacity:0;visibility:hidden;transform:translateY(-4px);transition:.14s;pointer-events:none}
+.lk-tip:hover .lk-tiptext,.lk-tip.open .lk-tiptext{opacity:1;visibility:visible;transform:none}
+.lk-tiptext::before{content:"";position:absolute;bottom:100%;left:9px;border:6px solid transparent;border-bottom-color:#0f1622}
 .lk-result{background:linear-gradient(180deg,#0f1622,#0b0b0d);color:#fff;border-radius:18px;padding:24px 22px;position:sticky;top:90px}
 .lk-monthly{text-align:center;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.12)}
 .lk-mlabel{color:#9aa7b8;font-size:13px;font-weight:600}
@@ -299,6 +328,18 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
     seg('.lk-buyer', function(b){ buyer=b.getAttribute('data-b'); });
     seg('.lk-casco', function(b){ casco=b.getAttribute('data-c'); });
     seg('.lk-kamtip', function(){});
+    seg('.lk-allapot', function(){});
+    seg('.lk-eredet', function(){});
+
+    // Tooltips: hover (desktop) via CSS; tap-toggle (mobile) here
+    root.querySelectorAll('.lk-i').forEach(function(btn){
+      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation();
+        var tip=btn.parentNode, was=tip.classList.contains('open');
+        root.querySelectorAll('.lk-tip.open').forEach(function(t){ t.classList.remove('open'); });
+        if(!was) tip.classList.add('open');
+      });
+    });
+    document.addEventListener('click', function(){ root.querySelectorAll('.lk-tip.open').forEach(function(t){ t.classList.remove('open'); }); });
 
     reformat(elPrice); reformat(elReg); recalc();
   }
