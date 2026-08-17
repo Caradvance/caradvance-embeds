@@ -581,7 +581,7 @@
   function injectHomeCss(){
     if(document.getElementById("caHomeCss")) return;
     var st=document.createElement("style"); st.id="caHomeCss";
-    st.textContent=".ca-import .svc-media{background:#e8e4df!important}.ca-import .svc-media img{object-fit:contain!important}.ca-eladjuk.charity-accent{border-top:0!important}";
+    st.textContent=".ca-import .svc-media{background:#e8e4df!important}.ca-import .svc-media img{object-fit:contain!important}.ca-eladjuk.charity-accent{border-top:0!important}.stat-logos.ca-brandrow{justify-content:center}.stat-logos .ca-brk{flex-basis:100%;width:100%;height:0;margin:0}";
     (document.head||document.documentElement).appendChild(st);
   }
 
@@ -593,15 +593,24 @@
 
   function apply(){
     injectHomeCss();
-    // 1) Add MINI logo to the "Prémium márkák" logo row (once)
+    // 1) Prémium márkák logo row: ensure MINI, then order to BMW·Mercedes / Audi·MINI / Porsche
     [].slice.call(document.querySelectorAll(".stat-logos")).forEach(function(row){
-      var imgs=[].slice.call(row.querySelectorAll("img"));
-      var alts=imgs.map(function(i){ return i.getAttribute("alt"); });
-      if(alts.indexOf("BMW")>-1 && alts.indexOf("Porsche")>-1 && alts.indexOf("MINI")===-1){
-        var bmw=imgs.filter(function(i){ return i.getAttribute("alt")==="BMW"; })[0];
+      var alts=[].slice.call(row.querySelectorAll("img")).map(function(i){ return i.getAttribute("alt"); });
+      if(!(alts.indexOf("BMW")>-1 && alts.indexOf("Porsche")>-1)) return; // only the brand row
+      if(alts.indexOf("MINI")===-1){
         var mini=document.createElement("img"); mini.src="/mini-logo.webp"; mini.alt="MINI"; mini.loading="lazy"; mini.setAttribute("style","height:28px;width:auto");
-        if(bmw && bmw.nextSibling) row.insertBefore(mini, bmw.nextSibling); else row.appendChild(mini);
+        row.appendChild(mini);
       }
+      if(row.getAttribute("data-caorder")) return;
+      row.setAttribute("data-caorder","1");
+      row.classList.add("ca-brandrow");
+      var byAlt=function(a){ return [].slice.call(row.querySelectorAll("img")).filter(function(i){ return i.getAttribute("alt")===a; })[0]; };
+      var brk=function(){ var s=document.createElement("span"); s.className="ca-brk"; return s; };
+      ["BMW","Mercedes-Benz","Audi","MINI","Porsche"].forEach(function(a,idx){
+        var el=byAlt(a); if(!el) return;
+        row.appendChild(el);                            // move into desired order
+        if(idx===1 || idx===3) row.appendChild(brk());  // wrap after Mercedes and after MINI
+      });
     });
     // 2) Rewrite the buttons of each service card, matched by its tag text
     [].slice.call(document.querySelectorAll(".svc-grid .card.svc, .card.svc")).forEach(function(card){
