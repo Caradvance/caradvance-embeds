@@ -65,11 +65,11 @@ const faqJson = {
 </video>
 <div class="scrim"></div>
 <div class="inner">
-<div class="fl-herologos">
+<div class="fl-herologos"><span class="fl-herobar">
 <img class="fl-hl-logo" src="/mbh-euroleasing-logo.svg" alt="Euro Leasing" />
 <span class="fl-hl-sep"></span>
 <img class="fl-hl-logo" src="/merkantil-bank-logo-tr.png" alt="Merkantil Bank" />
-</div>
+</span></div>
 <h1>Finanszírozás és lízing —<br /><span class="accent">a te ütemedben</span></h1>
 <p class="sub sub-wide" style="max-width:760px">Nem kell egy összegben kifizetned az autót — finanszírozó és lízing partnereinken keresztül kulcsrakész lízinget intézünk, forint vagy euró alapon.</p>
 <div class="cta-row">
@@ -184,9 +184,11 @@ const faqJson = {
 .fl{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
 .fl .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
 /* Hero partner logos — bare white marks above the title */
-.fl-herologos{display:flex;align-items:center;justify-content:center;gap:24px;margin:0 0 20px}
-.fl-hl-logo{height:30px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 1px 6px rgba(0,0,0,.55));-webkit-filter:drop-shadow(0 1px 6px rgba(0,0,0,.55))}
-.fl-hl-sep{width:1px;height:24px;background:rgba(255,255,255,.5)}
+.fl-herologos{display:flex;justify-content:center;margin:0 0 22px}
+.fl-herobar{display:inline-flex;align-items:center;gap:22px;background:#fff;border-radius:14px;padding:12px 22px;box-shadow:0 10px 26px rgba(0,0,0,.22)}
+.fl-hl-logo{height:26px;width:auto;object-fit:contain;display:block}
+.fl-hl-sep{width:1px;height:22px;background:#e2e6ee}
+@media(max-width:560px){.fl-herobar{gap:14px;padding:10px 16px}.fl-hl-logo{height:22px}}
 @media(max-width:560px){.fl-herologos{gap:16px}.fl-hl-logo{height:22px}}
 /* Partner cards */
 .fl-partners{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px}
