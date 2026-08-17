@@ -1,35 +1,30 @@
 ---
 /*
-  Lízingkalkulátor — Euroleasing / Merkantil típusú űrlap, tájékoztató jellegű becslés.
-  Az annuitásos + maradványértékes képlet a valós Euroleasing példákra kalibrálva
-  (rögzített ügyleti kamat ~9,59%, THM 0–30,25%). A havi részlet a forintra pontosan
-  visszaadja az Euroleasing kalkulátor eredményét. Casco/GAP díja és a pontos THM
-  a személyre szabott ajánlatban szerepel.
+  Lízingkalkulátor — az Euroleasing "Autólízing kalkulátor" modelljére kalibrálva.
+  A futamidőnkénti ügyleti kamat, THM és maradványérték a valós Euroleasing
+  nyíltvégű / forint táblázatból származik; a nettó törlesztő és az áfa a forintra
+  pontosan visszaadja az Euroleasing eredményét (2026-08). Tájékoztató jellegű.
 
-  Props:
-    rate    – alapértelmezett ügyleti kamat (%), pl. 9.59
-    title   – opcionális cím
-    partner – opcionális partnernév ("Euro Leasing" / "Merkantil Bank")
+  Props: rate (nem használt, kompat.), title, partner
 */
-const { rate = 9.59, title = 'Lízingkalkulátor', partner = '' } = Astro.props as {
+const { title = 'Lízingkalkulátor', partner = '' } = Astro.props as {
   rate?: number; title?: string; partner?: string;
 };
-const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
+const EURHUF = 363.28;
 ---
 <section class="lk-sec">
-  <div class="lk" data-rate={rate} data-eur={EURHUF}>
+  <div class="lk" data-eur={EURHUF}>
     <div class="lk-head">
       <span class="lk-eyebrow">Kalkulátor</span>
       <h3 class="lk-title">{title}</h3>
       {partner && <p class="lk-partner">Becslés a(z) <b>{partner}</b> konstrukciói alapján</p>}
-      <p class="lk-lead">Állítsd be a paramétereket, és azonnal megmutatjuk a becsült havi részletet.</p>
+      <p class="lk-lead">A kalkulátor minden módosításkor újraszámolja a törlesztőrészletet, a THM-et és az ügyleti kamatot.</p>
     </div>
 
     <div class="lk-grid">
-      <!-- Bemenetek -->
       <div class="lk-inputs">
         <div class="lk-field">
-          <label>Az autó vételára</label>
+          <label>Az autó vételára (bruttó)</label>
           <input type="text" inputmode="numeric" class="lk-in lk-vetelar" value="15 000 000" />
           <div class="lk-hint lk-price-alt"></div>
         </div>
@@ -46,13 +41,11 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         <div class="lk-field">
           <label><span class="lk-lbl">Regisztrációs adó <span class="lk-opt">(opcionális)</span> <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A forgalomba helyezéskor fizetendő adó. Ha a vételár nem tartalmazza, itt add hozzá — növeli a finanszírozott összeget.</span></span></span></label>
           <input type="text" inputmode="numeric" class="lk-in lk-regado" value="0" />
-          <div class="lk-hint">Ha a vételár nem tartalmazza, itt add hozzá a finanszírozott összeghez.</div>
         </div>
 
         <div class="lk-field">
-          <label><span class="lk-lbl">Gyártás időpontja <span class="lk-opt">(opcionális)</span> <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A jármű gyártási éve és hónapja (pl. 2020-02). Idősebb vagy használt jármű esetén a finanszírozó magasabb kamatot ajánlhat — a becslést nem módosítja.</span></span></span></label>
+          <label><span class="lk-lbl">Gyártás időpontja <span class="lk-opt">(opcionális)</span> <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A jármű gyártási éve és hónapja. Idősebb vagy használt jármű esetén a finanszírozó magasabb kamatot ajánlhat — a becslést nem módosítja.</span></span></span></label>
           <input type="month" class="lk-in lk-gyartas" />
-          <div class="lk-hint">pl. 2020-02 — a jármű kora befolyásolhatja a felajánlott kamatot.</div>
         </div>
 
         <div class="lk-field">
@@ -72,7 +65,7 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         </div>
 
         <div class="lk-field">
-          <label><span class="lk-lbl">Hitelfelvevő <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Magánszemélyként bruttó árral számolunk. Vállalkozásként a lízingdíj tőkerészének áfája — jogszabályi feltételekkel — visszaigényelhető.</span></span></span></label>
+          <label><span class="lk-lbl">Hitelfelvevő <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Magánszemélyként bruttó árral számolunk. Vállalkozásként a nyíltvégű lízing nettó alapon fut, és a tőkerész áfája — jogszabályi feltételekkel — visszaigényelhető.</span></span></span></label>
           <div class="lk-seg lk-buyer">
             <button type="button" class="lk-segbtn is-on" data-b="magan">Magánszemély</button>
             <button type="button" class="lk-segbtn" data-b="ev">Egyéni váll.</button>
@@ -105,15 +98,9 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
         </div>
 
         <div class="lk-field">
-          <label><span class="lk-lbl">Futamidő <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A lízing időtartama hónapban. Hosszabb futamidő kisebb havi részletet, de több összes kamatot jelent.</span></span></span><span class="lk-val lk-fval">48 hó</span></label>
+          <label><span class="lk-lbl">Futamidő <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A lízing időtartama. Hosszabb futamidő kisebb havi részletet, de több összes törlesztőt jelent. A kamat, a THM és a maradványérték is a futamidőtől függ.</span></span></span><span class="lk-val lk-fval">48 hó</span></label>
           <input type="range" class="lk-range lk-futam" min="24" max="84" step="12" value="48" />
           <div class="lk-hint">2–7 év között választható</div>
-        </div>
-
-        <div class="lk-field lk-res-wrap">
-          <label><span class="lk-lbl">Maradványérték <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">Csak nyíltvégű lízingnél. A futamidő végén fennmaradó érték (20–30%); csökkenti a havi részletet, de a végén rendezned kell, ha megtartod az autót.</span></span></span><span class="lk-val lk-rval">30%</span></label>
-          <input type="range" class="lk-range lk-marad" min="20" max="30" step="1" value="30" />
-          <div class="lk-hint">Csak nyíltvégű lízingnél — 20% és 30% között.</div>
         </div>
 
         <div class="lk-field">
@@ -125,29 +112,32 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
           </div>
           <div class="lk-hint lk-casco-hint">A beépített casco havidíja a személyre szabott ajánlatban szerepel.</div>
         </div>
-
       </div>
 
-      <!-- Eredmény -->
+      <!-- Ajánlatunk -->
       <div class="lk-result">
         <div class="lk-monthly">
-          <span class="lk-mlabel">Becsült havi részlet</span>
+          <span class="lk-mlabel lk-mlbl">Becsült havi részlet</span>
           <div class="lk-mval"><span class="lk-mnum">—</span></div>
           <span class="lk-malt lk-m-alt"></span>
         </div>
         <div class="lk-rows">
-          <div class="lk-row"><span>Finanszírozott összeg</span><b class="lk-fin">—</b></div>
-          <div class="lk-row"><span>Önerő</span><b class="lk-down">—</b></div>
+          <div class="lk-row"><span>Teljes vételár</span><b class="lk-gross">—</b></div>
+          <div class="lk-row lk-r-net"><span>Teljes nettó vételár</span><b class="lk-net">—</b></div>
+          <div class="lk-row"><span class="lk-downlbl">Önerő</span><b class="lk-down">—</b></div>
           <div class="lk-row lk-rego-row"><span>Regisztrációs adó</span><b class="lk-regosum">—</b></div>
-          <div class="lk-row lk-marad-row"><span>Maradványérték a végén</span><b class="lk-maradsum">—</b></div>
-          <div class="lk-row"><span>Futamidő</span><b class="lk-term">—</b></div>
+          <div class="lk-row lk-r-afa"><span>Tőkerészt terhelő áfa</span><b class="lk-afa">—</b></div>
+          <div class="lk-row"><span>Finanszírozott összeg</span><b class="lk-fin">—</b></div>
           <div class="lk-row"><span>Ügyleti kamat</span><b class="lk-rate">—</b></div>
           <div class="lk-row"><span>THM <small>(tájékoztató)</small></span><b class="lk-thm">—</b></div>
-          <div class="lk-row lk-total"><span>Teljes visszafizetés</span><b class="lk-sum">—</b></div>
+          <div class="lk-row lk-marad-row"><span class="lk-maradlbl">Maradványérték</span><b class="lk-maradsum">—</b></div>
+          <div class="lk-row"><span>Futamidő</span><b class="lk-term">—</b></div>
+          <div class="lk-row"><span>Kamatozás típusa</span><b class="lk-kamtipout">rögzített</b></div>
+          <div class="lk-row lk-total"><span>Összes törlesztő</span><b class="lk-sum">—</b></div>
         </div>
         <p class="lk-vatnote" style="display:none"></p>
         <a class="lk-cta" href="/kapcsolat">Kérek személyre szabott ajánlatot →</a>
-        <p class="lk-disc">A kalkuláció <b>tájékoztató jellegű</b>, nem minősül ajánlattételnek. A tényleges havi részlet, a THM (0,0%–30,25%), a kamat, valamint a casco/GAP díja az egyedi hitelbírálat és ajánlat alapján alakul.</p>
+        <p class="lk-disc">A kalkuláció <b>tájékoztató jellegű</b>, nem minősül ajánlattételnek, és az Euroleasing nyíltvégű / forint modelljére van kalibrálva. A tényleges részlet, a THM, a kamat és a casco/GAP díja az egyedi hitelbírálat és ajánlat alapján alakul.</p>
       </div>
     </div>
   </div>
@@ -155,9 +145,7 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
 
 <style>
 .lk-sec{padding:8px 0}
-.lk{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;
-  max-width:1080px;margin:0 auto;background:#fff;border:1px solid var(--line);
-  border-radius:22px;padding:26px 28px;box-shadow:0 12px 34px rgba(8,8,10,.06)}
+.lk{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;max-width:1080px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px 28px;box-shadow:0 12px 34px rgba(8,8,10,.06)}
 .lk-head{margin-bottom:18px}
 .lk-eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
 .lk-title{font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 2px}
@@ -169,13 +157,8 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
 .lk-field>label{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;color:var(--ink);margin-bottom:8px}
 .lk-opt{font-weight:600;font-size:12px;color:var(--muted)}
 .lk-val{font-weight:800;color:var(--red)}
-.lk-price{display:flex;gap:10px}
 .lk-in{width:100%;box-sizing:border-box;min-width:0;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:17px;font-weight:800;color:var(--ink);font-family:inherit;background:#fbfcfe}
-.lk-price .lk-in{flex:1}
 .lk-in:focus{outline:none;border-color:var(--navy)}
-.lk-cur{display:flex;background:#f1f4f9;border-radius:12px;padding:4px;gap:2px}
-.lk-curbtn{border:0;background:transparent;font-family:inherit;font-weight:800;font-size:15px;color:var(--muted);padding:0 14px;border-radius:9px;cursor:pointer}
-.lk-curbtn.is-on{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(8,8,10,.1)}
 .lk-seg{display:flex;gap:8px;flex-wrap:wrap}
 .lk-segbtn{flex:1;min-width:92px;border:1px solid var(--line);background:#fbfcfe;font-family:inherit;font-weight:700;font-size:13px;color:var(--ink);padding:10px 8px;border-radius:12px;cursor:pointer;transition:.15s}
 .lk-segbtn.is-on{background:var(--navy);color:#fff;border-color:var(--navy)}
@@ -183,7 +166,6 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
 .lk-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--red);cursor:pointer;border:3px solid #fff;box-shadow:0 2px 8px rgba(226,0,26,.4)}
 .lk-range::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--red);cursor:pointer;border:3px solid #fff}
 .lk-hint{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:7px}
-.lk-ratebox{color:var(--muted);font-size:12.5px;line-height:1.5;background:#fbfcfe;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
 .lk-lbl{display:inline-flex;align-items:center;gap:6px}
 .lk-tip{position:relative;display:inline-flex;align-items:center;line-height:0}
 .lk-i{width:16px;height:16px;border-radius:50%;border:0;background:#c9d3e2;color:#fff;font:italic 700 11px/16px Georgia,serif;text-align:center;cursor:pointer;padding:0;flex:0 0 auto}
@@ -195,14 +177,14 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
 .lk-monthly{text-align:center;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.12)}
 .lk-mlabel{color:#9aa7b8;font-size:13px;font-weight:600}
 .lk-mval{margin:6px 0 2px}
-.lk-mnum{font-size:clamp(30px,5vw,40px);font-weight:800;letter-spacing:-.02em;color:#fff}
+.lk-mnum{font-size:clamp(28px,4.6vw,38px);font-weight:800;letter-spacing:-.02em;color:#fff}
 .lk-malt{color:#9aa7b8;font-size:13px}
 .lk-rows{margin:16px 0 14px;display:flex;flex-direction:column;gap:0}
-.lk-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+.lk-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13.5px}
 .lk-row span{color:#c4cddb}
 .lk-row b{color:#fff;font-weight:800;text-align:right}
 .lk-row small{font-size:11px;color:#8b98a9;font-weight:600}
-.lk-total{border-bottom:0;border-top:1px solid rgba(255,255,255,.18);margin-top:4px;padding-top:12px;font-size:15px}
+.lk-total{border-bottom:0;border-top:1px solid rgba(255,255,255,.18);margin-top:4px;padding-top:12px;font-size:14.5px}
 .lk-vatnote{color:#8fe3b8;font-size:12.5px;line-height:1.5;margin:0 0 12px;background:rgba(29,158,117,.14);border-radius:10px;padding:9px 12px}
 .lk-cta{display:block;text-align:center;background:var(--red);color:#fff;font-weight:800;font-size:15px;text-decoration:none;padding:14px;border-radius:12px;transition:.15s}
 .lk-cta:hover{filter:brightness(1.08)}
@@ -212,141 +194,137 @@ const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
 
 <script is:inline>
 (function(){
-  var fmtHU = function(n){ return Math.round(n).toLocaleString('hu-HU'); };
-  function parseNum(s){ return parseFloat(String(s).replace(/[^\d.,]/g,'').replace(/\s/g,'').replace(',','.'))||0; }
+  // Euroleasing nyíltvégű / forint táblázat (2026-08): futamidő -> {ügyleti kamat, maradvány%, THM}
+  var SCHED={24:{k:12.59,m:0.50,thm:10.4},36:{k:10.09,m:0.40,thm:8.3},48:{k:9.59,m:0.30,thm:7.8},60:{k:9.59,m:0.25,thm:7.8},72:{k:9.09,m:0.20,thm:7.4},84:{k:9.09,m:0.15,thm:7.4}};
+  var EUR_OFFSET=2.7; // euró finanszírozás kedvezőbb kamata (tájékoztató)
+  var fmtHU=function(n){return Math.round(n).toLocaleString('hu-HU');};
+  function parseNum(s){return parseFloat(String(s).replace(/[^\d.,]/g,'').replace(/\s/g,'').replace(',','.'))||0;}
+  function pct1(x){return x.toFixed(1).replace('.',',')+'%';}
+  function pct2(x){return x.toFixed(2).replace('.',',')+'%';}
 
   function wire(root){
-    var rate0 = parseFloat(root.getAttribute('data-rate'))||9.59;
-    var EUR = parseFloat(root.getAttribute('data-eur'))||363.28;
-    var cur = 'HUF';
-    var q = function(s){ return root.querySelector(s); };
-
+    var EUR=parseFloat(root.getAttribute('data-eur'))||363.28, cur='HUF';
+    var q=function(s){return root.querySelector(s);};
     var elPrice=q('.lk-vetelar'), elPriceAlt=q('.lk-price-alt'), elReg=q('.lk-regado');
     var oner=q('.lk-oner'), oval=q('.lk-oval'), onerFt=q('.lk-oner-ft');
     var futam=q('.lk-futam'), fval=q('.lk-fval');
-    var marad=q('.lk-marad'), rval=q('.lk-rval'), maradWrap=q('.lk-res-wrap'), maradRow=q('.lk-marad-row');
-    var outRate=q('.lk-rate'), outThm=q('.lk-thm'), curRate=rate0;
-    var konstrHint=q('.lk-konstr-hint'), buyerHint=q('.lk-buyer-hint'), cascoHint=q('.lk-casco-hint');
-    var vatNote=q('.lk-vatnote'), regRow=q('.lk-rego-row'), regSum=q('.lk-regosum');
-    var konstr='nyilt', buyer='magan', casco='beepitett';
+    var konstrHint=q('.lk-konstr-hint'), buyerHint=q('.lk-buyer-hint'), cascoHint=q('.lk-casco-hint'), devizaHint=q('.lk-deviza-hint');
+    var vatNote=q('.lk-vatnote');
+    var konstr='nyilt', buyer='magan', casco='beepitett', kamtip='fix';
 
-    var outM=q('.lk-mnum'), outMAlt=q('.lk-m-alt'), outFin=q('.lk-fin'), outDown=q('.lk-down');
-    var outMaradSum=q('.lk-maradsum'), outTerm=q('.lk-term'), outSum=q('.lk-sum');
+    var outM=q('.lk-mnum'), outMAlt=q('.lk-m-alt'), mLbl=q('.lk-mlbl');
+    var oGross=q('.lk-gross'), oNet=q('.lk-net'), rNet=q('.lk-r-net');
+    var oDown=q('.lk-down'), downLbl=q('.lk-downlbl');
+    var regRow=q('.lk-rego-row'), regSum=q('.lk-regosum');
+    var oAfa=q('.lk-afa'), rAfa=q('.lk-r-afa');
+    var oFin=q('.lk-fin'), oRate=q('.lk-rate'), oThm=q('.lk-thm');
+    var maradRow=q('.lk-marad-row'), maradLbl=q('.lk-maradlbl'), oMarad=q('.lk-maradsum');
+    var oTerm=q('.lk-term'), oKamtip=q('.lk-kamtipout'), oSum=q('.lk-sum');
 
-    function priceHUF(){ var v=parseNum(elPrice.value); return cur==='EUR'? v*EUR : v; }
-    function regHUF(){ var v=parseNum(elReg.value); return cur==='EUR'? v*EUR : v; }
-    function money(h){ return cur==='EUR'? fmtHU(h/EUR)+' €' : fmtHU(h)+' Ft'; }
-    function moneyAlt(h){ return cur==='EUR'? '≈ '+fmtHU(h)+' Ft' : '≈ '+fmtHU(h/EUR)+' €'; }
+    function priceHUF(){var v=parseNum(elPrice.value);return cur==='EUR'?v*EUR:v;}
+    function regHUF(){var v=parseNum(elReg.value);return cur==='EUR'?v*EUR:v;}
+    function money(h){return cur==='EUR'?fmtHU(h/EUR)+' €':fmtHU(h)+' Ft';}
+    function moneyAlt(h){return cur==='EUR'?'≈ '+fmtHU(h)+' Ft':'≈ '+fmtHU(h/EUR)+' €';}
+    function pmt(f,b,n,i){ if(i>0){return (f-b/Math.pow(1+i,n))*i/(1-Math.pow(1+i,-n));} return (f-b)/n; }
 
     function recalc(){
-      var base = priceHUF() + regHUF();
-      var oPct = parseFloat(oner.value)/100;
-      var n = parseInt(futam.value,10);
-      var rPct = konstr==='nyilt' ? parseFloat(marad.value)/100 : 0;
-      var i = (curRate/100)/12;
+      var gross=priceHUF()+regHUF();
+      var n=parseInt(futam.value,10); var sch=SCHED[n]||SCHED[48];
+      var business=(buyer!=='magan');
+      var useNet=(konstr==='nyilt' && business); // Euroleasing: nyíltvégű, cég -> nettó alap + áfa-visszaigénylés
+      var base=useNet ? gross/1.27 : gross;
 
-      var down = base*oPct;
-      var balloon = base*rPct;
-      var financed = Math.max(base - down, 0);
-      var monthly;
-      if(i>0){ var pv = financed - balloon/Math.pow(1+i,n); monthly = pv*i/(1-Math.pow(1+i,-n)); }
-      else { monthly = (financed - balloon)/n; }
-      if(!isFinite(monthly)||monthly<0) monthly=0;
-      var total = down + monthly*n + balloon;
+      var kamat=sch.k; if(cur==='EUR') kamat=Math.max(kamat-EUR_OFFSET, 3);
+      var i=kamat/1200;
+      var oPct=parseFloat(oner.value)/100;
+      var maradPct=(konstr==='nyilt') ? sch.m : 0;
 
-      oval.textContent = oner.value+'%';
-      onerFt.textContent = money(down);
-      fval.textContent = n+' hó ('+(n/12)+' év)';
-      rval.textContent = marad.value+'%';
-      var thm=(Math.pow(1+i,12)-1)*100;
-      outRate.textContent = String(curRate).replace('.',',')+'%';
-      outThm.textContent = (isFinite(thm)?thm.toFixed(1):'0').replace('.',',')+'%';
+      var down=base*oPct;
+      var financed=Math.max(base-down,0);
+      var marad=base*maradPct;
+      var monthly=pmt(financed, marad, n, i); if(!isFinite(monthly)||monthly<0) monthly=0;
+      var afaToke=useNet ? (financed-marad)*0.27 : 0;
+      var ossz=monthly*n;
 
-      outM.textContent = money(monthly)+'/hó';
-      outMAlt.textContent = moneyAlt(monthly)+'/hó';
-      outFin.textContent = money(financed);
-      outDown.textContent = money(down)+' ('+oner.value+'%)';
-      outTerm.textContent = n+' hó';
-      outSum.textContent = money(total);
+      // THM: nyíltvégű cég -> táblázat (euróra a kamataránnyal skálázva); egyébként effektív kamat
+      var thm;
+      if(konstr==='nyilt' && business){ thm=sch.thm*(kamat/sch.k); }
+      else { thm=(Math.pow(1+i,12)-1)*100; }
 
-      var reg=regHUF();
-      if(reg>0){ regRow.style.display=''; regSum.textContent=money(reg); } else { regRow.style.display='none'; }
+      // labels
+      oval.textContent=oner.value+'%';
+      onerFt.textContent=money(down);
+      fval.textContent=n+' hó ('+(n/12)+' év)';
 
-      if(konstr==='nyilt'){
-        maradWrap.style.display=''; maradRow.style.display='';
-        outMaradSum.textContent = money(balloon)+' ('+marad.value+'%)';
-        konstrHint.textContent = 'A futamidő végén te döntöd el, kié legyen az autó; a maradványértékkel csökken a havi részlet.';
-      } else {
-        maradWrap.style.display='none'; maradRow.style.display='none';
-        konstrHint.textContent = 'A futamidő végén automatikusan a tiéd lesz az autó — nincs maradványérték.';
-      }
+      // outputs
+      mLbl.textContent = useNet ? 'Becsült nettó havi törlesztő' : 'Becsült havi részlet';
+      outM.textContent=money(monthly)+'/hó';
+      outMAlt.textContent=moneyAlt(monthly)+'/hó';
+      oGross.textContent=money(gross);
+      rNet.style.display=useNet?'':'none'; oNet.textContent=money(base);
+      downLbl.textContent = useNet ? 'Nettó kezdő lízingdíj' : 'Önerő';
+      oDown.textContent=money(down)+' ('+oner.value+'%)';
+      var reg=regHUF(); if(reg>0){regRow.style.display='';regSum.textContent=money(reg);}else{regRow.style.display='none';}
+      rAfa.style.display=useNet?'':'none'; oAfa.textContent=money(afaToke);
+      oFin.textContent=money(financed);
+      oRate.textContent=pct2(kamat);
+      oThm.textContent=pct1(thm);
+      if(konstr==='nyilt'){ maradRow.style.display=''; maradLbl.textContent = useNet ? 'Nettó maradványérték' : 'Maradványérték'; oMarad.textContent=money(marad)+' ('+Math.round(maradPct*100)+'%)'; }
+      else { maradRow.style.display='none'; }
+      oTerm.textContent=n+' hó';
+      oKamtip.textContent = (kamtip==='fix'?'rögzített':'változó');
+      oSum.textContent=money(ossz);
 
-      // áfa / hitelfelvevő tájékoztató
-      if(buyer==='magan'){
-        buyerHint.textContent='Magánszemélyként bruttó árral számolunk.';
-        vatNote.style.display='none';
-      } else {
-        buyerHint.textContent='Vállalkozásként a lízingdíj tőkerészének áfája — jogszabályi feltételekkel — visszaigényelhető.';
-        vatNote.style.display=''; vatNote.textContent='Vállalkozásként a becsült részlet bruttó; a tőkerész áfája visszaigényelhető, így a tényleges költséged alacsonyabb lehet.';
-      }
-      cascoHint.textContent = casco==='beepitett'
-        ? 'A beépített casco havidíja a személyre szabott ajánlatban szerepel.'
-        : (casco==='egyeni' ? 'Saját cascót kötsz — a díj nem része a lízingrészletnek.' : 'Casco nélkül — a finanszírozó jóváhagyásától függően.');
+      // hints
+      konstrHint.textContent = (konstr==='nyilt')
+        ? 'A futamidő végén te döntöd el, kié legyen az autó; a maradványértékkel csökken a havi részlet.'
+        : 'A futamidő végén automatikusan a tiéd lesz az autó — nincs maradványérték.';
+      if(business){ buyerHint.textContent='Vállalkozásként a nyíltvégű lízing nettó alapon fut, a tőkerész áfája visszaigényelhető.'; }
+      else { buyerHint.textContent='Magánszemélyként bruttó árral számolunk.'; }
+      vatNote.style.display = useNet ? '' : 'none';
+      if(useNet) vatNote.textContent='Vállalkozásként a törlesztő nettó; a tőkerész áfája ('+money(afaToke)+') visszaigényelhető, így a tényleges költséged alacsonyabb.';
+      cascoHint.textContent = casco==='beepitett' ? 'A beépített casco havidíja a személyre szabott ajánlatban szerepel.' : (casco==='egyeni' ? 'Saját cascót kötsz — a díj nem része a lízingrészletnek.' : 'Casco nélkül — a finanszírozó jóváhagyásától függően.');
+      devizaHint.textContent = (cur==='EUR') ? 'Euró finanszírozás: igazolt euró bevétellel rendelkező vállalkozásoknak, kedvezőbb kamattal.' : 'Forint alapú finanszírozás mindenki számára elérhető.';
 
       var Pp=parseNum(elPrice.value);
-      elPriceAlt.textContent = cur==='EUR'
-        ? (Pp? '≈ '+fmtHU(Pp*EUR)+' Ft (1 € = '+String(EUR).replace('.',',')+' Ft)':'')
-        : (Pp? '≈ '+fmtHU(Pp/EUR)+' € (1 € = '+String(EUR).replace('.',',')+' Ft)':'');
+      elPriceAlt.textContent=cur==='EUR'?(Pp?'≈ '+fmtHU(Pp*EUR)+' Ft (1 € = '+String(EUR).replace('.',',')+' Ft)':''):(Pp?'≈ '+fmtHU(Pp/EUR)+' € (1 € = '+String(EUR).replace('.',',')+' Ft)':'');
     }
 
-    function reformat(el){ var v=parseNum(el.value); el.value = v? fmtHU(v):(el===elReg?'0':''); }
-    [elPrice,elReg].forEach(function(el){
-      el.addEventListener('input', recalc);
-      el.addEventListener('blur', function(){ reformat(el); recalc(); });
-    });
-    [oner,futam,marad].forEach(function(el){ el.addEventListener('input', recalc); });
+    function reformat(el){var v=parseNum(el.value);el.value=v?fmtHU(v):(el===elReg?'0':'');}
+    [elPrice,elReg].forEach(function(el){el.addEventListener('input',recalc);el.addEventListener('blur',function(){reformat(el);recalc();});});
+    [oner,futam].forEach(function(el){el.addEventListener('input',recalc);});
 
-    var devizaHint=q('.lk-deviza-hint');
-    var hufRate=rate0, eurRate=6.9; // EUR: tájékoztató, kedvezőbb kamat — pontos értéket az ajánlat rögzíti
     root.querySelectorAll('.lk-deviza .lk-segbtn').forEach(function(b){
-      b.addEventListener('click', function(){
-        if(b.classList.contains('is-on')) return;
-        root.querySelectorAll('.lk-deviza .lk-segbtn').forEach(function(x){ x.classList.remove('is-on'); });
+      b.addEventListener('click',function(){
+        if(b.classList.contains('is-on'))return;
+        root.querySelectorAll('.lk-deviza .lk-segbtn').forEach(function(x){x.classList.remove('is-on');});
         b.classList.add('is-on');
         var nc=b.getAttribute('data-d');
-        [elPrice,elReg].forEach(function(el){ var v=parseNum(el.value); if(cur==='HUF'&&nc==='EUR') v=v/EUR; else if(cur==='EUR'&&nc==='HUF') v=v*EUR; el.value=v?fmtHU(v):(el===elReg?'0':''); });
-        cur=nc;
-        curRate = (nc==='EUR' ? eurRate : hufRate);
-        devizaHint.textContent = (nc==='EUR'
-          ? 'Euró finanszírozás: igazolt euró bevétellel rendelkező vállalkozásoknak, a forint kamatnál jellemzően kedvezőbb kamatszinttel.'
-          : 'Forint alapú finanszírozás mindenki számára elérhető.');
-        recalc();
+        [elPrice,elReg].forEach(function(el){var v=parseNum(el.value);if(cur==='HUF'&&nc==='EUR')v=v/EUR;else if(cur==='EUR'&&nc==='HUF')v=v*EUR;el.value=v?fmtHU(v):(el===elReg?'0':'');});
+        cur=nc; recalc();
       });
     });
+    function seg(sel,cb){root.querySelectorAll(sel+' .lk-segbtn').forEach(function(b){b.addEventListener('click',function(){root.querySelectorAll(sel+' .lk-segbtn').forEach(function(x){x.classList.remove('is-on');});b.classList.add('is-on');cb(b);recalc();});});}
+    seg('.lk-konstr',function(b){konstr=b.getAttribute('data-k');});
+    seg('.lk-buyer',function(b){buyer=b.getAttribute('data-b');});
+    seg('.lk-casco',function(b){casco=b.getAttribute('data-c');});
+    seg('.lk-kamtip',function(b){kamtip=b.getAttribute('data-kt');});
+    seg('.lk-allapot',function(){});
+    seg('.lk-eredet',function(){});
 
-    function seg(sel, cb){ root.querySelectorAll(sel+' .lk-segbtn').forEach(function(b){ b.addEventListener('click', function(){ root.querySelectorAll(sel+' .lk-segbtn').forEach(function(x){ x.classList.remove('is-on'); }); b.classList.add('is-on'); cb(b); recalc(); }); }); }
-    seg('.lk-konstr', function(b){ konstr=b.getAttribute('data-k'); });
-    seg('.lk-buyer', function(b){ buyer=b.getAttribute('data-b'); });
-    seg('.lk-casco', function(b){ casco=b.getAttribute('data-c'); });
-    seg('.lk-kamtip', function(){});
-    seg('.lk-allapot', function(){});
-    seg('.lk-eredet', function(){});
-
-    // Tooltips: hover (desktop) via CSS; tap-toggle (mobile) here
     root.querySelectorAll('.lk-i').forEach(function(btn){
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation();
+      btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();
         var tip=btn.parentNode, was=tip.classList.contains('open');
-        root.querySelectorAll('.lk-tip.open').forEach(function(t){ t.classList.remove('open'); });
+        root.querySelectorAll('.lk-tip.open').forEach(function(t){t.classList.remove('open');});
         if(!was) tip.classList.add('open');
       });
     });
-    document.addEventListener('click', function(){ root.querySelectorAll('.lk-tip.open').forEach(function(t){ t.classList.remove('open'); }); });
+    document.addEventListener('click',function(){root.querySelectorAll('.lk-tip.open').forEach(function(t){t.classList.remove('open');});});
 
     reformat(elPrice); reformat(elReg); recalc();
   }
 
-  function init(){ document.querySelectorAll('.lk').forEach(wire); }
-  if(document.readyState!=='loading') init();
-  else document.addEventListener('DOMContentLoaded', init);
+  function init(){document.querySelectorAll('.lk').forEach(wire);}
+  if(document.readyState!=='loading')init();else document.addEventListener('DOMContentLoaded',init);
 })();
 </script>
