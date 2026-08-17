@@ -1,0 +1,269 @@
+---
+/*
+  Lízingkalkulátor — tájékoztató jellegű havi törlesztő becslés.
+  Az annuitásos + maradványértékes képlet a valós Euroleasing / Merkantil
+  példákra kalibrálva (rögzített ügyleti kamat ~9,59%, THM 0–30,25%).
+  Csak becslés: a pontos THM-et és kamatot a személyre szabott ajánlat tartalmazza.
+
+  Props:
+    rate      – alapértelmezett ügyleti kamat (%), pl. 9.59
+    title     – opcionális cím a kalkulátor fölé
+    partner   – opcionális partnernév a fejlécben ("Euro Leasing" / "Merkantil Bank")
+*/
+const { rate = 9.59, title = 'Lízingkalkulátor', partner = '' } = Astro.props as {
+  rate?: number; title?: string; partner?: string;
+};
+const EURHUF = 363.28; // 2026-08 MNB-közép, Euroleasing kalkulátor alapján
+---
+<section class="lk-sec">
+  <div class="lk" data-rate={rate} data-eur={EURHUF}>
+    <div class="lk-head">
+      <span class="lk-eyebrow">Kalkulátor</span>
+      <h3 class="lk-title">{title}</h3>
+      {partner && <p class="lk-partner">Becslés a(z) <b>{partner}</b> konstrukciói alapján</p>}
+      <p class="lk-lead">Állítsd be a paramétereket, és azonnal megmutatjuk a becsült havi részletet.</p>
+    </div>
+
+    <div class="lk-grid">
+      <!-- Bal oldal: bemenetek -->
+      <div class="lk-inputs">
+        <div class="lk-field">
+          <label>Az autó vételára</label>
+          <div class="lk-price">
+            <input type="text" inputmode="numeric" class="lk-in lk-vetelar" value="15 000 000" />
+            <div class="lk-cur" role="tablist">
+              <button type="button" class="lk-curbtn is-on" data-cur="HUF">Ft</button>
+              <button type="button" class="lk-curbtn" data-cur="EUR">€</button>
+            </div>
+          </div>
+          <div class="lk-hint lk-price-alt"></div>
+        </div>
+
+        <div class="lk-field">
+          <label>Konstrukció</label>
+          <div class="lk-seg lk-konstr">
+            <button type="button" class="lk-segbtn is-on" data-k="nyilt">Nyíltvégű lízing</button>
+            <button type="button" class="lk-segbtn" data-k="zart">Zártvégű lízing</button>
+          </div>
+          <div class="lk-hint lk-konstr-hint">A futamidő végén te döntöd el, kié legyen az autó; a maradványértékkel csökken a havi részlet.</div>
+        </div>
+
+        <div class="lk-field">
+          <label>Önerő <span class="lk-val lk-oval">20%</span></label>
+          <input type="range" class="lk-range lk-oner" min="0" max="80" step="5" value="20" />
+          <div class="lk-hint lk-oner-ft"></div>
+        </div>
+
+        <div class="lk-field">
+          <label>Futamidő <span class="lk-val lk-fval">48 hó</span></label>
+          <input type="range" class="lk-range lk-futam" min="24" max="84" step="12" value="48" />
+          <div class="lk-hint">2–7 év között választható</div>
+        </div>
+
+        <div class="lk-field lk-res-wrap">
+          <label>Maradványérték <span class="lk-val lk-rval">30%</span></label>
+          <input type="range" class="lk-range lk-marad" min="20" max="30" step="1" value="30" />
+          <div class="lk-hint">Csak nyíltvégű lízingnél — 20% és 30% között.</div>
+        </div>
+
+        <div class="lk-field">
+          <label>Ügyleti kamat <span class="lk-val lk-kval">9,59%</span></label>
+          <input type="range" class="lk-range lk-kamat" min="6" max="18" step="0.1" value="9.59" />
+          <div class="lk-hint">Tájékoztató, rögzített kamat. A tényleges kamatot az ajánlat rögzíti.</div>
+        </div>
+      </div>
+
+      <!-- Jobb oldal: eredmény -->
+      <div class="lk-result">
+        <div class="lk-monthly">
+          <span class="lk-mlabel">Becsült havi részlet</span>
+          <div class="lk-mval"><span class="lk-mnum">—</span></div>
+          <span class="lk-malt lk-m-alt"></span>
+        </div>
+        <div class="lk-rows">
+          <div class="lk-row"><span>Finanszírozott összeg</span><b class="lk-fin">—</b></div>
+          <div class="lk-row"><span>Önerő</span><b class="lk-down">—</b></div>
+          <div class="lk-row lk-marad-row"><span>Maradványérték a végén</span><b class="lk-maradsum">—</b></div>
+          <div class="lk-row"><span>Futamidő</span><b class="lk-term">—</b></div>
+          <div class="lk-row lk-total"><span>Teljes visszafizetés</span><b class="lk-sum">—</b></div>
+        </div>
+        <a class="lk-cta" href="/kapcsolat">Kérek személyre szabott ajánlatot →</a>
+        <p class="lk-disc">A kalkuláció <b>tájékoztató jellegű</b>, nem minősül ajánlattételnek. A tényleges havi részlet, a THM (0,0%–30,25%) és a kamat az egyedi hitelbírálat és ajánlat alapján alakul. THM-reprezentatív példák alapján készült becslés.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.lk-sec{padding:8px 0}
+.lk{--red:#E2001A;--navy:#1a1d23;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;
+  max-width:1080px;margin:0 auto;background:#fff;border:1px solid var(--line);
+  border-radius:22px;padding:26px 28px;box-shadow:0 12px 34px rgba(8,8,10,.06)}
+.lk-head{margin-bottom:18px}
+.lk-eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.lk-title{font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 2px}
+.lk-partner{color:var(--muted);font-size:14px;margin:0 0 2px}
+.lk-lead{color:var(--muted);font-size:14.5px;margin:4px 0 0}
+.lk-grid{display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start}
+@media(max-width:820px){.lk-grid{grid-template-columns:1fr;gap:20px}}
+.lk-field{margin-bottom:16px}
+.lk-field>label{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;color:var(--ink);margin-bottom:8px}
+.lk-val{font-weight:800;color:var(--red)}
+.lk-price{display:flex;gap:10px}
+.lk-in{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:17px;font-weight:800;color:var(--ink);font-family:inherit;background:#fbfcfe}
+.lk-in:focus{outline:none;border-color:var(--navy)}
+.lk-cur{display:flex;background:#f1f4f9;border-radius:12px;padding:4px;gap:2px}
+.lk-curbtn{border:0;background:transparent;font-family:inherit;font-weight:800;font-size:15px;color:var(--muted);padding:0 14px;border-radius:9px;cursor:pointer}
+.lk-curbtn.is-on{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(8,8,10,.1)}
+.lk-seg{display:flex;gap:8px}
+.lk-segbtn{flex:1;border:1px solid var(--line);background:#fbfcfe;font-family:inherit;font-weight:700;font-size:13.5px;color:var(--ink);padding:11px 8px;border-radius:12px;cursor:pointer;transition:.15s}
+.lk-segbtn.is-on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.lk-range{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;background:#e7ecf4;outline:none}
+.lk-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--red);cursor:pointer;border:3px solid #fff;box-shadow:0 2px 8px rgba(226,0,26,.4)}
+.lk-range::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--red);cursor:pointer;border:3px solid #fff}
+.lk-hint{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:7px}
+.lk-result{background:linear-gradient(180deg,#0f1622,#0b0b0d);color:#fff;border-radius:18px;padding:24px 22px;position:sticky;top:90px}
+.lk-monthly{text-align:center;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.12)}
+.lk-mlabel{color:#9aa7b8;font-size:13px;font-weight:600}
+.lk-mval{margin:6px 0 2px}
+.lk-mnum{font-size:clamp(30px,5vw,40px);font-weight:800;letter-spacing:-.02em;color:#fff}
+.lk-malt{color:#9aa7b8;font-size:13px}
+.lk-rows{margin:16px 0 18px;display:flex;flex-direction:column;gap:0}
+.lk-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+.lk-row span{color:#c4cddb}
+.lk-row b{color:#fff;font-weight:800;text-align:right}
+.lk-total b,.lk-total span{color:#fff}
+.lk-total{border-bottom:0;border-top:1px solid rgba(255,255,255,.18);margin-top:4px;padding-top:12px;font-size:15px}
+.lk-cta{display:block;text-align:center;background:var(--red);color:#fff;font-weight:800;font-size:15px;text-decoration:none;padding:14px;border-radius:12px;transition:.15s}
+.lk-cta:hover{filter:brightness(1.08)}
+.lk-disc{color:#8b98a9;font-size:11.5px;line-height:1.55;margin:14px 0 0}
+.lk-disc b{color:#c4cddb}
+</style>
+
+<script is:inline>
+(function(){
+  var fmtHU = function(n){ return Math.round(n).toLocaleString('hu-HU'); };
+  function parseNum(s){ return parseFloat(String(s).replace(/[^\d.,]/g,'').replace(/\s/g,'').replace(',','.'))||0; }
+
+  function wire(root){
+    var rate0 = parseFloat(root.getAttribute('data-rate'))||9.59;
+    var EUR = parseFloat(root.getAttribute('data-eur'))||363.28;
+    var cur = 'HUF';
+    var q = function(s){ return root.querySelector(s); };
+
+    var elPrice = q('.lk-vetelar'), elPriceAlt = q('.lk-price-alt');
+    var oner = q('.lk-oner'), oval = q('.lk-oval'), onerFt = q('.lk-oner-ft');
+    var futam = q('.lk-futam'), fval = q('.lk-fval');
+    var marad = q('.lk-marad'), rval = q('.lk-rval'), maradWrap = q('.lk-res-wrap'), maradRow = q('.lk-marad-row');
+    var kamat = q('.lk-kamat'), kval = q('.lk-kval');
+    var konstrHint = q('.lk-konstr-hint');
+    var konstr = 'nyilt';
+
+    var outM = q('.lk-mnum'), outMAlt = q('.lk-m-alt');
+    var outFin = q('.lk-fin'), outDown = q('.lk-down'), outMaradSum = q('.lk-maradsum');
+    var outTerm = q('.lk-term'), outSum = q('.lk-sum');
+
+    // currency helpers — work internally in HUF
+    function priceHUF(){ var v = parseNum(elPrice.value); return cur==='EUR' ? v*EUR : v; }
+    function money(hufAmount){
+      if(cur==='EUR'){ return fmtHU(hufAmount/EUR)+' €'; }
+      return fmtHU(hufAmount)+' Ft';
+    }
+    function moneyAlt(hufAmount){
+      if(cur==='EUR'){ return '≈ '+fmtHU(hufAmount)+' Ft'; }
+      return '≈ '+fmtHU(hufAmount/EUR)+' €';
+    }
+
+    function recalc(){
+      var P = priceHUF();
+      var oPct = parseFloat(oner.value)/100;
+      var n = parseInt(futam.value,10);
+      var rPct = konstr==='nyilt' ? parseFloat(marad.value)/100 : 0;
+      var i = (parseFloat(kamat.value)/100)/12;
+
+      var down = P*oPct;
+      var balloon = P*rPct;
+      var financed = Math.max(P - down, 0);
+      var monthly;
+      if(i>0){
+        var pv = financed - balloon/Math.pow(1+i,n);
+        monthly = pv * i / (1 - Math.pow(1+i,-n));
+      } else {
+        monthly = (financed - balloon)/n;
+      }
+      if(!isFinite(monthly)||monthly<0) monthly = 0;
+      var total = down + monthly*n + balloon;
+
+      // labels
+      oval.textContent = oner.value+'%';
+      onerFt.textContent = money(down);
+      fval.textContent = n+' hó ('+(n/12)+' év)';
+      rval.textContent = marad.value+'%';
+      kval.textContent = String(kamat.value).replace('.',',')+'%';
+
+      outM.textContent = money(monthly)+'/hó';
+      outMAlt.textContent = moneyAlt(monthly)+'/hó';
+      outFin.textContent = money(financed);
+      outDown.textContent = money(down)+' ('+oner.value+'%)';
+      outTerm.textContent = n+' hó';
+      outSum.textContent = money(total);
+
+      if(konstr==='nyilt'){
+        maradWrap.style.display=''; maradRow.style.display='';
+        outMaradSum.textContent = money(balloon)+' ('+marad.value+'%)';
+        konstrHint.textContent = 'A futamidő végén te döntöd el, kié legyen az autó; a maradványértékkel csökken a havi részlet.';
+      } else {
+        maradWrap.style.display='none'; maradRow.style.display='none';
+        konstrHint.textContent = 'A futamidő végén automatikusan a tiéd lesz az autó — nincs maradványérték.';
+      }
+
+      // price alt line
+      var Pp = parseNum(elPrice.value);
+      elPriceAlt.textContent = cur==='EUR'
+        ? (Pp ? '≈ '+fmtHU(Pp*EUR)+' Ft (1 € = '+String(EUR).replace('.',',')+' Ft)' : '')
+        : (Pp ? '≈ '+fmtHU(Pp/EUR)+' € (1 € = '+String(EUR).replace('.',',')+' Ft)' : '');
+    }
+
+    // input formatting for price (thousands, in chosen currency's own scale)
+    function reformatPrice(){
+      var v = parseNum(elPrice.value);
+      elPrice.value = v ? fmtHU(v) : '';
+    }
+    elPrice.addEventListener('input', function(){ recalc(); });
+    elPrice.addEventListener('blur', function(){ reformatPrice(); recalc(); });
+
+    [oner,futam,marad,kamat].forEach(function(el){ el.addEventListener('input', recalc); });
+
+    root.querySelectorAll('.lk-curbtn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(b.classList.contains('is-on')) return;
+        root.querySelectorAll('.lk-curbtn').forEach(function(x){ x.classList.remove('is-on'); });
+        b.classList.add('is-on');
+        var newCur = b.getAttribute('data-cur');
+        // convert the displayed price value between currencies
+        var v = parseNum(elPrice.value);
+        if(cur==='HUF' && newCur==='EUR') v = v/EUR;
+        else if(cur==='EUR' && newCur==='HUF') v = v*EUR;
+        cur = newCur;
+        elPrice.value = v ? fmtHU(v) : '';
+        recalc();
+      });
+    });
+
+    root.querySelectorAll('.lk-konstr .lk-segbtn').forEach(function(b){
+      b.addEventListener('click', function(){
+        root.querySelectorAll('.lk-konstr .lk-segbtn').forEach(function(x){ x.classList.remove('is-on'); });
+        b.classList.add('is-on');
+        konstr = b.getAttribute('data-k');
+        recalc();
+      });
+    });
+
+    kamat.value = rate0; reformatPrice(); recalc();
+  }
+
+  function init(){ document.querySelectorAll('.lk').forEach(wire); }
+  if(document.readyState!=='loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
