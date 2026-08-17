@@ -11,6 +11,9 @@ const { title = 'Lízingkalkulátor', partner = '' } = Astro.props as {
   rate?: number; title?: string; partner?: string;
 };
 const EURHUF = 363.28;
+const NOWY = new Date().getFullYear();
+const years = Array.from({ length: 21 }, (_, i) => NOWY - i);
+const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
 ---
 <section class="lk-sec">
   <div class="lk" data-eur={EURHUF}>
@@ -45,7 +48,10 @@ const EURHUF = 363.28;
 
         <div class="lk-field">
           <label><span class="lk-lbl">Gyártás időpontja <span class="lk-opt">(opcionális)</span> <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button><span class="lk-tiptext">A jármű gyártási éve és hónapja. Idősebb vagy használt jármű esetén a finanszírozó magasabb kamatot ajánlhat — a becslést nem módosítja.</span></span></span></label>
-          <input type="month" class="lk-in lk-gyartas" />
+          <div class="lk-gy2">
+            <select class="lk-in lk-sel lk-gyev"><option value="">Év</option>{years.map((y) => (<option value={y}>{y}</option>))}</select>
+            <select class="lk-in lk-sel lk-gyho"><option value="">Hónap</option>{months.map((m) => (<option value={m}>{m}</option>))}</select>
+          </div>
         </div>
 
         <div class="lk-field">
@@ -159,6 +165,9 @@ const EURHUF = 363.28;
 .lk-val{font-weight:800;color:var(--red)}
 .lk-in{width:100%;box-sizing:border-box;min-width:0;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:17px;font-weight:800;color:var(--ink);font-family:inherit;background:#fbfcfe}
 .lk-in:focus{outline:none;border-color:var(--navy)}
+.lk-gy2{display:flex;gap:10px}
+.lk-gy2 .lk-in{flex:1;min-width:0}
+select.lk-sel{font-size:15px;font-weight:700;appearance:auto;-webkit-appearance:menulist;cursor:pointer}
 .lk-seg{display:flex;gap:8px;flex-wrap:wrap}
 .lk-segbtn{flex:1;min-width:92px;border:1px solid var(--line);background:#fbfcfe;font-family:inherit;font-weight:700;font-size:13px;color:var(--ink);padding:10px 8px;border-radius:12px;cursor:pointer;transition:.15s}
 .lk-segbtn.is-on{background:var(--navy);color:#fff;border-color:var(--navy)}
