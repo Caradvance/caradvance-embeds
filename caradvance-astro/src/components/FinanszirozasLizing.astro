@@ -9,7 +9,7 @@ const partners = [
   {
     name: 'Euro Leasing',
     tag: 'MBH Bankcsoport',
-    href: '#kalkulator',
+    href: 'https://www.euroleasing.hu/konstrukciok/',
     accent: '#0a4d8c',
     logo: '/mbh-euroleasing-logo.svg',
     d: 'Nyíltvégű és zártvégű pénzügyi lízing magánszemélyeknek és vállalkozásoknak, forint és euró alapon, fix vagy változó kamatozással. Igazolt euró bevétel esetén kedvezőbb euró finanszírozás is elérhető.',
@@ -18,7 +18,7 @@ const partners = [
   {
     name: 'Merkantil Bank',
     tag: 'OTP Bankcsoport',
-    href: '#kalkulator',
+    href: 'https://www.merkantil.hu/hu/Gepjarmulizing/Uj-ugyfeleknek',
     accent: '#0a7d3c',
     logo: '/merkantil-bank-logo-tr.png',
     d: 'Személyre szabott gépjárműlízing új és használt autóra egyaránt, gyors bírálattal és rugalmas futamidővel. Az igényléstől a folyósításig végig szakértői támogatással — akár közvetlenül magánszemélytől vásárolt autóra is elérhető.',
@@ -143,7 +143,7 @@ const jsonLdAll = [faqJson, breadcrumbJson, serviceJson, calcJson];
 </div>
 <div class="wrap fl-partners">
 {partners.map((p) => (
-<a class="fl-pcard" href={p.href} style={`--pa:${p.accent}`}>
+<a class="fl-pcard" href={p.href} target="_blank" rel="noopener noreferrer" style={`--pa:${p.accent}`}>
 <div class="fl-plogo"><img src={p.logo} alt={p.name} loading="lazy" onerror={`this.style.display='none';this.parentNode.classList.add('txt');this.parentNode.textContent='${p.name}'`} /></div>
 <div class="fl-ptop">
 <span class="fl-ptag">{p.tag}</span>
@@ -153,7 +153,7 @@ const jsonLdAll = [faqJson, breadcrumbJson, serviceJson, calcJson];
 <ul class="fl-plist">
 {p.points.map((pt) => (<li>{pt}</li>))}
 </ul>
-<span class="fl-plink">Kalkulátor és ajánlat →</span>
+<span class="fl-plink">Tovább a partner oldalára ↗</span>
 </a>
 ))}
 </div>
