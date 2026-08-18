@@ -9,7 +9,7 @@ const partners = [
   {
     name: 'Euro Leasing',
     tag: 'MBH Bankcsoport',
-    href: '/finanszirozas-lizing/euro-leasing',
+    href: '#kalkulator',
     accent: '#0a4d8c',
     logo: '/mbh-euroleasing-logo.svg',
     d: 'Nyíltvégű és zártvégű pénzügyi lízing magánszemélyeknek és vállalkozásoknak, forint és euró alapon, fix vagy változó kamatozással. Igazolt euró bevétel esetén kedvezőbb euró finanszírozás is elérhető.',
@@ -18,7 +18,7 @@ const partners = [
   {
     name: 'Merkantil Bank',
     tag: 'OTP Bankcsoport',
-    href: '/finanszirozas-lizing/merkantil-bank',
+    href: '#kalkulator',
     accent: '#0a7d3c',
     logo: '/merkantil-bank-logo-tr.png',
     d: 'Személyre szabott gépjárműlízing új és használt autóra egyaránt, gyors bírálattal és rugalmas futamidővel. Az igényléstől a folyósításig végig szakértői támogatással — akár közvetlenül magánszemélytől vásárolt autóra is elérhető.',
@@ -37,6 +37,26 @@ const types = [
     d: 'A futamidő végén – az összes díj rendezése után – automatikusan a tiéd lesz az autó. Nincs maradványérték, a részlet a teljes finanszírozott összegre szól. Biztonságos forma: a futamidő alatt a finanszírozó a tulajdonos, így az autót nem terhelheti más jellegű tartozás.',
     tags: ['Automatikus tulajdonszerzés', 'Kiszámítható', 'Nincs záró nagyrészlet'],
   },
+  {
+    t: 'Euró finanszírozás',
+    d: 'Euró árbevétellel rendelkező vállalkozásoknak — a forint kamatokhoz képest jellemzően jelentősen alacsonyabb kamatszinttel. Nyíltvégű és zártvégű formában egyaránt elérhető, fix vagy változó kamatozással. Kizárólag igazolt euró bevétel esetén igényelhető.',
+    tags: ['Kedvezőbb kamatszint', 'Csak igazolt EUR bevétellel', 'Nyílt és zárt is'],
+  },
+];
+
+const benefits = [
+  'A lízingdíj kamatrésze vállalkozásoknál költségként elszámolható.',
+  'Nyíltvégűnél a beszerzési ár áfája nem része a lízingtőkének, így a fizetendő kamat kevesebb, mint hasonló ütemezésű zártvégűnél.',
+  'A lízingbevevő vállalkozások jogosultak az értékcsökkenés elszámolására.',
+  'Maradványértékes konstrukcióval csökkenthető a havi törlesztőrészlet.',
+  'Új és használt autó finanszírozására is igénybe vehető.',
+  'Meghatározott feltételek mellett a szerződés akár biztosításmentesen is megköthető.',
+];
+
+const docs = [
+  { g: 'Magánszemélyeknek', items: ['Kitöltött lízingkérelmi adatlap', 'Munkáltatói jövedelemigazolás vagy az utolsó 3 havi bankszámlakivonat', 'Személyi igazolvány'] },
+  { g: 'Egyéni vállalkozók, őstermelők', items: ['Lízingkérelmi adatlap', '30 napnál nem régebbi NAV folyószámla-kivonat (köztartozásmentesnél nem szükséges)', 'Személyi igazolvány másolat'] },
+  { g: 'Társas vállalkozások', items: ['Lízingkérelmi adatlap', '30 napnál nem régebbi NAV folyószámla-kivonat', 'Aláírási címpéldány'] },
 ];
 
 const steps = [
@@ -133,7 +153,7 @@ const jsonLdAll = [faqJson, breadcrumbJson, serviceJson, calcJson];
 <ul class="fl-plist">
 {p.points.map((pt) => (<li>{pt}</li>))}
 </ul>
-<span class="fl-plink">Részletek és kalkulátor →</span>
+<span class="fl-plink">Kalkulátor és ajánlat →</span>
 </a>
 ))}
 </div>
@@ -167,6 +187,35 @@ const jsonLdAll = [faqJson, breadcrumbJson, serviceJson, calcJson];
 </div>
 <div class="wrap">
 <LizingKalkulator title="Lízingkalkulátor" rate={9.59} />
+</div>
+</section>
+
+<!-- Előnyök -->
+<section class="section" style="padding-top:16px">
+<div class="wrap center">
+<span class="eyebrow">Előnyök</span>
+<h2 class="sec-title">Miért jó választás az autó lízing?</h2>
+<p class="sec-intro">A pénzügyi lízing rugalmas és — főleg vállalkozásoknak — adóoptimális módja az autóvásárlásnak.</p>
+</div>
+<div class="wrap fl-benefits">
+{benefits.map((b) => (<div class="fl-b"><span class="fl-check">✓</span><p>{b}</p></div>))}
+</div>
+</section>
+
+<!-- Dokumentumok -->
+<section class="section" style="padding-top:8px">
+<div class="wrap center">
+<span class="eyebrow">Igénylés</span>
+<h2 class="sec-title">Mire van szükség az autó lízing igényléséhez?</h2>
+<p class="sec-intro">A pontos dokumentumlistát a finanszírozó adja meg — jellemzően az alábbiakra van szükség.</p>
+</div>
+<div class="wrap fl-docs">
+{docs.map((d) => (
+<div class="fl-doc">
+<h3>{d.g}</h3>
+<ul>{d.items.map((x) => (<li>{x}</li>))}</ul>
+</div>
+))}
 </div>
 </section>
 
@@ -241,8 +290,22 @@ const jsonLdAll = [faqJson, breadcrumbJson, serviceJson, calcJson];
 .fl-plist li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#e8f7ee;color:#16a34a;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .fl-plink{font-weight:800;font-size:14.5px;color:var(--pa)}
 /* Type cards */
-.fl-types{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
-@media(max-width:820px){.fl-types{grid-template-columns:1fr}}
+.fl-types{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+@media(max-width:900px){.fl-types{grid-template-columns:1fr}}
+/* Benefits */
+.fl-benefits{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;margin-top:22px}
+@media(max-width:720px){.fl-benefits{grid-template-columns:1fr}}
+.fl-b{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.fl-check{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#e8f7ee;color:#16a34a;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.fl-b p{color:var(--ink);font-size:14.5px;line-height:1.55;margin:0;font-weight:600}
+/* Docs */
+.fl-docs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}
+@media(max-width:900px){.fl-docs{grid-template-columns:1fr}}
+.fl-doc{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 24px;box-shadow:0 10px 30px rgba(8,8,10,.05)}
+.fl-doc h3{font-size:16px;font-weight:800;color:var(--ink);margin:0 0 12px}
+.fl-doc ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.fl-doc li{position:relative;padding-left:22px;color:var(--muted);font-size:14px;line-height:1.5}
+.fl-doc li::before{content:"›";position:absolute;left:5px;top:-1px;color:var(--red);font-weight:800;font-size:16px}
 .fl-tcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 10px 30px rgba(8,8,10,.05)}
 .fl-tcard h3{font-size:19px;font-weight:800;color:var(--ink);margin:0 0 8px}
 .fl-tcard p{color:var(--muted);font-size:14.5px;line-height:1.65;margin:0 0 14px}
