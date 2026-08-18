@@ -47,16 +47,50 @@ const steps = [
 ];
 
 const faqs: [string, string][] = [
-  ['Ki intézi a finanszírozást?', 'A finanszírozást finanszírozó és lízing partnereinken – az Euro Leasingen és a Merkantil Bankon – keresztül tudjuk biztosítani. Mi segítünk kiválasztani a megfelelő konstrukciót, és összekötünk a partnerrel; a hitelbírálatot és a szerződést a finanszírozó végzi.'],
-  ['Magánszemélyként is igényelhetek lízinget?', 'Igen. Nyíltvégű és zártvégű pénzügyi lízing egyaránt elérhető magánszemélyek számára is, személygépkocsi és motorkerékpár finanszírozására. Az euró alapú finanszírozás azonban csak igazolt euró bevétellel rendelkező vállalkozásoknak nyújtható.'],
-  ['Mennyi önerő szükséges?', 'Az önerő mértéke a konstrukciótól és a hitelbírálattól függ. A kalkulátorban szabadon állíthatod, így látod, hogyan változik tőle a havi részlet. A pontos elvárt önerőt az egyedi ajánlat rögzíti.'],
-  ['Forintban vagy euróban finanszírozhatok?', 'Mindkettő elérhető. A forint alapú konstrukció bárkinek nyitva áll; az euró alapú, jellemzően alacsonyabb kamatszintű finanszírozás igazolt euró bevétellel rendelkező vállalkozásoknak szól.'],
-  ['Mennyire pontos a kalkulátor?', 'A kalkulátor tájékoztató jellegű becslést ad a valós, reprezentatív THM-példák alapján. A tényleges havi részletet, a THM-et (0,0%–30,25%) és a kamatot mindig az egyedi hitelbírálat és a finanszírozó ajánlata határozza meg.'],
+  ['Mit jelent az autó lízing?', 'Az autó lízing olyan finanszírozási forma, amelynél a lízingcég megveszi az általad kiválasztott autót, te pedig havi részletekben fizetsz a használatáért. Nyíltvégű lízingnél a futamidő végén te döntesz a tulajdonjogról, zártvégűnél a záró díj után automatikusan a tiéd lesz az autó.'],
+  ['Igényelhető autó lízing magánszemélyként?', 'Igen, az autó lízing magánszemélyeknek és cégeknek egyaránt elérhető, új és használt személyautóra is. Magánszemélyként bruttó árral, vállalkozásként nettó alapon — áfa-visszaigénylési lehetőséggel — számolunk.'],
+  ['Van autó lízing önerő nélkül vagy alacsony önerővel?', 'Az önerő mértéke a konstrukciótól és a hitelbírálattól függ. A lízingkalkulátorban 0%-tól szabadon állíthatod, és azonnal látod, hogyan változik tőle a havi részlet; a pontos elvárt önerőt az egyedi ajánlat rögzíti.'],
+  ['Használt autóra is van lízing?', 'Igen. Mind az Euro Leasing, mind a Merkantil Bank finanszíroz új és használt autót is, típusonként eltérő korhatárokkal. A jármű kora és állapota befolyásolhatja a felajánlott kamatot.'],
+  ['Mik az autó lízing feltételei?', 'Jellemzően magyarországi lakcím, igazolható jövedelem és pozitív hitelbírálat szükséges; vállalkozásoknál a cég adatai és a köztartozásmentesség számít. A pontos feltételeket a finanszírozó szabja meg.'],
+  ['Autó lízing vagy autóhitel — mi a különbség?', 'Lízingnél a futamidő alatt a finanszírozó a tulajdonos, te üzembentartóként használod az autót; hitelnél rögtön a te tulajdonod. A lízing gyakran rugalmasabb önerőt és cégeknél áfa-előnyt kínál.'],
+  ['Mi történik az autó lízing lejárta után?', 'Zártvégű lízingnél az utolsó díj rendezése után automatikusan a tiéd lesz az autó. Nyíltvégűnél megveheted a maradványértéken, harmadik felet jelölhetsz ki, vagy visszaadhatod az autót.'],
+  ['Ki intézi a finanszírozást?', 'A finanszírozást finanszírozó és lízing partnereinken – az Euro Leasingen és a Merkantil Bankon – keresztül biztosítjuk. Segítünk kiválasztani a megfelelő konstrukciót és összekötünk a partnerrel; a hitelbírálatot és a szerződést a finanszírozó végzi.'],
+  ['Forintban vagy euróban finanszírozhatok?', 'Mindkettő elérhető. A forint alapú lízing bárkinek nyitva áll; az euró alapú, jellemzően kedvezőbb kamatszintű finanszírozás igazolt euró bevétellel rendelkező vállalkozásoknak szól.'],
+  ['Mennyire pontos a lízingkalkulátor?', 'A lízingkalkulátor az Euroleasing valós, futamidőnkénti kamat- és THM-táblázatára van kalibrálva, így a becsült havi részlet közel áll a tényleges ajánlathoz. A végleges THM-et (0,0%–30,25%) és a kamatot mindig az egyedi hitelbírálat rögzíti.'],
 ];
+const SITE = 'https://www.caradvance.hu';
 const faqJson = {
   '@context': 'https://schema.org', '@type': 'FAQPage',
   mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
 };
+const breadcrumbJson = {
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Kezdőlap', item: SITE + '/' },
+    { '@type': 'ListItem', position: 2, name: 'Megvásárolható autóink', item: SITE + '/autoink/' },
+    { '@type': 'ListItem', position: 3, name: 'Autó lízing és finanszírozás', item: SITE + '/finanszirozas-lizing/' },
+  ],
+};
+const serviceJson = {
+  '@context': 'https://schema.org', '@type': 'FinancialProduct',
+  name: 'Autó lízing és finanszírozás',
+  serviceType: 'Gépjárműlízing – nyíltvégű és zártvégű pénzügyi lízing',
+  category: 'Autófinanszírozás',
+  url: SITE + '/finanszirozas-lizing/',
+  areaServed: { '@type': 'Country', name: 'Magyarország' },
+  description: 'Autó lízing magánszemélyeknek és cégeknek, új és használt autóra — nyíltvégű és zártvégű pénzügyi lízing forint vagy euró alapon, az Euro Leasing és a Merkantil Bank feltételei alapján.',
+  provider: { '@type': 'AutoDealer', name: 'CarAdvance (BH Group Zrt.)', url: SITE + '/', telephone: '+36 30 214 6989' },
+};
+const calcJson = {
+  '@context': 'https://schema.org', '@type': 'WebApplication',
+  name: 'Lízingkalkulátor – CarAdvance',
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Web',
+  url: SITE + '/finanszirozas-lizing/#kalkulator',
+  description: 'Autó lízing kalkulátor: számold ki a becsült havi részletet, a THM-et és az ügyleti kamatot futamidő, önerő és konstrukció szerint.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'HUF' },
+};
+const jsonLdAll = [faqJson, breadcrumbJson, serviceJson, calcJson];
 ---
 <section class="fl">
 <section class="hero">
@@ -70,8 +104,8 @@ const faqJson = {
 <span class="fl-hl-sep"></span>
 <img class="fl-hl-logo" src="/merkantil-bank-logo-tr.png" alt="Merkantil Bank" />
 </span></div>
-<h1>Finanszírozás és lízing —<br /><span class="accent">a te ütemedben</span></h1>
-<p class="sub sub-wide" style="max-width:760px">Nem kell egy összegben kifizetned az autót — finanszírozó és lízing partnereinken keresztül kulcsrakész lízinget intézünk, forint vagy euró alapon.</p>
+<h1>Autó lízing és finanszírozás —<br /><span class="accent">a te ütemedben</span></h1>
+<p class="sub sub-wide" style="max-width:840px">Autó lízing magánszemélyeknek és cégeknek, új és használt autóra — nyíltvégű és zártvégű pénzügyi lízing, forint vagy euró alapon. Számold ki a havi részleted a lízingkalkulátorral.</p>
 <div class="cta-row">
 <a class="btn btn-primary" href="#kalkulator">Havi részlet kiszámítása</a>
 <a class="btn btn-white" href="/kapcsolat">Ajánlatot kérek</a>
@@ -85,7 +119,7 @@ const faqJson = {
 <div class="wrap center">
 <span class="eyebrow">Finanszírozó partnereink</span>
 <h2 class="sec-title">Rajtunk keresztül finanszírozáshoz juthatsz</h2>
-<p class="sec-intro">Ezek a finanszírozó és lízing partnereink, akiken keresztül finanszírozást tudunk biztosítani neked. Segítünk kiválasztani a megfelelő konstrukciót, és összekötünk a partnerrel — a bírálatot és a szerződést a finanszírozó intézi.</p>
+<p class="sec-intro">Az autó lízinget és finanszírozást finanszírozó és lízing partnereinken keresztül biztosítjuk. Segítünk kiválasztani a megfelelő lízingkonstrukciót, és összekötünk a partnerrel — a hitelbírálatot és a szerződést a finanszírozó intézi.</p>
 </div>
 <div class="wrap fl-partners">
 {partners.map((p) => (
@@ -109,8 +143,8 @@ const faqJson = {
 <section class="section" style="padding-top:24px">
 <div class="wrap center">
 <span class="eyebrow">Konstrukciók</span>
-<h2 class="sec-title">Milyen lízingtípus közül választhatsz?</h2>
-<p class="sec-intro">Kétféle pénzügyi lízing közül választhatsz — mindkettő elérhető forint és euró alapon, fix vagy változó kamatozással.</p>
+<h2 class="sec-title">Milyen autó lízing típus közül választhatsz?</h2>
+<p class="sec-intro">Az autó lízingnek két fő formája van. Mindkét pénzügyi lízing elérhető forint és euró alapon, fix vagy változó kamatozással, új és használt autóra egyaránt — magánszemélyeknek és cégeknek is.</p>
 </div>
 <div class="wrap fl-types">
 {types.map((ty) => (
@@ -128,8 +162,8 @@ const faqJson = {
 <section class="section" id="kalkulator" style="padding-top:8px">
 <div class="wrap center">
 <span class="eyebrow">Kalkulátor</span>
-<h2 class="sec-title">Mennyibe kerülne havonta?</h2>
-<p class="sec-intro">Állítsd be az autó árát, az önerőt, a futamidőt és a konstrukciót — azonnal megmutatjuk a becsült havi részletet.</p>
+<h2 class="sec-title">Autó lízing kalkulátor — mennyi lesz a havi részlet?</h2>
+<p class="sec-intro">Lízingkalkulátorunkban állítsd be az autó árát, az önerőt, a futamidőt és a konstrukciót — azonnal megmutatjuk a becsült havi részletet, a THM-et és az ügyleti kamatot.</p>
 </div>
 <div class="wrap">
 <LizingKalkulator title="Lízingkalkulátor" rate={9.59} />
@@ -177,7 +211,7 @@ const faqJson = {
 </div>
 </section>
 
-<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+{jsonLdAll.map((j) => (<script type="application/ld+json" set:html={JSON.stringify(j)}></script>))}
 </section>
 
 <style>
