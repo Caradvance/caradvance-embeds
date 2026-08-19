@@ -4,35 +4,36 @@ import type { Locale } from '../i18n/utils';
 const { lang } = Astro.props as { lang: Locale };
 
 /* ─────────────────────────────────────────────────────────────
-   ITT ADD MEG A KÖZÖSSÉGI OLDALAK LINKJEIT
-   (a "YOUR_..." részeket cseréld a valós fiókokra)
+   KÖZÖSSÉGI OLDALAK LINKJEI — a "YOUR_..." részeket cseréld valósra
    ───────────────────────────────────────────────────────────── */
 const SOCIAL = {
-  facebook: 'https://www.facebook.com/YOUR_PAGE',
-  instagram: 'https://www.instagram.com/YOUR_HANDLE',
+  facebook: 'https://www.facebook.com/share/19BfQsJxSk/',
+  instagram: 'https://www.instagram.com/caradvance_hungary',
   tiktok: 'https://www.tiktok.com/@YOUR_HANDLE',
   youtube: 'https://www.youtube.com/@YOUR_CHANNEL',
-  youtubeVideoId: '',          // opcionális: egy kiemelt YouTube-videó azonosítója a beágyazáshoz
+  youtubeVideoId: '',          // opcionális: egy kiemelt YouTube-videó azonosítója
   googleReviewsUrl: '#',       // Google értékelések / cégprofil linkje
   googleRating: '5,0',
   googleReviewCount: '',       // pl. "48"
 };
 const real = (u: string) => !!u && u.indexOf('YOUR_') === -1 && u !== '#';
 const tiktokHandle = (SOCIAL.tiktok.split('@')[1] || '').replace(/\/.*$/, '');
+const fbEmbeddable = real(SOCIAL.facebook) && SOCIAL.facebook.indexOf('/share/') === -1;
+const hasEmbeds = fbEmbeddable || (real(SOCIAL.youtube) && !!SOCIAL.youtubeVideoId) || (real(SOCIAL.tiktok) && !!tiktokHandle);
 
-const ICONS: Record<string, string> = {
-  facebook: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07Z"/></svg>',
-  instagram: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16Zm0 3.68A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84Zm0 10.16A4 4 0 1 1 16 12a4 4 0 0 1-4 4Zm6.41-10.4a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44Z"/></svg>',
-  tiktok: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 5.82a4.28 4.28 0 0 1-1.06-2.82h-3.2v12.9a2.59 2.59 0 0 1-2.6 2.5 2.59 2.59 0 1 1 .7-5.08V9.98a5.77 5.77 0 0 0-.7-.04A5.77 5.77 0 1 0 15.5 15.7V9.1a7.5 7.5 0 0 0 4.5 1.5V7.4a4.28 4.28 0 0 1-3.4-1.58Z"/></svg>',
-  youtube: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3 3 0 0 0 2.12-2.14A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.55 15.57V8.43L15.82 12Z"/></svg>',
-  google: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.82-.07-1.6-.2-2.36H12v4.47h6.45a5.5 5.5 0 0 1-2.39 3.6v3h3.86c2.26-2.08 3.58-5.15 3.58-8.71Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.9l-3.86-3a7.2 7.2 0 0 1-4.09 1.16 7.19 7.19 0 0 1-6.76-4.97H1.24v3.09A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.24 14.29a7.14 7.14 0 0 1 0-4.58V6.62H1.24a12 12 0 0 0 0 10.76Z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42A11.98 11.98 0 0 0 12 0 12 12 0 0 0 1.24 6.62l4 3.09A7.19 7.19 0 0 1 12 4.75Z"/></svg>',
-};
+const GOOGLE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.82-.07-1.6-.2-2.36H12v4.47h6.45a5.5 5.5 0 0 1-2.39 3.6v3h3.86c2.26-2.08 3.58-5.15 3.58-8.71Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.9l-3.86-3a7.2 7.2 0 0 1-4.09 1.16 7.19 7.19 0 0 1-6.76-4.97H1.24v3.09A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.24 14.29a7.14 7.14 0 0 1 0-4.58V6.62H1.24a12 12 0 0 0 0 10.76Z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42A11.98 11.98 0 0 0 12 0 12 12 0 0 0 1.24 6.62l4 3.09A7.19 7.19 0 0 1 12 4.75Z"/></svg>';
 
 const channels = [
-  { key: 'facebook', name: 'Facebook', handle: 'CarAdvance', color: '#1877F2', url: SOCIAL.facebook, cta: 'Kövess a Facebookon' },
-  { key: 'instagram', name: 'Instagram', handle: '@caradvance', color: '#E4405F', url: SOCIAL.instagram, cta: 'Kövess az Instagramon' },
-  { key: 'tiktok', name: 'TikTok', handle: '@caradvance', color: '#111111', url: SOCIAL.tiktok, cta: 'Kövess a TikTokon' },
-  { key: 'youtube', name: 'YouTube', handle: 'CarAdvance', color: '#FF0000', url: SOCIAL.youtube, cta: 'Iratkozz fel' },
+  { name: 'Facebook', handle: 'CarAdvance', color: '#1877F2', url: SOCIAL.facebook, icon: '/facebook.webp', cta: 'Kövess a Facebookon' },
+  { name: 'Instagram', handle: '@caradvance_hungary', color: '#E4405F', url: SOCIAL.instagram, icon: '/instagram.webp', cta: 'Kövess az Instagramon' },
+  { name: 'TikTok', handle: '@caradvance', color: '#111111', url: SOCIAL.tiktok, icon: '/tiktok.webp', cta: 'Kövess a TikTokon' },
+  { name: 'YouTube', handle: 'CarAdvance', color: '#FF0000', url: SOCIAL.youtube, icon: '/youtube.svg', cta: 'Iratkozz fel' },
+];
+
+const reviews = [
+  { name: 'Alexandru Ion', initials: 'AI', color: '#D93025', when: '2 éve', text: 'Kiváló munka. Délelőtt 11-re érkeztem, és 14 órára, a fizetés után már vittem is az autót. Az ár stimmelt, az autó minden adata pontos volt. Köszönöm!' },
+  { name: 'Ciccio Grifó', initials: 'CG', color: '#1E8E3E', when: '4 éve', text: 'Komoly, és főleg előzékeny, kedves munkatársak. A megkereséseket és e-maileket gyorsan megválaszolják.' },
+  { name: 'Bad Martin', initials: 'BM', color: '#7B45D6', when: '2 éve', text: 'Nagyon kedves és hozzáértő munkatársak. Itt fel is veszik a telefont — és pontosan azt kapod, amit ígérnek.' },
 ];
 
 const orgJson: any = {
@@ -59,17 +60,33 @@ const orgJson: any = {
 <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
 </section>
 
-<!-- Google értékelés -->
+<!-- Google értékelés + vélemények -->
 <section class="section" style="padding-top:56px;padding-bottom:8px">
 <div class="wrap">
 <a class="md-google" href={SOCIAL.googleReviewsUrl} target="_blank" rel="noopener noreferrer">
-<span class="md-g-ico" set:html={ICONS.google}></span>
+<span class="md-g-ico" set:html={GOOGLE_SVG}></span>
 <span class="md-g-txt">
 <b>{SOCIAL.googleRating} <span class="md-stars">★★★★★</span></b>
 <span>Kiváló Google-értékelés{SOCIAL.googleReviewCount ? ` — ${SOCIAL.googleReviewCount} vélemény` : ''} és aktív közösségi média jelenlét</span>
 </span>
 <span class="md-g-link">Értékelések ↗</span>
 </a>
+</div>
+<div class="wrap">
+<div class="md-reviews" role="list">
+{reviews.map((r) => (
+<div class="md-rev" role="listitem">
+<div class="md-rev-top">
+<span class="md-avatar" style={`background:${r.color}`}>{r.initials}</span>
+<span class="md-rev-id"><b>{r.name}</b><span>{r.when}</span></span>
+<span class="md-rev-g" set:html={GOOGLE_SVG}></span>
+</div>
+<div class="md-rev-stars">★★★★★</div>
+<p class="md-rev-text">{r.text}</p>
+</div>
+))}
+</div>
+<p class="md-rev-hint">← görgess a további Google-véleményekért →</p>
 </div>
 </section>
 
@@ -81,18 +98,25 @@ const orgJson: any = {
 <p class="sec-intro">Napi frissítések a behozott és készleten lévő autókról, ügyfélsztorik és videós tartalmak.</p>
 </div>
 <div class="wrap md-cards">
-{channels.map((c) => (
+{channels.map((c) => real(c.url) ? (
 <a class="md-card" href={c.url} target="_blank" rel="noopener noreferrer" style={`--c:${c.color}`}>
-<span class="md-ico" set:html={ICONS[c.key]}></span>
+<img class="md-ico-img" src={c.icon} alt={c.name} loading="lazy" />
 <span class="md-name">{c.name}</span>
 <span class="md-handle">{c.handle}</span>
 <span class="md-follow">{c.cta} ↗</span>
 </a>
+) : (
+<div class="md-card md-card-soon" style={`--c:${c.color}`}>
+<img class="md-ico-img" src={c.icon} alt={c.name} loading="lazy" />
+<span class="md-name">{c.name}</span>
+<span class="md-handle">{c.handle}</span>
+<span class="md-follow md-soon">Hamarosan</span>
+</div>
 ))}
 </div>
 </section>
 
-<!-- Beágyazott tartalom -->
+{hasEmbeds && (
 <section class="section" style="padding-top:8px">
 <div class="wrap center">
 <span class="eyebrow">Legfrissebb tartalom</span>
@@ -101,28 +125,23 @@ const orgJson: any = {
 <div class="wrap md-embeds">
 {real(SOCIAL.youtube) && SOCIAL.youtubeVideoId && (
 <div class="md-embed md-yt">
-<div class="md-embed-head"><span class="md-ico sm" set:html={ICONS.youtube}></span> YouTube</div>
 <div class="md-yt-frame"><iframe src={`https://www.youtube-nocookie.com/embed/${SOCIAL.youtubeVideoId}`} title="CarAdvance YouTube" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
 </div>
 )}
-{real(SOCIAL.facebook) && (
+{fbEmbeddable && (
 <div class="md-embed">
-<div class="md-embed-head"><span class="md-ico sm" set:html={ICONS.facebook}></span> Facebook</div>
 <iframe class="md-fb" src={`https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(SOCIAL.facebook)}&tabs=timeline&width=380&height=520&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true`} width="380" height="520" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen={true} allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
 </div>
 )}
 {real(SOCIAL.tiktok) && tiktokHandle && (
 <div class="md-embed">
-<div class="md-embed-head"><span class="md-ico sm" set:html={ICONS.tiktok}></span> TikTok</div>
 <blockquote class="tiktok-embed" cite={SOCIAL.tiktok} data-unique-id={tiktokHandle} data-embed-type="creator" style="max-width:325px;min-width:288px"><section></section></blockquote>
 <script async src="https://www.tiktok.com/embed.js"></script>
 </div>
 )}
-{!(real(SOCIAL.facebook) || (real(SOCIAL.youtube) && SOCIAL.youtubeVideoId) || real(SOCIAL.tiktok)) && (
-<p class="md-note">A beágyazott feedek akkor jelennek meg, ha a fenti <code>SOCIAL</code> beállításban megadod a valós közösségi oldalak linkjeit (és opcionálisan egy kiemelt YouTube-videó azonosítóját).</p>
-)}
 </div>
 </section>
+)}
 
 <!-- CTA -->
 <section class="section">
@@ -154,6 +173,23 @@ const orgJson: any = {
 .md-g-txt span{color:var(--muted);font-size:13.5px;line-height:1.4}
 .md-g-link{flex:0 0 auto;font-weight:800;font-size:14px;color:#4285F4}
 @media(max-width:560px){.md-g-link{display:none}}
+/* Reviews carousel */
+.md-reviews{display:flex;gap:16px;overflow-x:auto;padding:16px 2px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.md-reviews::-webkit-scrollbar{height:8px}
+.md-reviews::-webkit-scrollbar-track{background:transparent}
+.md-reviews::-webkit-scrollbar-thumb{background:#d5dbe6;border-radius:999px}
+.md-rev{flex:0 0 340px;max-width:340px;scroll-snap-align:start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(8,8,10,.05)}
+@media(max-width:480px){.md-rev{flex:0 0 82%}}
+.md-rev-top{display:flex;align-items:center;gap:12px}
+.md-avatar{flex:0 0 auto;width:44px;height:44px;border-radius:50%;color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+.md-rev-id{display:flex;flex-direction:column;flex:1;min-width:0}
+.md-rev-id b{font-size:15px;font-weight:800;color:var(--ink)}
+.md-rev-id span{font-size:12.5px;color:var(--muted)}
+.md-rev-g{flex:0 0 auto;width:20px;height:20px}
+.md-rev-g svg{width:20px;height:20px;display:block}
+.md-rev-stars{color:#F5A623;font-size:16px;letter-spacing:2px;margin:12px 0 8px}
+.md-rev-text{color:var(--ink);font-size:14px;line-height:1.6;margin:0}
+.md-rev-hint{color:var(--muted);font-size:12.5px;margin:2px 0 0;text-align:center}
 /* Channel cards */
 .md-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:22px}
 @media(max-width:820px){.md-cards{grid-template-columns:1fr 1fr}}
@@ -161,23 +197,19 @@ const orgJson: any = {
 .md-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 18px;text-decoration:none;color:inherit;box-shadow:0 10px 30px rgba(8,8,10,.05);transition:.18s;position:relative;overflow:hidden}
 .md-card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--c)}
 .md-card:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(8,8,10,.14);border-color:var(--c)}
-.md-ico{width:46px;height:46px;color:var(--c);margin-bottom:4px}
-.md-ico svg{width:46px;height:46px;display:block}
+.md-card-soon{opacity:.75}
+.md-ico-img{width:52px;height:52px;object-fit:contain;margin-bottom:6px}
 .md-name{font-weight:800;font-size:18px;color:var(--ink)}
 .md-handle{color:var(--muted);font-size:13.5px}
 .md-follow{margin-top:8px;font-weight:800;font-size:13.5px;color:var(--c)}
+.md-soon{color:var(--muted)}
 /* Embeds */
 .md-embeds{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:22px}
 .md-embed{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(8,8,10,.05)}
-.md-embed-head{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:var(--ink);margin-bottom:10px}
-.md-ico.sm{width:20px;height:20px;margin:0}
-.md-ico.sm svg{width:20px;height:20px}
 .md-yt{flex:1 1 100%;max-width:760px}
 .md-yt-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden}
 .md-yt-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .md-fb{width:380px;max-width:100%}
-.md-note{max-width:760px;margin:10px auto 0;text-align:center;color:var(--muted);font-size:13.5px;background:#fbfcfe;border:1px dashed var(--line);border-radius:12px;padding:14px 18px}
-.md-note code{background:#eef2f8;padding:1px 6px;border-radius:6px;font-size:12.5px}
 /* CTA */
 .md-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .md-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
