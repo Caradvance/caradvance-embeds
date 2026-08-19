@@ -265,6 +265,7 @@
       [],
       { "Előnyök": "/vasarlas-elonyei", "Finanszírozás – lízing": "/finanszirozas-lizing" },
       [{ t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
+    syncNavMenu(wrap, "Rólunk", [], { "Media": "/media" }, []);
   }
 
   ready(run);
