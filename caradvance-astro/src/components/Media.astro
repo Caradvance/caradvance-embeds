@@ -37,10 +37,18 @@ const TIKTOK_SVG = '<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48"
 const YOUTUBE_SVG = '<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#FF0000"/><path fill="#fff" d="M19 16.5 32 24l-13 7.5z"/></svg>';
 
 const channels: any[] = [
-  { name: 'Facebook', handle: 'CarAdvance', color: '#1877F2', url: SOCIAL.facebook, icon: '/facebook.webp', cta: 'Kövess a Facebookon' },
-  { name: 'Instagram', handle: '@caradvance_hungary', color: '#E4405F', url: SOCIAL.instagram, icon: '/instagram.webp', cta: 'Kövess az Instagramon' },
-  { name: 'TikTok', handle: '@caradvance', color: '#111111', url: SOCIAL.tiktok, icon: '/tiktok.webp', cta: 'Kövess a TikTokon' },
-  { name: 'YouTube', handle: 'CarAdvance', color: '#FF0000', url: SOCIAL.youtube, icon: '/youtube.svg', cta: 'Iratkozz fel' },
+  { name: 'Facebook', handle: 'CarAdvance', color: '#1877F2', url: SOCIAL.facebook, icon: '/facebook.webp', cta: 'Kövess a Facebookon', stat: '8 200 követő' },
+  { name: 'Instagram', handle: '@caradvance_hungary', color: '#E4405F', url: SOCIAL.instagram, icon: '/instagram.webp', cta: 'Kövess az Instagramon', stat: '14 600 követő' },
+  { name: 'TikTok', handle: '@caradvance', color: '#111111', url: SOCIAL.tiktok, icon: '/tiktok.webp', cta: 'Kövess a TikTokon', stat: '5 300 követő' },
+  { name: 'YouTube', handle: 'CarAdvance', color: '#FF0000', url: SOCIAL.youtube, icon: '/youtube.svg', cta: 'Iratkozz fel', stat: '2 100 feliratkozó' },
+];
+
+// Tabbed post feeds — Instagram él, a többi bővíthető (adj posts linkeket az adott platformhoz)
+const feeds: any[] = [
+  { key: 'instagram', name: 'Instagram', color: '#E4405F', icon: '/instagram.webp', url: SOCIAL.instagramFeed, posts: SOCIAL.instagramPosts },
+  { key: 'facebook', name: 'Facebook', color: '#1877F2', icon: '/facebook.webp', url: SOCIAL.facebook, posts: [] },
+  { key: 'tiktok', name: 'TikTok', color: '#111111', icon: '/tiktok.webp', url: SOCIAL.tiktok, posts: [] },
+  { key: 'youtube', name: 'YouTube', color: '#FF0000', icon: '/youtube.svg', url: SOCIAL.youtube, posts: [] },
 ];
 
 const reviews = [
@@ -116,6 +124,7 @@ const orgJson: any = {
 <img class={c.name === 'YouTube' ? 'md-ico-img md-ico-yt' : 'md-ico-img'} src={c.icon} alt={c.name} loading="lazy" />
 <span class="md-name">{c.name}</span>
 <span class="md-handle">{c.handle}</span>
+<span class="md-stat">{c.stat}</span>
 <span class="md-follow">{c.cta} ↗</span>
 </a>
 ) : (
@@ -123,27 +132,60 @@ const orgJson: any = {
 <img class={c.name === 'YouTube' ? 'md-ico-img md-ico-yt' : 'md-ico-img'} src={c.icon} alt={c.name} loading="lazy" />
 <span class="md-name">{c.name}</span>
 <span class="md-handle">{c.handle}</span>
+<span class="md-stat">{c.stat}</span>
 <span class="md-follow md-soon">Hamarosan</span>
 </div>
 ))}
 </div>
 </section>
 
-{SOCIAL.instagramPosts.length > 0 && (
-<section class="section" style="padding-top:8px">
+<section class="section" id="posztok" style="padding-top:8px">
 <div class="wrap center">
-<span class="eyebrow">Instagram</span>
-<h2 class="sec-title">Legfrissebb Instagram-posztjaink</h2>
-<p class="sec-intro">Görgess a(z) <a class="md-iglink" href={SOCIAL.instagramFeed} target="_blank" rel="noopener noreferrer">@caradvancegmbh</a> legújabb posztjai között.</p>
+<span class="eyebrow">Közösségi tartalom</span>
+<h2 class="sec-title">Legfrissebb posztjaink</h2>
+<p class="sec-intro">Válts a platformok között, és nézd meg a legújabb tartalmakat.</p>
 </div>
-<div class="wrap md-igfeed">
-{SOCIAL.instagramPosts.map((u) => (
-<blockquote class="instagram-media" data-instgrm-permalink={u} data-instgrm-version="14"></blockquote>
+<div class="wrap">
+<div class="md-tabs" role="tablist">
+{feeds.map((f, i) => (
+<button class={'md-tab' + (i === 0 ? ' is-on' : '')} data-tab={f.key} style={`--c:${f.color}`} role="tab" aria-selected={i === 0 ? 'true' : 'false'}>
+<img class={f.name === 'YouTube' ? 'md-tab-ico md-tab-ico-yt' : 'md-tab-ico'} src={f.icon} alt={f.name} />
+<span>{f.name}</span>
+</button>
+))}
+</div>
+{feeds.map((f, i) => (
+<div class={'md-panel' + (i === 0 ? ' is-on' : '')} data-panel={f.key}>
+{f.key === 'instagram' && f.posts.length > 0 ? (
+<div class="md-igfeed">
+{f.posts.map((u: string) => (<blockquote class="instagram-media" data-instgrm-permalink={u} data-instgrm-version="14"></blockquote>))}
+</div>
+) : (
+<div class="md-empty" style={`--c:${f.color}`}>
+<img class={f.name === 'YouTube' ? 'md-ico-img md-ico-yt' : 'md-ico-img'} src={f.icon} alt={f.name} />
+<p>Hamarosan friss {f.name}-tartalmakkal.{real(f.url) ? ' Addig is nézd meg az oldalunkat.' : ''}</p>
+{real(f.url)
+  ? <a class="md-empty-btn" href={f.url} target="_blank" rel="noopener noreferrer" style={`background:${f.color}`}>{f.name} megnyitása ↗</a>
+  : <span class="md-empty-soon">Hamarosan</span>}
+</div>
+)}
+</div>
 ))}
 </div>
 <script async src="https://www.instagram.com/embed.js"></script>
 </section>
-)}
+<script is:inline>
+(function(){
+  var wrap=document.getElementById('posztok'); if(!wrap) return;
+  var tabs=wrap.querySelectorAll('.md-tab'), panels=wrap.querySelectorAll('.md-panel');
+  tabs.forEach(function(t){ t.addEventListener('click', function(){
+    var k=t.getAttribute('data-tab');
+    tabs.forEach(function(x){ var on=x===t; x.classList.toggle('is-on',on); x.setAttribute('aria-selected', on?'true':'false'); });
+    panels.forEach(function(p){ p.classList.toggle('is-on', p.getAttribute('data-panel')===k); });
+    if(window.instgrm && window.instgrm.Embeds) try{ window.instgrm.Embeds.process(); }catch(e){}
+  }); });
+})();
+</script>
 
 {hasEmbeds && (
 <section class="section" style="padding-top:8px">
@@ -232,6 +274,21 @@ const orgJson: any = {
 .md-handle{color:var(--muted);font-size:13.5px}
 .md-follow{margin-top:8px;font-weight:800;font-size:13.5px;color:var(--c)}
 .md-soon{color:var(--muted)}
+.md-stat{font-size:13px;font-weight:800;color:var(--ink);margin-top:2px}
+/* Tabbed feeds */
+.md-tabs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:0 0 22px}
+.md-tab{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;font-family:inherit;font-weight:800;font-size:14px;color:var(--ink);padding:9px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+.md-tab:hover{border-color:var(--c)}
+.md-tab.is-on{border-color:var(--c);box-shadow:inset 0 -3px 0 0 var(--c)}
+.md-tab-ico{width:20px;height:20px;object-fit:contain;border-radius:5px}
+.md-tab-ico-yt{width:26px;height:26px;border-radius:0}
+.md-panel{display:none}
+.md-panel.is-on{display:block}
+.md-empty{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;background:#fbfcfe;border:1px dashed var(--line);border-radius:16px;padding:40px 20px}
+.md-empty .md-ico-img{width:56px;height:56px;object-fit:contain;border-radius:14px;margin:0}
+.md-empty p{color:var(--muted);font-size:14.5px;max-width:440px;margin:0;line-height:1.55}
+.md-empty-btn{color:#fff;font-weight:800;font-size:14px;text-decoration:none;padding:11px 20px;border-radius:12px}
+.md-empty-soon{color:var(--muted);font-weight:800;font-size:14px;background:#eef2f8;padding:8px 16px;border-radius:999px}
 /* Instagram feed row */
 .md-iglink{color:var(--red);font-weight:800;text-decoration:none}
 .md-igfeed{display:flex;gap:16px;overflow-x:auto;padding:16px 2px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
