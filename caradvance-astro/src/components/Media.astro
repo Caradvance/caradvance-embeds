@@ -12,7 +12,7 @@ const SOCIAL = {
   tiktok: 'https://www.tiktok.com/@YOUR_HANDLE',
   youtube: 'https://www.youtube.com/@YOUR_CHANNEL',
   youtubeVideoId: '',          // opcionális: egy kiemelt YouTube-videó azonosítója
-  googleReviewsUrl: '#',       // Google értékelések / cégprofil linkje
+  googleReviewsUrl: 'https://www.google.com/maps/search/?api=1&query=Caradvance%20GmbH%20Autovermietung',  // Google értékelések / cégprofil
   googleRating: '5,0',
   googleReviewCount: '',       // pl. "48"
 };
@@ -27,10 +27,10 @@ const TIKTOK_SVG = '<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48"
 const YOUTUBE_SVG = '<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#FF0000"/><path fill="#fff" d="M19 16.5 32 24l-13 7.5z"/></svg>';
 
 const channels: any[] = [
-  { name: 'Facebook', handle: 'CarAdvance', color: '#1877F2', url: SOCIAL.facebook, svg: FB_SVG, cta: 'Kövess a Facebookon' },
+  { name: 'Facebook', handle: 'CarAdvance', color: '#1877F2', url: SOCIAL.facebook, icon: '/facebook.webp', cta: 'Kövess a Facebookon' },
   { name: 'Instagram', handle: '@caradvance_hungary', color: '#E4405F', url: SOCIAL.instagram, icon: '/instagram.webp', cta: 'Kövess az Instagramon' },
-  { name: 'TikTok', handle: '@caradvance', color: '#111111', url: SOCIAL.tiktok, svg: TIKTOK_SVG, cta: 'Kövess a TikTokon' },
-  { name: 'YouTube', handle: 'CarAdvance', color: '#FF0000', url: SOCIAL.youtube, svg: YOUTUBE_SVG, cta: 'Iratkozz fel' },
+  { name: 'TikTok', handle: '@caradvance', color: '#111111', url: SOCIAL.tiktok, icon: '/tiktok.webp', cta: 'Kövess a TikTokon' },
+  { name: 'YouTube', handle: 'CarAdvance', color: '#FF0000', url: SOCIAL.youtube, icon: '/youtube.svg', cta: 'Iratkozz fel' },
 ];
 
 const reviews = [
@@ -103,14 +103,14 @@ const orgJson: any = {
 <div class="wrap md-cards">
 {channels.map((c) => real(c.url) ? (
 <a class="md-card" href={c.url} target="_blank" rel="noopener noreferrer" style={`--c:${c.color}`}>
-{c.svg ? <span class="md-ico-tile" set:html={c.svg}></span> : <img class="md-ico-img" src={c.icon} alt={c.name} loading="lazy" />}
+<img class="md-ico-img" src={c.icon} alt={c.name} loading="lazy" />
 <span class="md-name">{c.name}</span>
 <span class="md-handle">{c.handle}</span>
 <span class="md-follow">{c.cta} ↗</span>
 </a>
 ) : (
 <div class="md-card md-card-soon" style={`--c:${c.color}`}>
-{c.svg ? <span class="md-ico-tile" set:html={c.svg}></span> : <img class="md-ico-img" src={c.icon} alt={c.name} loading="lazy" />}
+<img class="md-ico-img" src={c.icon} alt={c.name} loading="lazy" />
 <span class="md-name">{c.name}</span>
 <span class="md-handle">{c.handle}</span>
 <span class="md-follow md-soon">Hamarosan</span>
@@ -200,10 +200,7 @@ const orgJson: any = {
 .md-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 18px;text-decoration:none;color:inherit;box-shadow:0 10px 30px rgba(8,8,10,.05);transition:.18s;position:relative;overflow:hidden}
 .md-card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--c)}
 .md-card:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(8,8,10,.14);border-color:var(--c)}
-.md-card-soon{opacity:.75}
 .md-ico-img{width:52px;height:52px;object-fit:contain;border-radius:13px;margin-bottom:6px}
-.md-ico-tile{width:52px;height:52px;margin-bottom:6px;display:block}
-.md-ico-tile svg{width:52px;height:52px;display:block;border-radius:13px}
 .md-name{font-weight:800;font-size:18px;color:var(--ink)}
 .md-handle{color:var(--muted);font-size:13.5px}
 .md-follow{margin-top:8px;font-weight:800;font-size:13.5px;color:var(--c)}
