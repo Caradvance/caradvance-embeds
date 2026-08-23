@@ -43,7 +43,7 @@ export const POSTS: Post[] = [
     excerpt: 'Kiváló Google-értékelés, németországi háttér és kulcsrakész folyamat. Megmutatjuk, miért választanak minket az ügyfeleink.',
     dateISO: '2026-08-23',
     readingMin: 5,
-    image: '/cover-caradvance-referenciak-vasarloi-tortenetek.jpg',
+    image: '/cover-caradvance-referenciak-vasarloi-tortenetek.webp',
     keywords: 'caradvance vélemények, caradvance referenciák, prémium autó vásárlás tapasztalatok, autó behozatal vélemények',
   },
   {
@@ -53,7 +53,7 @@ export const POSTS: Post[] = [
     excerpt: 'A bizományos értékesítés leveszi rólad a hirdetés, az alkudozás és a papírmunka terhét. Megnézzük, hogyan működik és mennyiért éri meg.',
     dateISO: '2026-08-23',
     readingMin: 6,
-    image: '/cover-bizomanyos-auto-ertekesites.jpg',
+    image: '/cover-bizomanyos-auto-ertekesites.webp',
     keywords: 'bizományos autó értékesítés, bizományos autó eladás, autó eladás gyorsan, bizományos autó',
   },
   {
@@ -63,7 +63,7 @@ export const POSTS: Post[] = [
     excerpt: 'A három nagy német prémium márka mind kiváló — de más karakterrel. Segítünk eldönteni, melyik illik a stílusodhoz és az igényeidhez.',
     dateISO: '2026-08-23',
     readingMin: 7,
-    image: '/cover-audi-bmw-mercedes-osszehasonlitas.jpg',
+    image: '/cover-audi-bmw-mercedes-osszehasonlitas.webp',
     keywords: 'audi bmw mercedes összehasonlítás, prémium autó márkák, melyik prémium autó, német prémium márkák',
   },
   {
@@ -73,7 +73,7 @@ export const POSTS: Post[] = [
     excerpt: 'A Mercedes a német piac egyik legjobban dokumentált márkája. Megnézzük, melyik modell kinek való, és hogyan hozz be biztonságosan E-osztályt, Vitót vagy Sprintert.',
     dateISO: '2026-08-23',
     readingMin: 7,
-    image: '/cover-mercedes-behozatal-nemetorszagbol.jpg',
+    image: '/cover-mercedes-behozatal-nemetorszagbol.webp',
     keywords: 'eladó mercedes, mercedes vito eladó, mercedes sprinter eladó, mercedes e 220 cdi, mercedes behozatal',
   },
   {
@@ -83,7 +83,7 @@ export const POSTS: Post[] = [
     excerpt: 'Mennyibe kerül egy BMW X5 Németországból behozva, melyik motor és felszereltség éri meg, és mire figyelj vásárláskor? Végigvesszük a teljes folyamatot.',
     dateISO: '2026-08-23',
     readingMin: 7,
-    image: '/cover-bmw-x5-vasarlas-behozatal.jpg',
+    image: '/cover-bmw-x5-vasarlas-behozatal.webp',
     keywords: 'bmw x5, bmw x5 eladó, bmw x5 ár, bmw x5 behozatal, használt bmw x5',
   },
   {
@@ -93,7 +93,7 @@ export const POSTS: Post[] = [
     excerpt: 'Használt autót is lehet lízingelni — de van néhány feltétel, ami eltér az új autótól. Végigvesszük, mit kér a finanszírozó és mire figyelj.',
     dateISO: '2026-08-23',
     readingMin: 6,
-    image: '/cover-hasznalt-auto-lizing-feltetelei.jpg',
+    image: '/cover-hasznalt-auto-lizing-feltetelei.webp',
     keywords: 'használt autó lízing feltételei, használt autó lízing, autó lízing feltételei, használt autó finanszírozás',
   },
   {
@@ -103,7 +103,7 @@ export const POSTS: Post[] = [
     excerpt: 'Céges autónál a lízing és a tartós bérlet közti választás adózási és cashflow-kérdés is. Végigvesszük, mikor melyik éri meg.',
     dateISO: '2026-08-23',
     readingMin: 7,
-    image: '/cover-ceges-auto-operativ-lizing-tartos-berlet.jpg',
+    image: '/cover-ceges-auto-operativ-lizing-tartos-berlet.webp',
     keywords: 'céges autó, operatív lízing, céges autó lízing, tartós bérlet céges, flottakezelés',
   },
   {
@@ -113,7 +113,7 @@ export const POSTS: Post[] = [
     excerpt: 'Mennyibe kerül egy elektromos autó lízingje, milyen támogatások érhetők el, és megéri-e a váltás? Végigvesszük a költségeket és a döntési szempontokat.',
     dateISO: '2026-08-23',
     readingMin: 8,
-    image: '/cover-elektromos-auto-lizing-tamogatas.jpg',
+    image: '/cover-elektromos-auto-lizing-tamogatas.webp',
     keywords: 'elektromos autó, elektromos autó lízing, elektromos autó támogatás magánszemélyeknek, elektromos autó árak, használt elektromos autó',
   },
   {
@@ -123,7 +123,7 @@ export const POSTS: Post[] = [
     excerpt: 'Mennyibe kerül az autó lízing havonta, ki igényelheti, mi kell hozzá, és hogyan működik a 0% önerős konstrukció? Végigvesszük lépésről lépésre.',
     dateISO: '2026-08-22',
     readingMin: 8,
-    image: '/cover-auto-lizing-maganszemelykent.jpg',
+    image: '/cover-auto-lizing-maganszemelykent.webp',
     keywords: 'autó lízing, autólízing, lízing kalkulátor, autó lízing magánszemély, használt autó lízing',
   },
   {
@@ -133,7 +133,7 @@ export const POSTS: Post[] = [
     excerpt: 'Mielőtt használt prémium autót vennél, fuss végig ezen a 10 ponton. Ezekkel kiszűröd a rejtett hibákat és a rossz vásárlásokat.',
     dateISO: '2026-08-23',
     readingMin: 6,
-    image: '/cover-hasznalt-premium-auto-ellenorzo-lista.jpg',
+    image: '/cover-hasznalt-premium-auto-ellenorzo-lista.webp',
     keywords: 'használt autó vásárlás, használt prémium autó, autó ellenőrzés vásárlás előtt, használt autó ellenőrző lista',
   },
   {
@@ -143,7 +143,7 @@ export const POSTS: Post[] = [
     excerpt: 'Regisztrációs adó, áfa, honosítás, szállítás: mennyibe kerül valójában egy németországi autó behozatala, és hogyan kerüld el a buktatókat?',
     dateISO: '2026-08-22',
     readingMin: 9,
-    image: '/cover-auto-behozatal-nemetorszagbol.jpg',
+    image: '/cover-auto-behozatal-nemetorszagbol.webp',
     keywords: 'autó behozatal németország, autó import németországból, használt autó import, autó vásárlás németországból',
   },
   {
@@ -153,7 +153,7 @@ export const POSTS: Post[] = [
     excerpt: 'Prémium autót bérelnél Budapesten, vagy külföldre vinnéd a bérelt kocsit? Végigvesszük a feltételeket, a kauciót és a legfontosabb tudnivalókat.',
     dateISO: '2026-08-23',
     readingMin: 6,
-    image: '/cover-autoberles-budapest-kulfoldre.jpg',
+    image: '/cover-autoberles-budapest-kulfoldre.webp',
     keywords: 'autóbérlés budapest, autóbérlés külföldre, prémium autóbérlés, autóbérlés feltételek',
   },
   {
@@ -163,7 +163,7 @@ export const POSTS: Post[] = [
     excerpt: 'A tartós bérlet egyetlen havi díjba csomagol mindent a szervizről a biztosításig. Megnézzük, mikor jobb választás, mint a vásárlás vagy a lízing.',
     dateISO: '2026-08-22',
     readingMin: 7,
-    image: '/cover-hosszu-tavu-autoberles.jpg',
+    image: '/cover-hosszu-tavu-autoberles.webp',
     keywords: 'hosszú távú autóbérlés, tartós autóbérlés, tartós bérlet, prémium autóbérlés',
   },
 ];
