@@ -107,6 +107,16 @@ export const POSTS: Post[] = [
     keywords: 'autó behozatal németország, autó import németországból, használt autó import, autó vásárlás németországból',
   },
   {
+    slug: 'autoberles-budapest-kulfoldre',
+    cat: 'berles',
+    title: 'Autóbérlés Budapesten és külföldre — mit kell tudni? Teljes útmutató',
+    excerpt: 'Prémium autót bérelnél Budapesten, vagy külföldre vinnéd a bérelt kocsit? Végigvesszük a feltételeket, a kauciót és a legfontosabb tudnivalókat.',
+    dateISO: '2026-08-23',
+    readingMin: 6,
+    image: '/caradvance-hero-beszerzesi-poster.jpg',
+    keywords: 'autóbérlés budapest, autóbérlés külföldre, prémium autóbérlés, autóbérlés feltételek',
+  },
+  {
     slug: 'hosszu-tavu-autoberles',
     cat: 'berles',
     title: 'Hosszú távú (tartós) autóbérlés — kinek éri meg és mennyibe kerül?',
