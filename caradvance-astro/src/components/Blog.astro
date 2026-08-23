@@ -59,6 +59,25 @@ const jsonLdAll = [blogJson, breadcrumbJson];
 <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
 </section>
 
+<!-- Témák / kategóriák -->
+<section class="section" id="temak" style="padding-top:56px">
+<div class="wrap">
+<span class="eyebrow">Böngéssz téma szerint</span>
+<h2 class="sec-title">Témák</h2>
+<p class="sec-intro">A magazin a szolgáltatásaink köré épül — válaszd ki a témát, és megjelennek a hozzá tartozó cikkek. Ahol még nincs tartalom, ott hamarosan érkezik.</p>
+<div class="bl-cats">
+{CATEGORIES.map((c) => (
+<button type="button" class="bl-cat-tile" data-cat={c.key} data-service={c.service} data-label={c.label} data-count={countFor(c.key)}>
+<span class="bl-cat-ico" set:html={CATICONS[c.key]}></span>
+<span class="bl-cat-label">{c.label}</span>
+<span class="bl-cat-blurb">{c.blurb}</span>
+<span class="bl-cat-foot">{countFor(c.key) > 0 ? `${countFor(c.key)} cikk` : 'Hamarosan'}<span class="bl-cat-arrow">→</span></span>
+</button>
+))}
+</div>
+</div>
+</section>
+
 <!-- Kiemelt + legfrissebb cikkek -->
 <section class="section" id="cikkek" style="padding-top:56px">
 <div class="wrap">
@@ -93,25 +112,6 @@ const jsonLdAll = [blogJson, breadcrumbJson];
 <div class="bl-empty" id="bl-empty" hidden>
 <p>Ebben a témában hamarosan érkeznek a cikkek. Addig nézd meg a kapcsolódó oldalunkat:</p>
 <a class="btn btn-primary" id="bl-empty-link" href="/">Tovább →</a>
-</div>
-</div>
-</section>
-
-<!-- Témák / kategóriák -->
-<section class="section" id="temak" style="padding-top:24px">
-<div class="wrap">
-<span class="eyebrow">Böngéssz téma szerint</span>
-<h2 class="sec-title">Témák</h2>
-<p class="sec-intro">A magazin a szolgáltatásaink köré épül — válaszd ki a témát, és megjelennek a hozzá tartozó cikkek. Ahol még nincs tartalom, ott hamarosan érkezik.</p>
-<div class="bl-cats">
-{CATEGORIES.map((c) => (
-<button type="button" class="bl-cat-tile" data-cat={c.key} data-service={c.service} data-label={c.label} data-count={countFor(c.key)}>
-<span class="bl-cat-ico" set:html={CATICONS[c.key]}></span>
-<span class="bl-cat-label">{c.label}</span>
-<span class="bl-cat-blurb">{c.blurb}</span>
-<span class="bl-cat-foot">{countFor(c.key) > 0 ? `${countFor(c.key)} cikk` : 'Hamarosan'}<span class="bl-cat-arrow">→</span></span>
-</button>
-))}
 </div>
 </div>
 </section>
@@ -194,8 +194,8 @@ const jsonLdAll = [blogJson, breadcrumbJson];
   .bl-dot{opacity:.6;}
   .bl-more{font-weight:700;color:var(--red);margin-top:4px;}
   /* Category tiles */
-  .bl-cats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;}
-  .bl-cat-tile{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;text-decoration:none;color:var(--ink);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;font:inherit;text-align:left;width:100%;cursor:pointer;-webkit-appearance:none;appearance:none;}
+  .bl-cats{display:flex;gap:16px;margin-top:22px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;}
+  .bl-cat-tile{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;text-decoration:none;color:var(--ink);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;font:inherit;text-align:left;width:300px;flex:0 0 300px;scroll-snap-align:start;cursor:pointer;-webkit-appearance:none;appearance:none;}
   .bl-cat-tile.is-active{border-color:var(--red);box-shadow:0 0 0 2px rgba(226,35,26,.14);}
   .bl-cat-tile.is-active .bl-cat-ico{background:var(--red);color:#fff;}
   .bl-reset{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;background:none;border:none;color:var(--red);font-weight:700;font-size:.95rem;cursor:pointer;padding:0;}
@@ -220,6 +220,5 @@ const jsonLdAll = [blogJson, breadcrumbJson];
     .bl-feat{grid-template-columns:1fr;}
     .bl-featimg{min-height:210px;}
     .bl-grid{grid-template-columns:1fr;}
-    .bl-cats{grid-template-columns:1fr;}
   }
 </style>
