@@ -57,6 +57,16 @@ export const POSTS: Post[] = [
     keywords: 'bmw x5, bmw x5 eladó, bmw x5 ár, bmw x5 behozatal, használt bmw x5',
   },
   {
+    slug: 'ceges-auto-operativ-lizing-tartos-berlet',
+    cat: 'finanszirozas',
+    title: 'Céges autó: operatív lízing vagy tartós bérlet? Adózás, áfa, döntés',
+    excerpt: 'Céges autónál a lízing és a tartós bérlet közti választás adózási és cashflow-kérdés is. Végigvesszük, mikor melyik éri meg.',
+    dateISO: '2026-08-23',
+    readingMin: 7,
+    image: '/finanszirozas-hero-poster.jpg',
+    keywords: 'céges autó, operatív lízing, céges autó lízing, tartós bérlet céges, flottakezelés',
+  },
+  {
     slug: 'elektromos-auto-lizing-tamogatas',
     cat: 'finanszirozas',
     title: 'Elektromos autó lízing és állami támogatás 2026 — árak, feltételek, tudnivalók',
