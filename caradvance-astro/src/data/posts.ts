@@ -47,6 +47,16 @@ export const POSTS: Post[] = [
     keywords: 'bizományos autó értékesítés, bizományos autó eladás, autó eladás gyorsan, bizományos autó',
   },
   {
+    slug: 'audi-bmw-mercedes-osszehasonlitas',
+    cat: 'markak',
+    title: 'Audi, BMW vagy Mercedes? A prémium márkák összehasonlítása',
+    excerpt: 'A három nagy német prémium márka mind kiváló — de más karakterrel. Segítünk eldönteni, melyik illik a stílusodhoz és az igényeidhez.',
+    dateISO: '2026-08-23',
+    readingMin: 7,
+    image: '/caradvance-hero-x5-poster.jpg',
+    keywords: 'audi bmw mercedes összehasonlítás, prémium autó márkák, melyik prémium autó, német prémium márkák',
+  },
+  {
     slug: 'mercedes-behozatal-nemetorszagbol',
     cat: 'markak',
     title: 'Mercedes behozatal Németországból — E-osztály, Vito, Sprinter vásárlás',
