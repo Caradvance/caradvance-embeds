@@ -62,10 +62,11 @@ const jsonLdAll = [blogJson, breadcrumbJson];
 <!-- Kiemelt + legfrissebb cikkek -->
 <section class="section" id="cikkek" style="padding-top:56px">
 <div class="wrap">
-<span class="eyebrow">Legfrissebb</span>
-<h2 class="sec-title">Friss a magazinból</h2>
+<span class="eyebrow" id="bl-eyebrow">Legfrissebb</span>
+<h2 class="sec-title" id="bl-artitle">Friss a magazinból</h2>
+<button type="button" id="bl-reset" class="bl-reset" hidden>← Összes téma</button>
 
-<a class="bl-feat" href={`/blog/${featured.slug}`}>
+<a class="bl-feat" data-cat={featured.cat} href={`/blog/${featured.slug}`}>
 <span class="bl-featimg" style={`background-image:url(${featured.image})`}></span>
 <span class="bl-featbody">
 <span class="bl-cat">{catOf(featured.cat).label}</span>
@@ -78,7 +79,7 @@ const jsonLdAll = [blogJson, breadcrumbJson];
 
 <div class="bl-grid">
 {rest.map((p) => (
-<a class="bl-card" href={`/blog/${p.slug}`}>
+<a class="bl-card" data-cat={p.cat} href={`/blog/${p.slug}`}>
 <span class="bl-cardimg" style={`background-image:url(${p.image})`}></span>
 <span class="bl-cardbody">
 <span class="bl-cat">{catOf(p.cat).label}</span>
@@ -89,6 +90,10 @@ const jsonLdAll = [blogJson, breadcrumbJson];
 </a>
 ))}
 </div>
+<div class="bl-empty" id="bl-empty" hidden>
+<p>Ebben a témában hamarosan érkeznek a cikkek. Addig nézd meg a kapcsolódó oldalunkat:</p>
+<a class="btn btn-primary" id="bl-empty-link" href="/">Tovább →</a>
+</div>
 </div>
 </section>
 
@@ -97,15 +102,15 @@ const jsonLdAll = [blogJson, breadcrumbJson];
 <div class="wrap">
 <span class="eyebrow">Böngéssz téma szerint</span>
 <h2 class="sec-title">Témák</h2>
-<p class="sec-intro">A magazin a szolgáltatásaink köré épül — válaszd ki, ami most érdekel, és ugorj a kapcsolódó oldalra vagy cikkekre.</p>
+<p class="sec-intro">A magazin a szolgáltatásaink köré épül — válaszd ki a témát, és megjelennek a hozzá tartozó cikkek. Ahol még nincs tartalom, ott hamarosan érkezik.</p>
 <div class="bl-cats">
 {CATEGORIES.map((c) => (
-<a class="bl-cat-tile" href={c.service}>
+<button type="button" class="bl-cat-tile" data-cat={c.key} data-service={c.service} data-label={c.label} data-count={countFor(c.key)}>
 <span class="bl-cat-ico" set:html={CATICONS[c.key]}></span>
 <span class="bl-cat-label">{c.label}</span>
 <span class="bl-cat-blurb">{c.blurb}</span>
 <span class="bl-cat-foot">{countFor(c.key) > 0 ? `${countFor(c.key)} cikk` : 'Hamarosan'}<span class="bl-cat-arrow">→</span></span>
-</a>
+</button>
 ))}
 </div>
 </div>
@@ -127,6 +132,41 @@ const jsonLdAll = [blogJson, breadcrumbJson];
 </div>
 </section>
 
+<script is:inline>
+(function(){
+  var tiles=[].slice.call(document.querySelectorAll('.bl-cat-tile'));
+  var cards=[].slice.call(document.querySelectorAll('.bl-feat,.bl-card'));
+  var reset=document.getElementById('bl-reset');
+  var eyebrow=document.getElementById('bl-eyebrow');
+  var title=document.getElementById('bl-artitle');
+  var empty=document.getElementById('bl-empty');
+  var emptyLink=document.getElementById('bl-empty-link');
+  var section=document.getElementById('cikkek');
+  function apply(cat,label,service,count){
+    cards.forEach(function(el){ el.style.display=(el.getAttribute('data-cat')===cat)?'':'none'; });
+    eyebrow.textContent='Téma';
+    title.textContent=label;
+    reset.hidden=false;
+    tiles.forEach(function(t){ t.classList.toggle('is-active', t.getAttribute('data-cat')===cat); });
+    if(count>0){ empty.hidden=true; }
+    else { empty.hidden=false; emptyLink.setAttribute('href',service); emptyLink.textContent=label+' →'; }
+    if(section) section.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function clearAll(){
+    cards.forEach(function(el){ el.style.display=''; });
+    eyebrow.textContent='Legfrissebb';
+    title.textContent='Friss a magazinból';
+    reset.hidden=true; empty.hidden=true;
+    tiles.forEach(function(t){ t.classList.remove('is-active'); });
+  }
+  tiles.forEach(function(t){
+    t.addEventListener('click',function(){
+      apply(t.getAttribute('data-cat'), t.getAttribute('data-label'), t.getAttribute('data-service'), parseInt(t.getAttribute('data-count')||'0',10));
+    });
+  });
+  if(reset) reset.addEventListener('click', clearAll);
+})();
+</script>
 {jsonLdAll.map((j) => (<script type="application/ld+json" set:html={JSON.stringify(j)}></script>))}
 </section>
 
@@ -155,7 +195,13 @@ const jsonLdAll = [blogJson, breadcrumbJson];
   .bl-more{font-weight:700;color:var(--red);margin-top:4px;}
   /* Category tiles */
   .bl-cats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;}
-  .bl-cat-tile{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;text-decoration:none;color:var(--ink);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+  .bl-cat-tile{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;text-decoration:none;color:var(--ink);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;font:inherit;text-align:left;width:100%;cursor:pointer;-webkit-appearance:none;appearance:none;}
+  .bl-cat-tile.is-active{border-color:var(--red);box-shadow:0 0 0 2px rgba(226,35,26,.14);}
+  .bl-cat-tile.is-active .bl-cat-ico{background:var(--red);color:#fff;}
+  .bl-reset{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;background:none;border:none;color:var(--red);font-weight:700;font-size:.95rem;cursor:pointer;padding:0;}
+  .bl-reset:hover{text-decoration:underline;}
+  .bl-empty{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px 24px;text-align:center;margin-top:6px;}
+  .bl-empty p{color:var(--muted);line-height:1.55;margin:0 0 14px;}
   .bl-cat-tile:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(0,0,0,.09);border-color:#dcdce0;}
   .bl-cat-ico{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:12px;background:#fdeceb;color:var(--red);margin-bottom:4px;}
   .bl-cat-ico svg{width:24px;height:24px;}
