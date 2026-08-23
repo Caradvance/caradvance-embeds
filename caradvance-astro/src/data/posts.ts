@@ -37,6 +37,16 @@ export type Post = {
 
 export const POSTS: Post[] = [
   {
+    slug: 'caradvance-referenciak-vasarloi-tortenetek',
+    cat: 'hirek',
+    title: 'Miért a CarAdvance? Vásárlói történetek és referenciák',
+    excerpt: 'Kiváló Google-értékelés, németországi háttér és kulcsrakész folyamat. Megmutatjuk, miért választanak minket az ügyfeleink.',
+    dateISO: '2026-08-23',
+    readingMin: 5,
+    image: '/caradvance-hero-beszerzesi-poster.jpg',
+    keywords: 'caradvance vélemények, caradvance referenciák, prémium autó vásárlás tapasztalatok, autó behozatal vélemények',
+  },
+  {
     slug: 'bizomanyos-auto-ertekesites',
     cat: 'bizomanyos',
     title: 'Bizományos autóértékesítés — hogyan add el az autód gyorsan, jó áron?',
