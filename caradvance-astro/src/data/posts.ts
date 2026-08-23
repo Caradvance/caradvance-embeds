@@ -47,6 +47,16 @@ export const POSTS: Post[] = [
     keywords: 'bmw x5, bmw x5 eladó, bmw x5 ár, bmw x5 behozatal, használt bmw x5',
   },
   {
+    slug: 'elektromos-auto-lizing-tamogatas',
+    cat: 'finanszirozas',
+    title: 'Elektromos autó lízing és állami támogatás 2026 — árak, feltételek, tudnivalók',
+    excerpt: 'Mennyibe kerül egy elektromos autó lízingje, milyen támogatások érhetők el, és megéri-e a váltás? Végigvesszük a költségeket és a döntési szempontokat.',
+    dateISO: '2026-08-23',
+    readingMin: 8,
+    image: '/finanszirozas-hero-poster.jpg',
+    keywords: 'elektromos autó, elektromos autó lízing, elektromos autó támogatás magánszemélyeknek, elektromos autó árak, használt elektromos autó',
+  },
+  {
     slug: 'auto-lizing-maganszemelykent',
     cat: 'finanszirozas',
     title: 'Autó lízing magánszemélyként 2026 — feltételek, kalkulátor, 0% önerő',
