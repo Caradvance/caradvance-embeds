@@ -37,6 +37,16 @@ export type Post = {
 
 export const POSTS: Post[] = [
   {
+    slug: 'mercedes-behozatal-nemetorszagbol',
+    cat: 'markak',
+    title: 'Mercedes behozatal Németországból — E-osztály, Vito, Sprinter vásárlás',
+    excerpt: 'A Mercedes a német piac egyik legjobban dokumentált márkája. Megnézzük, melyik modell kinek való, és hogyan hozz be biztonságosan E-osztályt, Vitót vagy Sprintert.',
+    dateISO: '2026-08-23',
+    readingMin: 7,
+    image: '/caradvance-hero-beszerzesi-poster.jpg',
+    keywords: 'eladó mercedes, mercedes vito eladó, mercedes sprinter eladó, mercedes e 220 cdi, mercedes behozatal',
+  },
+  {
     slug: 'bmw-x5-vasarlas-behozatal',
     cat: 'markak',
     title: 'BMW X5 vásárlás és behozatal Németországból — árak, felszereltség, folyamat',
