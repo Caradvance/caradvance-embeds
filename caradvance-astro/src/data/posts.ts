@@ -77,6 +77,16 @@ export const POSTS: Post[] = [
     keywords: 'autó lízing, autólízing, lízing kalkulátor, autó lízing magánszemély, használt autó lízing',
   },
   {
+    slug: 'hasznalt-premium-auto-ellenorzo-lista',
+    cat: 'import',
+    title: 'Használt prémium autó vásárlás — 10 pontos ellenőrző lista',
+    excerpt: 'Mielőtt használt prémium autót vennél, fuss végig ezen a 10 ponton. Ezekkel kiszűröd a rejtett hibákat és a rossz vásárlásokat.',
+    dateISO: '2026-08-23',
+    readingMin: 6,
+    image: '/caradvance-hero-beszerzesi-poster.jpg',
+    keywords: 'használt autó vásárlás, használt prémium autó, autó ellenőrzés vásárlás előtt, használt autó ellenőrző lista',
+  },
+  {
     slug: 'auto-behozatal-nemetorszagbol',
     cat: 'import',
     title: 'Autó behozatal Németországból — teljes útmutató a költségekhez és a folyamathoz',
