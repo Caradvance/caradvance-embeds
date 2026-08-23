@@ -37,6 +37,16 @@ export type Post = {
 
 export const POSTS: Post[] = [
   {
+    slug: 'bmw-x5-vasarlas-behozatal',
+    cat: 'markak',
+    title: 'BMW X5 vásárlás és behozatal Németországból — árak, felszereltség, folyamat',
+    excerpt: 'Mennyibe kerül egy BMW X5 Németországból behozva, melyik motor és felszereltség éri meg, és mire figyelj vásárláskor? Végigvesszük a teljes folyamatot.',
+    dateISO: '2026-08-23',
+    readingMin: 7,
+    image: '/caradvance-hero-x5-poster.jpg',
+    keywords: 'bmw x5, bmw x5 eladó, bmw x5 ár, bmw x5 behozatal, használt bmw x5',
+  },
+  {
     slug: 'auto-lizing-maganszemelykent',
     cat: 'finanszirozas',
     title: 'Autó lízing magánszemélyként 2026 — feltételek, kalkulátor, 0% önerő',
