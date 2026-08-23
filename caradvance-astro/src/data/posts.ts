@@ -37,6 +37,16 @@ export type Post = {
 
 export const POSTS: Post[] = [
   {
+    slug: 'bizomanyos-auto-ertekesites',
+    cat: 'bizomanyos',
+    title: 'Bizományos autóértékesítés — hogyan add el az autód gyorsan, jó áron?',
+    excerpt: 'A bizományos értékesítés leveszi rólad a hirdetés, az alkudozás és a papírmunka terhét. Megnézzük, hogyan működik és mennyiért éri meg.',
+    dateISO: '2026-08-23',
+    readingMin: 6,
+    image: '/caradvance-hero-beszerzesi-poster.jpg',
+    keywords: 'bizományos autó értékesítés, bizományos autó eladás, autó eladás gyorsan, bizományos autó',
+  },
+  {
     slug: 'mercedes-behozatal-nemetorszagbol',
     cat: 'markak',
     title: 'Mercedes behozatal Németországból — E-osztály, Vito, Sprinter vásárlás',
