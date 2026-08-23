@@ -57,6 +57,16 @@ export const POSTS: Post[] = [
     keywords: 'bmw x5, bmw x5 eladó, bmw x5 ár, bmw x5 behozatal, használt bmw x5',
   },
   {
+    slug: 'hasznalt-auto-lizing-feltetelei',
+    cat: 'finanszirozas',
+    title: 'Használt autó lízing feltételei magánszemélyként — mire figyelj?',
+    excerpt: 'Használt autót is lehet lízingelni — de van néhány feltétel, ami eltér az új autótól. Végigvesszük, mit kér a finanszírozó és mire figyelj.',
+    dateISO: '2026-08-23',
+    readingMin: 6,
+    image: '/finanszirozas-hero-poster.jpg',
+    keywords: 'használt autó lízing feltételei, használt autó lízing, autó lízing feltételei, használt autó finanszírozás',
+  },
+  {
     slug: 'ceges-auto-operativ-lizing-tartos-berlet',
     cat: 'finanszirozas',
     title: 'Céges autó: operatív lízing vagy tartós bérlet? Adózás, áfa, döntés',
