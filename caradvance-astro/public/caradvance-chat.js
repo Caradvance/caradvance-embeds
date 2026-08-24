@@ -173,7 +173,8 @@
   var BRANDS = [
     { t: "BMW",      href: "/egyedi-auto-rendeles?brand=bmw",      logo: "/bmw/bmw-logo.webp?v=2" },
     { t: "MINI",     href: "/egyedi-auto-rendeles?brand=mini",     logo: "/mini-logo.webp?v=3" },
-    { t: "Mercedes", href: "/egyedi-auto-rendeles?brand=mercedes", logo: "/mb-star.webp?v=1" }
+    { t: "Mercedes", href: "/egyedi-auto-rendeles?brand=mercedes", logo: "/mb-star.webp?v=1" },
+    { t: "Audi", href: "/egyedi-auto-rendeles?brand=audi", logo: "/audi/audi-logo.webp?v=1" }
   ];
   var LABEL = "Egyedi autó rendelés";
   var DEST = "/egyedi-auto-rendeles";
