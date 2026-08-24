@@ -17,12 +17,12 @@ const _rebuild='rebuild-nudge-3';
     </div>
     <nav class="egl-crumb"><a href="/">Főoldal</a> / <span id="eglCrumbCur">Egyedi autó rendelés</span></nav>
     <h1 id="eglTitle">Egyedi autó rendelés</h1>
-    <p class="egl-sub" id="eglSub">Új BMW, MINI és Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.
+    <p class="egl-sub" id="eglSub">Új BMW, MINI, Mercedes-Benz és Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.
       Az árak tájékoztató német nettó listaárak, élő árfolyammal (1&nbsp;€ = <span id="eglFx">361</span>&nbsp;Ft).</p>
 
     <div class="egl-filters">
       <input type="text" id="eglQ" class="egl-search" placeholder="Keresés (pl. X5, Cooper)…" />
-      <div class="egl-sel" id="eglBrandWrap"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option><option>MINI</option><option value="MB">Mercedes-Benz</option></select></div>
+      <div class="egl-sel" id="eglBrandWrap"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option><option>MINI</option><option value="MB">Mercedes-Benz</option><option value="AUDI">Audi</option></select></div>
       <div class="egl-sel" id="eglClassWrap" style="display:none"><select id="eglClass"><option value="">Minden osztály</option><option>A-osztály</option><option>B-osztály</option><option>C-osztály</option><option>E-osztály</option><option>S-osztály</option><option>CLE</option><option>GLA</option><option>GLB</option><option>GLC</option><option>GLE</option></select></div>
       <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>Kompakt</option><option>Limuzin</option><option>Touring</option><option>Kombi</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option><option>Kabrió</option><option>Ferdehátú</option><option>Egyterű</option><option>SUV</option><option>SUV Coupé</option><option>Roadster</option></select></div>
       <div class="egl-sel"><select id="eglFuel"><option value="">Minden üzemanyag</option><option>Benzin</option><option>Dízel</option><option>Hibrid</option><option>Elektromos</option></select></div>
@@ -154,6 +154,7 @@ const _rebuild='rebuild-nudge-3';
   .egl-brand{display:inline-flex;align-items:center;}
   .egl-bmw{height:28px;width:auto;position:relative;z-index:2;}
   .egl-minilogo{height:26px;width:auto;}
+  .egl-audilogo{height:19px;width:auto;}
   .egl-mlogo{height:16px;width:auto;margin-left:6px;}
   .egl-jcwlogo{height:19px;width:auto;margin-left:8px;}
   .egl-mblogo{height:26px;width:auto;}
@@ -293,7 +294,22 @@ const _rebuild='rebuild-nudge-3';
     {brand:'MB',key:'mbamgglec',name:'Mercedes-AMG GLE Coupé',body:'SUV Coupé',fuel:'Hibrid',img:'/mb-amg-gle-coupe.webp?v=1',logo:'mb',from:120053}
   ];
 
-  var CARS = MINIS.concat(MB).concat([
+  var AUDI = [
+    {brand:'AUDI',key:'a3',name:'Audi A3 Sportback',body:'Ferdehátú',fuel:'Benzin',img:'/audi/a3.webp',from:31600},
+    {brand:'AUDI',key:'a5',name:'Audi A5',body:'Limuzin',fuel:'Benzin',img:'/audi/a5.webp',from:44800},
+    {brand:'AUDI',key:'a6',name:'Audi A6 Avant',body:'Kombi',fuel:'Benzin',img:'/audi/a6.webp',from:56000},
+    {brand:'AUDI',key:'a6etron',name:'Audi A6 e-tron',body:'Limuzin',fuel:'Elektromos',img:'/audi/a6etron.webp',from:63500},
+    {brand:'AUDI',key:'a8',name:'Audi A8',body:'Limuzin',fuel:'Benzin',img:'/audi/a8.webp',from:102000},
+    {brand:'AUDI',key:'rsetrongt',name:'Audi RS e-tron GT',body:'Coupé',fuel:'Elektromos',img:'/audi/rsetrongt.webp',from:126000},
+    {brand:'AUDI',key:'q3',name:'Audi Q3',body:'SUV',fuel:'Benzin',img:'/audi/q3.webp',from:44600},
+    {brand:'AUDI',key:'q4etron',name:'Audi Q4 e-tron',body:'SUV',fuel:'Elektromos',img:'/audi/q4etron.webp',from:47000},
+    {brand:'AUDI',key:'q5',name:'Audi Q5',body:'SUV',fuel:'Benzin',img:'/audi/q5.webp',from:52000},
+    {brand:'AUDI',key:'q6etron',name:'Audi Q6 e-tron',body:'SUV',fuel:'Elektromos',img:'/audi/q6etron.webp',from:63500},
+    {brand:'AUDI',key:'q7',name:'Audi Q7',body:'SUV',fuel:'Benzin',img:'/audi/q7.webp',from:75000},
+    {brand:'AUDI',key:'q8',name:'Audi Q8',body:'SUV Coupé',fuel:'Benzin',img:'/audi/q8.webp',from:95000},
+    {brand:'AUDI',key:'q9',name:'Audi Q9',body:'SUV',fuel:'Benzin',img:'/audi/q9.webp'}
+  ];
+  var CARS = MINIS.concat(MB).concat(AUDI).concat([
     {key:'ix',name:'BMW iX',body:'SUV',fuel:'Elektromos',from:83500},
     {key:'ixm',name:'BMW iX M',body:'SUV',fuel:'Elektromos',from:126500,hide:true},
     {key:'ix5',name:'BMW iX5',body:'SUV',fuel:'Elektromos',from:100000},
@@ -394,6 +410,7 @@ const _rebuild='rebuild-nudge-3';
   function card(c){
     var isMini = (c.brand==='MINI');
     var isMB = (c.brand==='MB');
+    var isAudi = (c.brand==='AUDI');
     var img = c.img ? c.img : '/bmw/'+c.key+'.webp?v=6';
     var logoHtml;
     if(isMB){
@@ -401,26 +418,28 @@ const _rebuild='rebuild-nudge-3';
       logoHtml = '<img class="egl-mblogo" src="/mb-star.webp?v=1" alt="Mercedes-Benz"/>' + (isAMG ? '<img class="egl-amglogo" src="/mb-logo.webp?v=2" alt="Mercedes-AMG"/>' : '');
     } else if(isMini){
       logoHtml = '<img class="egl-minilogo" src="/mini-logo.webp?v=3" alt="MINI"/>' + (c.logo==='jcw' ? '<img class="egl-jcwlogo" src="/jcw-logo.webp?v=3" alt="John Cooper Works"/>' : '');
+    } else if(isAudi){
+      logoHtml = '<img class="egl-audilogo" src="/audi/audi-logo.webp?v=1" alt="Audi"/>';
     } else {
       logoHtml = '<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=2" alt="BMW"/>' + (isM(c) ? '<img class="egl-mlogo" src="/bmw/m-logo.webp?v=2" alt="M"/>' : '');
     }
     var priceHtml;
-    if((isMini||isMB) && !c.from){
+    if((isMini||isMB||isAudi) && !c.from){
       priceHtml = '<span class="egl-soon">Ár kérésre</span>';
     } else if(!isMini && SOON.indexOf(slug(c))>-1){
       priceHtml = '<span class="egl-soon">Hamarosan</span>';
     } else {
       priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
     }
-    var href = (isMini||isMB) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c);
+    var href = (isMini||isMB||isAudi) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c);
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var fuelList = c.fuels || [c.fuel];
     var fuelBadges = fuelList.map(function(fu){ return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>'; }).join('');
-    var priceLine = ((isMini||isMB)&&!c.from) ? 'Ár kérésre'
+    var priceLine = ((isMini||isMB||isAudi)&&!c.from) ? 'Ár kérésre'
       : ((!isMini && SOON.indexOf(slug(c))>-1) ? 'Hamarosan'
       : (HUF(net(c.from))+' · '+EUR(net(c.from))));
     var a=document.createElement('div');
-    a.className='egl-card'+((isMini||isMB)?' egl-card-mini':'');
+    a.className='egl-card'+((isMini||isMB||isAudi)?' egl-card-mini':'');
     a.innerHTML =
       '<a class="egl-clink" href="'+href+'">'+
         '<div class="egl-media">'+newBadge+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
@@ -504,9 +523,10 @@ const _rebuild='rebuild-nudge-3';
     'BMW':{crumb:'BMW',title:'Egyedi BMW rendelés',intro:'Új BMW modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
     'MINI':{crumb:'MINI',title:'Egyedi MINI rendelés',intro:'Új MINI modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
     'MB':{crumb:'Mercedes-Benz',title:'Egyedi Mercedes-Benz rendelés',intro:'Új Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
-    '':{crumb:'Egyedi autó rendelés',title:'Egyedi autó rendelés',intro:'Új BMW, MINI és Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'}
+    'AUDI':{crumb:'Audi',title:'Egyedi Audi rendelés',intro:'Új Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
+    '':{crumb:'Egyedi autó rendelés',title:'Egyedi autó rendelés',intro:'Új BMW, MINI, Mercedes-Benz és Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'}
   };
-  var PH={'BMW':'Keresés (pl. X5, i4)…','MINI':'Keresés (pl. Cooper, Countryman)…','MB':'Keresés (pl. E-osztály, GLC)…','':'Keresés (pl. X5, Cooper)…'};
+  var PH={'AUDI':'Keresés (pl. Q5, A6)…','BMW':'Keresés (pl. X5, i4)…','MINI':'Keresés (pl. Cooper, Countryman)…','MB':'Keresés (pl. E-osztály, GLC)…','':'Keresés (pl. X5, Cooper)…'};
   function applyHero(br){
     var h=HERO[br]||HERO[''];
     var t=document.getElementById('eglTitle'); if(t) t.textContent=h.title;
@@ -565,9 +585,17 @@ const _rebuild='rebuild-nudge-3';
       grid.appendChild(mbh);
       mbs.forEach(function(c){ grid.appendChild(card(c)); });
     }
+    var audis=list.filter(function(c){return c.brand==='AUDI';});
+    if(audis.length){
+      var ah=document.createElement('div');
+      ah.className='egl-section';
+      ah.innerHTML='<span class="dot" style="background:#bb0a30"></span>Audi <span class="cnt">'+audis.length+' modell</span>';
+      grid.appendChild(ah);
+      audis.forEach(function(c){ grid.appendChild(card(c)); });
+    }
     var order=['Elektromos','Hibrid','Benzin','Dízel'];
     order.forEach(function(fuel){
-      var group=list.filter(function(c){var br2=(c.brand||'BMW'); return br2!=='MINI' && br2!=='MB' && c.fuel===fuel;});
+      var group=list.filter(function(c){var br2=(c.brand||'BMW'); return br2!=='MINI' && br2!=='MB' && br2!=='AUDI' && c.fuel===fuel;});
       if(!group.length) return;
       var h=document.createElement('div');
       h.className='egl-section';
@@ -579,7 +607,7 @@ const _rebuild='rebuild-nudge-3';
   }
   [q,fb,ff,fbr,fcls].forEach(function(el){ if(el){ el.addEventListener('input',render); el.addEventListener('change',render); } });
   fbr.addEventListener('change',function(){ applyHero(fbr.value); });
-  try{var _qb=new URLSearchParams(location.search).get('brand'); if(_qb){ var _map={bmw:'BMW',mini:'MINI',mercedes:'MB',mb:'MB'}; fbr.value=(_map[_qb.toLowerCase()]||_qb); }}catch(e){}
+  try{var _qb=new URLSearchParams(location.search).get('brand'); if(_qb){ var _map={bmw:'BMW',mini:'MINI',mercedes:'MB',mb:'MB',audi:'AUDI'}; fbr.value=(_map[_qb.toLowerCase()]||_qb); }}catch(e){}
   applyHero(fbr.value);
   render();
   function loadFx(){ try{
