@@ -155,6 +155,7 @@ const _rebuild='rebuild-nudge-3';
   .egl-bmw{height:28px;width:auto;position:relative;z-index:2;}
   .egl-minilogo{height:26px;width:auto;}
   .egl-audilogo{height:19px;width:auto;}
+  .egl-audirslogo{height:15px;width:auto;margin-left:7px;}
   .egl-mlogo{height:16px;width:auto;margin-left:6px;}
   .egl-jcwlogo{height:19px;width:auto;margin-left:8px;}
   .egl-mblogo{height:26px;width:auto;}
@@ -433,7 +434,7 @@ const _rebuild='rebuild-nudge-3';
     } else if(isMini){
       logoHtml = '<img class="egl-minilogo" src="/mini-logo.webp?v=3" alt="MINI"/>' + (c.logo==='jcw' ? '<img class="egl-jcwlogo" src="/jcw-logo.webp?v=3" alt="John Cooper Works"/>' : '');
     } else if(isAudi){
-      logoHtml = '<img class="egl-audilogo" src="/audi/audi-logo.webp?v=2" alt="Audi"/>';
+      logoHtml = '<img class="egl-audilogo" src="/audi/audi-logo.webp?v=2" alt="Audi"/>' + (/RS /.test(c.name) ? '<img class="egl-audirslogo" src="/audi/rs-logo.webp?v=1" alt="Audi RS"/>' : '');
     } else {
       logoHtml = '<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=2" alt="BMW"/>' + (isM(c) ? '<img class="egl-mlogo" src="/bmw/m-logo.webp?v=2" alt="M"/>' : '');
     }
