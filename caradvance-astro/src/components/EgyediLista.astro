@@ -446,7 +446,7 @@ const _rebuild='rebuild-nudge-3';
     } else {
       priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
     }
-    var __DET={'a3lim-benzin':1,'a3sb-benzin':1,'a3allstreet-benzin':1,'rs3lim-benzin':1,'rs3sb-benzin':1};var href = __DET[slug(c)] ? '/egyedi-auto-rendeles/'+slug(c) : ((isMini||isMB||isAudi) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c));
+    var href = isAudi ? ('/egyedi-auto-rendeles/'+slug(c)) : ((isMini||isMB) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c));
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var fuelList = c.fuels || [c.fuel];
     var fuelBadges = fuelList.map(function(fu){ return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>'; }).join('');
