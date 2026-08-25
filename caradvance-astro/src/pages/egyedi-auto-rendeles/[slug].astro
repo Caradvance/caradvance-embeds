@@ -38,25 +38,25 @@ const faqJson = m ? { '@context':'https://schema.org','@type':'FAQPage', mainEnt
 <Base lang="hu" path={`/egyedi-auto-rendeles/${slug}`} title={title} description={desc}>
 <section class="ad">
   <section class="ad-hero">
+    <div class="ad-hero-car"><img id="adHeroCar" src={`/audi/${m.key}.webp`} alt={m.name} /></div>
     <div class="ad-hero-in">
       <nav class="ad-crumb"><a href="/">Főoldal</a> / <a href="/egyedi-auto-rendeles?brand=audi">Egyedi Audi rendelés</a> / <span>{m.name}</span></nav>
-      <div class="ad-hero-grid">
-        <div class="ad-hero-txt">
-          <div class="ad-chips"><span class="ad-chip">{m.body}</span>{m.fuels.map((f)=>(<span class="ad-chip ad-chip-ghost">{f}</span>))}<span class="ad-chip ad-chip-year">2026 · Németország</span></div>
-          <h1>{m.name}</h1>
-          <p class="ad-tag">{fam.tagline}</p>
-          {hasPrice ? (<Fragment>
-          <div class="ad-price"><span class="ad-price-huf" id="adHuf" data-net={net}>{huf}</span><span class="ad-price-eur">{eur} nettó-tól</span></div>
-          <p class="ad-price-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€ = <span id="adFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p>
-          </Fragment>) : (<Fragment>
-          <div class="ad-price"><span class="ad-price-huf">Egyedi ajánlat alapján</span></div>
-          <p class="ad-price-note">Ez a modell egyedi ajánlat alapján rendelhető. Vedd fel velünk a kapcsolatot a pontos árért és elérhetőségért.</p>
-          </Fragment>)}
-          <div class="ad-cta"><a class="ad-btn ad-btn-red" href="/kapcsolat">Autót rendelek</a><a class="ad-btn ad-btn-ghost" href="/kapcsolat">Ajánlatot kérek</a></div>
-        </div>
-        <div class="ad-hero-img"><img src={`/audi/${m.key}.webp`} alt={m.name} /></div>
+      <div class="ad-hero-txt">
+        <img class="ad-hero-logo" src="/audi/audi-logo.webp?v=4" alt="Audi" />
+        <div class="ad-chips"><span class="ad-chip">{m.body}</span>{m.fuels.map((f)=>(<span class="ad-chip ad-chip-ghost">{f}</span>))}<span class="ad-chip ad-chip-year">2026 · Németország</span></div>
+        <h1>{m.name}</h1>
+        <p class="ad-tag">{fam.tagline}</p>
+        {hasPrice ? (<Fragment>
+        <div class="ad-price"><span class="ad-price-huf" id="adHuf" data-net={net}>{huf}</span><span class="ad-price-eur">{eur} nettó-tól</span></div>
+        <p class="ad-price-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€ = <span id="adFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p>
+        </Fragment>) : (<Fragment>
+        <div class="ad-price"><span class="ad-price-huf">Egyedi ajánlat alapján</span></div>
+        <p class="ad-price-note">Ez a modell egyedi ajánlat alapján rendelhető. Vedd fel velünk a kapcsolatot a pontos árért és elérhetőségért.</p>
+        </Fragment>)}
+        <div class="ad-cta"><a class="ad-btn ad-btn-red" href="/kapcsolat">Autót rendelek</a><a class="ad-btn ad-btn-ghost" href="/kapcsolat">Ajánlatot kérek</a></div>
       </div>
     </div>
+    <div class="ad-scroll">GÖRGESS<span>⌄</span></div>
   </section>
 
   <section class="ad-sec">
@@ -118,29 +118,41 @@ const faqJson = m ? { '@context':'https://schema.org','@type':'FAQPage', mainEnt
 <style>
   .ad{--red:#E2001A;--navy:#0F1B2D;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
   .ad a{text-decoration:none;}
-  .ad-hero{background:radial-gradient(1200px 400px at 70% -10%,#1c2942,#0b1220);color:#fff;padding:22px 20px 40px;}
-  .ad-hero-in{max-width:1160px;margin:0 auto;}
-  .ad-crumb{font-size:13.5px;color:#9fb0c8;margin-bottom:18px;}
+ .ad-hero{position:relative;overflow:hidden;background:radial-gradient(1100px 520px at 78% 12%,#1d2c46,#0a0f1a 72%);color:#fff;min-height:560px;display:flex;align-items:center;padding:40px 20px 66px;}
+  .ad-hero-car{position:absolute;top:50%;right:-4%;transform:translateY(-46%);width:70%;max-width:940px;pointer-events:none;z-index:1;}
+  .ad-hero-car img{width:100%;height:auto;filter:drop-shadow(0 40px 60px rgba(0,0,0,.55));opacity:0;transition:opacity .4s ease;}
+  .ad-hero-car img.ad-ready{opacity:1;}
+  .ad-hero::before{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(90deg,rgba(6,10,18,.96) 0%,rgba(6,10,18,.85) 34%,rgba(6,10,18,.22) 60%,rgba(6,10,18,0) 80%),linear-gradient(0deg,rgba(6,9,15,.7) 0%,rgba(6,9,15,0) 32%);}
+  .ad-hero-in{position:relative;z-index:3;max-width:1160px;margin:0 auto;width:100%;}
+  .ad-crumb{font-size:13.5px;color:#9fb0c8;margin-bottom:20px;}
   .ad-crumb a{color:#9fb0c8;}.ad-crumb span{color:#fff;}
-  .ad-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;}
-  .ad-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
-  .ad-chip{background:rgba(255,255,255,.12);color:#fff;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:100px;}
-  .ad-chip-ghost{background:rgba(255,255,255,.06);color:#cbd6e6;}
+  .ad-hero-txt{max-width:600px;}
+  .ad-hero-logo{height:44px;width:auto;margin-bottom:18px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));}
+  .ad-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+  .ad-chip{background:rgba(255,255,255,.14);color:#fff;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:100px;}
+  .ad-chip-ghost{background:rgba(255,255,255,.07);color:#cbd6e6;}
   .ad-chip-year{background:var(--red);}
-  .ad-hero-txt h1{font-size:clamp(30px,4.4vw,46px);font-weight:800;line-height:1.05;margin:0 0 10px;letter-spacing:-.02em;}
-  .ad-tag{font-size:17px;color:#cbd6e6;margin:0 0 20px;line-height:1.5;}
+  .ad-hero-txt h1{font-size:clamp(34px,5vw,60px);font-weight:800;line-height:1.03;margin:0 0 12px;letter-spacing:-.02em;text-shadow:0 2px 30px rgba(0,0,0,.45);}
+  .ad-tag{font-size:18px;color:#cbd6e6;margin:0 0 22px;line-height:1.5;max-width:520px;}
   .ad-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
-  .ad-price-huf{font-size:30px;font-weight:800;}
+  .ad-price-huf{font-size:clamp(28px,3.4vw,36px);font-weight:800;}
   .ad-price-eur{font-size:15px;color:#aab8cc;font-weight:600;}
-  .ad-price-note{font-size:12.5px;color:#8ea0b8;margin:0 0 20px;max-width:520px;line-height:1.5;}
+  .ad-price-note{font-size:12.5px;color:#8ea0b8;margin:0 0 22px;max-width:480px;line-height:1.5;}
   .ad-cta{display:flex;gap:12px;flex-wrap:wrap;}
-  .ad-btn{display:inline-block;font-weight:700;font-size:15px;padding:14px 24px;border-radius:12px;transition:.15s;}
+  .ad-btn{display:inline-block;font-weight:700;font-size:15px;padding:14px 26px;border-radius:100px;transition:.15s;}
   .ad-btn-red{background:var(--red);color:#fff;}.ad-btn-red:hover{filter:brightness(1.08);}
-  .ad-btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);}
+  .ad-btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);}
+  .ad-btn-ghost:hover{background:rgba(255,255,255,.2);}
   .ad-btn-white{background:#fff;color:var(--navy);}
-  .ad-hero-img{display:flex;align-items:center;justify-content:center;background:#fff;border-radius:20px;padding:26px 30px;box-shadow:0 24px 60px rgba(0,0,0,.30);}
-  .ad-hero-img img{width:100%;max-width:520px;height:auto;}
-  @media(max-width:860px){.ad-hero-grid{grid-template-columns:1fr;}.ad-hero-img{order:-1;}}
+  .ad-scroll{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;font-size:12px;letter-spacing:.15em;color:#9fb0c8;font-weight:700;text-align:center;}
+  .ad-scroll span{display:block;font-size:22px;line-height:1;margin-top:0;animation:adbounce 1.6s infinite;}
+  @keyframes adbounce{0%,100%{transform:translateY(0);}50%{transform:translateY(5px);}}
+  @media(max-width:860px){
+    .ad-hero{display:block;min-height:0;padding:24px 18px 82px;}
+    .ad-hero-car{position:relative;top:auto;right:auto;transform:none;width:100%;max-width:440px;margin:10px auto 4px;}
+    .ad-hero::before{background:linear-gradient(0deg,rgba(6,9,15,.9) 0%,rgba(6,9,15,0) 58%);}
+    .ad-hero-txt{max-width:100%;}
+  }
   .ad-sec{padding:34px 20px;}
   .ad-wrap{max-width:1160px;margin:0 auto;}
   .ad-narrow{max-width:800px;}
@@ -193,6 +205,34 @@ const faqJson = m ? { '@context':'https://schema.org','@type':'FAQPage', mainEnt
         if(hufEl){ var net=Number(hufEl.getAttribute('data-net')||0); if(net){ hufEl.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(net*fx))+' Ft'; } }
       }
     }).catch(function(){});
+  }catch(e){}
+  // Client-side white-background removal for the hero car (studio shot -> transparent on dark hero)
+  try{
+    var hc=document.getElementById('adHeroCar');
+    function adCut(img){
+      try{
+        var w=img.naturalWidth,h=img.naturalHeight; if(!w){img.classList.add('ad-ready');return;}
+        var c=document.createElement('canvas'); c.width=w; c.height=h;
+        var x=c.getContext('2d'); x.drawImage(img,0,0);
+        var id; try{ id=x.getImageData(0,0,w,h); }catch(e){ img.classList.add('ad-ready'); return; }
+        var d=id.data, N=w*h, i, p, r, g, b, mn, mx;
+        var cand=new Uint8Array(N);
+        for(i=0;i<N;i++){ r=d[i*4]; g=d[i*4+1]; b=d[i*4+2]; mn=r<g?(r<b?r:b):(g<b?g:b); mx=r>g?(r>b?r:b):(g>b?g:b); if(mn>=228 && (mx-mn)<=18) cand[i]=1; }
+        var er=cand, it, y, xx, nx;
+        var up,dn,lf,rt; for(it=0;it<1;it++){ nx=new Uint8Array(N); for(y=0;y<h;y++){ for(xx=0;xx<w;xx++){ p=y*w+xx; if(!er[p]) continue; up=(y>0)?er[p-w]:1; dn=(y<h-1)?er[p+w]:1; lf=(xx>0)?er[p-1]:1; rt=(xx<w-1)?er[p+1]:1; if(up&&dn&&lf&&rt) nx[p]=1; } } er=nx; }
+        var bg=new Uint8Array(N), st=[];
+        for(xx=0;xx<w;xx++){ if(er[xx]){bg[xx]=1;st.push(xx);} p=(h-1)*w+xx; if(er[p]){bg[p]=1;st.push(p);} }
+        for(y=0;y<h;y++){ p=y*w; if(er[p]){bg[p]=1;st.push(p);} var q=y*w+w-1; if(er[q]){bg[q]=1;st.push(q);} }
+        while(st.length){ p=st.pop(); var a=p-1,bb=p+1,cc=p-w,dd=p+w; if(a>=0&&er[a]&&!bg[a]){bg[a]=1;st.push(a);} if(bb<N&&er[bb]&&!bg[bb]){bg[bb]=1;st.push(bb);} if(cc>=0&&er[cc]&&!bg[cc]){bg[cc]=1;st.push(cc);} if(dd<N&&er[dd]&&!bg[dd]){bg[dd]=1;st.push(dd);} }
+        var dg=bg;
+        for(it=0;it<2;it++){ nx=new Uint8Array(N); for(p=0;p<N;p++){ if(dg[p]){nx[p]=1;continue;} if(cand[p] && ((p>=1&&dg[p-1])||(p+1<N&&dg[p+1])||(p>=w&&dg[p-w])||(p+w<N&&dg[p+w]))) nx[p]=1; } dg=nx; }
+        for(i=0;i<N;i++){ if(dg[i]) d[i*4+3]=0; }
+        x.putImageData(id,0,0);
+        img.src=c.toDataURL('image/png');
+      }catch(e){}
+      img.classList.add('ad-ready');
+    }
+    if(hc){ if(hc.complete && hc.naturalWidth){ adCut(hc); } else { hc.addEventListener('load',function(){adCut(hc);}); hc.addEventListener('error',function(){hc.classList.add('ad-ready');}); } }
   }catch(e){}
 })();
 </script>
