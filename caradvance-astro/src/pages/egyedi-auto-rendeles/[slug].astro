@@ -1,0 +1,245 @@
+---
+// Audi model detail pages — /egyedi-auto-rendeles/<slug>
+import Base from '../../layouts/Base.astro';
+
+const FX = 361; // tájékoztató árfolyam; élőben frissül a kliens oldalon
+const IMG = 'https://www.caradvance.hu';
+
+// ---- Család-szintű tartalom (megosztott) ----
+const FAMILIES = {
+  A3: {
+    tagline: 'A prémium kompakt, amivel a mindennapok is élménnyé válnak',
+    video: 'O6fZDiaic0Y',
+    intro: 'Az Audi A3 a prémium kompakt szegmens mércéje: feszes, precíz vezetési élmény, kiváló anyagminőség és a nagyobb Audikból ismert digitális élmény egy kezelhető méretű karosszériában. Németországból, egyedi konfigurációval és kulcsrakész behozatallal a CarAdvance-től.',
+    highlights: [
+      { icon: '⚡', title: 'Hatékony TFSI és TDI motorok', text: 'Mild-hybrid technológiával támogatott, kulturált és takarékos erőforrások a városi és autópályás használatra egyaránt.' },
+      { icon: '🅿️', title: 'Digitális Audi élmény', text: 'Audi virtual cockpit és 10,1"-os MMI touch érintőképernyő, okostelefon-integrációval (Apple CarPlay, Android Auto).' },
+      { icon: '🛡️', title: 'Prémium biztonság', text: 'Fejlett vezetéstámogató rendszerek, LED / Matrix LED fényszórók és az Audi ismert felépítési minősége.' },
+    ],
+    sections: [
+      { title: 'Vezetési élmény és felszereltség', body: 'Az A3 alapból is gazdagon felszerelt: kétzónás klíma, digitális műszeregység, ambient világítás és minőségi kárpitok. A választható S line csomaggal sportosabb megjelenést és feszesebb futóművet kapsz, míg a Matrix LED fényszóró éjszaka is nappali biztonságot ad.' },
+      { title: 'Miért a CarAdvance-től rendeld?', body: 'Müncheni hátterünkkel közvetlen rálátásunk van a német piacra. Magánszemélyként akár 19%-os német áfával vásárolhatsz a hazai 27% helyett, a teljes behozatalt — keresés, ellenőrzés, szállítás, honosítás — kulcsrakészen intézzük, előre rögzített, átlátható feltételekkel.' },
+    ],
+    faq: [
+      { q: 'Mennyi idő alatt érkezik meg az autó?', a: 'Új, gyári rendelés esetén a szállítási idő a konfigurációtól függ; készletről elérhető darabnál akár néhány hét. Konkrét határidőt a kiválasztott konfigurációra adunk.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett, ami a listaár jelentős részét jelentheti.' },
+    ],
+  },
+  RS3: {
+    tagline: 'Öthengeres legenda: 400 lóerő, quattro, tiszta érzelem',
+    video: 'O6fZDiaic0Y',
+    intro: 'Az Audi RS 3 a szegmens egyik legkarizmatikusabb sportautója. A 2,5 literes, öthengeres TFSI motor 400 lóerővel és jellegzetes hangjával, a quattro összkerékhajtással és az RS torque splitterrel olyan élményt ad, amit egyszer érezni kell. Németországból, kulcsrakészen.',
+    highlights: [
+      { icon: '🔥', title: '2.5 TFSI · 400 LE', text: 'Az ikonikus öthengeres motor 500 Nm nyomatékkal, 3,8 mp-es 0–100 km/h gyorsulással.' },
+      { icon: '🏁', title: 'quattro + torque splitter', text: 'Változtatható nyomatékelosztás a hátsó keréken — drift mód és tökéletes tapadás egyben.' },
+      { icon: '🎯', title: 'RS dizájn és kijelzők', text: 'RS-specifikus lökhárítók, kipufogó, sportülések és dedikált RS műszeregység-nézetek.' },
+    ],
+    sections: [
+      { title: 'Teljesítmény, ami megkülönböztet', body: 'Az RS 3 nem csupán gyors: az öthengeres motor egyedi gyújtási sorrendje adja azt a hangot és karaktert, ami az Audi Sport örökségének része. A választható RS dinamikus csomaggal a végsebesség 290 km/h-ra emelhető, kerámia fékek pedig a versenypályára is felkészítenek.' },
+      { title: 'Miért a CarAdvance-től rendeld?', body: 'Müncheni hátterünkkel közvetlen rálátásunk van a német piacra. Magánszemélyként akár 19%-os német áfával vásárolhatsz a hazai 27% helyett, a teljes behozatalt kulcsrakészen intézzük, előre rögzített feltételekkel.' },
+    ],
+    faq: [
+      { q: 'A végsebesség hogyan emelhető?', a: 'Az RS dinamikus csomaggal a gyárilag korlátozott 250 km/h akár 290 km/h-ra emelhető. A pontos elérhetőséget a konfigurációnál egyeztetjük.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+    ],
+  },
+};
+
+// ---- Variáns-szintű adatok ----
+const MODELS = {
+  'a3lim-benzin': { key:'a3lim', name:'Audi A3 Limousine', family:'A3', body:'Limuzin', fuels:['Benzin','Hibrid','Dízel'], from:32650,
+    specs:[['Karosszéria','4 ajtós limuzin'],['Motorok','1.5 TFSI / 2.0 TDI (mild-hybrid)'],['Teljesítmény','116–150 LE'],['Hajtás','Első / quattro'],['Váltó','7 fokozatú S tronic'],['Gyorsulás (0–100)','kb. 8,1 mp-től'],['Végsebesség','kb. 224 km/h'],['Csomagtér','425 liter'],['Fogyasztás','kb. 5,3 l/100 km-től']] },
+  'a3sb-benzin': { key:'a3sb', name:'Audi A3 Sportback', family:'A3', body:'Ferdehátú', fuels:['Benzin','Hibrid','Dízel'], from:31850,
+    specs:[['Karosszéria','5 ajtós ferdehátú'],['Motorok','1.5 TFSI / 2.0 TDI (mild-hybrid)'],['Teljesítmény','116–150 LE'],['Hajtás','Első / quattro'],['Váltó','7 fokozatú S tronic'],['Gyorsulás (0–100)','kb. 8,1 mp-től'],['Végsebesség','kb. 224 km/h'],['Csomagtér','380 liter'],['Fogyasztás','kb. 5,3 l/100 km-től']] },
+  'a3allstreet-benzin': { key:'a3allstreet', name:'Audi A3 allstreet', family:'A3', body:'Ferdehátú (crossover)', fuels:['Benzin','Hibrid','Dízel'], from:36550,
+    specs:[['Karosszéria','Emelt, crossover stílusú A3'],['Motorok','1.5 TFSI / 2.0 TDI (mild-hybrid)'],['Teljesítmény','116–150 LE'],['Hajtás','Első / quattro'],['Váltó','7 fokozatú S tronic'],['Hasmagasság','Emelt, robusztus dizájn'],['Gyorsulás (0–100)','kb. 8,3 mp-től'],['Csomagtér','380 liter'],['Fogyasztás','kb. 5,4 l/100 km-től']] },
+  'rs3lim-benzin': { key:'rs3lim', name:'Audi RS 3 Limousine', family:'RS3', body:'Limuzin', fuels:['Benzin'], from:70500,
+    specs:[['Karosszéria','4 ajtós sportlimuzin'],['Motor','2.5 TFSI öthengeres'],['Teljesítmény','400 LE / 500 Nm'],['Hajtás','quattro + RS torque splitter'],['Váltó','7 fokozatú S tronic'],['Gyorsulás (0–100)','3,8 mp'],['Végsebesség','250 km/h (opc. 290 km/h)'],['Csomagtér','321 liter'],['Fék','Opcionális kerámia']] },
+  'rs3sb-benzin': { key:'rs3sb', name:'Audi RS 3 Sportback', family:'RS3', body:'Ferdehátú', fuels:['Benzin'], from:68500,
+    specs:[['Karosszéria','5 ajtós sport ferdehátú'],['Motor','2.5 TFSI öthengeres'],['Teljesítmény','400 LE / 500 Nm'],['Hajtás','quattro + RS torque splitter'],['Váltó','7 fokozatú S tronic'],['Gyorsulás (0–100)','3,8 mp'],['Végsebesség','250 km/h (opc. 290 km/h)'],['Csomagtér','282 liter'],['Fék','Opcionális kerámia']] },
+};
+
+export function getStaticPaths() {
+  return Object.keys(MODELS).map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const m = MODELS[slug];
+const fam = m ? FAMILIES[m.family] : null;
+
+const net = m ? Math.round(m.from / 1.19) : 0;
+const eur = new Intl.NumberFormat('de-DE').format(net) + ' €';
+const huf = new Intl.NumberFormat('hu-HU').format(Math.round(net * FX)) + ' Ft';
+
+const title = m ? `${m.name} — új autó Németországból, egyedi rendelés | CarAdvance` : 'Audi';
+const desc = m ? `${m.name} ${m.body.toLowerCase()} egyedi rendelése Németországból, kulcsrakész behozatallal és akár 19% német áfával. ${fam.tagline}.` : '';
+
+// Kapcsolódó modellek (azonos család, kivéve az aktuális)
+const related = m ? Object.keys(MODELS).filter((s) => MODELS[s].family === m.family && s !== slug).slice(0, 3) : [];
+
+const carJson = m ? {
+  '@context':'https://schema.org','@type':'Car', name:m.name, brand:{'@type':'Brand',name:'Audi'},
+  bodyType:m.body, image:`${IMG}/audi/${m.key}.webp`,
+  offers:{'@type':'Offer', price:net, priceCurrency:'EUR', availability:'https://schema.org/InStock', seller:{'@type':'Organization',name:'CarAdvance'}}
+} : null;
+const faqJson = m ? { '@context':'https://schema.org','@type':'FAQPage', mainEntity: fam.faq.map((f)=>({'@type':'Question',name:f.q,acceptedAnswer:{'@type':'Answer',text:f.a}})) } : null;
+---
+{m && (
+<Base lang="hu" path={`/egyedi-auto-rendeles/${slug}`} title={title} description={desc}>
+<section class="ad">
+  <section class="ad-hero">
+    <div class="ad-hero-in">
+      <nav class="ad-crumb"><a href="/">Főoldal</a> / <a href="/egyedi-auto-rendeles?brand=audi">Egyedi Audi rendelés</a> / <span>{m.name}</span></nav>
+      <div class="ad-hero-grid">
+        <div class="ad-hero-txt">
+          <div class="ad-chips"><span class="ad-chip">{m.body}</span>{m.fuels.map((f)=>(<span class="ad-chip ad-chip-ghost">{f}</span>))}<span class="ad-chip ad-chip-year">2026 · Németország</span></div>
+          <h1>{m.name}</h1>
+          <p class="ad-tag">{fam.tagline}</p>
+          <div class="ad-price"><span class="ad-price-huf" id="adHuf" data-net={net}>{huf}</span><span class="ad-price-eur">{eur} nettó-tól</span></div>
+          <p class="ad-price-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€ = <span id="adFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p>
+          <div class="ad-cta"><a class="ad-btn ad-btn-red" href="/kapcsolat">Autót rendelek</a><a class="ad-btn ad-btn-ghost" href="/kapcsolat">Ajánlatot kérek</a></div>
+        </div>
+        <div class="ad-hero-img"><img src={`/audi/${m.key}.webp`} alt={m.name} /></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ad-sec">
+    <div class="ad-wrap">
+      <div class="ad-highlights">{fam.highlights.map((h)=>(<div class="ad-hl"><span class="ad-hl-i">{h.icon}</span><h3>{h.title}</h3><p>{h.text}</p></div>))}</div>
+    </div>
+  </section>
+
+  <section class="ad-sec">
+    <div class="ad-wrap ad-2col">
+      <div class="ad-copy">
+        <p class="ad-lead">{fam.intro}</p>
+        {fam.sections.map((s)=>(<div class="ad-block"><h2>{s.title}</h2><p>{s.body}</p></div>))}
+      </div>
+      <aside class="ad-specs">
+        <h3>Műszaki adatok</h3>
+        <table>{m.specs.map((row)=>(<tr><th>{row[0]}</th><td>{row[1]}</td></tr>))}</table>
+        <p class="ad-specs-note">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek.</p>
+      </aside>
+    </div>
+  </section>
+
+  {fam.video && (
+  <section class="ad-sec">
+    <div class="ad-wrap">
+      <h2 class="ad-center">Videó bemutató</h2>
+      <div class="ad-video"><iframe src={`https://www.youtube-nocookie.com/embed/${fam.video}`} title={`${m.name} videó`} loading="lazy" allowfullscreen frameborder="0"></iframe></div>
+    </div>
+  </section>) }
+
+  <section class="ad-sec">
+    <div class="ad-wrap ad-narrow">
+      <h2 class="ad-center">Gyakori kérdések</h2>
+      {fam.faq.map((f)=>(<details class="ad-faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </section>
+
+  {related.length > 0 && (
+  <section class="ad-sec">
+    <div class="ad-wrap">
+      <h2 class="ad-center">Kapcsolódó modellek</h2>
+      <div class="ad-rel">{related.map((s)=>(<a class="ad-rel-card" href={`/egyedi-auto-rendeles/${s}`}><div class="ad-rel-img"><img src={`/audi/${MODELS[s].key}.webp`} alt={MODELS[s].name} /></div><span>{MODELS[s].name}</span></a>))}</div>
+    </div>
+  </section>) }
+
+  <section class="ad-sec">
+    <div class="ad-wrap">
+      <div class="ad-band">
+        <div><h2>Rendeld meg álmaid Audiját</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div>
+        <a class="ad-btn ad-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(carJson)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+</section>
+
+<style>
+  .ad{--red:#E2001A;--navy:#0F1B2D;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
+  .ad a{text-decoration:none;}
+  .ad-hero{background:radial-gradient(1200px 400px at 70% -10%,#1c2942,#0b1220);color:#fff;padding:22px 20px 40px;}
+  .ad-hero-in{max-width:1160px;margin:0 auto;}
+  .ad-crumb{font-size:13.5px;color:#9fb0c8;margin-bottom:18px;}
+  .ad-crumb a{color:#9fb0c8;}.ad-crumb span{color:#fff;}
+  .ad-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;}
+  .ad-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .ad-chip{background:rgba(255,255,255,.12);color:#fff;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:100px;}
+  .ad-chip-ghost{background:rgba(255,255,255,.06);color:#cbd6e6;}
+  .ad-chip-year{background:var(--red);}
+  .ad-hero-txt h1{font-size:clamp(30px,4.4vw,46px);font-weight:800;line-height:1.05;margin:0 0 10px;letter-spacing:-.02em;}
+  .ad-tag{font-size:17px;color:#cbd6e6;margin:0 0 20px;line-height:1.5;}
+  .ad-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .ad-price-huf{font-size:30px;font-weight:800;}
+  .ad-price-eur{font-size:15px;color:#aab8cc;font-weight:600;}
+  .ad-price-note{font-size:12.5px;color:#8ea0b8;margin:0 0 20px;max-width:520px;line-height:1.5;}
+  .ad-cta{display:flex;gap:12px;flex-wrap:wrap;}
+  .ad-btn{display:inline-block;font-weight:700;font-size:15px;padding:14px 24px;border-radius:12px;transition:.15s;}
+  .ad-btn-red{background:var(--red);color:#fff;}.ad-btn-red:hover{filter:brightness(1.08);}
+  .ad-btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);}
+  .ad-btn-white{background:#fff;color:var(--navy);}
+  .ad-hero-img{display:flex;align-items:center;justify-content:center;}
+  .ad-hero-img img{width:100%;max-width:560px;height:auto;filter:drop-shadow(0 30px 50px rgba(0,0,0,.5));}
+  @media(max-width:860px){.ad-hero-grid{grid-template-columns:1fr;}.ad-hero-img{order:-1;}}
+  .ad-sec{padding:34px 20px;}
+  .ad-wrap{max-width:1160px;margin:0 auto;}
+  .ad-narrow{max-width:800px;}
+  .ad-highlights{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media(max-width:800px){.ad-highlights{grid-template-columns:1fr;}}
+  .ad-hl{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;}
+  .ad-hl-i{font-size:26px;}
+  .ad-hl h3{font-size:17px;font-weight:800;color:var(--navy);margin:10px 0 8px;}
+  .ad-hl p{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0;}
+  .ad-2col{display:grid;grid-template-columns:1.4fr 1fr;gap:34px;align-items:start;}
+  @media(max-width:860px){.ad-2col{grid-template-columns:1fr;}}
+  .ad-lead{font-size:18px;line-height:1.7;color:var(--ink);margin:0 0 22px;}
+  .ad-block{margin-bottom:20px;}
+  .ad-block h2{font-size:22px;font-weight:800;color:var(--navy);margin:0 0 8px;letter-spacing:-.01em;}
+  .ad-block p{font-size:15.5px;color:var(--muted);line-height:1.7;margin:0;}
+  .ad-specs{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;position:sticky;top:20px;}
+  .ad-specs h3{font-size:18px;font-weight:800;color:var(--navy);margin:0 0 14px;}
+  .ad-specs table{width:100%;border-collapse:collapse;}
+  .ad-specs tr{border-bottom:1px solid var(--line);}
+  .ad-specs th{text-align:left;font-size:13.5px;color:var(--muted);font-weight:600;padding:10px 0;width:46%;}
+  .ad-specs td{text-align:right;font-size:13.5px;color:var(--ink);font-weight:700;padding:10px 0;}
+  .ad-specs-note{font-size:12px;color:#9aa7ba;margin:12px 0 0;line-height:1.5;}
+  .ad-center{text-align:center;font-size:26px;font-weight:800;color:var(--navy);margin:0 0 22px;}
+  .ad-video{position:relative;padding-top:56.25%;border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(8,8,10,.12);}
+  .ad-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .ad-faq{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 20px;margin-bottom:12px;}
+  .ad-faq summary{cursor:pointer;font-weight:700;color:var(--navy);padding:16px 0;list-style:none;}
+  .ad-faq summary::-webkit-details-marker{display:none;}
+  .ad-faq[open] summary{color:var(--red);}
+  .ad-faq p{color:var(--muted);line-height:1.65;margin:0 0 16px;}
+  .ad-rel{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media(max-width:800px){.ad-rel{grid-template-columns:1fr;}}
+  .ad-rel-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--navy);font-weight:700;transition:.15s;}
+  .ad-rel-card:hover{box-shadow:0 12px 30px rgba(15,27,45,.1);transform:translateY(-3px);}
+  .ad-rel-img{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;}
+  .ad-rel-img img{max-width:88%;max-height:100%;object-fit:contain;}
+  .ad-band{background:#0B0B0D;color:#fff;border-radius:22px;padding:32px 38px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;}
+  .ad-band h2{font-size:24px;font-weight:800;margin:0 0 6px;}
+  .ad-band p{color:#cfd6e2;margin:0;font-size:15px;max-width:560px;}
+</style>
+
+<script is:inline>
+(function(){
+  try{
+    fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
+      if(d&&d.rates&&d.rates.HUF){
+        var fx=Math.round(d.rates.HUF);
+        var fxEl=document.getElementById('adFx'); if(fxEl) fxEl.textContent=fx;
+        var hufEl=document.getElementById('adHuf');
+        if(hufEl){ var net=Number(hufEl.getAttribute('data-net')||0); if(net){ hufEl.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(net*fx))+' Ft'; } }
+      }
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+</Base>
+)}
