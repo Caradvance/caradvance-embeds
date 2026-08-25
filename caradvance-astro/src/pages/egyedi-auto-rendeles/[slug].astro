@@ -16,6 +16,7 @@ const { slug } = Astro.params;
 const m = MODELS[slug];
 const fam = m ? FAMILIES[m.family] : null;
 
+const hasPrice = !!(m && m.from);
 const net = m ? Math.round(m.from / 1.19) : 0;
 const eur = new Intl.NumberFormat('de-DE').format(net) + ' €';
 const huf = new Intl.NumberFormat('hu-HU').format(Math.round(net * FX)) + ' Ft';
@@ -29,7 +30,7 @@ const related = m ? Object.keys(MODELS).filter((s) => MODELS[s].family === m.fam
 const carJson = m ? {
   '@context':'https://schema.org','@type':'Car', name:m.name, brand:{'@type':'Brand',name:'Audi'},
   bodyType:m.body, image:`${IMG}/audi/${m.key}.webp`,
-  offers:{'@type':'Offer', price:net, priceCurrency:'EUR', availability:'https://schema.org/InStock', seller:{'@type':'Organization',name:'CarAdvance'}}
+  ...(hasPrice ? {offers:{'@type':'Offer', price:net, priceCurrency:'EUR', availability:'https://schema.org/InStock', seller:{'@type':'Organization',name:'CarAdvance'}}} : {})
 } : null;
 const faqJson = m ? { '@context':'https://schema.org','@type':'FAQPage', mainEntity: fam.faq.map((f)=>({'@type':'Question',name:f.q,acceptedAnswer:{'@type':'Answer',text:f.a}})) } : null;
 ---
@@ -44,8 +45,13 @@ const faqJson = m ? { '@context':'https://schema.org','@type':'FAQPage', mainEnt
           <div class="ad-chips"><span class="ad-chip">{m.body}</span>{m.fuels.map((f)=>(<span class="ad-chip ad-chip-ghost">{f}</span>))}<span class="ad-chip ad-chip-year">2026 · Németország</span></div>
           <h1>{m.name}</h1>
           <p class="ad-tag">{fam.tagline}</p>
+          {hasPrice ? (<Fragment>
           <div class="ad-price"><span class="ad-price-huf" id="adHuf" data-net={net}>{huf}</span><span class="ad-price-eur">{eur} nettó-tól</span></div>
           <p class="ad-price-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€ = <span id="adFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p>
+          </Fragment>) : (<Fragment>
+          <div class="ad-price"><span class="ad-price-huf">Egyedi ajánlat alapján</span></div>
+          <p class="ad-price-note">Ez a modell egyedi ajánlat alapján rendelhető. Vedd fel velünk a kapcsolatot a pontos árért és elérhetőségért.</p>
+          </Fragment>)}
           <div class="ad-cta"><a class="ad-btn ad-btn-red" href="/kapcsolat">Autót rendelek</a><a class="ad-btn ad-btn-ghost" href="/kapcsolat">Ajánlatot kérek</a></div>
         </div>
         <div class="ad-hero-img"><img src={`/audi/${m.key}.webp`} alt={m.name} /></div>
