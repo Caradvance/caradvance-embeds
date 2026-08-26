@@ -5,17 +5,17 @@ const { lang } = Astro.props as { lang: Locale };
 
 const IMG = 'https://www.caradvance.hu/';
 const benefits = [
-{ t: 'A piac legjobb ára', img: IMG + 'piros-bmw-x6-m-premium-autoberles.webp',
+{ t: 'A piac legjobb ára', img: IMG + 'elony-01-piac-ara.webp',
 d: 'A német piacon egyszerre több százezer autó verseng a vevőkért, ami lenyomja az árakat. A teljes kínálatot átnézzük helyetted, és a lehető legjobb piaci áron szerezzük meg a kiválasztott autót — a behozatallal együtt is gyakran kedvezőbben jársz, mint itthon.' },
-{ t: 'Német új vagy alig használt autók', img: IMG + 'autoszallitas-autoimport-nemetorszagbol.webp',
+{ t: 'Német új vagy alig használt autók', img: IMG + 'elony-02-allapot.webp',
 d: 'Kizárólag német, új vagy alig használt, kifogástalan állapotú autókat hozunk. Gondos karbantartás, minőségi utak és fegyelmezett szervizkultúra áll mögöttük — így ugyanazért a pénzért megbízhatóbb, hosszabb élettartamú autót kapsz.' },
-{ t: 'Végigkísérünk — az átvétel után is', img: IMG + 'bmw-m3-touring-premium-auto-eladas.webp',
+{ t: 'Végigkísérünk — az átvétel után is', img: IMG + 'elony-03-vegigkiserunk.webp',
 d: 'Segítünk kiválasztani a megfelelő autót, intézzük a teljes papírmunkát, és gondoskodunk mindenről, amíg a kulcsot a kezedbe nem adjuk. De nem állunk meg itt: az átvétel után is bármikor számíthatsz ránk.' },
-{ t: 'A sajátod — minden előnnyel, km-korlát nélkül', img: IMG + 'toyota-rav4-hybrid-hasznaltauto-eladas.webp',
+{ t: 'A sajátod — minden előnnyel, km-korlát nélkül', img: IMG + 'elony-04-km-korlat.webp',
 d: 'Az autó a tiéd, minden tulajdonosi előnnyel. Nincs kilométer-korlát: annyit vezetsz vele, amennyit csak szeretnél — semmi nem köt és semmi nem korlátoz.' },
-{ t: 'Bármikor továbbértékesítheted', img: IMG + 'caradvance-hero-x5-poster.jpg',
+{ t: 'Bármikor továbbértékesítheted', img: IMG + 'elony-05-eladhato.webp',
 d: 'Mivel a sajátod, bármikor eladhatod vagy továbbértékesítheted — nem köt hosszú távú bérleti szerződés, és nem kell a futamidő végét kivárnod. Szabadon döntesz az autód sorsáról.' },
-{ t: '19% német áfa — magánszemélyként is', img: IMG + 'bmw-m3-touring-premium-auto-eladas.webp',
+{ t: '19% német áfa — magánszemélyként is', img: IMG + 'elony-06-afa.webp',
 d: 'Magánszemélyként is vásárolhatsz tőlünk a müncheni Caradvance GmbH-n keresztül, akár 19%-os német áfával a hazai 27% helyett. Ez jelentős megtakarítás — az autó még kedvezőbb áron lehet a tiéd.' },
 ];
 ---
@@ -72,19 +72,22 @@ d: 'Magánszemélyként is vásárolhatsz tőlünk a müncheni Caradvance GmbH-n
 <style>
 .el{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
 .el-wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-.zz{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;padding:34px 0}
+.zz{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:stretch;padding:34px 0}
 .zz + .zz{border-top:1px solid var(--line)}
 .zz.flip .zz-media{order:2}
 .zz-media{border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(8,8,10,.12);background:linear-gradient(135deg,#1a1d23,#3a3f4a);aspect-ratio:16/10}
 .zz-media img{width:100%;height:100%;object-fit:cover;display:block}
 .zz-media.noimg{position:relative}
 .zz-media.noimg::after{content:"CarAdvance";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:.08em;opacity:.5}
-.zz-num{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border-radius:12px;background:var(--red);color:#fff;font-weight:800;font-size:18px;letter-spacing:-.02em}
-.zz-text h3{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;margin:16px 0 12px;color:var(--ink)}
+.zz-text{display:flex;flex-direction:column;height:100%}
+.zz-num{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border-radius:12px;background:var(--red);color:#fff;font-weight:800;font-size:18px;letter-spacing:-.02em}
+.zz-text h3{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;margin:auto 0 12px;color:var(--ink)}
 .zz-text p{color:var(--muted);font-size:16px;line-height:1.65;margin:0}
 @media(max-width:820px){
 .zz{grid-template-columns:1fr;gap:20px;padding:26px 0}
 .zz.flip .zz-media{order:0}
+.zz-text{height:auto}
+.zz-text h3{margin-top:14px}
 }
 .el-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .el-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
