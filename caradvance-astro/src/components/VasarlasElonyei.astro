@@ -119,22 +119,19 @@ provider: { '@type': 'AutoDealer', name: 'Caradvance Hungary (BH Group Zrt.)', t
 <style>
 .el{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
 .el-wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-.zz{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:stretch;padding:34px 0}
+.zz{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;padding:38px 0}
 .zz + .zz{border-top:1px solid var(--line)}
 .zz.flip .zz-media{order:2}
 .zz-media{border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(8,8,10,.12);background:linear-gradient(135deg,#1a1d23,#3a3f4a);aspect-ratio:16/10}
 .zz-media img{width:100%;height:100%;object-fit:cover;display:block}
 .zz-media.noimg{position:relative}
 .zz-media.noimg::after{content:"CarAdvance";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:.08em;opacity:.5}
-.zz-text{display:flex;flex-direction:column;height:100%}
-.zz-num{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border-radius:12px;background:var(--red);color:#fff;font-weight:800;font-size:18px;letter-spacing:-.02em}
-.zz-text h3{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;margin:18px 0 12px;color:var(--ink)}
+.zz-num{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border-radius:12px;background:var(--red);color:#fff;font-weight:800;font-size:18px;letter-spacing:-.02em}
+.zz-text h3{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;margin:16px 0 12px;color:var(--ink)}
 .zz-text p{color:var(--muted);font-size:16px;line-height:1.65;margin:0}
 @media(max-width:820px){
 .zz{grid-template-columns:1fr;gap:22px;padding:26px 0}
 .zz.flip .zz-media{order:0}
-.zz-text{height:auto}
-.zz-text h3{margin-top:14px}
 }
 .el-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .el-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
