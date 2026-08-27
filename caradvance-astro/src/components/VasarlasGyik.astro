@@ -1,0 +1,142 @@
+---
+import '../styles/eladom.css';
+import type { Locale } from '../i18n/utils';
+const { lang } = Astro.props as { lang: Locale };
+
+const cats = [
+{ id: 'mind', t: 'Mind' },
+{ id: 'altalanos', t: 'A vásárlásról' },
+{ id: 'autok', t: 'Autók & választás' },
+{ id: 'ar', t: 'Ár & áfa' },
+{ id: 'behozatal', t: 'Behozatal & ügyintézés' },
+{ id: 'finanszirozas', t: 'Finanszírozás' },
+{ id: 'folyamat', t: 'Folyamat & átvétel' },
+];
+
+const faqs = [
+{ c: 'altalanos', q: 'Mit jelent a CarAdvance-nél autót vásárolni?', a: 'Prémium német autót — Audi, BMW, Mercedes, MINI — veszel meg tőlünk, kulcsrakészen: kiválasztjuk, leinformáljuk, a helyszínen bevizsgáljuk, behozzuk és forgalomba helyezzük. Az autó teljes egészében a sajátod lesz, minden tulajdonosi előnnyel, kilométer-korlát nélkül.' },
+{ c: 'altalanos', q: 'Miért érdemes tőletek venni, és nem itthon?', a: 'A német piac sokszorosa a hazainak, az autók jellemzően gondozottabbak, dokumentált előélettel. Magánszemélyként pedig akár 19%-os német áfával vásárolhatsz a hazai 27% helyett — nagyobb választék, jobb állapot és gyakran kedvezőbb ár. Az előnyökről a vásárlás előnyei oldalon olvashatsz bővebben.' },
+{ c: 'altalanos', q: 'Kell személyesen bemennem hozzátok?', a: 'Nem feltétlenül. Az első egyeztetés telefonon, e-mailben vagy az online űrlapon is elindítható, és sok mindent távolról intézünk. Ha szeretnéd, természetesen személyesen is egyeztethetünk.' },
+{ c: 'autok', q: 'Milyen márkákat és modelleket lehet rendelni?', a: 'Elsősorban német prémium márkákat: Audi, BMW, Mercedes és MINI. Az egyedi autórendelésen keresztül gyakorlatilag a teljes német kínálatból megkeressük a hozzád illő darabot.' },
+{ c: 'autok', q: 'Kérhetek konkrét felszereltséget, színt vagy modellt?', a: 'Igen. Mondd el, mit szeretnél, és a német piac teljes kínálatából pontosan azt a modellt, felszereltséget és színt keressük meg, amire vágysz — nem csak azt, ami épp itthon elérhető.' },
+{ c: 'autok', q: 'Új vagy használt autót vásárolhatok?', a: 'Mindkettőt. Kizárólag német, új vagy alig használt, kifogástalan állapotú prémium autókat hozunk — gondozott, megbízható, dokumentált előéletű darabokat.' },
+{ c: 'ar', q: 'Mit jelent a 19%-os német áfa?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett — ez önmagában több százezer forintos megtakarítást jelenthet. A teljes folyamatot szabályosan és átláthatóan mi bonyolítjuk le.' },
+{ c: 'ar', q: 'Tényleg kedvezőbb, mint itthon vásárolni?', a: 'Jellemzően igen: a nagy német kínálat lenyomja az árakat, és a behozatallal, valamint a teljes ügyintézéssel együtt is gyakran kedvezőbben jársz, mint egy hasonló korú és felszereltségű hazai autóval — ráadásul jobb állapotban.' },
+{ c: 'ar', q: 'Van garancia az autóra?', a: 'Az importált autóinkra 1 év szavatosságot vállalunk. Minden autót leinformálunk és a helyszínen bevizsgálunk a vásárlás előtt, így pontosan tudod, mit veszel — kellemetlen meglepetések nélkül.' },
+{ c: 'behozatal', q: 'Ti intézitek a behozatalt is?', a: 'Igen, kulcsrakészen: kiválasztás, leinformálás, helyszíni bevizsgálás, megvásárlás, szállítás, honosítás, műszaki vizsga és a teljes papírmunka — mindent mi vállalunk. Neked csak át kell venned a nevedre írt, forgalomba helyezett autót.' },
+{ c: 'behozatal', q: 'Mennyi ideig tart a behozatal?', a: 'A modelltől és a beszerzéstől függ, jellemzően néhány hét. A pontos időt előre egyeztetjük, és végig tájékoztatunk a folyamat állásáról.' },
+{ c: 'behozatal', q: 'Milyen dokumentumokat kapok az autóhoz?', a: 'Teljes, rendezett papírokat: forgalmi engedély, törzskönyv, dokumentált szervizelőélet és az adásvételi dokumentáció. Minden a nevedre, szabályosan rendezve.' },
+{ c: 'finanszirozas', q: 'Lehet finanszírozással vagy lízinggel vásárolni?', a: 'Igen. Partnereinkkel finanszírozási és lízing konstrukciókat is kínálunk, hogy ne kelljen egy összegben kifizetned az autót. A részletekről a finanszírozás–lízing oldalon tájékozódhatsz.' },
+{ c: 'finanszirozas', q: 'Céges és magánszemélyként is finanszírozható?', a: 'Mindkettő megoldható. A konstrukciót — futamidő, önerő, havidíj — az igényeidhez és a lehetőségeidhez igazítjuk, átlátható feltételekkel.' },
+{ c: 'finanszirozas', q: 'Van lízingkalkulátor?', a: 'Igen, a finanszírozás–lízing oldalon elérhető kalkulátorral előzetesen megbecsülheted a várható havidíjat, mielőtt döntenél.' },
+{ c: 'folyamat', q: 'Hogyan indul a vásárlás?', a: 'Böngéssz a modellek között, vagy mondd el, mit keresel. Kiválasztjuk és beszerezzük a megfelelő autót, egyeztetjük a feltételeket, majd kulcsrakészen átadjuk — a többit mi intézzük.' },
+{ c: 'folyamat', q: 'Mi történik az átvételkor?', a: 'A nevedre írt, forgalomba helyezett autót veszed át, minden papír rendezve. Végigkísérünk a folyamaton, és gondoskodunk róla, hogy a kulcsot nyugodt szívvel vehesd át.' },
+{ c: 'folyamat', q: 'Segítetek az átvétel után is?', a: 'Igen. A munkánk nem ér véget az átadással: kérdés, szerviz vagy a következő autó esetén is bármikor számíthatsz ránk — egy hosszú távú partnert kapsz.' },
+];
+
+const faqJson = {
+'@context': 'https://schema.org', '@type': 'FAQPage',
+mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+---
+<section class="el">
+<section class="hero">
+<video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-beszerzesi-poster.jpg">
+<source src="https://www.caradvance.hu/caradvance-hero-beszerzesi.mp4" type="video/mp4" />
+</video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>Gyakori kérdések —<br /><span class="accent">a prémium autóvásárlásról</span></h1>
+<p class="sub sub-wide" style="max-width:900px">Minden, amit a vásárlásról tudni érdemes: márkák és választás, ár és 19% német áfa, behozatal és ügyintézés, finanszírozás és a folyamat. Keress rá a témára — és ha nem találod a választ, egy hívás vagy e-mail&nbsp;elég.</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="/egyedi-auto-rendeles">Autók böngészése</a>
+<a class="btn btn-white" href="#gyik">Kérdések böngészése</a>
+</div>
+</div>
+<button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+</section>
+
+<section class="section" id="gyik" style="padding-top:56px">
+<div class="wrap center">
+<span class="eyebrow">GY.I.K.</span>
+<h2 class="sec-title">Miben segíthetünk?</h2>
+<p class="sec-intro">Keress rá egy kulcsszóra, vagy válassz témát a fülek közül. A válaszok tájékoztató jellegűek; a pontos, egyedi részleteket mindig írásban, személyre szabottan rögzítjük.</p>
+</div>
+<div class="wrap gyik-wrap">
+<input id="gyikSearch" class="gyik-search" type="search" placeholder="Keresés a kérdések között…" autocomplete="off" />
+<div class="gyik-tabs">
+{cats.map((c, i) => (<button class={`gyik-tab${i === 0 ? ' is-active' : ''}`} data-cat={c.id}>{c.t}</button>))}
+</div>
+<div class="gyik-list">
+{faqs.map((f) => (
+<details class="gyik-item" data-cat={f.c} data-text={(f.q + ' ' + f.a).toLowerCase()}>
+<summary>{f.q}<span class="pl">+</span></summary>
+<p>{f.a}</p>
+</details>
+))}
+</div>
+<p id="gyikEmpty" class="gyik-empty" hidden>Nincs a keresésnek megfelelő kérdés. Próbálj más kulcsszót, vagy írj nekünk: import@caradvance.de.</p>
+</div>
+</section>
+
+<section class="section">
+<div class="wrap">
+<div class="el-cta">
+<div>
+<h2>Nem találod a választ?</h2>
+<p>Írj vagy hívj minket — szívesen segítünk bármilyen kérdésben, kötelezettségmentesen.</p>
+</div>
+<a class="btn btn-white" href="/kapcsolat">Kapcsolat →</a>
+</div>
+</div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+</section>
+
+<style>
+.el{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
+.gyik-wrap{max-width:820px;margin:0 auto;padding:0 20px}
+.gyik-search{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-size:16px;color:var(--ink);outline:none;background:#fff}
+.gyik-search:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(226,0,26,.12)}
+.gyik-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 20px}
+.gyik-tab{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+.gyik-tab:hover{border-color:#c9d2df}
+.gyik-tab.is-active{background:var(--red);border-color:var(--red);color:#fff}
+.gyik-list{display:flex;flex-direction:column;gap:10px}
+.gyik-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.gyik-item summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.gyik-item summary::-webkit-details-marker{display:none}
+.gyik-item .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;transition:.15s}
+.gyik-item[open] .pl{transform:rotate(45deg)}
+.gyik-item p{color:var(--muted);font-size:15px;line-height:1.65;margin:0 0 16px}
+.gyik-empty{color:var(--muted);font-size:15px;text-align:center;padding:20px 0}
+.el-cta{max-width:1080px;margin:0 auto;background:#0B0B0D;color:#fff;border-radius:22px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.el-cta h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
+.el-cta p{color:#cfd6e2;margin:0;font-size:15px}
+</style>
+
+<script is:inline>
+(function(){
+  var wrap=document.querySelector('.gyik-wrap'); if(!wrap) return;
+  var items=[].slice.call(wrap.querySelectorAll('.gyik-item'));
+  var tabs=[].slice.call(wrap.querySelectorAll('.gyik-tab'));
+  var search=wrap.querySelector('#gyikSearch');
+  var empty=wrap.querySelector('#gyikEmpty');
+  var cat='mind';
+  function apply(){
+    var q=(search.value||'').trim().toLowerCase();
+    var vis=0;
+    items.forEach(function(it){
+      var okCat = cat==='mind' || it.getAttribute('data-cat')===cat;
+      var okQ = !q || it.getAttribute('data-text').indexOf(q)>-1;
+      var show = okCat && okQ;
+      it.hidden=!show; if(show) vis++; if(!show) it.open=false;
+    });
+    empty.hidden = vis>0;
+  }
+  tabs.forEach(function(t){ t.addEventListener('click',function(){ cat=t.getAttribute('data-cat'); tabs.forEach(function(x){ x.classList.toggle('is-active', x===t); }); apply(); }); });
+  search.addEventListener('input', apply);
+  apply();
+})();
+</script>
