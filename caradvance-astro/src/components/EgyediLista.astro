@@ -1,743 +1,101 @@
----
-const { lang = 'hu' } = Astro.props;
-const _rebuild='rebuild-nudge-3';
----
-<section class="egl">
-  <div class="egl-in">
-    <div class="egl-mhero" id="eglMHero" style="display:none">
-      <video class="egl-mhero-vid" autoplay loop muted playsinline poster="/mini-jcw-hero-poster.jpg"><source src="/mini-JCW-family-video-wide.mp4" type="video/mp4"></video>
-      <div class="egl-mhero-ov"></div>
-      <div class="egl-mhero-inner">
-        <div class="egl-mhero-logos"><img src="/mini-hero-logo.webp" alt="Mini Cooper"/></div>
-        <div class="egl-mhero-h1">Egyedi Mini Cooper rendelés</div>
-        <p class="egl-mhero-sub">Új Mini Cooper és John Cooper Works modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.</p>
-        <div class="egl-mhero-cta"><a class="egl-mhero-btn red" href="/berelheto">Bérlés</a><a class="egl-mhero-btn white" href="/vasarlas-elonyei">Előnyök</a></div>
-      </div>
-      <button class="egl-mhero-scroll" type="button" onclick="window.scrollBy({top:Math.round(window.innerHeight*0.72),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
-    </div>
-    <nav class="egl-crumb"><a href="/">Főoldal</a> / <span id="eglCrumbCur">Egyedi autó rendelés</span></nav>
-    <h1 id="eglTitle">Egyedi autó rendelés</h1>
-    <p class="egl-sub" id="eglSub">Új BMW, MINI, Mercedes-Benz és Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.
-      Az árak tájékoztató német nettó listaárak, élő árfolyammal (1&nbsp;€ = <span id="eglFx">361</span>&nbsp;Ft).</p>
-
-    <div class="egl-filters">
-      <input type="text" id="eglQ" class="egl-search" placeholder="Keresés (pl. X5, Cooper)…" />
-      <div class="egl-sel" id="eglBrandWrap"><select id="eglBrand"><option value="">Minden márka</option><option>BMW</option><option>MINI</option><option value="MB">Mercedes-Benz</option><option value="AUDI">Audi</option></select></div>
-      <div class="egl-sel" id="eglClassWrap" style="display:none"><select id="eglClass"><option value="">Minden osztály</option><option>A-osztály</option><option>B-osztály</option><option>C-osztály</option><option>E-osztály</option><option>S-osztály</option><option>CLE</option><option>GLA</option><option>GLB</option><option>GLC</option><option>GLE</option></select></div>
-      <div class="egl-sel"><select id="eglBody"><option value="">Minden karosszéria</option><option>Kompakt</option><option>Limuzin</option><option>Touring</option><option>Kombi</option><option>Coupé</option><option>Gran Coupé</option><option>Cabrio</option><option>Kabrió</option><option>Ferdehátú</option><option>Egyterű</option><option>SUV</option><option>SUV Coupé</option><option>Roadster</option></select></div>
-      <div class="egl-sel"><select id="eglFuel"><option value="">Minden üzemanyag</option><option>Benzin</option><option>Dízel</option><option>Hibrid</option><option>Elektromos</option></select></div>
-    </div>
-
-    <div class="egl-count" id="eglCount"></div>
-    <div class="egl-grid" id="eglGrid"></div>
-  </div>
-
-  <div class="egl-modal" id="eglOrder" aria-hidden="true">
-    <div class="egl-modal-back" data-close></div>
-    <div class="egl-modal-card" role="dialog" aria-modal="true" aria-labelledby="eglOrderTitle">
-      <button class="egl-modal-x" type="button" data-close aria-label="Bezárás">✕</button>
-      <div class="egl-modal-head">
-        <img id="eglOrderImg" src="" alt="" />
-        <div class="egl-modal-headtext">
-          <div class="egl-modal-eyebrow">Autó rendelése</div>
-          <h3 id="eglOrderTitle">—</h3>
-          <div class="egl-modal-sub"><span id="eglOrderPrice"></span> <span class="egl-tol" id="eglOrderTol" style="display:none">-tól</span><span class="egl-info" id="eglOrderInfo" tabindex="0" style="display:none">i<span class="egl-tip" id="eglOrderTip"></span></span></div>
-        </div>
-      </div>
-      <form id="eglOrderForm" class="egl-form" novalidate>
-        <input type="hidden" name="car" id="eglOrderCar" />
-        <input type="hidden" name="buyer" id="eglBuyer" value="Magánszemély" />
-        <div class="egl-toggle">
-          <button type="button" class="egl-tgl active" data-buyer="Magánszemély">Magánszemélyként</button>
-          <button type="button" class="egl-tgl" data-buyer="Cég">Cégként</button>
-        </div>
-        <div class="egl-fblock" id="eglFuelBlock"></div>
-        <div class="egl-fblock">
-          <div class="egl-flabel">2. Kész specifikáció <span class="egl-fopt">(opcionális)</span></div>
-          <p class="egl-fhint">Ha van kész felszereltségi listád, töltsd fel — PDF, kép vagy dokumentum.</p>
-          <input type="file" name="spec" id="eglOrderFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" />
-        </div>
-        <div class="egl-fblock">
-          <div class="egl-flabel">3. Elérhetőséged</div>
-          <div class="egl-fgrid egl-company-only" id="eglCompanyFields" style="display:none">
-            <input type="text" name="company" id="eglCompany" placeholder="Cégnév *" />
-            <input type="text" name="taxid" placeholder="Adószám" />
-          </div>
-          <div class="egl-fgrid">
-            <input type="text" name="lastname" id="eglLast" placeholder="Vezetéknév *" />
-            <input type="text" name="firstname" placeholder="Keresztnév *" />
-            <input type="tel" name="phone" placeholder="Telefonszám" />
-            <input type="email" name="email" placeholder="E-mail *" />
-          </div>
-          <textarea name="message" rows="3" placeholder="Megjegyzés, kívánt felszereltség…"></textarea>
-        </div>
-        <div class="egl-fblock">
-          <div class="egl-flabel">4. Hogyan szeretnéd megvásárolni?</div>
-          <label class="egl-radio"><input type="radio" name="mode" id="eglMode1" value="Nettó EUR, Németországból (Caradvance GmbH)" /><span id="eglMode1Label">Nettó EUR-ban, Németországból (Caradvance GmbH)</span></label>
-          <label class="egl-radio"><input type="radio" name="mode" value="27% magyar áfával, BH Group Zrt." /><span>27% magyar áfával, a BH Group Zrt.-n keresztül</span></label>
-          <div class="egl-sublabel">Fizetés módja</div>
-          <label class="egl-radio"><input type="radio" name="payment" value="Egy összegben" /><span>Egy összegben</span></label>
-          <label class="egl-radio"><input type="radio" name="payment" value="Finanszírozással" /><span>Finanszírozással</span></label>
-          <div id="eglFinancing" class="egl-subblock" style="display:none">
-            <div class="egl-sublabel">Finanszírozás módja</div>
-            <label class="egl-radio"><input type="radio" name="financing" value="Segítséget kérek (Euro Leasing / Mercantil Bank)" /><span>Kérek segítséget — Euro Leasing vagy Mercantil Bank</span></label>
-            <label class="egl-radio"><input type="radio" name="financing" value="Saját finanszírozás" /><span>Saját finanszírozásom van</span></label>
-          </div>
-        </div>
-        <label class="egl-consent"><input type="checkbox" name="consent" id="eglConsent" /><span>Elfogadom az <a href="/adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
-        <div class="egl-fmsg" id="eglOrderMsg"></div>
-        <button type="submit" class="egl-fsubmit">Rendelés elküldése</button>
-        <p class="egl-fnote">Az elküldés nem végleges megrendelés — felvesszük veled a kapcsolatot a részletekhez.</p>
-      </form>
+<section id="eglLand" class="egl-land">
+  <div class="egl-land-hero">
+    <video class="egl-land-vid" autoplay loop muted playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-beszerzesi-poster.jpg">
+      <source src="https://www.caradvance.hu/caradvance-hero-beszerzesi.mp4" type="video/mp4" />
+    </video>
+    <div class="egl-land-ov"></div>
+    <div class="egl-land-inner">
+      <h1>Egyedi autó rendelés<br /><span>Németországból, kulcsrakészen</span></h1>
+      <p>Válaszd ki a márkát, és a német piac teljes kínálatából hozzuk haza a következő prémium autódat — egyedi konfigurációval, kulcsrakész behozatallal, magánszemélyként akár 19% német áfával.</p>
+      <div class="egl-land-scroll">Válassz márkát ⌄</div>
     </div>
   </div>
+
+  <div class="egl-brands">
+    <a class="egl-brand-tile" href="/egyedi-auto-rendeles?brand=bmw" aria-label="BMW modellek">
+      <img src="https://www.caradvance.hu/bmw/bmw-logo.webp?v=2" alt="BMW" loading="lazy" />
+      <span class="egl-brand-name">BMW</span>
+      <span class="egl-brand-cta">Modellek →</span>
+    </a>
+    <a class="egl-brand-tile" href="/egyedi-auto-rendeles?brand=mini" aria-label="MINI modellek">
+      <img src="https://www.caradvance.hu/mini-logo.webp?v=3" alt="MINI" loading="lazy" />
+      <span class="egl-brand-name">MINI</span>
+      <span class="egl-brand-cta">Modellek →</span>
+    </a>
+    <a class="egl-brand-tile" href="/egyedi-auto-rendeles?brand=mercedes" aria-label="Mercedes modellek">
+      <img src="https://www.caradvance.hu/mb-star.webp?v=1" alt="Mercedes" loading="lazy" />
+      <span class="egl-brand-name">Mercedes</span>
+      <span class="egl-brand-cta">Modellek →</span>
+    </a>
+    <a class="egl-brand-tile" href="/egyedi-auto-rendeles?brand=audi" aria-label="Audi modellek">
+      <img src="https://www.caradvance.hu/audi/audi-logo.webp?v=4" alt="Audi" loading="lazy" />
+      <span class="egl-brand-name">Audi</span>
+      <span class="egl-brand-cta">Modellek →</span>
+    </a>
+  </div>
+
+  <div class="egl-seo">
+    <span class="egl-eyebrow">Jó tudni</span>
+    <h2 class="egl-seo-h">Autó behozatal Németországból — egyedi rendelés kulcsrakészen</h2>
+    <p>Az <strong>autó behozatal Németországból</strong> a magyar vásárlók egyik legkedvezőbb választása: a német piacon több százezer prémium autó közül válogathatsz — <span class="kw">BMW, MINI, Mercedes és Audi</span> modellek, gyakran kedvezőbb áron és jobb állapotban, mint itthon. Válaszd ki a márkát, és pontosan azt a konfigurációt, felszereltséget és színt keressük meg, amit megálmodtál.</p>
+    <p>Nálunk az <strong>egyedi autó rendelés</strong> nem a te feladatod: a kiválasztástól a helyszíni bevizsgáláson át a szállításig, honosításig és a magyar forgalomba helyezésig mindent kulcsrakészen intézünk. Magánszemélyként akár <span class="kw">19%-os német áfával</span> vásárolhatsz a müncheni Caradvance GmbH-tól a hazai 27% helyett — ez több százezer forintos megtakarítás.</p>
+    <p>Legyen szó egy új BMW-ről, egy konkrét Audi vagy Mercedes modellről: átlátható, forintban is kiszámítható árak, dokumentált előélet és 1 év szavatosság az importált autókra. Válaszd ki a márkát fent, és nézd meg az elérhető modelleket.</p>
+  </div>
+
+  <div class="egl-faq2">
+    <span class="egl-eyebrow">GYIK</span>
+    <h2 class="egl-seo-h">Gyakori kérdések</h2>
+    <details><summary>Hogyan zajlik az egyedi autó rendelés?<span class="pl">+</span></summary><p>Válaszd ki a márkát és a modellt, mondd el a kívánt felszereltséget és költségkeretet, a többit mi intézzük: felkutatjuk a német piacon, a helyszínen bevizsgáljuk, megvásároljuk, behozzuk és a nevedre, forgalomba helyezve adjuk át — kulcsrakészen.</p></details>
+    <details><summary>Mennyibe kerül a behozatal?<span class="pl">+</span></summary><p>A behozatal, a vám és a teljes ügyintézés díja a modelltől függ, de átlátható és előre rögzített. A nagy német kínálat és a 19%-os német áfa miatt a végösszeg gyakran még így is kedvezőbb, mint egy hasonló hazai autóé.</p></details>
+    <details><summary>Melyik márkákat lehet rendelni?<span class="pl">+</span></summary><p>Elsősorban német prémium márkákat: BMW, MINI, Mercedes és Audi. Gyakorlatilag a teljes német kínálatból megkeressük a hozzád illő új vagy alig használt darabot.</p></details>
+    <details><summary>Mit jelent a 19%-os német áfa?<span class="pl">+</span></summary><p>Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett — ez önmagában több százezer forintos megtakarítást jelenthet. A teljes folyamatot szabályosan és átláthatóan mi bonyolítjuk le.</p></details>
+    <details><summary>Mennyi idő a teljes folyamat?<span class="pl">+</span></summary><p>A kiválasztott modelltől és a beszerzéstől függ, jellemzően néhány hét. A pontos időt előre egyeztetjük, és végig tájékoztatunk a folyamat állásáról.</p></details>
+  </div>
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Hogyan zajlik az egyedi autó rendelés?","acceptedAnswer":{"@type":"Answer","text":"Válaszd ki a márkát és a modellt, mondd el a kívánt felszereltséget és költségkeretet, a többit mi intézzük: felkutatjuk a német piacon, a helyszínen bevizsgáljuk, megvásároljuk, behozzuk és a nevedre, forgalomba helyezve adjuk át — kulcsrakészen."}},{"@type":"Question","name":"Mennyibe kerül a behozatal?","acceptedAnswer":{"@type":"Answer","text":"A behozatal, a vám és a teljes ügyintézés díja a modelltől függ, de átlátható és előre rögzített. A nagy német kínálat és a 19%-os német áfa miatt a végösszeg gyakran még így is kedvezőbb, mint egy hasonló hazai autóé."}},{"@type":"Question","name":"Melyik márkákat lehet rendelni?","acceptedAnswer":{"@type":"Answer","text":"Elsősorban német prémium márkákat: BMW, MINI, Mercedes és Audi. Gyakorlatilag a teljes német kínálatból megkeressük a hozzád illő új vagy alig használt darabot."}},{"@type":"Question","name":"Mit jelent a 19%-os német áfa?","acceptedAnswer":{"@type":"Answer","text":"Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett — ez önmagában több százezer forintos megtakarítást jelenthet."}},{"@type":"Question","name":"Mennyi idő a teljes folyamat?","acceptedAnswer":{"@type":"Answer","text":"A kiválasztott modelltől és a beszerzéstől függ, jellemzően néhány hét. A pontos időt előre egyeztetjük, és végig tájékoztatunk a folyamat állásáról."}}]}</script>
 </section>
 
 <style is:global>
-  .egl{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--navy:#0F1B2D;--bg:#F4F7FB;
-    background:var(--bg);padding:34px 20px 72px;
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);}
-  .egl-in{max-width:1160px;margin:0 auto;}
-  .egl-crumb{font-size:14px;color:var(--muted);margin-bottom:16px;}
-  .egl-crumb a{color:var(--muted);text-decoration:none;}
-  .egl-crumb span{color:var(--ink);font-weight:600;}
-  .egl h1{font-size:40px;line-height:1.1;font-weight:800;color:var(--navy);margin:0 0 10px;}
-  .egl-sub{font-size:17px;color:var(--muted);margin:0 0 24px;max-width:820px;line-height:1.5;}
-  .egl-mhero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;width:calc(100vw - 32px);margin:calc(6px - var(--navh, 80px) - 34px) 0 30px calc(50% - 50vw + 16px);background:linear-gradient(#17181c,#0b0b0d 62%,#060607);}
-  .egl-mhero-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;}
-  .egl-mhero-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7));}
-  .egl-mhero-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0;}
-  .egl-mhero-logos{display:inline-flex;align-items:center;justify-content:center;margin:0 0 22px;}
-  .egl-mhero-logos img{height:78px;width:auto;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));}
-  .egl-mhero-h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.35);}
-  .egl-mhero-sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:600px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4);}
-  .egl-mhero-cta{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
-  .egl-mhero-btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;padding:15px 32px;border-radius:999px;text-decoration:none;transition:.15s;box-shadow:0 8px 22px rgba(0,0,0,.22);}
-  .egl-mhero-btn.red{background:#e2001a;color:#fff;}
-  .egl-mhero-btn.red:hover{background:#c40017;}
-  .egl-mhero-btn.white{background:#fff;color:#0f1b2d;}
-  .egl-mhero-btn.white:hover{background:#eef0f4;}
-  .egl-mhero-scroll{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.82);background:none;border:0;cursor:pointer;letter-spacing:.05em;font-size:11px;text-transform:uppercase;font-family:inherit;animation:caScrollBob 1.9s ease-in-out infinite;}
-  .egl-mhero-scroll:hover{color:#fff;}
-  .egl-mhero-scroll svg{width:26px;height:26px;}
-  @keyframes caScrollBob{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,8px);}}
-  .egl-filters{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px;}
-  .egl-search{flex:1;min-width:220px;background:#fff;border:1px solid var(--line);border-radius:12px;
-    padding:14px 18px;font-size:15px;color:var(--ink);font-family:inherit;}
-  .egl-search::placeholder{color:#9aa7ba;}
-  .egl-search:focus{outline:none;border-color:#c9d3e3;}
-  .egl-sel{position:relative;}
-  .egl-sel select{appearance:none;-webkit-appearance:none;background:#fff;border:1px solid var(--line);
-    border-radius:12px;padding:14px 42px 14px 18px;font-size:15px;color:var(--ink);font-family:inherit;cursor:pointer;min-width:170px;}
-  .egl-sel::after{content:'⌄';position:absolute;right:16px;top:50%;transform:translateY(-60%);color:var(--muted);pointer-events:none;font-size:16px;}
-  .egl-sel select:focus{outline:none;border-color:#c9d3e3;}
-  .egl-count{display:none;}
-  .egl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
-  .egl-new{position:absolute;left:14px;top:14px;background:var(--red);color:#fff;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;letter-spacing:.05em;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.18);}
-  .egl-section{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800;color:var(--ink);margin:26px 0 2px;letter-spacing:-.01em;}
-  .egl-section:first-child{margin-top:0;}
-  .egl-section .dot{width:13px;height:13px;border-radius:50%;flex:0 0 auto;}
-  .egl-section .cnt{font-size:14px;font-weight:600;color:var(--muted);}
-  @media (max-width:900px){.egl-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:600px){.egl-grid{grid-template-columns:1fr;}}
-  .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:visible;position:relative;
-    display:flex;flex-direction:column;transition:.18s;text-decoration:none;color:inherit;}
-  .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.10);transform:translateY(-3px);z-index:30;}
-  .egl-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:flex-end;justify-content:center;padding:6px 4px 0;border-radius:20px 20px 0 0;overflow:hidden;}
-  .egl-media img{max-width:78%;max-height:88%;width:auto;height:auto;object-fit:contain;margin:0 auto;display:block;}
-  .egl-fuels{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
-  .egl-fuel{color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12);}
-  @media (hover:hover){ .egl-fuels{opacity:0;transition:opacity .18s;} .egl-card:hover .egl-fuels{opacity:1;} }
-  .egl-media img.egl-m{position:absolute;left:16px;bottom:12px;height:16px;width:auto;max-width:none;max-height:none;}
-  .egl-body{padding:16px 20px 20px;}
-  .egl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-  .egl-brand{display:inline-flex;align-items:center;}
-  .egl-bmw{height:28px;width:auto;position:relative;z-index:2;}
-  .egl-minilogo{height:26px;width:auto;}
-  .egl-audilogo{height:19px;width:auto;}
-  .egl-audirslogo{height:15px;width:auto;margin-left:7px;}
-  .egl-mlogo{height:16px;width:auto;margin-left:6px;}
-  .egl-jcwlogo{height:19px;width:auto;margin-left:8px;}
-  .egl-mblogo{height:26px;width:auto;}
-  .egl-amglogo{height:9px;width:auto;margin-left:8px;}
-  .egl-year{font-size:13.5px;color:var(--muted);}
-  .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2;}
-  .egl-card-mini .egl-body{display:flex;flex-direction:column;flex:1;}
-  .egl-card-mini .egl-price{margin-top:auto;}
-  .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px;}
-  .egl-price{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;flex-wrap:nowrap;white-space:nowrap;}
-  .egl-price b{font-size:21px;font-weight:800;color:var(--ink);}
-  .egl-price .eur{font-size:14px;font-weight:600;color:var(--muted);}
-  .egl-price .egl-soon{font-size:22px;font-weight:800;color:var(--navy);}
-  .egl-price .tol{font-size:13px;color:var(--muted);font-weight:600;}
-  .egl-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:2px;flex:0 0 auto;}
-  .egl-info .egl-tip{position:absolute;bottom:150%;right:0;left:auto;transform:none;width:230px;white-space:normal;background:var(--navy);color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left;letter-spacing:0;}
-  .egl-info:hover .egl-tip,.egl-info:focus .egl-tip{opacity:1;visibility:visible;}
-  .egl-clink{display:block;text-decoration:none;color:inherit;}
-  .egl-body{padding:16px 20px 12px;}
-  .egl-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px;}
-  .egl-btn{display:block;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;
-    font-size:15px;padding:14px;border-radius:12px;transition:.15s;text-decoration:none;}
-  .egl-order{display:block;width:100%;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;
-    font-size:15px;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;transition:.15s;}
-  @media (hover:hover){
-    a.egl-btn:hover,.egl-card:hover .egl-btn{background:var(--navy);color:#fff;}
-    .egl-card:hover .egl-order,.egl-order:hover{background:var(--red);color:#fff;}
-  }
-
-  /* order modal */
-  .egl-modal[aria-hidden="true"]{display:none;}
-  .egl-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
-  .egl-modal-back{position:absolute;inset:0;background:rgba(8,12,20,.55);backdrop-filter:blur(2px);}
-  .egl-modal-card{position:relative;z-index:1;background:#fff;border-radius:22px;width:min(560px,100%);max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(8,12,20,.4);padding:26px 26px 28px;}
-  .egl-modal-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:10px;background:#eef2f8;color:var(--navy);font-size:16px;cursor:pointer;}
-  .egl-modal-x:hover{background:#e0e6f0;}
-  .egl-modal-head{display:flex;gap:16px;align-items:center;margin-bottom:4px;padding-right:30px;}
-  .egl-modal-head img{width:168px;height:112px;object-fit:contain;background:transparent;border-radius:12px;flex:0 0 auto;}
-  .egl-modal-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);}
-  .egl-modal-head h3{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0 4px;line-height:1.15;}
-  .egl-modal-sub{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-  .egl-modal-sub .egl-tol{font-size:13px;color:var(--muted);font-weight:600;}
-  .egl-modal-headtext{position:relative;}
-  .egl-modal .egl-info{position:static;}
-  .egl-modal .egl-info .egl-tip{position:absolute;top:100%;left:0;right:auto;bottom:auto;width:100%;margin-top:8px;}
-  @media(max-width:560px){
-    .egl-modal{align-items:flex-start;padding:16px 12px;}
-    .egl-modal-card{max-height:calc(100dvh - 32px);padding:22px 20px 24px;}
-    .egl-modal-head{flex-direction:column;align-items:flex-start;gap:10px;padding-right:0;}
-    .egl-modal-head img{width:150px;height:92px;}
-    .egl-modal-headtext{width:100%;}
-    .egl-modal-head h3{font-size:20px;}
-  }
-  .egl-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink);line-height:1.45;cursor:pointer;}
-  .egl-consent input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;margin-top:1px;}
-  .egl-consent a{color:var(--red);font-weight:700;}
-  .egl-form{display:flex;flex-direction:column;gap:18px;}
-  .egl-toggle{display:flex;gap:6px;background:#eef2f8;border-radius:12px;padding:5px;}
-  .egl-tgl{flex:1;border:0;background:transparent;font-family:inherit;font-weight:700;font-size:14.5px;color:var(--muted);padding:12px;border-radius:9px;cursor:pointer;transition:.15s;}
-  .egl-tgl.active{background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(226,0,26,.25);}
-  .egl-fblock{border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;}
-  .egl-flabel{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:10px;}
-  .egl-fopt{font-weight:600;color:var(--muted);font-size:13px;}
-  .egl-fhint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45;}
-  .egl-sublabel{font-size:13.5px;font-weight:800;color:var(--ink);margin:16px 0 2px;}
-  .egl-subblock{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);}
-  .egl-radio{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:14.5px;color:var(--ink);cursor:pointer;border-top:1px solid var(--line);}
-  .egl-radio:first-of-type{border-top:0;}
-  .egl-radio input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;}
-  .egl-fuelpick{display:flex;flex-wrap:wrap;gap:8px;}
-  .egl-fuelopt{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;}
-  .egl-fuelopt input{position:absolute;opacity:0;width:0;height:0;}
-  .egl-fuelopt:hover{border-color:#c9d2e0;}
-  .egl-fuelopt.active{border-color:var(--red);color:var(--red);background:rgba(226,0,26,.06);}
-  .egl-fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-  @media(max-width:460px){.egl-fgrid{grid-template-columns:1fr;}}
-  .egl-form input[type=text],.egl-form input[type=email],.egl-form input[type=tel],.egl-form textarea{width:100%;font:inherit;font-size:14.5px;color:var(--ink);background:#f7f9fc;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;outline:none;transition:.15s;}
-  .egl-form input:focus,.egl-form textarea:focus{border-color:var(--red);background:#fff;box-shadow:0 0 0 4px rgba(226,0,26,.08);}
-  .egl-form input[type=file]{width:100%;font:inherit;font-size:13.5px;color:var(--muted);}
-  .egl-form textarea{resize:vertical;}
-  .egl-fmsg{font-size:14px;font-weight:600;display:none;border-radius:10px;padding:11px 13px;}
-  .egl-fmsg.err{display:block;background:#fdeaec;color:#b3121f;}
-  .egl-fmsg.ok{display:block;background:#e8f7ee;color:#177a3d;}
-  .egl-fsubmit{background:var(--red);color:#fff;border:0;border-radius:12px;padding:15px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;transition:.15s;}
-  .egl-fsubmit:hover{background:#c40017;}
-  .egl-fsubmit:disabled{opacity:.6;cursor:default;}
-  .egl-fnote{font-size:12.5px;color:var(--muted);text-align:center;margin:0;line-height:1.4;}
+.egl-land{display:none}
+.egl-in.egl-choose > :not(#eglLand){display:none!important}
+.egl-in.egl-choose > #eglLand{display:block}
+.egl-land{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;max-width:1120px;margin:0 auto;padding:0 20px 20px}
+.egl-land-hero{position:relative;border-radius:22px;overflow:hidden;min-height:340px;display:flex;align-items:center;margin-top:8px}
+.egl-land-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.egl-land-ov{position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,9,12,.86),rgba(8,9,12,.45))}
+.egl-land-inner{position:relative;z-index:2;padding:44px 40px;color:#fff;max-width:680px}
+.egl-land-inner h1{font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:0 0 12px}
+.egl-land-inner h1 span{color:#fff;opacity:.85;font-weight:800}
+.egl-land-inner p{font-size:clamp(15px,1.6vw,18px);line-height:1.55;color:#e7ebf2;margin:0 0 16px;max-width:600px}
+.egl-land-scroll{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fff;opacity:.85}
+.egl-brands{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:26px 0 8px}
+.egl-brand-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 16px;text-decoration:none;color:var(--ink);box-shadow:0 10px 30px rgba(8,8,10,.06);transition:.16s}
+.egl-brand-tile:hover{transform:translateY(-3px);border-color:#c9d2df;box-shadow:0 18px 44px rgba(8,8,10,.12)}
+.egl-brand-tile img{height:52px;width:auto;object-fit:contain}
+.egl-brand-name{font-weight:800;font-size:17px}
+.egl-brand-cta{font-weight:800;font-size:13px;color:var(--red)}
+.egl-seo{max-width:900px;margin:34px auto 0}
+.egl-eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.egl-seo-h{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 14px}
+.egl-seo p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 14px}
+.egl-seo strong{color:var(--ink)}
+.egl-seo .kw{color:var(--red);font-weight:700}
+.egl-faq2{max-width:900px;margin:30px auto 0;display:flex;flex-direction:column;gap:10px}
+.egl-faq2 details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.egl-faq2 summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:15px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.egl-faq2 summary::-webkit-details-marker{display:none}
+.egl-faq2 .pl{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700}
+.egl-faq2 details[open] .pl{transform:rotate(45deg)}
+.egl-faq2 p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 15px}
+@media(max-width:820px){.egl-brands{grid-template-columns:repeat(2,1fr)}.egl-land-inner{padding:30px 22px}}
 </style>
 
 <script is:inline>
 (function(){
-  var FX = 361;
-  var HUF = function(eur){ return new Intl.NumberFormat('hu-HU').format(Math.round(eur*FX)) + ' Ft'; };
-  var EUR = function(eur){ return new Intl.NumberFormat('de-DE').format(eur) + ' €'; };
-  var net = function(g){ return Math.round(g/1.19); };
-  var SOON = ['ix5-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','7erb-dizel'];
-  var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
-
-  var MINIS = [
-    {brand:'MINI',key:'coopers',name:'MINI Cooper',body:'Ferdehátú',fuel:'Benzin',img:'/cooper-s.webp?v=2',logo:'mini',from:26450},
-    {brand:'MINI',key:'cooper',name:'MINI Cooper 5 ajtós',body:'Ferdehátú',fuel:'Benzin',img:'/cooper.webp?v=2',logo:'mini',from:27450},
-    {brand:'MINI',key:'coopercab',name:'MINI Cooper Cabrio',body:'Kabrió',fuel:'Benzin',img:'/cooper-cabrio.webp?v=2',logo:'mini',from:32450},
-    {brand:'MINI',key:'countryman',name:'MINI Countryman',body:'SUV',fuel:'Benzin',img:'/countryman.webp?v=2',logo:'mini',from:38120},
-    {brand:'MINI',key:'jcwhatch',name:'MINI John Cooper Works',body:'Ferdehátú',fuel:'Benzin',img:'/jcw-hatch.webp?v=2',logo:'jcw',from:40950},
-    {brand:'MINI',key:'jcwcabrio',name:'MINI John Cooper Works Cabrio',body:'Kabrió',fuel:'Benzin',img:'/jcw-cabrio.webp?v=2',logo:'jcw',from:44950},
-    {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=2',logo:'jcw',from:54220}
-  ];
-
-  var MB = [
-    {brand:'MB',key:'mbs',name:'Mercedes-Benz S-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-s.webp?v=1',logo:'mb',from:109221},
-    {brand:'MB',key:'mba',name:'Mercedes-Benz A-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-a.webp?v=1',logo:'mb',from:32297},
-    {brand:'MB',key:'mbb',name:'Mercedes-Benz B-osztály',body:'Egyterű',fuel:'Benzin',img:'/mb-b.webp?v=1',logo:'mb',from:35559},
-    {brand:'MB',key:'mbc',name:'Mercedes-Benz C-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-c.webp?v=1',logo:'mb',from:42427},
-    {brand:'MB',key:'mbct',name:'Mercedes-Benz C-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-ct.webp?v=1',logo:'mb',from:46221},
-    {brand:'MB',key:'mbclec',name:'Mercedes-Benz CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-cle-coupe.webp?v=1',logo:'mb',from:49521},
-    {brand:'MB',key:'mbclecab',name:'Mercedes-Benz CLE Cabrio',body:'Kabrió',fuel:'Benzin',img:'/mb-cle-cabrio.webp?v=1',logo:'mb',from:56814},
-    {brand:'MB',key:'mbe',name:'Mercedes-Benz E-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-e.webp?v=1',logo:'mb',from:52586},
-    {brand:'MB',key:'mbet',name:'Mercedes-Benz E-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-et.webp?v=1',logo:'mb',from:54835},
-    {brand:'MB',key:'mbgla',name:'Mercedes-Benz GLA',body:'SUV',fuel:'Benzin',img:'/mb-gla.webp?v=1',logo:'mb',from:41685},
-    {brand:'MB',key:'mbglb',name:'Mercedes-Benz GLB',body:'SUV',fuel:'Benzin',img:'/mb-glb.webp?v=1',logo:'mb',from:46869},
-    {brand:'MB',key:'mbglc',name:'Mercedes-Benz GLC',body:'SUV',fuel:'Benzin',img:'/mb-glc.webp?v=1',logo:'mb',from:54017},
-    {brand:'MB',key:'mbglcc',name:'Mercedes-Benz GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-glc-coupe.webp?v=1',logo:'mb',from:57820},
-    {brand:'MB',key:'mbgle',name:'Mercedes-Benz GLE',body:'SUV',fuel:'Benzin',img:'/mb-gle.webp?v=1',logo:'mb',from:87461},
-    {brand:'MB',key:'mbglec',name:'Mercedes-Benz GLE Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-gle-coupe.webp?v=1',logo:'mb',from:94205},
-    {brand:'MB',key:'mbamga',name:'Mercedes-AMG A-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-a.webp?v=1',logo:'mb',from:51177},
-    {brand:'MB',key:'mbamgc',name:'Mercedes-AMG C-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-c.webp?v=1',logo:'mb'},
-    {brand:'MB',key:'mbamgct',name:'Mercedes-AMG C-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-amg-ct.webp?v=1',logo:'mb'},
-    {brand:'MB',key:'mbamgclec',name:'Mercedes-AMG CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-amg-cle-coupe.webp?v=1',logo:'mb',from:85674},
-    {brand:'MB',key:'mbamgclecab',name:'Mercedes-AMG CLE Cabrio',body:'Kabrió',fuel:'Benzin',img:'/mb-amg-cle-cabrio.webp?v=1',logo:'mb',from:93092},
-    {brand:'MB',key:'mbamge',name:'Mercedes-AMG E-osztály',body:'Limuzin',fuel:'Hibrid',img:'/mb-amg-e.webp?v=1',logo:'mb',from:98318},
-    {brand:'MB',key:'mbamget',name:'Mercedes-AMG E-osztály T-Modell',body:'Kombi',fuel:'Hibrid',img:'/mb-amg-et.webp?v=1',logo:'mb',from:100567},
-    {brand:'MB',key:'mbamggla',name:'Mercedes-AMG GLA',body:'SUV',fuel:'Benzin',img:'/mb-amg-gla.webp?v=1',logo:'mb',from:62940},
-    {brand:'MB',key:'mbamgglb',name:'Mercedes-AMG GLB',body:'SUV',fuel:'Benzin',img:'/mb-amg-glb.webp?v=1',logo:'mb'},
-    {brand:'MB',key:'mbamgglc',name:'Mercedes-AMG GLC',body:'SUV',fuel:'Benzin',img:'/mb-amg-glc.webp?v=1',logo:'mb',from:78464},
-    {brand:'MB',key:'mbamgglcc',name:'Mercedes-AMG GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-amg-glc-coupe.webp?v=1',logo:'mb',from:82519},
-    {brand:'MB',key:'mbamggle',name:'Mercedes-AMG GLE',body:'SUV',fuel:'Hibrid',img:'/mb-amg-gle.webp?v=1',logo:'mb',from:114045},
-    {brand:'MB',key:'mbamgglec',name:'Mercedes-AMG GLE Coupé',body:'SUV Coupé',fuel:'Hibrid',img:'/mb-amg-gle-coupe.webp?v=1',logo:'mb',from:120053}
-  ];
-
-  var AUDI = [
-    {brand:'AUDI',key:'a3lim',name:'Audi A3 Limousine',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a3lim.webp',from:32650},
-    {brand:'AUDI',key:'a3sb',name:'Audi A3 Sportback',body:'Ferdehátú',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a3sb.webp',from:31850},
-    {brand:'AUDI',key:'a3allstreet',name:'Audi A3 allstreet',body:'Ferdehátú',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a3allstreet.webp',from:36550},
-    {brand:'AUDI',key:'rs3lim',name:'Audi RS 3 Limousine',body:'Limuzin',fuel:'Benzin',img:'/audi/rs3lim.webp',from:70500},
-    {brand:'AUDI',key:'rs3sb',name:'Audi RS 3 Sportback',body:'Ferdehátú',fuel:'Benzin',img:'/audi/rs3sb.webp',from:68500},
-    {brand:'AUDI',key:'a5lim',name:'Audi A5 Limousine',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a5lim.webp',from:47800},
-    {brand:'AUDI',key:'a5avant',name:'Audi A5 Avant',body:'Kombi',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a5avant.webp',from:49450},
-    {brand:'AUDI',key:'rs5lim',name:'Audi RS 5 Limousine',body:'Limuzin',fuel:'Benzin',img:'/audi/rs5lim.webp',from:106200},
-    {brand:'AUDI',key:'rs5avant',name:'Audi RS 5 Avant',body:'Kombi',fuel:'Benzin',img:'/audi/rs5avant.webp',from:107850},
-    {brand:'AUDI',key:'a6lim',name:'Audi A6 Limousine',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a6lim.webp',from:56300},
-    {brand:'AUDI',key:'a6avant',name:'Audi A6 Avant',body:'Kombi',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a6avant.webp',from:58800},
-    {brand:'AUDI',key:'a6allroad',name:'Audi A6 allroad',body:'Kombi',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/a6allroad.webp',from:77250},
-    {brand:'AUDI',key:'a6sbetron',name:'Audi A6 Sportback e-tron',body:'Limuzin',fuel:'Elektromos',img:'/audi/a6sbetron.webp',from:62800},
-    {brand:'AUDI',key:'a6avantetron',name:'Audi A6 Avant e-tron',body:'Kombi',fuel:'Elektromos',img:'/audi/a6avantetron.webp',from:64450},
-    {brand:'AUDI',key:'a8',name:'Audi A8',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid'],img:'/audi/a8.webp'},
-    {brand:'AUDI',key:'q3',name:'Audi Q3',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/q3.webp',from:46100},
-    {brand:'AUDI',key:'q3sb',name:'Audi Q3 Sportback',body:'SUV Coupé',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/q3sb.webp',from:47950},
-    {brand:'AUDI',key:'q5',name:'Audi Q5',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/q5.webp',from:55250},
-    {brand:'AUDI',key:'q5sb',name:'Audi Q5 Sportback',body:'SUV Coupé',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/q5sb.webp',from:57750},
-    {brand:'AUDI',key:'q6etron',name:'Audi Q6 e-tron',body:'SUV',fuel:'Elektromos',img:'/audi/q6etron.webp',from:63500},
-    {brand:'AUDI',key:'q6sbetron',name:'Audi Q6 Sportback e-tron',body:'SUV Coupé',fuel:'Elektromos',img:'/audi/q6sbetron.webp',from:65900},
-    {brand:'AUDI',key:'q7',name:'Audi Q7',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/q7.webp',from:87900},
-    {brand:'AUDI',key:'q8',name:'Audi Q8',body:'SUV Coupé',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/audi/q8.webp',from:90200},
-    {brand:'AUDI',key:'rsq8',name:'Audi RS Q8 performance',body:'SUV Coupé',fuel:'Benzin',img:'/audi/rsq8.webp',from:160000},
-    {brand:'AUDI',key:'q9',name:'Audi Q9',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid'],img:'/audi/q9.webp'},
-    {brand:'AUDI',key:'etrongt',name:'Audi e-tron GT',body:'Coupé',fuel:'Elektromos',img:'/audi/etrongt.webp'},
-    {brand:'AUDI',key:'rsetrongt',name:'Audi RS e-tron GT',body:'Coupé',fuel:'Elektromos',img:'/audi/rsetrongt.webp'}
-  ];
-  var CARS = MINIS.concat(MB).concat(AUDI).concat([
-    {key:'ix',name:'BMW iX',body:'SUV',fuel:'Elektromos',from:83500},
-    {key:'ixm',name:'BMW iX M',body:'SUV',fuel:'Elektromos',from:126500,hide:true},
-    {key:'ix5',name:'BMW iX5',body:'SUV',fuel:'Elektromos',from:100000},
-    {key:'ix3',name:'BMW iX3',body:'SUV',fuel:'Elektromos',from:63400},
-    {key:'ix2',name:'BMW iX2',body:'SUV Coupé',fuel:'Elektromos',from:51000},
-    {key:'ix1',name:'BMW iX1',body:'SUV',fuel:'Elektromos',from:49400},
-    {key:'i7',name:'BMW i7',body:'Limuzin',fuel:'Elektromos',from:121400},
-    {key:'i7m',name:'BMW i7 M',body:'Limuzin',fuel:'Elektromos',from:182400,hide:true},
-    {key:'i5s',name:'BMW i5',body:'Limuzin',fuel:'Elektromos',from:70900},
-    {key:'i5m',name:'BMW i5 M',body:'Limuzin',fuel:'Elektromos',from:100200,hide:true},
-    {key:'i5ts',name:'BMW i5 Touring',body:'Touring',fuel:'Elektromos',from:72900},
-    {key:'i5tm',name:'BMW i5 Touring M',body:'Touring',fuel:'Elektromos',from:102200,hide:true},
-    {key:'i4s',name:'BMW i4',body:'Gran Coupé',fuel:'Elektromos',from:58200},
-    {key:'i4m',name:'BMW i4 M',body:'Gran Coupé',fuel:'Elektromos',from:73700,hide:true},
-    {key:'i3',name:'BMW i3',body:'Limuzin',fuel:'Elektromos',from:47900},
-    {key:'xm',name:'BMW XM',body:'SUV',fuel:'Hibrid',from:135500},
-    {key:'x5h',name:'BMW X5',body:'SUV',fuel:'Hibrid',from:86700,hide:true},
-    {key:'x5m',name:'BMW X5 M',body:'SUV',fuel:'Hibrid',from:102900,hide:true},
-    {key:'x3',name:'BMW X3',body:'SUV',fuel:'Hibrid',from:66900,hide:true},
-    {key:'x1h',name:'BMW X1',body:'SUV',fuel:'Hibrid',from:51600,hide:true},
-    {key:'e750',name:'BMW 7-es 750e',body:'Limuzin',fuel:'Hibrid',from:109900,hide:true},
-    {key:'m760e',name:'BMW 7-es M760e',body:'Limuzin',fuel:'Hibrid',from:154000,hide:true},
-    {key:'5er',name:'BMW 5-ös',body:'Limuzin',fuel:'Hibrid',from:66700,hide:true},
-    {key:'5erth',name:'BMW 5-ös Touring',body:'Touring',fuel:'Hibrid',from:68700,hide:true},
-    {key:'3erh',name:'BMW 3-as',body:'Limuzin',fuel:'Hibrid',from:63300,hide:true},
-    {key:'3erth',name:'BMW 3-as Touring',body:'Touring',fuel:'Hibrid',from:64600,hide:true},
-    {key:'2erat',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Hibrid',from:49150,hide:true},
-    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Benzin',fuels:['Benzin','Dízel'],from:106500},
-    {key:'x7m',name:'BMW X7 M',body:'SUV',fuel:'Benzin',from:138000,hide:true},
-    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Benzin',from:102800,hide:true},
-    {key:'x6b',name:'BMW X6 M',body:'SUV Coupé',fuel:'Benzin',from:123500,hide:true},
-    {key:'x5',name:'BMW X5',body:'SUV',fuel:'Benzin',from:99750,hide:true},
-    {key:'x3',name:'BMW X3',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/x3mw.webp?v=6',from:60300},
-    {key:'x3mw',name:'BMW X3 M',body:'SUV',fuel:'Benzin',from:85200,hide:true},
-    {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:48600},
-    {key:'x2m',name:'BMW X2 M',body:'SUV Coupé',fuel:'Benzin',from:67100,hide:true},
-    {key:'x1b',name:'BMW X1',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:45100},
-    {key:'x1m',name:'BMW X1 M',body:'SUV',fuel:'Benzin',from:65600,hide:true},
-    {key:'7erb',name:'BMW 7-es',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/m760e.webp?v=6',from:117900},
-    {key:'5erb',name:'BMW 5-ös',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:60000},
-    {key:'5ertb',name:'BMW 5-ös Touring',body:'Touring',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:62000},
-    {key:'m5',name:'BMW M5',body:'Limuzin',fuel:'Hibrid',from:145200},
-    {key:'m5t',name:'BMW M5 Touring',body:'Touring',fuel:'Hibrid',from:147200},
-    {key:'4erc',name:'BMW 4-es Coupé',body:'Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900},
-    {key:'4ergc',name:'BMW 4-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900},
-    {key:'4ercab',name:'BMW 4-es Cabrio',body:'Cabrio',fuel:'Benzin',fuels:['Benzin','Dízel'],from:61400},
-    {key:'m4b',name:'BMW M4',body:'Coupé',fuel:'Benzin',from:98500},
-    {key:'m4cab',name:'BMW M4 Cabrio',body:'Cabrio',fuel:'Benzin',from:114100},
-    {key:'m4',name:'BMW 4-es Coupé M',body:'Coupé',fuel:'Benzin',from:77600,hide:true},
-    {key:'m4gc',name:'BMW 4-es Gran Coupé M',body:'Gran Coupé',fuel:'Benzin',from:77600,hide:true},
-    {key:'m4cabb',name:'BMW 4-es Cabrio M',body:'Cabrio',fuel:'Benzin',from:85200,hide:true},
-    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:47000},
-    {key:'3ert',name:'BMW 3-as Touring',body:'Touring',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:48300},
-    {key:'m3',name:'BMW M3',body:'Limuzin',fuel:'Benzin',from:96500},
-    {key:'m3t',name:'BMW M3 Touring',body:'Touring',fuel:'Benzin',from:108900},
-    {key:'m3b',name:'BMW 3-as M',body:'Limuzin',fuel:'Benzin',from:77500,hide:true},
-    {key:'m3tb',name:'BMW 3-as Touring M',body:'Touring',fuel:'Benzin',from:78800,hide:true},
-    {key:'2eratb',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/2erat.webp?v=6',from:36750},
-    {key:'2ercb',name:'BMW 2-es Coupé',body:'Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:46300},
-    {key:'2ergc',name:'BMW 2-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:37750},
-    {key:'m2',name:'BMW M2',body:'Coupé',fuel:'Benzin',from:81300},
-    {key:'m2b',name:'BMW 2-es Coupé M',body:'Coupé',fuel:'Benzin',from:63600,hide:true},
-    {key:'m2gc',name:'BMW 2-es Gran Coupé M',body:'Gran Coupé',fuel:'Benzin',from:60650,hide:true},
-    {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Benzin',fuels:['Benzin','Dízel'],from:34250},
-    {key:'1er',name:'BMW 1-es M',body:'Kompakt',fuel:'Benzin',from:57150,hide:true},
-    {key:'z4',name:'BMW Z4',body:'Roadster',fuel:'Benzin',from:49900,hide:true},
-    {key:'z4m',name:'BMW Z4 M',body:'Roadster',fuel:'Benzin',from:68900,hide:true},
-    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Dízel',from:108500,hide:true},
-    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Dízel',fuels:['Benzin','Dízel'],from:98100},
-    {key:'x6',name:'BMW X6 M Competition',body:'SUV Coupé',fuel:'Benzin',from:171900},
-    {key:'x5',name:'BMW X5',body:'SUV',fuel:'Dízel',fuels:['Benzin','Hibrid','Dízel'],from:95750},
-    {key:'x3m',name:'BMW X3',body:'SUV',fuel:'Dízel',from:62800,hide:true},
-    {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Dízel',from:49200,hide:true},
-    {key:'x1b',name:'BMW X1',body:'SUV',fuel:'Dízel',from:47700,hide:true},
-    {key:'7erb',name:'BMW 7-es',body:'Limuzin',fuel:'Dízel',from:111900,hide:true},
-    {key:'5erb',name:'BMW 5-ös',body:'Limuzin',fuel:'Dízel',from:62300,hide:true},
-    {key:'5ertd',name:'BMW 5-ös Touring',body:'Touring',fuel:'Dízel',from:64300,hide:true},
-    {key:'4erc',name:'BMW 4-es Coupé',body:'Coupé',fuel:'Dízel',from:56700,hide:true},
-    {key:'m4d',name:'BMW 4-es Coupé M',body:'Coupé',fuel:'Dízel',from:78600,hide:true},
-    {key:'4ergcd',name:'BMW 4-es Gran Coupé',body:'Gran Coupé',fuel:'Dízel',from:56800,hide:true},
-    {key:'4ercab',name:'BMW 4-es Cabrio',body:'Cabrio',fuel:'Dízel',from:64300,hide:true},
-    {key:'m4cabd',name:'BMW 4-es Cabrio M',body:'Cabrio',fuel:'Dízel',from:86200,hide:true},
-    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Dízel',from:51500,hide:true},
-    {key:'m3d',name:'BMW 3-as M',body:'Limuzin',fuel:'Dízel',from:77500,hide:true},
-    {key:'3ert',name:'BMW 3-as Touring',body:'Touring',fuel:'Dízel',from:52800,hide:true},
-    {key:'m3td',name:'BMW 3-as Touring M',body:'Touring',fuel:'Dízel',from:78800,hide:true},
-    {key:'2ercb',name:'BMW 2-es Coupé',body:'Coupé',fuel:'Dízel',from:53400,hide:true},
-    {key:'2ergcd',name:'BMW 2-es Gran Coupé',body:'Gran Coupé',fuel:'Dízel',from:42850,hide:true},
-    {key:'2eratb',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Dízel',from:42450,hide:true},
-    {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Dízel',from:39350,hide:true}
-  ]);
-
-  var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel'];
-  function slug(c){ return c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel]); }
-  function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
-  function att(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
-  function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
-  function card(c){
-    var isMini = (c.brand==='MINI');
-    var isMB = (c.brand==='MB');
-    var isAudi = (c.brand==='AUDI');
-    var img = c.img ? c.img : '/bmw/'+c.key+'.webp?v=6';
-    var logoHtml;
-    if(isMB){
-      var isAMG = /AMG/.test(c.name);
-      logoHtml = '<img class="egl-mblogo" src="/mb-star.webp?v=1" alt="Mercedes-Benz"/>' + (isAMG ? '<img class="egl-amglogo" src="/mb-logo.webp?v=2" alt="Mercedes-AMG"/>' : '');
-    } else if(isMini){
-      logoHtml = '<img class="egl-minilogo" src="/mini-logo.webp?v=3" alt="MINI"/>' + (c.logo==='jcw' ? '<img class="egl-jcwlogo" src="/jcw-logo.webp?v=3" alt="John Cooper Works"/>' : '');
-    } else if(isAudi){
-      logoHtml = '<img class="egl-audilogo" src="/audi/audi-logo.webp?v=4" alt="Audi"/>' + (/RS /.test(c.name) ? '<img class="egl-audirslogo" src="/audi/rs-logo.webp?v=1" alt="Audi RS"/>' : '');
-    } else {
-      logoHtml = '<img class="egl-bmw" src="/bmw/bmw-logo.webp?v=2" alt="BMW"/>' + (isM(c) ? '<img class="egl-mlogo" src="/bmw/m-logo.webp?v=2" alt="M"/>' : '');
-    }
-    var priceHtml;
-    if((isMini||isMB||isAudi) && !c.from){
-      priceHtml = '<span class="egl-soon">Ár kérésre</span>';
-    } else if(!isMini && SOON.indexOf(slug(c))>-1){
-      priceHtml = '<span class="egl-soon">Hamarosan</span>';
-    } else {
-      priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
-    }
-    var href = isAudi ? ('/egyedi-auto-rendeles/'+slug(c)) : ((isMini||isMB) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c));
-    var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
-    var fuelList = c.fuels || [c.fuel];
-    var fuelBadges = fuelList.map(function(fu){ return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>'; }).join('');
-    var priceLine = ((isMini||isMB||isAudi)&&!c.from) ? 'Ár kérésre'
-      : ((!isMini && SOON.indexOf(slug(c))>-1) ? 'Hamarosan'
-      : (HUF(net(c.from))+' · '+EUR(net(c.from))));
-    var a=document.createElement('div');
-    a.className='egl-card'+((isMini||isMB||isAudi)?' egl-card-mini':'');
-    a.innerHTML =
-      '<a class="egl-clink" href="'+href+'">'+
-        '<div class="egl-media">'+newBadge+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
-          '<div class="egl-fuels">'+fuelBadges+'</div>'+'</div>'+
-        '<div class="egl-body">'+
-          '<div class="egl-meta"><span class="egl-brand">'+logoHtml+'</span><span class="egl-year">2026 · Németország</span></div>'+
-          '<div class="egl-name">'+c.name+'</div>'+
-          '<div class="egl-specs">'+specLine(c)+'</div>'+
-          '<div class="egl-price">'+priceHtml+'</div>'+
-        '</div>'+
-      '</a>'+
-      '<div class="egl-actions">'+
-        '<a class="egl-btn" href="'+href+'">Részletek</a>'+
-        '<button class="egl-order" type="button" data-name="'+att(c.name)+'" data-img="'+att(img)+'" data-spec="'+att(specLine(c))+'" data-price="'+att(priceLine)+'" data-fuels="'+att(fuelList.join(','))+'">Autót rendelek</button>'+
-      '</div>';
-    return a;
-  }
-
-  var grid=document.getElementById('eglGrid');
-  var q=document.getElementById('eglQ'), fb=document.getElementById('eglBody'), ff=document.getElementById('eglFuel'), fbr=document.getElementById('eglBrand'), fcls=document.getElementById('eglClass');
-
-  var mhero=document.getElementById('eglMHero');
-  var filtersEl=document.querySelector('.egl-filters');
-  var filtersHomeParent=filtersEl?filtersEl.parentNode:null, filtersHomeNext=document.getElementById('eglCount');
-  var textHeroEls=[document.querySelector('.egl-crumb'), document.getElementById('eglTitle'), document.getElementById('eglSub')];
-  function setBrandHero(br){
-    if(!mhero) return;
-    var isMini=(br==='MINI'), isMB=(br==='MB'), isBMW=(br==='BMW'), isAudi=(br==='AUDI');
-    if(isMini||isMB||isBMW||isAudi){
-      var vid=mhero.querySelector('.egl-mhero-vid'), src=vid&&vid.querySelector('source');
-      var logo=mhero.querySelector('.egl-mhero-logos img');
-      var h1=mhero.querySelector('.egl-mhero-h1'), sub=mhero.querySelector('.egl-mhero-sub');
-      if(logo) logo.style.display='';
-      if(isMB){
-        if(src) src.setAttribute('src','/mercedes-hero.mp4'); if(vid) vid.removeAttribute('poster');
-        if(logo){ logo.src='/mb-star.webp'; logo.alt='Mercedes-Benz'; }
-        if(h1) h1.textContent='Egyedi Mercedes-Benz rendelés';
-        if(sub) sub.textContent='Új Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
-        mhero.classList.add('egl-mhero-mb');
-      } else if(isBMW){
-        if(src) src.setAttribute('src','/caradvance-hero-x5.mp4'); if(vid) vid.setAttribute('poster','/caradvance-hero-x5-poster.jpg');
-        if(logo){ logo.src='/bmw-hero-logo.png'; logo.alt='BMW'; }
-        if(h1) h1.textContent='Egyedi BMW rendelés';
-        if(sub) sub.textContent='Új BMW modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
-        mhero.classList.remove('egl-mhero-mb');
-      } else if(isAudi){
-        if(src) src.setAttribute('src','/audi-hero.mp4'); if(vid) vid.setAttribute('poster','/audi-hero-poster.jpg');
-        if(logo){ logo.src='/audi/audi-logo.webp?v=4'; logo.alt='Audi'; }
-        if(h1) h1.textContent='Egyedi Audi rendelés';
-        if(sub) sub.textContent='Új Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
-        mhero.classList.remove('egl-mhero-mb');
-      } else {
-        if(src) src.setAttribute('src','/mini-JCW-family-video-wide.mp4'); if(vid) vid.setAttribute('poster','/mini-jcw-hero-poster.jpg');
-        if(logo){ logo.src='/mini-hero-logo.webp'; logo.alt='Mini Cooper'; }
-        if(h1) h1.textContent='Egyedi Mini Cooper rendelés';
-        if(sub) sub.textContent='Új Mini Cooper és John Cooper Works modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.';
-        mhero.classList.remove('egl-mhero-mb');
-      }
-      try{ if(vid){ vid.load(); var p=vid.play&&vid.play(); if(p&&p.catch) p.catch(function(){}); } }catch(e){}
-      mhero.style.display='';
-      textHeroEls.forEach(function(e){ if(e) e.style.display='none'; });
-      if(filtersEl) filtersEl.style.display = isMini ? 'none' : '';
-    } else {
-      mhero.style.display='none';
-      textHeroEls.forEach(function(e){ if(e) e.style.display=''; });
-      if(filtersEl) filtersEl.style.display='';
-    }
-  }
-
-  function mbClass(c){ var n=c.name;
-    if(/S-osztály/.test(n))return'S-osztály'; if(/A-osztály/.test(n))return'A-osztály'; if(/B-osztály/.test(n))return'B-osztály';
-    if(/C-osztály/.test(n))return'C-osztály'; if(/E-osztály/.test(n))return'E-osztály'; if(/CLE/.test(n))return'CLE';
-    if(/GLA/.test(n))return'GLA'; if(/GLB/.test(n))return'GLB'; if(/GLC/.test(n))return'GLC'; if(/GLE/.test(n))return'GLE'; return'Egyéb'; }
-  var MBORDER=['A-osztály','B-osztály','C-osztály','E-osztály','S-osztály','CLE','GLA','GLB','GLC','GLE'];
-  function bmwSeries(c){ var n=c.name;
-    if(/\b1-es\b/.test(n))return'1-es'; if(/\b2-es\b|\bM2\b/.test(n))return'2-es'; if(/\b3-as\b|\bM3\b/.test(n))return'3-as';
-    if(/\b4-es\b|\bi4\b|\bM4\b/.test(n))return'4-es'; if(/\b5-ös\b|\bi5\b|\bM5\b/.test(n))return'5-ös'; if(/\b7-es\b|\bi7\b|M760/.test(n))return'7-es';
-    if(/\bXM\b/.test(n))return'XM'; if(/iX1|X1\b/.test(n))return'X1'; if(/iX2|X2\b/.test(n))return'X2'; if(/iX3|X3\b/.test(n))return'X3';
-    if(/iX5|X5\b/.test(n))return'X5'; if(/X6\b/.test(n))return'X6'; if(/X7\b/.test(n))return'X7'; if(/\biX\b/.test(n))return'iX';
-    if(/\bi3\b/.test(n))return'3-as'; if(/Z4/.test(n))return'Z4'; return'Egyéb'; }
-  var BMWORDER=['1-es','2-es','3-as','4-es','5-ös','7-es','iX','X1','X2','X3','X5','X6','X7','XM'];
-  function audiGroup(c){ var n=c.name;
-    if(/A6.*e-tron/.test(n))return'A6 e-tron'; if(/Q6.*e-tron/.test(n))return'Q6 e-tron'; if(/e-tron GT/.test(n))return'e-tron GT';
-    if(/A3|RS 3/.test(n))return'A3'; if(/A5|RS 5/.test(n))return'A5'; if(/A6/.test(n))return'A6'; if(/A8/.test(n))return'A8';
-    if(/Q3/.test(n))return'Q3'; if(/Q5/.test(n))return'Q5'; if(/Q7/.test(n))return'Q7'; if(/Q8/.test(n))return'Q8'; if(/Q9/.test(n))return'Q9'; return'Egyéb'; }
-  var AUDIORDER=['A3','A5','A6','A6 e-tron','A8','Q3','Q5','Q6 e-tron','Q7','Q8','Q9','e-tron GT'];
-  function isGrouped(br){ return br==='MB'||br==='BMW'||br==='AUDI'; }
-  function groupOf(c,br){ return br==='MB'?mbClass(c):(br==='BMW'?bmwSeries(c):(br==='AUDI'?audiGroup(c):'')); }
-  function groupOrder(br){ return br==='MB'?MBORDER:(br==='BMW'?BMWORDER:(br==='AUDI'?AUDIORDER:[])); }
-  function classLabel(br){ return br==='MB'?'Minden osztály':(br==='BMW'?'Minden modell':(br==='AUDI'?'Minden modell':'')); }
-
-  var HERO={
-    'BMW':{crumb:'BMW',title:'Egyedi BMW rendelés',intro:'Új BMW modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
-    'MINI':{crumb:'MINI',title:'Egyedi MINI rendelés',intro:'Új MINI modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
-    'MB':{crumb:'Mercedes-Benz',title:'Egyedi Mercedes-Benz rendelés',intro:'Új Mercedes-Benz modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
-    'AUDI':{crumb:'Audi',title:'Egyedi Audi rendelés',intro:'Új Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
-    '':{crumb:'Egyedi autó rendelés',title:'Egyedi autó rendelés',intro:'Új BMW, MINI, Mercedes-Benz és Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'}
-  };
-  var PH={'AUDI':'Keresés (pl. Q5, A6)…','BMW':'Keresés (pl. X5, i4)…','MINI':'Keresés (pl. Cooper, Countryman)…','MB':'Keresés (pl. E-osztály, GLC)…','':'Keresés (pl. X5, Cooper)…'};
-  function applyHero(br){
-    var h=HERO[br]||HERO[''];
-    var t=document.getElementById('eglTitle'); if(t) t.textContent=h.title;
-    var c=document.getElementById('eglCrumbCur'); if(c) c.textContent=h.crumb;
-    var fxEl=document.getElementById('eglFx'); var fx=fxEl?fxEl.textContent:'361';
-    var s=document.getElementById('eglSub');
-    if(s) s.innerHTML=h.intro+' Az árak tájékoztató német nettó listaárak, élő árfolyammal (1&nbsp;€ = <span id="eglFx">'+fx+'</span>&nbsp;Ft).';
-    if(q) q.placeholder = PH[br]||PH[''];
-    var bw=document.getElementById('eglBrandWrap'), cw=document.getElementById('eglClassWrap');
-    if(isGrouped(br)){
-      if(bw)bw.style.display='none'; if(cw)cw.style.display='';
-      if(fcls){ var ord=groupOrder(br), html='<option value="">'+classLabel(br)+'</option>'; ord.forEach(function(g){ html+='<option>'+g+'</option>'; }); fcls.innerHTML=html; }
-    } else { if(bw)bw.style.display=''; if(cw)cw.style.display='none'; if(fcls)fcls.value=''; }
-    setBrandHero(br);
-  }
-
-  function render(){
-    var qq=(q.value||'').toLowerCase(), b=fb.value, f=ff.value, br=fbr.value, cl=(fcls?fcls.value:'');
-    var grouped=isGrouped(br);
-    var list=CARS.filter(function(c){
-      if(c.hide) return false;
-      if(qq && c.name.toLowerCase().indexOf(qq)===-1) return false;
-      if(b && c.body!==b) return false;
-      if(f && (c.fuels||[c.fuel]).indexOf(f)===-1) return false;
-      if(br && (c.brand||'BMW')!==br) return false;
-      if(grouped && cl && groupOf(c,br)!==cl) return false;
-      return true;
-    });
-    grid.innerHTML='';
-    if(grouped){
-      var dot=(br==='BMW')?'#0166b1':(br==='AUDI'?'#bb0a30':'#00a3e0');
-      groupOrder(br).forEach(function(gr){
-        var g=list.filter(function(c){return groupOf(c,br)===gr;});
-        if(!g.length) return;
-        var hh=document.createElement('div'); hh.className='egl-section';
-        hh.innerHTML='<span class="dot" style="background:'+dot+'"></span>'+gr+' <span class="cnt">'+g.length+' modell</span>';
-        grid.appendChild(hh);
-        g.forEach(function(c){ grid.appendChild(card(c)); });
-      });
-      document.getElementById('eglCount').textContent = list.length + ' modell';
-      return;
-    }
-    var minis=list.filter(function(c){return c.brand==='MINI';});
-    if(minis.length){
-      var mh=document.createElement('div');
-      mh.className='egl-section';
-      mh.innerHTML='<span class="dot" style="background:#1b1b1b"></span>MINI <span class="cnt">'+minis.length+' modell</span>';
-      grid.appendChild(mh);
-      minis.forEach(function(c){ grid.appendChild(card(c)); });
-    }
-    var mbs=list.filter(function(c){return c.brand==='MB';});
-    if(mbs.length){
-      var mbh=document.createElement('div');
-      mbh.className='egl-section';
-      mbh.innerHTML='<span class="dot" style="background:#00a3e0"></span>Mercedes-Benz <span class="cnt">'+mbs.length+' modell</span>';
-      grid.appendChild(mbh);
-      mbs.forEach(function(c){ grid.appendChild(card(c)); });
-    }
-    var audis=list.filter(function(c){return c.brand==='AUDI';});
-    if(audis.length){
-      var ah=document.createElement('div');
-      ah.className='egl-section';
-      ah.innerHTML='<span class="dot" style="background:#bb0a30"></span>Audi <span class="cnt">'+audis.length+' modell</span>';
-      grid.appendChild(ah);
-      audis.forEach(function(c){ grid.appendChild(card(c)); });
-    }
-    var order=['Elektromos','Hibrid','Benzin','Dízel'];
-    order.forEach(function(fuel){
-      var group=list.filter(function(c){var br2=(c.brand||'BMW'); return br2!=='MINI' && br2!=='MB' && br2!=='AUDI' && c.fuel===fuel;});
-      if(!group.length) return;
-      var h=document.createElement('div');
-      h.className='egl-section';
-      h.innerHTML='<span class="dot" style="background:'+(FUELC[fuel]||'#5A6B82')+'"></span>'+fuel+' <span class="cnt">'+group.length+' modell</span>';
-      grid.appendChild(h);
-      group.forEach(function(c){ grid.appendChild(card(c)); });
-    });
-    document.getElementById('eglCount').textContent = list.length + ' modell';
-  }
-  [q,fb,ff,fbr,fcls].forEach(function(el){ if(el){ el.addEventListener('input',render); el.addEventListener('change',render); } });
-  fbr.addEventListener('change',function(){ applyHero(fbr.value); });
-  try{var _qb=new URLSearchParams(location.search).get('brand'); if(_qb){ var _map={bmw:'BMW',mini:'MINI',mercedes:'MB',mb:'MB',audi:'AUDI'}; fbr.value=(_map[_qb.toLowerCase()]||_qb); }}catch(e){}
-  applyHero(fbr.value);
-  render();
-  function loadFx(){ try{
-    fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
-      if(d&&d.rates&&d.rates.HUF){ FX=Math.round(d.rates.HUF); var e=document.getElementById('eglFx'); if(e)e.textContent=FX; render(); }
-    }).catch(function(){});
-  }catch(e){} }
-  loadFx();
-  setInterval(loadFx, 3600000);
-
-  // ---- order modal ----
-  var ORDER_API = 'https://caradvance-chatbot.flat-fire-7e25.workers.dev/api/order';
-  var SALES_EMAIL = 'info@caradvance.hu';
-  var modal=document.getElementById('eglOrder');
-  var oForm=document.getElementById('eglOrderForm');
-  var oMsg=document.getElementById('eglOrderMsg');
-  function showMsg(kind,txt){ if(oMsg){ oMsg.className='egl-fmsg '+kind; oMsg.textContent=txt; } }
-  function openOrder(d){
-    if(oForm) oForm.reset();
-    setBuyer('Magánszemély');
-    var im=document.getElementById('eglOrderImg'); if(im){ im.src=d.img||''; im.alt=d.name||''; }
-    var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v||''; };
-    set('eglOrderTitle',d.name); set('eglOrderPrice',d.price);
-    var cc=document.getElementById('eglOrderCar'); if(cc) cc.value=d.name||'';
-    // price "-tól" + info tooltip (only when a real price is shown)
-    var info=document.getElementById('eglOrderInfo'), tip=document.getElementById('eglOrderTip'), tol=document.getElementById('eglOrderTol');
-    var hasPrice=/\d/.test(d.price||'') && (d.price||'').indexOf('Ft')>-1;
-    if(tol) tol.style.display=hasPrice?'':'none';
-    if(info && tip){
-      if(hasPrice){
-        tip.innerHTML='Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.';
-        info.style.display='';
-      } else { info.style.display='none'; }
-    }
-    // fuel picker (adapts to the car)
-    var fb2=document.getElementById('eglFuelBlock');
-    if(fb2){
-      var fuels=(d.fuels||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
-      var h='<div class="egl-flabel">1. Üzemanyag</div><div class="egl-fuelpick">';
-      if(!fuels.length) fuels=[''];
-      fuels.forEach(function(fu,i){ h+='<label class="egl-fuelopt'+(i===0?' active':'')+'"><input type="radio" name="fuel" value="'+att(fu)+'"'+(i===0?' checked':'')+' />'+'<span>'+(fu||'—')+'</span></label>'; });
-      h+='</div>';
-      if(fuels.length===1) h+='<p class="egl-fhint" style="margin:10px 0 0">Ehhez a modellhez ez az egyetlen elérhető hajtás.</p>';
-      fb2.innerHTML=h;
-    }
-    var fin=document.getElementById('eglFinancing'); if(fin) fin.style.display='none';
-    showMsg('','');
-    if(modal){ modal.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; }
-  }
-  function closeOrder(){ if(modal){ modal.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; } }
-  var tgls=modal?modal.querySelectorAll('.egl-tgl'):[];
-  function setBuyer(v){
-    var be=document.getElementById('eglBuyer'); if(be) be.value=v;
-    [].forEach.call(tgls,function(t){ t.classList.toggle('active', t.getAttribute('data-buyer')===v); });
-    var isCo=(v==='Cég');
-    var comp=document.getElementById('eglCompanyFields'); if(comp) comp.style.display=isCo?'':'none';
-    var m1=document.getElementById('eglMode1'), m1l=document.getElementById('eglMode1Label');
-    if(m1 && m1l){
-      var txt=isCo?'Nettó EUR-ban, Németországból (Caradvance GmbH)':'19% német áfával, Németországból (Caradvance GmbH)';
-      m1.value=txt; m1l.textContent=txt;
-    }
-  }
-  [].forEach.call(tgls,function(t){ t.addEventListener('click',function(){ setBuyer(t.getAttribute('data-buyer')); }); });
-  var fuelBlock=document.getElementById('eglFuelBlock');
-  if(fuelBlock){ fuelBlock.addEventListener('change',function(){
-    [].forEach.call(fuelBlock.querySelectorAll('.egl-fuelopt'),function(o){ var r=o.querySelector('input'); o.classList.toggle('active', !!(r&&r.checked)); });
-  }); }
-  if(oForm){ oForm.addEventListener('change',function(e){
-    if(e.target && e.target.name==='payment'){
-      var fin=document.getElementById('eglFinancing'); if(fin) fin.style.display=(e.target.value==='Finanszírozással')?'':'none';
-    }
-  }); }
-  if(grid){ grid.addEventListener('click',function(e){
-    var b=e.target.closest?e.target.closest('.egl-order'):null;
-    if(!b) return; e.preventDefault();
-    openOrder({name:b.getAttribute('data-name'),img:b.getAttribute('data-img'),spec:b.getAttribute('data-spec'),price:b.getAttribute('data-price'),fuels:b.getAttribute('data-fuels')});
-  }); }
-  if(modal){ modal.addEventListener('click',function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute('data-close')) closeOrder(); }); }
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape' && modal && modal.getAttribute('aria-hidden')==='false') closeOrder(); });
-  if(oForm){ oForm.addEventListener('submit',function(e){
-    e.preventDefault();
-    var fd=new FormData(oForm);
-    var last=(fd.get('lastname')||'').trim(), first=(fd.get('firstname')||'').trim();
-    var name=(last+' '+first).trim();
-    var email=(fd.get('email')||'').trim(), mode=fd.get('mode');
-    var buyer=fd.get('buyer'), company=(fd.get('company')||'').trim();
-    if(buyer==='Cég' && !company){ showMsg('err','Kérlek add meg a cég nevét.'); return; }
-    if(!last || !first || !email){ showMsg('err','Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed.'); return; }
-    if(!mode){ showMsg('err','Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót.'); return; }
-    var payment=fd.get('payment');
-    if(!payment){ showMsg('err','Kérlek válaszd ki a fizetés módját.'); return; }
-    if(payment==='Finanszírozással' && !fd.get('financing')){ showMsg('err','Kérlek válaszd ki a finanszírozás módját.'); return; }
-    if(!fd.get('consent')){ showMsg('err','Kérlek fogadd el az adatkezelési tájékoztatót.'); return; }
-    var btn=oForm.querySelector('.egl-fsubmit'); btn.disabled=true; btn.textContent='Küldés…';
-    fetch(ORDER_API,{method:'POST',body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
-      showMsg('ok','Köszönjük! Megkaptuk a rendelési igényed — hamarosan keresünk.');
-      oForm.reset(); setBuyer('Magánszemély'); btn.disabled=false; btn.textContent='Rendelés elküldése';
-    }).catch(function(){
-      var body='Autó: '+(fd.get('car')||'')+'\nÜzemanyag: '+(fd.get('fuel')||'')+'\nVásárló típusa: '+(buyer||'')+'\nVásárlás módja: '+(mode||'')+'\nFizetés: '+(payment||'')+'\nFinanszírozás: '+(fd.get('financing')||'')+'\nNév: '+name+'\nE-mail: '+email+'\nTelefon: '+(fd.get('phone')||'')+'\nCég: '+company+'\nAdószám: '+(fd.get('taxid')||'')+'\nMegjegyzés: '+(fd.get('message')||'');
-      window.location.href='mailto:'+SALES_EMAIL+'?subject='+encodeURIComponent('Autó rendelés – '+(fd.get('car')||''))+'&body='+encodeURIComponent(body);
-      showMsg('ok','Megnyitottuk az e-mail vázlatot. Ha van specifikációs fájlod, csatold az e-mailhez.');
-      btn.disabled=false; btn.textContent='Rendelés elküldése';
-    });
-  }); }
+  try{
+    var qb = new URLSearchParams(location.search).get('brand');
+    var wrap = document.querySelector('.egl-in');
+    if(wrap && !qb){ wrap.classList.add('egl-choose'); }
+  }catch(e){}
 })();
 </script>
