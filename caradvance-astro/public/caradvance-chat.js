@@ -265,7 +265,7 @@
     syncNavMenu(wrap, "Megvásárolható autóink",
       [],
       { "Előnyök": "/vasarlas-elonyei", "Finanszírozás – lízing": "/finanszirozas-lizing" },
-      [{ t: "Gyakori kérdések", href: "/gyakori-kerdesek" }]);
+      [{ t: "Gyakori kérdések", href: "/vasarlas-gyakori-kerdesek" }]);
     syncNavMenu(wrap, "Rólunk", [], { "Media": "/media", "Blog": "/blog" }, []);
   }
 
