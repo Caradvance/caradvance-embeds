@@ -9,8 +9,12 @@ function cp(src, dst) {
   fs.cpSync(src, dst, { recursive: true });
 }
 
-cp('../autoink', 'public/autoink');
-cp('../auto', 'public/auto');
+// Ha a prebuild.mjs frissen legeneralta az oldalakat a Google Sheetbol, azokat
+// hasznaljuk; ha nem sikerult, a repoban levo (utolso jo) valtozat marad.
+const GEN = fs.existsSync('.gen/autoink/index.html') ? '.gen' : '..';
+console.log('fix-pages: forras = ' + (GEN === '.gen' ? 'friss Sheet-generalas (.gen)' : 'repo (..)'));
+cp(GEN + '/autoink', 'public/autoink');
+cp(GEN + '/auto', 'public/auto');
 
 // copy root static assets (logo, hero videos, images) so the site is self-contained
 for (const f of fs.readdirSync('..')) {
@@ -64,4 +68,14 @@ function fix(p) {
 
 walk('public/autoink');
 walk('public/auto');
+
+// Igazi 404-es lap. Nelkule a Cloudflare Pages a nem letezo URL-ekre a
+// FOOLDALT adja vissza HTTP 200-cal (SPA-fallback) -> a Google vegtelen sok
+// duplikalt fooldalt lat, es az eladott autok regi linkjei is a fooldalra
+// visznek, magyarazat nelkul. (2026.08.28.)
+if (fs.existsSync('sheet-404.html')) {
+  fs.copyFileSync('sheet-404.html', 'public/404.html');
+  console.log('fix-pages: 404.html bemasolva');
+}
+
 console.log('fix-pages: done');
