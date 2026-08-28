@@ -603,7 +603,7 @@
         var mini=document.createElement("img"); mini.src="/mini-logo.webp"; mini.alt="MINI"; mini.loading="lazy"; mini.setAttribute("style","height:28px;width:auto");
         row.appendChild(mini);
       }
-      if(row.getAttribute("data-caorder")) return;
+      [].slice.call(row.querySelectorAll("img")).forEach(function(im){ im.style.height="24px"; im.style.width="auto"; im.style.maxWidth="none"; im.style.objectFit="contain"; if(im.getAttribute("alt")==="Audi" && (im.src||"").indexOf("audi-logo.webp")<0){ im.src=location.origin+"/audi/audi-logo.webp"; } }); row.style.flexWrap="nowrap"; row.style.gap="12px"; row.style.justifyContent="center"; row.style.alignItems="center"; row.style.overflow="hidden"; if(row.getAttribute("data-caorder")) return;
       row.setAttribute("data-caorder","1");
       row.classList.add("ca-brandrow");
       var byAlt=function(a){ return [].slice.call(row.querySelectorAll("img")).filter(function(i){ return i.getAttribute("alt")===a; })[0]; };
