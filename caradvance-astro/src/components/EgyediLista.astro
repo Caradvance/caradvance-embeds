@@ -11,7 +11,7 @@ const _rebuild='rebuild-nudge-3';
     </video>
     <div class="egl-land-ov"></div>
     <div class="egl-mhero-inner">
-      <div class="egl-mhero-logos egl-land-brandrow"><img src="https://www.caradvance.hu/bmw/bmw-logo.webp?v=2" alt="BMW" /><img src="https://www.caradvance.hu/mini-logo.webp?v=3" alt="MINI" /><img src="https://www.caradvance.hu/mb-star.webp?v=1" alt="Mercedes" /><img src="https://www.caradvance.hu/audi/audi-logo.webp?v=4" alt="Audi" /></div>
+      <div class="egl-mhero-logos egl-land-brandrow"><img src="https://www.caradvance.hu/bmw/bmw-logo.webp?v=2" alt="BMW" /><img src="https://www.caradvance.hu/mini-hero-logo.webp?v=3" alt="MINI" /><img src="https://www.caradvance.hu/mb-star.webp?v=1" alt="Mercedes" /><img src="https://www.caradvance.hu/audi/audi-logo.webp?v=4" alt="Audi" /></div>
       <div class="egl-mhero-h1">Egyedi autó rendelés</div>
       <p class="egl-mhero-sub">Válaszd ki a márkát — új prémium autók Németországból, egyedi konfigurációval, kulcsrakész behozatallal.</p>
       <div class="egl-mhero-cta"><a class="egl-mhero-btn red" href="#eglBrands" onclick="var b=document.querySelector('#eglLand .egl-brands');if(b){b.scrollIntoView({behavior:'smooth',block:'center'});} return false;">Válassz márkát</a><a class="egl-mhero-btn white" href="/vasarlas-elonyei">Előnyök</a></div>
@@ -103,7 +103,7 @@ const _rebuild='rebuild-nudge-3';
   try{
     var qb = new URLSearchParams(location.search).get('brand');
     var wrap = document.querySelector('.egl-in');
-    if(wrap && !qb){ wrap.classList.add('egl-choose'); var v=document.querySelector('#eglLand .egl-land-vid'); if(v){ var O=location.origin+'/'; var V=[O+'caradvance-hero-x5.mp4',O+'mini-JCW-family-video-wide.mp4',O+'mercedes-hero.mp4',O+'audi-hero.mp4']; var i=0; v.removeAttribute('loop'); var ss=function(k){ try{ v.src=V[k]; v.load(); var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){} }; ss(0); setInterval(function(){ i=(i+1)%V.length; v.style.opacity='0'; setTimeout(function(){ ss(i); v.style.opacity='1'; },260); },6000); } }
+    if(wrap && !qb){ wrap.classList.add('egl-choose'); var v=document.querySelector('#eglLand .egl-land-vid'); if(v){ var O=location.origin+'/'; var V=[O+'caradvance-hero-x5.mp4',O+'mini-JCW-family-video-wide.mp4',O+'mercedes-hero.mp4',O+'audi-hero.mp4']; var i=0; v.removeAttribute('loop'); var ST=[0,0,7,0]; var ss=function(k){ try{ v.src=V[k]; v.load(); var onm=function(){ try{ if(ST[k]) v.currentTime=ST[k]; }catch(e){} v.removeEventListener('loadedmetadata',onm); var p=v.play(); if(p&&p.catch) p.catch(function(){}); }; v.addEventListener('loadedmetadata',onm); }catch(e){} }; ss(0); setInterval(function(){ i=(i+1)%V.length; v.style.opacity='0'; setTimeout(function(){ ss(i); v.style.opacity='1'; },260); },6000); } }
   }catch(e){}
 })();
 </script>
