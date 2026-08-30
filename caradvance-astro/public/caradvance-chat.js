@@ -414,7 +414,7 @@
     document.head.appendChild(s);
   }
 
-  var modal, mImg, mTitle, mSub, mCar, mForm, mMsg;
+  var modal, mImg, mTitle, mSub, mCar, mForm, mMsg, curKind = "sale";
   function showMsg(k,t){ if(mMsg){ mMsg.className="cain-msg "+k; mMsg.textContent=t; } }
   function buildModal(){
     if(modal) return;
@@ -428,7 +428,7 @@
           '<input type="hidden" name="car"/>'+
           '<input type="hidden" name="buyer" value="Magánszemély"/>'+
           '<div class="cain-toggle"><button type="button" class="cain-tgl active" data-buyer="Magánszemély">Magánszemélyként</button><button type="button" class="cain-tgl" data-buyer="Cég">Cégként</button></div>'+
-          '<div class="cain-block">'+
+          '<div class="cain-block cain-buy">'+
             '<div class="cain-flabel">Hogyan szeretnéd megvásárolni?</div>'+
             '<label class="cain-radio"><input type="radio" name="mode" class="cain-mode1" value="19% német áfával, Németországból (Caradvance GmbH)"/><span class="cain-mode1lbl">19% német áfával, Németországból (Caradvance GmbH)</span></label>'+
             '<label class="cain-radio"><input type="radio" name="mode" value="27% magyar áfával, BH Group Zrt."/><span>27% magyar áfával, a BH Group Zrt.-n keresztül</span></label>'+
@@ -440,6 +440,19 @@
               '<label class="cain-radio"><input type="radio" name="financing" value="Segítséget kérek (Euro Leasing / Mercantil Bank)"/><span>Kérek segítséget — Euro Leasing vagy Mercantil Bank</span></label>'+
               '<label class="cain-radio"><input type="radio" name="financing" value="Saját finanszírozás"/><span>Saját finanszírozásom van</span></label>'+
             '</div>'+
+          '</div>'+
+          '<div class="cain-block cain-rent" style="display:none">'+
+            '<div class="cain-flabel">Milyen km-kerettel bérelnéd?</div>'+
+            '<label class="cain-radio"><input type="radio" name="km" value="2 000 km / hó"/><span>2 000 km / hó</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="km" value="3 000 km / hó"/><span>3 000 km / hó</span></label>'+
+            '<div class="cain-sublabel">Bérlés időtartama</div>'+
+            '<label class="cain-radio"><input type="radio" name="futamido" value="6 hónap"/><span>6 hónap</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="futamido" value="12 hónap"/><span>12 hónap</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="futamido" value="24 hónap"/><span>24 hónap</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="futamido" value="Még nem tudom"/><span>Még nem tudom</span></label>'+
+            '<div class="cain-sublabel">Mikortól?</div>'+
+            '<input type="text" name="kezdes" placeholder="pl. azonnal, vagy 2026. október"/>'+
+            '<p class="cain-note" style="text-align:left;margin:10px 0 0">Bérlés minimum 6 hónapos időtartamtól, havidíjas konstrukcióban. A kaució egyszeri, a bérlés végén visszajár.</p>'+
           '</div>'+
           '<div class="cain-grid cain-company" style="display:none"><input type="text" name="company" placeholder="Cégnév *"/><input type="text" name="taxid" placeholder="Adószám"/></div>'+
           '<div class="cain-grid"><input type="text" name="lastname" placeholder="Vezetéknév *"/><input type="text" name="firstname" placeholder="Keresztnév *"/></div>'+
@@ -473,6 +486,13 @@
     buildModal(); mForm.reset();
     setBuyer("Magánszemély");
     var fin=modal.querySelector(".cain-fin"); if(fin) fin.style.display="none";
+    // Berelheto autonal berlesi kerdesek jonnek, nem vasarlasiak (Marc, 2026.08.30.)
+    curKind = d.kind || "sale";
+    var isRent = (curKind === "rent");
+    var buyBlk=modal.querySelector(".cain-buy"), rentBlk=modal.querySelector(".cain-rent");
+    if(buyBlk)  buyBlk.style.display  = isRent ? "none" : "";
+    if(rentBlk) rentBlk.style.display = isRent ? "" : "none";
+    var eb=modal.querySelector(".cain-eyebrow"); if(eb) eb.textContent = isRent ? "Bérlési érdeklődés" : "Érdeklődés";
     if(mImg){ mImg.src=d.img||""; mImg.alt=d.name||""; }
     mTitle.textContent=d.name||"";
     mSub.innerHTML="";
@@ -492,32 +512,55 @@
     var fd=new FormData(mForm);
     var last=(fd.get("lastname")||"").trim(), first=(fd.get("firstname")||"").trim(), email=(fd.get("email")||"").trim();
     var buyer=fd.get("buyer"), company=(fd.get("company")||"").trim(), mode=fd.get("mode"), payment=fd.get("payment");
-    if(!mode){ showMsg("err","Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót."); return; }
-    if(!payment){ showMsg("err","Kérlek válaszd ki a fizetés módját."); return; }
-    if(payment==="Finanszírozással" && !fd.get("financing")){ showMsg("err","Kérlek válaszd ki a finanszírozás módját."); return; }
+    var isRent=(curKind==="rent");
+    if(isRent){
+      if(!fd.get("km")){ showMsg("err","Kérlek válaszd ki, milyen km-kerettel bérelnéd."); return; }
+      if(!fd.get("futamido")){ showMsg("err","Kérlek válaszd ki a bérlés időtartamát."); return; }
+      fd.delete("mode"); fd.delete("payment"); fd.delete("financing");
+    } else {
+      if(!mode){ showMsg("err","Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót."); return; }
+      if(!payment){ showMsg("err","Kérlek válaszd ki a fizetés módját."); return; }
+      if(payment==="Finanszírozással" && !fd.get("financing")){ showMsg("err","Kérlek válaszd ki a finanszírozás módját."); return; }
+      fd.delete("km"); fd.delete("futamido"); fd.delete("kezdes");
+    }
     if(buyer==="Cég" && !company){ showMsg("err","Kérlek add meg a cég nevét."); return; }
     if(!last||!first||!email){ showMsg("err","Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed."); return; }
     if(!fd.get("consent")){ showMsg("err","Kérlek fogadd el az adatkezelési tájékoztatót."); return; }
     var btn=mForm.querySelector(".cain-submit"); btn.disabled=true; btn.textContent="Küldés…";
-    fd.append("kind","Érdeklődés (készletautó)");
+    fd.append("kind", isRent ? "Bérlési érdeklődés" : "Érdeklődés (készletautó)");
     fetch(INQ_API,{method:"POST",body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
       showMsg("ok","Köszönjük! Megkaptuk az érdeklődésed — hamarosan keresünk.");
       mForm.reset(); setBuyer("Magánszemély"); btn.disabled=false; btn.textContent="Érdeklődés elküldése";
     }).catch(function(){
-      var body="Autó: "+(fd.get("car")||"")+"\nVásárló típusa: "+(buyer||"")+"\nVásárlás módja: "+(mode||"")+"\nFizetés: "+(payment||"")+"\nFinanszírozás: "+(fd.get("financing")||"")+"\nNév: "+last+" "+first+"\nE-mail: "+email+"\nTelefon: "+(fd.get("phone")||"")+"\nCég: "+company+"\nAdószám: "+(fd.get("taxid")||"")+"\nMegjegyzés: "+(fd.get("message")||"");
-      window.location.href="mailto:"+SALES_EMAIL+"?subject="+encodeURIComponent("Érdeklődés – "+(fd.get("car")||""))+"&body="+encodeURIComponent(body);
+      var body = isRent
+        ? ("Autó: "+(fd.get("car")||"")+"\nÉrdeklődés típusa: BÉRLÉS\nBérlő típusa: "+(buyer||"")+"\nKm-keret: "+(fd.get("km")||"")+"\nIdőtartam: "+(fd.get("futamido")||"")+"\nKezdés: "+(fd.get("kezdes")||"")+"\nNév: "+last+" "+first+"\nE-mail: "+email+"\nTelefon: "+(fd.get("phone")||"")+"\nCég: "+company+"\nAdószám: "+(fd.get("taxid")||"")+"\nMegjegyzés: "+(fd.get("message")||""))
+        : ("Autó: "+(fd.get("car")||"")+"\nVásárló típusa: "+(buyer||"")+"\nVásárlás módja: "+(mode||"")+"\nFizetés: "+(payment||"")+"\nFinanszírozás: "+(fd.get("financing")||"")+"\nNév: "+last+" "+first+"\nE-mail: "+email+"\nTelefon: "+(fd.get("phone")||"")+"\nCég: "+company+"\nAdószám: "+(fd.get("taxid")||"")+"\nMegjegyzés: "+(fd.get("message")||""));
+      window.location.href="mailto:"+SALES_EMAIL+"?subject="+encodeURIComponent((isRent?"Bérlési érdeklődés – ":"Érdeklődés – ")+(fd.get("car")||""))+"&body="+encodeURIComponent(body);
       showMsg("ok","Megnyitottuk az e-mail vázlatot az érdeklődéshez.");
       btn.disabled=false; btn.textContent="Érdeklődés elküldése";
     });
   }
 
   function priceOf(card){
+    var rp=card.querySelector(".rentprices");
+    if(rp){
+      var sorok=[].slice.call(rp.querySelectorAll(".rp")).map(function(x){
+        var resz=[].slice.call(x.children).map(function(c){return (c.textContent||"").replace(/\s+/g," ").trim();}).filter(Boolean);
+        if(resz.length>=2) return resz[0]+": "+resz.slice(1).join(" ");
+        return (x.textContent||"").replace(/\s+/g," ").trim();
+      }).filter(Boolean);
+      if(sorok.length) return sorok.join(" · ");
+    }
     var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow");
     if(!prow) return "";
     var parts=[].slice.call(prow.children).filter(function(c){return !(c.classList&&c.classList.contains("ca-cinfo"));}).map(function(c){return (c.textContent||"").replace(/\s+/g," ").trim();}).filter(Boolean);
     return parts.length?parts.join(" · "):(prow.textContent||"").replace(/\s+/g," ").trim();
   }
-  function cardKind(card){ return card.classList.contains("bizcard") ? "biz" : (card.querySelector(".rentrow") ? "rent" : "sale"); }
+  function cardKind(card){
+    if(card.classList.contains("bizcard")) return "biz";
+    if(card.querySelector(".rentrow")||card.querySelector(".rentprices")) return "rent";
+    return "sale";
+  }
   function cardHref(card){ if(card.tagName==="A") return card.getAttribute("href")||""; var l=card.querySelector('a[href*="/auto/"]'); return l?(l.getAttribute("href")||""):""; }
   function cardData(card){
     var t=card.querySelector(".title"), img=card.querySelector(".media img");
@@ -533,8 +576,10 @@
   }
   function enhance(card){
     var body=card.querySelector(".body"); if(!body) return;
-    var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow");
+    var prow=card.querySelector(".pricerow")||card.querySelector(".rentrow")||card.querySelector(".rentprices");
     if(!prow) return;                       // not a car card
+    // Eladott auto: csak "Reszletek", erdeklodni mar nem lehet ra (Marc, 2026.08.30.)
+    if(card.classList.contains("sold")) return;
     card.classList.add("ca-enh");
     if(body.querySelector(".ca-inq")) return;
     var kind=cardKind(card);

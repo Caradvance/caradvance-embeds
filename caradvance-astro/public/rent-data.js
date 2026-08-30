@@ -63,11 +63,21 @@ window.RENT = (function () {
       for(var r=1;r<rows.length;r++){ var row=rows[r]; if(!row||!row.length)continue;
         var modell=g(row,'modell'); if(!modell)continue;
         if((g(row,'aktiv')||'').toLowerCase()==='nem')continue;
-        var ri=rentInfo(modell, g(row,'marka'), g(row,'karosszeria'));
-        if(!ri) continue;
         // only CarAdvance's own fleet is rentable — exclude WeGa/partner cars
         var _forras=(g(row,'forras')||'').toLowerCase(), _sajat=(g(row,'sajat')||'').toLowerCase();
         if(_forras && _forras!=='caradvance' && _sajat!=='igen') continue;
+        // A Sheet dont (Marc, 2026.08.30.): a `berelheto` oszlop es a Rental.xlsx arai
+        // az igazsag, hogy a /berelheto/ oldal es az /autoink/ berlet-fule ugyanazt mutassa.
+        var _num=function(v){return parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;};
+        var ri=rentInfo(modell, g(row,'marka'), g(row,'karosszeria'));
+        var _ber=(g(row,'berelheto')||'').toLowerCase();
+        if(_ber==='igen'){
+          ri={ cat:(g(row,'berlet_modell')||(ri&&ri.cat)||''),
+               price:(_num(g(row,'berlet_2000_eur'))||(ri&&ri.price)||0),
+               p3:_num(g(row,'berlet_3000_eur')),
+               kaution:(_num(g(row,'kaucio_eur'))||(ri&&ri.kaution)||0) };
+        } else if(_ber){ continue; }
+        if(!ri || !ri.price) continue;
         out.push({
           modell:modell, marka:g(row,'marka'), karosszeria:g(row,'karosszeria'),
           km:g(row,'km'), teljesitmeny:g(row,'teljesitmeny'), valto:g(row,'valto'),
