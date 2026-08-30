@@ -549,5 +549,102 @@ rep('const slugOf   = (c) => String(c.slug || "").trim() || slugOf(c);',
     'const slugOf   = (c) => String(c.slug || "").trim() || slugify(c.modell);',
     'slugOf rekurzio-javitas');
 
+/* ------------------------------------------------- 41. hero a katalogus fuleken
+   Marc, 2026.08.30.: pontosan olyan hero, mint a tobbi oldalon (fooldal) —
+   ugyanaz a video, logo, cim, alcim, ket gomb es a "Gorgess" jelzes. A fulvaltas
+   csak a szoveget csereli, a video marad. */
+rep(
+`  const body = \`
+<div class="wrap">
+  <div class="crumb"><a href="../">Főoldal</a> / <b>Megvásárolható autóink</b></div>`,
+`  const heroVar = (tab, h, p, cta, goto) => \`
+  <div class="inner ch-var\${tab === "eladas" ? " on" : ""}" data-hero="\${tab}">
+    <img class="brand-logo" src="/caradvance-logo-white.webp" alt="CarAdvance — the automotive people" width="403" height="133">
+    \${tab === "eladas" ? \`<h1>\${esc(h)}</h1>\` : \`<div class="hh">\${esc(h)}</div>\`}
+    <p class="sub">\${esc(p)}</p>
+    <div class="cta-row"><a class="btn btn-primary" href="#autok"\${goto ? \` data-goto="\${goto}"\` : ""}>\${esc(cta)}</a><a class="btn btn-white" href="/eladom">Add el az autód</a></div>
+  </div>\`;
+  const body = \`
+<section class="hero">
+  <video class="video-bg" autoplay muted loop playsinline preload="auto" poster="/caradvance-hero-x5-poster.jpg"><source src="/caradvance-hero-x5.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+\${heroVar("eladas", "Megvásárolható autóink",
+  "Prémium autók Németországból, nettó áron — bevizsgálva, garanciával, teljes ügyintézéssel.",
+  sale.length + " autó a készletben")}
+\${heroVar("berelheto", "Bérelhető autóink",
+  "Havidíjas konstrukció 6 hónaptól, 2 000 vagy 3 000 km/hó kerettel. A kaució a bérlés végén visszajár.",
+  rent.length + " bérelhető autó")}
+\${biz.length ? heroVar("bizomanyos", "Bizományos autóink",
+  "Partnereink és magánszemélyek autói — ugyanazzal a bevizsgálással és ügyintézéssel, mint a saját készletünk.",
+  biz.length + " bizományos autó") : ""}
+\${sold.length ? heroVar("eladva", "Már elkelt autóink",
+  "Ezeket az autókat mi hoztuk be és adtuk el. Ha hasonlót keresel, a teljes német piacról behozzuk neked.",
+  "Aktuális készletünk", "eladas") : ""}
+  <button class="scrolldown" type="button" aria-label="Görgess lejjebb" onclick="var e=document.getElementById('autok');if(e)e.scrollIntoView({behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+</section>
+<div class="wrap">
+  <div class="crumb"><a href="../">Főoldal</a> / <b>Megvásárolható autóink</b></div>`,
+'katalogus hero (fooldal-stilus)');
+
+rep(
+`  <div class="autok-head" style="margin:0 0 18px">
+    <div class="autok-tabs" role="tablist">
+      <button class="autok-tab on" data-tab="eladas"`,
+`  <div class="autok-head" id="autok" style="margin:0 0 18px">
+    <div class="autok-tabs" role="tablist">
+      <button class="autok-tab on" data-tab="eladas"`,
+'hero cta horgony');
+
+rep(
+`  <div class="chead"><h1>Megvásárolható autóink</h1><p>Prémium autók Németországból, nettó árakkal (áfa nélkül). Az árak élő árfolyammal frissülnek (1 € = <span id="ratev">\${rate}</span> Ft).</p></div>`,
+`  <div class="crate">Az árak nettó árak (áfa nélkül), élő árfolyammal frissülnek — 1 € = <span id="ratev">\${rate}</span> Ft.</div>`,
+'chead helyett arfolyam-sor');
+
+rep(
+`.crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:14px}`,
+`.hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;margin:8px 16px 16px;margin-top:calc(6px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
+.hero .video-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
+.hero .overlay{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(180deg,rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7))}
+.hero .inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0;display:none}
+.hero .inner.on{display:block}
+.hero .brand-logo{height:64px;width:auto;display:block;margin:0 auto 26px;filter:drop-shadow(0 4px 18px rgba(0,0,0,.5))}
+.hero h1,.hero .hh{font-size:clamp(30px,4.6vw,52px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.hero .sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#E7EAF0;max-width:640px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
+.hero .cta-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;align-items:center}
+.hero .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:16px;padding:15px 32px;border-radius:999px;text-decoration:none;cursor:pointer;border:0;transition:background .15s}
+.hero .btn-primary{background:var(--red);color:#fff;box-shadow:0 10px 30px rgba(226,0,26,.4)}
+.hero .btn-primary:hover{background:#B80015}
+.hero .btn-white{background:#fff;color:var(--navy)}
+.hero .btn-white:hover{background:#ECEEF2}
+.hero .scrolldown{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.82);background:none;border:0;cursor:pointer;font:inherit;letter-spacing:.05em;font-size:11px;text-transform:uppercase;animation:caScrollBob 1.9s ease-in-out infinite}
+.hero .scrolldown svg{width:26px;height:26px}
+@keyframes caScrollBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+@media(max-width:640px){.hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:84px 18px 72px;min-height:480px}.hero .brand-logo{height:48px;margin-bottom:20px}}
+.crate{font-size:14px;color:var(--muted);font-weight:600;margin:0 0 18px}
+.crumb{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:14px}`,
+'katalogus hero css');
+
+rep(
+` tabs.forEach(function(b){b.addEventListener('click',function(){
+  tabs.forEach(function(x){x.classList.toggle('on',x===b);});
+  document.querySelectorAll('.autok-panel').forEach(function(p){p.classList.toggle('on',p.id==='panel-'+b.getAttribute('data-tab'));});`,
+` var heroSwap=function(name){document.querySelectorAll('.hero .ch-var').forEach(function(v){v.classList.toggle('on',v.getAttribute('data-hero')===name);});};
+ document.querySelectorAll('.btn[data-goto]').forEach(function(a){a.addEventListener('click',function(e){
+  e.preventDefault();var g=a.getAttribute('data-goto');
+  var t=tabs.filter(function(x){return x.getAttribute('data-tab')===g;})[0];if(t)t.click();
+  var el=document.getElementById('autok');if(el)el.scrollIntoView({behavior:'smooth'});});});
+ tabs.forEach(function(b){b.addEventListener('click',function(){
+  tabs.forEach(function(x){x.classList.toggle('on',x===b);});
+  heroSwap(b.getAttribute('data-tab'));
+  document.querySelectorAll('.autok-panel').forEach(function(p){p.classList.toggle('on',p.id==='panel-'+b.getAttribute('data-tab'));});`,
+'hero valtas a fulekkel');
+
+/* -- a fulek bevezeto mondata mar a hero-ban van, itt csak ismetles volt -- */
+[
+  ['    <p class="ptab">Bérlés minimum 6 hónapos időtartamtól, havidíjas konstrukcióban. A havi díj a választott km-kerettől függ; a kaució egyszeri, a bérlés végén visszajár.</p>\n', 'ptab berlet'],
+  ['    <p class="ptab">Bizományos autók: magánszemélyek és partnereink autói, amelyeket mi értékesítünk — ugyanazzal a bevizsgálással és ügyintézéssel.</p>\n', 'ptab bizomanyos'],
+  ['    <p class="ptab">Ezek az autók már elkeltek — referenciaként hagyjuk fent őket. Ha hasonlót keresel, a teljes német piacról behozzuk neked.</p>\n', 'ptab eladva'],
+].forEach(function (x) { rep(x[0], '', x[1] + ' torlese (a hero mondja el)'); });
+
 fs.writeFileSync(file, s);
 console.log('patch-generate: ' + log.length + ' modositas rendben');
