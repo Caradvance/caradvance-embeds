@@ -1,3 +1,34 @@
+/* ── /berelheto/ -> /autoink/#berelheto (Marc, 2026.08.30.) ──
+   A ket berlés-lista eggye valik: a kulon /berelheto/ oldal atvezet a keszlet-oldal
+   "Berelheto" fulere. Ugyanaz az adat, ugyanazok az arak, egy helyen. ── */
+(function () {
+  var TARGET = "/autoink/#berelheto";
+  try {
+    var p = String(location.pathname || "").replace(/\/+$/, "");
+    if (p === "/berelheto") {
+      var m = document.createElement("meta");
+      m.setAttribute("name", "robots"); m.setAttribute("content", "noindex,follow");
+      (document.head || document.documentElement).appendChild(m);
+      location.replace(TARGET);
+      return;
+    }
+    // A menuben (es barhol az oldalon) a /berelheto hivatkozas egybol a fulre mutasson,
+    // ne atiranyitason keresztul. A menu kesobb is epulhet, ezert par masodpercig figyeljuk.
+    var fix = function () {
+      var as = document.querySelectorAll('a[href]');
+      for (var i = 0; i < as.length; i++) {
+        var h = as[i].getAttribute("href") || "";
+        if (/^(?:https?:\/\/[^\/]*caradvance\.hu)?\/berelheto\/?(?:[?#].*)?$/i.test(h)) {
+          as[i].setAttribute("href", TARGET);
+        }
+      }
+    };
+    var start = function () { fix(); var n = 0, iv = setInterval(function () { fix(); if (++n > 12) clearInterval(iv); }, 500); };
+    if (document.readyState !== "loading") start();
+    else document.addEventListener("DOMContentLoaded", start);
+  } catch (e) {}
+})();
+
 /* ── Kill the "Hamarosan indul / Belépési kód" preview gate (site is public) ── */
 (function () {
   "use strict";
@@ -353,20 +384,6 @@
   document.documentElement.style.overflow = "hidden";
   (document.body || document.documentElement).appendChild(wrap);
   var vid = wrap.querySelector("video"); if (vid && vid.play) { vid.play().catch(function () {}); }
-})();
-
-/* ── /berelheto/ -> /autoink/#berelheto (Marc, 2026.08.30.) ──
-   A ket berlés-lista eggye valik: a kulon /berelheto/ oldal atvezet a keszlet-oldal
-   "Berelheto" fulere. Ugyanaz az adat, ugyanazok az arak, egy helyen. ── */
-(function () {
-  try {
-    var p = String(location.pathname || "").replace(/\/+$/, "");
-    if (p !== "/berelheto") return;
-    var m = document.createElement("meta");
-    m.setAttribute("name", "robots"); m.setAttribute("content", "noindex,follow");
-    (document.head || document.documentElement).appendChild(m);
-    location.replace("/autoink/#berelheto");
-  } catch (e) {}
 })();
 
 /* ── "Érdeklődöm" button + inquiry modal on catalog cards (autoink / berelheto / bizomanyos / home) ── */
