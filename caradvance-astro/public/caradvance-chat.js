@@ -355,6 +355,20 @@
   var vid = wrap.querySelector("video"); if (vid && vid.play) { vid.play().catch(function () {}); }
 })();
 
+/* ── /berelheto/ -> /autoink/#berelheto (Marc, 2026.08.30.) ──
+   A ket berlés-lista eggye valik: a kulon /berelheto/ oldal atvezet a keszlet-oldal
+   "Berelheto" fulere. Ugyanaz az adat, ugyanazok az arak, egy helyen. ── */
+(function () {
+  try {
+    var p = String(location.pathname || "").replace(/\/+$/, "");
+    if (p !== "/berelheto") return;
+    var m = document.createElement("meta");
+    m.setAttribute("name", "robots"); m.setAttribute("content", "noindex,follow");
+    (document.head || document.documentElement).appendChild(m);
+    location.replace("/autoink/#berelheto");
+  } catch (e) {}
+})();
+
 /* ── "Érdeklődöm" button + inquiry modal on catalog cards (autoink / berelheto / bizomanyos / home) ── */
 (function () {
   if (window.__caInqLoaded) return; window.__caInqLoaded = true;
@@ -384,6 +398,9 @@
       ".cain-head img{width:150px;height:92px;object-fit:contain;flex:0 0 auto;}",
       ".cain-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#E2001A;}",
       ".cain-head h3{font-size:20px;font-weight:800;color:#0F1B2D;margin:4px 0 4px;line-height:1.15;}",
+      ".cain-head h3.long{font-size:16.5px;line-height:1.25;}",
+      ".cain-head{align-items:flex-start;}",
+      ".cain-head img{width:120px;height:78px;border-radius:10px;}",
       ".cain-sub{font-size:13.5px;color:#5A6B82;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}",
       ".cain-sub .ca-cinfo .ca-ctip{bottom:auto;top:150%;right:0;left:auto;max-width:min(260px,72vw);width:260px;}",
       "@media(max-width:560px){.cain-head{flex-direction:column;align-items:flex-start;padding-right:0;}}",
@@ -443,8 +460,8 @@
           '</div>'+
           '<div class="cain-block cain-rent" style="display:none">'+
             '<div class="cain-flabel">Milyen km-kerettel bérelnéd?</div>'+
-            '<label class="cain-radio"><input type="radio" name="km" value="2 000 km / hó"/><span>2 000 km / hó</span></label>'+
-            '<label class="cain-radio"><input type="radio" name="km" value="3 000 km / hó"/><span>3 000 km / hó</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="km" value="2 000 km / hó"/><span class="cain-km2lbl">2 000 km / hó</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="km" value="3 000 km / hó"/><span class="cain-km3lbl">3 000 km / hó</span></label>'+
             '<div class="cain-sublabel">Bérlés időtartama</div>'+
             '<label class="cain-radio"><input type="radio" name="futamido" value="6 hónap"/><span>6 hónap</span></label>'+
             '<label class="cain-radio"><input type="radio" name="futamido" value="12 hónap"/><span>12 hónap</span></label>'+
@@ -495,8 +512,20 @@
     var eb=modal.querySelector(".cain-eyebrow"); if(eb) eb.textContent = isRent ? "Bérlési érdeklődés" : "Érdeklődés";
     if(mImg){ mImg.src=d.img||""; mImg.alt=d.name||""; }
     mTitle.textContent=d.name||"";
+    mTitle.className=((d.name||"").length>34?"long":"");
+    // A berleti arakat a km-opciok mellett mutatjuk, a fejlecbe csak egy rovid osszefoglalo kerul.
+    var rovid="";
+    if(isRent && d.rent){
+      var els=(d.rent.km2||"").split("≈")[0].trim();
+      rovid=(els?els+" / hó-tól":"") + (d.rent.kaucio?(els?" · ":"")+"kaució "+d.rent.kaucio:"");
+      var l2=modal.querySelector(".cain-km2lbl"), l3=modal.querySelector(".cain-km3lbl");
+      if(l2) l2.textContent="2 000 km / hó"+(d.rent.km2?" — "+d.rent.km2:"");
+      if(l3) l3.textContent="3 000 km / hó"+(d.rent.km3?" — "+d.rent.km3:"");
+      var i2=modal.querySelector('input[name=km][value="2 000 km / hó"]'); if(i2&&d.rent.km2) i2.value="2 000 km / hó ("+d.rent.km2+")";
+      var i3=modal.querySelector('input[name=km][value="3 000 km / hó"]'); if(i3&&d.rent.km3) i3.value="3 000 km / hó ("+d.rent.km3+")";
+    }
     mSub.innerHTML="";
-    var pspan=document.createElement("span"); pspan.textContent=d.price||""; mSub.appendChild(pspan);
+    var pspan=document.createElement("span"); pspan.textContent=(isRent?(rovid||d.price||""):(d.price||"")); mSub.appendChild(pspan);
     if(d.price){
       var inf=document.createElement("span"); inf.className="ca-cinfo"; inf.setAttribute("tabindex","0"); inf.textContent="i";
       var tip=document.createElement("span"); tip.className="ca-ctip"; tip.textContent=infoText(d.kind); inf.appendChild(tip);
@@ -562,9 +591,29 @@
     return "sale";
   }
   function cardHref(card){ if(card.tagName==="A") return card.getAttribute("href")||""; var l=card.querySelector('a[href*="/auto/"]'); return l?(l.getAttribute("href")||""):""; }
+  function rentOf(card){
+    var out={ km2:"", km3:"", kaucio:"" };
+    var rp=card.querySelector(".rentprices");
+    if(rp){
+      [].slice.call(rp.querySelectorAll(".rp")).forEach(function(x){
+        var lab=(x.children[0]?x.children[0].textContent:"").replace(/\s+/g," ").trim();
+        var val=(x.children[1]?x.children[1].textContent:"").replace(/\s+/g," ").trim();
+        if(/kauci/i.test(lab)) out.kaucio=val;
+        else if(/3\s*000/.test(lab)) out.km3=val;
+        else if(/2\s*000/.test(lab)) out.km2=val;
+      });
+      return out;
+    }
+    var rr=card.querySelector(".rentrow"); var ka=card.querySelector(".kaucio");
+    if(rr) out.km2=(rr.textContent||"").replace(/\s+/g," ").trim();
+    if(ka) out.kaucio=(ka.textContent||"").replace(/\s*Kaució:?\s*/i,"").replace(/\s+/g," ").trim();
+    return out;
+  }
   function cardData(card){
     var t=card.querySelector(".title"), img=card.querySelector(".media img");
-    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"", price:priceOf(card), kind:cardKind(card) };
+    var kind=cardKind(card);
+    return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"",
+             price:priceOf(card), kind:kind, rent:(kind==="rent"?rentOf(card):null) };
   }
   function infoText(kind){
     var fx="";
