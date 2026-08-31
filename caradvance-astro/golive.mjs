@@ -30,7 +30,14 @@ const SITE = (process.env.SITE_BASE || 'https://www.caradvance.hu').replace(/\/+
 // Magyar tartalom idegen nyelvi kod alatt -> duplikatum, nem indexelheto.
 const DUP_LANGS = ['cs', 'de', 'fr', 'pl', 'sk', 'uk', 'zh'];
 
+// Nem nyilvanos / nem indexelheto utvonalak. A kapu eddig ezeket is takarta,
+// elesites utan viszont a Google-nek sem a belso iranyitopult, sem az egyedi
+// ugyfel-ajanlat nem valo. (A /berelheto/ atiranyit a /autoink/#berelheto-re,
+// ezert duplikatum lenne a sitemapban.)
+const PRIVATE_PATHS = ['/belso/', '/ajanlat/', '/berelheto/'];
+
 const NOINDEX_DUP = '<meta name="robots" content="noindex,follow">';
+const NOINDEX_PRIVATE = '<meta name="robots" content="noindex,nofollow">';
 
 let nGate = 0, nNoindex = 0, nDup = 0;
 const urls = [];
@@ -75,13 +82,15 @@ try {
     if (h !== before) nGate++;
 
     // 4. noindex
-    const dup = DUP_LANGS.includes(firstSeg(file));
+    const relPath = urlOf(file).slice(SITE.length);
+    const priv = PRIVATE_PATHS.includes(relPath);
+    const dup = DUP_LANGS.includes(firstSeg(file)) || priv;
     h = h.replace(/[ \t]*<meta\s+name=["']robots["'][^>]*>\s*\n?/gi, (m) => {
       if (/noindex\s*,\s*nofollow/i.test(m)) nNoindex++;
       return '';
     });
     if (dup) {
-      h = h.replace(/<\/head>/i, NOINDEX_DUP + '\n</head>');
+      h = h.replace(/<\/head>/i, (priv ? NOINDEX_PRIVATE : NOINDEX_DUP) + '\n</head>');
       nDup++;
     } else {
       urls.push(urlOf(file));
@@ -104,8 +113,8 @@ try {
     `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`
   );
 
-  console.log(`golive: kapu eltavolitva ${nGate} oldalrol, noindex,nofollow levéve ${nNoindex} oldalrol, `
-    + `${nDup} nyelvi duplikatum noindexelve, sitemap ${urls.length} URL`);
+  console.log(`golive: kapu eltavolitva ${nGate} oldalrol, noindex,nofollow leveve ${nNoindex} oldalrol, `
+    + `${nDup} noindexelve (nyelvi duplikatum + nem nyilvanos), sitemap ${urls.length} URL`);
 } catch (e) {
   console.log('golive: FIGYELEM - ' + (e && e.message) + ' (a build megy tovabb)');
   process.exit(0);
