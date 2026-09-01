@@ -749,3 +749,6 @@
   ready(apply);
   [300,900,2000,4000].forEach(function(ms){ setTimeout(apply, ms); });
 })();
+
+/* brandrow-even-grid */
+;(function(){function apply(){var rows=document.querySelectorAll('.stat-logos.ca-brandrow');rows.forEach(function(brand){var imgs=[].slice.call(brand.querySelectorAll('img'));if(!imgs.length)return;brand.querySelectorAll('.ca-brk').forEach(function(b){b.style.display='none';});var big={'BMW':34,'Mercedes-Benz':34,'Porsche':32,'Audi':26,'MINI':30};imgs.forEach(function(im){if(im.parentElement&&!im.parentElement.classList.contains('ca-slot')){var sp=document.createElement('span');sp.className='ca-slot';sp.style.cssText='display:flex;align-items:center;justify-content:center;width:100%;min-width:0';im.parentNode.insertBefore(sp,im);sp.appendChild(im);}var h=big[im.alt]||28;im.style.cssText='height:'+h+'px;width:auto;max-width:100%;object-fit:contain;display:block';});brand.style.cssText='display:grid;grid-template-columns:repeat('+imgs.length+',1fr);align-items:center;justify-items:center;width:100%;gap:0;padding:18px 4px 0;margin-top:16px;border-top:1px solid #E6EAF1;overflow:visible';});}var n=0;var iv=setInterval(function(){apply();if(++n>30)clearInterval(iv);},300);})();
