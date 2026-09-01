@@ -163,11 +163,18 @@ var TEAM=[
 ];
 var OFFICE={img:"https://www.caradvance.hu/caradvance-iroda.webp?v=4",name:"A Caradvance iroda",role:"Háttércsapat · Ügyintézés",bio:"Náluk fut össze minden papírmunka: adminisztráció, honosítás, okmányirodai ügyintézés — hogy neked ezzel ne kelljen foglalkoznod.",chips:[["🕘","H–P 9:00–17:00",""],["📍","2083 Solymár, Ibolya utca 12.",""],["✉","info@caradvance.hu","mailto:info@caradvance.hu"],["✆","+36 30 233 6060","tel:+36302336060"],["🟢","WhatsApp","https://wa.me/36302336060"]]};
 (function(o){var ch=o.chips.map(function(c){var inner='<span class="ic">'+c[0]+'</span>'+c[1];var cls='kap-chip'+(c[2]&&c[2].indexOf('wa.me')>=0?' kap-wa':'');return c[2]?'<a class="'+cls+'" href="'+c[2]+'"'+(c[2].indexOf('wa.me')>=0?' target="_blank" rel="noopener"':'')+'>'+inner+'</a>':'<span class="kap-chip">'+inner+'</span>';}).join('');document.getElementById('kap-office').innerHTML='<div class="kap-office-photo"><img src="'+o.img+'" alt="'+o.name+'"></div><div class="kap-office-body"><div class="kap-office-name">'+o.name+'</div><div class="kap-office-role">'+o.role+'</div><p class="kap-office-bio">'+o.bio+'</p><div class="kap-office-chips">'+ch+'</div></div>';})(OFFICE);
-document.var _caCard=function(t){
+document.getElementById('kap-team').innerHTML=TEAM.map(function(t){
   var chips=t.chips.map(function(c){var inner='<span class="ic">'+c[0]+'</span>'+c[1];var cls='kap-chip'+(c[2]&&c[2].indexOf('wa.me')>=0?' kap-wa':'');return c[2]?'<a class="'+cls+'" href="'+c[2]+'"'+(c[2].indexOf('wa.me')>=0?' target="_blank" rel="noopener"':'')+'>'+inner+'</a>':'<span class="kap-chip">'+inner+'</span>';}).join('');
   var photo=t.img?'<img src="'+t.img+'" alt="'+t.name+'" loading="lazy">':'<div class="ph" style="background:'+t.color+'">'+t.ini+'</div>';
   return '<div class="kap-card"><div class="kap-photo">'+photo+'</div><div class="body"><div class="nm">'+t.name+(t.flags?'<span class="kap-flags">'+FL(t.flags)+'</span>':'')+'</div><div class="rl">'+t.role+'</div><div class="bio">'+t.bio+'</div>'+(chips?'<div class="cc">'+chips+'</div>':'')+'</div></div>';
-}; document.getElementById('kap-team').innerHTML=TEAM.slice(0,3).map(_caCard).join(""); var _e2=document.getElementById('kap-team2'); if(_e2) _e2.innerHTML=TEAM.slice(3).map(_caCard).join("");
+}).join('');
 })();
 </script>
+<script is:inline>
+(function(){
+  function mv(){ var a=document.getElementById("kap-team"), b=document.getElementById("kap-team2"); if(!a||!b) return false; if(a.getAttribute("data-split")) return true; if(a.children.length<4) return false; a.setAttribute("data-split","1"); var cards=[].slice.call(a.children); for(var i=3;i<cards.length;i++){ b.appendChild(cards[i]); } return true; }
+  if(!mv()){ var n=0; var iv=setInterval(function(){ if(mv()||++n>40) clearInterval(iv); }, 100); }
+})();
+</script>
+
 </Base>
