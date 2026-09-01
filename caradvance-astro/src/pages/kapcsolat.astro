@@ -99,6 +99,22 @@ const lang = 'hu';
 .kap-langs .kap-rflag{width:26px;height:26px}
 .kap-chip.kap-wa{background:#E7F9EF;border-color:#BFE9CF;color:#0B7A43}
 @media(max-width:900px){.kap-hero{grid-template-columns:1fr}.kap-office{grid-template-columns:1fr}.kap-head h1{font-size:30px}}
+
+/* office-card-redesign */
+.kap-office{grid-template-columns:320px 1fr;border-radius:22px;box-shadow:0 18px 50px rgba(20,21,25,.10);border-color:#eef1f6}
+.kap-office-photo{min-height:100%}
+.kap-office-body{padding:32px 34px;display:flex;flex-direction:column}
+.kap-office-role{letter-spacing:.12em;text-transform:uppercase;font-size:12px;font-weight:800;color:#E2001A}
+.kap-office-name{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:8px 0 0}
+.kap-office-bio{color:#5A6B82;font-size:15px;line-height:1.6;margin:12px 0 4px;max-width:52ch}
+.kap-office-chips{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:20px;align-items:stretch}
+.kap-office-chips .kap-chip{width:auto;background:#fff;border:1px solid #E9EDF3;border-radius:14px;padding:12px 14px;gap:12px;font-weight:600;box-shadow:0 1px 2px rgba(20,21,25,.03);transition:.15s}
+.kap-office-chips a.kap-chip:hover{border-color:#cfd8e4;transform:translateY(-1px);box-shadow:0 6px 16px rgba(20,21,25,.08)}
+.kap-office-chips .kap-chip .ic{opacity:1;width:34px;height:34px;flex:0 0 34px;display:inline-flex;align-items:center;justify-content:center;background:#F3F6FB;border-radius:10px;font-size:16px}
+.kap-office-chips a.kap-wa{grid-column:1 / -1;justify-content:center;background:#25D366;border-color:#25D366;color:#fff;font-weight:800;padding:13px 14px}
+.kap-office-chips a.kap-wa .ic{background:rgba(255,255,255,.22);color:#fff}
+@media(max-width:760px){.kap-office{grid-template-columns:1fr}.kap-office-chips{grid-template-columns:1fr}}
+
 </style>
 
 <script is:inline>
