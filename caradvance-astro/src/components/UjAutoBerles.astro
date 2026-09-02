@@ -58,7 +58,9 @@ const BRANDS = [
   { id:'audi',     name:'Audi',     logo:'/audi/audi-logo.webp?v=4' },
 ];
 
+const HUF = 368; // 1 € = 368 Ft (matches Egyedi live rate)
 const g = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const gh = (eur) => g(eur * HUF);
 const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 ---
@@ -107,7 +109,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
       <span class="uab-eyebrow">GYIK</span>
       <h2 class="uab-seo-h">Gyakori kérdések</h2>
       <details><summary>Mit tartalmaz a havi bérleti díj?<span class="pl">+</span></summary><p>A feltüntetett havidíj a választott modell bérletét jelenti a megadott futáskerettel (2000 vagy 3000 km/hó). A pontos, teljes körű feltételeket — biztosítás, szerviz, kilométer-túllépés — minden esetben előre, írásban egyeztetjük.</p></details>
-      <details><summary>Mennyi a kaució?<span class="pl">+</span></summary><p>A kaució (egyszeri, visszatérítendő letét) modellenként eltér, és a kártyán fel van tüntetve. A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.</p></details>
+      <details><summary>Mennyi a kaució?<span class="pl">+</span></summary><p>A kaució (egyszeri, visszatérítendő letét) modellenként eltér, és a kártyán, illetve az ár melletti információs ikonra kattintva látható. A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.</p></details>
       <details><summary>Melyik márkákat lehet bérelni?<span class="pl">+</span></summary><p>Jelenleg BMW, Mercedes, MINI és Audi új modelleket kínálunk bérlésre. Válaszd ki a márkát fent, és nézd meg az elérhető modelleket és díjakat.</p></details>
       <details><summary>Mi a különbség a 2000 és a 3000 km/hó között?<span class="pl">+</span></summary><p>A havi szabad futáskeretet jelenti. Ha többet vezetsz, válaszd a 3000 km/hó csomagot; a keret túllépését előre egyeztetett km-díjjal számoljuk el.</p></details>
       <details><summary>Hogyan tudok bérelni?<span class="pl">+</span></summary><p>Válaszd ki a modellt, majd kattints a „Bérlés igénylése” gombra vagy vedd fel velünk a kapcsolatot. Egyeztetjük az elérhetőséget, a feltételeket és az átadás időpontját.</p></details>
@@ -127,14 +129,21 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   <!-- ===== PER-BRAND VIEWS ===== -->
   {BRANDS.map((br) => (
     <div class="uab-brandview" data-brand={br.id}>
-      <div class="egl-mhero uab-bmhero">
+      <div class="egl-mhero">
+        <video class="egl-mhero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-poster-hd.jpg">
+          <source src="/caradvance-hero-hd.mp4" type="video/mp4" />
+        </video>
         <div class="egl-mhero-ov"></div>
         <div class="egl-mhero-inner">
-          <a class="uab-back" href="/uj-auto-berlese">← Összes márka</a>
           <div class="egl-mhero-logos"><img src={br.logo} alt={br.name} loading="lazy" /></div>
           <div class="egl-mhero-h1">{br.name} bérlés</div>
           <p class="egl-mhero-sub">Válaszd ki a modellt — kaució és havi bérleti díj 2000, illetve 3000 km/hó futáskerettel.</p>
+          <div class="egl-mhero-cta">
+            <a class="egl-mhero-btn red" href="#uabModels" onclick="var el=this.closest('.uab-brandview').querySelector('.egl-grid');if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}return false;">Modellek</a>
+            <a class="egl-mhero-btn white" href="/uj-auto-berlese">← Összes márka</a>
+          </div>
         </div>
+        <button class="egl-mhero-scroll" type="button" onclick="window.scrollBy({top:Math.round(window.innerHeight*0.72),behavior:'smooth'})">Görgess<span class="uab-chev" set:html={chevron}></span></button>
       </div>
       <div class="egl-grid">
         {MODELS.filter((x) => x.b === br.id).map((car) => (
@@ -149,10 +158,16 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
                 <span class="egl-year">Új autó · Bérlés</span>
               </div>
               <div class="egl-name">{car.m}</div>
-              <div class="egl-specs">Kaució: {g(car.k)} € · 3000 km/hó: {g(car.p3)} €</div>
-              <div class="egl-price"><b>{g(car.p2)} €</b><span class="eur">/ hó</span><span class="tol">2000 km-től</span></div>
+              <div class="egl-specs">Bérlés · 2000 vagy 3000 km/hó futáskeret</div>
+              <div class="egl-price">
+                <b>{gh(car.p2)} Ft</b>
+                <span class="eur">/ hó</span>
+                <span class="tol">{g(car.p2)} €-tól</span>
+                <span class="egl-info" tabindex="0">i<span class="egl-tip">A havi díj 2000 km/hó futáskerettel értendő. 3000 km/hó esetén {g(car.p3)} € / hó ({gh(car.p3)} Ft). Egyszeri, visszatérítendő kaució: {g(car.k)} € ({gh(car.k)} Ft). Az árak tájékoztató jellegűek, élő árfolyammal (1 € = 368 Ft).</span></span>
+              </div>
             </div>
             <div class="egl-actions">
+              <a class="egl-btn" href="/berlesi-folyamat">Részletek</a>
               <a class="egl-order" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Bérlés igénylése</a>
             </div>
           </article>
@@ -184,12 +199,6 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 .uab .egl-mhero-scroll:hover{color:#fff}
 .uab .uab-chev svg{width:26px;height:26px;display:block}
 @keyframes caScrollBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
-/* compact brand-view hero */
-.uab .uab-bmhero{min-height:360px;padding:20px 24px 40px}
-.uab .uab-bmhero .egl-mhero-inner{margin:40px auto 0}
-.uab .uab-bmhero .egl-mhero-logos img{height:64px}
-.uab-back{position:absolute;left:calc(50% - 50vw + 34px);top:16px;z-index:4;color:rgba(255,255,255,.85);text-decoration:none;font-weight:700;font-size:14px}
-.uab-back:hover{color:#fff}
 
 /* brand tiles */
 .uab-brands{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:6px 0 8px}
@@ -215,11 +224,16 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 .uab .egl-year{font-size:13.5px;color:var(--muted)}
 .uab .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2}
 .uab .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px}
-.uab .egl-price{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;flex-wrap:nowrap;white-space:nowrap}
+.uab .egl-price{display:flex;align-items:baseline;gap:7px;margin-bottom:14px;flex-wrap:wrap;position:relative}
 .uab .egl-price b{font-size:23px;font-weight:800;color:var(--ink)}
 .uab .egl-price .eur{font-size:14px;font-weight:700;color:var(--muted)}
 .uab .egl-price .tol{font-size:13px;color:var(--muted);font-weight:600}
+.uab .egl-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:2px;flex:0 0 auto}
+.uab .egl-info .egl-tip{position:absolute;bottom:150%;right:0;left:auto;width:240px;white-space:normal;background:var(--navy);color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left;letter-spacing:0}
+.uab .egl-info:hover .egl-tip,.uab .egl-info:focus .egl-tip{opacity:1;visibility:visible}
 .uab .egl-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px}
+.uab .egl-btn{display:block;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;font-size:15px;padding:14px;border-radius:12px;transition:.15s;text-decoration:none}
+.uab a.egl-btn:hover,.uab .egl-card:hover .egl-btn{background:var(--navy);color:#fff}
 .uab .egl-order{display:block;width:100%;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;font-size:15px;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;transition:.15s;text-decoration:none}
 .uab .egl-card:hover .egl-order,.uab .egl-order:hover{background:var(--red);color:#fff}
 
