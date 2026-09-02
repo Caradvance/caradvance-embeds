@@ -1,7 +1,6 @@
 ---
-// Új autó bérlése — brand-tile rental catalog, styled like Egyedi autó rendelés.
+// Új autó bérlése — same look as Egyedi autó rendelés (egl-mhero hero + egl-card cards), rental data.
 // Data source: "új autó bérlés" sheet (44 models). Do not add models not in this list.
-// Car photos reuse the Egyedi konfigurátor model images.
 const MODELS = [
   { b:'bmw', m:'BMW M2 Coupe', k:5000, p2:1450, p3:1600, img:'/bmw/m2.webp' },
   { b:'bmw', m:'BMW 3-as Limuzin', k:5000, p2:1400, p3:1500, img:'/bmw/3er.webp' },
@@ -54,34 +53,39 @@ const MODELS = [
 
 const BRANDS = [
   { id:'bmw',      name:'BMW',      logo:'/bmw/bmw-logo.webp?v=2' },
-  { id:'mercedes', name:'Mercedes', logo:'/mb-star.webp?v=1' },
   { id:'mini',     name:'MINI',     logo:'/mini-hero-logo.webp?v=3' },
+  { id:'mercedes', name:'Mercedes', logo:'/mb-star.webp?v=1' },
   { id:'audi',     name:'Audi',     logo:'/audi/audi-logo.webp?v=4' },
 ];
 
 const g = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
+const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 ---
 
 <section id="uab" class="uab uab-choose">
   <!-- ===== LANDING ===== -->
   <div id="uabLand" class="uab-land">
-    <div class="uab-hero">
-      <video class="uab-hero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-poster-hd.jpg">
+    <div class="egl-mhero">
+      <video class="egl-mhero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-poster-hd.jpg">
         <source src="/caradvance-hero-hd.mp4" type="video/mp4" />
       </video>
-      <div class="uab-hero-ov"></div>
-      <div class="uab-hero-inner">
-        <div class="uab-hero-logos">
+      <div class="egl-mhero-ov"></div>
+      <div class="egl-mhero-inner">
+        <div class="egl-mhero-logos">
           {BRANDS.map((b) => (<img src={b.logo} alt={b.name} loading="lazy" />))}
         </div>
-        <h1>Új autó bérlése<br /><span>Prémium márkák, rugalmas feltételekkel</span></h1>
-        <p>Válaszd ki a márkát, és bérelj vadonatúj prémium autót — átlátható havidíjjal, egyszeri kaucióval, 2000 vagy 3000 km/hó futáskerettel.</p>
-        <div class="uab-hero-scroll">Válassz márkát ⌄</div>
+        <div class="egl-mhero-h1">Új autó bérlése</div>
+        <p class="egl-mhero-sub">Válaszd ki a márkát — bérelj vadonatúj prémium autót, átlátható havidíjjal, egyszeri kaucióval, 2000 vagy 3000 km/hó futáskerettel.</p>
+        <div class="egl-mhero-cta">
+          <a class="egl-mhero-btn red" href="#uabBrands" onclick="var b=document.querySelector('#uabLand .uab-brands');if(b){b.scrollIntoView({behavior:'smooth',block:'center'});}return false;">Válassz márkát</a>
+          <a class="egl-mhero-btn white" href="/berles-elonyei">Előnyök</a>
+        </div>
       </div>
+      <button class="egl-mhero-scroll" type="button" onclick="window.scrollBy({top:Math.round(window.innerHeight*0.72),behavior:'smooth'})">Görgess<span class="uab-chev" set:html={chevron}></span></button>
     </div>
 
-    <div class="uab-brands">
+    <div id="uabBrands" class="uab-brands">
       {BRANDS.map((b) => (
         <a class="uab-brand-tile" href={`/uj-auto-berlese?brand=${b.id}`} aria-label={`${b.name} bérelhető modellek`}>
           <img src={b.logo} alt={b.name} loading="lazy" />
@@ -106,7 +110,7 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
       <details><summary>Mennyi a kaució?<span class="pl">+</span></summary><p>A kaució (egyszeri, visszatérítendő letét) modellenként eltér, és a kártyán fel van tüntetve. A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.</p></details>
       <details><summary>Melyik márkákat lehet bérelni?<span class="pl">+</span></summary><p>Jelenleg BMW, Mercedes, MINI és Audi új modelleket kínálunk bérlésre. Válaszd ki a márkát fent, és nézd meg az elérhető modelleket és díjakat.</p></details>
       <details><summary>Mi a különbség a 2000 és a 3000 km/hó között?<span class="pl">+</span></summary><p>A havi szabad futáskeretet jelenti. Ha többet vezetsz, válaszd a 3000 km/hó csomagot; a keret túllépését előre egyeztetett km-díjjal számoljuk el.</p></details>
-      <details><summary>Hogyan tudok bérelni?<span class="pl">+</span></summary><p>Válaszd ki a modellt, majd kattints az „Érdeklődöm” gombra vagy vedd fel velünk a kapcsolatot. Egyeztetjük az elérhetőséget, a feltételeket és az átadás időpontját.</p></details>
+      <details><summary>Hogyan tudok bérelni?<span class="pl">+</span></summary><p>Válaszd ki a modellt, majd kattints a „Bérlés igénylése” gombra vagy vedd fel velünk a kapcsolatot. Egyeztetjük az elérhetőséget, a feltételeket és az átadás időpontját.</p></details>
     </div>
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify({
@@ -115,7 +119,7 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
         {'@type':'Question','name':'Mennyi a kaució?','acceptedAnswer':{'@type':'Answer','text':'A kaució modellenként eltér, és a kártyán fel van tüntetve. A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.'}},
         {'@type':'Question','name':'Melyik márkákat lehet bérelni?','acceptedAnswer':{'@type':'Answer','text':'Jelenleg BMW, Mercedes, MINI és Audi új modelleket kínálunk bérlésre.'}},
         {'@type':'Question','name':'Mi a különbség a 2000 és a 3000 km/hó között?','acceptedAnswer':{'@type':'Answer','text':'A havi szabad futáskeretet jelenti. A keret túllépését előre egyeztetett km-díjjal számoljuk el.'}},
-        {'@type':'Question','name':'Hogyan tudok bérelni?','acceptedAnswer':{'@type':'Answer','text':'Válaszd ki a modellt, majd kattints az Érdeklődöm gombra vagy vedd fel velünk a kapcsolatot.'}}
+        {'@type':'Question','name':'Hogyan tudok bérelni?','acceptedAnswer':{'@type':'Answer','text':'Válaszd ki a modellt, majd kattints a Bérlés igénylése gombra vagy vedd fel velünk a kapcsolatot.'}}
       ]
     })} />
   </div>
@@ -123,30 +127,34 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
   <!-- ===== PER-BRAND VIEWS ===== -->
   {BRANDS.map((br) => (
     <div class="uab-brandview" data-brand={br.id}>
-      <div class="uab-bhero">
-        <a class="uab-back" href="/uj-auto-berlese">← Összes márka</a>
-        <img class="uab-bhero-logo" src={br.logo} alt={br.name} />
-        <h2 class="uab-bhero-h">{br.name} bérlés</h2>
-        <p class="uab-bhero-sub">Válaszd ki a modellt — kaució és havidíj 2000 / 3000 km/hó futáskerettel.</p>
+      <div class="egl-mhero uab-bmhero">
+        <div class="egl-mhero-ov"></div>
+        <div class="egl-mhero-inner">
+          <a class="uab-back" href="/uj-auto-berlese">← Összes márka</a>
+          <div class="egl-mhero-logos"><img src={br.logo} alt={br.name} loading="lazy" /></div>
+          <div class="egl-mhero-h1">{br.name} bérlés</div>
+          <p class="egl-mhero-sub">Válaszd ki a modellt — kaució és havi bérleti díj 2000, illetve 3000 km/hó futáskerettel.</p>
+        </div>
       </div>
-      <div class="uab-grid">
+      <div class="egl-grid">
         {MODELS.filter((x) => x.b === br.id).map((car) => (
-          <article class="uab-card">
-            <div class="uab-card-photo"><img src={car.img} alt={car.m} loading="lazy" /></div>
-            <span class="uab-card-brand">{br.name}</span>
-            <h3 class="uab-card-name">{car.m}</h3>
-            <div class="uab-card-prices">
-              <div class="uab-price">
-                <span class="uab-price-lbl">2000 km / hó</span>
-                <span class="uab-price-val">{g(car.p2)} €<small>/hó</small></span>
-              </div>
-              <div class="uab-price">
-                <span class="uab-price-lbl">3000 km / hó</span>
-                <span class="uab-price-val">{g(car.p3)} €<small>/hó</small></span>
-              </div>
+          <article class="egl-card egl-card-mini">
+            <div class="egl-media">
+              <img src={car.img} alt={car.m} loading="lazy" />
+              <div class="egl-fuels"><span class="egl-fuel uab-badge">Bérelhető</span></div>
             </div>
-            <div class="uab-card-dep">Kaució: <strong>{g(car.k)} €</strong></div>
-            <a class="uab-card-cta" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Érdeklődöm</a>
+            <div class="egl-body">
+              <div class="egl-meta">
+                <span class="egl-brand"><img class="uab-cardlogo" src={br.logo} alt={br.name} /></span>
+                <span class="egl-year">Új autó · Bérlés</span>
+              </div>
+              <div class="egl-name">{car.m}</div>
+              <div class="egl-specs">Kaució: {g(car.k)} € · 3000 km/hó: {g(car.p3)} €</div>
+              <div class="egl-price"><b>{g(car.p2)} €</b><span class="eur">/ hó</span><span class="tol">2000 km-től</span></div>
+            </div>
+            <div class="egl-actions">
+              <a class="egl-order" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Bérlés igénylése</a>
+            </div>
           </article>
         ))}
       </div>
@@ -155,19 +163,33 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 </section>
 
 <style is:global>
-.uab{--red:#E2001A;--red-dark:#b80016;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--navy:#0B0B0D;max-width:1120px;margin:0 auto;padding:0 20px 26px}
+.uab{--red:#E2001A;--red-dark:#b80016;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--navy:#0F1B2D;max-width:1160px;margin:0 auto;padding:0 20px 26px}
 
-/* landing hero (full-bleed dark, like Egyedi) */
-.uab-hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;padding:40px 24px 60px;border-radius:32px;width:calc(100vw - 32px);margin:calc(6px - var(--navh,80px) - 34px) 0 26px calc(50% - 50vw + 16px);background:linear-gradient(#17181c,#0b0b0d 62%,#060607)}
-.uab-hero-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;opacity:.5}
-.uab-hero-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.5),rgba(8,8,10,.55) 45%,rgba(8,8,10,.72))}
-.uab-hero-inner{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:8px 16px}
-.uab-hero-logos{display:inline-flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 0 22px}
-.uab-hero-logos img{height:30px;width:auto;object-fit:contain;background:#fff;border-radius:10px;padding:7px 10px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-.uab-hero-inner h1{font-size:clamp(32px,5vw,56px);font-weight:800;letter-spacing:-.025em;line-height:1.08;margin:0 0 16px;color:#fff}
-.uab-hero-inner h1 span{opacity:.9;font-weight:800}
-.uab-hero-inner p{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:620px;margin:0 auto 16px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
-.uab-hero-scroll{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:4px}
+/* ===== HERO (copied from Egyedi egl-mhero) ===== */
+.uab .egl-mhero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;width:calc(100vw - 32px);margin:calc(6px - var(--navh,80px) - 34px) 0 30px calc(50% - 50vw + 16px);background:linear-gradient(#17181c,#0b0b0d 62%,#060607)}
+.uab .egl-mhero-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
+.uab .egl-mhero-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7))}
+.uab .egl-mhero-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0}
+.uab .egl-mhero-logos{display:inline-flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;margin:0 0 22px}
+.uab .egl-mhero-logos img{height:78px;width:auto;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+.uab .egl-mhero-h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.uab .egl-mhero-sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:600px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
+.uab .egl-mhero-cta{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.uab .egl-mhero-btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;padding:15px 32px;border-radius:999px;text-decoration:none;transition:.15s;box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.uab .egl-mhero-btn.red{background:#E2001A;color:#fff}
+.uab .egl-mhero-btn.red:hover{background:#c40017}
+.uab .egl-mhero-btn.white{background:#fff;color:#0F1B2D}
+.uab .egl-mhero-btn.white:hover{background:#eef0f4}
+.uab .egl-mhero-scroll{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.82);background:none;border:0;cursor:pointer;letter-spacing:.05em;font-size:11px;text-transform:uppercase;font-family:inherit;animation:caScrollBob 1.9s ease-in-out infinite}
+.uab .egl-mhero-scroll:hover{color:#fff}
+.uab .uab-chev svg{width:26px;height:26px;display:block}
+@keyframes caScrollBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+/* compact brand-view hero */
+.uab .uab-bmhero{min-height:360px;padding:20px 24px 40px}
+.uab .uab-bmhero .egl-mhero-inner{margin:40px auto 0}
+.uab .uab-bmhero .egl-mhero-logos img{height:64px}
+.uab-back{position:absolute;left:calc(50% - 50vw + 34px);top:16px;z-index:4;color:rgba(255,255,255,.85);text-decoration:none;font-weight:700;font-size:14px}
+.uab-back:hover{color:#fff}
 
 /* brand tiles */
 .uab-brands{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:6px 0 8px}
@@ -177,7 +199,31 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 .uab-brand-name{font-weight:800;font-size:17px}
 .uab-brand-cta{font-weight:800;font-size:13px;color:var(--red)}
 
-/* SEO + FAQ (shared look) */
+/* ===== CARDS (copied from Egyedi egl-card) ===== */
+.uab .egl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.uab .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:visible;position:relative;display:flex;flex-direction:column;transition:.18s;text-decoration:none;color:inherit}
+.uab .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.1);transform:translateY(-3px);z-index:30}
+.uab .egl-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:flex-end;justify-content:center;padding:6px 4px 0;border-radius:20px 20px 0 0;overflow:hidden}
+.uab .egl-media img{max-width:82%;max-height:90%;width:auto;height:auto;object-fit:contain;margin:0 auto;display:block}
+.uab .egl-fuels{position:absolute;top:14px;right:14px;display:flex;gap:6px}
+.uab .egl-fuel{color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.uab .uab-badge{background:#0F8A3C}
+.uab .egl-body{padding:16px 20px 12px}
+.uab .egl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.uab .egl-brand{display:inline-flex;align-items:center}
+.uab .uab-cardlogo{height:22px;width:auto;max-width:70px;object-fit:contain}
+.uab .egl-year{font-size:13.5px;color:var(--muted)}
+.uab .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2}
+.uab .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px}
+.uab .egl-price{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;flex-wrap:nowrap;white-space:nowrap}
+.uab .egl-price b{font-size:23px;font-weight:800;color:var(--ink)}
+.uab .egl-price .eur{font-size:14px;font-weight:700;color:var(--muted)}
+.uab .egl-price .tol{font-size:13px;color:var(--muted);font-weight:600}
+.uab .egl-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px}
+.uab .egl-order{display:block;width:100%;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;font-size:15px;padding:14px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;transition:.15s;text-decoration:none}
+.uab .egl-card:hover .egl-order,.uab .egl-order:hover{background:var(--red);color:#fff}
+
+/* SEO + FAQ */
 .uab-seo{max-width:900px;margin:34px auto 0}
 .uab-eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
 .uab-seo-h{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 14px}
@@ -192,41 +238,16 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 .uab-faq2 details[open] .pl{transform:rotate(45deg)}
 .uab-faq2 p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 15px}
 
-/* per-brand view */
+/* toggle */
 .uab-brandview{display:none}
-.uab-bhero{position:relative;overflow:hidden;color:#fff;text-align:center;border-radius:26px;padding:38px 24px 34px;margin:calc(6px - var(--navh,80px) - 34px) 0 22px calc(50% - 50vw + 16px);width:calc(100vw - 32px);background:radial-gradient(900px 400px at 50% -20%,rgba(226,0,26,.22),transparent 60%),linear-gradient(#17181c,#0b0b0d 65%,#060607)}
-.uab-back{position:absolute;left:20px;top:18px;color:rgba(255,255,255,.85);text-decoration:none;font-weight:700;font-size:14px}
-.uab-back:hover{color:#fff}
-.uab-bhero-logo{height:52px;width:auto;max-width:150px;object-fit:contain;background:#fff;border-radius:12px;padding:9px 12px;margin:6px 0 14px;box-shadow:0 8px 22px rgba(0,0,0,.3)}
-.uab-bhero-h{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-.02em;margin:0 0 8px}
-.uab-bhero-sub{color:#e7eaf0;font-size:15px;margin:0;opacity:.9}
-
-.uab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.uab-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 22px 20px;box-shadow:0 10px 30px rgba(8,8,10,.05);transition:.16s;overflow:hidden}
-.uab-card:hover{transform:translateY(-3px);border-color:#c9d2df;box-shadow:0 18px 44px rgba(8,8,10,.1)}
-.uab-card-photo{margin:-22px -22px 16px;height:160px;background:linear-gradient(135deg,#f2f5fa,#e6ebf3);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.uab-card-photo img{width:100%;height:100%;object-fit:cover;object-position:center}
-.uab-card-brand{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
-.uab-card-name{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--ink);margin:6px 0 0;min-height:48px}
-.uab-card-prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 12px}
-.uab-price{background:#F4F7FB;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.uab-price-lbl{display:block;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.uab-price-val{display:block;font-size:19px;font-weight:800;color:var(--ink);margin-top:2px}
-.uab-price-val small{font-size:12px;font-weight:700;color:var(--muted)}
-.uab-card-dep{font-size:14px;color:var(--muted)}
-.uab-card-dep strong{color:var(--ink)}
-.uab-card-cta{margin-top:16px;display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;font-weight:800;font-size:15px;text-decoration:none;border-radius:12px;padding:12px 16px;box-shadow:0 12px 28px rgba(226,0,26,.28);transition:.15s}
-.uab-card-cta:hover{background:var(--red-dark)}
-
-/* toggle: landing vs brand view */
 .uab.uab-choose .uab-brandview{display:none}
 .uab.uab-choose #uabLand{display:block}
 .uab:not(.uab-choose) #uabLand{display:none}
 .uab:not(.uab-choose) .uab-brandview.is-active{display:block}
 
-@media(max-width:900px){.uab-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.uab .egl-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:820px){.uab-brands{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){.uab-grid{grid-template-columns:1fr}.uab-card-name{min-height:0}}
+@media(max-width:600px){.uab .egl-grid{grid-template-columns:1fr}}
 </style>
 
 <script is:inline>
