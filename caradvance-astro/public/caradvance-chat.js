@@ -758,3 +758,6 @@
 
 /* charity-reorder */
 ;(function(){function mv(){var c=document.getElementById('jotekonysag-blokk'),a=document.getElementById('autoink');if(!c||!a)return false;var w=document.getElementById('ca-cah');if(!w){w=document.createElement('div');w.className='cah';w.id='ca-cah';}if(a.previousElementSibling!==w)a.parentNode.insertBefore(w,a);if(c.parentElement!==w)w.appendChild(c);[].slice.call(w.querySelectorAll('.reveal')).forEach(function(e){e.classList.remove('reveal');});return true;}var n=0;var iv=setInterval(function(){mv();if(++n>60)clearInterval(iv);},80);})();
+
+/* mobile-brand-charity */
+;(function(){var css='@media(max-width:768px){.stat-logos.ca-brandrow{flex-wrap:wrap!important;gap:10px 8px!important}.stat-logos.ca-brandrow img[alt="BMW"]{height:26px!important}.stat-logos.ca-brandrow img[alt="Mercedes-Benz"]{height:24px!important}.stat-logos.ca-brandrow img[alt="Porsche"]{height:24px!important}.stat-logos.ca-brandrow img[alt="Audi"]{height:17px!important}.stat-logos.ca-brandrow img[alt="MINI"]{height:19px!important;margin-left:0!important}}#ca-cah .block{padding-bottom:10px!important}#ca-cah{padding-bottom:0!important;margin-bottom:0!important}';var s=document.createElement('style');s.id='ca-mob-fix';s.textContent=css;(document.head||document.documentElement).appendChild(s);})();
