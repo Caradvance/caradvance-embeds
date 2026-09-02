@@ -203,7 +203,7 @@
 
   var BRANDS = [
     { t: "BMW",      href: "/egyedi-auto-rendeles?brand=bmw",      logo: "/bmw/bmw-logo.webp?v=2" },
-    { t: "MINI",     href: "/egyedi-auto-rendeles?brand=mini",     logo: "/mini-logo.webp?v=3" },
+    { t: "MINI",     href: "/egyedi-auto-rendeles?brand=mini",     logo: "/mini-hero-logo.webp?v=3" },
     { t: "Mercedes", href: "/egyedi-auto-rendeles?brand=mercedes", logo: "/mb-star.webp?v=1" },
     { t: "Audi", href: "/egyedi-auto-rendeles?brand=audi", logo: "/audi/audi-logo.webp?v=4" }
   ];
@@ -711,7 +711,7 @@
       var alts=[].slice.call(row.querySelectorAll("img")).map(function(i){ return i.getAttribute("alt"); });
       if(!(alts.indexOf("BMW")>-1 && alts.indexOf("Porsche")>-1)) return; // only the brand row
       if(alts.indexOf("MINI")===-1){
-        var mini=document.createElement("img"); mini.src="/mini-logo.webp"; mini.alt="MINI"; mini.loading="lazy"; mini.setAttribute("style","height:28px;width:auto");
+        var mini=document.createElement("img"); mini.src="/mini-hero-logo.webp"; mini.alt="MINI"; mini.loading="lazy"; mini.setAttribute("style","height:28px;width:auto");
         row.appendChild(mini);
       }
       [].slice.call(row.querySelectorAll("img")).forEach(function(im){ im.style.height="24px"; im.style.width="auto"; im.style.maxWidth="none"; im.style.objectFit="contain"; if(im.getAttribute("alt")==="Audi" && (im.src||"").indexOf("audi-logo.webp")<0){ im.src=location.origin+"/audi/audi-logo.webp"; } }); row.style.flexWrap="nowrap"; row.style.gap="12px"; row.style.justifyContent="center"; row.style.alignItems="center"; row.style.overflow="hidden"; if(row.getAttribute("data-caorder")) return;
