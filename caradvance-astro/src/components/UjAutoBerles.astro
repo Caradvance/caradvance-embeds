@@ -1,54 +1,55 @@
 ---
 // Új autó bérlése — brand-tile rental catalog, styled like Egyedi autó rendelés.
 // Data source: "új autó bérlés" sheet (44 models). Do not add models not in this list.
+// Car photos reuse the Egyedi konfigurátor model images.
 const MODELS = [
-  { b:'bmw', m:'BMW M2 Coupe', k:5000, p2:1450, p3:1600 },
-  { b:'bmw', m:'BMW 3-as Limuzin', k:5000, p2:1400, p3:1500 },
-  { b:'bmw', m:'BMW 3-as Touring', k:5000, p2:1400, p3:1500 },
-  { b:'bmw', m:'BMW M3 Limuzin', k:7500, p2:1950, p3:2150 },
-  { b:'bmw', m:'BMW M3 Touring', k:7500, p2:1950, p3:2150 },
-  { b:'bmw', m:'BMW 4-es Coupé', k:5000, p2:1550, p3:1790 },
-  { b:'bmw', m:'BMW M4 Coupé', k:7500, p2:2000, p3:2150 },
-  { b:'bmw', m:'BMW 5-ös Limuzin', k:7500, p2:1600, p3:1900 },
-  { b:'bmw', m:'BMW 5-ös Touring', k:7500, p2:1600, p3:1900 },
-  { b:'bmw', m:'BMW M5 Limuzin', k:10000, p2:2100, p3:2300 },
-  { b:'bmw', m:'BMW M5 Touring', k:10000, p2:2100, p3:2300 },
-  { b:'bmw', m:'BMW X1', k:3000, p2:1180, p3:1380 },
-  { b:'bmw', m:'BMW X3', k:5000, p2:1550, p3:1660 },
-  { b:'bmw', m:'BMW X5', k:7500, p2:1790, p3:2020 },
-  { b:'bmw', m:'BMW X6', k:7500, p2:1840, p3:2120 },
+  { b:'bmw', m:'BMW M2 Coupe', k:5000, p2:1450, p3:1600, img:'/bmw/m2.webp' },
+  { b:'bmw', m:'BMW 3-as Limuzin', k:5000, p2:1400, p3:1500, img:'/bmw/3er.webp' },
+  { b:'bmw', m:'BMW 3-as Touring', k:5000, p2:1400, p3:1500, img:'/bmw/3ert.webp' },
+  { b:'bmw', m:'BMW M3 Limuzin', k:7500, p2:1950, p3:2150, img:'/bmw/m3.webp' },
+  { b:'bmw', m:'BMW M3 Touring', k:7500, p2:1950, p3:2150, img:'/bmw/m3t.webp' },
+  { b:'bmw', m:'BMW 4-es Coupé', k:5000, p2:1550, p3:1790, img:'/bmw/4erc.webp' },
+  { b:'bmw', m:'BMW M4 Coupé', k:7500, p2:2000, p3:2150, img:'/bmw/m4b.webp' },
+  { b:'bmw', m:'BMW 5-ös Limuzin', k:7500, p2:1600, p3:1900, img:'/bmw/5erb.webp' },
+  { b:'bmw', m:'BMW 5-ös Touring', k:7500, p2:1600, p3:1900, img:'/bmw/5ertb.webp' },
+  { b:'bmw', m:'BMW M5 Limuzin', k:10000, p2:2100, p3:2300, img:'/bmw/m5.webp' },
+  { b:'bmw', m:'BMW M5 Touring', k:10000, p2:2100, p3:2300, img:'/bmw/m5t.webp' },
+  { b:'bmw', m:'BMW X1', k:3000, p2:1180, p3:1380, img:'/bmw/x1b.webp' },
+  { b:'bmw', m:'BMW X3', k:5000, p2:1550, p3:1660, img:'/bmw/x3mw.webp' },
+  { b:'bmw', m:'BMW X5', k:7500, p2:1790, p3:2020, img:'/bmw/x5.webp' },
+  { b:'bmw', m:'BMW X6', k:7500, p2:1840, p3:2120, img:'/bmw/x6b.webp' },
 
-  { b:'mini', m:'MINI Cooper 3 ajtós', k:3000, p2:1050, p3:1250 },
-  { b:'mini', m:'MINI Cooper 5 ajtós', k:3000, p2:1050, p3:1250 },
-  { b:'mini', m:'MINI Cooper Cabrio', k:3000, p2:1050, p3:1250 },
-  { b:'mini', m:'MINI Countryman', k:3000, p2:1050, p3:1250 },
-  { b:'mini', m:'MINI John Cooper Works', k:3000, p2:1100, p3:1350 },
+  { b:'mini', m:'MINI Cooper 3 ajtós', k:3000, p2:1050, p3:1250, img:'/cooper-s.webp' },
+  { b:'mini', m:'MINI Cooper 5 ajtós', k:3000, p2:1050, p3:1250, img:'/cooper.webp' },
+  { b:'mini', m:'MINI Cooper Cabrio', k:3000, p2:1050, p3:1250, img:'/cooper-cabrio.webp' },
+  { b:'mini', m:'MINI Countryman', k:3000, p2:1050, p3:1250, img:'/countryman.webp' },
+  { b:'mini', m:'MINI John Cooper Works', k:3000, p2:1100, p3:1350, img:'/jcw-hatch.webp' },
 
-  { b:'mercedes', m:'Mercedes A-osztály', k:3000, p2:1030, p3:1220 },
-  { b:'mercedes', m:'Mercedes B-osztály', k:3000, p2:1100, p3:1350 },
-  { b:'mercedes', m:'Mercedes C-osztály Limuzin', k:5000, p2:1200, p3:1430 },
-  { b:'mercedes', m:'Mercedes-AMG C-osztály Limuzin', k:7500, p2:1680, p3:2010 },
-  { b:'mercedes', m:'Mercedes C-osztály T-modell', k:5000, p2:1200, p3:1430 },
-  { b:'mercedes', m:'Mercedes-AMG C-osztály T-modell', k:7500, p2:1680, p3:2010 },
-  { b:'mercedes', m:'Mercedes CLE Cabrio', k:5000, p2:1300, p3:1400 },
-  { b:'mercedes', m:'Mercedes CLE Coupé', k:5000, p2:1300, p3:1550 },
-  { b:'mercedes', m:'Mercedes-AMG CLE Coupé', k:7500, p2:1720, p3:2040 },
-  { b:'mercedes', m:'Mercedes E-osztály Limuzin', k:7500, p2:1450, p3:1760 },
-  { b:'mercedes', m:'Mercedes-AMG E-osztály Limuzin', k:10000, p2:1900, p3:2300 },
-  { b:'mercedes', m:'Mercedes E-osztály T-modell', k:7500, p2:1450, p3:1760 },
-  { b:'mercedes', m:'Mercedes-AMG E-osztály T-modell', k:10000, p2:2100, p3:2500 },
-  { b:'mercedes', m:'Mercedes GLA', k:5000, p2:1300, p3:1500 },
-  { b:'mercedes', m:'Mercedes GLB', k:5000, p2:1300, p3:1550 },
-  { b:'mercedes', m:'Mercedes GLC', k:5000, p2:1450, p3:1760 },
-  { b:'mercedes', m:'Mercedes GLC Coupé', k:5000, p2:1650, p3:1900 },
-  { b:'mercedes', m:'Mercedes GLE', k:7500, p2:1720, p3:2040 },
-  { b:'mercedes', m:'Mercedes GLE Coupé', k:7500, p2:1720, p3:2040 },
-  { b:'mercedes', m:'Mercedes S-osztály', k:10000, p2:2400, p3:2650 },
+  { b:'mercedes', m:'Mercedes A-osztály', k:3000, p2:1030, p3:1220, img:'/mb-a.webp' },
+  { b:'mercedes', m:'Mercedes B-osztály', k:3000, p2:1100, p3:1350, img:'/mb-b.webp' },
+  { b:'mercedes', m:'Mercedes C-osztály Limuzin', k:5000, p2:1200, p3:1430, img:'/mb-c.webp' },
+  { b:'mercedes', m:'Mercedes-AMG C-osztály Limuzin', k:7500, p2:1680, p3:2010, img:'/mb-amg-c.webp' },
+  { b:'mercedes', m:'Mercedes C-osztály T-modell', k:5000, p2:1200, p3:1430, img:'/mb-ct.webp' },
+  { b:'mercedes', m:'Mercedes-AMG C-osztály T-modell', k:7500, p2:1680, p3:2010, img:'/mb-amg-ct.webp' },
+  { b:'mercedes', m:'Mercedes CLE Cabrio', k:5000, p2:1300, p3:1400, img:'/mb-cle-cabrio.webp' },
+  { b:'mercedes', m:'Mercedes CLE Coupé', k:5000, p2:1300, p3:1550, img:'/mb-cle-coupe.webp' },
+  { b:'mercedes', m:'Mercedes-AMG CLE Coupé', k:7500, p2:1720, p3:2040, img:'/mb-amg-cle-coupe.webp' },
+  { b:'mercedes', m:'Mercedes E-osztály Limuzin', k:7500, p2:1450, p3:1760, img:'/mb-e.webp' },
+  { b:'mercedes', m:'Mercedes-AMG E-osztály Limuzin', k:10000, p2:1900, p3:2300, img:'/mb-amg-e.webp' },
+  { b:'mercedes', m:'Mercedes E-osztály T-modell', k:7500, p2:1450, p3:1760, img:'/mb-et.webp' },
+  { b:'mercedes', m:'Mercedes-AMG E-osztály T-modell', k:10000, p2:2100, p3:2500, img:'/mb-amg-et.webp' },
+  { b:'mercedes', m:'Mercedes GLA', k:5000, p2:1300, p3:1500, img:'/mb-gla.webp' },
+  { b:'mercedes', m:'Mercedes GLB', k:5000, p2:1300, p3:1550, img:'/mb-glb.webp' },
+  { b:'mercedes', m:'Mercedes GLC', k:5000, p2:1450, p3:1760, img:'/mb-glc.webp' },
+  { b:'mercedes', m:'Mercedes GLC Coupé', k:5000, p2:1650, p3:1900, img:'/mb-glc-coupe.webp' },
+  { b:'mercedes', m:'Mercedes GLE', k:7500, p2:1720, p3:2040, img:'/mb-gle.webp' },
+  { b:'mercedes', m:'Mercedes GLE Coupé', k:7500, p2:1720, p3:2040, img:'/mb-gle-coupe.webp' },
+  { b:'mercedes', m:'Mercedes S-osztály', k:10000, p2:2400, p3:2650, img:'/mb-s.webp' },
 
-  { b:'audi', m:'Audi A3', k:3000, p2:1150, p3:1350 },
-  { b:'audi', m:'Audi Q5', k:5000, p2:1720, p3:2040 },
-  { b:'audi', m:'Audi A6', k:7500, p2:1720, p3:2040 },
-  { b:'audi', m:'Audi Q7', k:7500, p2:2100, p3:2500 },
+  { b:'audi', m:'Audi A3', k:3000, p2:1150, p3:1350, img:'/audi/a3lim.webp' },
+  { b:'audi', m:'Audi Q5', k:5000, p2:1720, p3:2040, img:'/audi/q5.webp' },
+  { b:'audi', m:'Audi A6', k:7500, p2:1720, p3:2040, img:'/audi/a6lim.webp' },
+  { b:'audi', m:'Audi Q7', k:7500, p2:2100, p3:2500, img:'/audi/q7.webp' },
 ];
 
 const BRANDS = [
@@ -131,10 +132,9 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
       <div class="uab-grid">
         {MODELS.filter((x) => x.b === br.id).map((car) => (
           <article class="uab-card">
-            <div class="uab-card-top">
-              <span class="uab-card-brand">{br.name}</span>
-              <h3 class="uab-card-name">{car.m}</h3>
-            </div>
+            <div class="uab-card-photo"><img src={car.img} alt={car.m} loading="lazy" /></div>
+            <span class="uab-card-brand">{br.name}</span>
+            <h3 class="uab-card-name">{car.m}</h3>
             <div class="uab-card-prices">
               <div class="uab-price">
                 <span class="uab-price-lbl">2000 km / hó</span>
@@ -202,8 +202,10 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 .uab-bhero-sub{color:#e7eaf0;font-size:15px;margin:0;opacity:.9}
 
 .uab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.uab-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 22px 20px;box-shadow:0 10px 30px rgba(8,8,10,.05);transition:.16s}
+.uab-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 22px 20px;box-shadow:0 10px 30px rgba(8,8,10,.05);transition:.16s;overflow:hidden}
 .uab-card:hover{transform:translateY(-3px);border-color:#c9d2df;box-shadow:0 18px 44px rgba(8,8,10,.1)}
+.uab-card-photo{margin:-22px -22px 16px;height:160px;background:linear-gradient(135deg,#f2f5fa,#e6ebf3);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.uab-card-photo img{width:100%;height:100%;object-fit:cover;object-position:center}
 .uab-card-brand{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
 .uab-card-name{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--ink);margin:6px 0 0;min-height:48px}
 .uab-card-prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 12px}
