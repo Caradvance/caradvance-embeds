@@ -1,0 +1,19 @@
+{
+  "GA4_ID": "G-XXXXXXXXXX",
+  "ADS_ID": "AW-XXXXXXXXXX",
+  "ADS_LEAD_LABEL": "xxxxxxxxxxxxxxxxxx",
+  "ADS_CALL_LABEL": "",
+  "META_PIXEL_ID": "XXXXXXXXXXXXXXX",
+  "GTM_ID": "",
+  "LEAD_ENDPOINT": "/api/lead",
+  "COOKIE_POLICY_URL": "/adatvedelem/",
+  "DEBUG": false,
+  "THANKS_TITLE": "Köszönjük az érdeklődésed!",
+  "THANKS_TEXT": "Megkaptuk a kérésed, és hamarosan jelentkezünk a személyre szabott ajánlattal.",
+  "THANKS_NOTE": "Ha sürgős, hívj minket bátran.",
+  "ERROR_TITLE": "A küldés nem sikerült",
+  "ERROR_TEXT": "Sajnos nem tudtuk fogadni a kérésed. Kérjük, hívj minket, vagy írj a sales@caradvance.hu címre — pár perc alatt elintézzük.",
+  "PHONE": "+36 30 214 6989",
+  "WHATSAPP": "https://wa.me/36302146989",
+  "TURNSTILE_SITEKEY": ""
+}
