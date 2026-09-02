@@ -58,7 +58,7 @@ const BRANDS = [
   { id:'audi',     name:'Audi',     logo:'/audi/audi-logo.webp?v=4' },
 ];
 
-const g = (n) => Number(n).toLocaleString('hu-HU').replace(/ /g, ' ');
+const g = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 ---
 
