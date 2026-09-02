@@ -1,0 +1,250 @@
+---
+// Új autó bérlése — brand-tile rental catalog, styled like Egyedi autó rendelés.
+// Data source: "új autó bérlés" sheet (44 models). Do not add models not in this list.
+const MODELS = [
+  { b:'bmw', m:'BMW M2 Coupe', k:5000, p2:1450, p3:1600 },
+  { b:'bmw', m:'BMW 3-as Limuzin', k:5000, p2:1400, p3:1500 },
+  { b:'bmw', m:'BMW 3-as Touring', k:5000, p2:1400, p3:1500 },
+  { b:'bmw', m:'BMW M3 Limuzin', k:7500, p2:1950, p3:2150 },
+  { b:'bmw', m:'BMW M3 Touring', k:7500, p2:1950, p3:2150 },
+  { b:'bmw', m:'BMW 4-es Coupé', k:5000, p2:1550, p3:1790 },
+  { b:'bmw', m:'BMW M4 Coupé', k:7500, p2:2000, p3:2150 },
+  { b:'bmw', m:'BMW 5-ös Limuzin', k:7500, p2:1600, p3:1900 },
+  { b:'bmw', m:'BMW 5-ös Touring', k:7500, p2:1600, p3:1900 },
+  { b:'bmw', m:'BMW M5 Limuzin', k:10000, p2:2100, p3:2300 },
+  { b:'bmw', m:'BMW M5 Touring', k:10000, p2:2100, p3:2300 },
+  { b:'bmw', m:'BMW X1', k:3000, p2:1180, p3:1380 },
+  { b:'bmw', m:'BMW X3', k:5000, p2:1550, p3:1660 },
+  { b:'bmw', m:'BMW X5', k:7500, p2:1790, p3:2020 },
+  { b:'bmw', m:'BMW X6', k:7500, p2:1840, p3:2120 },
+
+  { b:'mini', m:'MINI Cooper 3 ajtós', k:3000, p2:1050, p3:1250 },
+  { b:'mini', m:'MINI Cooper 5 ajtós', k:3000, p2:1050, p3:1250 },
+  { b:'mini', m:'MINI Cooper Cabrio', k:3000, p2:1050, p3:1250 },
+  { b:'mini', m:'MINI Countryman', k:3000, p2:1050, p3:1250 },
+  { b:'mini', m:'MINI John Cooper Works', k:3000, p2:1100, p3:1350 },
+
+  { b:'mercedes', m:'Mercedes A-osztály', k:3000, p2:1030, p3:1220 },
+  { b:'mercedes', m:'Mercedes B-osztály', k:3000, p2:1100, p3:1350 },
+  { b:'mercedes', m:'Mercedes C-osztály Limuzin', k:5000, p2:1200, p3:1430 },
+  { b:'mercedes', m:'Mercedes-AMG C-osztály Limuzin', k:7500, p2:1680, p3:2010 },
+  { b:'mercedes', m:'Mercedes C-osztály T-modell', k:5000, p2:1200, p3:1430 },
+  { b:'mercedes', m:'Mercedes-AMG C-osztály T-modell', k:7500, p2:1680, p3:2010 },
+  { b:'mercedes', m:'Mercedes CLE Cabrio', k:5000, p2:1300, p3:1400 },
+  { b:'mercedes', m:'Mercedes CLE Coupé', k:5000, p2:1300, p3:1550 },
+  { b:'mercedes', m:'Mercedes-AMG CLE Coupé', k:7500, p2:1720, p3:2040 },
+  { b:'mercedes', m:'Mercedes E-osztály Limuzin', k:7500, p2:1450, p3:1760 },
+  { b:'mercedes', m:'Mercedes-AMG E-osztály Limuzin', k:10000, p2:1900, p3:2300 },
+  { b:'mercedes', m:'Mercedes E-osztály T-modell', k:7500, p2:1450, p3:1760 },
+  { b:'mercedes', m:'Mercedes-AMG E-osztály T-modell', k:10000, p2:2100, p3:2500 },
+  { b:'mercedes', m:'Mercedes GLA', k:5000, p2:1300, p3:1500 },
+  { b:'mercedes', m:'Mercedes GLB', k:5000, p2:1300, p3:1550 },
+  { b:'mercedes', m:'Mercedes GLC', k:5000, p2:1450, p3:1760 },
+  { b:'mercedes', m:'Mercedes GLC Coupé', k:5000, p2:1650, p3:1900 },
+  { b:'mercedes', m:'Mercedes GLE', k:7500, p2:1720, p3:2040 },
+  { b:'mercedes', m:'Mercedes GLE Coupé', k:7500, p2:1720, p3:2040 },
+  { b:'mercedes', m:'Mercedes S-osztály', k:10000, p2:2400, p3:2650 },
+
+  { b:'audi', m:'Audi A3', k:3000, p2:1150, p3:1350 },
+  { b:'audi', m:'Audi Q5', k:5000, p2:1720, p3:2040 },
+  { b:'audi', m:'Audi A6', k:7500, p2:1720, p3:2040 },
+  { b:'audi', m:'Audi Q7', k:7500, p2:2100, p3:2500 },
+];
+
+const BRANDS = [
+  { id:'bmw',      name:'BMW',      logo:'/bmw/bmw-logo.webp?v=2' },
+  { id:'mercedes', name:'Mercedes', logo:'/mb-star.webp?v=1' },
+  { id:'mini',     name:'MINI',     logo:'/mini-hero-logo.webp?v=3' },
+  { id:'audi',     name:'Audi',     logo:'/audi/audi-logo.webp?v=4' },
+];
+
+const g = (n) => Number(n).toLocaleString('hu-HU').replace(/ /g, ' ');
+const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
+---
+
+<section id="uab" class="uab uab-choose">
+  <!-- ===== LANDING ===== -->
+  <div id="uabLand" class="uab-land">
+    <div class="uab-hero">
+      <video class="uab-hero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-poster-hd.jpg">
+        <source src="/caradvance-hero-hd.mp4" type="video/mp4" />
+      </video>
+      <div class="uab-hero-ov"></div>
+      <div class="uab-hero-inner">
+        <div class="uab-hero-logos">
+          {BRANDS.map((b) => (<img src={b.logo} alt={b.name} loading="lazy" />))}
+        </div>
+        <h1>Új autó bérlése<br /><span>Prémium márkák, rugalmas feltételekkel</span></h1>
+        <p>Válaszd ki a márkát, és bérelj vadonatúj prémium autót — átlátható havidíjjal, egyszeri kaucióval, 2000 vagy 3000 km/hó futáskerettel.</p>
+        <div class="uab-hero-scroll">Válassz márkát ⌄</div>
+      </div>
+    </div>
+
+    <div class="uab-brands">
+      {BRANDS.map((b) => (
+        <a class="uab-brand-tile" href={`/uj-auto-berlese?brand=${b.id}`} aria-label={`${b.name} bérelhető modellek`}>
+          <img src={b.logo} alt={b.name} loading="lazy" />
+          <span class="uab-brand-name">{b.name}</span>
+          <span class="uab-brand-cta">{brandCount(b.id)} modell →</span>
+        </a>
+      ))}
+    </div>
+
+    <div class="uab-seo">
+      <span class="uab-eyebrow">Jó tudni</span>
+      <h2 class="uab-seo-h">Új autó bérlése — prémium autóbérlés hosszú távra</h2>
+      <p>Az <strong>új autó bérlése</strong> a legrugalmasabb módja annak, hogy mindig friss, prémium autóval járj — vásárlás és a hosszú távú elköteleződés nélkül. Válaszd ki a márkát: <span class="kw">BMW, Mercedes, MINI és Audi</span> modellek közül, majd nézd meg az adott modell egyszeri kaucióját és a havi bérleti díjat 2000, illetve 3000 km/hó futáskerettel.</p>
+      <p>A havidíj minden esetben tartalmazza a gondtalan használatot: te csak vezetsz, a többit mi intézzük. A pontos feltételekről, a kaucióról és a szabad kilométerkeret túllépéséről minden esetben előre, átláthatóan egyeztetünk.</p>
+      <p>Nem találod a listában a kívánt modellt vagy hosszabb futásidőre lenne szükséged? Vedd fel velünk a kapcsolatot, és egyedi ajánlatot adunk.</p>
+    </div>
+
+    <div class="uab-faq2">
+      <span class="uab-eyebrow">GYIK</span>
+      <h2 class="uab-seo-h">Gyakori kérdések</h2>
+      <details><summary>Mit tartalmaz a havi bérleti díj?<span class="pl">+</span></summary><p>A feltüntetett havidíj a választott modell bérletét jelenti a megadott futáskerettel (2000 vagy 3000 km/hó). A pontos, teljes körű feltételeket — biztosítás, szerviz, kilométer-túllépés — minden esetben előre, írásban egyeztetjük.</p></details>
+      <details><summary>Mennyi a kaució?<span class="pl">+</span></summary><p>A kaució (egyszeri, visszatérítendő letét) modellenként eltér, és a kártyán fel van tüntetve. A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.</p></details>
+      <details><summary>Melyik márkákat lehet bérelni?<span class="pl">+</span></summary><p>Jelenleg BMW, Mercedes, MINI és Audi új modelleket kínálunk bérlésre. Válaszd ki a márkát fent, és nézd meg az elérhető modelleket és díjakat.</p></details>
+      <details><summary>Mi a különbség a 2000 és a 3000 km/hó között?<span class="pl">+</span></summary><p>A havi szabad futáskeretet jelenti. Ha többet vezetsz, válaszd a 3000 km/hó csomagot; a keret túllépését előre egyeztetett km-díjjal számoljuk el.</p></details>
+      <details><summary>Hogyan tudok bérelni?<span class="pl">+</span></summary><p>Válaszd ki a modellt, majd kattints az „Érdeklődöm” gombra vagy vedd fel velünk a kapcsolatot. Egyeztetjük az elérhetőséget, a feltételeket és az átadás időpontját.</p></details>
+    </div>
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      '@context':'https://schema.org','@type':'FAQPage','mainEntity':[
+        {'@type':'Question','name':'Mit tartalmaz a havi bérleti díj?','acceptedAnswer':{'@type':'Answer','text':'A feltüntetett havidíj a választott modell bérletét jelenti a megadott futáskerettel (2000 vagy 3000 km/hó). A pontos, teljes körű feltételeket minden esetben előre, írásban egyeztetjük.'}},
+        {'@type':'Question','name':'Mennyi a kaució?','acceptedAnswer':{'@type':'Answer','text':'A kaució modellenként eltér, és a kártyán fel van tüntetve. A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.'}},
+        {'@type':'Question','name':'Melyik márkákat lehet bérelni?','acceptedAnswer':{'@type':'Answer','text':'Jelenleg BMW, Mercedes, MINI és Audi új modelleket kínálunk bérlésre.'}},
+        {'@type':'Question','name':'Mi a különbség a 2000 és a 3000 km/hó között?','acceptedAnswer':{'@type':'Answer','text':'A havi szabad futáskeretet jelenti. A keret túllépését előre egyeztetett km-díjjal számoljuk el.'}},
+        {'@type':'Question','name':'Hogyan tudok bérelni?','acceptedAnswer':{'@type':'Answer','text':'Válaszd ki a modellt, majd kattints az Érdeklődöm gombra vagy vedd fel velünk a kapcsolatot.'}}
+      ]
+    })} />
+  </div>
+
+  <!-- ===== PER-BRAND VIEWS ===== -->
+  {BRANDS.map((br) => (
+    <div class="uab-brandview" data-brand={br.id}>
+      <div class="uab-bhero">
+        <a class="uab-back" href="/uj-auto-berlese">← Összes márka</a>
+        <img class="uab-bhero-logo" src={br.logo} alt={br.name} />
+        <h2 class="uab-bhero-h">{br.name} bérlés</h2>
+        <p class="uab-bhero-sub">Válaszd ki a modellt — kaució és havidíj 2000 / 3000 km/hó futáskerettel.</p>
+      </div>
+      <div class="uab-grid">
+        {MODELS.filter((x) => x.b === br.id).map((car) => (
+          <article class="uab-card">
+            <div class="uab-card-top">
+              <span class="uab-card-brand">{br.name}</span>
+              <h3 class="uab-card-name">{car.m}</h3>
+            </div>
+            <div class="uab-card-prices">
+              <div class="uab-price">
+                <span class="uab-price-lbl">2000 km / hó</span>
+                <span class="uab-price-val">{g(car.p2)} €<small>/hó</small></span>
+              </div>
+              <div class="uab-price">
+                <span class="uab-price-lbl">3000 km / hó</span>
+                <span class="uab-price-val">{g(car.p3)} €<small>/hó</small></span>
+              </div>
+            </div>
+            <div class="uab-card-dep">Kaució: <strong>{g(car.k)} €</strong></div>
+            <a class="uab-card-cta" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Érdeklődöm</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  ))}
+</section>
+
+<style is:global>
+.uab{--red:#E2001A;--red-dark:#b80016;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--navy:#0B0B0D;max-width:1120px;margin:0 auto;padding:0 20px 26px}
+
+/* landing hero (full-bleed dark, like Egyedi) */
+.uab-hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;padding:40px 24px 60px;border-radius:32px;width:calc(100vw - 32px);margin:calc(6px - var(--navh,80px) - 34px) 0 26px calc(50% - 50vw + 16px);background:linear-gradient(#17181c,#0b0b0d 62%,#060607)}
+.uab-hero-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;opacity:.5}
+.uab-hero-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.5),rgba(8,8,10,.55) 45%,rgba(8,8,10,.72))}
+.uab-hero-inner{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:8px 16px}
+.uab-hero-logos{display:inline-flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 0 22px}
+.uab-hero-logos img{height:30px;width:auto;object-fit:contain;background:#fff;border-radius:10px;padding:7px 10px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.uab-hero-inner h1{font-size:clamp(32px,5vw,56px);font-weight:800;letter-spacing:-.025em;line-height:1.08;margin:0 0 16px;color:#fff}
+.uab-hero-inner h1 span{opacity:.9;font-weight:800}
+.uab-hero-inner p{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:620px;margin:0 auto 16px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
+.uab-hero-scroll{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:4px}
+
+/* brand tiles */
+.uab-brands{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:6px 0 8px}
+.uab-brand-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 16px;text-decoration:none;color:var(--ink);box-shadow:0 10px 30px rgba(8,8,10,.06);transition:.16s;min-height:150px}
+.uab-brand-tile:hover{transform:translateY(-3px);border-color:#c9d2df;box-shadow:0 18px 44px rgba(8,8,10,.12)}
+.uab-brand-tile img{height:46px;width:auto;max-width:120px;object-fit:contain}
+.uab-brand-name{font-weight:800;font-size:17px}
+.uab-brand-cta{font-weight:800;font-size:13px;color:var(--red)}
+
+/* SEO + FAQ (shared look) */
+.uab-seo{max-width:900px;margin:34px auto 0}
+.uab-eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.uab-seo-h{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 14px}
+.uab-seo p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 14px}
+.uab-seo strong{color:var(--ink)}
+.uab-seo .kw{color:var(--red);font-weight:700}
+.uab-faq2{max-width:900px;margin:30px auto 0;display:flex;flex-direction:column;gap:10px}
+.uab-faq2 details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.uab-faq2 summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:15px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.uab-faq2 summary::-webkit-details-marker{display:none}
+.uab-faq2 .pl{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700}
+.uab-faq2 details[open] .pl{transform:rotate(45deg)}
+.uab-faq2 p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 15px}
+
+/* per-brand view */
+.uab-brandview{display:none}
+.uab-bhero{position:relative;overflow:hidden;color:#fff;text-align:center;border-radius:26px;padding:38px 24px 34px;margin:calc(6px - var(--navh,80px) - 34px) 0 22px calc(50% - 50vw + 16px);width:calc(100vw - 32px);background:radial-gradient(900px 400px at 50% -20%,rgba(226,0,26,.22),transparent 60%),linear-gradient(#17181c,#0b0b0d 65%,#060607)}
+.uab-back{position:absolute;left:20px;top:18px;color:rgba(255,255,255,.85);text-decoration:none;font-weight:700;font-size:14px}
+.uab-back:hover{color:#fff}
+.uab-bhero-logo{height:52px;width:auto;max-width:150px;object-fit:contain;background:#fff;border-radius:12px;padding:9px 12px;margin:6px 0 14px;box-shadow:0 8px 22px rgba(0,0,0,.3)}
+.uab-bhero-h{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-.02em;margin:0 0 8px}
+.uab-bhero-sub{color:#e7eaf0;font-size:15px;margin:0;opacity:.9}
+
+.uab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.uab-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 22px 20px;box-shadow:0 10px 30px rgba(8,8,10,.05);transition:.16s}
+.uab-card:hover{transform:translateY(-3px);border-color:#c9d2df;box-shadow:0 18px 44px rgba(8,8,10,.1)}
+.uab-card-brand{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.uab-card-name{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--ink);margin:6px 0 0;min-height:48px}
+.uab-card-prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 12px}
+.uab-price{background:#F4F7FB;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.uab-price-lbl{display:block;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.uab-price-val{display:block;font-size:19px;font-weight:800;color:var(--ink);margin-top:2px}
+.uab-price-val small{font-size:12px;font-weight:700;color:var(--muted)}
+.uab-card-dep{font-size:14px;color:var(--muted)}
+.uab-card-dep strong{color:var(--ink)}
+.uab-card-cta{margin-top:16px;display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;font-weight:800;font-size:15px;text-decoration:none;border-radius:12px;padding:12px 16px;box-shadow:0 12px 28px rgba(226,0,26,.28);transition:.15s}
+.uab-card-cta:hover{background:var(--red-dark)}
+
+/* toggle: landing vs brand view */
+.uab.uab-choose .uab-brandview{display:none}
+.uab.uab-choose #uabLand{display:block}
+.uab:not(.uab-choose) #uabLand{display:none}
+.uab:not(.uab-choose) .uab-brandview.is-active{display:block}
+
+@media(max-width:900px){.uab-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.uab-brands{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.uab-grid{grid-template-columns:1fr}.uab-card-name{min-height:0}}
+</style>
+
+<script is:inline>
+(function () {
+  function apply() {
+    var sec = document.getElementById('uab');
+    if (!sec) return;
+    var brand = new URLSearchParams(location.search).get('brand');
+    var views = sec.querySelectorAll('.uab-brandview');
+    views.forEach(function (v) { v.classList.remove('is-active'); });
+    if (!brand) {
+      sec.classList.add('uab-choose');
+    } else {
+      sec.classList.remove('uab-choose');
+      var active = sec.querySelector('.uab-brandview[data-brand="' + brand + '"]');
+      if (active) { active.classList.add('is-active'); }
+      else { sec.classList.add('uab-choose'); }
+    }
+  }
+  apply();
+  window.addEventListener('popstate', apply);
+})();
+</script>
