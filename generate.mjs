@@ -1495,3 +1495,4 @@ async function main() {
   console.log(`Done. ${seen.size} car pages + home + catalog + sitemap (${urls.length} urls) -> ${outDir}`);
 }
 main().catch((e) => { console.error(e); process.exit(1); });
+// rebuild trigger to refresh baked nav (rental brand flyout) 1788425186475
