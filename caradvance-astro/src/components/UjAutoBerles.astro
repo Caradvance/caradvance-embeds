@@ -1,67 +1,74 @@
 ---
 // Új autó bérlése — same look as Egyedi autó rendelés (egl-mhero hero + egl-card cards), rental data.
 // Data source: "új autó bérlés" sheet (44 models). Do not add models not in this list.
+// Cars grouped by model family (fam) with section headers, like Egyedi.
 const MODELS = [
-  { b:'bmw', m:'BMW M2 Coupe', k:5000, p2:1450, p3:1600, img:'/bmw/m2.webp' },
-  { b:'bmw', m:'BMW 3-as Limuzin', k:5000, p2:1400, p3:1500, img:'/bmw/3er.webp' },
-  { b:'bmw', m:'BMW 3-as Touring', k:5000, p2:1400, p3:1500, img:'/bmw/3ert.webp' },
-  { b:'bmw', m:'BMW M3 Limuzin', k:7500, p2:1950, p3:2150, img:'/bmw/m3.webp' },
-  { b:'bmw', m:'BMW M3 Touring', k:7500, p2:1950, p3:2150, img:'/bmw/m3t.webp' },
-  { b:'bmw', m:'BMW 4-es Coupé', k:5000, p2:1550, p3:1790, img:'/bmw/4erc.webp' },
-  { b:'bmw', m:'BMW M4 Coupé', k:7500, p2:2000, p3:2150, img:'/bmw/m4b.webp' },
-  { b:'bmw', m:'BMW 5-ös Limuzin', k:7500, p2:1600, p3:1900, img:'/bmw/5erb.webp' },
-  { b:'bmw', m:'BMW 5-ös Touring', k:7500, p2:1600, p3:1900, img:'/bmw/5ertb.webp' },
-  { b:'bmw', m:'BMW M5 Limuzin', k:10000, p2:2100, p3:2300, img:'/bmw/m5.webp' },
-  { b:'bmw', m:'BMW M5 Touring', k:10000, p2:2100, p3:2300, img:'/bmw/m5t.webp' },
-  { b:'bmw', m:'BMW X1', k:3000, p2:1180, p3:1380, img:'/bmw/x1b.webp' },
-  { b:'bmw', m:'BMW X3', k:5000, p2:1550, p3:1660, img:'/bmw/x3mw.webp' },
-  { b:'bmw', m:'BMW X5', k:7500, p2:1790, p3:2020, img:'/bmw/x5.webp' },
-  { b:'bmw', m:'BMW X6', k:7500, p2:1840, p3:2120, img:'/bmw/x6b.webp' },
+  // BMW
+  { b:'bmw', fam:'2-es', m:'BMW M2 Coupe', k:5000, p2:1450, p3:1600, img:'/bmw/m2.webp' },
+  { b:'bmw', fam:'3-as', m:'BMW 3-as Limuzin', k:5000, p2:1400, p3:1500, img:'/bmw/3er.webp' },
+  { b:'bmw', fam:'3-as', m:'BMW 3-as Touring', k:5000, p2:1400, p3:1500, img:'/bmw/3ert.webp' },
+  { b:'bmw', fam:'3-as', m:'BMW M3 Limuzin', k:7500, p2:1950, p3:2150, img:'/bmw/m3.webp' },
+  { b:'bmw', fam:'3-as', m:'BMW M3 Touring', k:7500, p2:1950, p3:2150, img:'/bmw/m3t.webp' },
+  { b:'bmw', fam:'4-es', m:'BMW 4-es Coupé', k:5000, p2:1550, p3:1790, img:'/bmw/4erc.webp' },
+  { b:'bmw', fam:'4-es', m:'BMW M4 Coupé', k:7500, p2:2000, p3:2150, img:'/bmw/m4b.webp' },
+  { b:'bmw', fam:'5-ös', m:'BMW 5-ös Limuzin', k:7500, p2:1600, p3:1900, img:'/bmw/5erb.webp' },
+  { b:'bmw', fam:'5-ös', m:'BMW 5-ös Touring', k:7500, p2:1600, p3:1900, img:'/bmw/5ertb.webp' },
+  { b:'bmw', fam:'5-ös', m:'BMW M5 Limuzin', k:10000, p2:2100, p3:2300, img:'/bmw/m5.webp' },
+  { b:'bmw', fam:'5-ös', m:'BMW M5 Touring', k:10000, p2:2100, p3:2300, img:'/bmw/m5t.webp' },
+  { b:'bmw', fam:'X1', m:'BMW X1', k:3000, p2:1180, p3:1380, img:'/bmw/x1b.webp' },
+  { b:'bmw', fam:'X3', m:'BMW X3', k:5000, p2:1550, p3:1660, img:'/bmw/x3mw.webp' },
+  { b:'bmw', fam:'X5', m:'BMW X5', k:7500, p2:1790, p3:2020, img:'/bmw/x5.webp' },
+  { b:'bmw', fam:'X6', m:'BMW X6', k:7500, p2:1840, p3:2120, img:'/bmw/x6b.webp' },
 
-  { b:'mini', m:'MINI Cooper 3 ajtós', k:3000, p2:1050, p3:1250, img:'/cooper-s.webp' },
-  { b:'mini', m:'MINI Cooper 5 ajtós', k:3000, p2:1050, p3:1250, img:'/cooper.webp' },
-  { b:'mini', m:'MINI Cooper Cabrio', k:3000, p2:1050, p3:1250, img:'/cooper-cabrio.webp' },
-  { b:'mini', m:'MINI Countryman', k:3000, p2:1050, p3:1250, img:'/countryman.webp' },
-  { b:'mini', m:'MINI John Cooper Works', k:3000, p2:1100, p3:1350, img:'/jcw-hatch.webp' },
+  // MINI
+  { b:'mini', fam:'MINI', m:'MINI Cooper 3 ajtós', k:3000, p2:1050, p3:1250, img:'/cooper-s.webp' },
+  { b:'mini', fam:'MINI', m:'MINI Cooper 5 ajtós', k:3000, p2:1050, p3:1250, img:'/cooper.webp' },
+  { b:'mini', fam:'MINI', m:'MINI Cooper Cabrio', k:3000, p2:1050, p3:1250, img:'/cooper-cabrio.webp' },
+  { b:'mini', fam:'MINI', m:'MINI Countryman', k:3000, p2:1050, p3:1250, img:'/countryman.webp' },
+  { b:'mini', fam:'MINI', m:'MINI John Cooper Works', k:3000, p2:1100, p3:1350, img:'/jcw-hatch.webp' },
 
-  { b:'mercedes', m:'Mercedes A-osztály', k:3000, p2:1030, p3:1220, img:'/mb-a.webp' },
-  { b:'mercedes', m:'Mercedes B-osztály', k:3000, p2:1100, p3:1350, img:'/mb-b.webp' },
-  { b:'mercedes', m:'Mercedes C-osztály Limuzin', k:5000, p2:1200, p3:1430, img:'/mb-c.webp' },
-  { b:'mercedes', m:'Mercedes-AMG C-osztály Limuzin', k:7500, p2:1680, p3:2010, img:'/mb-amg-c.webp' },
-  { b:'mercedes', m:'Mercedes C-osztály T-modell', k:5000, p2:1200, p3:1430, img:'/mb-ct.webp' },
-  { b:'mercedes', m:'Mercedes-AMG C-osztály T-modell', k:7500, p2:1680, p3:2010, img:'/mb-amg-ct.webp' },
-  { b:'mercedes', m:'Mercedes CLE Cabrio', k:5000, p2:1300, p3:1400, img:'/mb-cle-cabrio.webp' },
-  { b:'mercedes', m:'Mercedes CLE Coupé', k:5000, p2:1300, p3:1550, img:'/mb-cle-coupe.webp' },
-  { b:'mercedes', m:'Mercedes-AMG CLE Coupé', k:7500, p2:1720, p3:2040, img:'/mb-amg-cle-coupe.webp' },
-  { b:'mercedes', m:'Mercedes E-osztály Limuzin', k:7500, p2:1450, p3:1760, img:'/mb-e.webp' },
-  { b:'mercedes', m:'Mercedes-AMG E-osztály Limuzin', k:10000, p2:1900, p3:2300, img:'/mb-amg-e.webp' },
-  { b:'mercedes', m:'Mercedes E-osztály T-modell', k:7500, p2:1450, p3:1760, img:'/mb-et.webp' },
-  { b:'mercedes', m:'Mercedes-AMG E-osztály T-modell', k:10000, p2:2100, p3:2500, img:'/mb-amg-et.webp' },
-  { b:'mercedes', m:'Mercedes GLA', k:5000, p2:1300, p3:1500, img:'/mb-gla.webp' },
-  { b:'mercedes', m:'Mercedes GLB', k:5000, p2:1300, p3:1550, img:'/mb-glb.webp' },
-  { b:'mercedes', m:'Mercedes GLC', k:5000, p2:1450, p3:1760, img:'/mb-glc.webp' },
-  { b:'mercedes', m:'Mercedes GLC Coupé', k:5000, p2:1650, p3:1900, img:'/mb-glc-coupe.webp' },
-  { b:'mercedes', m:'Mercedes GLE', k:7500, p2:1720, p3:2040, img:'/mb-gle.webp' },
-  { b:'mercedes', m:'Mercedes GLE Coupé', k:7500, p2:1720, p3:2040, img:'/mb-gle-coupe.webp' },
-  { b:'mercedes', m:'Mercedes S-osztály', k:10000, p2:2400, p3:2650, img:'/mb-s.webp' },
+  // Mercedes
+  { b:'mercedes', fam:'A-osztály', m:'Mercedes A-osztály', k:3000, p2:1030, p3:1220, img:'/mb-a.webp' },
+  { b:'mercedes', fam:'B-osztály', m:'Mercedes B-osztály', k:3000, p2:1100, p3:1350, img:'/mb-b.webp' },
+  { b:'mercedes', fam:'C-osztály', m:'Mercedes C-osztály Limuzin', k:5000, p2:1200, p3:1430, img:'/mb-c.webp' },
+  { b:'mercedes', fam:'C-osztály', m:'Mercedes-AMG C-osztály Limuzin', k:7500, p2:1680, p3:2010, img:'/mb-amg-c.webp' },
+  { b:'mercedes', fam:'C-osztály', m:'Mercedes C-osztály T-modell', k:5000, p2:1200, p3:1430, img:'/mb-ct.webp' },
+  { b:'mercedes', fam:'C-osztály', m:'Mercedes-AMG C-osztály T-modell', k:7500, p2:1680, p3:2010, img:'/mb-amg-ct.webp' },
+  { b:'mercedes', fam:'E-osztály', m:'Mercedes E-osztály Limuzin', k:7500, p2:1450, p3:1760, img:'/mb-e.webp' },
+  { b:'mercedes', fam:'E-osztály', m:'Mercedes-AMG E-osztály Limuzin', k:10000, p2:1900, p3:2300, img:'/mb-amg-e.webp' },
+  { b:'mercedes', fam:'E-osztály', m:'Mercedes E-osztály T-modell', k:7500, p2:1450, p3:1760, img:'/mb-et.webp' },
+  { b:'mercedes', fam:'E-osztály', m:'Mercedes-AMG E-osztály T-modell', k:10000, p2:2100, p3:2500, img:'/mb-amg-et.webp' },
+  { b:'mercedes', fam:'S-osztály', m:'Mercedes S-osztály', k:10000, p2:2400, p3:2650, img:'/mb-s.webp' },
+  { b:'mercedes', fam:'CLE', m:'Mercedes CLE Cabrio', k:5000, p2:1300, p3:1400, img:'/mb-cle-cabrio.webp' },
+  { b:'mercedes', fam:'CLE', m:'Mercedes CLE Coupé', k:5000, p2:1300, p3:1550, img:'/mb-cle-coupe.webp' },
+  { b:'mercedes', fam:'CLE', m:'Mercedes-AMG CLE Coupé', k:7500, p2:1720, p3:2040, img:'/mb-amg-cle-coupe.webp' },
+  { b:'mercedes', fam:'GLA', m:'Mercedes GLA', k:5000, p2:1300, p3:1500, img:'/mb-gla.webp' },
+  { b:'mercedes', fam:'GLB', m:'Mercedes GLB', k:5000, p2:1300, p3:1550, img:'/mb-glb.webp' },
+  { b:'mercedes', fam:'GLC', m:'Mercedes GLC', k:5000, p2:1450, p3:1760, img:'/mb-glc.webp' },
+  { b:'mercedes', fam:'GLC', m:'Mercedes GLC Coupé', k:5000, p2:1650, p3:1900, img:'/mb-glc-coupe.webp' },
+  { b:'mercedes', fam:'GLE', m:'Mercedes GLE', k:7500, p2:1720, p3:2040, img:'/mb-gle.webp' },
+  { b:'mercedes', fam:'GLE', m:'Mercedes GLE Coupé', k:7500, p2:1720, p3:2040, img:'/mb-gle-coupe.webp' },
 
-  { b:'audi', m:'Audi A3', k:3000, p2:1150, p3:1350, img:'/audi/a3lim.webp' },
-  { b:'audi', m:'Audi Q5', k:5000, p2:1720, p3:2040, img:'/audi/q5.webp' },
-  { b:'audi', m:'Audi A6', k:7500, p2:1720, p3:2040, img:'/audi/a6lim.webp' },
-  { b:'audi', m:'Audi Q7', k:7500, p2:2100, p3:2500, img:'/audi/q7.webp' },
+  // Audi
+  { b:'audi', fam:'A3', m:'Audi A3', k:3000, p2:1150, p3:1350, img:'/audi/a3lim.webp' },
+  { b:'audi', fam:'A6', m:'Audi A6', k:7500, p2:1720, p3:2040, img:'/audi/a6lim.webp' },
+  { b:'audi', fam:'Q5', m:'Audi Q5', k:5000, p2:1720, p3:2040, img:'/audi/q5.webp' },
+  { b:'audi', fam:'Q7', m:'Audi Q7', k:7500, p2:2100, p3:2500, img:'/audi/q7.webp' },
 ];
 
 const BRANDS = [
-  { id:'bmw',      name:'BMW',      logo:'/bmw/bmw-logo.webp?v=2' },
-  { id:'mini',     name:'MINI',     logo:'/mini-hero-logo.webp?v=3' },
-  { id:'mercedes', name:'Mercedes', logo:'/mb-star.webp?v=1' },
-  { id:'audi',     name:'Audi',     logo:'/audi/audi-logo.webp?v=4' },
+  { id:'bmw',      name:'BMW',      logo:'/bmw/bmw-logo.webp?v=2', vid:'/caradvance-hero-x5.mp4',            dot:'#0166B1' },
+  { id:'mini',     name:'MINI',     logo:'/mini-hero-logo.webp?v=3', vid:'/mini-JCW-family-video-wide.mp4',  dot:'#1B1B1B' },
+  { id:'mercedes', name:'Mercedes', logo:'/mb-star.webp?v=1',      vid:'/mercedes-hero.mp4',                 dot:'#00A3E0' },
+  { id:'audi',     name:'Audi',     logo:'/audi/audi-logo.webp?v=4', vid:'/audi-hero.mp4',                   dot:'#BB0A30' },
 ];
 
 const HUF = 368; // 1 € = 368 Ft (matches Egyedi live rate)
 const g = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const gh = (eur) => g(eur * HUF);
 const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
+const families = (bid) => { const seen = []; MODELS.filter((x) => x.b === bid).forEach((x) => { if (seen.indexOf(x.fam) < 0) seen.push(x.fam); }); return seen; };
+const famCount = (bid, fam) => MODELS.filter((x) => x.b === bid && x.fam === fam).length;
 const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 ---
 
@@ -130,8 +137,8 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   {BRANDS.map((br) => (
     <div class="uab-brandview" data-brand={br.id}>
       <div class="egl-mhero">
-        <video class="egl-mhero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-poster-hd.jpg">
-          <source src="/caradvance-hero-hd.mp4" type="video/mp4" />
+        <video class="egl-mhero-vid" autoplay loop muted playsinline preload="auto">
+          <source src={br.vid} type="video/mp4" />
         </video>
         <div class="egl-mhero-ov"></div>
         <div class="egl-mhero-inner">
@@ -146,31 +153,36 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
         <button class="egl-mhero-scroll" type="button" onclick="window.scrollBy({top:Math.round(window.innerHeight*0.72),behavior:'smooth'})">Görgess<span class="uab-chev" set:html={chevron}></span></button>
       </div>
       <div class="egl-grid">
-        {MODELS.filter((x) => x.b === br.id).map((car) => (
-          <article class="egl-card egl-card-mini">
-            <div class="egl-media">
-              <img src={car.img} alt={car.m} loading="lazy" />
-              <div class="egl-fuels"><span class="egl-fuel uab-badge">Bérelhető</span></div>
-            </div>
-            <div class="egl-body">
-              <div class="egl-meta">
-                <span class="egl-brand"><img class="uab-cardlogo" src={br.logo} alt={br.name} /></span>
-                <span class="egl-year">Új autó · Bérlés</span>
-              </div>
-              <div class="egl-name">{car.m}</div>
-              <div class="egl-specs">Bérlés · 2000 vagy 3000 km/hó futáskeret</div>
-              <div class="egl-price">
-                <b>{gh(car.p2)} Ft</b>
-                <span class="eur">/ hó</span>
-                <span class="tol">{g(car.p2)} €-tól</span>
-                <span class="egl-info" tabindex="0">i<span class="egl-tip">A havi díj 2000 km/hó futáskerettel értendő. 3000 km/hó esetén {g(car.p3)} € / hó ({gh(car.p3)} Ft). Egyszeri, visszatérítendő kaució: {g(car.k)} € ({gh(car.k)} Ft). Az árak tájékoztató jellegűek, élő árfolyammal (1 € = 368 Ft).</span></span>
-              </div>
-            </div>
-            <div class="egl-actions">
-              <a class="egl-btn" href="/berlesi-folyamat">Részletek</a>
-              <a class="egl-order" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Bérlés igénylése</a>
-            </div>
-          </article>
+        {families(br.id).map((fam) => (
+          <Fragment>
+            <div class="egl-section"><span class="dot" style={`background:${br.dot}`}></span>{fam}<span class="cnt">{famCount(br.id, fam)} modell</span></div>
+            {MODELS.filter((x) => x.b === br.id && x.fam === fam).map((car) => (
+              <article class="egl-card egl-card-mini">
+                <div class="egl-media">
+                  <img src={car.img} alt={car.m} loading="lazy" />
+                  <div class="egl-fuels"><span class="egl-fuel uab-badge">Bérelhető</span></div>
+                </div>
+                <div class="egl-body">
+                  <div class="egl-meta">
+                    <span class="egl-brand"><img class="uab-cardlogo" src={br.logo} alt={br.name} /></span>
+                    <span class="egl-year">Új autó · Bérlés</span>
+                  </div>
+                  <div class="egl-name">{car.m}</div>
+                  <div class="egl-specs">Bérlés · 2000 vagy 3000 km/hó futáskeret</div>
+                  <div class="egl-price">
+                    <b>{gh(car.p2)} Ft</b>
+                    <span class="eur">/ hó</span>
+                    <span class="tol">{g(car.p2)} €-tól</span>
+                    <span class="egl-info" tabindex="0">i<span class="egl-tip">A havi díj 2000 km/hó futáskerettel értendő. 3000 km/hó esetén {g(car.p3)} € / hó ({gh(car.p3)} Ft). Egyszeri, visszatérítendő kaució: {g(car.k)} € ({gh(car.k)} Ft). Az árak tájékoztató jellegűek, élő árfolyammal (1 € = 368 Ft).</span></span>
+                  </div>
+                </div>
+                <div class="egl-actions">
+                  <a class="egl-btn" href="/berlesi-folyamat">Részletek</a>
+                  <a class="egl-order" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Bérlés igénylése</a>
+                </div>
+              </article>
+            ))}
+          </Fragment>
         ))}
       </div>
     </div>
@@ -181,7 +193,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 .uab{--red:#E2001A;--red-dark:#b80016;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--navy:#0F1B2D;max-width:1160px;margin:0 auto;padding:0 20px 26px}
 
 /* ===== HERO (copied from Egyedi egl-mhero) ===== */
-.uab .egl-mhero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;width:calc(100vw - 32px);margin:calc(6px - var(--navh,80px) - 34px) 0 30px calc(50% - 50vw + 16px);background:linear-gradient(#17181c,#0b0b0d 62%,#060607)}
+.uab .egl-mhero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;width:calc(100vw - 32px);margin:calc(6px - var(--navh,80px)) 0 30px calc(50% - 50vw + 16px);background:linear-gradient(#17181c,#0b0b0d 62%,#060607)}
 .uab .egl-mhero-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
 .uab .egl-mhero-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7))}
 .uab .egl-mhero-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0}
@@ -210,6 +222,10 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 
 /* ===== CARDS (copied from Egyedi egl-card) ===== */
 .uab .egl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.uab .egl-section{grid-column:1 / -1;display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800;color:var(--ink);margin:26px 0 2px;letter-spacing:-.01em}
+.uab .egl-section:first-child{margin-top:0}
+.uab .egl-section .dot{width:13px;height:13px;border-radius:50%;flex:0 0 auto}
+.uab .egl-section .cnt{font-size:14px;font-weight:600;color:var(--muted)}
 .uab .egl-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:visible;position:relative;display:flex;flex-direction:column;transition:.18s;text-decoration:none;color:inherit}
 .uab .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.1);transform:translateY(-3px);z-index:30}
 .uab .egl-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:flex-end;justify-content:center;padding:6px 4px 0;border-radius:20px 20px 0 0;overflow:hidden}
