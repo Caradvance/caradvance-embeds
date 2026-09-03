@@ -764,3 +764,38 @@
 
 /* charity-width-match */
 (function(){try{var id='ca-cahw';if(document.getElementById(id))return;var s=document.createElement('style');s.id=id;s.textContent='.cah .wrap{max-width:1160px !important}';(document.head||document.documentElement).appendChild(s);}catch(e){}})();
+
+/* rental-brand-flyout-inject */
+(function(){
+  function repoint(a){ var h=a.getAttribute('href')||''; if(h.indexOf('/egyedi-auto-rendeles')>=0) a.setAttribute('href', h.replace('/egyedi-auto-rendeles','/uj-auto-berlese')); }
+  function relabel(a){ [].slice.call(a.childNodes).forEach(function(n){ if(n.nodeType===3 && /Egyedi aut\u00f3 rendel\u00e9s/i.test(n.textContent)) n.textContent=n.textContent.replace(/Egyedi aut\u00f3 rendel\u00e9s/i,'\u00daj aut\u00f3 b\u00e9rl\u00e9se'); }); }
+  function isRental(a){ return /\u00daj aut\u00f3 b\u00e9rl\u00e9se/i.test(a.textContent) && !/brand=/.test(a.getAttribute('href')||''); }
+  function run(){
+    try{
+      if(document.querySelector('a[href*="uj-auto-berlese"][href*="brand="]')) return true;
+      var did=false;
+      var esub=[].slice.call(document.querySelectorAll('.ddi-sub')).filter(function(s){var a=s.querySelector('a');return a&&/Egyedi aut\u00f3 rendel\u00e9s/i.test(a.textContent);})[0];
+      if(esub){
+        [].slice.call(document.querySelectorAll('.dd-inner')).forEach(function(root){
+          var leaf=[].slice.call(root.children).filter(function(el){return el.matches&&el.matches('a.ddi')&&isRental(el);})[0];
+          if(!leaf) return;
+          var clone=esub.cloneNode(true);
+          var p=clone.querySelector('a.ddi-parent')||clone.querySelector('a');
+          p.setAttribute('href','/uj-auto-berlese'); relabel(p);
+          [].slice.call(clone.querySelectorAll('a')).forEach(repoint);
+          leaf.parentNode.replaceChild(clone, leaf); did=true;
+        });
+      }
+      var mp=document.querySelector('.mobilepanel');
+      if(mp){
+        var mBrand=[].slice.call(mp.querySelectorAll('a.m-subitem')).filter(function(a){var h=a.getAttribute('href')||';';return h.indexOf('/egyedi-auto-rendeles')>=0&&/brand=/.test(h);});
+        var mRental=[].slice.call(mp.querySelectorAll('a')).filter(isRental)[0];
+        if(mBrand.length&&mRental){ var nx=mRental.nextElementSibling; var has=nx&&/brand=/.test(nx.getAttribute('href')||''); if(!has){ mRental.setAttribute('href','/uj-auto-berlese'); var after=mRental; mBrand.forEach(function(a){ var c=a.cloneNode(true); repoint(c); after.parentNode.insertBefore(c, after.nextSibling); after=c; }); did=true; } }
+      }
+      return did;
+    }catch(e){ return false; }
+  }
+  var n=0; var iv=setInterval(function(){ if(run()||++n>60) clearInterval(iv); },100);
+  if(document.readyState!=='loading') run(); else document.addEventListener('DOMContentLoaded',run);
+})();
+
