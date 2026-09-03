@@ -761,3 +761,6 @@
 
 /* mobile-brand-charity */
 ;(function(){var css='@media(max-width:768px){.stat-logos.ca-brandrow{flex-wrap:wrap!important;gap:12px 8px!important}.stat-logos.ca-brandrow img[alt="BMW"]{height:30px!important}.stat-logos.ca-brandrow img[alt="Mercedes-Benz"]{height:28px!important}.stat-logos.ca-brandrow img[alt="Porsche"]{height:28px!important}.stat-logos.ca-brandrow img[alt="Audi"]{height:18px!important}.stat-logos.ca-brandrow img[alt="MINI"]{height:20px!important;margin-left:0!important}}#ca-cah .block{padding-bottom:10px!important}#ca-cah{padding-bottom:0!important;margin-bottom:0!important}';var s=document.createElement('style');s.id='ca-mob-fix';s.textContent=css;(document.head||document.documentElement).appendChild(s);})();
+
+/* charity-width-match */
+(function(){try{var id='ca-cahw';if(document.getElementById(id))return;var s=document.createElement('style');s.id=id;s.textContent='.cah .wrap{max-width:1160px !important}';(document.head||document.documentElement).appendChild(s);}catch(e){}})();
