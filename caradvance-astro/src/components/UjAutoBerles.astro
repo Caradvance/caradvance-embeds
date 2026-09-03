@@ -76,12 +76,12 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   <!-- ===== LANDING ===== -->
   <div id="uabLand" class="uab-land">
     <div class="egl-mhero">
-      <video class="egl-mhero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-poster-hd.jpg">
-        <source src="/caradvance-hero-hd.mp4" type="video/mp4" />
+      <video class="egl-mhero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-beszerzesi-poster.jpg">
+        <source src="/caradvance-hero-beszerzesi.mp4" type="video/mp4" />
       </video>
       <div class="egl-mhero-ov"></div>
       <div class="egl-mhero-inner">
-        <div class="egl-mhero-logos">
+        <div class="egl-mhero-logos egl-land-brandrow">
           {BRANDS.map((b) => (<img src={b.logo} alt={b.name} loading="lazy" />))}
         </div>
         <div class="egl-mhero-h1">Új autó bérlése</div>
@@ -199,6 +199,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 .uab .egl-mhero-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0}
 .uab .egl-mhero-logos{display:inline-flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;margin:0 0 22px}
 .uab .egl-mhero-logos img{height:78px;width:auto;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+.uab .egl-mhero-logos.egl-land-brandrow img{height:48px}
 .uab .egl-mhero-h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.35)}
 .uab .egl-mhero-sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:600px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
 .uab .egl-mhero-cta{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
