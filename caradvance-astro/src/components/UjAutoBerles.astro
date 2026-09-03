@@ -76,7 +76,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   <!-- ===== LANDING ===== -->
   <div id="uabLand" class="uab-land">
     <div class="egl-mhero">
-      <video class="egl-mhero-vid" autoplay loop muted playsinline preload="auto" poster="/caradvance-hero-beszerzesi-poster.jpg">
+      <video id="uabLandVid" class="egl-mhero-vid" autoplay muted playsinline preload="auto" poster="/caradvance-hero-beszerzesi-poster.jpg">
         <source src="/caradvance-hero-beszerzesi.mp4" type="video/mp4" />
       </video>
       <div class="egl-mhero-ov"></div>
@@ -301,4 +301,5 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   apply();
   window.addEventListener('popstate', apply);
 })();
+(function(){var vids=['/caradvance-hero-x5.mp4','/mini-JCW-family-video-wide.mp4','/mercedes-hero.mp4','/audi-hero.mp4'];var v=document.getElementById('uabLandVid');if(!v)return;var i=0;function set(n){try{v.src=vids[n];v.load();var p=v.play();if(p&&p.catch)p.catch(function(){});}catch(e){}}set(0);v.addEventListener('ended',function(){i=(i+1)%vids.length;set(i);});})();
 </script>
