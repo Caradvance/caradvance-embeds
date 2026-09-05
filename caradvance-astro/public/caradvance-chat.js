@@ -799,3 +799,32 @@
   if(document.readyState!=='loading') run(); else document.addEventListener('DOMContentLoaded',run);
 })();
 
+/* sold-stats-boxes */
+(function(){
+  if(location.pathname.indexOf('autoink')<0) return;
+  var MON=['Janu\u00e1r','Febru\u00e1r','M\u00e1rcius','\u00c1prilis','M\u00e1jus','J\u00fanius','J\u00falius','Augusztus','Szeptember','Okt\u00f3ber','November','December'];
+  function num(s){ return parseInt((s||'').replace(/[^\d]/g,''),10)||0; }
+  function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
+  function run(){
+    try{
+      if(document.getElementById('ca-soldstats')) return true;
+      var cards=[].slice.call(document.querySelectorAll('.card.sold'));
+      if(!cards.length) return false;
+      var year=new Date().getFullYear();
+      var yt={ft:0,eur:0,n:0}, bm={};
+      cards.forEach(function(c){ var d=c.querySelector('.solddate'),p=c.querySelector('.price'),e=c.querySelector('.peur'); var m=(d&&d.textContent||'').match(/(20\d\d)\.\s*(\d\d)\./); if(!m)return; var yy=+m[1],mm=+m[2],ft=num(p&&p.textContent),eur=num(e&&e.textContent); if(yy!==year)return; yt.ft+=ft;yt.eur+=eur;yt.n++; if(!bm[mm])bm[mm]={ft:0,eur:0,n:0}; bm[mm].ft+=ft;bm[mm].eur+=eur;bm[mm].n++; });
+      function box(lb,o){ return '<div class="ca-ss-box"><div class="ca-ss-label">'+lb+'</div><div class="ca-ss-val">'+fmt(o.ft)+' Ft</div><div class="ca-ss-eur">'+fmt(o.eur)+' \u20ac \u00b7 '+o.n+' aut\u00f3</div></div>'; }
+      var html=box(year+' \u2014 \u00f6sszesen',yt);
+      var mns=Object.keys(bm).map(Number).sort(function(x,y){return y-x;});
+      mns.slice(0,2).forEach(function(mn){ html+=box(MON[mn-1],bm[mn]); });
+      if(!document.getElementById('ca-ss-css')){ var st=document.createElement('style'); st.id='ca-ss-css'; st.textContent='.ca-ss{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 26px}.ca-ss-box{background:#fff;border:1px solid #E6EAF1;border-radius:18px;padding:20px 22px;box-shadow:0 10px 30px rgba(8,8,10,.05)}.ca-ss-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#E2001A;margin-bottom:8px}.ca-ss-val{font-size:26px;font-weight:800;color:#0F1B2D;line-height:1.1;letter-spacing:-.02em}.ca-ss-eur{font-size:14px;font-weight:600;color:#5A6B82;margin-top:5px}@media(max-width:760px){.ca-ss{grid-template-columns:1fr}}'; document.head.appendChild(st); }
+      var w=document.createElement('div'); w.id='ca-soldstats'; w.className='ca-ss'; w.innerHTML=html;
+      var grid=cards[0].closest('.grid')||cards[0].parentElement;
+      grid.parentNode.insertBefore(w, grid);
+      return true;
+    }catch(e){ return false; }
+  }
+  var n=0; var iv=setInterval(function(){ if(run()||++n>80) clearInterval(iv); },100);
+  if(document.readyState!=='loading') run(); else document.addEventListener('DOMContentLoaded',run);
+})();
+
