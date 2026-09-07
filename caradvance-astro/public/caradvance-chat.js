@@ -828,3 +828,44 @@
   if(document.readyState!=='loading') run(); else document.addEventListener('DOMContentLoaded',run);
 })();
 
+/* car-contact-rewrite */
+(function(){
+  if(location.pathname.indexOf('/auto/')<0) return;
+  var C='<svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="8" stroke-linecap="butt"><path stroke="#33373D" d="M37 16.5 A15 15 0 1 0 37 31.5"/><path stroke="#E2001A" d="M10.6 30 A15 15 0 0 0 19.4 38.6"/></g></svg>';
+  var W='//wa.me/';
+  var people=[
+    {office:true,name:'CarAdvance Iroda',role:'\u00dcgyint\u00e9z\u00e9s',tel:'+36 30 233 6060',telh:'tel:+36302336060',wah:W+'36302336060'},
+    {img:'/toth-karoly.webp',name:'T\u00f3th K\u00e1roly',role:'Kereskedelmi Igazgat\u00f3',tel:'+36 30 214 6989',telh:'tel:+36302146989',wah:W+'36302146989'},
+    {img:'/vadnai-zsombor.webp',name:'Vadnai Zsombor',role:'Sales Manager',tel:'+36 30 094 2105',telh:'tel:+36300942105',wah:W+'36300942105'},
+    {img:'/bajzath-balazs.webp',name:'Bajz\u00e1th Bal\u00e1zs',role:'Sales Manager',tel:'+36 30 094 2081',telh:'tel:+36300942081',wah:W+'36300942081'}
+  ];
+  function run(){
+    try{
+      var box=document.querySelector('.panel.contact'); if(!box) return false;
+      if(box.getAttribute('data-ca-ct')) return true;
+      var tpl=box.querySelector('.tmem'); if(!tpl) return false;
+      var frag=document.createDocumentFragment();
+      people.forEach(function(p){
+        var m=tpl.cloneNode(true);
+        var img=m.querySelector('img');
+        if(p.office){ var s=document.createElement('span'); s.className='tmem-ic'; s.innerHTML=C; if(img)img.replaceWith(s); }
+        else if(img){ img.setAttribute('src',p.img); img.setAttribute('alt',p.name); }
+        var pn=m.querySelector('.pname'); if(pn)pn.textContent=p.name;
+        var pr=m.querySelector('.prole'); if(pr)pr.textContent=p.role;
+        var as=m.querySelectorAll('.tcontact a'); var telA=as[0], waA=as[1];
+        if(telA){ var svg=telA.querySelector('svg'); telA.setAttribute('href',p.telh); telA.textContent=''; if(svg)telA.appendChild(svg); telA.appendChild(document.createTextNode(p.tel)); }
+        if(waA) waA.setAttribute('href',p.wah);
+        frag.appendChild(m);
+      });
+      [].slice.call(box.querySelectorAll('.tmem')).forEach(function(e){e.remove();});
+      var crow=box.querySelector('.crow');
+      if(crow) box.insertBefore(frag,crow); else box.appendChild(frag);
+      if(!document.getElementById('ca-ct-css')){ var st=document.createElement('style'); st.id='ca-ct-css'; st.textContent='.panel.contact .tmem-ic{width:56px;height:56px;border-radius:50%;background:#fff;border:1px solid #E6EAF1;display:flex;align-items:center;justify-content:center;flex:0 0 auto}'; document.head.appendChild(st); }
+      box.setAttribute('data-ca-ct','1');
+      return true;
+    }catch(e){ return false; }
+  }
+  var n=0; var iv=setInterval(function(){ if(run()||++n>80) clearInterval(iv); },100);
+  if(document.readyState!=='loading') run(); else document.addEventListener('DOMContentLoaded',run);
+})();
+
