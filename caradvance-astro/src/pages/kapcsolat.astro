@@ -172,6 +172,8 @@ var NAME={nograd:"Nógrád",heves:"Heves",jnsz:"Jász-Nagykun-Szolnok",budapest:
 var REGION={balazs:["gyms","vas","zala","somogy","veszprem","fejer","ke","tolna","baranya","pest","budapest","nograd"],zsombor:["baz","heves","jnsz","hb","szszb","bk","bekes","csongrad"]};
 var REPS={
  balazs:{name:"Bajzáth Balázs",role:"Sales Manager",email:"sales@caradvance.hu",phone:"+36 30 094 2081",langs:"hu gb",color:"#2563EB",ini:"BB",img:"https://www.caradvance.hu/bajzath-balazs.webp?v=4"},
+    { ini:"VS", name:"Vadnai Soma", role:"Sofőr", flags:"hu gb", color:"#111827", img:"/vadnai-soma.webp", bio:"Autóink hazaszállítója Németországból — gondos, pontos transzport az átadásig.", chips:[] },
+    { ini:"CF", name:"Csadi Ferenc", role:"Lengyel piaci felelős", flags:"hu gb pl", color:"#111827", img:"/csadi-ferenc.webp", bio:"A lengyel piac felelőse — lengyel ügyfeleink és beszerzéseink kapcsolattartója." , chips:[] },
  zsombor:{name:"Vadnai Zsombor",role:"Sales Manager",email:"media@caradvance.hu",phone:"+36 30 094 2105",langs:"hu gb",color:"#E2001A",ini:"VZ",img:"https://www.caradvance.hu/vadnai-zsombor.webp?v=4"}
 };
 function repOf(id){return REGION.balazs.indexOf(id)>=0?"balazs":"zsombor";}
