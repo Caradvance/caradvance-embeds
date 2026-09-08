@@ -4,10 +4,20 @@ const lang = 'hu';
 ---
 <Base lang={lang} path="/kapcsolat" title="Kapcsolat — CarAdvance" description="Lépj kapcsolatba a CarAdvance csapatával. Válaszd ki a megyédet a térképen, és megmutatjuk, ki a személyes kapcsolattartód. Iroda: 2083 Solymár, Ibolya utca 18.">
 <div class="kap">
-  <div class="kap-head">
-    <h1>Kapcsolat</h1>
-    <p>Válaszd ki a megyédet a térképen — megmutatjuk, ki a kapcsolattartód.</p>
-  </div>
+  <div class="kaphero">
+      <img class="kaphero-bg" src="/caradvance-iroda.webp" alt="CarAdvance iroda" />
+      <div class="kaphero-ov"></div>
+      <div class="kaphero-inner">
+        <img class="kaphero-logo" src="/caradvance-logo-white.webp" alt="CarAdvance" />
+        <h1 class="kaphero-h1">Kapcsolat</h1>
+        <p class="kaphero-sub">Kérdésed van, autót keresel vagy eladnál? Segítünk — hívj minket, írj nekünk, vagy válaszd ki a megyédet lentebb, és megmutatjuk, ki a kapcsolattartód.</p>
+        <div class="kaphero-cta">
+          <a class="kaphero-btn red" href="tel:+36302336060">Hívjon minket</a>
+          <a class="kaphero-btn white" href="//wa.me/36302336060" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+      <button class="kaphero-scroll" type="button" onclick="window.scrollBy({top:Math.round(window.innerHeight*0.72),behavior:'smooth'})">Görgess<span class="kaphero-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button>
+    </div>
 
   <div class="kap-office" id="kap-office"></div>
 
@@ -115,6 +125,23 @@ const lang = 'hu';
 .kap-office-chips a.kap-wa .ic{background:#E7F8EE;color:#0F8A3C}
 @media(max-width:760px){.kap-office{grid-template-columns:1fr}.kap-office-chips{grid-template-columns:1fr}}
 
+
+.kaphero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:520px;padding:20px 24px 72px;border-radius:32px;width:calc(100vw - 32px);margin:calc(6px - var(--navh,80px)) 0 30px calc(50% - 50vw + 16px);background:#111}
+.kaphero-bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center 42%}
+.kaphero-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.16),transparent 60%),linear-gradient(rgba(10,10,12,.62),rgba(10,10,12,.66) 45%,rgba(10,10,12,.8))}
+.kaphero-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0}
+.kaphero-logo{height:60px;width:auto;object-fit:contain;margin:0 0 22px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55))}
+.kaphero-h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.4);color:#fff}
+.kaphero-sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#eef0f4;max-width:640px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.5)}
+.kaphero-cta{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.kaphero-btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;padding:15px 32px;border-radius:999px;text-decoration:none;transition:.15s;box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.kaphero-btn.red{background:#E2001A;color:#fff}
+.kaphero-btn.red:hover{background:#c40017}
+.kaphero-btn.white{background:#fff;color:#0F1B2D}
+.kaphero-btn.white:hover{background:#eef0f4}
+.kaphero-scroll{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.82);background:none;border:0;cursor:pointer;letter-spacing:.05em;font-size:11px;text-transform:uppercase;font-family:inherit}
+.kaphero-scroll:hover{color:#fff}
+.kaphero-chev svg{width:26px;height:26px;display:block}
 </style>
 
 <script is:inline>
