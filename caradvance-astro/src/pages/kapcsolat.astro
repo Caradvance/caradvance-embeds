@@ -222,4 +222,33 @@ document.getElementById('kap-team').innerHTML=TEAM.map(function(t){
 })();
 </script>
 
+<style>
+.kap-scrollwrap{position:relative;}
+.kap-scroll-arrow{position:absolute;top:34%;right:8px;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:#E2001A;color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:26px;font-weight:700;line-height:1;padding:0 0 3px 2px;transition:opacity .35s ease;animation:kapArrowNudge 1.4s ease-in-out infinite;}
+.kap-scroll-arrow:hover{background:#c40017;}
+.kap-scroll-arrow[hidden]{opacity:0;pointer-events:none;}
+@keyframes kapArrowNudge{0%,100%{transform:translateY(-50%) translateX(0);}50%{transform:translateY(-50%) translateX(6px);}}
+@media (max-width:600px){.kap-scroll-arrow{width:40px;height:40px;font-size:22px;top:32%;}}
+</style>
+<script>
+(function(){
+function setup(){
+var list=document.querySelectorAll(".kap-team-scroll");
+for(var k=0;k<list.length;k++){(function(sc){
+if(sc.__arrowed)return;
+if(sc.scrollWidth<=sc.clientWidth+6)return;
+sc.__arrowed=true;
+var wrap=document.createElement("div");wrap.className="kap-scrollwrap";
+sc.parentNode.insertBefore(wrap,sc);wrap.appendChild(sc);
+var btn=document.createElement("button");btn.type="button";btn.className="kap-scroll-arrow";btn.setAttribute("aria-label","Tovabb");btn.innerHTML="\u203A";
+wrap.appendChild(btn);
+function upd(){var atEnd=sc.scrollLeft+sc.clientWidth>=sc.scrollWidth-10;btn.hidden=atEnd;}
+btn.addEventListener("click",function(){sc.scrollBy({left:Math.round(sc.clientWidth*0.8),behavior:"smooth"});});
+sc.addEventListener("scroll",upd);window.addEventListener("resize",upd);upd();
+})(list[k]);}
+}
+var n=0,iv=setInterval(function(){setup();if(n++>25)clearInterval(iv);},300);
+if(document.readyState!=="loading")setup();else document.addEventListener("DOMContentLoaded",setup);
+})();
+</script>
 </Base>
