@@ -233,14 +233,24 @@ for(var k=0;k<list.length;k++){(function(sc){
 if(sc.__arrowed)return;
 if(sc.scrollWidth<=sc.clientWidth+6)return;
 sc.__arrowed=true;
-var wrap=document.createElement("div");
-wrap.style.position="relative";
+var wrap=document.createElement("div");wrap.style.position="relative";
 sc.parentNode.insertBefore(wrap,sc);wrap.appendChild(sc);
-var btn=document.createElement("button");btn.type="button";btn.setAttribute("aria-label","Tovabb");btn.className="kap-scroll-arrow";btn.innerHTML="\u203A";
-btn.style.cssText="position:absolute;top:34%;right:10px;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:#E2001A;color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:26px;font-weight:700;line-height:1;padding:0 0 3px 2px;animation:kapArrowNudge 1.4s ease-in-out infinite;";
-wrap.appendChild(btn);
-function upd(){var atEnd=sc.scrollLeft+sc.clientWidth>=sc.scrollWidth-10;btn.style.opacity=atEnd?"0":"1";btn.style.pointerEvents=atEnd?"none":"auto";}
-btn.addEventListener("click",function(){sc.scrollBy({left:Math.round(sc.clientWidth*0.8),behavior:"smooth"});});
+function mk(dir){
+var b=document.createElement("button");b.type="button";b.className="kap-scroll-arrow";
+b.setAttribute("aria-label",dir>0?"Tovabb":"Vissza");
+b.innerHTML=dir>0?"\u203A":"\u2039";
+b.style.cssText="position:absolute;top:34%;"+(dir>0?"right:10px;":"left:10px;")+"transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:#E2001A;color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:26px;font-weight:700;line-height:1;padding:0 0 3px "+(dir>0?"2px":"0")+";transition:opacity .25s ease;";
+b.addEventListener("click",function(){sc.scrollBy({left:dir*Math.round(sc.clientWidth*0.8),behavior:"smooth"});});
+wrap.appendChild(b);return b;
+}
+var right=mk(1),left=mk(-1);
+right.style.animation="kapArrowNudge 1.4s ease-in-out infinite";
+function upd(){
+var canR=sc.scrollLeft+sc.clientWidth<sc.scrollWidth-10;
+var canL=sc.scrollLeft>10;
+right.style.opacity=canR?"1":"0";right.style.pointerEvents=canR?"auto":"none";
+left.style.opacity=canL?"1":"0";left.style.pointerEvents=canL?"auto":"none";
+}
 sc.addEventListener("scroll",upd);window.addEventListener("resize",upd);upd();
 })(list[k]);}
 }
