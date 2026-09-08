@@ -848,7 +848,7 @@
       people.forEach(function(p){
         var m=tpl.cloneNode(true);
         var img=m.querySelector('img');
-        if(p.office){ var s=document.createElement('span'); s.className='tmem-ic'; s.innerHTML=C; if(img)img.replaceWith(s); }
+        if(p.office){ if(img){ img.setAttribute('src','/caradvance-c.png'); img.setAttribute('alt','CarAdvance'); img.classList.add('tmem-office'); } }
         else if(img){ img.setAttribute('src',p.img); img.setAttribute('alt',p.name); }
         var pn=m.querySelector('.pname'); if(pn)pn.textContent=p.name;
         var pr=m.querySelector('.prole'); if(pr)pr.textContent=p.role;
@@ -860,7 +860,7 @@
       [].slice.call(box.querySelectorAll('.tmem')).forEach(function(e){e.remove();});
       var crow=box.querySelector('.crow');
       if(crow) box.insertBefore(frag,crow); else box.appendChild(frag);
-      if(!document.getElementById('ca-ct-css')){ var st=document.createElement('style'); st.id='ca-ct-css'; st.textContent='.panel.contact .tmem-ic{width:56px;height:56px;border-radius:50%;background:#fff;border:1px solid #E6EAF1;display:flex;align-items:center;justify-content:center;flex:0 0 auto}'; document.head.appendChild(st); }
+      if(!document.getElementById('ca-ct-css')){ var st=document.createElement('style'); st.id='ca-ct-css'; st.textContent='.panel.contact .tmem img.tmem-office{object-fit:contain;background:#fff}'; document.head.appendChild(st); }
       box.setAttribute('data-ca-ct','1');
       return true;
     }catch(e){ return false; }
