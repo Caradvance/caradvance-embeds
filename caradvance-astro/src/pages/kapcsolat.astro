@@ -246,8 +246,10 @@ wrap.appendChild(b);return b;
 var right=mk(1),left=mk(-1);
 right.style.animation="kapArrowNudge 1.4s ease-in-out infinite";
 function upd(){
-var canR=sc.scrollLeft+sc.clientWidth<sc.scrollWidth-10;
-var canL=sc.scrollLeft>10;
+if(sc.__startLeft===undefined)sc.__startLeft=sc.scrollLeft;
+var max=sc.scrollWidth-sc.clientWidth;
+var canR=max-sc.scrollLeft>12;
+var canL=sc.scrollLeft>sc.__startLeft+8;
 right.style.opacity=canR?"1":"0";right.style.pointerEvents=canR?"auto":"none";
 left.style.opacity=canL?"1":"0";left.style.pointerEvents=canL?"auto":"none";
 }
