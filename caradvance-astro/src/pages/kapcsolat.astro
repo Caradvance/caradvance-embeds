@@ -222,10 +222,10 @@ document.getElementById('kap-team').innerHTML=TEAM.map(function(t){
 })();
 </script>
 
-<style is:global>
+<style is:inline>
 @keyframes kapArrowNudge{0%,100%{transform:translateY(-50%) translateX(0);}50%{transform:translateY(-50%) translateX(6px);}}
 </style>
-<script>
+<script is:inline>
 (function(){
 function setup(){
 var list=document.querySelectorAll(".kap-team-scroll");
