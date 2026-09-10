@@ -305,6 +305,8 @@ el.innerHTML='<div class="kap-off2"><div class="kap-off2-body"><div class="kap-o
 function post(){
 var hero=document.querySelector('.kap-hero');if(hero)hero.classList.add('kap-nomap');
 document.querySelectorAll('.kap-card .cc').forEach(function(c){c.remove();});
+var roles={'Tóth Károly':'Kereskedelmi vezető','Némethy Marc':'Ügyvezető','Némethy Zsófia':'Operatív vezető','Vadnai Zsombor':'Marketing \u2013 Sales Manager','Vadnai Soma':'Logisztika'};
+document.querySelectorAll('.kap-card').forEach(function(card){var nm=card.querySelector('.nm'),rl=card.querySelector('.rl');if(!nm||!rl)return;var name=nm.textContent.replace(/\s+/g,' ').trim();for(var k in roles){if(name.indexOf(k)>=0){rl.textContent=roles[k];break;}}});
 }
 function all(){office();post();}
 if(document.readyState!=='loading')setTimeout(all,120);else document.addEventListener('DOMContentLoaded',function(){setTimeout(all,120);});
