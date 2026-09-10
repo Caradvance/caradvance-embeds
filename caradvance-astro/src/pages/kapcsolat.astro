@@ -269,30 +269,22 @@ if(document.readyState!=="loading")setup();else document.addEventListener("DOMCo
 #kap-office .kap-off2-meta{display:flex;flex-wrap:wrap;gap:6px 20px;margin:14px 0 20px;color:#5b616e;font-size:14px}
 #kap-office .kap-off2-cats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 #kap-office .kap-cat{background:#f6f7f9;border:1px solid #e6e8ec;border-radius:14px;padding:16px}
-#kap-office .kap-cat-t{font-weight:700;color:#0b0b0d;margin-bottom:10px;font-size:14.5px}
-#kap-office .kap-cat a{display:block;margin:6px 0;color:#3a3f4a;text-decoration:none;font-size:13.5px}
+#kap-office .kap-cat-t{font-weight:700;color:#0b0b0d;margin-bottom:12px;font-size:14.5px}
+#kap-office .kap-cat a{display:flex;align-items:center;gap:9px;margin:8px 0;color:#3a3f4a;text-decoration:none;font-size:13.5px;font-weight:600}
+#kap-office .kap-cat a svg{width:16px;height:16px;color:#9aa0ab;flex:0 0 auto}
 #kap-office .kap-cat a:hover{color:#0b0b0d}
 #kap-office .kap-cat a.wa{color:#12a150}
+#kap-office .kap-cat a.wa svg{color:#25D366}
 @media(max-width:900px){#kap-office .kap-off2-cats{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){#kap-office .kap-off2-cats{grid-template-columns:1fr}}
 .kap-hero.kap-nomap{display:none!important}
-.kap-hero.kap-nomap .kap-mapwrap{display:none!important}
-.kap-hero.kap-nomap .kap-panel{max-width:560px;margin:0 auto}
-.kap-p2{padding:26px 28px}
-.kap-p2-h{font-size:12px;font-weight:800;letter-spacing:.08em;color:#8a8f9a;margin-bottom:16px}
-.kap-p2-top{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-.kap-p2-av{width:58px;height:58px;border-radius:50%;object-fit:cover;background:#eef0f3}
-.kap-p2-name{font-size:20px;font-weight:800;color:#0b0b0d}
-.kap-p2-role{font-size:12px;font-weight:800;letter-spacing:.06em;color:#1d63ff;margin-top:2px}
-.kap-p2-link{display:flex;align-items:center;gap:11px;padding:12px 15px;margin:9px 0;border:1px solid #e6e8ec;border-radius:13px;color:#0b0b0d;text-decoration:none;font-weight:600;font-size:14.5px;transition:.15s}
-.kap-p2-link:hover{background:#f6f7f9}
-.kap-p2-link svg{color:#8a8f9a;flex:0 0 auto}
-.kap-p2-link.wa{background:#25D366;color:#fff;border-color:#25D366}
-.kap-p2-link.wa svg{color:#fff}
 </style>
 <script is:inline>
 (function(){
 var AT='\u0040',C='\u003a',WA='https'+C+'//wa.me/';
+var svgPhone='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z"/></svg>';
+var svgMail='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+var svgWa='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.1.1.3 0 .5l-.3.5-.3.3c-.2.2-.3.4-.1.7.2.3.9 1.5 2 2.4 1.3 1.2 2 1.4 2.3 1.5.2.1.4.1.6-.1l.7-.8c.2-.3.4-.2.7-.1l1.7.8c.3.2.5.2.6.4.1.1.1.6-.1 1.2z"/></svg>';
 function office(){
 var el=document.getElementById('kap-office');if(!el)return;
 var cats=[
@@ -302,28 +294,16 @@ var cats=[
 {t:'Autó import Németországból',tel:'+36 30 214 69 89',r:'36302146989',m:'import'+AT+'caradvance.de'}
 ];
 var ch=cats.map(function(c){return '<div class="kap-cat"><div class="kap-cat-t">'+c.t+'</div>'+
-'<a href="tel'+C+'+'+c.r+'">\u260E '+c.tel+'</a>'+
-'<a class="wa" target="_blank" rel="noopener" href="'+WA+c.r+'">WhatsApp</a>'+
-'<a href="mailto'+C+c.m+'">\u2709 '+c.m+'</a></div>';}).join('');
+'<a href="tel'+C+'+'+c.r+'">'+svgPhone+'<span>'+c.tel+'</span></a>'+
+'<a class="wa" target="_blank" rel="noopener" href="'+WA+c.r+'">'+svgWa+'<span>WhatsApp</span></a>'+
+'<a href="mailto'+C+c.m+'">'+svgMail+'<span>'+c.m+'</span></a></div>';}).join('');
 el.innerHTML='<div class="kap-off2"><div class="kap-off2-body"><div class="kap-off2-name">A Caradvance iroda</div>'+
 '<div class="kap-off2-role">HÁTTÉRCSAPAT \u00B7 ÜGYINTÉZÉS</div>'+
 '<div class="kap-off2-meta"><span>\uD83D\uDD52 H\u2013P 9:00\u201317:00</span><span>\uD83D\uDCCD 2083 Solymár, Ibolya utca 18.</span></div>'+
 '<div class="kap-off2-cats">'+ch+'</div></div></div>';
 }
-var svgPhone='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z"/></svg>';
-var svgMail='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
-var svgWa='<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.8c.1.1.1.3 0 .5l-.3.5-.3.3c-.2.2-.3.4-.1.7.2.3.9 1.5 2 2.4 1.3 1.2 2 1.4 2.3 1.5.2.1.4.1.6-.1l.7-.8c.2-.3.4-.2.7-.1l1.7.8c.3.2.5.2.6.4.1.1.1.6-.1 1.2z"/></svg>';
 function post(){
 var hero=document.querySelector('.kap-hero');if(hero)hero.classList.add('kap-nomap');
-var panel=document.querySelector('.kap-panel');
-if(panel){
-var mail='sales'+AT+'caradvance.hu',rp='36300942081';
-panel.innerHTML='<div class="kap-p2"><div class="kap-p2-h">A KAPCSOLATTARTÓD</div>'+
-'<div class="kap-p2-top"><img class="kap-p2-av" src="/bajzath-balazs.webp" onerror="this.style.display=\'none\'"><div><div class="kap-p2-name">Bajzáth Balázs</div><div class="kap-p2-role">SALES MANAGER</div></div></div>'+
-'<a class="kap-p2-link" href="tel'+C+'+'+rp+'">'+svgPhone+'<span>+36 30 094 2081</span></a>'+
-'<a class="kap-p2-link" href="mailto'+C+mail+'">'+svgMail+'<span>'+mail+'</span></a>'+
-'<a class="kap-p2-link wa" target="_blank" rel="noopener" href="'+WA+rp+'">'+svgWa+'<span>WhatsApp</span></a></div>';
-}
 document.querySelectorAll('.kap-card .cc').forEach(function(c){c.remove();});
 }
 function all(){office();post();}
