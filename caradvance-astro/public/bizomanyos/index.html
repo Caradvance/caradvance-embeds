@@ -326,7 +326,34 @@ html.ca-ok #ca-gate{display:none}
   <div class="autok-head"><div><span class="feyebrow">Bizományos értékesítés</span><h2>Bizományos autóink</h2></div></div>
   <p class="biz-lead">Bizományban értékesített prémium autók — és minden eladással egy magyar jótékony szervezetet is támogatunk. A jutalékunk <strong>30%-a</strong> jó ügyre megy: a felét (15%) az eladó, a másikat a vevő irányítja. Válaszd ki alább, te melyik ügyet támogatnád vevőként.</p>
 
-  <div class="biz-filters">
+  <style>
+.biz-toggle{display:inline-flex;background:#f0f2f5;border:1px solid #e2e5ea;border-radius:12px;padding:4px;gap:4px;margin:0 0 14px}
+.biz-tg{border:0;background:none;padding:9px 22px;border-radius:9px;font:inherit;font-size:14px;font-weight:700;color:#5b616e;cursor:pointer;transition:.15s}
+.biz-tg.active{background:#fff;color:#0b0b0d;box-shadow:0 1px 3px rgba(8,8,10,.12)}
+.biz-tg:hover:not(.active){color:#0b0b0d}
+.biz-soldempty{text-align:center;padding:56px 20px;color:#6b7280;font-size:15px;display:none}
+</style>
+<div class="biz-toggle"><button type="button" class="biz-tg active" data-tg="stock">Készleten</button><button type="button" class="biz-tg" data-tg="sold">Eladva</button></div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+var tgs=document.querySelectorAll('.biz-tg');
+var grid=document.getElementById('bizgrid');
+var count=document.getElementById('bizcount');
+var empty=document.getElementById('bizempty');
+if(!grid)return;
+var sm=document.createElement('div');sm.className='biz-soldempty';sm.textContent='Az eladott autók hamarosan itt jelennek meg.';
+grid.parentNode.insertBefore(sm,grid.nextSibling);
+tgs.forEach(function(b){b.addEventListener('click',function(){
+ tgs.forEach(function(x){x.classList.remove('active')});b.classList.add('active');
+ var sold=b.getAttribute('data-tg')==='sold';
+ grid.style.display=sold?'none':'';
+ if(count)count.style.display=sold?'none':'';
+ if(empty)empty.style.display='none';
+ sm.style.display=sold?'block':'none';
+});});
+});
+</script>
+<div class="biz-filters">
     <input id="bq" type="search" placeholder="Keresés (pl. BMW, Audi, dízel)…" autocomplete="off">
     <select id="bf-marka"><option value="">Minden márka</option></select>
     <select id="bf-kar"><option value="">Minden karosszéria</option></select>
