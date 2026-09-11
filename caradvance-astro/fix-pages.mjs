@@ -16,6 +16,19 @@ console.log('fix-pages: forras = ' + (GEN === '.gen' ? 'friss Sheet-generalas (.
 cp(GEN + '/autoink', 'public/autoink');
 cp(GEN + '/auto', 'public/auto');
 
+// Kezzel keszitett bizomanyos aloldalak, amiket a Sheet-generator nem allit elo
+// (a kulon "bizomanyos" munkalapon szereplo autok). Csak akkor masoljuk be, ha a
+// repoban commitolva van ES a friss generalasban nincs ilyen slug -> igy sosem
+// tamasztunk fel eladott/kivezetett autot.
+const KEEP_MANUAL = ['ford-fiesta-1-6-gtdi-st200'];
+for (const slug of KEEP_MANUAL) {
+  const src = '../auto/' + slug;
+  if (fs.existsSync(src + '/index.html') && !fs.existsSync('public/auto/' + slug + '/index.html')) {
+    cp(src, 'public/auto/' + slug);
+    console.log('fix-pages: kezi bizomanyos aloldal megtartva -> ' + slug);
+  }
+}
+
 // copy root static assets (logo, hero videos, images) so the site is self-contained
 for (const f of fs.readdirSync('..')) {
   if (/\.(webp|png|jpe?g|mp4|svg|ico|gif)$/i.test(f)) {
