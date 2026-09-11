@@ -21,9 +21,9 @@ img{max-width:100%}
 .btn-soft{background:var(--soft);color:var(--ink)}.btn-soft:hover{background:var(--navy);color:#fff}
 /* header/nav */
 .ca-navwrap{position:sticky;top:0;z-index:1000;display:flex;justify-content:center;padding:12px 14px 0}
-.ca-nav{position:relative;width:100%;max-width:1200px;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 22px 8px 22px;box-shadow:0 14px 40px rgba(8,8,10,.20)}
-.ca-nav .brand{display:flex;align-items:center;flex-shrink:0;text-decoration:none}.ca-nav .brand img{height:30px;width:auto;display:block}
-.ca-nav .menu{list-style:none;display:flex;align-items:center;gap:6px;margin:0;padding:0;flex:1;justify-content:center}
+.ca-nav{position:relative;width:100%;max-width:1320px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 18px 8px 18px;box-shadow:0 14px 40px rgba(8,8,10,.20)}
+.ca-nav .brand{display:flex;align-items:center;flex-shrink:0;text-decoration:none}.ca-nav .brand img{height:50px;width:auto;display:block}
+.ca-nav .menu{list-style:none;display:flex;align-items:center;gap:4px;margin:0;padding:0;flex:1;justify-content:center}
 .navitem{position:relative}
 .navlink{border:0;background:transparent;font:inherit;font-weight:700;font-size:15px;color:var(--ink);padding:12px 15px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:color .15s;text-decoration:none}
 .navlink .chev{font-size:13px;color:var(--muted);transition:transform .15s}
@@ -298,7 +298,7 @@ html.ca-ok #ca-gate{display:none}
 </div>
 <style>
 @keyframes caScrollBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
-.bizhero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:440px;padding:28px 24px 64px;border-radius:32px;margin:8px 16px 24px;background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
+.bizhero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:440px;padding:calc(28px + var(--navh)) 24px 64px;border-radius:32px;margin:calc(6px - var(--navh)) 16px 24px;background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
 .bizhero-logo{height:112px;width:auto;display:block;margin:0 auto 22px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
 .bizhero-title{font-size:clamp(34px,5vw,56px);font-weight:800;margin:0;line-height:1.05}
 .bizhero-sub{max-width:640px;margin:14px auto 0;color:rgba(255,255,255,.85);font-size:clamp(15px,2vw,18px);line-height:1.5}
