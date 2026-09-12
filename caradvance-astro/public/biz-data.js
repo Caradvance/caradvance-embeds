@@ -2,13 +2,13 @@
 window.BIZ = (function () {
   var RATE = 362; // EUR->HUF fallback; updated live from frankfurter
   var PROJECTS = {
-    sos:          { key:'sos',          name:'SOS Gyermekfalu Magyarország',        cat:'Gyerekek & családok',      logo:'/sos-badge.png', blue:true, project:'Egy gyermekház téli felújítása',            raised:0,  goal:100000, url:'https://www.sos.hu' },
-    elelmiszerbank:{ key:'elelmiszerbank',name:'Magyar Élelmiszerbank Egyesület',    cat:'Élelmiszer & rászorulók',  logo:'/magyar-elelmiszerbank-egyesulet.webp', project:'50 000 adag étel a téli hónapokra',   raised:0,  goal:100000, url:'https://www.elelmiszerbank.hu' },
-    bator:        { key:'bator',        name:'Bátor Tábor Alapítvány',              cat:'Beteg gyerekek',           logo:'/bator-tabor.webp', project:'5 gyermek nyári tábori részvétele',            raised:0, goal:100000, url:'https://www.batortabor.hu' },
-    maltai:       { key:'maltai',       name:'Magyar Máltai Szeretetszolgálat',     cat:'Humanitárius',             logo:'/magyar-maltai-szeretetszolgalat.webp', project:'Téli krízisellátás hajléktalan embereknek', raised:0, goal:100000, url:'https://www.maltai.hu' },
+    sos:          { key:'sos',          name:'SOS Gyermekfalu Magyarország',        cat:'Gyerekek & családok',      logo:'/sos-badge.png', blue:true, project:'Téli ruházat egy gyermeknek',            raised:0,  goal:100000, url:'https://www.sos.hu' },
+    elelmiszerbank:{ key:'elelmiszerbank',name:'Magyar Élelmiszerbank Egyesület',    cat:'Élelmiszer & rászorulók',  logo:'/magyar-elelmiszerbank-egyesulet.webp', project:'Élelmiszercsomag rászoruló családoknak',   raised:0,  goal:100000, url:'https://www.elelmiszerbank.hu' },
+    bator:        { key:'bator',        name:'Bátor Tábor Alapítvány',              cat:'Beteg gyerekek',           logo:'/bator-tabor.webp', project:'Egy tábori nap egy beteg gyermeknek',            raised:0, goal:100000, url:'https://www.batortabor.hu' },
+    maltai:       { key:'maltai',       name:'Magyar Máltai Szeretetszolgálat',     cat:'Humanitárius',             logo:'/magyar-maltai-szeretetszolgalat.webp', project:'Meleg étel és takaró hajléktalanoknak', raised:0, goal:100000, url:'https://www.maltai.hu' },
     rex:          { key:'rex',          name:'Rex Kutyaotthon Alapítvány',          cat:'Állatvédelem',             logo:'/rex-kutyaotthon-alapitvany.webp', project:'Eledel a menhely kutyáinak',   raised:0,  goal:100000, url:'https://www.rexalapitvany.hu' },
-    heimpal:      { key:'heimpal',      name:'Heim Pál Gyermekgyógyászati Intézet', cat:'Gyermekgyógyászat',        logo:'/heim-pal-orszagos-gyermekgyogyaszati-intezet.webp', project:'Új gyermekgyógyászati műszer beszerzése', raised:0, goal:100000, url:'https://heimpalkorhaz.hu' },
-    patent:       { key:'patent',       name:'PATENT Egyesület',                    cat:'Jogvédelem',               logo:'/patent-egyesulet.webp', project:'Ingyenes jogsegély-szolgálat egy évig',      raised:0,  goal:100000, url:'https://patent.org.hu' }
+    heimpal:      { key:'heimpal',      name:'Heim Pál Gyermekgyógyászati Intézet', cat:'Gyermekgyógyászat',        logo:'/heim-pal-orszagos-gyermekgyogyaszati-intezet.webp', project:'Gyógyító eszközök a gyermekosztálynak', raised:0, goal:100000, url:'https://heimpalkorhaz.hu' },
+    patent:       { key:'patent',       name:'PATENT Egyesület',                    cat:'Jogvédelem',               logo:'/patent-egyesulet.webp', project:'Ingyenes jogi segítség egy rászorulónak',      raised:0,  goal:100000, url:'https://patent.org.hu' }
   };
   var ORDER = ['sos','elelmiszerbank','bator','maltai','rex','heimpal','patent'];
 
