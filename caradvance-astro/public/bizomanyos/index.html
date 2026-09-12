@@ -435,6 +435,11 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
     var side=B.ftOf(B.sideEur(car.eur));
     var total=B.ftOf(B.totalDonationEur(car.eur));
     var slug=B.slugify(car.modell);
+    var HUFOV={'ford-fiesta-1-6-gtdi-st200':6999000};
+    var realFt=(car.huf&&car.huf>0)?car.huf:(HUFOV[slug]||0);
+    var ftShown=realFt>0?realFt:B.ftOf(car.eur);
+    var eurShown=realFt>0?Math.round(realFt/B.getRate()):car.eur;
+    var eurPfx=realFt>0?'≈ ':'';
     var media=car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" decoding="async" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="ph" style="display:none">fotó</span>':'<span class="ph" style="display:flex">fotó hamarosan</span>';
     var specs=[car.km,car.teljesitmeny,car.valto,car.uzemanyag].filter(Boolean).join(' · ');
     var def=B.ORDER.filter(function(k){return k!==car.seller;})[0]||B.ORDER[0];
@@ -443,7 +448,7 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
       +'<a class="bizcard-link" href="/auto/'+slug+'/?biz=1"><div class="media">'+media+'</div>'
       +'<div class="body"><div class="meta"><span class="cond">Használt</span><span class="year">'+esc(car.evjarat)+'</span></div>'
       +'<h3 class="title">'+esc(car.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
-      +'<div class="pricerow"><span class="price">'+esc(B.fmtFt(B.ftOf(car.eur)))+'</span><span class="peur">'+car.eur.toLocaleString('hu-HU')+' €</span></div></div></a>'
+      +'<div class="pricerow"><span class="price">'+esc(B.fmtFt(ftShown))+'</span><span class="peur">'+eurPfx+eurShown.toLocaleString('hu-HU')+' €</span></div></div></a>'
       +'<div class="biz-donate">'
         +'<div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
           +'<span class="bd-txt"><span class="bd-l">Támogatott ügy · eladó 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'

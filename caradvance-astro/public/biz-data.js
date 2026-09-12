@@ -51,7 +51,7 @@ window.BIZ = (function () {
       if(g('aktiv') && g('aktiv').toLowerCase()==='nem') continue;
       var modell=g('modell'); if(!modell) continue;
       var eur=parseFloat((g('vetel_eur')||g('eur')||'').replace(/[^\d.]/g,''))||0;
-      out.push({modell:modell,marka:g('marka'),karosszeria:g('karosszeria'),km:g('km'),teljesitmeny:g('teljesitmeny'),valto:g('valto'),uzemanyag:g('uzemanyag'),evjarat:g('evjarat'),hajtas:g('hajtas'),eur:eur,seller:(g('seller_ngo')||g('seller')||'sos').toLowerCase(),img:g('kep_url')||''});
+      out.push({modell:modell,marka:g('marka'),karosszeria:g('karosszeria'),km:g('km'),teljesitmeny:g('teljesitmeny'),valto:g('valto'),uzemanyag:g('uzemanyag'),evjarat:g('evjarat'),hajtas:g('hajtas'),huf:parseFloat((g('vetel_huf')||g('vetel_ft')||g('ar_ft')||'').replace(/[^\d.]/g,''))||0,eur:eur,seller:(g('seller_ngo')||g('seller')||'sos').toLowerCase(),img:g('kep_url')||''});
     }
     return out;
   }
