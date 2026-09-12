@@ -337,13 +337,12 @@ html.ca-ok #ca-gate{display:none}
   <p class="biz-lead">Bizományban értékesített prémium autók — és minden eladással egy magyar jótékony szervezetet is támogatunk. A jutalékunk <strong>30%-a</strong> jó ügyre megy: a felét (15%) az eladó, a másikat a vevő irányítja. Válaszd ki alább, te melyik ügyet támogatnád vevőként.</p>
 
   <style>
-.biz-toggle{display:inline-flex;background:#f0f2f5;border:1px solid #e2e5ea;border-radius:12px;padding:4px;gap:4px;margin:0 0 14px}
-.biz-tg{border:0;background:none;padding:9px 22px;border-radius:9px;font:inherit;font-size:14px;font-weight:700;color:#5b616e;cursor:pointer;transition:.15s}
-.biz-tg.active{background:#fff;color:#0b0b0d;box-shadow:0 1px 3px rgba(8,8,10,.12)}
+.biz-toggle{display:inline-flex;background:#fff;border:1px solid #e6eaf1;border-radius:999px;padding:5px;gap:6px;margin:0 0 16px}
+.biz-tg{border:0;background:transparent;padding:10px 20px;border-radius:999px;font:inherit;font-size:14px;font-weight:700;color:#141519;cursor:pointer;transition:.2s}
+.biz-tg.active{background:#0b0b0d;color:#fff}
 .biz-tg:hover:not(.active){color:#0b0b0d}
 .biz-soldempty{text-align:center;padding:56px 20px;color:#6b7280;font-size:15px;display:none}
 </style>
-<div class="biz-toggle"><button type="button" class="biz-tg active" data-tg="stock">Készleten</button><button type="button" class="biz-tg" data-tg="sold">Eladva</button></div>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
 var tgs=document.querySelectorAll('.biz-tg');
@@ -369,6 +368,7 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
     <select id="bf-kar"><option value="">Minden karosszéria</option></select>
     <select id="bf-uz"><option value="">Minden üzemanyag</option></select>
   </div>
+  <div class="biz-toggle"><button type="button" class="biz-tg active" data-tg="stock">Készleten</button><button type="button" class="biz-tg" data-tg="sold">Eladva</button></div>
   <div class="cat-count" id="bizcount">Autók betöltése…</div>
   <div class="grid" id="bizgrid"></div>
   <div id="bizempty" class="cat-empty" style="display:none">Nincs a szűrésnek megfelelő autó.</div>
