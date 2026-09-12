@@ -60,11 +60,15 @@ window.BIZ = (function () {
   function parseCSV(t){var rows=[],row=[],cur='',q=false,i=0,c;for(;i<t.length;i++){c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){cur+='"';i++;}else q=false;}else cur+=c;}else{if(c=='"')q=true;else if(c==','){row.push(cur);cur='';}else if(c=='\n'){row.push(cur);rows.push(row);row=[];cur='';}else if(c=='\r'){}else cur+=c;}}if(cur!==''||row.length){row.push(cur);rows.push(row);}return rows;}
 
   // load cars: try the sheet tab, else fallback; then run cb(cars)
+  var EXTRA = [
+    { modell:'Ford Focus 1.5 EcoBlue ST-Line (Automata)', marka:'Ford', karosszeria:'Kombi', km:'65 390 km', teljesitmeny:'120 LE', valto:'Automata', uzemanyag:'Dízel', evjarat:'03/2023', hajtas:'Első kerék', eur:18684, huf:6799000, seller:'heimpal', img:'https://img.hasznaltautocdn.com/2048x1536/23486159/30823120.jpg' }
+  ];
+  function withExtra(list){ var out=(list||[]).slice(); for(var i=0;i<EXTRA.length;i++){ var e=EXTRA[i], sl=slugify(e.modell); if(!out.some(function(c){return slugify(c.modell)===sl;})) out.push(e); } return out; }
   function loadCars(cb){
     fetch(SHEET_CSV,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var rows=parseCSV(t); var cars=fromRows(rows);
-      cb(cars.length?cars:CARS);
-    }).catch(function(){ cb(CARS); });
+      cb(withExtra(cars.length?cars:CARS));
+    }).catch(function(){ cb(withExtra(CARS)); });
   }
   function loadRate(cb){
     fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-store'})

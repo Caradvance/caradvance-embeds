@@ -20,7 +20,7 @@ cp(GEN + '/auto', 'public/auto');
 // (a kulon "bizomanyos" munkalapon szereplo autok). Csak akkor masoljuk be, ha a
 // repoban commitolva van ES a friss generalasban nincs ilyen slug -> igy sosem
 // tamasztunk fel eladott/kivezetett autot.
-const KEEP_MANUAL = ['ford-fiesta-1-6-gtdi-st200'];
+const KEEP_MANUAL = ['ford-fiesta-1-6-gtdi-st200', 'ford-focus-1-5-ecoblue-st-line-automata'];
 for (const slug of KEEP_MANUAL) {
   const src = '../auto/' + slug;
   if (fs.existsSync(src + '/index.html') && !fs.existsSync('public/auto/' + slug + '/index.html')) {
