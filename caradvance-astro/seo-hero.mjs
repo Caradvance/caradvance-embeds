@@ -7,8 +7,10 @@
 // felső térköze és pozíciója pontosan ugyanaz lesz. Idempotens; hiba esetén exit 0.
 import fs from 'node:fs';
 
-const FROM = '.inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0}';
-const TO   = '.inner{position:relative;z-index:2;max-width:1120px;margin:24px auto 0}';
+// Rövid, robusztus horgony: illik akkor is, ha a .inner szabály után még van
+// deklaráció (pl. az autoink hero több .inner változata ;display:none-t is tartalmaz).
+const FROM = 'max-width:1120px;margin:64px auto 0';
+const TO   = 'max-width:1120px;margin:24px auto 0';
 
 function walk(dir, out = []) {
   if (!fs.existsSync(dir)) return out;
