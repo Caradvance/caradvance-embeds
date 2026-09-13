@@ -37,6 +37,16 @@ export type Post = {
 
 export const POSTS: Post[] = [
   {
+    slug: 'nemet-hasznaltauto-vasarlas',
+    cat: 'import',
+    title: 'Német használtautó vásárlás — így válaszd ki és ellenőrizd biztonságosan',
+    excerpt: 'A német piac Európa legnagyobb és legjobban dokumentált használtautó-kínálata. Megmutatjuk, hol keress, mire figyelj a hirdetésben, és hogyan ellenőrizd az autót vásárlás előtt.',
+    dateISO: '2026-09-13',
+    readingMin: 8,
+    image: '/cover-nemet-hasznaltauto-vasarlas.webp',
+    keywords: 'német használtautó, német használtautó vásárlás, német használtautó piac, autó behozatal németországból, mobile.de, autoscout24',
+  },
+  {
     slug: 'caradvance-referenciak-vasarloi-tortenetek',
     cat: 'hirek',
     title: 'Miért a CarAdvance? Vásárlói történetek és referenciák',
