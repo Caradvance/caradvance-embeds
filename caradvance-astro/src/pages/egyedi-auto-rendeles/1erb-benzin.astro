@@ -1,0 +1,376 @@
+---
+// BMW 1-es — egyedi autó részletes oldal (pilot, új dizájn)
+// Önálló statikus útvonal: /egyedi-auto-rendeles/1erb-benzin
+// Nem érinti az Audi [slug].astro oldalt. A képek helye jelölve (később töltöd fel):
+//   háttérvideó: /bmw/1erb-hero.mp4 · főkép + galéria: /bmw/1erb-*.webp
+import Base from '../../layouts/Base.astro';
+
+const FX = 361;                       // tájékoztató árfolyam; élőben frissül
+const net = 28782;                    // nettó EUR
+const eur = new Intl.NumberFormat('de-DE').format(net) + ' €';
+const huf = new Intl.NumberFormat('hu-HU').format(net * FX) + ' Ft';
+
+const title = 'BMW 1-es (F70) — új autó Németországból, egyedi rendelés | CarAdvance';
+const description = 'Új BMW 1-es (116, 118, 120) egyedi rendelése Németországból, kulcsrakész behozatallal és akár 19% német áfával. Ár, felszereltség, műszaki adatok és tartós bérlet egy helyen.';
+
+const carJson = {
+  '@context':'https://schema.org','@type':'Car', name:'BMW 1-es', brand:{'@type':'Brand',name:'BMW'},
+  bodyType:'Kompakt', vehicleTransmission:'Automata',
+  offers:{'@type':'Offer', price:net, priceCurrency:'EUR', availability:'https://schema.org/InStock', seller:{'@type':'Organization',name:'CarAdvance'}}
+};
+const faqJson = {'@context':'https://schema.org','@type':'FAQPage',mainEntity:[
+  {'@type':'Question',name:'Mennyibe kerül egy új BMW 1-es Németországból?',acceptedAnswer:{'@type':'Answer',text:'A BMW 118 nettó listaára 28.782 €-tól (kb. 10,4 millió Ft) indul, a felszereltségtől függően. Magánszemélyként akár 19% német áfával rendelheted a müncheni Caradvance GmbH-n keresztül.'}},
+  {'@type':'Question',name:'Melyik BMW 1-es kivitelt válasszam — 116, 118 vagy 120?',acceptedAnswer:{'@type':'Answer',text:'A BMW 116 a belépő benzines, a 118 a legkiegyensúlyozottabb választás, a 120 a legdinamikusabb; dízel is rendelhető. Segítünk kiválasztani a hozzád illő motorizációt és felszereltséget.'}},
+  {'@type':'Question',name:'Bérelhető is a BMW 1-es?',acceptedAnswer:{'@type':'Answer',text:'Igen, a BMW 1-es tartós bérletben is elérhető, egyetlen kiszámítható havi díjjal, amiben a szerviz és a biztosítás is benne lehet.'}},
+  {'@type':'Question',name:'Mennyi idő a behozatal?',acceptedAnswer:{'@type':'Answer',text:'A kiválasztott konfigurációtól függ, jellemzően néhány hét. A beszerzést, a honosítást és a forgalomba helyezést mi intézzük.'}}
+]};
+const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:[
+  {'@type':'ListItem',position:1,name:'Főoldal',item:'https://www.caradvance.hu/'},
+  {'@type':'ListItem',position:2,name:'Egyedi BMW rendelés',item:'https://www.caradvance.hu/egyedi-auto-rendeles?brand=bmw'},
+  {'@type':'ListItem',position:3,name:'BMW 1-es',item:'https://www.caradvance.hu/egyedi-auto-rendeles/1erb-benzin'}
+]};
+---
+<Base lang="hu" path="/egyedi-auto-rendeles/1erb-benzin" title={title} description={description}>
+<div class="cd">
+
+  <!-- ===== HERO (homepage-mintájú) ===== -->
+  <section class="cd-hero">
+    <video class="cd-vid" autoplay muted loop playsinline preload="auto" poster="/bmw/1erb-hero-poster.jpg">
+      <source src="/bmw/1erb-hero.mp4" type="video/mp4" />
+    </video>
+    <div class="cd-ov"></div>
+    <div class="cd-inner">
+      <img class="cd-logo" src="/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133" />
+      <h1>BMW 1-es</h1>
+      <p class="cd-sub">Prémium kompakt Németországból — sportos vezetés, digitális belső tér, új autóként, egyedi konfigurációval.</p>
+      <div class="cd-cta">
+        <a class="cd-btn cd-btn-red" href="/kapcsolat">Autót rendelek</a>
+        <a class="cd-btn cd-btn-white" href="/kapcsolat">Ajánlatot kérek</a>
+      </div>
+    </div>
+    <button class="cd-scroll" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+  </section>
+
+  <!-- ===== CAR SHOWCASE + SUMMARY ===== -->
+  <section class="cd-show-wrap">
+    <div class="cd-w">
+      <div class="cd-show">
+        <span class="cd-ghost">1</span>
+        <div class="cd-ph cd-ph-hero"><span>BMW 1-es főkép — hamarosan</span></div>
+      </div>
+      <nav class="cd-crumb"><a href="/">Főoldal</a> / <a href="/egyedi-auto-rendeles?brand=bmw">Egyedi BMW rendelés</a> / <b>BMW 1-es</b></nav>
+      <div class="cd-bar">
+        <div class="cd-bar-head">
+          <div class="cd-chips"><span class="cd-chip">Kompakt</span><span class="cd-chip">Benzin</span><span class="cd-chip">Dízel</span><span class="cd-chip">Automata</span><span class="cd-chip cd-chip-year">2026 · Németország</span></div>
+        </div>
+        <div class="cd-buy">
+          <div class="cd-price"><span class="cd-huf" id="cdHuf" data-net={net}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
+          <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft).</p>
+          <div class="cd-cta2"><a class="cd-btn cd-btn-red" href="/kapcsolat">Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></div>
+        </div>
+        <div class="cd-trust">
+          <span><i></i> akár 19% német áfával</span>
+          <span><i></i> kulcsrakész behozatal</span>
+          <span><i></i> 2003 óta a német piacon</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STICKY SUBNAV ===== -->
+  <div class="cd-nav">
+    <div class="cd-w cd-nav-in">
+      <div class="cd-nav-links">
+        <a href="#attekintes">Áttekintés</a>
+        <a href="#elonyok">Miért ez a modell</a>
+        <a href="#adatok">Műszaki adatok</a>
+        <a href="#szolg">Bérlés &amp; import</a>
+        <a href="#gyik">GYIK</a>
+      </div>
+      <div class="cd-nav-price">{huf}-tól</div>
+    </div>
+  </div>
+
+  <!-- ===== OVERVIEW ===== -->
+  <section class="cd-sec" id="attekintes">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Áttekintés</span>
+      <h2 class="cd-h2">Új BMW 1-es Németországból, egyedi rendelésre</h2>
+      <p class="cd-lead">A <strong>BMW 1-es</strong> (BMW 1 Series) a márka belépő prémium kompaktja: feszes futómű, letisztult, digitális utastér és a jól ismert BMW vezetési élmény. A CarAdvance-nél pontosan azt a <strong>BMW 116</strong>, <strong>BMW 118</strong> vagy <strong>BMW 120</strong> kivitelt rendeljük meg neked, amit szeretnél — új autóként, gyári felszereltséggel, <a href="/beszerzesi-folyamat">Németországból, kulcsrakész behozatallal</a>. Nem szeretnél venni? A 1-es <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is elérhető.</p>
+    </div>
+  </section>
+
+  <!-- ===== HIGHLIGHTS ===== -->
+  <section class="cd-sec cd-soft" id="elonyok">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Miért a BMW 1-es</span>
+      <h2 class="cd-h2">Amiért szeretni fogod</h2>
+      <div class="cd-hl">
+        <div class="cd-c"><div class="cd-i">◈</div><h3>Sportos vezetés</h3><p>Feszes futómű és pontos kormányzás — a kompakt kategória vezetési etalonja.</p></div>
+        <div class="cd-c"><div class="cd-i">▦</div><h3>Digitális utastér</h3><p>BMW Curved Display és a legújabb iDrive — modern, letisztult vezérlés.</p></div>
+        <div class="cd-c"><div class="cd-i">🛡</div><h3>Biztonság</h3><p>Fejlett vezetéstámogató rendszerek és a BMW ismert felépítési minősége.</p></div>
+        <div class="cd-c"><div class="cd-i">€</div><h3>Kedvező német ár</h3><p>Magánszemélyként akár 19% német áfával — több százezer forint megtakarítás.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EDITORIAL ===== -->
+  <section class="cd-sec">
+    <div class="cd-w">
+      <div class="cd-edi">
+        <div class="cd-txt">
+          <span class="cd-eyebrow">Dizájn</span>
+          <h3 class="cd-h3">Karakteres megjelenés, prémium részletek</h3>
+          <p>A BMW 1-es önmagáért beszél: markáns veserács, letisztult vonalvezetés és minőségi anyaghasználat. Az M Sport csomaggal a kompakt sportos karaktert kap — pontosan úgy konfigurálva, ahogy te szeretnéd.</p>
+          <ul><li>M Sport és Sport Line kivitel</li><li>LED / adaptív fényszórók</li><li>17–19&quot; könnyűfém keréktárcsák</li></ul>
+        </div>
+        <div class="cd-ph cd-ph-edi"><span>Külső fotó — hamarosan</span></div>
+      </div>
+      <div class="cd-edi cd-rev">
+        <div class="cd-txt">
+          <span class="cd-eyebrow">Belső tér</span>
+          <h3 class="cd-h3">Digitális, tágas, kényelmes</h3>
+          <p>A BMW Curved Display, a hangulatvilágítás és a minőségi kárpitok prémium környezetet teremtenek. A megnövelt utastér és csomagtér a kompakt méret ellenére is praktikus a mindennapokra.</p>
+          <ul><li>BMW Curved Display + iDrive</li><li>Ülésfűtés, kétzónás klíma</li><li>Vezeték nélküli Apple CarPlay / Android Auto</li></ul>
+        </div>
+        <div class="cd-ph cd-ph-edi"><span>Belső fotó — hamarosan</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VARIANTS + SPECS ===== -->
+  <section class="cd-sec cd-soft" id="adatok">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Változatok</span>
+      <h2 class="cd-h2">Változatok és műszaki adatok</h2>
+      <div class="cd-varsel"><button class="on">BMW 118</button><button>BMW 120</button><button>BMW 116d (dízel)</button></div>
+      <div class="cd-specwrap">
+        <div class="cd-stage"><span class="cd-ghost2">1</span><div class="cd-ph cd-ph-stage"><span>BMW 118 fotó — hamarosan</span></div></div>
+        <div class="cd-spec">
+          <div class="r"><span class="k">Karosszéria</span><span class="v">5 ajtós kompakt</span></div>
+          <div class="r"><span class="k">Üzemanyag</span><span class="v">Benzin (mild-hybrid)</span></div>
+          <div class="r"><span class="k">Max. teljesítmény</span><span class="v">~156 LE</span></div>
+          <div class="r"><span class="k">Hajtás</span><span class="v">Első / 7 fok. DKG</span></div>
+          <div class="r"><span class="k">Gyorsulás (0–100)</span><span class="v">~8,5 mp</span></div>
+          <div class="r"><span class="k">Végsebesség</span><span class="v">~216 km/h</span></div>
+          <div class="r"><span class="k">Fogyasztás (WLTP)</span><span class="v">~5,5 l/100 km</span></div>
+          <div class="r"><span class="k">Csomagtér</span><span class="v">380 liter</span></div>
+          <div class="r"><span class="k">Nettó ár -tól</span><span class="v">{eur} · {huf}</span></div>
+        </div>
+      </div>
+      <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek. A végleges specifikációt a rendeléskor rögzítjük.</p>
+    </div>
+  </section>
+
+  <!-- ===== SERVICES / INTERNAL LINKS ===== -->
+  <section class="cd-sec" id="szolg">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Ahogy neked a legjobb</span>
+      <h2 class="cd-h2">Vedd meg, béreld, vagy hozasd be — mi mindent intézünk</h2>
+      <div class="cd-svc">
+        <a href="/uj-auto-berlese?brand=bmw"><h3>BMW 1-es tartós bérlet</h3><p>Nem szeretnél venni? A 1-es <strong>tartós bérletben</strong> is a tiéd lehet, egyetlen havi díjjal — szerviz és biztosítás beépítve.</p><span class="go">Bérlési ajánlatok →</span></a>
+        <a href="/blog/auto-behozatal-nemetorszagbol"><h3>Autó behozatal Németországból</h3><p>Regisztrációs adó, áfa, honosítás, szállítás — nézd meg, hogyan zajlik a <strong>német autó behozatal</strong> lépésről lépésre.</p><span class="go">Import útmutató →</span></a>
+        <a href="/egyedi-auto-rendeles?brand=bmw"><h3>BMW konfigurátor</h3><p>Állítsd össze a saját BMW-det a <strong>BMW konfigurátorban</strong>, a kész specifikációt pedig bízd ránk.</p><span class="go">Összes BMW modell →</span></a>
+        <a href="/finanszirozas-lizing"><h3>Finanszírozás &amp; lízing</h3><p>Kiszámítható havi díj: nézd meg a <strong>BMW 1-es lízing</strong> lehetőségeket és a kalkulátort.</p><span class="go">Lízing kalkulátor →</span></a>
+        <a href="/blog/nemet-hasznaltauto-vasarlas"><h3>Német használtautó?</h3><p>Ha alig használt darabot keresel, mutatjuk, hogyan válaszd ki és ellenőrizd a <strong>német használtautót</strong>.</p><span class="go">Vásárlási tippek →</span></a>
+        <a href="/kapcsolat"><h3>Személyes ajánlat</h3><p>Mondd el, milyen 1-est szeretnél — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Kapcsolatfelvétel →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GALLERY ===== -->
+  <section class="cd-sec cd-soft">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Galéria</span>
+      <h2 class="cd-h2">BMW 1-es képek</h2>
+      <div class="cd-gal"><div class="cd-ph"><span>Fotó 1</span></div><div class="cd-ph"><span>Fotó 2</span></div><div class="cd-ph"><span>Fotó 3</span></div><div class="cd-ph"><span>Fotó 4</span></div></div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="cd-sec" id="gyik">
+    <div class="cd-w cd-faqwrap">
+      <span class="cd-eyebrow">GYIK</span>
+      <h2 class="cd-h2">Gyakori kérdések a BMW 1-esről</h2>
+      <details open><summary>Mennyibe kerül egy új BMW 1-es Németországból?</summary><p>A BMW 118 nettó listaára {eur}-tól (kb. {huf}) indul, a felszereltségtől függően. Magánszemélyként akár 19% német áfával rendelheted a müncheni Caradvance GmbH-n keresztül.</p></details>
+      <details><summary>Melyik BMW 1-es kivitelt válasszam — 116, 118 vagy 120?</summary><p>A BMW 116 a belépő benzines, a 118 a legkiegyensúlyozottabb választás, a 120 a legdinamikusabb. Dízelt is rendelhetsz. Segítünk kiválasztani a hozzád illő motorizációt és felszereltséget.</p></details>
+      <details><summary>Bérelhető is a BMW 1-es?</summary><p>Igen — a 1-es <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is elérhető, egyetlen, kiszámítható havi díjjal, amiben a szerviz és a biztosítás is benne lehet.</p></details>
+      <details><summary>Mennyi idő a behozatal?</summary><p>A kiválasztott konfigurációtól függ, jellemzően néhány hét. A <a href="/beszerzesi-folyamat">beszerzési folyamat</a> minden lépését mi intézzük, a honosítással és forgalomba helyezéssel együtt.</p></details>
+    </div>
+  </section>
+
+  <!-- ===== RELATED ===== -->
+  <section class="cd-sec cd-soft">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Kapcsolódó modellek</span>
+      <h2 class="cd-h2">Hasonló BMW modellek</h2>
+      <div class="cd-rel">
+        <a class="cd-relc" href="/egyedi-auto-rendeles?brand=bmw"><div class="cd-ph"><span>BMW 2-es</span></div><div class="b"><div class="n">BMW 2-es Gran Coupé</div></div></a>
+        <a class="cd-relc" href="/egyedi-auto-rendeles?brand=bmw"><div class="cd-ph"><span>BMW X1</span></div><div class="b"><div class="n">BMW X1</div></div></a>
+        <a class="cd-relc" href="/egyedi-auto-rendeles?brand=bmw"><div class="cd-ph"><span>BMW X2</span></div><div class="b"><div class="n">BMW X2</div></div></a>
+        <a class="cd-relc" href="/egyedi-auto-rendeles?brand=bmw"><div class="cd-ph"><span>BMW i4</span></div><div class="b"><div class="n">BMW i4 (elektromos)</div></div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA BAND ===== -->
+  <section class="cd-sec">
+    <div class="cd-w"><div class="cd-band"><div><h2>Rendeld meg a saját BMW 1-esed</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div><a class="cd-btn cd-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a></div></div>
+  </section>
+
+  <!-- ===== STICKY BOTTOM ===== -->
+  <div class="cd-sticky">
+    <div class="cd-w cd-sticky-in">
+      <div class="cd-sinfo"><div class="n">BMW 1-es</div><div class="p">{huf} · {eur} nettó-tól</div></div>
+      <div class="cd-sbtns"><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a><a class="cd-btn cd-btn-red" href="/kapcsolat">Autót rendelek</a></div>
+    </div>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(carJson)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+  <script type="application/ld+json" set:html={JSON.stringify(crumbJson)} />
+  <script is:inline>
+  (function(){try{
+    fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
+      if(d&&d.rates&&d.rates.HUF){var fx=Math.round(d.rates.HUF);
+        var f=document.getElementById('cdFx'); if(f) f.textContent=fx;
+        var h=document.getElementById('cdHuf'); if(h){var n=Number(h.getAttribute('data-net')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx))+' Ft';}
+      }
+    }).catch(function(){});
+  }catch(e){}})();
+  </script>
+</div>
+
+<style>
+  .cd{--red:#E2001A;--navy:#0B0B0D;--ink:#12161c;--muted:#5b6675;--line:#e7ebf1;--soft:#f4f6fa;--font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-family:var(--font);color:var(--ink);}
+  .cd *{box-sizing:border-box;}
+  .cd a{text-decoration:none;color:inherit;}
+  .cd img{max-width:100%;display:block;}
+  .cd-w{max-width:1180px;margin:0 auto;padding:0 22px;}
+  .cd-eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);}
+  .cd-h2{font-size:clamp(24px,3vw,36px);font-weight:800;letter-spacing:-.02em;color:var(--navy);margin:8px 0 22px;}
+  .cd-h3{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-.01em;margin:0 0 12px;}
+  .cd-btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:15px;padding:15px 30px;border-radius:999px;cursor:pointer;line-height:1.1;transition:.15s;}
+  .cd-btn-red{background:var(--red);color:#fff;} .cd-btn-red:hover{filter:brightness(1.07);}
+  .cd-btn-dark{background:var(--navy);color:#fff;} .cd-btn-dark:hover{filter:brightness(1.25);}
+  .cd-btn-white{background:#fff;color:var(--navy);}
+
+  /* HERO — homepage clone */
+  .cd-hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;margin:6px 16px 16px;background:linear-gradient(#17181c,#0b0b0d 62%,#060607);}
+  .cd-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;}
+  .cd-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7));}
+  .cd-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0;}
+  .cd-logo{height:72px;width:auto;margin:0 auto 22px;}
+  .cd-hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.35);}
+  .cd-sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:600px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4);}
+  .cd-cta{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+  .cd-scroll{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;background:none;border:0;color:#c3cede;font-weight:700;font-size:12px;letter-spacing:.05em;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .cd-scroll svg{width:22px;height:22px;}
+
+  /* placeholders */
+  .cd-ph{position:relative;border-radius:16px;background:#eef1f6;border:1px dashed #cfd6e2;display:flex;align-items:center;justify-content:center;color:#9aa7ba;text-align:center;font-size:13px;font-weight:600;min-height:120px;}
+
+  /* showcase + summary */
+  .cd-show-wrap{position:relative;z-index:5;}
+  .cd-show{margin-top:-58px;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 70px rgba(11,20,32,.14);padding:30px;display:flex;align-items:center;justify-content:center;min-height:320px;position:relative;overflow:hidden;}
+  .cd-ghost{position:absolute;left:2%;top:50%;transform:translateY(-50%);font-size:300px;font-weight:800;color:#f1f3f7;z-index:0;line-height:1;letter-spacing:-.04em;pointer-events:none;}
+  .cd-ph-hero{position:relative;z-index:1;width:100%;max-width:820px;aspect-ratio:16/9;background:transparent;}
+  .cd-crumb{color:var(--muted);font-size:13px;margin:22px 0 12px;}
+  .cd-crumb a{color:var(--muted);} .cd-crumb b{color:var(--navy);font-weight:600;}
+  .cd-bar{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px 36px;display:grid;grid-template-columns:1fr auto;gap:26px 46px;align-items:center;}
+  .cd-chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .cd-chip{background:var(--soft);color:var(--navy);font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:100px;}
+  .cd-chip-year{background:var(--red);color:#fff;}
+  .cd-buy{text-align:right;}
+  .cd-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+  .cd-huf{font-size:clamp(28px,3.4vw,36px);font-weight:800;color:var(--navy);}
+  .cd-eur{font-size:15px;color:var(--muted);font-weight:600;}
+  .cd-note{font-size:12.5px;color:#9aa7ba;margin:8px 0 16px;line-height:1.5;}
+  .cd-cta2{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+  .cd-trust{grid-column:1/-1;border-top:1px solid var(--line);padding-top:18px;display:flex;gap:30px;flex-wrap:wrap;color:var(--muted);font-size:13px;}
+  .cd-trust span{display:flex;align-items:center;gap:9px;}
+  .cd-trust i{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;}
+  @media(max-width:820px){.cd-bar{grid-template-columns:1fr;gap:20px;}.cd-buy{text-align:left;}.cd-price,.cd-cta2{justify-content:flex-start;}}
+
+  /* sticky subnav */
+  .cd-nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:26px;}
+  .cd-nav-in{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px;}
+  .cd-nav-links{display:flex;gap:26px;font-size:14px;font-weight:600;color:var(--muted);overflow-x:auto;}
+  .cd-nav-links a{white-space:nowrap;padding:4px 0;border-bottom:2px solid transparent;}
+  .cd-nav-links a:hover{color:var(--navy);border-color:var(--red);}
+  .cd-nav-price{font-weight:800;color:var(--navy);font-size:15px;white-space:nowrap;}
+  @media(max-width:640px){.cd-nav-price{display:none;}}
+
+  /* sections */
+  .cd-sec{padding:56px 0;}
+  .cd-soft{background:var(--soft);}
+  .cd-lead{font-size:19px;line-height:1.75;max-width:820px;}
+  .cd-lead a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
+  .cd-hl{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media(max-width:900px){.cd-hl{grid-template-columns:1fr 1fr;}}
+  @media(max-width:540px){.cd-hl{grid-template-columns:1fr;}}
+  .cd-c{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;}
+  .cd-i{width:46px;height:46px;border-radius:12px;background:#fdecea;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+  .cd-c h3{font-size:17px;font-weight:800;color:var(--navy);margin:0 0 8px;}
+  .cd-c p{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0;}
+
+  .cd-edi{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:46px;}
+  .cd-edi:last-child{margin-bottom:0;}
+  .cd-rev .cd-txt{order:2;}
+  @media(max-width:820px){.cd-edi{grid-template-columns:1fr;gap:20px;}.cd-rev .cd-txt{order:0;}}
+  .cd-ph-edi{aspect-ratio:4/3;}
+  .cd-edi p{font-size:16px;color:var(--muted);line-height:1.75;margin:0 0 14px;}
+  .cd-edi ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.8;font-size:15.5px;}
+
+  .cd-varsel{display:flex;gap:10px;margin:0 0 26px;flex-wrap:wrap;}
+  .cd-varsel button{border:1px solid var(--line);background:#fff;border-radius:100px;padding:10px 20px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;}
+  .cd-varsel button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .cd-specwrap{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:center;}
+  @media(max-width:820px){.cd-specwrap{grid-template-columns:1fr;}}
+  .cd-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:280px;}
+  .cd-ghost2{position:absolute;font-size:230px;font-weight:800;color:#eceff4;z-index:0;line-height:1;letter-spacing:-.04em;}
+  .cd-ph-stage{position:relative;z-index:1;width:100%;aspect-ratio:16/10;background:#fff;}
+  .cd-spec{background:#fff;border:1px solid var(--line);border-radius:18px;padding:8px 22px;}
+  .cd-spec .r{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);}
+  .cd-spec .r:last-child{border-bottom:0;}
+  .cd-spec .k{font-size:14px;color:var(--muted);} .cd-spec .v{font-size:14.5px;font-weight:700;text-align:right;}
+  .cd-specnote{font-size:12px;color:#9aa7ba;margin:14px 0 0;}
+
+  .cd-svc{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media(max-width:820px){.cd-svc{grid-template-columns:1fr;}}
+  .cd-svc a{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;transition:.15s;display:block;}
+  .cd-svc a:hover{box-shadow:0 16px 40px rgba(11,20,32,.10);transform:translateY(-3px);border-color:#dfe4ec;}
+  .cd-svc h3{font-size:17px;font-weight:800;color:var(--navy);margin:0 0 8px;}
+  .cd-svc p{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0 0 12px;}
+  .cd-svc .go{color:var(--red);font-weight:700;font-size:14px;}
+
+  .cd-gal{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  @media(max-width:820px){.cd-gal{grid-template-columns:1fr 1fr;}}
+  .cd-gal .cd-ph{aspect-ratio:4/3;}
+
+  .cd-faqwrap{max-width:820px;}
+  .cd details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 20px;margin-bottom:12px;}
+  .cd summary{cursor:pointer;font-weight:700;color:var(--navy);padding:16px 0;list-style:none;}
+  .cd summary::-webkit-details-marker{display:none;}
+  .cd details[open] summary{color:var(--red);}
+  .cd details p{color:var(--muted);line-height:1.7;margin:0 0 16px;}
+  .cd details a{color:var(--red);text-decoration:underline;}
+
+  .cd-rel{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media(max-width:820px){.cd-rel{grid-template-columns:1fr 1fr;}}
+  .cd-relc{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:.15s;}
+  .cd-relc:hover{box-shadow:0 14px 34px rgba(11,20,32,.10);transform:translateY(-3px);}
+  .cd-relc .cd-ph{aspect-ratio:16/10;border:0;border-bottom:1px dashed #dfe4ec;border-radius:0;}
+  .cd-relc .b{padding:14px 16px;} .cd-relc .n{font-weight:800;color:var(--navy);font-size:15px;}
+
+  .cd-band{background:var(--navy);color:#fff;border-radius:22px;padding:40px 42px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;}
+  .cd-band h2{font-size:26px;font-weight:800;margin:0 0 6px;}
+  .cd-band p{color:#c7d1df;margin:0;max-width:560px;line-height:1.6;}
+
+  .cd-sticky{position:sticky;bottom:0;z-index:45;background:#fff;border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.08);}
+  .cd-sticky-in{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 22px;}
+  .cd-sinfo .n{font-weight:800;color:var(--navy);font-size:15px;} .cd-sinfo .p{font-size:13px;color:var(--muted);}
+  .cd-sbtns{display:flex;gap:10px;}
+  @media(max-width:600px){.cd-sinfo .p{display:none;}.cd-sbtns .cd-btn{padding:12px 18px;font-size:14px;}}
+</style>
+</Base>
