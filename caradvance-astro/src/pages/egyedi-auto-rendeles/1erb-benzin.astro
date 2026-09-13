@@ -40,6 +40,7 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
     </video>
     <div class="cd-ov"></div>
     <div class="cd-inner">
+      <img class="cd-brandlogo" src="/bmw/bmw-logo.webp?v=2" alt="BMW" width="56" height="56" />
       <img class="cd-logo" src="/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133" />
       <h1>BMW 1-es</h1>
       <p class="cd-sub">Prémium kompakt Németországból — sportos vezetés, digitális belső tér, új autóként, egyedi konfigurációval.</p>
@@ -56,7 +57,7 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
     <div class="cd-w">
       <div class="cd-show">
         <span class="cd-ghost">1</span>
-        <div class="cd-ph cd-ph-hero"><span>BMW 1-es főkép — hamarosan</span></div>
+        <img class="cd-hero-car" src="/bmw/1erb.webp" alt="BMW 1-es" />
       </div>
       <nav class="cd-crumb"><a href="/">Főoldal</a> / <a href="/egyedi-auto-rendeles?brand=bmw">Egyedi BMW rendelés</a> / <b>BMW 1-es</b></nav>
       <div class="cd-bar">
@@ -256,7 +257,8 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
   .cd a.cd-btn-white{background:#fff;color:var(--navy);}
 
   /* HERO — homepage clone */
-  .cd-hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;margin:6px 16px 16px;background:linear-gradient(#17181c,#0b0b0d 62%,#060607);}
+  .cd-hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:calc(var(--navh) + 20px) 24px 72px;border-radius:32px;margin:calc(6px - var(--navh)) 16px 16px;background:linear-gradient(#17181c,#0b0b0d 62%,#060607);}
+  .cd-brandlogo{height:56px;width:auto;margin:0 auto 16px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5));}
   .cd-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;}
   .cd-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7));}
   .cd-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0;}
@@ -275,6 +277,7 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
   .cd-show{margin-top:-58px;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 70px rgba(11,20,32,.14);padding:30px;display:flex;align-items:center;justify-content:center;min-height:320px;position:relative;overflow:hidden;}
   .cd-ghost{position:absolute;left:2%;top:50%;transform:translateY(-50%);font-size:300px;font-weight:800;color:#f1f3f7;z-index:0;line-height:1;letter-spacing:-.04em;pointer-events:none;}
   .cd-ph-hero{position:relative;z-index:1;width:100%;max-width:820px;aspect-ratio:16/9;background:transparent;}
+  .cd-hero-car{position:relative;z-index:1;width:100%;max-width:820px;height:auto;object-fit:contain;}
   .cd-crumb{color:var(--muted);font-size:13px;margin:22px 0 12px;}
   .cd-crumb a{color:var(--muted);} .cd-crumb b{color:var(--navy);font-weight:600;}
   .cd-bar{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px 36px;display:grid;grid-template-columns:1fr auto;gap:26px 46px;align-items:center;}
