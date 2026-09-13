@@ -42,6 +42,14 @@ try {
     let h = fs.readFileSync(EF, 'utf8');
     if (!h.includes(MARK) && h.includes('</head>')) {
       const css = '<style id="' + MARK + '">' +
+        // (1) Hero = pontosan a kezdőlap hero mérete/pozíciója
+        '.egl-land-hero{min-height:540px!important;padding:20px 24px 72px!important;border-radius:32px!important;margin:8px 16px 16px!important;margin-top:calc(6px - var(--navh))!important;}' +
+        '.egl-mhero-inner{margin:24px auto 0!important;max-width:1120px!important;}' +
+        '@media(max-width:640px){.egl-land-hero{margin:8px!important;margin-top:calc(8px - var(--navh))!important;border-radius:22px!important;padding:84px 18px 72px!important;min-height:480px!important;}}' +
+        // (2) Márka-logók ne lógjanak ki a heróból
+        '.egl-land-brandrow{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;gap:12px 16px!important;max-width:100%!important;margin:0 auto 18px!important;}' +
+        '.egl-land-brandrow img{height:30px!important;width:auto!important;max-width:76px!important;object-fit:contain!important;}' +
+        // (3) Szűrők az autoink stílusához
         '.egl-filters .egl-search,.egl-filters select{height:46px!important;padding:12px 14px!important;font-size:14px!important;border:1px solid #e2e5ea!important;border-radius:12px!important;box-shadow:0 1px 2px rgba(8,8,10,.05)!important;}' +
         '.egl-filters select{padding:12px 40px 12px 14px!important;}' +
         '</style>';
