@@ -35,16 +35,21 @@ try {
 } catch (e) { console.log('seo-hero: (A) FIGYELEM - ' + (e && e.message)); }
 
 // (B) per-oldal hero-igazitas — egy <style> beszurasa a </head> ele, markerrel
-function inject(file, marker, css) {
+function inject(file, marker, css, js) {
   try {
     if (!fs.existsSync(file)) { return; }
     let h = fs.readFileSync(file, 'utf8');
     if (h.includes(marker) || !h.includes('</head>')) return;
-    h = h.replace('</head>', '<style id="' + marker + '">' + css + '</style></head>');
+    const extra = (css ? '<style id="' + marker + '">' + css + '</style>' : '') +
+                  (js ? '<script id="' + marker + '-js">' + js + '</script>' : '');
+    h = h.replace('</head>', extra + '</head>');
     fs.writeFileSync(file, h);
     console.log('seo-hero: igazitva -> ' + file);
   } catch (e) { console.log('seo-hero: ' + file + ' FIGYELEM - ' + (e && e.message)); }
 }
+
+// ?order=<key> esetén megnyitja az adott modell rendelő-modálját (a valódi űrlap)
+const ORDERJS = "(function(){try{var p=new URLSearchParams(location.search).get('order');if(!p)return;var n=0;var iv=setInterval(function(){n++;var b=document.querySelector('.egl-order[data-img*=\"/'+p+'.\"]');if(b){clearInterval(iv);setTimeout(function(){b.click();try{document.querySelector('#eglOrder .egl-modal-card').scrollIntoView({block:'center'});}catch(e){}},250);}else if(n>60){clearInterval(iv);}},100);}catch(e){}})();";
 
 // A kezdőlap mobil hero geometriaja:
 //   top-level hero:  margin:8px; margin-top:calc(8px - navh); radius:22; padding:84 18 72; min-h:480
@@ -59,7 +64,8 @@ const FILTERS = '.egl-filters .egl-search,.egl-filters select{height:46px!import
 inject('dist/egyedi-auto-rendeles/index.html', 'cd-align-egl',
   '@media(max-width:640px){.egl-land-hero{' + NEST + 'margin-top:calc(8px - var(--navh) - 34px)!important;}.egl-mhero-inner{margin-top:12px!important;}}' +
   '.egl-land-brandrow{' + LOGOROW + '}.egl-land-brandrow img{' + LOGOIMG + '}' +
-  FILTERS
+  FILTERS,
+  ORDERJS
 );
 
 // Bérlés lista (rental): fészkelt egl-mhero + logósor biztonsági behúzás
