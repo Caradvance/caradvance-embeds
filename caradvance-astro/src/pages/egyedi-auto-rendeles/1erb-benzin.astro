@@ -51,6 +51,14 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
     <button class="cd-scroll" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
   </section>
 
+  <script is:inline>
+  (function(){var v=document.querySelector('.cd-hero .cd-vid');if(!v)return;try{v.muted=true;v.setAttribute('muted','');}catch(e){}
+    var kick=function(){var p=v.play();if(p&&p.catch)p.catch(function(){});};
+    kick(); v.addEventListener('loadedmetadata',kick); v.addEventListener('canplay',kick);
+    if(document.readyState!=='loading')kick(); else document.addEventListener('DOMContentLoaded',kick);
+  })();
+  </script>
+
   <!-- ===== INTRO: info left, car right ===== -->
   <section class="cd-intro">
     <div class="cd-w">
