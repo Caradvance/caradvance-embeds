@@ -24,7 +24,9 @@ const carImages = [
   imgBase + 'bmw-1es-muszerfal.webp',
   imgBase + 'bmw-1es-sport-ulesek.webp',
   imgBase + 'bmw-1es-m-felni-feknyereg.webp',
-  imgBase + 'bmw-118-elolnezet.webp'
+  imgBase + 'bmw-118-elolnezet.webp',
+  imgBase + 'bmw-120-elolnezet.webp',
+  imgBase + 'bmw-120d-elolnezet.webp'
 ];
 const carJson = {
   '@context':'https://schema.org','@type':'Car', name:'BMW 1-es', brand:{'@type':'Brand',name:'BMW'},
@@ -162,21 +164,39 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
     <div class="cd-w">
       <span class="cd-eyebrow">Változatok</span>
       <h2 class="cd-h2">Változatok és műszaki adatok</h2>
-      <div class="cd-varsel"><button class="on">BMW 118</button><button>BMW 120</button><button>BMW 116d (dízel)</button></div>
+      <div class="cd-varsel"><button class="on" data-var="118">BMW 118</button><button data-var="120">BMW 120</button><button data-var="120d">BMW 120d (dízel)</button></div>
       <div class="cd-specwrap">
-        <div class="cd-stage"><img class="cd-shot cd-shot-stage" src="/bmw/bmw-118-elolnezet.webp" alt="BMW 118 – kompakt prémium, elölnézet" width="1200" height="750" loading="lazy" /></div>
+        <div class="cd-stage"><img id="cdStageImg" class="cd-shot cd-shot-stage" src="/bmw/bmw-118-elolnezet.webp" alt="BMW 118 – kompakt prémium, elölnézet" width="1200" height="750" loading="lazy" /></div>
         <div class="cd-spec">
           <div class="r"><span class="k">Karosszéria</span><span class="v">5 ajtós kompakt</span></div>
-          <div class="r"><span class="k">Üzemanyag</span><span class="v">Benzin (mild-hybrid)</span></div>
-          <div class="r"><span class="k">Max. teljesítmény</span><span class="v">~156 LE</span></div>
-          <div class="r"><span class="k">Hajtás</span><span class="v">Első / 7 fok. DKG</span></div>
-          <div class="r"><span class="k">Gyorsulás (0–100)</span><span class="v">~8,5 mp</span></div>
-          <div class="r"><span class="k">Végsebesség</span><span class="v">~216 km/h</span></div>
-          <div class="r"><span class="k">Fogyasztás (WLTP)</span><span class="v">~5,5 l/100 km</span></div>
-          <div class="r"><span class="k">Csomagtér</span><span class="v">380 liter</span></div>
+          <div class="r"><span class="k">Üzemanyag</span><span class="v" id="svFuel">Benzin</span></div>
+          <div class="r"><span class="k">Max. teljesítmény</span><span class="v" id="svPower">156 LE (115 kW)</span></div>
+          <div class="r"><span class="k">Nyomaték</span><span class="v" id="svTorque">230 Nm</span></div>
+          <div class="r"><span class="k">Hajtás</span><span class="v" id="svDrive">Első / 7 fok. DKG</span></div>
+          <div class="r"><span class="k">Gyorsulás (0–100)</span><span class="v" id="svAccel">9,0 mp</span></div>
+          <div class="r"><span class="k">Végsebesség</span><span class="v" id="svVmax">215 km/h</span></div>
+          <div class="r"><span class="k">Fogyasztás (WLTP)</span><span class="v" id="svCons">~5,7 l/100 km</span></div>
+          <div class="r"><span class="k">Csomagtér</span><span class="v" id="svBoot">380 liter</span></div>
           <div class="r"><span class="k">Nettó ár -tól</span><span class="v">{eur} · {huf}</span></div>
         </div>
       </div>
+      <script is:inline>
+      (function(){
+        var V={
+          '118':{img:'/bmw/bmw-118-elolnezet.webp',alt:'BMW 118 – kompakt prémium, elölnézet',fuel:'Benzin',power:'156 LE (115 kW)',torque:'230 Nm',drive:'Első / 7 fok. DKG',accel:'9,0 mp',vmax:'215 km/h',cons:'~5,7 l/100 km',boot:'380 liter'},
+          '120':{img:'/bmw/bmw-120-elolnezet.webp',alt:'BMW 120 M Sport – elölnézet',fuel:'Benzin (mild-hybrid)',power:'170 LE (125 kW)',torque:'240 Nm',drive:'Első / 7 fok. DKG',accel:'8,3 mp',vmax:'216 km/h',cons:'~5,8 l/100 km',boot:'300 liter'},
+          '120d':{img:'/bmw/bmw-120d-elolnezet.webp',alt:'BMW 120d dízel – elölnézet',fuel:'Dízel (mild-hybrid)',power:'163 LE (120 kW)',torque:'360 Nm',drive:'Első / 7 fok. DKG',accel:'8,6 mp',vmax:'225 km/h',cons:'~4,5 l/100 km',boot:'300 liter'}
+        };
+        function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+        function apply(k){var d=V[k];if(!d)return;var img=document.getElementById('cdStageImg');if(img){img.src=d.img;img.alt=d.alt;}set('svFuel',d.fuel);set('svPower',d.power);set('svTorque',d.torque);set('svDrive',d.drive);set('svAccel',d.accel);set('svVmax',d.vmax);set('svCons',d.cons);set('svBoot',d.boot);}
+        [].forEach.call(document.querySelectorAll('.cd-varsel button'),function(b){
+          b.addEventListener('click',function(){
+            [].forEach.call(document.querySelectorAll('.cd-varsel button'),function(x){x.classList.remove('on');});
+            b.classList.add('on'); apply(b.getAttribute('data-var'));
+          });
+        });
+      })();
+      </script>
       <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek. A végleges specifikációt a rendeléskor rögzítjük.</p>
     </div>
   </section>
