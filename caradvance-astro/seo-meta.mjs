@@ -71,6 +71,39 @@ try {
     if (h !== before) { fs.writeFileSync(file, h); changed++; }
     console.log('seo-meta: /' + slug + '/ - ' + log.join(', '));
   }
+
+  // 4. Modell-aloldalak: og:image / twitter kartya (megoszthato borito).
+  //    A Base.astro nem ad og:image-et, ezert itt szurjuk be a kesz dist/-be.
+  const MODELS = {
+    'egyedi-auto-rendeles/1erb-benzin': 'https://www.caradvance.hu/bmw/bmw-1es-og.jpg',
+  };
+  for (const [rel, img] of Object.entries(MODELS)) {
+    const file = path.join(DIST, rel, 'index.html');
+    if (!fs.existsSync(file)) { console.log('seo-meta(og): FIGYELEM - nincs ' + file); warn++; continue; }
+    let h = fs.readFileSync(file, 'utf8'); const before = h;
+    const t = (h.match(/<title>([\s\S]*?)<\/title>/) || [,''])[1];
+    const d = (h.match(/<meta name="description" content="([^"]*)"/) || [,''])[1];
+    const url = 'https://www.caradvance.hu/' + rel;
+    if (!/property="og:image"/.test(h)) {
+      const tags = [
+        '<meta property="og:type" content="website">',
+        '<meta property="og:url" content="' + url + '">',
+        '<meta property="og:title" content="' + t + '">',
+        '<meta property="og:description" content="' + d + '">',
+        '<meta property="og:image" content="' + img + '">',
+        '<meta property="og:image:width" content="1200">',
+        '<meta property="og:image:height" content="630">',
+        '<meta name="twitter:card" content="summary_large_image">',
+        '<meta name="twitter:title" content="' + t + '">',
+        '<meta name="twitter:description" content="' + d + '">',
+        '<meta name="twitter:image" content="' + img + '">',
+      ].join('\n');
+      h = h.replace('</head>', tags + '\n</head>');
+    }
+    if (h !== before) { fs.writeFileSync(file, h); changed++; console.log('seo-meta(og): ' + rel + ' - og:image beszurva'); }
+    else { console.log('seo-meta(og): ' + rel + ' - mar van'); }
+  }
+
   console.log('seo-meta: kesz (' + changed + ' fajl modositva, ' + warn + ' figyelmeztetes)');
 } catch (e) {
   console.log('seo-meta: FIGYELEM - ' + (e && e.message) + ' (a build megy tovabb)');
