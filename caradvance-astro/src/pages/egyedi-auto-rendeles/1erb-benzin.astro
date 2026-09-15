@@ -257,13 +257,30 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
     <div class="cd-w"><div class="cd-band"><div><h2>Rendeld meg a saját BMW 1-esed</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div><a class="cd-btn cd-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a></div></div>
   </section>
 
-  <!-- ===== STICKY BOTTOM ===== -->
-  <div class="cd-sticky">
-    <div class="cd-w cd-sticky-in">
-      <div class="cd-sinfo"><div class="n">BMW 1-es</div><div class="p">{huf} · {eur} nettó-tól</div></div>
-      <div class="cd-sbtns"><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a><a class="cd-btn cd-btn-red" href="/egyedi-auto-rendeles?brand=bmw&amp;order=1erb" data-egl-order data-name="BMW 1-es" data-img="/bmw/bmw-1es-m-sport-elolnezet.webp" data-price="10 476 648 Ft · 28.782 €" data-fuels="Benzin,Dízel">Autót rendelek</a></div>
-    </div>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="cd-lb" id="cdLb" aria-hidden="true">
+    <button class="cd-lb-x" type="button" aria-label="Bezárás">✕</button>
+    <button class="cd-lb-nav cd-lb-prev" type="button" aria-label="Előző">‹</button>
+    <img class="cd-lb-img" id="cdLbImg" src="" alt="" />
+    <button class="cd-lb-nav cd-lb-next" type="button" aria-label="Következő">›</button>
   </div>
+  <script is:inline>
+  (function(){
+    var lb=document.getElementById('cdLb'), lbImg=document.getElementById('cdLbImg');
+    if(!lb||!lbImg) return;
+    var imgs=[].slice.call(document.querySelectorAll('.cd-gal img, .cd-shot-edi, #cdStageImg, .cd-hero-car'));
+    var i=0;
+    function open(n){ i=(n+imgs.length)%imgs.length; lbImg.src=imgs[i].src; lbImg.alt=imgs[i].alt||''; lb.classList.add('on'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+    function close(){ lb.classList.remove('on'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    imgs.forEach(function(im,n){ im.style.cursor='zoom-in'; im.addEventListener('click',function(){open(n);}); });
+    lb.querySelector('.cd-lb-x').addEventListener('click',close);
+    lb.querySelector('.cd-lb-prev').addEventListener('click',function(e){e.stopPropagation();open(i-1);});
+    lb.querySelector('.cd-lb-next').addEventListener('click',function(e){e.stopPropagation();open(i+1);});
+    lb.addEventListener('click',function(e){ if(e.target===lb||e.target===lbImg) close(); });
+    document.addEventListener('keydown',function(e){ if(!lb.classList.contains('on'))return; if(e.key==='Escape')close(); else if(e.key==='ArrowLeft')open(i-1); else if(e.key==='ArrowRight')open(i+1); });
+  })();
+  </script>
 
   <!-- ===== ORDER MODAL (in-place, same form + backend as the listing) ===== -->
   <div class="egl-modal" id="eglOrder" aria-hidden="true">
@@ -450,6 +467,15 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
   .cd-shot-edi{aspect-ratio:4/3;}
   .cd-shot-stage{position:relative;z-index:1;aspect-ratio:16/10;box-shadow:0 18px 44px rgba(11,20,32,.10);}
   .cd-gal .cd-shot{aspect-ratio:4/3;}
+  /* lightbox */
+  .cd-lb{position:fixed;inset:0;z-index:120;background:rgba(8,8,10,.92);display:none;align-items:center;justify-content:center;}
+  .cd-lb.on{display:flex;}
+  .cd-lb-img{max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  .cd-lb-x{position:absolute;top:18px;right:22px;background:none;border:0;color:#fff;font-size:30px;line-height:1;cursor:pointer;opacity:.85;}
+  .cd-lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);border:0;color:#fff;width:52px;height:52px;border-radius:50%;font-size:32px;line-height:1;cursor:pointer;}
+  .cd-lb-nav:hover{background:rgba(255,255,255,.22);}
+  .cd-lb-prev{left:18px;} .cd-lb-next{right:18px;}
+  @media(max-width:640px){.cd-lb-nav{width:42px;height:42px;font-size:26px;}}
 
   /* intro: info left, car right */
   .cd-intro{padding:36px 0 12px;background:#fff;}
