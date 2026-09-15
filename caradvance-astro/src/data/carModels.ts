@@ -1,0 +1,149 @@
+// Egyedi autó modell-adatok — a CarDetail.astro sablon ebből épít fel egy teljes
+// modell-aloldalt (/egyedi-auto-rendeles/<slug>). Új modell = új bejegyzés ide +
+// a képek feltöltése a public/bmw (ill. /mini, /mercedes, /audi) mappába.
+//
+// A megosztott részek (fejléc-videó logika, rendelő-modal, lightbox, CSS, GYIK-doboz
+// stílus) a komponensben vannak; itt csak a modellre jellemző tartalom van.
+
+export interface Variant {
+  key: string;      // '118'  (data-var / kapcsoló)
+  label: string;    // 'BMW 118'
+  fuel: string;     // 'Benzin'
+  power: string;    // '156 LE (115 kW)'
+  torque: string;   // '230 Nm'
+  drive: string;    // 'Első / 7 fok. DKG'
+  accel: string;    // '9,0 mp'
+  vmax: string;     // '215 km/h'
+  cons: string;     // '~5,7 l/100 km'
+  boot: string;     // '380 liter'
+  rec: string;      // 'Kiegyensúlyozott belépő'  (összehasonlító táblához)
+  img: string;      // '/bmw/bmw-118-elolnezet.webp'
+  alt: string;
+}
+export interface Faq { q: string; a: string; }               // a: tartalmazhat HTML-t
+export interface Img { img: string; alt: string; }
+export interface Related { name: string; href: string; }
+export interface Block { h3?: string; html: string; }
+
+export interface CarModel {
+  slug: string;            // '1erb-benzin'  (útvonal + fájlnevek)
+  brand: string;           // 'BMW'
+  brandKey: string;        // 'bmw'
+  brandLogo: string;       // '/bmw-hero-logo.png'
+  name: string;            // 'BMW 1-es'
+  modelCode?: string;      // 'F70'
+  title: string;
+  description: string;
+  netEur: number;          // nettó EUR (induló ár)
+  orderKey: string;        // '1erb'  (a lista ?order= kulcsa)
+  orderFuels: string;      // 'Benzin,Dízel'
+  heroSub: string;
+  heroVideo: string;
+  heroPoster: string;
+  mainImg: string;
+  mainAlt: string;
+  chips: string[];
+  yearChip: string;        // '2026 · Németország'
+  bodyType: string;        // '5 ajtós kompakt'
+  overviewH2: string;
+  overviewLead: string;    // HTML
+  highlights: { icon: string; title: string; text: string }[];
+  design: { h3: string; text: string; bullets: string[]; img: string; alt: string };
+  interior: { h3: string; text: string; bullets: string[]; img: string; alt: string };
+  prose: { h2: string; blocks: Block[] };
+  variants: Variant[];
+  gallery: Img[];
+  faq: Faq[];
+  related: Related[];
+  // Car schema kiegészítők (a base változat pontos adatai):
+  schema: {
+    modelName: string; modelDate: string; bodyTypeEn: string; doors: number;
+    transmission: string; drive: string; fuelType: string; engineFuel: string;
+    powerKw: number; torqueNm: number; vmaxKmh: number; accelSec: number;
+    cargoL: number; consL: number;
+  };
+}
+
+export const carModels: Record<string, CarModel> = {
+  '1erb-benzin': {
+    slug: '1erb-benzin',
+    brand: 'BMW', brandKey: 'bmw', brandLogo: '/bmw-hero-logo.png',
+    name: 'BMW 1-es', modelCode: 'F70',
+    title: 'BMW 1-es (F70) — új autó Németországból, egyedi rendelés | CarAdvance',
+    description: 'Új BMW 1-es (118, 120, 120d) egyedi rendelése Németországból — kulcsrakész behozatal, akár 19% német áfával. Ár, felszereltség, tartós bérlet egy helyen.',
+    netEur: 28782,
+    orderKey: '1erb', orderFuels: 'Benzin,Dízel',
+    heroSub: 'Prémium kompakt Németországból — sportos vezetés, digitális belső tér, új autóként, egyedi konfigurációval.',
+    heroVideo: '/bmw/1erb-hero.mp4',
+    heroPoster: '/bmw/1erb-hero-poster.jpg',
+    mainImg: '/bmw/bmw-1es-m-sport-elolnezet.webp',
+    mainAlt: 'BMW 1-es M Sport – új autó Németországból, egyedi rendelés',
+    chips: ['Kompakt', 'Benzin', 'Dízel', 'Automata'],
+    yearChip: '2026 · Németország',
+    bodyType: '5 ajtós kompakt',
+    overviewH2: 'Új BMW 1-es Németországból, egyedi rendelésre',
+    overviewLead: 'A <strong>BMW 1-es</strong> (BMW 1 Series) a márka belépő prémium kompaktja: feszes futómű, letisztult, digitális utastér és a jól ismert BMW vezetési élmény. A CarAdvance-nél pontosan azt a <strong>BMW 118</strong>, <strong>BMW 120</strong> vagy <strong>BMW 120d</strong> kivitelt rendeljük meg neked, amit szeretnél — új autóként, gyári felszereltséggel, <a href="/beszerzesi-folyamat">Németországból, kulcsrakész behozatallal</a>. Nem szeretnél venni? A 1-es <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is elérhető.',
+    highlights: [
+      { icon: '◈', title: 'Sportos vezetés', text: 'Feszes futómű és pontos kormányzás — a kompakt kategória vezetési etalonja.' },
+      { icon: '▦', title: 'Digitális utastér', text: 'BMW Curved Display és a legújabb iDrive — modern, letisztult vezérlés.' },
+      { icon: '🛡', title: 'Biztonság', text: 'Fejlett vezetéstámogató rendszerek és a BMW ismert felépítési minősége.' },
+      { icon: '€', title: 'Kedvező német ár', text: 'Magánszemélyként akár 19% német áfával — több százezer forint megtakarítás.' },
+    ],
+    design: {
+      h3: 'Karakteres megjelenés, prémium részletek',
+      text: 'A BMW 1-es önmagáért beszél: markáns veserács, letisztult vonalvezetés és minőségi anyaghasználat. Az M Sport csomaggal a kompakt sportos karaktert kap — pontosan úgy konfigurálva, ahogy te szeretnéd.',
+      bullets: ['M Sport és Sport Line kivitel', 'LED / adaptív fényszórók', '17–19&quot; könnyűfém keréktárcsák'],
+      img: '/bmw/bmw-1es-m-sport-kulso.webp', alt: 'BMW 1-es M Sport külső – markáns veserács, LED fényszórók',
+    },
+    interior: {
+      h3: 'Digitális, tágas, kényelmes',
+      text: 'A BMW Curved Display, a hangulatvilágítás és a minőségi kárpitok prémium környezetet teremtenek. A megnövelt utastér és csomagtér a kompakt méret ellenére is praktikus a mindennapokra.',
+      bullets: ['BMW Curved Display + iDrive', 'Ülésfűtés, kétzónás klíma', 'Vezeték nélküli Apple CarPlay / Android Auto'],
+      img: '/bmw/bmw-1es-belso-ter-curved-display.webp', alt: 'BMW 1-es belső tér – BMW Curved Display és iDrive',
+    },
+    prose: {
+      h2: 'Új BMW 1-es Németországból — miért éri meg?',
+      blocks: [
+        { html: 'A <strong>BMW 1-es</strong> a márka belépő prémium kompaktja, mégis igazi BMW: precíz futómű, kiváló anyagminőség és a legújabb digitális utastér. Ha új autót szeretnél, a német piac kínálata nagyságrendekkel szélesebb a hazainál — így pontosan azt a motorizációt, színt és felszereltséget találjuk meg neked, amit elképzeltél. A CarAdvance 2003 óta hozza be a prémium autókat Németországból, <a href="/beszerzesi-folyamat">kulcsrakészen, teljes ügyintézéssel</a>.' },
+        { h3: 'Mennyibe kerül egy új BMW 1-es?', html: 'A <strong>BMW 1-es ára</strong> a választott kiviteltől függ: a benzines <strong>BMW 118</strong> a kiegyensúlyozott belépő, a <strong>BMW 120</strong> a dinamikusabb mild-hybrid, a <strong>BMW 120d</strong> pedig a takarékos dízel a sokat autózóknak. Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár <strong>19%-os német áfával</strong> vásárolhatsz a hazai 27% helyett — ez önmagában több százezer forintos megtakarítás.' },
+        { h3: 'Melyik BMW 1-es kivitelt válaszd?', html: 'A <strong>118</strong> (156 LE) a mindennapokra ideális, kedvező fenntartással; a <strong>120</strong> (170 LE) sportosabb élményt és 48V-os mild-hybrid rendszert kínál; a <strong>120d</strong> (163 LE, 360 Nm) hosszú távon a legtakarékosabb, bőséges nyomatékkal. Mindegyikhez 7 fokozatú DKG váltó és első kerék hajtás jár.' },
+        { h3: 'Megvásárolod, lízingeled vagy béreled?', html: 'Ahogy neked a legjobb: az egyedi rendelés mellett a 1-es elérhető <a href="/finanszirozas-lizing">finanszírozással és lízinggel</a> is, kiszámítható havidíjjal. Ha pedig nem szeretnél tulajdonolni, a modell <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is a tiéd lehet. Alig használt darabot keresel? Mutatjuk, mire figyelj a <a href="/blog/nemet-hasznaltauto-vasarlas">német használtautó vásárlásakor</a>.' },
+      ],
+    },
+    variants: [
+      { key: '118', label: 'BMW 118', fuel: 'Benzin', power: '156 LE (115 kW)', torque: '230 Nm', drive: 'Első / 7 fok. DKG', accel: '9,0 mp', vmax: '215 km/h', cons: '~5,7 l/100 km', boot: '380 liter', rec: 'Kiegyensúlyozott belépő', img: '/bmw/bmw-118-elolnezet.webp', alt: 'BMW 118 – kompakt prémium, elölnézet' },
+      { key: '120', label: 'BMW 120', fuel: 'Benzin (mild-hybrid)', power: '170 LE (125 kW)', torque: '240 Nm', drive: 'Első / 7 fok. DKG', accel: '8,3 mp', vmax: '216 km/h', cons: '~5,8 l/100 km', boot: '300 liter', rec: 'Sportosabb, dinamikus', img: '/bmw/bmw-120-elolnezet.webp', alt: 'BMW 120 M Sport – elölnézet' },
+      { key: '120d', label: 'BMW 120d (dízel)', fuel: 'Dízel (mild-hybrid)', power: '163 LE (120 kW)', torque: '360 Nm', drive: 'Első / 7 fok. DKG', accel: '8,6 mp', vmax: '225 km/h', cons: '~4,5 l/100 km', boot: '300 liter', rec: 'Sokat autózóknak, takarékos', img: '/bmw/bmw-120d-elolnezet.webp', alt: 'BMW 120d dízel – elölnézet' },
+    ],
+    gallery: [
+      { img: '/bmw/bmw-1es-menet-kozben.webp', alt: 'BMW 1-es menet közben, hegyi úton' },
+      { img: '/bmw/bmw-1es-hegyi-uton.webp', alt: 'BMW 1-es dinamikus vezetés hegyi környezetben' },
+      { img: '/bmw/bmw-1es-oldalnezet.webp', alt: 'BMW 1-es M Sport oldalnézet' },
+      { img: '/bmw/bmw-1es-m-felni-feknyereg.webp', alt: 'BMW 1-es M könnyűfém keréktárcsa, piros féknyereg' },
+      { img: '/bmw/bmw-1es-muszerfal.webp', alt: 'BMW 1-es utastér – BMW Curved Display' },
+      { img: '/bmw/bmw-1es-sport-ulesek.webp', alt: 'BMW 1-es sport ülések' },
+    ],
+    faq: [
+      { q: 'Mennyibe kerül egy új BMW 1-es Németországból?', a: 'A BMW 118 nettó listaára a feltüntetett ártól indul, a felszereltségtől függően. Magánszemélyként akár 19% német áfával rendelheted a müncheni Caradvance GmbH-n keresztül.' },
+      { q: 'Melyik BMW 1-es kivitelt válasszam — 118, 120 vagy 120d?', a: 'A <strong>BMW 118</strong> (156 LE) a kiegyensúlyozott benzines belépő, a <strong>120</strong> (170 LE) a sportosabb, mild-hybrid választás, a <strong>120d</strong> (163 LE, 360 Nm) pedig a takarékos dízel a sokat autózóknak. Segítünk kiválasztani a hozzád illő motorizációt és felszereltséget.' },
+      { q: 'Mennyi egy BMW 1-es fogyasztása?', a: 'WLTP szerint a BMW 118 kb. 5,7 l/100 km, a 120 kb. 5,8 l/100 km, a dízel 120d pedig kb. 4,5 l/100 km átlagfogyasztással üzemel — a konkrét érték a felszereltségtől és a vezetési stílustól függ.' },
+      { q: 'Mekkora a BMW 1-es csomagtartója?', a: 'A BMW 1-es csomagtartója 380 liter, a hátsó ülések ledöntésével 1200 literig bővíthető. A mild-hybrid változatoknál az akkumulátor miatt 300 liter az alapérték.' },
+      { q: 'Mennyivel olcsóbb a német áfás vásárlás?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett. A 8 százalékpontnyi különbség egy új BMW 1-esnél több százezer forintos megtakarítást jelenthet.' },
+      { q: 'Lehet a BMW 1-est lízingelni vagy finanszírozni?', a: 'Igen — a BMW 1-es elérhető <a href="/finanszirozas-lizing">finanszírozással és lízinggel</a> is, kiszámítható havidíjjal. Ha nem szeretnél tulajdonolni, <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is a tiéd lehet, szervizzel és biztosítással együtt.' },
+      { q: 'Bérelhető is a BMW 1-es?', a: 'Igen — a 1-es <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is elérhető, egyetlen, kiszámítható havi díjjal, amiben a szerviz és a biztosítás is benne lehet.' },
+      { q: 'Mennyi idő a behozatal?', a: 'A kiválasztott konfigurációtól függ, jellemzően néhány hét. A <a href="/beszerzesi-folyamat">beszerzési folyamat</a> minden lépését mi intézzük, a honosítással és forgalomba helyezéssel együtt.' },
+    ],
+    related: [
+      { name: 'BMW 2-es Gran Coupé', href: '/egyedi-auto-rendeles?brand=bmw' },
+      { name: 'BMW X1', href: '/egyedi-auto-rendeles?brand=bmw' },
+      { name: 'BMW X2', href: '/egyedi-auto-rendeles?brand=bmw' },
+      { name: 'BMW i4 (elektromos)', href: '/egyedi-auto-rendeles?brand=bmw' },
+    ],
+    schema: {
+      modelName: '1 Series', modelDate: '2024', bodyTypeEn: 'Hatchback', doors: 5,
+      transmission: '7 fokozatú DKG automata', drive: 'FrontWheelDriveConfiguration',
+      fuelType: 'Benzin, Dízel', engineFuel: 'Benzin', powerKw: 115, torqueNm: 230,
+      vmaxKmh: 215, accelSec: 9.0, cargoL: 380, consL: 5.7,
+    },
+  },
+};
