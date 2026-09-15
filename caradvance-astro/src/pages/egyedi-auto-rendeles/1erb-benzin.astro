@@ -11,7 +11,7 @@ const eur = new Intl.NumberFormat('de-DE').format(net) + ' €';
 const huf = new Intl.NumberFormat('hu-HU').format(net * FX) + ' Ft';
 
 const title = 'BMW 1-es (F70) — új autó Németországból, egyedi rendelés | CarAdvance';
-const description = 'Új BMW 1-es (116, 118, 120) egyedi rendelése Németországból, kulcsrakész behozatallal és akár 19% német áfával. Ár, felszereltség, műszaki adatok és tartós bérlet egy helyen.';
+const description = 'Új BMW 1-es (118, 120, 120d) egyedi rendelése Németországból — kulcsrakész behozatal, akár 19% német áfával. Ár, felszereltség, tartós bérlet egy helyen.';
 
 const imgBase = 'https://www.caradvance.hu/bmw/';
 const carImages = [
@@ -156,6 +156,21 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
         </div>
         <img class="cd-shot cd-shot-edi" src="/bmw/bmw-1es-belso-ter-curved-display.webp" alt="BMW 1-es belső tér – BMW Curved Display és iDrive" width="1200" height="900" loading="lazy" />
       </div>
+    </div>
+  </section>
+
+  <!-- ===== BUYING GUIDE (SEO content) ===== -->
+  <section class="cd-sec">
+    <div class="cd-w cd-prose">
+      <span class="cd-eyebrow">Vásárlási útmutató</span>
+      <h2 class="cd-h2">Új BMW 1-es Németországból — miért éri meg?</h2>
+      <p>A <strong>BMW 1-es</strong> a márka belépő prémium kompaktja, mégis igazi BMW: hátsókerék-hajtású érzetet idéző, precíz futómű, kiváló anyagminőség és a legújabb digitális utastér. Ha új autót szeretnél, a német piac kínálata nagyságrendekkel szélesebb a hazainál — így pontosan azt a motorizációt, színt és felszereltséget találjuk meg neked, amit elképzeltél. A CarAdvance 2003 óta hozza be a prémium autókat Németországból, <a href="/beszerzesi-folyamat">kulcsrakészen, teljes ügyintézéssel</a>.</p>
+      <h3 class="cd-h3">Mennyibe kerül egy új BMW 1-es?</h3>
+      <p>A <strong>BMW 1-es ára</strong> a választott kiviteltől függ: a benzines <strong>BMW 118</strong> a kiegyensúlyozott belépő, a <strong>BMW 120</strong> a dinamikusabb mild-hybrid, a <strong>BMW 120d</strong> pedig a takarékos dízel a sokat autózóknak. Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár <strong>19%-os német áfával</strong> vásárolhatsz a hazai 27% helyett — ez önmagában több százezer forintos megtakarítás. A tájékoztató nettó listaár {eur}-tól (kb. {huf}) indul, élő árfolyammal számolva.</p>
+      <h3 class="cd-h3">Melyik BMW 1-es kivitelt válaszd?</h3>
+      <p>A <strong>118</strong> (156 LE) a mindennapokra ideális, kedvező fenntartással; a <strong>120</strong> (170 LE) sportosabb élményt és 48V-os mild-hybrid rendszert kínál; a <strong>120d</strong> (163 LE, 360 Nm) hosszú távon a legtakarékosabb, bőséges nyomatékkal. Mindegyikhez 7 fokozatú DKG váltó és első kerék hajtás jár. Segítünk kiválasztani a hozzád illő motort és felszereltséget — az M Sport csomagtól a vezetéstámogató rendszerekig.</p>
+      <h3 class="cd-h3">Megvásárolod, lízingeled vagy béreled?</h3>
+      <p>Ahogy neked a legjobb: az egyedi rendelés mellett a 1-es elérhető <a href="/finanszirozas-lizing">finanszírozással és lízinggel</a> is, kiszámítható havidíjjal. Ha pedig nem szeretnél tulajdonolni, a modell <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is a tiéd lehet — a szerviz és a biztosítás egyetlen díjba építve. Szívesebben néznél alig használt darabot? Mutatjuk, mire figyelj a <a href="/blog/nemet-hasznaltauto-vasarlas">német használtautó vásárlásakor</a>.</p>
     </div>
   </section>
 
@@ -512,6 +527,10 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
   .cd-sec{padding:56px 0;}
   .cd-soft{background:var(--soft);}
   .cd-lead{font-size:19px;line-height:1.75;max-width:820px;}
+  .cd-prose{max-width:820px;}
+  .cd-prose p{font-size:16.5px;line-height:1.8;color:var(--muted);margin:0 0 16px;}
+  .cd-prose .cd-h3{font-size:20px;font-weight:800;color:var(--navy);margin:28px 0 10px;}
+  .cd-prose a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
   .cd-lead a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
   .cd-hl{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
   @media(max-width:900px){.cd-hl{grid-template-columns:1fr 1fr;}}
