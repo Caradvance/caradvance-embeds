@@ -43,7 +43,11 @@ const carJson = {
 };
 const faqJson = {'@context':'https://schema.org','@type':'FAQPage',mainEntity:[
   {'@type':'Question',name:'Mennyibe kerül egy új BMW 1-es Németországból?',acceptedAnswer:{'@type':'Answer',text:'A BMW 118 nettó listaára 28.782 €-tól (kb. 10,4 millió Ft) indul, a felszereltségtől függően. Magánszemélyként akár 19% német áfával rendelheted a müncheni Caradvance GmbH-n keresztül.'}},
-  {'@type':'Question',name:'Melyik BMW 1-es kivitelt válasszam — 116, 118 vagy 120?',acceptedAnswer:{'@type':'Answer',text:'A BMW 116 a belépő benzines, a 118 a legkiegyensúlyozottabb választás, a 120 a legdinamikusabb; dízel is rendelhető. Segítünk kiválasztani a hozzád illő motorizációt és felszereltséget.'}},
+  {'@type':'Question',name:'Melyik BMW 1-es kivitelt válasszam — 118, 120 vagy 120d?',acceptedAnswer:{'@type':'Answer',text:'A BMW 118 (156 LE) a kiegyensúlyozott benzines belépő, a 120 (170 LE) a sportosabb, mild-hybrid választás, a 120d (163 LE, 360 Nm) pedig a takarékos dízel a sokat autózóknak. Segítünk kiválasztani a hozzád illő motorizációt és felszereltséget.'}},
+  {'@type':'Question',name:'Mennyi egy BMW 1-es fogyasztása?',acceptedAnswer:{'@type':'Answer',text:'WLTP szerint a BMW 118 kb. 5,7 l/100 km, a 120 kb. 5,8 l/100 km, a dízel 120d pedig kb. 4,5 l/100 km átlagfogyasztással üzemel — a konkrét érték a felszereltségtől és a vezetési stílustól függ.'}},
+  {'@type':'Question',name:'Mekkora a BMW 1-es csomagtartója?',acceptedAnswer:{'@type':'Answer',text:'A BMW 1-es csomagtartója 380 liter, a hátsó ülések ledöntésével 1200 literig bővíthető. A mild-hybrid változatoknál az akkumulátor miatt 300 liter az alapérték.'}},
+  {'@type':'Question',name:'Mennyivel olcsóbb a német áfás vásárlás?',acceptedAnswer:{'@type':'Answer',text:'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett. A 8 százalékpontnyi különbség egy új BMW 1-esnél több százezer forintos megtakarítást jelenthet.'}},
+  {'@type':'Question',name:'Lehet a BMW 1-est lízingelni vagy finanszírozni?',acceptedAnswer:{'@type':'Answer',text:'Igen, a BMW 1-es elérhető finanszírozással és lízinggel is, kiszámítható havidíjjal. Ha nem szeretnél tulajdonolni, tartós bérletben is a tiéd lehet, szervizzel és biztosítással együtt.'}},
   {'@type':'Question',name:'Bérelhető is a BMW 1-es?',acceptedAnswer:{'@type':'Answer',text:'Igen, a BMW 1-es tartós bérletben is elérhető, egyetlen kiszámítható havi díjjal, amiben a szerviz és a biztosítás is benne lehet.'}},
   {'@type':'Question',name:'Mennyi idő a behozatal?',acceptedAnswer:{'@type':'Answer',text:'A kiválasztott konfigurációtól függ, jellemzően néhány hét. A beszerzést, a honosítást és a forgalomba helyezést mi intézzük.'}}
 ]};
@@ -277,10 +281,14 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
     <div class="cd-w cd-faqwrap">
       <span class="cd-eyebrow">GYIK</span>
       <h2 class="cd-h2">Gyakori kérdések a BMW 1-esről</h2>
-      <details open><summary>Mennyibe kerül egy új BMW 1-es Németországból?</summary><p>A BMW 118 nettó listaára {eur}-tól (kb. {huf}) indul, a felszereltségtől függően. Magánszemélyként akár 19% német áfával rendelheted a müncheni Caradvance GmbH-n keresztül.</p></details>
-      <details><summary>Melyik BMW 1-es kivitelt válasszam — 116, 118 vagy 120?</summary><p>A BMW 116 a belépő benzines, a 118 a legkiegyensúlyozottabb választás, a 120 a legdinamikusabb. Dízelt is rendelhetsz. Segítünk kiválasztani a hozzád illő motorizációt és felszereltséget.</p></details>
-      <details><summary>Bérelhető is a BMW 1-es?</summary><p>Igen — a 1-es <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is elérhető, egyetlen, kiszámítható havi díjjal, amiben a szerviz és a biztosítás is benne lehet.</p></details>
-      <details><summary>Mennyi idő a behozatal?</summary><p>A kiválasztott konfigurációtól függ, jellemzően néhány hét. A <a href="/beszerzesi-folyamat">beszerzési folyamat</a> minden lépését mi intézzük, a honosítással és forgalomba helyezéssel együtt.</p></details>
+      <details open><summary>Mennyibe kerül egy új BMW 1-es Németországból?<span class="cd-plus">+</span></summary><p>A BMW 118 nettó listaára {eur}-tól (kb. {huf}) indul, a felszereltségtől függően. Magánszemélyként akár 19% német áfával rendelheted a müncheni Caradvance GmbH-n keresztül.</p></details>
+      <details><summary>Melyik BMW 1-es kivitelt válasszam — 118, 120 vagy 120d?<span class="cd-plus">+</span></summary><p>A <strong>BMW 118</strong> (156 LE) a kiegyensúlyozott benzines belépő, a <strong>120</strong> (170 LE) a sportosabb, mild-hybrid választás, a <strong>120d</strong> (163 LE, 360 Nm) pedig a takarékos dízel a sokat autózóknak. Segítünk kiválasztani a hozzád illő motorizációt és felszereltséget.</p></details>
+      <details><summary>Mennyi egy BMW 1-es fogyasztása?<span class="cd-plus">+</span></summary><p>WLTP szerint a BMW 118 kb. 5,7 l/100 km, a 120 kb. 5,8 l/100 km, a dízel 120d pedig kb. 4,5 l/100 km átlagfogyasztással üzemel — a konkrét érték a felszereltségtől és a vezetési stílustól függ.</p></details>
+      <details><summary>Mekkora a BMW 1-es csomagtartója?<span class="cd-plus">+</span></summary><p>A BMW 1-es csomagtartója 380 liter, a hátsó ülések ledöntésével 1200 literig bővíthető. A mild-hybrid változatoknál az akkumulátor miatt 300 liter az alapérték.</p></details>
+      <details><summary>Mennyivel olcsóbb a német áfás vásárlás?<span class="cd-plus">+</span></summary><p>Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett. A 8 százalékpontnyi különbség egy új BMW 1-esnél több százezer forintos megtakarítást jelenthet.</p></details>
+      <details><summary>Lehet a BMW 1-est lízingelni vagy finanszírozni?<span class="cd-plus">+</span></summary><p>Igen — a BMW 1-es elérhető <a href="/finanszirozas-lizing">finanszírozással és lízinggel</a> is, kiszámítható havidíjjal. Ha nem szeretnél tulajdonolni, <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is a tiéd lehet, szervizzel és biztosítással együtt.</p></details>
+      <details><summary>Bérelhető is a BMW 1-es?<span class="cd-plus">+</span></summary><p>Igen — a 1-es <a href="/uj-auto-berlese?brand=bmw">tartós bérletben</a> is elérhető, egyetlen, kiszámítható havi díjjal, amiben a szerviz és a biztosítás is benne lehet.</p></details>
+      <details><summary>Mennyi idő a behozatal?<span class="cd-plus">+</span></summary><p>A kiválasztott konfigurációtól függ, jellemzően néhány hét. A <a href="/beszerzesi-folyamat">beszerzési folyamat</a> minden lépését mi intézzük, a honosítással és forgalomba helyezéssel együtt.</p></details>
     </div>
   </section>
 
@@ -615,8 +623,10 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
 
   .cd-faqwrap{max-width:820px;}
   .cd details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 20px;margin-bottom:12px;}
-  .cd summary{cursor:pointer;font-weight:700;color:var(--navy);padding:16px 0;list-style:none;}
+  .cd summary{cursor:pointer;font-weight:700;color:var(--navy);padding:16px 0;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:16px;}
   .cd summary::-webkit-details-marker{display:none;}
+  .cd-plus{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:#fdecea;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:400;line-height:1;transition:transform .2s;}
+  .cd details[open] .cd-plus{transform:rotate(45deg);}
   .cd details[open] summary{color:var(--red);}
   .cd details p{color:var(--muted);line-height:1.7;margin:0 0 16px;}
   .cd details a{color:var(--red);text-decoration:underline;}
