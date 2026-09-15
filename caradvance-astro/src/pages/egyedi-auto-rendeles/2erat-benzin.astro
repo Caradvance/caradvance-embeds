@@ -1,0 +1,12 @@
+---
+// BMW 2-es Active Tourer — modell-aloldal (a közös CarDetail sablonból).
+// Tartalom: src/data/carModels.ts → carModels['2erat-benzin']
+import Base from '../../layouts/Base.astro';
+import CarDetail from '../../components/CarDetail.astro';
+import { carModels } from '../../data/carModels';
+
+const model = carModels['2erat-benzin'];
+---
+<Base lang="hu" path={`/egyedi-auto-rendeles/${model.slug}`} title={model.title} description={model.description}>
+  <CarDetail model={model} />
+</Base>
