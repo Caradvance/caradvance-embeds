@@ -1,0 +1,667 @@
+---
+// Újrafelhasználható modell-aloldal sablon. Egy `model` propot vár (lásd carModels.ts).
+// A megosztott logika (hero-videó, változó-váltó, rendelő-modal, lightbox, élő árfolyam,
+// CSS) itt van; a modellre jellemző tartalom a data fájlból jön.
+import type { CarModel } from '../data/carModels';
+const { model } = Astro.props as { model: CarModel };
+
+const ORIGIN = 'https://www.caradvance.hu';
+const FX = 364; // szerveroldali kezdőérték; a kliens élőben frissíti
+const eur = new Intl.NumberFormat('de-DE').format(model.netEur) + ' €';
+const huf = new Intl.NumberFormat('hu-HU').format(Math.round(model.netEur * FX)) + ' Ft';
+const orderPrice = huf + ' · ' + eur;
+
+const brandHref = `/egyedi-auto-rendeles?brand=${model.brandKey}`;
+const orderHref = `${brandHref}&order=${model.orderKey}`;
+
+const v0 = model.variants[0];
+
+// változó-váltó adatai (kliensoldali JSON)
+const varMap: Record<string, any> = {};
+for (const v of model.variants) varMap[v.key] = { img: v.img, alt: v.alt, fuel: v.fuel, power: v.power, torque: v.torque, drive: v.drive, accel: v.accel, vmax: v.vmax, cons: v.cons, boot: v.boot };
+
+// összehasonlító tábla a változókból
+const cmpShort = model.variants.map((v) => v.label.replace(/^BMW\s*/, '').replace(/\s*\(.*\)/, ''));
+const cmpHead = model.variants.map((v) => v.label.replace(/\s*\(.*\)/, ''));
+const cmpRows = [
+  ['Üzemanyag', ...model.variants.map((v) => v.fuel)],
+  ['Teljesítmény', ...model.variants.map((v) => v.power)],
+  ['Nyomaték', ...model.variants.map((v) => v.torque)],
+  ['Gyorsulás (0–100)', ...model.variants.map((v) => v.accel)],
+  ['Végsebesség', ...model.variants.map((v) => v.vmax)],
+  ['Fogyasztás (WLTP)', ...model.variants.map((v) => v.cons)],
+  ['Váltó / hajtás', ...model.variants.map((v) => v.drive)],
+  ['Kinek ajánljuk', ...model.variants.map((v) => v.rec)],
+];
+
+// schema képek (dedup, abszolút URL)
+const imgSet = new Set<string>();
+[model.mainImg, model.design.img, model.interior.img, ...model.gallery.map((g) => g.img), ...model.variants.map((v) => v.img)].forEach((p) => imgSet.add(ORIGIN + p));
+const carImages = Array.from(imgSet);
+
+const carJson = {
+  '@context': 'https://schema.org', '@type': 'Car', name: `${model.name}${model.modelCode ? ' (' + model.modelCode + ')' : ''}`,
+  brand: { '@type': 'Brand', name: model.brand }, model: model.schema.modelName, vehicleModelDate: model.schema.modelDate,
+  bodyType: model.schema.bodyTypeEn, numberOfDoors: model.schema.doors, vehicleTransmission: model.schema.transmission,
+  driveWheelConfiguration: model.schema.drive, fuelType: model.schema.fuelType,
+  vehicleEngine: { '@type': 'EngineSpecification', fuelType: model.schema.engineFuel, enginePower: { '@type': 'QuantitativeValue', value: model.schema.powerKw, unitText: 'kW' }, torque: { '@type': 'QuantitativeValue', value: model.schema.torqueNm, unitText: 'Nm' } },
+  speed: { '@type': 'QuantitativeValue', value: model.schema.vmaxKmh, unitCode: 'KMH' },
+  accelerationTime: { '@type': 'QuantitativeValue', value: model.schema.accelSec, unitCode: 'SEC' },
+  cargoVolume: { '@type': 'QuantitativeValue', value: model.schema.cargoL, unitCode: 'LTR' },
+  fuelConsumption: { '@type': 'QuantitativeValue', value: model.schema.consL, unitText: 'l/100km' },
+  image: carImages,
+  offers: { '@type': 'Offer', price: model.netEur, priceCurrency: 'EUR', availability: 'https://schema.org/InStock', seller: { '@type': 'Organization', name: 'CarAdvance' } },
+};
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: model.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') } })) };
+const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'Főoldal', item: ORIGIN + '/' },
+  { '@type': 'ListItem', position: 2, name: `Egyedi ${model.brand} rendelés`, item: ORIGIN + brandHref },
+  { '@type': 'ListItem', position: 3, name: model.name, item: `${ORIGIN}/egyedi-auto-rendeles/${model.slug}` },
+] };
+---
+<div class="cd">
+
+  <!-- ===== HERO ===== -->
+  <section class="cd-hero">
+    <video class="cd-vid" autoplay muted loop playsinline preload="auto" poster={model.heroPoster}>
+      <source src={model.heroVideo} type="video/mp4" />
+    </video>
+    <div class="cd-ov"></div>
+    <div class="cd-inner">
+      <img class="cd-brandlogo" src={model.brandLogo} alt={model.brand} width="120" height="120" />
+      <h1>{model.name}</h1>
+      <p class="cd-sub">{model.heroSub}</p>
+      <div class="cd-cta">
+        <a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a>
+        <a class="cd-btn cd-btn-white" href="/kapcsolat">Ajánlatot kérek</a>
+      </div>
+    </div>
+    <button class="cd-scroll" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+  </section>
+
+  <script is:inline>
+  (function(){var v=document.querySelector('.cd-hero .cd-vid');if(!v)return;try{v.muted=true;v.setAttribute('muted','');}catch(e){}
+    var kick=function(){var p=v.play();if(p&&p.catch)p.catch(function(){});};
+    kick(); v.addEventListener('loadedmetadata',kick); v.addEventListener('canplay',kick);
+    if(document.readyState!=='loading')kick(); else document.addEventListener('DOMContentLoaded',kick);
+  })();
+  </script>
+
+  <!-- ===== INTRO ===== -->
+  <section class="cd-intro">
+    <div class="cd-w">
+      <nav class="cd-crumb"><a href="/">Főoldal</a> / <a href={brandHref}>Egyedi {model.brand} rendelés</a> / <b>{model.name}</b></nav>
+      <div class="cd-intro-grid">
+        <div class="cd-info">
+          <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}<span class="cd-chip cd-chip-year">{model.yearChip}</span></div>
+          <div class="cd-price"><span class="cd-huf" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
+          <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p>
+          <div class="cd-cta2"><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></div>
+          <div class="cd-trust">
+            <span><i></i> akár 19% német áfával</span>
+            <span><i></i> kulcsrakész behozatal</span>
+            <span><i></i> 2003 óta a német piacon</span>
+          </div>
+        </div>
+        <div class="cd-photo">
+          <img class="cd-hero-car" src={model.mainImg} alt={model.mainAlt} width="1150" height="662" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STICKY SUBNAV ===== -->
+  <div class="cd-nav">
+    <div class="cd-w cd-nav-in">
+      <div class="cd-nav-links">
+        <a href="#attekintes">Áttekintés</a>
+        <a href="#elonyok">Miért ez a modell</a>
+        <a href="#adatok">Műszaki adatok</a>
+        <a href="#szolg">Bérlés &amp; import</a>
+        <a href="#gyik">GYIK</a>
+      </div>
+      <div class="cd-nav-price">{huf}-tól</div>
+    </div>
+  </div>
+
+  <!-- ===== OVERVIEW ===== -->
+  <section class="cd-sec" id="attekintes">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Áttekintés</span>
+      <h2 class="cd-h2">{model.overviewH2}</h2>
+      <p class="cd-lead" set:html={model.overviewLead}></p>
+    </div>
+  </section>
+
+  <!-- ===== HIGHLIGHTS ===== -->
+  <section class="cd-sec cd-soft" id="elonyok">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Miért a {model.name}</span>
+      <h2 class="cd-h2">Amiért szeretni fogod</h2>
+      <div class="cd-hl">
+        {model.highlights.map((h) => (
+          <div class="cd-c"><div class="cd-i">{h.icon}</div><h3>{h.title}</h3><p>{h.text}</p></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EDITORIAL ===== -->
+  <section class="cd-sec">
+    <div class="cd-w">
+      <div class="cd-edi">
+        <div class="cd-txt">
+          <span class="cd-eyebrow">Dizájn</span>
+          <h3 class="cd-h3">{model.design.h3}</h3>
+          <p>{model.design.text}</p>
+          <ul>{model.design.bullets.map((b) => (<li set:html={b}></li>))}</ul>
+        </div>
+        <img class="cd-shot cd-shot-edi" src={model.design.img} alt={model.design.alt} width="1200" height="900" loading="lazy" />
+      </div>
+      <div class="cd-edi cd-rev">
+        <div class="cd-txt">
+          <span class="cd-eyebrow">Belső tér</span>
+          <h3 class="cd-h3">{model.interior.h3}</h3>
+          <p>{model.interior.text}</p>
+          <ul>{model.interior.bullets.map((b) => (<li set:html={b}></li>))}</ul>
+        </div>
+        <img class="cd-shot cd-shot-edi" src={model.interior.img} alt={model.interior.alt} width="1200" height="900" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BUYING GUIDE ===== -->
+  <section class="cd-sec">
+    <div class="cd-w cd-prose">
+      <span class="cd-eyebrow">Vásárlási útmutató</span>
+      <h2 class="cd-h2">{model.prose.h2}</h2>
+      {model.prose.blocks.map((b) => (
+        <>
+          {b.h3 && <h3 class="cd-h3">{b.h3}</h3>}
+          <p set:html={b.html}></p>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <!-- ===== VARIANTS + SPECS ===== -->
+  <section class="cd-sec cd-soft" id="adatok">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Változatok</span>
+      <h2 class="cd-h2">Változatok és műszaki adatok</h2>
+      <div class="cd-varsel">{model.variants.map((v, i) => (<button class={i === 0 ? 'on' : ''} data-var={v.key}>{v.label}</button>))}</div>
+      <div class="cd-specwrap">
+        <div class="cd-stage"><img id="cdStageImg" class="cd-shot cd-shot-stage" src={v0.img} alt={v0.alt} width="1200" height="750" loading="lazy" /></div>
+        <div class="cd-spec">
+          <div class="r"><span class="k">Karosszéria</span><span class="v">{model.bodyType}</span></div>
+          <div class="r"><span class="k">Üzemanyag</span><span class="v" id="svFuel">{v0.fuel}</span></div>
+          <div class="r"><span class="k">Max. teljesítmény</span><span class="v" id="svPower">{v0.power}</span></div>
+          <div class="r"><span class="k">Nyomaték</span><span class="v" id="svTorque">{v0.torque}</span></div>
+          <div class="r"><span class="k">Hajtás</span><span class="v" id="svDrive">{v0.drive}</span></div>
+          <div class="r"><span class="k">Gyorsulás (0–100)</span><span class="v" id="svAccel">{v0.accel}</span></div>
+          <div class="r"><span class="k">Végsebesség</span><span class="v" id="svVmax">{v0.vmax}</span></div>
+          <div class="r"><span class="k">Fogyasztás (WLTP)</span><span class="v" id="svCons">{v0.cons}</span></div>
+          <div class="r"><span class="k">Csomagtér</span><span class="v" id="svBoot">{v0.boot}</span></div>
+          <div class="r"><span class="k">Nettó ár -tól</span><span class="v">{eur} · {huf}</span></div>
+        </div>
+      </div>
+      <script type="application/json" id="cdVarData" set:html={JSON.stringify(varMap)}></script>
+      <script is:inline>
+      (function(){
+        var el=document.getElementById('cdVarData'); if(!el) return;
+        var V={}; try{ V=JSON.parse(el.textContent); }catch(e){ return; }
+        function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+        function apply(k){var d=V[k];if(!d)return;var img=document.getElementById('cdStageImg');if(img){img.src=d.img;img.alt=d.alt;}set('svFuel',d.fuel);set('svPower',d.power);set('svTorque',d.torque);set('svDrive',d.drive);set('svAccel',d.accel);set('svVmax',d.vmax);set('svCons',d.cons);set('svBoot',d.boot);}
+        [].forEach.call(document.querySelectorAll('.cd-varsel button'),function(b){
+          b.addEventListener('click',function(){
+            [].forEach.call(document.querySelectorAll('.cd-varsel button'),function(x){x.classList.remove('on');});
+            b.classList.add('on'); apply(b.getAttribute('data-var'));
+          });
+        });
+      })();
+      </script>
+      <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek. A végleges specifikációt a rendeléskor rögzítjük.</p>
+    </div>
+  </section>
+
+  <!-- ===== COMPARISON ===== -->
+  <section class="cd-sec">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Összehasonlítás</span>
+      <h2 class="cd-h2">{model.brand} {cmpShort.join(' vs ')}</h2>
+      <div class="cd-cmpwrap">
+      <table class="cd-cmp">
+        <thead><tr><th>Jellemző</th>{cmpHead.map((h) => (<th>{h}</th>))}</tr></thead>
+        <tbody>
+          {cmpRows.map((row) => (<tr>{row.map((cell, ci) => (ci === 0 ? <td>{cell}</td> : <td>{cell}</td>))}</tr>))}
+        </tbody>
+      </table>
+      </div>
+      <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek.</p>
+    </div>
+  </section>
+
+  <!-- ===== SERVICES ===== -->
+  <section class="cd-sec" id="szolg">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Ahogy neked a legjobb</span>
+      <h2 class="cd-h2">Vedd meg, béreld, vagy hozasd be — mi mindent intézünk</h2>
+      <div class="cd-svc">
+        <a href={`/uj-auto-berlese?brand=${model.brandKey}`}><h3>{model.name} tartós bérlet</h3><p>Nem szeretnél venni? A {model.name} <strong>tartós bérletben</strong> is a tiéd lehet, egyetlen havi díjjal — szerviz és biztosítás beépítve.</p><span class="go">Bérlési ajánlatok →</span></a>
+        <a href="/blog/auto-behozatal-nemetorszagbol"><h3>Autó behozatal Németországból</h3><p>Regisztrációs adó, áfa, honosítás, szállítás — nézd meg, hogyan zajlik a <strong>német autó behozatal</strong> lépésről lépésre.</p><span class="go">Import útmutató →</span></a>
+        <a href={brandHref}><h3>{model.brand} konfigurátor</h3><p>Állítsd össze a saját {model.brand}-det a <strong>{model.brand} konfigurátorban</strong>, a kész specifikációt pedig bízd ránk.</p><span class="go">Összes {model.brand} modell →</span></a>
+        <a href="/finanszirozas-lizing"><h3>Finanszírozás &amp; lízing</h3><p>Kiszámítható havi díj: nézd meg a <strong>{model.name} lízing</strong> lehetőségeket és a kalkulátort.</p><span class="go">Lízing kalkulátor →</span></a>
+        <a href="/blog/nemet-hasznaltauto-vasarlas"><h3>Német használtautó?</h3><p>Ha alig használt darabot keresel, mutatjuk, hogyan válaszd ki és ellenőrizd a <strong>német használtautót</strong>.</p><span class="go">Vásárlási tippek →</span></a>
+        <a href="/kapcsolat"><h3>Személyes ajánlat</h3><p>Mondd el, milyen {model.name} modellt szeretnél — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Kapcsolatfelvétel →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GALLERY ===== -->
+  <section class="cd-sec cd-soft">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Galéria</span>
+      <h2 class="cd-h2">{model.name} képek</h2>
+      <div class="cd-gal">{model.gallery.map((g) => (<img class="cd-shot" src={g.img} alt={g.alt} width="900" height="675" loading="lazy" />))}</div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="cd-sec" id="gyik">
+    <div class="cd-w cd-faqwrap">
+      <span class="cd-eyebrow">GYIK</span>
+      <h2 class="cd-h2">Gyakori kérdések a {model.name} modellről</h2>
+      {model.faq.map((f, i) => (
+        <details open={i === 0}><summary>{f.q}<span class="cd-plus">+</span></summary><p set:html={f.a}></p></details>
+      ))}
+    </div>
+  </section>
+
+  <!-- ===== RELATED ===== -->
+  <section class="cd-sec cd-soft">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Kapcsolódó modellek</span>
+      <h2 class="cd-h2">Hasonló {model.brand} modellek</h2>
+      <div class="cd-rel">
+        {model.related.map((r) => (
+          <a class="cd-relc" href={r.href}><div class="cd-ph"><span>{r.name}</span></div><div class="b"><div class="n">{r.name}</div></div></a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA BAND ===== -->
+  <section class="cd-sec">
+    <div class="cd-w"><div class="cd-band"><div><h2>{model.name} — rendeld meg egyedileg</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div><a class="cd-btn cd-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a></div></div>
+  </section>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="cd-lb" id="cdLb" aria-hidden="true">
+    <button class="cd-lb-x" type="button" aria-label="Bezárás">✕</button>
+    <button class="cd-lb-nav cd-lb-prev" type="button" aria-label="Előző">‹</button>
+    <img class="cd-lb-img" id="cdLbImg" src="" alt="" />
+    <button class="cd-lb-nav cd-lb-next" type="button" aria-label="Következő">›</button>
+  </div>
+  <script is:inline>
+  (function(){
+    var lb=document.getElementById('cdLb'), lbImg=document.getElementById('cdLbImg');
+    if(!lb||!lbImg) return;
+    var imgs=[].slice.call(document.querySelectorAll('.cd-gal img, .cd-shot-edi, #cdStageImg, .cd-hero-car'));
+    var i=0;
+    function open(n){ i=(n+imgs.length)%imgs.length; lbImg.src=imgs[i].src; lbImg.alt=imgs[i].alt||''; lb.classList.add('on'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+    function close(){ lb.classList.remove('on'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    imgs.forEach(function(im,n){ im.style.cursor='zoom-in'; im.addEventListener('click',function(){open(n);}); });
+    lb.querySelector('.cd-lb-x').addEventListener('click',close);
+    lb.querySelector('.cd-lb-prev').addEventListener('click',function(e){e.stopPropagation();open(i-1);});
+    lb.querySelector('.cd-lb-next').addEventListener('click',function(e){e.stopPropagation();open(i+1);});
+    lb.addEventListener('click',function(e){ if(e.target===lb||e.target===lbImg) close(); });
+    document.addEventListener('keydown',function(e){ if(!lb.classList.contains('on'))return; if(e.key==='Escape')close(); else if(e.key==='ArrowLeft')open(i-1); else if(e.key==='ArrowRight')open(i+1); });
+  })();
+  </script>
+
+  <!-- ===== ORDER MODAL ===== -->
+  <div class="egl-modal" id="eglOrder" aria-hidden="true">
+    <div class="egl-modal-back" data-close></div>
+    <div class="egl-modal-card" role="dialog" aria-modal="true" aria-labelledby="eglOrderTitle">
+      <button class="egl-modal-x" type="button" data-close aria-label="Bezárás">✕</button>
+      <div class="egl-modal-head">
+        <img id="eglOrderImg" src={model.mainImg} alt={model.name} />
+        <div class="egl-modal-headtext">
+          <div class="egl-modal-eyebrow">Autó rendelése</div>
+          <h3 id="eglOrderTitle">{model.name}</h3>
+          <div class="egl-modal-sub"><span id="eglOrderPrice">{orderPrice}</span> <span class="egl-tol" id="eglOrderTol">-tól</span><span class="egl-info" id="eglOrderInfo" tabindex="0">i<span class="egl-tip" id="eglOrderTip">Az árak nettó árak, élő árfolyammal. A végleges ár a választott felszereltségtől és kedvezménytől függ. A képek csak illusztrációk.</span></span></div>
+        </div>
+      </div>
+      <form id="eglOrderForm" class="egl-form" novalidate>
+        <input type="hidden" name="car" id="eglOrderCar" value={model.name} />
+        <input type="hidden" name="buyer" id="eglBuyer" value="Magánszemély" />
+        <div class="egl-toggle">
+          <button type="button" class="egl-tgl active" data-buyer="Magánszemély">Magánszemélyként</button>
+          <button type="button" class="egl-tgl" data-buyer="Cég">Cégként</button>
+        </div>
+        <div class="egl-fblock" id="eglFuelBlock"><div class="egl-flabel">1. Üzemanyag</div><div class="egl-fuelpick"><label class="egl-fuelopt active"><input type="radio" name="fuel" value="Benzin" checked /><span>Benzin</span></label><label class="egl-fuelopt"><input type="radio" name="fuel" value="Dízel" /><span>Dízel</span></label></div></div>
+        <div class="egl-fblock">
+          <div class="egl-flabel">2. Kész specifikáció <span class="egl-fopt">(opcionális)</span></div>
+          <p class="egl-fhint">Ha van kész felszereltségi listád, töltsd fel — PDF, kép vagy dokumentum.</p>
+          <input type="file" name="spec" id="eglOrderFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" />
+        </div>
+        <div class="egl-fblock">
+          <div class="egl-flabel">3. Elérhetőséged</div>
+          <div class="egl-fgrid egl-company-only" id="eglCompanyFields" style="display:none">
+            <input type="text" name="company" id="eglCompany" placeholder="Cégnév *" />
+            <input type="text" name="taxid" placeholder="Adószám" />
+          </div>
+          <div class="egl-fgrid">
+            <input type="text" name="lastname" id="eglLast" placeholder="Vezetéknév *" />
+            <input type="text" name="firstname" placeholder="Keresztnév *" />
+            <input type="tel" name="phone" placeholder="Telefonszám" />
+            <input type="email" name="email" placeholder="E-mail *" />
+          </div>
+          <textarea name="message" rows="3" placeholder="Megjegyzés, kívánt felszereltség…"></textarea>
+        </div>
+        <div class="egl-fblock">
+          <div class="egl-flabel">4. Hogyan szeretnéd megvásárolni?</div>
+          <label class="egl-radio"><input type="radio" name="mode" id="eglMode1" value="19% német áfával, Németországból (Caradvance GmbH)" /><span id="eglMode1Label">19% német áfával, Németországból (Caradvance GmbH)</span></label>
+          <label class="egl-radio"><input type="radio" name="mode" value="27% magyar áfával, BH Group Zrt." /><span>27% magyar áfával, a BH Group Zrt.-n keresztül</span></label>
+          <div class="egl-sublabel">Fizetés módja</div>
+          <label class="egl-radio"><input type="radio" name="payment" value="Egy összegben" /><span>Egy összegben</span></label>
+          <label class="egl-radio"><input type="radio" name="payment" value="Finanszírozással" /><span>Finanszírozással</span></label>
+          <div id="eglFinancing" class="egl-subblock" style="display:none">
+            <div class="egl-sublabel">Finanszírozás módja</div>
+            <label class="egl-radio"><input type="radio" name="financing" value="Segítséget kérek (Euro Leasing / Mercantil Bank)" /><span>Kérek segítséget — Euro Leasing vagy Mercantil Bank</span></label>
+            <label class="egl-radio"><input type="radio" name="financing" value="Saját finanszírozás" /><span>Saját finanszírozásom van</span></label>
+          </div>
+        </div>
+        <label class="egl-consent"><input type="checkbox" name="consent" id="eglConsent" /><span>Elfogadom az <a href="/adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
+        <div class="egl-fmsg" id="eglOrderMsg"></div>
+        <button type="submit" class="egl-fsubmit">Rendelés elküldése</button>
+        <p class="egl-fnote">Az elküldés nem végleges megrendelés — felvesszük veled a kapcsolatot a részletekhez.</p>
+      </form>
+    </div>
+  </div>
+
+  <script is:inline>
+  (function(){
+    var ORDER_API=atob('aHR0cHM6Ly9jYXJhZHZhbmNlLWNoYXRib3QuZmxhdC1maXJlLTdlMjUud29ya2Vycy5kZXYvYXBpL29yZGVy');
+    var SALES_EMAIL='info@caradvance.hu';
+    var FX=364;
+    function att(s){return String(s==null?'':s).replace(/"/g,'&quot;');}
+    var modal=document.getElementById('eglOrder');
+    var oForm=document.getElementById('eglOrderForm');
+    var oMsg=document.getElementById('eglOrderMsg');
+    function showMsg(kind,txt){ if(oMsg){ oMsg.className='egl-fmsg '+kind; oMsg.textContent=txt; } }
+    var tgls=modal?modal.querySelectorAll('.egl-tgl'):[];
+    function setBuyer(v){
+      var be=document.getElementById('eglBuyer'); if(be) be.value=v;
+      [].forEach.call(tgls,function(t){ t.classList.toggle('active', t.getAttribute('data-buyer')===v); });
+      var isCo=(v==='Cég');
+      var comp=document.getElementById('eglCompanyFields'); if(comp) comp.style.display=isCo?'':'none';
+      var m1=document.getElementById('eglMode1'), m1l=document.getElementById('eglMode1Label');
+      if(m1&&m1l){ var txt=isCo?'Nettó EUR-ban, Németországból (Caradvance GmbH)':'19% német áfával, Németországból (Caradvance GmbH)'; m1.value=txt; m1l.textContent=txt; }
+    }
+    function openOrder(d){
+      if(oForm) oForm.reset();
+      setBuyer('Magánszemély');
+      var im=document.getElementById('eglOrderImg'); if(im){ im.src=d.img||''; im.alt=d.name||''; }
+      var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v||''; };
+      set('eglOrderTitle',d.name); set('eglOrderPrice',d.price);
+      var cc=document.getElementById('eglOrderCar'); if(cc) cc.value=d.name||'';
+      var info=document.getElementById('eglOrderInfo'), tip=document.getElementById('eglOrderTip'), tol=document.getElementById('eglOrderTol');
+      var hasPrice=/\d/.test(d.price||'') && (d.price||'').indexOf('Ft')>-1;
+      if(tol) tol.style.display=hasPrice?'':'none';
+      if(info&&tip){ if(hasPrice){ tip.innerHTML='Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.'; info.style.display=''; } else { info.style.display='none'; } }
+      var fb2=document.getElementById('eglFuelBlock');
+      if(fb2){ var fuels=(d.fuels||'').split(',').map(function(x){return x.trim();}).filter(Boolean); var h='<div class="egl-flabel">1. Üzemanyag</div><div class="egl-fuelpick">'; if(!fuels.length) fuels=['']; fuels.forEach(function(fu,i){ h+='<label class="egl-fuelopt'+(i===0?' active':'')+'"><input type="radio" name="fuel" value="'+att(fu)+'"'+(i===0?' checked':'')+' /><span>'+(fu||'—')+'</span></label>'; }); h+='</div>'; if(fuels.length===1) h+='<p class="egl-fhint" style="margin:10px 0 0">Ehhez a modellhez ez az egyetlen elérhető hajtás.</p>'; fb2.innerHTML=h; }
+      var fin=document.getElementById('eglFinancing'); if(fin) fin.style.display='none';
+      showMsg('','');
+      if(modal){ modal.setAttribute('aria-hidden','false'); document.documentElement.style.overflow='hidden'; }
+    }
+    function closeOrder(){ if(modal){ modal.setAttribute('aria-hidden','true'); document.documentElement.style.overflow=''; } }
+    [].forEach.call(tgls,function(t){ t.addEventListener('click',function(){ setBuyer(t.getAttribute('data-buyer')); }); });
+    var fuelBlock=document.getElementById('eglFuelBlock');
+    if(fuelBlock){ fuelBlock.addEventListener('change',function(){ [].forEach.call(fuelBlock.querySelectorAll('.egl-fuelopt'),function(o){ var r=o.querySelector('input'); o.classList.toggle('active', !!(r&&r.checked)); }); }); }
+    if(oForm){ oForm.addEventListener('change',function(e){ if(e.target&&e.target.name==='payment'){ var fin=document.getElementById('eglFinancing'); if(fin) fin.style.display=(e.target.value==='Finanszírozással')?'':'none'; } }); }
+    [].forEach.call(document.querySelectorAll('[data-egl-order]'),function(b){ b.addEventListener('click',function(e){ e.preventDefault(); openOrder({name:b.getAttribute('data-name'),img:b.getAttribute('data-img'),price:b.getAttribute('data-price'),fuels:b.getAttribute('data-fuels')}); }); });
+    if(modal){ modal.addEventListener('click',function(e){ if(e.target&&e.target.hasAttribute&&e.target.hasAttribute('data-close')) closeOrder(); }); }
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&modal&&modal.getAttribute('aria-hidden')==='false') closeOrder(); });
+    if(oForm){ oForm.addEventListener('submit',function(e){
+      e.preventDefault();
+      var fd=new FormData(oForm);
+      var last=(fd.get('lastname')||'').trim(), first=(fd.get('firstname')||'').trim();
+      var name=(last+' '+first).trim();
+      var email=(fd.get('email')||'').trim(), mode=fd.get('mode');
+      var buyer=fd.get('buyer'), company=(fd.get('company')||'').trim();
+      if(buyer==='Cég'&&!company){ showMsg('err','Kérlek add meg a cég nevét.'); return; }
+      if(!last||!first||!email){ showMsg('err','Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed.'); return; }
+      if(!mode){ showMsg('err','Kérlek válaszd ki, hogyan szeretnéd megvásárolni az autót.'); return; }
+      var payment=fd.get('payment');
+      if(!payment){ showMsg('err','Kérlek válaszd ki a fizetés módját.'); return; }
+      if(payment==='Finanszírozással'&&!fd.get('financing')){ showMsg('err','Kérlek válaszd ki a finanszírozás módját.'); return; }
+      if(!fd.get('consent')){ showMsg('err','Kérlek fogadd el az adatkezelési tájékoztatót.'); return; }
+      var btn=oForm.querySelector('.egl-fsubmit'); btn.disabled=true; btn.textContent='Küldés…';
+      fetch(ORDER_API,{method:'POST',body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
+        showMsg('ok','Köszönjük! Megkaptuk a rendelési igényed — hamarosan keresünk.');
+        oForm.reset(); setBuyer('Magánszemély'); btn.disabled=false; btn.textContent='Rendelés elküldése';
+      }).catch(function(){
+        var body='Autó: '+(fd.get('car')||'')+'\nÜzemanyag: '+(fd.get('fuel')||'')+'\nVásárló típusa: '+(buyer||'')+'\nVásárlás módja: '+(mode||'')+'\nFizetés: '+(payment||'')+'\nFinanszírozás: '+(fd.get('financing')||'')+'\nNév: '+name+'\nE-mail: '+email+'\nTelefon: '+(fd.get('phone')||'')+'\nCég: '+company+'\nAdószám: '+(fd.get('taxid')||'')+'\nMegjegyzés: '+(fd.get('message')||'');
+        window.location.href='mailto:'+SALES_EMAIL+'?subject='+encodeURIComponent('Autó rendelés – '+(fd.get('car')||''))+'&body='+encodeURIComponent(body);
+        showMsg('ok','Megnyitottuk az e-mail vázlatot. Ha van specifikációs fájlod, csatold az e-mailhez.');
+        btn.disabled=false; btn.textContent='Rendelés elküldése';
+      });
+    }); }
+  })();
+  </script>
+
+  <script type="application/ld+json" set:html={JSON.stringify(carJson)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+  <script type="application/ld+json" set:html={JSON.stringify(crumbJson)} />
+  <script is:inline>
+  (function(){try{
+    fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
+      if(d&&d.rates&&d.rates.HUF){var fx=Math.round(d.rates.HUF);
+        var f=document.getElementById('cdFx'); if(f) f.textContent=fx;
+        var h=document.getElementById('cdHuf'); if(h){var n=Number(h.getAttribute('data-net')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx))+' Ft';}
+      }
+    }).catch(function(){});
+  }catch(e){}})();
+  </script>
+</div>
+
+<style>
+  .cd{--red:#E2001A;--navy:#0B0B0D;--ink:#12161c;--muted:#5b6675;--line:#e7ebf1;--soft:#f4f6fa;--font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-family:var(--font);color:var(--ink);}
+  .cd *{box-sizing:border-box;}
+  .cd a{text-decoration:none;color:inherit;}
+  .cd img{max-width:100%;display:block;}
+  .cd-w{max-width:1180px;margin:0 auto;padding:0 22px;}
+  .cd-eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);}
+  .cd-h2{font-size:clamp(24px,3vw,36px);font-weight:800;letter-spacing:-.02em;color:var(--navy);margin:8px 0 22px;}
+  .cd-h3{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-.01em;margin:0 0 12px;}
+  .cd-btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:15px;padding:15px 30px;border-radius:999px;cursor:pointer;line-height:1.1;transition:.15s;}
+  .cd a.cd-btn-red{background:var(--red);color:#fff;} .cd a.cd-btn-red:hover{filter:brightness(1.07);}
+  .cd a.cd-btn-dark{background:var(--navy);color:#fff;} .cd a.cd-btn-dark:hover{filter:brightness(1.25);}
+  .cd a.cd-btn-white{background:#fff;color:var(--navy);}
+
+  .cd-hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;margin:calc(6px - var(--navh)) 16px 16px;background:linear-gradient(#17181c,#0b0b0d 62%,#060607);}
+  .cd-brandlogo{height:78px;width:auto;margin:0 auto 18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));}
+  .cd-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;}
+  .cd-ov{position:absolute;inset:0;z-index:1;background:radial-gradient(1100px 460px at 50% -10%,rgba(226,0,26,.18),transparent 60%),linear-gradient(rgba(8,8,10,.42),rgba(8,8,10,.48) 45%,rgba(8,8,10,.7));}
+  .cd-inner{position:relative;z-index:2;max-width:1120px;margin:64px auto 0;}
+  .cd-hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.025em;margin:0 0 16px;text-shadow:0 2px 24px rgba(0,0,0,.35);}
+  .cd-sub{font-size:clamp(16px,1.7vw,19px);line-height:1.5;color:#e7eaf0;max-width:600px;margin:0 auto 32px;text-shadow:0 1px 12px rgba(0,0,0,.4);}
+  .cd-cta{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+  .cd-scroll{position:absolute;left:50%;bottom:22px;transform:translate(-50%,0);z-index:3;background:none;border:0;color:rgba(255,255,255,.82);font-size:11px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:inherit;animation:cdbob 1.9s ease-in-out infinite;}
+  .cd-scroll svg{width:22px;height:22px;}
+  @keyframes cdbob{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,8px);}}
+  @media(max-width:640px){.cd-hero{margin:8px;margin-top:calc(8px - var(--navh));border-radius:22px;padding:84px 18px 72px;min-height:480px;}.cd-brandlogo{height:56px;margin-bottom:16px;}.cd-inner{margin-top:12px;}}
+
+  .cd-shot{display:block;width:100%;height:auto;border-radius:16px;object-fit:cover;}
+  .cd-shot-edi{aspect-ratio:4/3;}
+  .cd-shot-stage{position:relative;z-index:1;aspect-ratio:16/10;box-shadow:0 18px 44px rgba(11,20,32,.10);}
+  .cd-gal .cd-shot{aspect-ratio:4/3;}
+  .cd-lb{position:fixed;inset:0;z-index:120;background:rgba(8,8,10,.92);display:none;align-items:center;justify-content:center;}
+  .cd-lb.on{display:flex;}
+  .cd-lb-img{max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  .cd-lb-x{position:absolute;top:18px;right:22px;background:none;border:0;color:#fff;font-size:30px;line-height:1;cursor:pointer;opacity:.85;}
+  .cd-lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);border:0;color:#fff;width:52px;height:52px;border-radius:50%;font-size:32px;line-height:1;cursor:pointer;}
+  .cd-lb-nav:hover{background:rgba(255,255,255,.22);}
+  .cd-lb-prev{left:18px;} .cd-lb-next{right:18px;}
+  @media(max-width:640px){.cd-lb-nav{width:42px;height:42px;font-size:26px;}}
+
+  .cd-intro{padding:36px 0 12px;background:#fff;}
+  .cd-crumb{color:var(--muted);font-size:13px;margin:0 0 16px;}
+  .cd-crumb a{color:var(--muted);} .cd-crumb b{color:var(--navy);font-weight:600;}
+  .cd-intro-grid{display:grid;grid-template-columns:1fr .82fr;gap:44px;align-items:center;background:#fff;}
+  @media(max-width:820px){.cd-intro-grid{grid-template-columns:1fr;gap:16px;}}
+  .cd-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .cd-chip{background:var(--soft);color:var(--navy);font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:100px;}
+  .cd-chip-year{background:var(--red);color:#fff;}
+  .cd-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .cd-huf{font-size:clamp(32px,4.4vw,46px);font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+  .cd-eur{font-size:16px;color:var(--muted);font-weight:600;}
+  .cd-note{font-size:12.5px;color:#9aa7ba;margin:8px 0 22px;line-height:1.5;max-width:520px;}
+  .cd-cta2{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
+  .cd-trust{display:flex;gap:26px;flex-wrap:wrap;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:18px;}
+  .cd-trust span{display:flex;align-items:center;gap:9px;}
+  .cd-trust i{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;}
+  .cd-photo{position:relative;display:flex;align-items:center;justify-content:center;min-height:240px;}
+  .cd-hero-car{position:relative;z-index:1;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:16px;box-shadow:0 18px 44px rgba(11,20,32,.10);}
+  @media(max-width:820px){.cd-photo{order:-1;}}
+
+  .cd-nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:26px;}
+  .cd-nav-in{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px;}
+  .cd-nav-links{display:flex;gap:26px;font-size:14px;font-weight:600;color:var(--muted);overflow-x:auto;}
+  .cd-nav-links a{white-space:nowrap;padding:4px 0;border-bottom:2px solid transparent;}
+  .cd-nav-links a:hover{color:var(--navy);border-color:var(--red);}
+  .cd-nav-price{font-weight:800;color:var(--navy);font-size:15px;white-space:nowrap;}
+  @media(max-width:640px){.cd-nav-price{display:none;}}
+
+  .cd-sec{padding:56px 0;}
+  .cd-soft{background:var(--soft);}
+  .cd-lead{font-size:19px;line-height:1.75;max-width:820px;}
+  .cd-prose{max-width:820px;}
+  .cd-prose p{font-size:16.5px;line-height:1.8;color:var(--muted);margin:0 0 16px;}
+  .cd-prose .cd-h3{font-size:20px;font-weight:800;color:var(--navy);margin:28px 0 10px;}
+  .cd-prose a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
+  .cd-cmpwrap{overflow-x:auto;}
+  .cd-cmp{width:100%;border-collapse:collapse;min-width:640px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .cd-cmp th,.cd-cmp td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);font-size:14.5px;}
+  .cd-cmp thead th{background:var(--navy);color:#fff;font-weight:700;}
+  .cd-cmp tbody td:first-child{color:var(--muted);font-weight:600;}
+  .cd-cmp tbody td{color:var(--navy);font-weight:600;}
+  .cd-cmp tbody tr:nth-child(even){background:var(--soft);}
+  .cd-cmp tbody tr:last-child td{border-bottom:0;}
+  .cd-lead a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
+  .cd-hl{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media(max-width:900px){.cd-hl{grid-template-columns:1fr 1fr;}}
+  @media(max-width:540px){.cd-hl{grid-template-columns:1fr;}}
+  .cd-c{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;}
+  .cd-i{width:46px;height:46px;border-radius:12px;background:#fdecea;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+  .cd-c h3{font-size:17px;font-weight:800;color:var(--navy);margin:0 0 8px;}
+  .cd-c p{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0;}
+
+  .cd-edi{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:46px;}
+  .cd-edi:last-child{margin-bottom:0;}
+  .cd-rev .cd-txt{order:2;}
+  @media(max-width:820px){.cd-edi{grid-template-columns:1fr;gap:20px;}.cd-rev .cd-txt{order:0;}}
+  .cd-edi p{font-size:16px;color:var(--muted);line-height:1.75;margin:0 0 14px;}
+  .cd-edi ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.8;font-size:15.5px;}
+
+  .cd-varsel{display:flex;gap:10px;margin:0 0 26px;flex-wrap:wrap;}
+  .cd-varsel button{border:1px solid var(--line);background:#fff;border-radius:100px;padding:10px 20px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;}
+  .cd-varsel button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .cd-specwrap{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:center;}
+  @media(max-width:820px){.cd-specwrap{grid-template-columns:1fr;}}
+  .cd-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:280px;}
+  .cd-spec{background:#fff;border:1px solid var(--line);border-radius:18px;padding:8px 22px;}
+  .cd-spec .r{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);}
+  .cd-spec .r:last-child{border-bottom:0;}
+  .cd-spec .k{font-size:14px;color:var(--muted);} .cd-spec .v{font-size:14.5px;font-weight:700;text-align:right;}
+  .cd-specnote{font-size:12px;color:#9aa7ba;margin:14px 0 0;}
+
+  .cd-svc{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media(max-width:820px){.cd-svc{grid-template-columns:1fr;}}
+  .cd-svc a{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;transition:.15s;display:block;}
+  .cd-svc a:hover{box-shadow:0 16px 40px rgba(11,20,32,.10);transform:translateY(-3px);border-color:#dfe4ec;}
+  .cd-svc h3{font-size:17px;font-weight:800;color:var(--navy);margin:0 0 8px;}
+  .cd-svc p{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0 0 12px;}
+  .cd-svc .go{color:var(--red);font-weight:700;font-size:14px;}
+
+  .cd-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media(max-width:820px){.cd-gal{grid-template-columns:1fr 1fr;}}
+
+  .cd-faqwrap{max-width:820px;}
+  .cd details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 20px;margin-bottom:12px;}
+  .cd summary{cursor:pointer;font-weight:700;color:var(--navy);padding:16px 0;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .cd summary::-webkit-details-marker{display:none;}
+  .cd-plus{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:#fdecea;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:400;line-height:1;transition:transform .2s;}
+  .cd details[open] .cd-plus{transform:rotate(45deg);}
+  .cd details[open] summary{color:var(--red);}
+  .cd details p{color:var(--muted);line-height:1.7;margin:0 0 16px;}
+  .cd details a{color:var(--red);text-decoration:underline;}
+
+  .cd-rel{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media(max-width:820px){.cd-rel{grid-template-columns:1fr 1fr;}}
+  .cd-relc{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:.15s;}
+  .cd-relc:hover{box-shadow:0 14px 34px rgba(11,20,32,.10);transform:translateY(-3px);}
+  .cd-ph{position:relative;border-radius:16px;background:#eef1f6;border:1px dashed #cfd6e2;display:flex;align-items:center;justify-content:center;color:#9aa7ba;text-align:center;font-size:13px;font-weight:600;min-height:120px;}
+  .cd-relc .cd-ph{aspect-ratio:16/10;border:0;border-bottom:1px dashed #dfe4ec;border-radius:0;}
+  .cd-relc .b{padding:14px 16px;} .cd-relc .n{font-weight:800;color:var(--navy);font-size:15px;}
+
+  .cd-band{background:var(--navy);color:#fff;border-radius:22px;padding:40px 42px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;}
+  .cd-band h2{font-size:26px;font-weight:800;margin:0 0 6px;}
+  .cd-band p{color:#c7d1df;margin:0;max-width:560px;line-height:1.6;}
+
+  .egl-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:2px;flex:0 0 auto;}
+  .egl-info .egl-tip{position:absolute;bottom:150%;right:0;left:auto;transform:none;width:230px;white-space:normal;background:var(--navy);color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left;}
+  .egl-info:hover .egl-tip,.egl-info:focus .egl-tip{opacity:1;visibility:visible;}
+  .egl-modal[aria-hidden="true"]{display:none;}
+  .egl-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .egl-modal-back{position:absolute;inset:0;background:rgba(8,12,20,.55);backdrop-filter:blur(2px);}
+  .egl-modal-card{position:relative;z-index:1;background:#fff;border-radius:22px;width:min(560px,100%);max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(8,12,20,.4);padding:26px 26px 28px;}
+  .egl-modal-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:10px;background:#eef2f8;color:var(--navy);font-size:16px;cursor:pointer;}
+  .egl-modal-x:hover{background:#e0e6f0;}
+  .egl-modal-head{display:flex;gap:16px;align-items:center;margin-bottom:4px;padding-right:30px;}
+  .egl-modal-head img{width:168px;height:112px;object-fit:contain;background:transparent;border-radius:12px;flex:0 0 auto;}
+  .egl-modal-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);}
+  .egl-modal-head h3{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0;line-height:1.15;}
+  .egl-modal-sub{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .egl-modal-sub .egl-tol{font-size:13px;color:var(--muted);font-weight:600;}
+  .egl-modal-headtext{position:relative;}
+  .egl-modal .egl-info{position:static;}
+  .egl-modal .egl-info .egl-tip{position:absolute;inset:100% auto auto 0;width:100%;margin-top:8px;}
+  @media(max-width:560px){.egl-modal{align-items:flex-start;padding:16px 12px;}.egl-modal-card{max-height:calc(100dvh - 32px);padding:22px 20px 24px;}.egl-modal-head{flex-direction:column;align-items:flex-start;gap:10px;padding-right:0;}.egl-modal-head img{width:150px;height:92px;}.egl-modal-headtext{width:100%;}.egl-modal-head h3{font-size:20px;}}
+  .egl-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink);line-height:1.45;cursor:pointer;}
+  .egl-consent input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;margin-top:1px;}
+  .egl-consent a{color:var(--red);font-weight:700;}
+  .egl-form{display:flex;flex-direction:column;gap:18px;}
+  .egl-toggle{display:flex;gap:6px;background:#eef2f8;border-radius:12px;padding:5px;}
+  .egl-tgl{flex:1 1 0;border:0;background:transparent;font-family:inherit;font-weight:700;font-size:14.5px;color:var(--muted);padding:12px;border-radius:9px;cursor:pointer;transition:.15s;}
+  .egl-tgl.active{background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(226,0,26,.25);}
+  .egl-fblock{border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;}
+  .egl-flabel{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+  .egl-fopt{font-weight:600;color:var(--muted);font-size:13px;}
+  .egl-fhint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45;}
+  .egl-sublabel{font-size:13.5px;font-weight:800;color:var(--ink);margin:16px 0 2px;}
+  .egl-subblock{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);}
+  .egl-radio{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:14.5px;color:var(--ink);cursor:pointer;border-top:1px solid var(--line);}
+  .egl-radio:first-of-type{border-top:0;}
+  .egl-radio input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;}
+  .egl-fuelpick{display:flex;flex-wrap:wrap;gap:8px;}
+  .egl-fuelopt{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;}
+  .egl-fuelopt input{position:absolute;opacity:0;width:0;height:0;}
+  .egl-fuelopt:hover{border-color:#c9d2e0;}
+  .egl-fuelopt.active{border-color:var(--red);color:var(--red);background:rgba(226,0,26,.06);}
+  .egl-fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  @media(max-width:460px){.egl-fgrid{grid-template-columns:1fr;}}
+  .egl-form input[type="text"],.egl-form input[type="email"],.egl-form input[type="tel"],.egl-form textarea{width:100%;font-family:inherit;font-size:14.5px;color:var(--ink);background:#f7f9fc;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;outline:none;transition:.15s;}
+  .egl-form input:focus,.egl-form textarea:focus{border-color:var(--red);background:#fff;box-shadow:0 0 0 4px rgba(226,0,26,.08);}
+  .egl-form input[type="file"]{width:100%;font-family:inherit;font-size:13.5px;color:var(--muted);}
+  .egl-form textarea{resize:vertical;}
+  .egl-fmsg{font-size:14px;font-weight:600;display:none;border-radius:10px;padding:11px 13px;}
+  .egl-fmsg.err{display:block;background:#fdeaec;color:#b3121f;}
+  .egl-fmsg.ok{display:block;background:#e8f7ee;color:#177a3d;}
+  .egl-fsubmit{background:var(--red);color:#fff;border:0;border-radius:12px;padding:15px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;transition:.15s;}
+  .egl-fsubmit:hover{background:#c40017;}
+  .egl-fsubmit:disabled{opacity:.6;cursor:default;}
+  .egl-fnote{font-size:12.5px;color:var(--muted);text-align:center;margin:0;line-height:1.4;}
+</style>
