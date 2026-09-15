@@ -147,13 +147,13 @@ export const carModels: Record<string, CarModel> = {
     },
   },
 
-  '2erat-benzin': {
-    slug: '2erat-benzin',
+  '2eratb-benzin': {
+    slug: '2eratb-benzin',
     brand: 'BMW', brandKey: 'bmw', brandLogo: '/bmw-hero-logo.png',
     name: 'BMW 2-es Active Tourer', modelCode: 'U06',
     title: 'BMW 2-es Active Tourer (U06) — új autó Németországból, egyedi rendelés | CarAdvance',
     description: 'Új BMW 2-es Active Tourer (218i, 223i, 220d) egyedi rendelése Németországból — tágas prémium egyterű, kulcsrakész behozatal, akár 19% német áfával.',
-    netEur: 36750,
+    netEur: 30882,
     orderKey: '2eratb', orderFuels: 'Benzin,Hibrid,Dízel',
     heroSub: 'Tágas prémium egyterű Németországból — rugalmas utastér, magasabb beülő, digitális belső tér, új autóként, egyedi konfigurációval.',
     heroVideo: '',
