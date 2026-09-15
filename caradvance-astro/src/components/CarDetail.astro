@@ -62,10 +62,12 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
 <div class="cd">
 
   <!-- ===== HERO ===== -->
-  <section class="cd-hero">
-    <video class="cd-vid" autoplay muted loop playsinline preload="auto" poster={model.heroPoster}>
-      <source src={model.heroVideo} type="video/mp4" />
-    </video>
+  <section class="cd-hero" style={model.heroVideo ? '' : `background-image:url('${model.heroPoster}');background-size:cover;background-position:center;`}>
+    {model.heroVideo && (
+      <video class="cd-vid" autoplay muted loop playsinline preload="auto" poster={model.heroPoster}>
+        <source src={model.heroVideo} type="video/mp4" />
+      </video>
+    )}
     <div class="cd-ov"></div>
     <div class="cd-inner">
       <img class="cd-brandlogo" src={model.brandLogo} alt={model.brand} width="120" height="120" />
