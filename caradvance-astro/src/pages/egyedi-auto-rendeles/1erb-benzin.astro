@@ -29,8 +29,15 @@ const carImages = [
   imgBase + 'bmw-120d-elolnezet.webp'
 ];
 const carJson = {
-  '@context':'https://schema.org','@type':'Car', name:'BMW 1-es', brand:{'@type':'Brand',name:'BMW'},
-  bodyType:'Kompakt', vehicleTransmission:'Automata',
+  '@context':'https://schema.org','@type':'Car', name:'BMW 1-es (F70)', brand:{'@type':'Brand',name:'BMW'},
+  model:'1 Series', vehicleModelDate:'2024', bodyType:'Hatchback', numberOfDoors:5,
+  vehicleTransmission:'7 fokozatú DKG automata', driveWheelConfiguration:'FrontWheelDriveConfiguration',
+  fuelType:'Benzin, Dízel',
+  vehicleEngine:{'@type':'EngineSpecification', fuelType:'Benzin', enginePower:{'@type':'QuantitativeValue', value:115, unitText:'kW'}, torque:{'@type':'QuantitativeValue', value:230, unitText:'Nm'}},
+  speed:{'@type':'QuantitativeValue', value:215, unitCode:'KMH'},
+  accelerationTime:{'@type':'QuantitativeValue', value:9.0, unitCode:'SEC'},
+  cargoVolume:{'@type':'QuantitativeValue', value:380, unitCode:'LTR'},
+  fuelConsumption:{'@type':'QuantitativeValue', value:5.7, unitText:'l/100km'},
   image: carImages,
   offers:{'@type':'Offer', price:net, priceCurrency:'EUR', availability:'https://schema.org/InStock', seller:{'@type':'Organization',name:'CarAdvance'}}
 };
@@ -213,6 +220,30 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
       })();
       </script>
       <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek. A végleges specifikációt a rendeléskor rögzítjük.</p>
+    </div>
+  </section>
+
+  <!-- ===== COMPARISON TABLE (SEO) ===== -->
+  <section class="cd-sec">
+    <div class="cd-w">
+      <span class="cd-eyebrow">Összehasonlítás</span>
+      <h2 class="cd-h2">BMW 118 vs 120 vs 120d</h2>
+      <div class="cd-cmpwrap">
+      <table class="cd-cmp">
+        <thead><tr><th>Jellemző</th><th>BMW 118</th><th>BMW 120</th><th>BMW 120d</th></tr></thead>
+        <tbody>
+          <tr><td>Üzemanyag</td><td>Benzin</td><td>Benzin (mild-hybrid)</td><td>Dízel (mild-hybrid)</td></tr>
+          <tr><td>Teljesítmény</td><td>156 LE (115 kW)</td><td>170 LE (125 kW)</td><td>163 LE (120 kW)</td></tr>
+          <tr><td>Nyomaték</td><td>230 Nm</td><td>240 Nm</td><td>360 Nm</td></tr>
+          <tr><td>Gyorsulás (0–100)</td><td>9,0 mp</td><td>8,3 mp</td><td>8,6 mp</td></tr>
+          <tr><td>Végsebesség</td><td>215 km/h</td><td>216 km/h</td><td>225 km/h</td></tr>
+          <tr><td>Fogyasztás (WLTP)</td><td>~5,7 l/100 km</td><td>~5,8 l/100 km</td><td>~4,5 l/100 km</td></tr>
+          <tr><td>Váltó / hajtás</td><td>7 fok. DKG / első</td><td>7 fok. DKG / első</td><td>7 fok. DKG / első</td></tr>
+          <tr><td>Kinek ajánljuk</td><td>Kiegyensúlyozott belépő</td><td>Sportosabb, dinamikus</td><td>Sokat autózóknak, takarékos</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek.</p>
     </div>
   </section>
 
@@ -531,6 +562,14 @@ const crumbJson = {'@context':'https://schema.org','@type':'BreadcrumbList',item
   .cd-prose p{font-size:16.5px;line-height:1.8;color:var(--muted);margin:0 0 16px;}
   .cd-prose .cd-h3{font-size:20px;font-weight:800;color:var(--navy);margin:28px 0 10px;}
   .cd-prose a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
+  .cd-cmpwrap{overflow-x:auto;}
+  .cd-cmp{width:100%;border-collapse:collapse;min-width:640px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .cd-cmp th,.cd-cmp td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);font-size:14.5px;}
+  .cd-cmp thead th{background:var(--navy);color:#fff;font-weight:700;}
+  .cd-cmp tbody td:first-child{color:var(--muted);font-weight:600;}
+  .cd-cmp tbody td{color:var(--navy);font-weight:600;}
+  .cd-cmp tbody tr:nth-child(even){background:var(--soft);}
+  .cd-cmp tbody tr:last-child td{border-bottom:0;}
   .cd-lead a{color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
   .cd-hl{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
   @media(max-width:900px){.cd-hl{grid-template-columns:1fr 1fr;}}
