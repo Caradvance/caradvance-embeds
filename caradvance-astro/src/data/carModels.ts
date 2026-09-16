@@ -134,10 +134,10 @@ export const carModels: Record<string, CarModel> = {
       { q: 'Mennyi idő a behozatal?', a: 'A kiválasztott konfigurációtól függ, jellemzően néhány hét. A <a href="/beszerzesi-folyamat">beszerzési folyamat</a> minden lépését mi intézzük, a honosítással és forgalomba helyezéssel együtt.' },
     ],
     related: [
-      { name: 'BMW 2-es Gran Coupé', href: '/egyedi-auto-rendeles?brand=bmw' },
+      { name: 'BMW 2-es Gran Coupé', href: '/egyedi-auto-rendeles/2ergc-benzin' },
+      { name: 'BMW 2-es Active Tourer', href: '/egyedi-auto-rendeles/2eratb-benzin' },
       { name: 'BMW X1', href: '/egyedi-auto-rendeles?brand=bmw' },
       { name: 'BMW X2', href: '/egyedi-auto-rendeles?brand=bmw' },
-      { name: 'BMW i4 (elektromos)', href: '/egyedi-auto-rendeles?brand=bmw' },
     ],
     schema: {
       modelName: '1 Series', modelDate: '2024', bodyTypeEn: 'Hatchback', doors: 5,
@@ -220,7 +220,7 @@ export const carModels: Record<string, CarModel> = {
     ],
     related: [
       { name: 'BMW 1-es', href: '/egyedi-auto-rendeles/1erb-benzin' },
-      { name: 'BMW 2-es Gran Coupé', href: '/egyedi-auto-rendeles?brand=bmw' },
+      { name: 'BMW 2-es Gran Coupé', href: '/egyedi-auto-rendeles/2ergc-benzin' },
       { name: 'BMW X1', href: '/egyedi-auto-rendeles?brand=bmw' },
       { name: 'BMW X2', href: '/egyedi-auto-rendeles?brand=bmw' },
     ],
