@@ -483,6 +483,20 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     }).catch(function(){});
   }catch(e){}})();
   </script>
+
+  <script is:inline>
+  // A sticky sávban lévő "Rendeld meg" gomb csak akkor jelenik meg, ha a fejléc
+  // "Autót rendelek" gombja már kigördült a képből — így nincs duplikáció.
+  (function(){try{
+    var nav=document.querySelector('.cd-nav');
+    var heroCta=document.querySelector('.cd-cta2');
+    if(!nav||!heroCta||!('IntersectionObserver' in window))return;
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ nav.classList.toggle('show-cta', !e.isIntersecting); });
+    },{rootMargin:'-64px 0px 0px 0px'});
+    io.observe(heroCta);
+  }catch(e){}})();
+  </script>
 </div>
 
 <style>
@@ -552,8 +566,9 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   .cd-nav-links a:hover{color:var(--navy);border-color:var(--red);}
   .cd-nav-price{font-weight:800;color:var(--navy);font-size:15px;white-space:nowrap;}
   .cd-nav-cta{display:flex;align-items:center;gap:12px;white-space:nowrap;}
-  .cd-nav-btn{display:inline-block;padding:8px 16px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;background:var(--red);white-space:nowrap;transition:filter .15s;}
+  .cd-nav-btn{display:inline-block;padding:8px 16px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;background:var(--red);white-space:nowrap;transition:opacity .2s,filter .15s;opacity:0;visibility:hidden;pointer-events:none;}
   .cd-nav-btn:hover{filter:brightness(1.08);}
+  .cd-nav.show-cta .cd-nav-btn{opacity:1;visibility:visible;pointer-events:auto;}
   @media(max-width:640px){.cd-nav-price{display:none;} .cd-nav-links{flex:1;} .cd-nav-btn{padding:7px 13px;font-size:13px;}}
 
   .cd-sec{padding:56px 0;}
