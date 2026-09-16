@@ -2,11 +2,10 @@
 //
 // MIÉRT
 // Néhány mobile.de hirdetés fotósora a valódi képek UTÁN tartalmaz egy CarAdvance
-// logó-diát, majd más bemutatótermi autók (pl. BMW X, Audi) képeit. A generátor a
-// nyers fotólistát (var CAG=[...]) rakja a galériába, így az idegen képek is kikerülnek.
-// Amíg ez az importban nincs javítva, itt — a kész dist/-en — levágjuk a felesleget:
-// modellenként megadjuk, hány VALÓDI fotó van, és a CAG tömböt ennyire csonkítjuk.
-// A számláló CAG.length-ből számol, így magától „/ N”-re vált.
+// logó-diát, majd más bemutatótermi autók (pl. BMW X, Audi) képeit. A galéria két
+// helyről épül: a nagy kép a `var CAG=[...]` tömbből lépdel, a bélyegkép-sor pedig a
+// <div id="thumbs"> statikus <img> tagjaiből. Mindkettőt a valódi fotók számára vágjuk,
+// így a nagy kép, a bélyegképek és a számláló (1 / N) is egységesen N-re vált.
 //
 // Idempotens; hiba esetén csak logol és exit 0 (a build megy tovább).
 import fs from 'node:fs';
@@ -23,12 +22,22 @@ try {
     if (!fs.existsSync(file)) { console.log('fix-auto-photos: nincs ' + file + ' - kihagyva'); continue; }
     let h = fs.readFileSync(file, 'utf8');
     const before = h;
+
+    // 1) nagy kép tömb (CAG) csonkítása
     h = h.replace(/(var\s+CAG\s*=\s*\[)([\s\S]*?)(\]\s*;)/, (m, a, body, c) => {
       const urls = body.match(/"[^"]*"|'[^']*'/g) || [];
-      if (urls.length <= keep) return m; // már rendben / kevesebb kép van
+      if (urls.length <= keep) return m;
       return a + urls.slice(0, keep).join(',') + c;
     });
-    if (h !== before) { fs.writeFileSync(file, h); changed++; console.log('fix-auto-photos: ' + slug + ' -> max ' + keep + ' foto'); }
+
+    // 2) bélyegkép-sor (<div id="thumbs">) <img> tagjainak csonkítása
+    h = h.replace(/(<div[^>]*id="thumbs"[^>]*>)([\s\S]*?)(<\/div>)/, (m, a, body, c) => {
+      const imgs = body.match(/<img[^>]*>/g) || [];
+      if (imgs.length <= keep) return m;
+      return a + imgs.slice(0, keep).join('') + c;
+    });
+
+    if (h !== before) { fs.writeFileSync(file, h); changed++; console.log('fix-auto-photos: ' + slug + ' -> max ' + keep + ' foto (CAG + thumbs)'); }
     else { console.log('fix-auto-photos: ' + slug + ' - nincs teendo'); }
   }
   console.log('fix-auto-photos: kesz (' + changed + ' oldal modositva)');
