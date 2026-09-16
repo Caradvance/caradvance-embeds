@@ -486,15 +486,16 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
 
   <script is:inline>
   // A sticky sávban lévő "Rendeld meg" gomb csak akkor jelenik meg, ha a fejléc
-  // "Autót rendelek" gombja már kigördült a képből — így nincs duplikáció.
+  // "Autót rendelek" gombja már kigördült a képből (a bottomja a sticky sáv fölé ért)
+  // — így nincs duplikáció, amíg a fejléc gomb látszik.
   (function(){try{
     var nav=document.querySelector('.cd-nav');
-    var heroCta=document.querySelector('.cd-cta2');
-    if(!nav||!heroCta||!('IntersectionObserver' in window))return;
-    var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){ nav.classList.toggle('show-cta', !e.isIntersecting); });
-    },{rootMargin:'-64px 0px 0px 0px'});
-    io.observe(heroCta);
+    var hero=document.querySelector('.cd-cta2');
+    if(!nav||!hero)return;
+    function upd(){ nav.classList.toggle('show-cta', hero.getBoundingClientRect().bottom <= 64); }
+    window.addEventListener('scroll',upd,{passive:true});
+    window.addEventListener('resize',upd);
+    upd();
   }catch(e){}})();
   </script>
 </div>
