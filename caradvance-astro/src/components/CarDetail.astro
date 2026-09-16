@@ -96,7 +96,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <div class="cd-intro-grid">
         <div class="cd-info">
           <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}<span class="cd-chip cd-chip-year">{model.yearChip}</span></div>
-          <div class="cd-price"><span class="cd-huf" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
+          <div class="cd-price"><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
           <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p>
           <div class="cd-cta2"><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></div>
           <div class="cd-trust">
@@ -122,7 +122,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         <a href="#szolg">Bérlés &amp; import</a>
         <a href="#gyik">GYIK</a>
       </div>
-      <div class="cd-nav-price">{huf}-tól</div>
+      <div class="cd-nav-price"><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</div>
     </div>
   </div>
 
@@ -204,7 +204,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
           <div class="r"><span class="k">Végsebesség</span><span class="v" id="svVmax">{v0.vmax}</span></div>
           <div class="r"><span class="k">Fogyasztás (WLTP)</span><span class="v" id="svCons">{v0.cons}</span></div>
           <div class="r"><span class="k">Csomagtér</span><span class="v" id="svBoot">{v0.boot}</span></div>
-          <div class="r"><span class="k">Nettó ár -tól</span><span class="v">{eur} · {huf}</span></div>
+          <div class="r"><span class="k">Nettó ár -tól</span><span class="v">{eur} · <span class="cd-huf-live" data-net={model.netEur}>{huf}</span></span></div>
         </div>
       </div>
       <script type="application/json" id="cdVarData" set:html={JSON.stringify(varMap)}></script>
@@ -462,7 +462,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
       if(d&&d.rates&&d.rates.HUF){var fx=Math.round(d.rates.HUF);
         var f=document.getElementById('cdFx'); if(f) f.textContent=fx;
-        var h=document.getElementById('cdHuf'); if(h){var n=Number(h.getAttribute('data-net')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx))+' Ft';}
+        [].forEach.call(document.querySelectorAll('.cd-huf-live'),function(h){var n=Number(h.getAttribute('data-net')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx))+' Ft';});
       }
     }).catch(function(){});
   }catch(e){}})();
