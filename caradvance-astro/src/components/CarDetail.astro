@@ -135,7 +135,10 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         <a href="#szolg">Bérlés &amp; import</a>
         <a href="#gyik">GYIK</a>
       </div>
-      <div class="cd-nav-price"><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</div>
+      <div class="cd-nav-cta">
+        <span class="cd-nav-price"><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</span>
+        <a class="cd-nav-btn" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Rendeld meg</a>
+      </div>
     </div>
   </div>
 
@@ -548,7 +551,10 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   .cd-nav-links a{white-space:nowrap;padding:4px 0;border-bottom:2px solid transparent;}
   .cd-nav-links a:hover{color:var(--navy);border-color:var(--red);}
   .cd-nav-price{font-weight:800;color:var(--navy);font-size:15px;white-space:nowrap;}
-  @media(max-width:640px){.cd-nav-price{display:none;}}
+  .cd-nav-cta{display:flex;align-items:center;gap:12px;white-space:nowrap;}
+  .cd-nav-btn{display:inline-block;padding:8px 16px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;background:var(--red);white-space:nowrap;transition:filter .15s;}
+  .cd-nav-btn:hover{filter:brightness(1.08);}
+  @media(max-width:640px){.cd-nav-price{display:none;} .cd-nav-links{flex:1;} .cd-nav-btn{padding:7px 13px;font-size:13px;}}
 
   .cd-sec{padding:56px 0;}
   .cd-soft{background:var(--soft);}
