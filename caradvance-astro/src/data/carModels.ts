@@ -452,6 +452,9 @@ export const carModels: Record<string, CarModel> = {
       { img: '/bmw/bmw-ix3-ulesek.webp', alt: 'BMW iX3 ülések, prémium utastér' },
       { img: '/bmw/bmw-ix3-csomagter.webp', alt: 'BMW iX3 csomagtér' },
       { img: '/bmw/bmw-ix3-toltes.webp', alt: 'BMW iX3 töltés – 800V gyorstöltés' },
+      { img: '/bmw/bmw-ix3-kek-topart.webp', alt: 'BMW iX3 kék színben, tópartnál menet közben' },
+      { img: '/bmw/bmw-ix3-kek-naplemente.webp', alt: 'BMW iX3 kék színben, naplementében' },
+      { img: '/bmw/bmw-ix3-kek-front.webp', alt: 'BMW iX3 kék színben, menet közben elölnézet' },
     ],
     faq: [
       { q: 'Mennyibe kerül egy új BMW iX3 Németországból?', a: 'Az iX3 50 xDrive nettó listaára a feltüntetett ártól indul, a felszereltségtől függően. Magánszemélyként akár 19% német áfával rendelheted a müncheni Caradvance GmbH-n keresztül.' },
