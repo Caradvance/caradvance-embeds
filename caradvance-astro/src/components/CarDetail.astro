@@ -39,18 +39,31 @@ const imgSet = new Set<string>();
 [model.mainImg, model.design.img, model.interior.img, ...model.gallery.map((g) => g.img), ...model.variants.map((v) => v.img)].forEach((p) => imgSet.add(ORIGIN + p));
 const carImages = Array.from(imgSet);
 
+const pageUrl = `${ORIGIN}/egyedi-auto-rendeles/${model.slug}`;
+// Ár érvényessége: mai naptól +1 év (a Google Offer-hez ajánlott priceValidUntil).
+const priceValid = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 const carJson = {
   '@context': 'https://schema.org', '@type': 'Car', name: `${model.name}${model.modelCode ? ' (' + model.modelCode + ')' : ''}`,
-  brand: { '@type': 'Brand', name: model.brand }, model: model.schema.modelName, vehicleModelDate: model.schema.modelDate,
+  url: pageUrl,
+  brand: { '@type': 'Brand', name: model.brand },
+  manufacturer: { '@type': 'Organization', name: model.brand },
+  model: model.schema.modelName, vehicleModelDate: model.schema.modelDate,
   bodyType: model.schema.bodyTypeEn, numberOfDoors: model.schema.doors, vehicleTransmission: model.schema.transmission,
   driveWheelConfiguration: model.schema.drive, fuelType: model.schema.fuelType,
+  itemCondition: 'https://schema.org/NewCondition',
+  mileageFromOdometer: { '@type': 'QuantitativeValue', value: 0, unitCode: 'KMT' },
   vehicleEngine: { '@type': 'EngineSpecification', fuelType: model.schema.engineFuel, enginePower: { '@type': 'QuantitativeValue', value: model.schema.powerKw, unitText: 'kW' }, torque: { '@type': 'QuantitativeValue', value: model.schema.torqueNm, unitText: 'Nm' } },
   speed: { '@type': 'QuantitativeValue', value: model.schema.vmaxKmh, unitCode: 'KMH' },
   accelerationTime: { '@type': 'QuantitativeValue', value: model.schema.accelSec, unitCode: 'SEC' },
   cargoVolume: { '@type': 'QuantitativeValue', value: model.schema.cargoL, unitCode: 'LTR' },
   fuelConsumption: { '@type': 'QuantitativeValue', value: model.schema.consL, unitText: 'l/100km' },
   image: carImages,
-  offers: { '@type': 'Offer', price: model.netEur, priceCurrency: 'EUR', availability: 'https://schema.org/InStock', seller: { '@type': 'Organization', name: 'CarAdvance' } },
+  offers: {
+    '@type': 'Offer', price: model.netEur, priceCurrency: 'EUR',
+    availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition',
+    priceValidUntil: priceValid, url: pageUrl,
+    seller: { '@type': 'Organization', name: 'CarAdvance', url: ORIGIN },
+  },
 };
 const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: model.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') } })) };
 const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
