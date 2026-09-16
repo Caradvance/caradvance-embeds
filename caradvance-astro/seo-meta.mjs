@@ -77,6 +77,7 @@ try {
   const MODELS = {
     'egyedi-auto-rendeles/1erb-benzin': 'https://www.caradvance.hu/bmw/bmw-1es-og.jpg',
     'egyedi-auto-rendeles/2eratb-benzin': 'https://www.caradvance.hu/bmw/bmw-2es-active-tourer-og.jpg',
+    'egyedi-auto-rendeles/2ergc-benzin': 'https://www.caradvance.hu/bmw/bmw-2es-gran-coupe-og.jpg',
   };
   for (const [rel, img] of Object.entries(MODELS)) {
     const file = path.join(DIST, rel, 'index.html');
