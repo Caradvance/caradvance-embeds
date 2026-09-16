@@ -63,7 +63,7 @@ const carJson = {
   speed: { '@type': 'QuantitativeValue', value: model.schema.vmaxKmh, unitCode: 'KMH' },
   accelerationTime: { '@type': 'QuantitativeValue', value: model.schema.accelSec, unitCode: 'SEC' },
   cargoVolume: { '@type': 'QuantitativeValue', value: model.schema.cargoL, unitCode: 'LTR' },
-  fuelConsumption: { '@type': 'QuantitativeValue', value: model.schema.consL, unitText: 'l/100km' },
+  fuelConsumption: model.schema.consL ? { '@type': 'QuantitativeValue', value: model.schema.consL, unitText: 'l/100km' } : undefined,
   image: carImages,
   offers: {
     '@type': 'Offer', price: model.netEur, priceCurrency: 'EUR',
