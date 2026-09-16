@@ -405,7 +405,7 @@ export const carModels: Record<string, CarModel> = {
     netEur: 53277,
     orderKey: 'ix3', orderFuels: 'Elektromos',
     heroSub: 'Az új Neue Klasse elektromos SUV Németországból — akár 805 km hatótáv, Panoramic iDrive, xDrive, új autóként, egyedi konfigurációval.',
-    heroVideo: '',
+    heroVideo: '/bmw/ix3-hero.mp4',
     heroPoster: '/bmw/bmw-ix3-hero.webp',
     mainImg: '/bmw/bmw-ix3-elolnezet.webp',
     mainAlt: 'BMW iX3 50 xDrive – új elektromos SUV Németországból, egyedi rendelés',
