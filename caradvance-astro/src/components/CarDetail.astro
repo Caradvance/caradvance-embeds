@@ -3,7 +3,14 @@
 // A megosztott logika (hero-videó, változó-váltó, rendelő-modal, lightbox, élő árfolyam,
 // CSS) itt van; a modellre jellemző tartalom a data fájlból jön.
 import type { CarModel } from '../data/carModels';
+import { carModels } from '../data/carModels';
 const { model } = Astro.props as { model: CarModel };
+// A "Hasonló modellek" kártyákhoz: ha a hivatkozott modellnek van kész aloldala
+// (azaz szerepel a carModels-ben ezzel a slug-gal), akkor a valódi fotóját mutatjuk.
+const relImg = (href: string) => {
+  const m = Object.values(carModels).find((x) => `/egyedi-auto-rendeles/${x.slug}` === href);
+  return m ? { img: m.mainImg, alt: m.mainAlt } : null;
+};
 
 const ORIGIN = 'https://www.caradvance.hu';
 const FX = 364; // szerveroldali kezdőérték; a kliens élőben frissíti
@@ -302,7 +309,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <h2 class="cd-h2">Hasonló {model.brand} modellek</h2>
       <div class="cd-rel">
         {model.related.map((r) => (
-          <a class="cd-relc" href={r.href}><div class="cd-ph"><span>{r.name}</span></div><div class="b"><div class="n">{r.name}</div></div></a>
+          <a class="cd-relc" href={r.href}>{(() => { const ri = relImg(r.href); return ri ? (<div class="cd-ph cd-ph-img"><img src={ri.img} alt={ri.alt} loading="lazy" /></div>) : (<div class="cd-ph"><span>{r.name}</span></div>); })()}<div class="b"><div class="n">{r.name}</div></div></a>
         ))}
       </div>
     </div>
@@ -642,6 +649,8 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   .cd-relc:hover{box-shadow:0 14px 34px rgba(11,20,32,.10);transform:translateY(-3px);}
   .cd-ph{position:relative;border-radius:16px;background:#eef1f6;border:1px dashed #cfd6e2;display:flex;align-items:center;justify-content:center;color:#9aa7ba;text-align:center;font-size:13px;font-weight:600;min-height:120px;}
   .cd-relc .cd-ph{aspect-ratio:16/10;border:0;border-bottom:1px dashed #dfe4ec;border-radius:0;}
+  .cd-relc .cd-ph-img{padding:0;border-bottom:0;background:#000;overflow:hidden;}
+  .cd-relc .cd-ph-img img{width:100%;height:100%;object-fit:cover;display:block;}
   .cd-relc .b{padding:14px 16px;} .cd-relc .n{font-weight:800;color:var(--navy);font-size:15px;}
 
   .cd-band{background:var(--navy);color:#fff;border-radius:22px;padding:40px 42px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;}
