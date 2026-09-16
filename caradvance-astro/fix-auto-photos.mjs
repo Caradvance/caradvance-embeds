@@ -1,34 +1,41 @@
 // Build lépés (a build lánc végén fut). Két, egymástól független, biztonságos javítás
 // a KÉSZ dist/-en. Bármelyik hiba esetén csak logol; a build sosem áll le.
 //
-// A) Kezdőlap (dist/index.html): az eladó/bizományos kártyák ára BRUTTÓ helyett NETTÓ.
-//    Csak a <span class="price">…Ft</span> + <span class="peur">…€</span> párokat írja át
-//    (nettó = bruttó / 1,19), semmi mást nem érint. (A bérlés €/hó ára nem illik a mintára,
-//    így érintetlen marad.)
+// A) Kezdőlap: a kiemelt ELADÓ kártyák ára BRUTTÓ helyett NETTÓ.
+//    A kártyákat kliensoldali script (saleCard) rajzolja a bruttó c.eur adatból, ezért
+//    nem a statikus HTML-t, hanem magát az INLINE SCRIPTET írjuk át: a megjelenített €
+//    és az abból számolt Ft is nettó lesz (c.eur / 1,19). A bérlés (rentCard) és a
+//    bizományos donáció-számítás érintetlen marad.
 // B) /auto/<slug>/ galériákból az idegen/hibás fotók levágása (CAG + thumbs + számláló).
 import fs from 'node:fs';
 
-// ---- A) kezdőlap: nettó árak -------------------------------------------------
+// ---- A) kezdőlap: eladó kártyák nettó ára (inline saleCard script patch) ------
+// A saleCard két helyen használ bruttót:
+//   1) var huf=Math.ceil(c.eur*RATE/10000)*10000;              -> Ft a bruttóból
+//   2) <span class="peur">'+Math.round(c.eur).toLocaleString(..)+' €'  -> kiírt €
+// Mindkettőt nettóra váltjuk (osztás 1,19-cel). Literál csere, így idempotens:
+// átírás után a régi minta már nem szerepel, újrafuttatva nem duplázódik.
+const HP_PATCHES = [
+  ['var huf=Math.ceil(c.eur*RATE/10000)*10000;',
+   'var huf=Math.ceil(Math.round(c.eur/1.19)*RATE/10000)*10000;'],
+  ['<span class="peur">\'+Math.round(c.eur).toLocaleString(\'hu-HU\')+\' €</span>',
+   '<span class="peur">\'+Math.round(c.eur/1.19).toLocaleString(\'hu-HU\')+\' €</span>'],
+];
 try {
-  const hp = 'dist/index.html';
-  if (fs.existsSync(hp)) {
+  const homes = ['dist/index.html', 'dist/en/index.html'];
+  let touched = 0;
+  for (const hp of homes) {
+    if (!fs.existsSync(hp)) continue;
     let h = fs.readFileSync(hp, 'utf8');
-    const RATE = 364; // build-idejű árfolyam (mint a részletes oldalakon build-kor)
-    const fmt = (n) => n.toLocaleString('hu-HU');
-    let cnt = 0;
-    h = h.replace(/<span class="price">([^<]*?)Ft<\/span>\s*<span class="peur">([^<]*?)€<\/span>/g, (m, ftTxt, eurTxt) => {
-      const grossEur = Number(String(eurTxt).replace(/[^\d]/g, ''));
-      if (!grossEur) return m;
-      const netEur = Math.round(grossEur / 1.19);
-      const netFt = Math.ceil(netEur * RATE / 10000) * 10000;
-      cnt++;
-      return `<span class="price">${fmt(netFt)} Ft</span><span class="peur">${fmt(netEur)} €</span>`;
-    });
-    if (cnt > 0) { fs.writeFileSync(hp, h); console.log('fix-auto: kezdolap ' + cnt + ' ar nettora javitva'); }
-    else { console.log('fix-auto: kezdolap - nincs atirando ar (mar netto vagy nincs kartya)'); }
-  } else {
-    console.log('fix-auto: nincs dist/index.html - kezdolap kihagyva');
+    const before = h;
+    let hits = 0;
+    for (const [find, repl] of HP_PATCHES) {
+      if (h.includes(find)) { h = h.split(find).join(repl); hits++; }
+    }
+    if (h !== before) { fs.writeFileSync(hp, h); touched++; console.log('fix-auto: ' + hp + ' elado kartyak nettora (' + hits + '/' + HP_PATCHES.length + ' minta)'); }
+    else { console.log('fix-auto: ' + hp + ' - nincs atirando (mar netto vagy nincs saleCard)'); }
   }
+  if (!touched) console.log('fix-auto: kezdolap - nem valtozott');
 } catch (e) {
   console.log('fix-auto: FIGYELEM (kezdolap ar) - ' + (e && e.message));
 }
