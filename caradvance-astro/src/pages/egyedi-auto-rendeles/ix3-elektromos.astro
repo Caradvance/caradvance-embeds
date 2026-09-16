@@ -1,0 +1,12 @@
+---
+// BMW iX3 — modell-aloldal (a közös CarDetail sablonból).
+// Tartalom: src/data/carModels.ts → carModels['ix3-elektromos']
+import Base from '../../layouts/Base.astro';
+import CarDetail from '../../components/CarDetail.astro';
+import { carModels } from '../../data/carModels';
+
+const model = carModels['ix3-elektromos'];
+---
+<Base lang="hu" path={`/egyedi-auto-rendeles/${model.slug}`} title={model.title} description={model.description}>
+  <CarDetail model={model} />
+</Base>
