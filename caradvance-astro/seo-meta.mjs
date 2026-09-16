@@ -79,6 +79,7 @@ try {
     'egyedi-auto-rendeles/2eratb-benzin': 'https://www.caradvance.hu/bmw/bmw-2es-active-tourer-og.jpg',
     'egyedi-auto-rendeles/2ergc-benzin': 'https://www.caradvance.hu/bmw/bmw-2es-gran-coupe-og.jpg',
     'egyedi-auto-rendeles/2ercb-benzin': 'https://www.caradvance.hu/bmw/bmw-2es-coupe-og.jpg',
+    'egyedi-auto-rendeles/ix3-elektromos': 'https://www.caradvance.hu/bmw/bmw-ix3-og.jpg',
   };
   for (const [rel, img] of Object.entries(MODELS)) {
     const file = path.join(DIST, rel, 'index.html');
