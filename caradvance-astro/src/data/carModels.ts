@@ -156,7 +156,7 @@ export const carModels: Record<string, CarModel> = {
     netEur: 30882,
     orderKey: '2eratb', orderFuels: 'Benzin,Hibrid,Dízel',
     heroSub: 'Tágas prémium egyterű Németországból — rugalmas utastér, magasabb beülő, digitális belső tér, új autóként, egyedi konfigurációval.',
-    heroVideo: '',
+    heroVideo: '/bmw/2erat-hero.mp4',
     heroPoster: '/bmw/2erat-hero-poster.jpg',
     mainImg: '/bmw/bmw-2es-active-tourer-m-sport-elolnezet.webp',
     mainAlt: 'BMW 2-es Active Tourer M Sport – új autó Németországból, egyedi rendelés',
