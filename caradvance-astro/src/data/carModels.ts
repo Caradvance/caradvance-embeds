@@ -242,7 +242,7 @@ export const carModels: Record<string, CarModel> = {
     orderKey: '2ergc', orderFuels: 'Benzin',
     heroSub: 'Sportos négyajtós coupé Németországból — keret nélküli oldalablakok, M Performance csúcs, digitális belső tér, új autóként, egyedi konfigurációval.',
     heroVideo: '',
-    heroPoster: '/bmw/bmw-2es-gran-coupe-hero.jpg',
+    heroPoster: '/bmw/bmw-2es-gran-coupe-hero.webp',
     mainImg: '/bmw/bmw-2es-gran-coupe-m235-elolnezet.webp',
     mainAlt: 'BMW M235 xDrive Gran Coupé – új autó Németországból, egyedi rendelés',
     chips: ['Gran Coupé', 'Benzin', 'M Performance', 'Automata'],
