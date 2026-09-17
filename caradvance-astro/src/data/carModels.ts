@@ -598,7 +598,7 @@ export const carModels: Record<string, CarModel> = {
       h3: 'Markáns forma, X-tipikus karakter',
       text: 'Az új X3 nagyobb jelenlétet sugároz: nagyvonalú felületek, hosszú oldalvonal, széles hátsó rész és a teljesen újraértelmezett, választhatóan világító veserács. Pontosan úgy konfigurálva, ahogy te szeretnéd — színben, keréktárcsában és felszereltségben.',
       bullets: ['Iconic Glow világító veserács, új dupla fény-szignatúra', 'Adaptív LED fényszórók', '19–21&quot; könnyűfém keréktárcsák, M Sport csomagok'],
-      img: '/bmw/bmw-x3-elol34.webp', alt: 'BMW X3 külső – elölnézet háromnegyedből, új G45 formanyelv',
+      img: '/bmw/bmw-x3-kek-oldal.webp', alt: 'BMW X3 külső – oldalnézet, új G45 formanyelv',
     },
     interior: {
       h3: 'BMW Curved Display, tágas prémium utastér',
@@ -616,15 +616,13 @@ export const carModels: Record<string, CarModel> = {
       ],
     },
     variants: [
-      { key: 'x3-20', label: 'BMW X3 20 xDrive', fuel: 'Benzin (mild-hybrid)', power: '208 LE (153 kW)', torque: '330 Nm', drive: 'xDrive összkerék / 8 fok. aut.', accel: '7,8 mp', vmax: '215 km/h', cons: '~7,6 l/100 km', boot: '570–1700 liter', rec: 'Kulturált, erős benzines belépő', img: '/bmw/bmw-x3-elol34.webp', alt: 'BMW X3 20 xDrive – elölnézet' },
+      { key: 'x3-20', label: 'BMW X3 20 xDrive', fuel: 'Benzin (mild-hybrid)', power: '208 LE (153 kW)', torque: '330 Nm', drive: 'xDrive összkerék / 8 fok. aut.', accel: '7,8 mp', vmax: '215 km/h', cons: '~7,6 l/100 km', boot: '570–1700 liter', rec: 'Kulturált, erős benzines belépő', img: '/bmw/bmw-x3-hero.webp', alt: 'BMW X3 20 xDrive – elölnézet' },
     ],
     gallery: [
       { img: '/bmw/bmw-x3-kek-eleje.webp', alt: 'BMW X3 kék színben, elölnézet a természetben' },
       { img: '/bmw/bmw-x3-kek-offroad.webp', alt: 'BMW X3 kék színben, terepen menet közben' },
-      { img: '/bmw/bmw-x3-kek-oldal.webp', alt: 'BMW X3 kék színben, oldalnézet vízparton' },
       { img: '/bmw/bmw-x3-kek-hatso.webp', alt: 'BMW X3 kék színben, hátsó nézet tóparti úton' },
       { img: '/bmw/bmw-x3-hatso.webp', alt: 'BMW X3 hátsó háromnegyedes nézet' },
-      { img: '/bmw/bmw-x3-studio.webp', alt: 'BMW X3 stúdiófotó, elölnézet háromnegyedből' },
       { img: '/bmw/bmw-x3-veserac.webp', alt: 'BMW X3 Iconic Glow világító veserács' },
       { img: '/bmw/bmw-x3-felni.webp', alt: 'BMW X3 M könnyűfém keréktárcsa, közeli nézet' },
       { img: '/bmw/bmw-x3-kek-panorama.webp', alt: 'BMW X3 panoráma-üvegtető, világos utastér' },
