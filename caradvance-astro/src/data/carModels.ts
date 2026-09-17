@@ -489,7 +489,7 @@ export const carModels: Record<string, CarModel> = {
     netEur: 80462,
     orderKey: 'x5', orderFuels: 'Benzin,Dízel,Plug-in hibrid',
     heroSub: 'Az új, G65 generációs X5 Németországból — xDrive összkerékhajtás, mild-hybrid és plug-in hibrid hajtás, Panoramic Vision, új autóként, egyedi konfigurációval.',
-    heroVideo: '',
+    heroVideo: '/caradvance-hero-x5.mp4',
     heroPoster: '/bmw/bmw-x5-hero.webp',
     mainImg: '/bmw/bmw-x5-hero.webp',
     mainAlt: 'BMW X5 xDrive40 – új generációs prémium SUV Németországból, egyedi rendelés',
