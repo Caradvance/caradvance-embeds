@@ -1,0 +1,12 @@
+---
+// BMW X6 — modell-aloldal (a közös CarDetail sablonból).
+// Tartalom: src/data/carModels.ts → carModels['x6-dizel']
+import Base from '../../layouts/Base.astro';
+import CarDetail from '../../components/CarDetail.astro';
+import { carModels } from '../../data/carModels';
+
+const model = carModels['x6-dizel'];
+---
+<Base lang="hu" path={`/egyedi-auto-rendeles/${model.slug}`} title={model.title} description={model.description}>
+  <CarDetail model={model} />
+</Base>
