@@ -11,39 +11,27 @@ const autoink = localizedPath(lang, '/autoink/');
 // Menu mirrors the real caradvance.hu landing-page header exactly.
 const menu = [
   { label: 'Prémium autóbérlés', items: [
-    { t: 'Bérelhető autóink', href: '/berelheto' }, { t: 'Új autó bérlése', href: '/uj-auto-berlese', sub: [
-      { t: 'BMW', href: '/uj-auto-berlese?brand=bmw', logo: '/bmw/bmw-logo.webp?v=2' },
-      { t: 'MINI', href: '/uj-auto-berlese?brand=mini', logo: '/mini-logo.webp?v=3' },
-      { t: 'Mercedes', href: '/uj-auto-berlese?brand=mercedes', logo: '/mb-star.webp?v=1' },
-      { t: 'Audi', href: '/uj-auto-berlese?brand=audi', logo: '/audi/audi-logo.webp?v=4' },
-    ] },
-    { t: 'Bérlési folyamat', href: '/berlesi-folyamat' }, { t: 'Előnyök', href: '/berles-elonyei' },
-    { t: 'Gyakori kérdések', href: '/berles-gyakori-kerdesek' },
+    { t: 'Bérelhető autóink', href: '/berelheto' }, { t: 'Új autó bérlése', href: '#' },
+    { t: 'Rövid távú bérlés', href: '#' }, { t: 'Hosszú távú bérlés', href: '#' },
+    { t: 'Flotta kezelés', href: '#' }, { t: 'Feltételek', href: '#' },
   ]},
   { label: 'Megvásárolható autóink', items: [
-    { t: 'Autóink', href: autoink },
-    { t: 'Egyedi autó rendelés', href: '/egyedi-auto-rendeles', sub: [
-      { t: 'BMW', href: '/egyedi-auto-rendeles?brand=bmw', logo: '/bmw/bmw-logo.webp?v=2' },
-      { t: 'MINI', href: '/egyedi-auto-rendeles?brand=mini', logo: '/mini-logo.webp?v=3' },
-      { t: 'Mercedes', href: '/egyedi-auto-rendeles?brand=mercedes', logo: '/mb-star.webp?v=1' },
-      { t: 'Audi', href: '/egyedi-auto-rendeles?brand=audi', logo: '/audi/audi-logo.webp?v=4' },
-    ]},
-    { t: 'Finanszírozás – lízing', href: '/finanszirozas-lizing' }, { t: 'Előnyök', href: '/vasarlas-elonyei' },
-    { t: 'Gyakori kérdések', href: '/vasarlas-gyakori-kerdesek' },
+    { t: 'Autóink', href: autoink }, { t: 'Egyedi autó rendelés', href: '#' },
+    { t: 'Finanszírozás – lízing', href: '#' }, { t: 'Előnyök', href: '#' },
   ]},
   { label: 'Bizományos értékesítés', items: [
     { t: 'Bizományos autóink', href: '/bizomanyos' }, { t: 'Eladom az autómat', href: eladom }, { t: 'Jótékonyság', href: jotekonysag },
     { t: 'Értékesítési folyamat', href: '/ertekesitesi-folyamat' }, { t: 'Gyakori kérdések', href: '/gyakori-kerdesek' },
   ]},
   { label: 'Import', items: [
-    { t: 'Autó rendelés', href: '/auto-rendeles' }, { t: 'Beszerzési folyamat', href: '/beszerzesi-folyamat' },
-    { t: 'Előnyök', href: '/elonyok' }, { t: 'Egyedül vagy velünk?', href: '/egyedul-vagy-velunk' },
-    { t: 'Referenciák', href: '#' },
+    { t: 'Autó rendelés', href: '/auto-rendeles' }, { t: 'Beszerzési folyamat', href: '/auto-rendeles#folyamat' },
+    { t: 'Honosítás kalkulátor', href: '/honositas-kalkulator/' },
+    { t: 'Előnyök', href: '#' }, { t: 'Referenciák', href: '#' },
   ]},
   { label: 'Rólunk', items: [
-    { t: 'Miért mi?', href: '/miert-mi' }, { t: 'Caradvance Németország', href: '#' },
+    { t: 'Miért mi?', href: '#' }, { t: 'Caradvance Németország', href: '#' },
     { t: 'Caradvance Magyarország', href: '#' }, { t: 'Referenciák', href: '#' },
-    { t: 'Partnereink', href: '#' }, { t: 'Media', href: '/media' }, { t: 'Blog', href: '/blog' },
+    { t: 'Partnereink', href: '#' }, { t: 'Media', href: '#' }, { t: 'Blog', href: '#' },
   ]},
 ];
 const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
@@ -53,15 +41,12 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
   <ul class="menu">
     {menu.map((m) => (
       <li class="navitem"><button class="navlink" type="button">{m.label}<span class="chev">⌄</span></button><div class="dropdown"><div class="dd-inner">
-        {m.items.map((it) => (it as any).sub
-          ? <div class="ddi-sub"><a class="ddi ddi-parent" href={it.href}>{it.t}<span class="subchev">›</span></a><div class="flyout">{(it as any).sub.map((s: any) => <a class="ddi ddi-brand" href={s.href}><img class="brandlogo" src={s.logo} alt={s.t} width="22" height="22" loading="lazy"/><span>{s.t}</span></a>)}</div></div>
-          : <a class="ddi" href={it.href}>{it.t}</a>
-        )}
+        {m.items.map((it) => <a class="ddi" href={it.href}>{it.t}</a>)}
       </div></div></li>
     ))}
   </ul>
   <div class="navright">
-    <a class="kapcsolat" href="/kapcsolat">Kapcsolat</a>
+    <a class="kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
     <div class="lang"><button class="langbtn" type="button" aria-label="Nyelvváltás"><span class="navflag" style={`background-image:url(${flagUrl(lang)})`}></span><span class="lchev"></span></button><div class="langmenu">
       {localeList.map((loc) => (
         <a class="langopt" href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
@@ -73,13 +58,10 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
 <div class="mobilepanel">
   {menu.map((m) => (
     <div class="m-acc"><button class="m-accbtn" type="button">{m.label}<span class="m-plus">+</span></button><div class="m-sub">
-      {m.items.map((it) => (it as any).sub
-        ? <Fragment><a href={it.href}>{it.t}</a>{(it as any).sub.map((s: any) => <a class="m-subitem" href={s.href}><img class="brandlogo" src={s.logo} alt={s.t} width="20" height="20" loading="lazy"/><span>{s.t}</span></a>)}</Fragment>
-        : <a href={it.href}>{it.t}</a>
-      )}
+      {m.items.map((it) => <a href={it.href}>{it.t}</a>)}
     </div></div>
   ))}
-  <a class="m-kapcsolat" href="/kapcsolat">Kapcsolat</a>
+  <a class="m-kapcsolat" href="mailto:info@caradvance.hu">Kapcsolat</a>
   <div class="m-langtitle">Nyelv</div>
   <div class="m-langs">
     {localeList.map((loc) => (
@@ -88,27 +70,6 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
   </div>
 </div>
 </div>
-
-<style is:global>
-  /* Nested brand submenu under "Egyedi autó rendelés" */
-  .ca-navwrap .dd-inner .ddi-sub{position:relative;}
-  .ca-navwrap .ddi-parent{display:flex;align-items:center;justify-content:space-between;gap:12px;}
-  .ca-navwrap .ddi-parent .subchev{opacity:.55;font-size:1.15em;line-height:1;transform:translateY(-1px);}
-  .ca-navwrap .ddi-sub > .flyout{
-    position:absolute;top:-6px;left:100%;min-width:170px;
-    background:#fff;border:1px solid #e8e8ea;border-radius:12px;
-    box-shadow:0 14px 34px rgba(0,0,0,.14);padding:6px;
-    display:none;z-index:70;
-  }
-  .ca-navwrap .ddi-sub:hover > .flyout,
-  .ca-navwrap .ddi-sub.open > .flyout{display:block;}
-  .ca-navwrap .ddi-sub > .flyout .ddi{white-space:nowrap;}
-  .ca-navwrap .ddi-brand{display:flex;align-items:center;gap:11px;}
-  .ca-navwrap .ddi-brand .brandlogo{width:22px;height:22px;object-fit:contain;flex:0 0 22px;}
-  /* Mobile: brand items indented under the parent */
-  .ca-navwrap .m-sub .m-subitem{display:flex;align-items:center;gap:10px;padding-left:30px;opacity:.85;font-size:.95em;}
-  .ca-navwrap .m-sub .m-subitem .brandlogo{width:20px;height:20px;object-fit:contain;flex:0 0 20px;}
-</style>
 
 <script>
   const wrap = document.querySelector('.ca-navwrap');
@@ -121,15 +82,7 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
         if (!wasOpen) li.classList.add('open');
       });
     });
-    /* nested brand flyout: on touch (no hover), first tap reveals, second tap navigates */
-    wrap.querySelectorAll('.ddi-sub > .ddi-parent').forEach(function(p){
-      p.addEventListener('click', function(e){
-        var sub = p.parentElement;
-        var noHover = window.matchMedia && window.matchMedia('(hover: none)').matches;
-        if (noHover && !sub.classList.contains('open')) { e.preventDefault(); e.stopPropagation(); sub.classList.add('open'); }
-      });
-    });
-    document.addEventListener('click', function(){ wrap.querySelectorAll('.menu .navitem').forEach(function(x){ x.classList.remove('open'); wrap.querySelectorAll('.ddi-sub').forEach(function(s){ s.classList.remove('open'); }); }); });
+    document.addEventListener('click', function(){ wrap.querySelectorAll('.menu .navitem').forEach(function(x){ x.classList.remove('open'); }); });
 
     const burger = wrap.querySelector('.burger');
     burger && burger.addEventListener('click', () => wrap.classList.toggle('open'));
