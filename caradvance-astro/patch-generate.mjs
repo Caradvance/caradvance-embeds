@@ -225,8 +225,9 @@ rep(
   document.querySelectorAll('.autok-panel').forEach(function(p){p.classList.toggle('on',p.id==='panel-'+b.getAttribute('data-tab'));});
   if(location.hash!=='#'+b.getAttribute('data-tab'))history.replaceState(null,'','#'+b.getAttribute('data-tab'));
  });});
- var h=(location.hash||'').replace('#','');
- if(h){var t=tabs.filter(function(x){return x.getAttribute('data-tab')===h;})[0];if(t)t.click();}
+ var goHash=function(scroll){var h=(location.hash||'').replace('#','');if(!h)return;var t=tabs.filter(function(x){return x.getAttribute('data-tab')===h;})[0];if(t){t.click();if(scroll){var el=document.getElementById('autok');if(el)el.scrollIntoView({behavior:'smooth'});}}};
+ goHash(false);
+ window.addEventListener('hashchange',function(){goHash(true);});
 })();
 </script>\`;
   return page({
