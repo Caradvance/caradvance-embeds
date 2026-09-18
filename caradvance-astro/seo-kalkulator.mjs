@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 /**
- * seo-kalkulator.mjs  —  v1  (2026-09-17)
+ * seo-kalkulator.mjs  —  v2  (2026-09-18)
  *
  * Legenerálja a  /honositas-kalkulator/  oldalt a dist/ mappába, egy meglévő
  * oldal fejlécét és láblécét sablonként használva, majd felveszi a sitemap.xml-be.
+ *
+ * v2: a kalkulátor kártya vizuálisan a  /finanszirozas-lizing/  lízingkalkulátor
+ * (".lk") dizájnját követi — fehér, lekerekített kártya, piros "KALKULÁTOR"
+ * kiemelés, bal oldali űrlap, jobb oldali sötét eredménypanel, piros CTA.
+ * A NAV regisztrációs adó számítási logika VÁLTOZATLAN.
  *
  * Adatforrás: NAV "Személygépjármű Regadó kalkulátor 20260101.xlsx" — a tábla
  * változatlanul, kézzel átemelve. A motor a NAV saját példáján ellenőrizve:
@@ -25,158 +30,199 @@ const URL_PATH = '/honositas-kalkulator/';
 const CIM  = 'Honosítás kalkulátor 2026 — regisztrációs adó számítás | CarAdvance';
 const LEIR = 'Számold ki a külföldről behozott autó regisztrációs adóját a NAV 2026-os hivatalos táblájával. Teljesítmény, környezetvédelmi osztály és életkor alapján, azonnal.';
 
-const STILUS = `#ca-kalk{
-  --ink:#14171c; --ink-2:#474e59; --ink-3:#79818d;
-  --ground:#f6f6f4; --panel:#fff; --panel-2:#fbfbfa;
-  --line:#e3e3df; --line-2:#cbcbc5;
-  --accent:#c8102e; --accent-soft:#fdeef0;
-  --good:#1c6b4a; --good-soft:#e6f2ec;
-  --warn:#8a6512; --warn-soft:#faf1da;
-  --mono-bg:#f1f1ee; --field:#fff;
-}
-
-#ca-kalk *{box-sizing:border-box}
-
-#ca-kalk{font-family:inherit;color:var(--ink);max-width:960px;margin:0 auto;padding-block:36px 72px;padding-left:20px;padding-right:20px;display:flex;flex-direction:column;gap:34px}
-#ca-kalk h1, #ca-kalk h2, #ca-kalk h3{font-family:Archivo,system-ui,sans-serif;margin:0;text-wrap:balance}
-#ca-kalk h1{font-size:30px;font-weight:700;letter-spacing:-.02em}
-#ca-kalk h2{font-size:20px;font-weight:600;letter-spacing:-.01em}
-#ca-kalk h3{font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
-#ca-kalk p{margin:0}.lede{color:var(--ink-2);max-width:66ch}
-#ca-kalk .eyebrow{font-family:Archivo,sans-serif;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
-#ca-kalk header{display:flex;flex-direction:column;gap:9px;padding-bottom:22px;border-bottom:2px solid var(--ink)}
-#ca-kalk .sec{display:flex;flex-direction:column;gap:14px}
-#ca-kalk code{font-family:"JetBrains Mono",monospace;font-size:12.5px;background:var(--mono-bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
-
-/* calculator */
-#ca-kalk .calc{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
-@media(max-width:800px){.calc{grid-template-columns:1fr}}
-#ca-kalk .form{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:17px}
-#ca-kalk .fld{display:flex;flex-direction:column;gap:6px}
-#ca-kalk .fld > label{font-family:Archivo,sans-serif;font-size:12.5px;font-weight:600;color:var(--ink)}
-#ca-kalk .fld .hint{font-size:12.5px;color:var(--ink-3)}
-#ca-kalk select, #ca-kalk input[type=number]{width:100%;font:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--line-2);
-  border-radius:8px;background:var(--field);color:var(--ink)}
-#ca-kalk select:focus-visible, #ca-kalk input:focus-visible, #ca-kalk button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-#ca-kalk .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#ca-kalk .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-#ca-kalk .seg{display:flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
-#ca-kalk .seg button{flex:1;font:inherit;font-size:14px;padding:8px 6px;background:var(--field);color:var(--ink-2);border:0;cursor:pointer}
-#ca-kalk .seg button + button{border-left:1px solid var(--line-2)}
-#ca-kalk .seg button[aria-pressed=true]{background:var(--accent);color:#fff;font-weight:600}
-
-#ca-kalk .result{background:var(--panel);border:1.5px solid var(--accent);border-radius:12px;overflow:hidden;position:sticky;top:12px}
-#ca-kalk .result .top{background:var(--accent-soft);padding:17px 20px;border-bottom:1px solid var(--accent);display:flex;flex-direction:column;gap:2px}
-#ca-kalk .result .top .k{font-family:Archivo,sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-#ca-kalk .result .top .v{font-family:"JetBrains Mono",monospace;font-size:30px;font-weight:700;color:var(--accent);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-#ca-kalk .result .body{padding:6px 20px 18px}
-#ca-kalk .result dl{margin:0;display:flex;flex-direction:column}
-#ca-kalk .result .line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
-#ca-kalk .result .line:last-child{border-bottom:0}
-#ca-kalk .result .line dt{color:var(--ink-2)}
-#ca-kalk .result .line dd{margin:0;font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
-#ca-kalk .result .line.strong dt, #ca-kalk .result .line.strong dd{font-weight:700;color:var(--ink)}
-#ca-kalk .badge{display:inline-block;font-family:Archivo,sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.05em;
-  padding:2px 8px;border-radius:999px;background:var(--good-soft);color:var(--good);border:1px solid var(--good);margin-top:6px}
-
-#ca-kalk .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
-#ca-kalk table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
-#ca-kalk th, #ca-kalk td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
-#ca-kalk tbody tr:last-child td{border-bottom:0}
-#ca-kalk th{font-family:Archivo,sans-serif;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:600;background:var(--panel-2)}
-#ca-kalk td.n{text-align:right;font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
-
-#ca-kalk .note{padding:14px 16px;border-radius:9px;background:var(--warn-soft);
-  border:1px solid color-mix(in srgb,var(--warn) 32%,transparent);font-size:14.5px;color:var(--ink)}
-#ca-kalk .note b{font-family:Archivo,sans-serif;color:var(--warn)}
-#ca-kalk .note.todo{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 32%,transparent)}
-#ca-kalk .note.todo b{color:var(--accent)}
-#ca-kalk .faq{display:flex;flex-direction:column;gap:10px}
-#ca-kalk .faq details{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px 16px}
-#ca-kalk .faq summary{font-family:Archivo,sans-serif;font-weight:600;font-size:15px;cursor:pointer}
-#ca-kalk .faq p{margin-top:9px;color:var(--ink-2);font-size:14.5px}
-#ca-kalk .cta{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:9px}
-#ca-kalk .cta .t{font-family:Archivo,sans-serif;font-weight:700;font-size:17px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}`;
-
-const TORZS = `<div class="ca-kalk-fej">
-  <h1>Honosítás kalkulátor 2026 — regisztrációs adó számítás</h1>
-  <p class="lede">Számold ki, mennyi regisztrációs adót kell fizetned egy külföldről behozott
-  személyautó után. A számítás a NAV 2026.01.01-től hatályos adótáblájával dolgozik.</p>
-</div>
-
-
-
-
-<section class="sec">
-  <div class="calc">
-    <div class="form">
-      <div class="fld">
-        <label for="osztaly">Környezetvédelmi osztály</label>
-        <select id="osztaly"></select>
-        <span class="hint">A forgalmi engedély V.9. rovatában találod.</span>
-      </div>
-
-      <div class="fld">
-        <label for="teljesitmeny">Motorteljesítmény</label>
-        <div class="row2">
-          <input type="number" id="teljesitmeny" value="150" min="1" max="2000" step="1" inputmode="numeric">
-          <div class="seg" role="group" aria-label="Mértékegység">
-            <button type="button" id="egysegKw" aria-pressed="true">kW</button>
-            <button type="button" id="egysegLe" aria-pressed="false">LE</button>
-          </div>
-        </div>
-        <span class="hint" id="atvaltas">&nbsp;</span>
-      </div>
-
-      <div class="fld">
-        <label>Milyen autóról van szó?</label>
-        <div class="seg" role="group" aria-label="Új vagy használt">
-          <button type="button" id="hasznaltGomb" aria-pressed="true">Külföldi, használt</button>
-          <button type="button" id="ujGomb" aria-pressed="false">Magyarországon új</button>
-        </div>
-        <span class="hint">Új autónál nincs korkedvezmény: a teljes alapadót kell fizetni.</span>
-      </div>
-
-      <div class="fld" id="korBlokk" hidden>
-        <label>Első forgalomba helyezés (külföldön)</label>
-        <div class="row2">
-          <select id="elsoEv" aria-label="Első forgalomba helyezés éve"></select>
-          <select id="elsoHo" aria-label="Első forgalomba helyezés hónapja"></select>
-        </div>
-      </div>
-
-      <div class="fld" id="regBlokk" hidden>
-        <label>A regisztrációs eljárás kezdete</label>
-        <div class="row2">
-          <select id="regEv" aria-label="Regisztrációs eljárás éve"></select>
-          <select id="regHo" aria-label="Regisztrációs eljárás hónapja"></select>
-        </div>
-        <span class="hint">Amikor a NAV-nál elindul az eljárás — jellemzően a behozatal hónapja.</span>
-      </div>
+// A hero az Import (beszerzési folyamat) oldal heroját tükrözi. A .hero, .scrim,
+// .inner, .partners, .sub, .cta-row, .btn, .scrolldown osztályokat az örökölt
+// globális CSS stílusozza — itt csak a markup és a honosításra szabott szöveg kell.
+const HERO = `<section class="hero">
+  <video autoplay muted loop playsinline poster="/caradvance-hero-beszerzesi-poster.jpg">
+    <source src="/caradvance-hero-beszerzesi.mp4" type="video/mp4">
+  </video>
+  <div class="scrim"></div>
+  <div class="inner">
+    <div class="partners">
+      <img src="/mobile-de.webp" alt="mobile.de" loading="lazy">
+      <img src="/autoscout24.webp" alt="AutoScout24" loading="lazy">
     </div>
-
-    <div class="result">
-      <div class="top">
-        <span class="k">Fizetendő regisztrációs adó</span>
-        <span class="v" id="fizetendo">—</span>
-        <span id="mentesBadge" hidden><span class="badge">Adómentes</span></span>
-      </div>
-      <div class="body">
-        <dl>
-          <div class="line"><dt>Teljesítménysáv</dt><dd id="oSav">—</dd></div>
-          <div class="line"><dt>Alap regisztrációs adó</dt><dd id="oAlap">—</dd></div>
-          <div class="line" id="lineKor"><dt>Eltelt hónapok</dt><dd id="oHonap">—</dd></div>
-          <div class="line" id="lineSzorzo"><dt>Korkedvezmény szorzója</dt><dd id="oSzorzo">—</dd></div>
-          <div class="line" id="lineCsokk"><dt>Adócsökkenés</dt><dd id="oCsokk">—</dd></div>
-          <div class="line strong"><dt>Fizetendő</dt><dd id="oFiz">—</dd></div>
-        </dl>
-      </div>
+    <h1>Honosítás kalkulátor 2026 —<br><span class="accent">regisztrációs adó másodpercek alatt</span></h1>
+    <p class="sub sub-wide">Számold ki a külföldről behozott autó regisztrációs adóját a NAV
+    hivatalos táblájával, majd bízd ránk a teljes honosítást — eredetiségvizsgálat, műszaki,
+    forgalomba helyezés és a teljes papírmunka. Te csak átveszed a magyar forgalmival.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#kalkulator">Adó kiszámítása</a>
+      <a class="btn btn-white" href="/kapcsolat">Kérek segítséget</a>
     </div>
   </div>
-</section>
+  <button class="scrolldown" type="button" onclick="document.getElementById('kalkulator').scrollIntoView({behavior:'smooth'})">Görgess
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  </button>
+</section>`;
 
+const STILUS = `#ca-kalk{
+  --red:#E2001A; --navy:#1a1d23; --ink:#141519; --muted:#5A6B82; --line:#E6EAF1; --good:#1D9E75;
+  color:var(--ink);max-width:1080px;margin:0 auto;padding:28px 20px 72px;
+  display:flex;flex-direction:column;gap:34px;font-family:inherit;
+}
+#ca-kalk *{box-sizing:border-box}
+#ca-kalk p{margin:0}
 
+/* ---- kalkulátor kártya (.lk, a lízingkalkulátorral azonos) ---- */
+#ca-kalk .lk{background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px 28px;box-shadow:0 12px 34px rgba(8,8,10,.06)}
+#ca-kalk .lk-head{margin-bottom:18px}
+#ca-kalk .lk-eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+#ca-kalk .lk-head .lk-title{font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 2px;line-height:1.15;text-wrap:balance}
+#ca-kalk .lk-lead{color:var(--muted);font-size:14.5px;margin:4px 0 0;max-width:70ch}
+
+#ca-kalk .lk-grid{display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start}
+@media(max-width:820px){#ca-kalk .lk-grid{grid-template-columns:1fr;gap:20px}}
+
+#ca-kalk .lk-field{margin-bottom:16px}
+#ca-kalk .lk-field>label{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;color:var(--ink);margin-bottom:8px}
+#ca-kalk .lk-lbl{display:inline-flex;align-items:center;gap:6px}
+#ca-kalk .lk-in{width:100%;min-width:0;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:17px;font-weight:800;color:var(--ink);font-family:inherit;background:#fbfcfe}
+#ca-kalk .lk-in:focus{outline:none;border-color:var(--navy)}
+#ca-kalk select.lk-sel{font-size:15px;font-weight:700;appearance:menulist;cursor:pointer}
+#ca-kalk .lk-gy2{display:flex;gap:10px}
+#ca-kalk .lk-gy2 .lk-in{flex:1 1 0;min-width:0}
+
+#ca-kalk .lk-seg{display:flex;gap:8px;flex-wrap:wrap}
+#ca-kalk .lk-segbtn{flex:1 1 0;min-width:92px;border:1px solid var(--line);background:#fbfcfe;font-family:inherit;font-weight:700;font-size:13px;color:var(--ink);padding:10px 8px;border-radius:12px;cursor:pointer;transition:.15s}
+#ca-kalk .lk-segbtn[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+#ca-kalk .lk-seg-unit{flex:0 0 auto}
+#ca-kalk .lk-seg-unit .lk-segbtn{flex:0 0 auto;min-width:52px;padding:10px 14px}
+#ca-kalk .lk-hint{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:7px}
+
+/* info-buborék */
+#ca-kalk .lk-tip{position:relative;display:inline-flex;align-items:center;line-height:0}
+#ca-kalk .lk-i{width:16px;height:16px;border-radius:50%;border:0;background:#c9d3e2;color:#fff;font:italic 700 11px/16px Georgia,serif;text-align:center;cursor:pointer;padding:0;flex:0 0 auto}
+#ca-kalk .lk-i:hover{background:var(--navy)}
+#ca-kalk .lk-tiptext{position:absolute;top:calc(100% + 9px);left:-4px;z-index:50;width:240px;max-width:72vw;background:#0f1622;color:#fff;font-size:12.5px;font-weight:600;line-height:1.5;padding:10px 12px;border-radius:10px;box-shadow:0 12px 32px rgba(8,12,20,.32);opacity:0;visibility:hidden;transform:translateY(-4px);transition:.14s;pointer-events:none}
+#ca-kalk .lk-tip:hover .lk-tiptext,#ca-kalk .lk-tip.open .lk-tiptext{opacity:1;visibility:visible;transform:none}
+#ca-kalk .lk-tiptext::before{content:"";position:absolute;bottom:100%;left:9px;border:6px solid transparent;border-bottom-color:#0f1622}
+
+/* sötét eredménypanel */
+#ca-kalk .lk-result{background:linear-gradient(#0f1622,#0b0b0d);color:#fff;border-radius:18px;padding:24px 22px;position:sticky;top:90px}
+#ca-kalk .lk-monthly{text-align:center;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.12)}
+#ca-kalk .lk-mlabel{color:#9aa7b8;font-size:13px;font-weight:600}
+#ca-kalk .lk-mval{margin:6px 0 2px}
+#ca-kalk .lk-mnum{font-size:clamp(28px,4.6vw,38px);font-weight:800;letter-spacing:-.02em;color:#fff;font-variant-numeric:tabular-nums}
+#ca-kalk .lk-badge{display:inline-block;margin-top:8px;font-size:11px;font-weight:800;letter-spacing:.04em;padding:3px 10px;border-radius:999px;background:rgba(29,158,117,.16);color:#8fe3b8}
+#ca-kalk .lk-rows{margin:16px 0 14px;display:flex;flex-direction:column}
+#ca-kalk .lk-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13.5px}
+#ca-kalk .lk-row span{color:#c4cddb}
+#ca-kalk .lk-row b{color:#fff;font-weight:800;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ca-kalk .lk-total{border-bottom:0;border-top:1px solid rgba(255,255,255,.18);margin-top:4px;padding-top:12px;font-size:14.5px}
+#ca-kalk .lk-cta{display:block;text-align:center;background:var(--red);color:#fff;font-weight:800;font-size:15px;text-decoration:none;padding:14px;border-radius:12px;transition:.15s;margin-top:2px}
+#ca-kalk .lk-cta:hover{filter:brightness(1.08)}
+#ca-kalk .lk-disc{color:#8b98a9;font-size:11.5px;line-height:1.55;margin:14px 0 0}
+#ca-kalk .lk-disc b{color:#c4cddb}
+
+/* ---- kiegészítő szekciók (tábla, GYIK, CTA) ---- */
+#ca-kalk .sec{display:flex;flex-direction:column;gap:14px}
+#ca-kalk h2{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--ink);text-wrap:balance}
+#ca-kalk .lede{color:var(--muted);font-size:14.5px;max-width:74ch;margin:0}
+#ca-kalk .lede b{color:var(--ink)}
+#ca-kalk .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+#ca-kalk table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+#ca-kalk th,#ca-kalk td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line)}
+#ca-kalk tbody tr:last-child td{border-bottom:0}
+#ca-kalk th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;background:#fbfcfe}
+#ca-kalk td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ca-kalk .faq{display:flex;flex-direction:column;gap:10px}
+#ca-kalk .faq details{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+#ca-kalk .faq summary{font-weight:800;font-size:15px;cursor:pointer;color:var(--ink)}
+#ca-kalk .faq p{margin-top:9px;color:var(--muted);font-size:14.5px}
+#ca-kalk .faq b{color:var(--ink)}
+#ca-kalk .cta{background:linear-gradient(#0f1622,#0b0b0d);color:#fff;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:9px}
+#ca-kalk .cta .t{font-weight:800;font-size:18px}
+#ca-kalk .cta p{color:#c4cddb;font-size:14.5px}
+#ca-kalk .cta b{color:#fff}
+#ca-kalk .foot{color:var(--muted);font-size:12.5px;line-height:1.55}
+@media(prefers-reduced-motion:reduce){#ca-kalk *{animation:none!important;transition:none!important}}`;
+
+const TORZS = `<div class="lk" id="kalkulator">
+  <div class="lk-head">
+    <span class="lk-eyebrow">Kalkulátor</span>
+    <h2 class="lk-title">Regisztrációs adó kalkulátor</h2>
+    <p class="lk-lead">Állítsd be a teljesítményt, a környezetvédelmi osztályt és az autó korát —
+    azonnal megmutatjuk a fizetendő regisztrációs adót a NAV 2026.01.01-től hatályos táblája
+    alapján. Minden módosításkor újraszámol.</p>
+  </div>
+
+  <div class="lk-grid">
+    <div class="lk-inputs">
+      <div class="lk-field">
+        <label><span class="lk-lbl">Környezetvédelmi osztály
+          <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button>
+          <span class="lk-tiptext">A forgalmi engedély V.9. rovatában találod. Az 5E és 5Z (elektromos / nulla emissziós) autók adómentesek.</span></span>
+        </span></label>
+        <select id="osztaly" class="lk-in lk-sel"></select>
+        <span class="lk-hint">A forgalmi engedély V.9. rovatában találod.</span>
+      </div>
+
+      <div class="lk-field">
+        <label><span class="lk-lbl">Motorteljesítmény
+          <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button>
+          <span class="lk-tiptext">A motor névleges teljesítménye. kW-ban és lóerőben is megadhatod — a kalkulátor automatikusan átváltja.</span></span>
+        </span></label>
+        <div class="lk-gy2">
+          <input type="number" id="teljesitmeny" class="lk-in" value="150" min="1" max="2000" step="1" inputmode="numeric">
+          <div class="lk-seg lk-seg-unit" role="group" aria-label="Mértékegység">
+            <button type="button" class="lk-segbtn" id="egysegKw" aria-pressed="true">kW</button>
+            <button type="button" class="lk-segbtn" id="egysegLe" aria-pressed="false">LE</button>
+          </div>
+        </div>
+        <span class="lk-hint" id="atvaltas">&nbsp;</span>
+      </div>
+
+      <div class="lk-field">
+        <label><span class="lk-lbl">Milyen autóról van szó?</span></label>
+        <div class="lk-seg" role="group" aria-label="Új vagy használt">
+          <button type="button" class="lk-segbtn" id="hasznaltGomb" aria-pressed="true">Külföldi, használt</button>
+          <button type="button" class="lk-segbtn" id="ujGomb" aria-pressed="false">Magyarországon új</button>
+        </div>
+        <span class="lk-hint">Új autónál nincs korkedvezmény: a teljes alapadót kell fizetni.</span>
+      </div>
+
+      <div class="lk-field" id="korBlokk" hidden>
+        <label><span class="lk-lbl">Első forgalomba helyezés (külföldön)</span></label>
+        <div class="lk-gy2">
+          <select id="elsoEv" class="lk-in lk-sel" aria-label="Első forgalomba helyezés éve"></select>
+          <select id="elsoHo" class="lk-in lk-sel" aria-label="Első forgalomba helyezés hónapja"></select>
+        </div>
+      </div>
+
+      <div class="lk-field" id="regBlokk" hidden>
+        <label><span class="lk-lbl">A regisztrációs eljárás kezdete
+          <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button>
+          <span class="lk-tiptext">Amikor a NAV-nál elindul az eljárás — jellemzően a behozatal hónapja.</span></span>
+        </span></label>
+        <div class="lk-gy2">
+          <select id="regEv" class="lk-in lk-sel" aria-label="Regisztrációs eljárás éve"></select>
+          <select id="regHo" class="lk-in lk-sel" aria-label="Regisztrációs eljárás hónapja"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="lk-result">
+      <div class="lk-monthly">
+        <span class="lk-mlabel">Fizetendő regisztrációs adó</span>
+        <div class="lk-mval"><span class="lk-mnum" id="fizetendo">—</span></div>
+        <span id="mentesBadge" hidden><span class="lk-badge">Adómentes</span></span>
+      </div>
+      <div class="lk-rows">
+        <div class="lk-row"><span>Teljesítménysáv</span><b id="oSav">—</b></div>
+        <div class="lk-row"><span>Alap regisztrációs adó</span><b id="oAlap">—</b></div>
+        <div class="lk-row" id="lineKor"><span>Eltelt hónapok</span><b id="oHonap">—</b></div>
+        <div class="lk-row" id="lineSzorzo"><span>Korkedvezmény szorzója</span><b id="oSzorzo">—</b></div>
+        <div class="lk-row" id="lineCsokk"><span>Adócsökkenés</span><b id="oCsokk">—</b></div>
+        <div class="lk-row lk-total"><span>Fizetendő</span><b id="oFiz">—</b></div>
+      </div>
+      <a class="lk-cta" href="/kapcsolat">Kérek segítséget a honosításban →</a>
+      <p class="lk-disc"><b>A kalkulátor tájékoztató jellegű.</b> A fizetendő adót minden esetben
+      a NAV állapítja meg az eljárás során. Adótábla forrása: NAV, 2026.01.01.</p>
+    </div>
+  </div>
+</div>
 
 <section class="sec">
   <h2>A hivatalos adótábla</h2>
@@ -236,12 +282,12 @@ const TORZS = `<div class="ca-kalk-fej">
 <section class="sec">
   <div class="cta">
     <div class="t">Ennyibe kerül, ha egyedül csinálod</div>
-    <p class="lede">A CarAdvance-nél a keresés, az alku, a szállítás és a teljes honosítási
+    <p>A CarAdvance-nél a keresés, az alku, a szállítás és a teljes honosítási
     ügyintézés egy csomagban van — az autót a nevedre írt magyar forgalmival adjuk át.
     23 éve hozunk prémium autókat Németországból.</p>
-    <p class="lede"><b>+36 30 233 6060</b> · info@caradvance.hu</p>
+    <p><b>+36 30 233 6060</b> · info@caradvance.hu</p>
   </div>
-  <p class="lede" style="font-size:13.5px">A kalkulátor tájékoztató jellegű. A fizetendő adót
+  <p class="foot">A kalkulátor tájékoztató jellegű. A fizetendő adót
   minden esetben a NAV állapítja meg az eljárás során. Adótábla forrása: NAV, 2026.01.01.</p>
 </section>
 
@@ -300,6 +346,17 @@ function init(){
   $('hasznaltGomb').onclick=()=>{ujAuto=false;szinkronUj();};
   ['osztaly','teljesitmeny','elsoEv','elsoHo','regEv','regHo'].forEach(id=>{
     $(id).addEventListener('input',szamol); $(id).addEventListener('change',szamol);});
+
+  /* info-buborékok érintésre (mobil) */
+  document.querySelectorAll('#ca-kalk .lk-i').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();
+      var t=b.closest('.lk-tip');
+      document.querySelectorAll('#ca-kalk .lk-tip.open').forEach(function(x){if(x!==t)x.classList.remove('open');});
+      t.classList.toggle('open');});
+  });
+  document.addEventListener('click',function(){
+    document.querySelectorAll('#ca-kalk .lk-tip.open').forEach(function(x){x.classList.remove('open');});});
+
   szinkronEgyseg(); szinkronUj();
 }
 function szinkronEgyseg(){
@@ -318,7 +375,7 @@ function szamol(){
   const kw=egysegKw?nyers:nyers*LE_KW;
   $('atvaltas').textContent = nyers>0
     ? (egysegKw ? \`\${Math.round(nyers/LE_KW)} lóerő\` : \`\${Math.round(kw)} kW\`)
-    : ' ';
+    : ' ';
   const kod=parseInt($('osztaly').value,10);
   const i=kwSav(kw);
   $('oSav').textContent=KW_SAVOK[i].cimke;
@@ -420,7 +477,7 @@ async function fut() {
   fej = fej.replace('</head>', `<style>${STILUS}</style>\n${JSONLD}\n</head>`);
 
   // ---- oldal összerakása -------------------------------------------------
-  const oldal = fej + elo + `\n<div id="ca-kalk">\n${TORZS}\n</div>\n<script>${SZKRIPT}<\/script>\n` + uto;
+  const oldal = fej + elo + `\n${HERO}\n<div id="ca-kalk">\n${TORZS}\n</div>\n<script>${SZKRIPT}<\/script>\n` + uto;
 
   await mkdir(path.dirname(KIMENET), { recursive: true });
   await writeFile(KIMENET, oldal, 'utf8');
