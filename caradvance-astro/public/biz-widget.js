@@ -1,3 +1,28 @@
+// Gallery fallback (CarAdvance): on /auto/<slug>/ pages where the inline
+// ca_go gallery script is missing (e.g. manually-built consignment pages),
+// wire the thumbnail strip to the main image. Defines ca_go/ca_step/CAG only
+// if they are not already present, so generated pages are never affected.
+(function () {
+  function wireGallery() {
+    if (typeof window.ca_go === 'function') return;
+    var stg = document.getElementById('stg'), thumbs = document.getElementById('thumbs');
+    if (!stg || !thumbs) return;
+    var imgs = [].slice.call(thumbs.querySelectorAll('img'));
+    if (!imgs.length) return;
+    var CAG = imgs.map(function (im) { return im.getAttribute('src'); }), CI = 0;
+    window.CAG = CAG;
+    window.ca_go = function (i) {
+      CI = (i + CAG.length) % CAG.length;
+      stg.src = CAG[CI];
+      var c = document.getElementById('cidx'); if (c) c.textContent = CI + 1;
+      imgs.forEach(function (im, j) { im.className = j === CI ? 'active' : ''; });
+    };
+    window.ca_step = function (d) { window.ca_go(CI + d); };
+  }
+  if (document.readyState !== 'loading') wireGallery();
+  else document.addEventListener('DOMContentLoaded', wireGallery);
+})();
+
 // Injects a compact "supported cause" (seller 15% + buyer 15%) widget into the
 // right-hand column of a /auto/<slug>/ car page, IF the car is in the bizományos list.
 (function () {
