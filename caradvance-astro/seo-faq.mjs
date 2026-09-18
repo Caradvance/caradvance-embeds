@@ -33,15 +33,10 @@ details>summary{list-style:none!important;cursor:pointer;display:flex!important;
   color:#141519!important;background:transparent!important;border:0!important;}
 details>summary::-webkit-details-marker{display:none!important;}
 details>summary::marker{content:""!important;font-size:0!important;}
-/* meglévő, oldalankénti ikon-elemek elrejtése (nehogy dupla ikon legyen) */
-details>summary svg,
-details>summary img,
-details>summary .cd-plus,
-details>summary [class*="plus"],
-details>summary [class*="chev"],
-details>summary [class*="arrow"],
-details>summary [class*="icon"],
-details>summary [class*="toggle"]{display:none!important;}
+/* meglévő, oldalankénti ikon-elemek elrejtése (nehogy dupla ikon legyen).
+   A kérdés szövege minden változatban közvetlen szöveg-csomópont (nincs elembe
+   csomagolva), ezért a summary MINDEN elem-gyereke ikon/dekoráció -> elrejtjük. */
+details>summary>*{display:none!important;}
 /* egységes piros + ikon, ami nyitáskor ×-re fordul */
 details>summary::after{content:"+"!important;flex:0 0 auto;width:26px;height:26px;
   line-height:26px!important;text-align:center;border-radius:50%;background:#E2001A!important;
