@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "node prebuild.mjs && node fix-pages.mjs && astro build && node fix-home.mjs && node golive.mjs && node seo-copy.mjs && node seo-cars.mjs && node seo-meta.mjs && node seo-hreflang.mjs && node seo-h1.mjs && node seo-egyedi.mjs && node seo-hero.mjs && node fix-auto-photos.mjs",
+    "build": "node prebuild.mjs && node fix-pages.mjs && astro build && node fix-home.mjs && node golive.mjs && node seo-copy.mjs && node seo-cars.mjs && node seo-meta.mjs && node seo-hreflang.mjs && node seo-h1.mjs && node seo-egyedi.mjs && node seo-hero.mjs && node fix-auto-photos.mjs && node seo-kalkulator.mjs && node seo-canonical.mjs",
     "preview": "astro preview"
   },
   "dependencies": {
