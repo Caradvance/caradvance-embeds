@@ -125,9 +125,9 @@ const STILUS = `#ca-kalk{
 #ca-kalk table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
 #ca-kalk th,#ca-kalk td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
 #ca-kalk tbody tr:last-child td{border-bottom:0}
-#ca-kalk th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#fff;font-weight:800;background:var(--navy);border-bottom:0;white-space:nowrap}
-#ca-kalk th.n{text-align:right}
-#ca-kalk td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#ca-kalk th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#fff;font-weight:800;background:var(--navy);border-bottom:0}
+#ca-kalk th.n{text-align:center}
+#ca-kalk td.n{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
 #ca-kalk tbody tr:nth-child(even) td{background:#fbfcfe}
 #ca-kalk .faq{display:flex;flex-direction:column;gap:10px}
 #ca-kalk .faq details{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
