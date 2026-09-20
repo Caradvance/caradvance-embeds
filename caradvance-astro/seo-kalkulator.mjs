@@ -287,6 +287,7 @@ const TORZS = `<div class="lk" id="kalkulator">
     <p>A CarAdvance-nél a keresés, az alku, a szállítás és a teljes honosítási
     ügyintézés egy csomagban van — az autót a nevedre írt magyar forgalmival adjuk át.
     23 éve hozunk prémium autókat Németországból.</p>
+    <p>A behozott autó nevedre írásának költségét az <a href="/atiras-kalkulator/" style="color:#fff;text-decoration:underline">átírás kalkulátorral</a> tudod megbecsülni.</p>
     <p><b>+36 30 233 6060</b> · info@caradvance.hu</p>
   </div>
   <p class="foot">A kalkulátor tájékoztató jellegű. A fizetendő adót

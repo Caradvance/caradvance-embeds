@@ -229,6 +229,35 @@ const TORZS = `<div class="lk" id="kalkulator">
 </section>
 
 <section class="sec">
+  <h2>Hogyan zajlik a gépjármű átírás 2026-ban?</h2>
+  <p class="lede">A használt autó tulajdonjogának átírása néhány jól követhető lépésből áll. A vevőnek
+  a birtokbavételtől — az adásvételi szerződés keltétől — számított <b>15 napon belül</b> kell
+  kezdeményeznie az átírást a kormányablakban; a határidő elmulasztása bírságot vonhat maga után.
+  Az eladó ezzel párhuzamosan <b>8 napon belül</b> bejelenti az adásvételt, így mentesül a jármű
+  utáni későbbi kötelezettségek alól.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Lépés</th><th>Mi történik?</th></tr></thead>
+      <tbody>
+        <tr><td>1. Adásvételi szerződés</td><td>Két, teljes bizonyító erejű magánokiratba foglalt példány, az eladó és a vevő adataival, a jármű azonosítóival és a vételárral.</td></tr>
+        <tr><td>2. Eredetiségvizsgálat</td><td>A vevő nevére, vizsgálóállomáson — az átírás előfeltétele. Díja személygépkocsira 24 975 Ft (kategóriától függően eltérhet).</td></tr>
+        <tr><td>3. Kötelező biztosítás</td><td>A vevő a tulajdonszerzés napjától köteles kötelező gépjármű-felelősségbiztosítást (KGFB) kötni.</td></tr>
+        <tr><td>4. Átírás a kormányablakban</td><td>A vagyonszerzési illeték és az okmánydíjak megfizetése után kiállítják az új forgalmi engedélyt és a törzskönyvet a vevő nevére.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="lede">Az átíráshoz általában szükséges: az <b>adásvételi szerződés</b>, az eladó és a vevő
+  <b>személyazonosító okmányai és lakcímkártyája</b>, az érvényes <b>eredetiségvizsgálati határozat</b>,
+  az érvényes <b>műszaki vizsga</b> (forgalmi engedély), valamint a <b>kötelező biztosítás</b> megléte.
+  Ha nem személyesen jársz el, <b>meghatalmazás</b> is kell. Az ügyet bármelyik kormányablakban
+  vagy okmányirodában elintézheted.</p>
+  <p class="lede">Külföldről — például Németországból — behozott autónál az átírást megelőzi a
+  <b>honosítás</b>: a regisztrációs adó megfizetése, a honosítási műszaki vizsga és a forgalomba
+  helyezés. A várható regisztrációs adót a <a href="/honositas-kalkulator/">honosítás kalkulátorral</a>
+  tudod kiszámolni, a teljes ügyintézést pedig a CarAdvance kulcsrakészen elvégzi helyetted.</p>
+</section>
+
+<section class="sec">
   <h2>Gyakori kérdések</h2>
   <div class="faq">
     <details><summary>Mennyi egy 110 kW-os, 8 évnél idősebb autó átírása?</summary>
