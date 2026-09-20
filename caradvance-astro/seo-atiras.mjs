@@ -127,10 +127,6 @@ const HERO = `<section class="hero">
   </video>
   <div class="scrim"></div>
   <div class="inner">
-    <div class="partners" style="display:flex;gap:18px;align-items:center;justify-content:center;margin-bottom:26px">
-      <img src="/mobile-de.webp" alt="mobile.de" loading="lazy" style="height:34px;width:auto">
-      <img src="/autoscout24.webp" alt="AutoScout24" loading="lazy" style="height:34px;width:auto">
-    </div>
     <h1>Átírás kalkulátor 2026 —<br><span class="accent">a teljes átírási költség egy perc alatt</span></h1>
     <p class="sub sub-wide">Számold ki a használt autó átírásának teljes költségét: vagyonszerzési
     illeték a NAV kW- és életkor-táblája alapján, plusz eredetiségvizsgálat és okmánydíjak.

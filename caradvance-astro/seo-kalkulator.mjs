@@ -39,10 +39,6 @@ const HERO = `<section class="hero">
   </video>
   <div class="scrim"></div>
   <div class="inner">
-    <div class="partners" style="display:flex;gap:18px;align-items:center;justify-content:center;margin-bottom:26px">
-      <img src="/mobile-de.webp" alt="mobile.de" loading="lazy" style="height:34px;width:auto">
-      <img src="/autoscout24.webp" alt="AutoScout24" loading="lazy" style="height:34px;width:auto">
-    </div>
     <h1>Honosítás kalkulátor 2026 —<br><span class="accent">regisztrációs adó másodpercek alatt</span></h1>
     <p class="sub sub-wide">Számold ki a külföldről behozott autó regisztrációs adóját a NAV
     hivatalos táblájával, majd bízd ránk a teljes honosítást — eredetiségvizsgálat, műszaki,
