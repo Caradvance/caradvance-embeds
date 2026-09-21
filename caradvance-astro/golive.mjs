@@ -14,9 +14,9 @@
 //
 // MIT TESZ
 // 1. minden dist/**/index.html-bol kiszedi a kaput es a noindex,nofollow-t
-// 2. a duplikalt nyelvi utvonalakra (cs,de,fr,pl,sk,uk,zh - magyar tartalom
-//    idegen lang koddal) noindex,follow-t tesz, hogy ne duplikaljak a fooldalt
-//    (/en/ marad indexelheto: az valodi angol forditas)
+// 2. a duplikalt nyelvi utvonalakra (en,cs,de,fr,pl,sk,uk,zh - meg leforditatlan
+//    tartalom idegen lang koddal) noindex,follow-t tesz, hogy ne duplikaljak a fooldalt
+//    (minden nem-magyar nyelv: a forditasok meg nem keszek -> noindex)
 // 3. kiirja a sitemap.xml-t es a robots.txt-t
 //
 // BIZTONSAG
@@ -28,7 +28,7 @@ import path from 'node:path';
 const DIST = 'dist';
 const SITE = (process.env.SITE_BASE || 'https://www.caradvance.hu').replace(/\/+$/, '');
 // Magyar tartalom idegen nyelvi kod alatt -> duplikatum, nem indexelheto.
-const DUP_LANGS = ['cs', 'de', 'fr', 'pl', 'sk', 'uk', 'zh'];
+const DUP_LANGS = ['en', 'cs', 'de', 'fr', 'pl', 'sk', 'uk', 'zh'];
 
 // Nem nyilvanos / nem indexelheto utvonalak. A kapu eddig ezeket is takarta,
 // elesites utan viszont a Google-nek sem a belso iranyitopult, sem az egyedi
