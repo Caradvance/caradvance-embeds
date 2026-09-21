@@ -251,6 +251,33 @@ const TORZS = `<div class="lk" id="kalkulator">
 </section>
 
 <section class="sec">
+  <h2>Hogyan zajlik egy külföldi autó honosítása?</h2>
+  <p class="lede">Amikor külföldről — jellemzően Németországból — behozott autót helyezel forgalomba
+  Magyarországon, a regisztrációs adó csak az egyik tétel a folyamatban. A honosítás néhány jól
+  követhető lépésből áll, a végén magyar forgalmival és rendszámmal.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Lépés</th><th>Mi történik?</th></tr></thead>
+      <tbody>
+        <tr><td>1. Eredetiségvizsgálat</td><td>A jármű azonosítóinak (alvázszám, motor) ellenőrzése vizsgálóállomáson — a forgalomba helyezés előfeltétele.</td></tr>
+        <tr><td>2. Honosítási műszaki vizsga</td><td>A jármű megfelelőségének ellenőrzése a magyar előírások szerint; a külföldi okmányok alapján készül a magyar műszaki adatlap.</td></tr>
+        <tr><td>3. Regisztrációs adó</td><td>A NAV veti ki a motor teljesítménye, a környezetvédelmi osztály és az autó életkora alapján — ezt számolja ki a fenti kalkulátor. Befizetése a forgalomba helyezés feltétele.</td></tr>
+        <tr><td>4. Forgalomba helyezés</td><td>A kormányablakban kiállítják a magyar forgalmi engedélyt, a törzskönyvet és a rendszámot.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="lede">A regisztrációs adó mértékét három tényező határozza meg: a motor <b>kW-ban</b>
+  kifejezett teljesítménye, a jármű <b>környezetvédelmi osztálya</b> (a forgalmi engedély V.9.
+  rovata), és az autó <b>életkora</b> — minél idősebb, annál nagyobb a korkedvezmény. A tisztán
+  elektromos (5E) és a nulla emissziós (5Z) autók, valamint a muzeális járművek <b>adómentesek</b>.</p>
+  <p class="lede">EU-s, különbözeti adózással vásárolt használt autónál magyar áfa jellemzően nem
+  merül fel; a hat hónapnál fiatalabb vagy 6 000 km-nél kevesebbet futott autó viszont új járműnek
+  minősül. A forgalomba helyezés után a tulajdonjog átírásának költségét az
+  <a href="/atiras-kalkulator/">átírás kalkulátorral</a> tudod kiszámolni — a teljes ügyintézést
+  pedig a CarAdvance kulcsrakészen elvégzi helyetted.</p>
+</section>
+
+<section class="sec">
   <h2>Gyakori kérdések</h2>
   <div class="faq">
     <details><summary>Mennyi a regisztrációs adó egy 2019-es, 150 kW-os dízelre?</summary>
