@@ -135,6 +135,26 @@ const STILUS = `#ca-kalk{
 #ca-kalk .cta p{color:#c4cddb;font-size:14.5px}
 #ca-kalk .cta b{color:#fff}
 #ca-kalk .foot{color:var(--muted);font-size:12.5px;line-height:1.55}
+/* ---- folyamat lépések + "Jó tudni" (finanszírozás/egyedi stílus) ---- */
+#ca-kalk .ca-proc{text-align:center}
+#ca-kalk .ca-eyebrow{display:inline-block;background:#fbe9ec;color:var(--red);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:8px 16px;border-radius:999px}
+#ca-kalk .ca-sectitle{font-size:clamp(26px,3.4vw,38px);line-height:1.1;font-weight:800;letter-spacing:-.02em;margin:14px 0 10px;color:var(--ink);text-wrap:balance}
+#ca-kalk .ca-secintro{color:var(--muted);font-size:15.5px;line-height:1.6;max-width:640px;margin:0 auto}
+#ca-kalk .ca-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;text-align:left}
+@media(max-width:820px){#ca-kalk .ca-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){#ca-kalk .ca-steps{grid-template-columns:1fr}}
+#ca-kalk .ca-step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(8,8,10,.04)}
+#ca-kalk .ca-sn{width:38px;height:38px;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+#ca-kalk .ca-step:last-child .ca-sn{background:var(--red)}
+#ca-kalk .ca-step h3{font-size:16px;font-weight:800;color:var(--ink);margin:0 0 6px}
+#ca-kalk .ca-step p{color:var(--muted);font-size:13.5px;line-height:1.55;margin:0}
+#ca-kalk .ca-jt{max-width:900px;margin:0 auto}
+#ca-kalk .ca-jt .ca-eyebrow2{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+#ca-kalk .ca-jt h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 14px}
+#ca-kalk .ca-jt p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 14px;max-width:none}
+#ca-kalk .ca-jt strong{color:var(--ink)}
+#ca-kalk .ca-jt .kw{color:var(--red);font-weight:700}
+#ca-kalk .ca-jt a{color:var(--red);font-weight:700}
 @media(prefers-reduced-motion:reduce){#ca-kalk *{animation:none!important;transition:none!important}}`;
 
 const TORZS = `<div class="lk" id="kalkulator">
@@ -250,31 +270,34 @@ const TORZS = `<div class="lk" id="kalkulator">
   </div>
 </section>
 
-<section class="sec">
-  <h2>Hogyan zajlik egy külföldi autó honosítása?</h2>
-  <p class="lede">Amikor külföldről — jellemzően Németországból — behozott autót helyezel forgalomba
-  Magyarországon, a regisztrációs adó csak az egyik tétel a folyamatban. A honosítás néhány jól
-  követhető lépésből áll, a végén magyar forgalmival és rendszámmal.</p>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>Lépés</th><th>Mi történik?</th></tr></thead>
-      <tbody>
-        <tr><td>1. Eredetiségvizsgálat</td><td>A jármű azonosítóinak (alvázszám, motor) ellenőrzése vizsgálóállomáson — a forgalomba helyezés előfeltétele.</td></tr>
-        <tr><td>2. Honosítási műszaki vizsga</td><td>A jármű megfelelőségének ellenőrzése a magyar előírások szerint; a külföldi okmányok alapján készül a magyar műszaki adatlap.</td></tr>
-        <tr><td>3. Regisztrációs adó</td><td>A NAV veti ki a motor teljesítménye, a környezetvédelmi osztály és az autó életkora alapján — ezt számolja ki a fenti kalkulátor. Befizetése a forgalomba helyezés feltétele.</td></tr>
-        <tr><td>4. Forgalomba helyezés</td><td>A kormányablakban kiállítják a magyar forgalmi engedélyt, a törzskönyvet és a rendszámot.</td></tr>
-      </tbody>
-    </table>
+<section class="ca-proc">
+  <span class="ca-eyebrow">Hogyan zajlik?</span>
+  <h2 class="ca-sectitle">Négy lépés egy külföldi autó honosításáig</h2>
+  <p class="ca-secintro">A külföldről behozott autó forgalomba helyezése néhány jól követhető
+  lépésből áll — a végén magyar forgalmival és rendszámmal.</p>
+  <div class="ca-steps">
+    <div class="ca-step"><div class="ca-sn">1</div><h3>Eredetiségvizsgálat</h3><p>A jármű azonosítóinak (alvázszám, motor) ellenőrzése vizsgálóállomáson — a forgalomba helyezés előfeltétele.</p></div>
+    <div class="ca-step"><div class="ca-sn">2</div><h3>Honosítási műszaki vizsga</h3><p>A jármű megfelelőségének ellenőrzése a magyar előírások szerint; elkészül a magyar műszaki adatlap.</p></div>
+    <div class="ca-step"><div class="ca-sn">3</div><h3>Regisztrációs adó</h3><p>A NAV veti ki teljesítmény, környezetvédelmi osztály és életkor alapján — ezt számolja ki a fenti kalkulátor.</p></div>
+    <div class="ca-step"><div class="ca-sn">4</div><h3>Forgalomba helyezés</h3><p>A kormányablakban kiállítják a magyar forgalmi engedélyt, a törzskönyvet és a rendszámot.</p></div>
   </div>
-  <p class="lede">A regisztrációs adó mértékét három tényező határozza meg: a motor <b>kW-ban</b>
-  kifejezett teljesítménye, a jármű <b>környezetvédelmi osztálya</b> (a forgalmi engedély V.9.
-  rovata), és az autó <b>életkora</b> — minél idősebb, annál nagyobb a korkedvezmény. A tisztán
-  elektromos (5E) és a nulla emissziós (5Z) autók, valamint a muzeális járművek <b>adómentesek</b>.</p>
-  <p class="lede">EU-s, különbözeti adózással vásárolt használt autónál magyar áfa jellemzően nem
-  merül fel; a hat hónapnál fiatalabb vagy 6 000 km-nél kevesebbet futott autó viszont új járműnek
-  minősül. A forgalomba helyezés után a tulajdonjog átírásának költségét az
-  <a href="/atiras-kalkulator/">átírás kalkulátorral</a> tudod kiszámolni — a teljes ügyintézést
-  pedig a CarAdvance kulcsrakészen elvégzi helyetted.</p>
+</section>
+
+<section>
+  <div class="ca-jt">
+    <span class="ca-eyebrow2">Jó tudni</span>
+    <h2>Mitől függ a regisztrációs adó?</h2>
+    <p>A regisztrációs adó mértékét három tényező határozza meg: a motor <span class="kw">kW-ban</span>
+    kifejezett teljesítménye, a jármű <strong>környezetvédelmi osztálya</strong> (a forgalmi engedély
+    V.9. rovata), és az autó <strong>életkora</strong> — minél idősebb, annál nagyobb a korkedvezmény.
+    A tisztán elektromos (5E) és a nulla emissziós (5Z) autók, valamint a muzeális járművek
+    <span class="kw">adómentesek</span>.</p>
+    <p>EU-s, különbözeti adózással vásárolt használt autónál magyar áfa jellemzően nem merül fel; a
+    hat hónapnál fiatalabb vagy 6 000 km-nél kevesebbet futott autó viszont új járműnek minősül. A
+    forgalomba helyezés után a tulajdonjog átírásának költségét az
+    <a href="/atiras-kalkulator/">átírás kalkulátorral</a> tudod kiszámolni — a teljes ügyintézést
+    pedig a CarAdvance kulcsrakészen elvégzi helyetted.</p>
+  </div>
 </section>
 
 <section class="sec">

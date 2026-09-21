@@ -119,6 +119,26 @@ const STILUS = `#ca-kalk{
 #ca-kalk .cta p{color:#c4cddb;font-size:14.5px}
 #ca-kalk .cta b{color:#fff}
 #ca-kalk .foot{color:var(--muted);font-size:12.5px;line-height:1.55}
+/* ---- folyamat lépések + "Jó tudni" (finanszírozás/egyedi stílus) ---- */
+#ca-kalk .ca-proc{text-align:center}
+#ca-kalk .ca-eyebrow{display:inline-block;background:#fbe9ec;color:var(--red);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:8px 16px;border-radius:999px}
+#ca-kalk .ca-sectitle{font-size:clamp(26px,3.4vw,38px);line-height:1.1;font-weight:800;letter-spacing:-.02em;margin:14px 0 10px;color:var(--ink);text-wrap:balance}
+#ca-kalk .ca-secintro{color:var(--muted);font-size:15.5px;line-height:1.6;max-width:640px;margin:0 auto}
+#ca-kalk .ca-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;text-align:left}
+@media(max-width:820px){#ca-kalk .ca-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){#ca-kalk .ca-steps{grid-template-columns:1fr}}
+#ca-kalk .ca-step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(8,8,10,.04)}
+#ca-kalk .ca-sn{width:38px;height:38px;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+#ca-kalk .ca-step:last-child .ca-sn{background:var(--red)}
+#ca-kalk .ca-step h3{font-size:16px;font-weight:800;color:var(--ink);margin:0 0 6px}
+#ca-kalk .ca-step p{color:var(--muted);font-size:13.5px;line-height:1.55;margin:0}
+#ca-kalk .ca-jt{max-width:900px;margin:0 auto}
+#ca-kalk .ca-jt .ca-eyebrow2{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+#ca-kalk .ca-jt h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:6px 0 14px}
+#ca-kalk .ca-jt p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 14px;max-width:none}
+#ca-kalk .ca-jt strong{color:var(--ink)}
+#ca-kalk .ca-jt .kw{color:var(--red);font-weight:700}
+#ca-kalk .ca-jt a{color:var(--red);font-weight:700}
 @media(prefers-reduced-motion:reduce){#ca-kalk *{animation:none!important;transition:none!important}}`;
 
 const HERO = `<section class="hero">
@@ -224,33 +244,38 @@ const TORZS = `<div class="lk" id="kalkulator">
   A rendszám átíráskor a járművön marad, így általában nincs új rendszámtábla-díj.</p>
 </section>
 
-<section class="sec">
-  <h2>Hogyan zajlik a gépjármű átírás 2026-ban?</h2>
-  <p class="lede">A használt autó tulajdonjogának átírása néhány jól követhető lépésből áll. A vevőnek
-  a birtokbavételtől — az adásvételi szerződés keltétől — számított <b>15 napon belül</b> kell
-  kezdeményeznie az átírást a kormányablakban; a határidő elmulasztása bírságot vonhat maga után.
-  Az eladó ezzel párhuzamosan <b>8 napon belül</b> bejelenti az adásvételt, így mentesül a jármű
-  utáni későbbi kötelezettségek alól.</p>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>Lépés</th><th>Mi történik?</th></tr></thead>
-      <tbody>
-        <tr><td>1. Adásvételi szerződés</td><td>Két, teljes bizonyító erejű magánokiratba foglalt példány, az eladó és a vevő adataival, a jármű azonosítóival és a vételárral.</td></tr>
-        <tr><td>2. Eredetiségvizsgálat</td><td>A vevő nevére, vizsgálóállomáson — az átírás előfeltétele. Díja személygépkocsira 24 975 Ft (kategóriától függően eltérhet).</td></tr>
-        <tr><td>3. Kötelező biztosítás</td><td>A vevő a tulajdonszerzés napjától köteles kötelező gépjármű-felelősségbiztosítást (KGFB) kötni.</td></tr>
-        <tr><td>4. Átírás a kormányablakban</td><td>A vagyonszerzési illeték és az okmánydíjak megfizetése után kiállítják az új forgalmi engedélyt és a törzskönyvet a vevő nevére.</td></tr>
-      </tbody>
-    </table>
+<section class="ca-proc">
+  <span class="ca-eyebrow">Hogyan zajlik?</span>
+  <h2 class="ca-sectitle">Négy lépés a gépjármű átírásig</h2>
+  <p class="ca-secintro">A vevőnek a birtokbavételtől — az adásvételi szerződés keltétől — számított
+  15 napon belül kell kezdeményeznie az átírást; az eladó pedig 8 napon belül bejelenti az adásvételt.</p>
+  <div class="ca-steps">
+    <div class="ca-step"><div class="ca-sn">1</div><h3>Adásvételi szerződés</h3><p>Két, teljes bizonyító erejű magánokiratba foglalt példány, a felek adataival, a jármű azonosítóival és a vételárral.</p></div>
+    <div class="ca-step"><div class="ca-sn">2</div><h3>Eredetiségvizsgálat</h3><p>A vevő nevére, vizsgálóállomáson — az átírás előfeltétele. Díja személygépkocsira 24 975 Ft.</p></div>
+    <div class="ca-step"><div class="ca-sn">3</div><h3>Kötelező biztosítás</h3><p>A vevő a tulajdonszerzés napjától köteles KGFB-t kötni a járműre.</p></div>
+    <div class="ca-step"><div class="ca-sn">4</div><h3>Átírás a kormányablakban</h3><p>Az illeték és az okmánydíjak megfizetése után kiállítják az új forgalmit és a törzskönyvet a vevő nevére.</p></div>
   </div>
-  <p class="lede">Az átíráshoz általában szükséges: az <b>adásvételi szerződés</b>, az eladó és a vevő
-  <b>személyazonosító okmányai és lakcímkártyája</b>, az érvényes <b>eredetiségvizsgálati határozat</b>,
-  az érvényes <b>műszaki vizsga</b> (forgalmi engedély), valamint a <b>kötelező biztosítás</b> megléte.
-  Ha nem személyesen jársz el, <b>meghatalmazás</b> is kell. Az ügyet bármelyik kormányablakban
-  vagy okmányirodában elintézheted.</p>
-  <p class="lede">Külföldről — például Németországból — behozott autónál az átírást megelőzi a
-  <b>honosítás</b>: a regisztrációs adó megfizetése, a honosítási műszaki vizsga és a forgalomba
-  helyezés. A várható regisztrációs adót a <a href="/honositas-kalkulator/">honosítás kalkulátorral</a>
-  tudod kiszámolni, a teljes ügyintézést pedig a CarAdvance kulcsrakészen elvégzi helyetted.</p>
+</section>
+
+<section>
+  <div class="ca-jt">
+    <span class="ca-eyebrow2">Jó tudni</span>
+    <h2>Határidők, iratok és a teljes költség</h2>
+    <p>A vevőnek a birtokbavételtől számított <span class="kw">15 napon belül</span> kell
+    kezdeményeznie az átírást a kormányablakban; a határidő elmulasztása bírságot vonhat maga után.
+    Az eladó ezzel párhuzamosan <strong>8 napon belül</strong> bejelenti az adásvételt, így mentesül
+    a jármű utáni későbbi kötelezettségek alól. Az illetéken felül fizetendő az
+    <strong>eredetiségvizsgálat</strong> (24 975 Ft) és az <strong>okmánydíjak</strong>: forgalmi
+    engedély 6 000 Ft, törzskönyv 6 000 Ft — a rendszám átíráskor a járművön marad.</p>
+    <p>Az átíráshoz általában szükséges az <strong>adásvételi szerződés</strong>, a felek
+    <strong>személyazonosító okmányai és lakcímkártyája</strong>, az érvényes
+    <strong>eredetiségvizsgálati határozat</strong>, az érvényes <strong>műszaki vizsga</strong> és a
+    <strong>kötelező biztosítás</strong> megléte; ha nem személyesen jársz el, <strong>meghatalmazás</strong>
+    is kell. Külföldről — például Németországból — behozott autónál az átírást megelőzi a
+    <span class="kw">honosítás</span>: a várható regisztrációs adót a
+    <a href="/honositas-kalkulator/">honosítás kalkulátorral</a> becsülheted meg, a teljes ügyintézést
+    pedig a CarAdvance kulcsrakészen elvégzi helyetted.</p>
+  </div>
 </section>
 
 <section class="sec">
