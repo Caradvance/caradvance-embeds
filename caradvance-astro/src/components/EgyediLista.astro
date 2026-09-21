@@ -476,7 +476,7 @@ const _rebuild='rebuild-nudge-3';
     {key:'4erc',name:'BMW 4-es Coupé',body:'Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900},
     {key:'4ergc',name:'BMW 4-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900},
     {key:'4ercab',name:'BMW 4-es Cabrio',body:'Cabrio',fuel:'Benzin',fuels:['Benzin','Dízel'],from:61400},
-    {key:'m4b',name:'BMW M4',body:'Coupé',fuel:'Benzin',from:98500},
+    {key:'m4b',name:'BMW M4',body:'Coupé',fuel:'Benzin',from:98500,slug:'m4-benzin'},
     {key:'m4cab',name:'BMW M4 Cabrio',body:'Cabrio',fuel:'Benzin',from:114100},
     {key:'m4',name:'BMW 4-es Coupé M',body:'Coupé',fuel:'Benzin',from:77600,hide:true},
     {key:'m4gc',name:'BMW 4-es Gran Coupé M',body:'Gran Coupé',fuel:'Benzin',from:77600,hide:true},
@@ -522,8 +522,8 @@ const _rebuild='rebuild-nudge-3';
     {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Dízel',from:39350,hide:true}
   ]);
 
-  var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel'];
-  function slug(c){ return c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel]); }
+  var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel','m4-benzin'];
+  function slug(c){ return c.slug || (c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel])); }
   function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
   function att(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
