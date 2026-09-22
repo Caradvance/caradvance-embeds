@@ -1,0 +1,240 @@
+---
+// Bérlési modell-aloldal — /uj-auto-berlese/<slug>
+// Adat: src/data/rentalModels.js. Egy oldal modellenként, a bérlési árakkal.
+import Base from '../../layouts/Base.astro';
+import { MODELS, brandOf, bodyOf, EGYEDI, g, gh, HUF } from '../../data/rentalModels.js';
+
+export function getStaticPaths() {
+  return MODELS.map((m) => ({ params: { slug: m.slug } }));
+}
+
+const { slug } = Astro.params;
+const car = MODELS.find((m) => m.slug === slug);
+const br = car ? brandOf(car.b) : null;
+const body = car ? bodyOf(car) : '';
+const related = car ? MODELS.filter((m) => m.b === car.b && m.slug !== car.slug).slice(0, 3) : [];
+const egyediSlug = car ? EGYEDI[car.m] : null;
+
+const title = car ? `${car.m} bérlés — tartós autóbérlet havidíjjal | CarAdvance` : 'Bérlés';
+const desc = car ? `${car.m} tartós bérlete: havi díj ${g(car.p2)} €-tól (${gh(car.p2)} Ft) 2000 km/hó futáskerettel, egyszeri ${g(car.k)} € kaucióval. Vadonatúj autó, kulcsrakész átadással.` : '';
+
+const carJson = car ? {
+  '@context':'https://schema.org','@type':'Car', name:car.m, brand:{'@type':'Brand',name:br.name},
+  image:`https://www.caradvance.hu${car.img}`, vehicleConfiguration:'Bérlés / tartós bérlet',
+} : null;
+const faqJson = {
+  '@context':'https://schema.org','@type':'FAQPage','mainEntity':[
+    {'@type':'Question','name':`Mennyibe kerül a ${car ? car.m : ''} bérlése?`,'acceptedAnswer':{'@type':'Answer','text':car ? `A havi bérleti díj ${g(car.p2)} €-tól (${gh(car.p2)} Ft) indul 2000 km/hó futáskerettel; 3000 km/hó esetén ${g(car.p3)} € (${gh(car.p3)} Ft). Egyszeri, visszatérítendő kaució: ${g(car.k)} € (${gh(car.k)} Ft).` : ''}},
+    {'@type':'Question','name':'Mit tartalmaz a havi bérleti díj?','acceptedAnswer':{'@type':'Answer','text':'A feltüntetett havidíj a választott modell bérletét jelenti a megadott futáskerettel (2000 vagy 3000 km/hó). A pontos, teljes körű feltételeket minden esetben előre, írásban egyeztetjük.'}},
+    {'@type':'Question','name':'Mennyi a kaució?','acceptedAnswer':{'@type':'Answer','text':car ? `A kaució egyszeri, visszatérítendő letét, ennél a modellnél ${g(car.k)} € (${gh(car.k)} Ft). A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.` : ''}},
+    {'@type':'Question','name':'Mennyi a minimális bérlési időtartam?','acceptedAnswer':{'@type':'Answer','text':'A tartós bérlet minimum 6 hónapos időtartamtól érhető el, hosszú távra is. A pontos futamidőt közösen egyeztetjük.'}},
+  ]
+};
+---
+{car && (
+<Base lang="hu" path={`/uj-auto-berlese/${car.slug}`} title={title} description={desc}>
+<section class="rt">
+  <section class="rt-hero">
+    <div class="rt-hero-in">
+      <nav class="rt-crumb"><a href="/">Főoldal</a> / <a href="/uj-auto-berlese">Új autó bérlése</a> / <a href={`/uj-auto-berlese?brand=${car.b}`}>{br.name} bérlés</a> / <span>{car.m}</span></nav>
+      <div class="rt-hero-grid">
+        <div class="rt-hero-txt">
+          <img class="rt-hero-logo" src={br.heroLogo} alt={br.name} />
+          <div class="rt-chips"><span class="rt-chip rt-chip-red">Bérelhető</span><span class="rt-chip">{car.fam}</span><span class="rt-chip">{body}</span><span class="rt-chip">Új autó</span></div>
+          <h1>{car.m}</h1>
+          <p class="rt-tag">Tartós bérlet — vadonatúj {br.name}, átlátható havidíjjal, egyszeri kaucióval, 2000 vagy 3000 km/hó futáskerettel.</p>
+          <div class="rt-price"><span class="rt-price-huf" data-eur={car.p2}>{gh(car.p2)} Ft</span><span class="rt-price-per">/ hó</span><span class="rt-price-eur">{g(car.p2)} €-tól</span></div>
+          <p class="rt-price-note">Havi bérleti díj 2000 km/hó futáskerettel, tájékoztató jelleggel, élő árfolyammal (1&nbsp;€ = <span id="rtFx">{HUF}</span>&nbsp;Ft). A pontos, teljes körű feltételeket előre egyeztetjük.</p>
+          <div class="rt-cta">
+            <a class="rt-btn rt-btn-red" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Bérlés igénylése</a>
+            <a class="rt-btn rt-btn-ghost" href={`/uj-auto-berlese?brand=${car.b}`}>← Összes {br.name} bérlet</a>
+          </div>
+        </div>
+        <div class="rt-hero-img"><img src={car.img} alt={car.m} /></div>
+      </div>
+    </div>
+    <div class="rt-scroll">GÖRGESS<span>⌄</span></div>
+  </section>
+
+  <section class="rt-sec">
+    <div class="rt-wrap">
+      <h2 class="rt-center">Bérleti díjak és kaució</h2>
+      <div class="rt-prices">
+        <div class="rt-pcard"><span class="rt-pcard-l">Havi díj · 2000 km/hó</span><span class="rt-pcard-huf" data-eur={car.p2}>{gh(car.p2)} Ft</span><span class="rt-pcard-eur">{g(car.p2)} € / hó</span></div>
+        <div class="rt-pcard"><span class="rt-pcard-l">Havi díj · 3000 km/hó</span><span class="rt-pcard-huf" data-eur={car.p3}>{gh(car.p3)} Ft</span><span class="rt-pcard-eur">{g(car.p3)} € / hó</span></div>
+        <div class="rt-pcard rt-pcard-dep"><span class="rt-pcard-l">Egyszeri kaució</span><span class="rt-pcard-huf" data-eur={car.k}>{gh(car.k)} Ft</span><span class="rt-pcard-eur">{g(car.k)} € · visszatérítendő</span></div>
+      </div>
+      <p class="rt-note">Az árak nettó, tájékoztató jellegű árak, élő árfolyammal számolva. A kaució a bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár. A km-kereten felüli futást előre egyeztetett km-díjjal számoljuk el.</p>
+    </div>
+  </section>
+
+  <section class="rt-sec rt-sec-alt">
+    <div class="rt-wrap">
+      <div class="rt-hl">
+        <div class="rt-hl-i"><span>✓</span><h3>Vadonatúj autó</h3><p>Mindig friss, új {br.name} modell — a vásárlás és a hosszú távú elköteleződés nélkül.</p></div>
+        <div class="rt-hl-i"><span>⏱</span><h3>Rugalmas futamidő</h3><p>Tartós bérlet minimum 6 hónaptól, hosszú távra is — igény szerinti időtartammal.</p></div>
+        <div class="rt-hl-i"><span>🛣</span><h3>2000 vagy 3000 km/hó</h3><p>Válaszd a hozzád illő havi futáskeretet; a túllépést előre egyeztetett díjjal számoljuk.</p></div>
+        <div class="rt-hl-i"><span>🔑</span><h3>Kulcsrakész átadás</h3><p>Az autót egyeztetett helyszínen, forgalomba helyezve, használatra készen adjuk át.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rt-sec">
+    <div class="rt-wrap rt-narrow">
+      <h2 class="rt-center">Hogyan zajlik a bérlés?</h2>
+      <ol class="rt-steps">
+        <li><b>Igénylés</b><span>Kattints a „Bérlés igénylése” gombra, vagy hívj minket — megnézzük az elérhetőséget.</span></li>
+        <li><b>Egyeztetés</b><span>Kiválasztjuk a futamidőt, a futáskeretet és a feltételeket, majd rögzítjük a kauciót.</span></li>
+        <li><b>Szerződés</b><span>Aláírjuk a bérleti szerződést, átlátható, előre tisztázott feltételekkel.</span></li>
+        <li><b>Átadás</b><span>Egyeztetett helyszínen, kulcsrakészen átvehető a vadonatúj autó.</span></li>
+      </ol>
+      <div class="rt-center"><a class="rt-btn rt-btn-ghost" href="/berlesi-folyamat">A teljes bérlési folyamat →</a></div>
+    </div>
+  </section>
+
+  {egyediSlug && (
+  <section class="rt-sec rt-sec-alt">
+    <div class="rt-wrap rt-buyrow">
+      <div><h3>Inkább megvásárolnád?</h3><p>A {car.m} egyedi rendeléssel, kulcsrakész behozatallal is elérhető Németországból.</p></div>
+      <a class="rt-btn rt-btn-dark" href={`/egyedi-auto-rendeles/${egyediSlug}`}>Egyedi rendelés →</a>
+    </div>
+  </section>) }
+
+  <section class="rt-sec">
+    <div class="rt-wrap rt-narrow">
+      <h2 class="rt-center">Gyakori kérdések</h2>
+      <details class="rt-faq"><summary>Mennyibe kerül a {car.m} bérlése?<span class="pl">+</span></summary><p>A havi bérleti díj {g(car.p2)} €-tól ({gh(car.p2)} Ft) indul 2000 km/hó futáskerettel; 3000 km/hó esetén {g(car.p3)} € ({gh(car.p3)} Ft). Egyszeri, visszatérítendő kaució: {g(car.k)} € ({gh(car.k)} Ft).</p></details>
+      <details class="rt-faq"><summary>Mit tartalmaz a havi bérleti díj?<span class="pl">+</span></summary><p>A feltüntetett havidíj a választott modell bérletét jelenti a megadott futáskerettel (2000 vagy 3000 km/hó). A pontos, teljes körű feltételeket minden esetben előre, írásban egyeztetjük.</p></details>
+      <details class="rt-faq"><summary>Mennyi a kaució?<span class="pl">+</span></summary><p>A kaució egyszeri, visszatérítendő letét, ennél a modellnél {g(car.k)} € ({gh(car.k)} Ft). A bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár.</p></details>
+      <details class="rt-faq"><summary>Mennyi a minimális bérlési időtartam?<span class="pl">+</span></summary><p>A tartós bérlet minimum 6 hónapos időtartamtól érhető el, hosszú távra is. A pontos futamidőt közösen egyeztetjük.</p></details>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+  <section class="rt-sec rt-sec-alt">
+    <div class="rt-wrap">
+      <h2 class="rt-center">További bérelhető {br.name} modellek</h2>
+      <div class="rt-rel">{related.map((r) => (
+        <a class="rt-rel-card" href={`/uj-auto-berlese/${r.slug}`}>
+          <div class="rt-rel-img"><img src={r.img} alt={r.m} loading="lazy" /></div>
+          <span class="rt-rel-name">{r.m}</span>
+          <span class="rt-rel-price">{gh(r.p2)} Ft / hó-tól</span>
+        </a>))}</div>
+    </div>
+  </section>) }
+
+  <section class="rt-sec">
+    <div class="rt-wrap">
+      <div class="rt-band">
+        <div><h2>Béreld a {car.m} modellt</h2><p>Mondd el, mikorra és milyen futamidőre szeretnéd — személyre szabott bérleti ajánlattal jelentkezünk.</p></div>
+        <a class="rt-btn rt-btn-white" href={`/kapcsolat/?berles=${encodeURIComponent(car.m)}`}>Bérlés igénylése →</a>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(carJson)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+</section>
+
+<style>
+  .rt{--red:#E2001A;--navy:#0F1B2D;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--bg:#F4F7FB;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
+  .rt a{text-decoration:none;}
+  .rt-hero{position:relative;background:radial-gradient(1100px 520px at 80% 8%,#1d2c46,#0a0f1a 72%);color:#fff;padding:34px 20px 56px;}
+  .rt-hero-in{max-width:1160px;margin:0 auto;}
+  .rt-crumb{font-size:13px;color:#9fb0c8;margin-bottom:22px;}
+  .rt-crumb a{color:#9fb0c8;}.rt-crumb span{color:#fff;}
+  .rt-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;}
+  @media(max-width:860px){.rt-hero-grid{grid-template-columns:1fr;gap:14px;}}
+  .rt-hero-logo{height:42px;width:auto;margin-bottom:16px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));}
+  .rt-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .rt-chip{background:rgba(255,255,255,.14);color:#fff;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:100px;}
+  .rt-chip-red{background:var(--red);}
+  .rt-hero-txt h1{font-size:clamp(30px,4.4vw,50px);font-weight:800;line-height:1.04;margin:0 0 12px;letter-spacing:-.02em;}
+  .rt-tag{font-size:16.5px;color:#cbd6e6;margin:0 0 20px;line-height:1.55;max-width:520px;}
+  .rt-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+  .rt-price-huf{font-size:clamp(28px,3.4vw,38px);font-weight:800;}
+  .rt-price-per{font-size:16px;color:#cbd6e6;font-weight:700;}
+  .rt-price-eur{font-size:15px;color:#aab8cc;font-weight:600;}
+  .rt-price-note{font-size:12.5px;color:#8ea0b8;margin:0 0 20px;max-width:500px;line-height:1.5;}
+  .rt-cta{display:flex;gap:12px;flex-wrap:wrap;}
+  .rt-btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;padding:14px 26px;border-radius:100px;transition:.15s;}
+  .rt-btn-red{background:var(--red);color:#fff;}.rt-btn-red:hover{filter:brightness(1.08);}
+  .rt-btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);}
+  .rt-btn-ghost:hover{background:rgba(255,255,255,.2);}
+  .rt-btn-dark{background:var(--navy);color:#fff;}.rt-btn-dark:hover{filter:brightness(1.15);}
+  .rt-btn-white{background:#fff;color:var(--navy);}
+  .rt-hero-img{background:#fff;border-radius:22px;padding:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 30px 60px rgba(0,0,0,.35);}
+  .rt-hero-img img{max-width:100%;height:auto;object-fit:contain;}
+  .rt-scroll{text-align:center;font-size:12px;letter-spacing:.15em;color:#9fb0c8;font-weight:700;margin-top:26px;}
+  .rt-scroll span{display:block;font-size:22px;line-height:1;animation:rtb 1.6s infinite;}
+  @keyframes rtb{0%,100%{transform:translateY(0);}50%{transform:translateY(5px);}}
+  .rt-sec{padding:34px 20px;}
+  .rt-sec-alt{background:#fff;}
+  .rt-wrap{max-width:1160px;margin:0 auto;}
+  .rt-narrow{max-width:820px;}
+  .rt-center{text-align:center;font-size:26px;font-weight:800;color:var(--navy);margin:0 0 22px;}
+  .rt-prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media(max-width:800px){.rt-prices{grid-template-columns:1fr;}}
+  .rt-pcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:6px;}
+  .rt-pcard-l{font-size:13.5px;color:var(--muted);font-weight:600;}
+  .rt-pcard-huf{font-size:26px;font-weight:800;color:var(--navy);}
+  .rt-pcard-eur{font-size:13.5px;color:var(--muted);}
+  .rt-pcard-dep{background:#0f1622;border-color:#0f1622;}
+  .rt-pcard-dep .rt-pcard-l,.rt-pcard-dep .rt-pcard-eur{color:#aab8cc;}
+  .rt-pcard-dep .rt-pcard-huf{color:#fff;}
+  .rt-note{font-size:12.5px;color:#9aa7ba;margin:14px 0 0;line-height:1.6;text-align:center;max-width:820px;margin-left:auto;margin-right:auto;}
+  .rt-hl{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media(max-width:900px){.rt-hl{grid-template-columns:1fr 1fr;}}
+  @media(max-width:560px){.rt-hl{grid-template-columns:1fr;}}
+  .rt-hl-i{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:20px;}
+  .rt-hl-i span{font-size:24px;}
+  .rt-hl-i h3{font-size:16px;font-weight:800;color:var(--navy);margin:8px 0 6px;}
+  .rt-hl-i p{font-size:14px;color:var(--muted);line-height:1.55;margin:0;}
+  .rt-steps{list-style:none;counter-reset:s;padding:0;margin:0 0 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media(max-width:800px){.rt-steps{grid-template-columns:1fr;}}
+  .rt-steps li{counter-increment:s;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;position:relative;}
+  .rt-steps li::before{content:counter(s);display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:15px;margin-bottom:12px;}
+  .rt-steps li:last-child::before{background:var(--red);}
+  .rt-steps b{display:block;font-size:16px;color:var(--navy);margin-bottom:4px;}
+  .rt-steps span{font-size:14px;color:var(--muted);line-height:1.55;}
+  .rt-buyrow{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .rt-buyrow h3{font-size:20px;font-weight:800;color:var(--navy);margin:0 0 4px;}
+  .rt-buyrow p{font-size:14.5px;color:var(--muted);margin:0;}
+  .rt-faq{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 20px;margin-bottom:12px;}
+  .rt-faq summary{cursor:pointer;font-weight:700;color:var(--navy);padding:16px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  .rt-faq summary::-webkit-details-marker{display:none;}
+  .rt-faq .pl{color:var(--red);font-weight:800;font-size:20px;}
+  .rt-faq[open] .pl{transform:rotate(45deg);}
+  .rt-faq[open] summary{color:var(--red);}
+  .rt-faq p{color:var(--muted);line-height:1.65;margin:0 0 16px;}
+  .rt-rel{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media(max-width:800px){.rt-rel{grid-template-columns:1fr;}}
+  .rt-rel-card{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--navy);transition:.15s;}
+  .rt-rel-card:hover{box-shadow:0 12px 30px rgba(15,27,45,.1);transform:translateY(-3px);}
+  .rt-rel-img{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:12px;}
+  .rt-rel-img img{max-width:86%;max-height:100%;object-fit:contain;}
+  .rt-rel-name{font-weight:700;font-size:15px;}
+  .rt-rel-price{font-size:13px;color:var(--muted);}
+  .rt-band{background:#0B0B0D;color:#fff;border-radius:22px;padding:32px 38px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;}
+  .rt-band h2{font-size:23px;font-weight:800;margin:0 0 6px;}
+  .rt-band p{color:#cfd6e2;margin:0;font-size:15px;max-width:560px;}
+</style>
+
+<script is:inline>
+(function(){
+  try{
+    fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
+      if(d&&d.rates&&d.rates.HUF){
+        var fx=Math.round(d.rates.HUF);
+        var fxEl=document.getElementById('rtFx'); if(fxEl) fxEl.textContent=fx;
+        document.querySelectorAll('[data-eur]').forEach(function(el){
+          var eur=Number(el.getAttribute('data-eur')||0); if(!eur) return;
+          el.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(eur*fx))+(el.classList.contains('rt-price-huf')?' Ft':' Ft');
+        });
+      }
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+</Base>
+)}
