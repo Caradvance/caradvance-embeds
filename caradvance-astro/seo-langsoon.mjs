@@ -25,7 +25,20 @@ import path from 'node:path';
 
 const DIST = 'dist';
 const MARKER = 'ca-langsoon-css';
-const SOON = 'Hamarosan';
+
+// A "hamarosan" felirat az adott nyelv saját nyelvén (a nyelvopció felirata alapján).
+// A magyar opció aktív marad, ezért nincs benne.
+const SOON = {
+  'English': 'Soon',
+  'Deutsch': 'Bald',
+  'Français': 'Bientôt',
+  'Slovenčina': 'Čoskoro',
+  'Čeština': 'Brzy',
+  'Polski': 'Wkrótce',
+  'Українська': 'Незабаром',
+  '中文': '即将推出',
+};
+const SOON_FALLBACK = 'Soon';
 
 const STYLE =
 `<style id="${MARKER}">` +
@@ -40,7 +53,9 @@ const RE = /<a class="(langopt|m-langopt)"([^>]*)>([\s\S]*?)<\/a>/g;
 function transform(html) {
   return html.replace(RE, (m, cls, _attrs, inner) => {
     if (inner.includes('>Magyar<')) return m;               // magyar marad kattintható
-    return `<span class="${cls} langopt-soon">${inner}<span class="ca-soon">${SOON}</span></span>`;
+    const label = (inner.match(/<span>([^<]+)<\/span>/) || [, ''])[1].trim();
+    const word = SOON[label] || SOON_FALLBACK;              // "hamarosan" az adott nyelven
+    return `<span class="${cls} langopt-soon">${inner}<span class="ca-soon">${word}</span></span>`;
   });
 }
 
