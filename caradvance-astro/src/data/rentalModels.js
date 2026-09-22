@@ -5,7 +5,7 @@
 export const HUF = 368; // 1 € = 368 Ft (a listával azonos árfolyam)
 
 export const BRANDS = [
-  { id:'bmw',      name:'BMW',      logo:'/bmw/bmw-logo.webp?v=2',   heroLogo:'/bmw-hero-logo.png',      vid:'/caradvance-hero-x5.mp4',          dot:'#0166B1' },
+  { id:'bmw',      name:'BMW',      logo:'/bmw-hero-logo.png',   heroLogo:'/bmw-hero-logo.png',      vid:'/caradvance-hero-x5.mp4',          dot:'#0166B1' },
   { id:'mini',     name:'MINI',     logo:'/mini-hero-logo.webp?v=3', heroLogo:'/mini-hero-logo.webp?v=3', vid:'/mini-JCW-family-video-wide.mp4', dot:'#1B1B1B' },
   { id:'mercedes', name:'Mercedes', logo:'/mb-star.webp?v=1',        heroLogo:'/mb-star.webp?v=1',       vid:'/mercedes-hero.mp4',               dot:'#00A3E0' },
   { id:'audi',     name:'Audi',     logo:'/audi/audi-logo.webp?v=4', heroLogo:'/audi/audi-logo.webp?v=4', vid:'/audi-hero.mp4',                  dot:'#BB0A30' },
