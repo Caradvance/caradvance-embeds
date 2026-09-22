@@ -202,7 +202,7 @@
   if (window.__caNavBrands) return; window.__caNavBrands = true;
 
   var BRANDS = [
-    { t: "BMW",      href: "/egyedi-auto-rendeles?brand=bmw",      logo: "/bmw/bmw-logo.webp?v=2" },
+    { t: "BMW",      href: "/egyedi-auto-rendeles?brand=bmw",      logo: "/bmw-hero-logo.png" },
     { t: "MINI",     href: "/egyedi-auto-rendeles?brand=mini",     logo: "/mini-hero-logo.webp?v=3" },
     { t: "Mercedes", href: "/egyedi-auto-rendeles?brand=mercedes", logo: "/mb-star.webp?v=1" },
     { t: "Audi", href: "/egyedi-auto-rendeles?brand=audi", logo: "/audi/audi-logo.webp?v=4" }
