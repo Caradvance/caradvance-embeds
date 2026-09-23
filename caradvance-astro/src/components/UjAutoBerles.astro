@@ -11,6 +11,12 @@ const bodiesOf = (bid) => { const s = []; MODELS.filter((x) => x.b === bid).forE
 const FUEL_ORDER = ['Benzin', 'Dízel', 'Hibrid', 'Elektromos'];
 const fuelsOf = (bid) => { const s = []; MODELS.filter((x) => x.b === bid).forEach((x) => (x.fu || []).forEach((f) => { if (s.indexOf(f) < 0) s.push(f); })); return FUEL_ORDER.filter((f) => s.indexOf(f) > -1); };
 const detailHref = (car) => `/uj-auto-berlese/${car.slug}`;
+// Kártya-részletek az Egyedi lista kártyájával azonos megjelenéshez
+const FUELC = { 'Elektromos': '#0a84ff', 'Hibrid': '#00a389', 'Benzin': '#e8820c', 'Dízel': '#6b7280' };
+const isM = (n) => /(^|\s)M\d/.test(n);
+const isAMG = (n) => /AMG/.test(n);
+const isJCW = (n) => /John Cooper Works/.test(n);
+const specLine = (car) => `${bodyOf(car)} · Automata · ${(car.fu && car.fu[0]) || 'Benzin'}`;
 const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 ---
 
@@ -108,15 +114,20 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
               <article class="egl-card egl-card-mini" data-name={car.m.toLowerCase()} data-fam={car.fam} data-body={bodyOf(car)} data-fuel={(car.fu || []).join('|')}>
                 <div class="egl-media">
                   <img src={car.img} alt={car.m} loading="lazy" />
-                  <div class="egl-fuels"><span class="egl-fuel uab-badge">Bérelhető</span></div>
+                  <div class="egl-fuels">{(car.fu || []).map((fu) => (<span class="egl-fuel" style={`background:${FUELC[fu] || '#5A6B82'}`}>{fu}</span>))}</div>
                 </div>
                 <div class="egl-body">
                   <div class="egl-meta">
-                    <span class="egl-brand"><img class="uab-cardlogo" src={br.logo} alt={br.name} /></span>
-                    <span class="egl-year">Új autó · Bérlés</span>
+                    <span class="egl-brand">
+                      {car.b === 'bmw' && (<Fragment><img class="egl-bmw" src="/bmw-hero-logo.png" alt="BMW" />{isM(car.m) && <img class="egl-mlogo" src="/bmw/m-logo.webp?v=2" alt="M" />}</Fragment>)}
+                      {car.b === 'mercedes' && (<Fragment><img class="egl-mblogo" src="/mb-star.webp?v=1" alt="Mercedes-Benz" />{isAMG(car.m) && <img class="egl-amglogo" src="/mb-logo.webp?v=2" alt="Mercedes-AMG" />}</Fragment>)}
+                      {car.b === 'mini' && (<Fragment><img class="egl-minilogo" src="/mini-logo.webp?v=3" alt="MINI" />{isJCW(car.m) && <img class="egl-jcwlogo" src="/jcw-logo.webp?v=3" alt="John Cooper Works" />}</Fragment>)}
+                      {car.b === 'audi' && (<img class="egl-audilogo" src="/audi/audi-logo.webp?v=4" alt="Audi" />)}
+                    </span>
+                    <span class="egl-year">2026 · Németország</span>
                   </div>
                   <div class="egl-name">{car.m}</div>
-                  <div class="egl-specs">Bérlés · 2000 vagy 3000 km/hó futáskeret</div>
+                  <div class="egl-specs">{specLine(car)}</div>
                   <div class="egl-price">
                     <b>{gh(car.p2)} Ft</b>
                     <span class="eur">/ hó</span>
@@ -179,13 +190,19 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 .uab .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.1);transform:translateY(-3px);z-index:30}
 .uab .egl-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:flex-end;justify-content:center;padding:6px 4px 0;border-radius:20px 20px 0 0;overflow:hidden}
 .uab .egl-media img{max-width:82%;max-height:90%;width:auto;height:auto;object-fit:contain;margin:0 auto;display:block}
-.uab .egl-fuels{position:absolute;top:14px;right:14px;display:flex;gap:6px}
+.uab .egl-fuels{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
 .uab .egl-fuel{color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
-.uab .uab-badge{background:#0F8A3C}
+@media (hover:hover){.uab .egl-fuels{opacity:0;transition:opacity .18s}.uab .egl-card:hover .egl-fuels{opacity:1}}
 .uab .egl-body{padding:16px 20px 12px}
 .uab .egl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .uab .egl-brand{display:inline-flex;align-items:center}
-.uab .uab-cardlogo{height:22px;width:auto;max-width:70px;object-fit:contain}
+.uab .egl-bmw{height:28px;width:auto}
+.uab .egl-mlogo{height:16px;width:auto;margin-left:6px}
+.uab .egl-mblogo{height:26px;width:auto}
+.uab .egl-amglogo{height:9px;width:auto;margin-left:8px}
+.uab .egl-minilogo{height:26px;width:auto}
+.uab .egl-jcwlogo{height:19px;width:auto;margin-left:8px}
+.uab .egl-audilogo{height:19px;width:auto}
 .uab .egl-year{font-size:13.5px;color:var(--muted)}
 .uab .egl-name{font-size:23px;font-weight:800;color:var(--navy);margin:0 0 8px;line-height:1.2}
 .uab .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px}
