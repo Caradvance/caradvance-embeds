@@ -8,6 +8,8 @@ const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 const families = (bid) => { const seen = []; MODELS.filter((x) => x.b === bid).forEach((x) => { if (seen.indexOf(x.fam) < 0) seen.push(x.fam); }); return seen; };
 const famCount = (bid, fam) => MODELS.filter((x) => x.b === bid && x.fam === fam).length;
 const bodiesOf = (bid) => { const s = []; MODELS.filter((x) => x.b === bid).forEach((x) => { const bo = bodyOf(x); if (s.indexOf(bo) < 0) s.push(bo); }); return s; };
+const FUEL_ORDER = ['Benzin', 'Dízel', 'Hibrid', 'Elektromos'];
+const fuelsOf = (bid) => { const s = []; MODELS.filter((x) => x.b === bid).forEach((x) => (x.fu || []).forEach((f) => { if (s.indexOf(f) < 0) s.push(f); })); return FUEL_ORDER.filter((f) => s.indexOf(f) > -1); };
 const detailHref = (car) => `/uj-auto-berlese/${car.slug}`;
 const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 ---
@@ -96,13 +98,14 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
         <input type="text" class="egl-search uab-q" placeholder="Keresés (pl. X5, M4)…" aria-label="Keresés a modellek között" />
         <div class="egl-sel"><select class="uab-fmodel" aria-label="Modell szűrő"><option value="">Minden modell</option>{families(br.id).map((f) => (<option value={f}>{f}</option>))}</select></div>
         <div class="egl-sel"><select class="uab-fbody" aria-label="Karosszéria szűrő"><option value="">Minden karosszéria</option>{bodiesOf(br.id).map((bo) => (<option value={bo}>{bo}</option>))}</select></div>
+        <div class="egl-sel"><select class="uab-ffuel" aria-label="Üzemanyag szűrő"><option value="">Minden üzemanyag</option>{fuelsOf(br.id).map((f) => (<option value={f}>{f}</option>))}</select></div>
       </div>
       <div class="egl-grid">
         {families(br.id).map((fam) => (
           <Fragment>
             <div class="egl-section"><span class="dot" style={`background:${br.dot}`}></span>{fam}<span class="cnt">{famCount(br.id, fam)} modell</span></div>
             {MODELS.filter((x) => x.b === br.id && x.fam === fam).map((car) => (
-              <article class="egl-card egl-card-mini" data-name={car.m.toLowerCase()} data-fam={car.fam} data-body={bodyOf(car)}>
+              <article class="egl-card egl-card-mini" data-name={car.m.toLowerCase()} data-fam={car.fam} data-body={bodyOf(car)} data-fuel={(car.fu || []).join('|')}>
                 <div class="egl-media">
                   <img src={car.img} alt={car.m} loading="lazy" />
                   <div class="egl-fuels"><span class="egl-fuel uab-badge">Bérelhető</span></div>
@@ -263,15 +266,16 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   var sec=document.getElementById('uab'); if(!sec) return;
   sec.querySelectorAll('.uab-brandview').forEach(function(view){
     var grid=view.querySelector('.egl-grid'); if(!grid) return;
-    var q=view.querySelector('.uab-q'), fm=view.querySelector('.uab-fmodel'), fb=view.querySelector('.uab-fbody');
+    var q=view.querySelector('.uab-q'), fm=view.querySelector('.uab-fmodel'), fb=view.querySelector('.uab-fbody'), ff=view.querySelector('.uab-ffuel');
     var cards=[].slice.call(grid.querySelectorAll('.egl-card'));
     var heads=[].slice.call(grid.querySelectorAll('.egl-section'));
     function run(){
-      var t=(q&&q.value||'').trim().toLowerCase(), mm=(fm&&fm.value)||'', bb=(fb&&fb.value)||'', shown=0;
+      var t=(q&&q.value||'').trim().toLowerCase(), mm=(fm&&fm.value)||'', bb=(fb&&fb.value)||'', fl=(ff&&ff.value)||'', shown=0;
       cards.forEach(function(c){
         var ok=(!t||(c.getAttribute('data-name')||'').indexOf(t)>-1)
             && (!mm||c.getAttribute('data-fam')===mm)
-            && (!bb||c.getAttribute('data-body')===bb);
+            && (!bb||c.getAttribute('data-body')===bb)
+            && (!fl||(c.getAttribute('data-fuel')||'').split('|').indexOf(fl)>-1);
         c.style.display=ok?'':'none'; if(ok) shown++;
       });
       heads.forEach(function(h){
@@ -286,6 +290,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
     q&&q.addEventListener('input',run);
     fm&&fm.addEventListener('change',run);
     fb&&fb.addEventListener('change',run);
+    ff&&ff.addEventListener('change',run);
   });
 })();
 </script>
