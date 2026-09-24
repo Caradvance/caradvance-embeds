@@ -1,4 +1,4 @@
-// deploy marker: rentals X2/X7/M5 added from Sheet — 2026-09-18
+// deploy marker: rentals X2/X7/M5 added from Sheet — 2026-09-18 · redeploy 20260924b
 // Build-time patcher: a repo gyokereben levo generate.mjs-t alakitja at ugy,
 // hogy a napi keszlet-pipeline (Google Sheet) oszlopaibol dolgozzon.
 //
