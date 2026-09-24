@@ -128,7 +128,6 @@ const jsonLdAll = [pageJson, ratingJson, breadcrumbJson];
 <a class="ref-more" href={row.more.href}>{row.more.t} →</a>
 </div>
 <div class="wrap ref-rowwrap">
-<button class="ref-nav ref-prev" data-row={row.key} aria-label="Előző" type="button">‹</button>
 <div class="ref-track" id={`row-${row.key}`} data-row={row.key}>
 <div class="ref-skel">Autók betöltése…</div>
 </div>
@@ -162,8 +161,8 @@ const jsonLdAll = [pageJson, ratingJson, breadcrumbJson];
 .ref .ref-sectitle{font-size:clamp(24px,3vw,34px);margin:12px 0 10px}
 .ref .ref-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .ref .ref-head .sec-intro{max-width:720px}
-.ref .ref-more{white-space:nowrap;font-weight:700;color:var(--rnavy);text-decoration:none;padding:10px 16px;border:1px solid var(--rline);border-radius:999px;transition:background .18s,color .18s}
-.ref .ref-more:hover{background:var(--rnavy);color:#fff}
+.ref .ref-more{white-space:nowrap;font-weight:700;color:#fff;background:var(--rred);text-decoration:none;padding:11px 18px;border:0;border-radius:999px;box-shadow:0 8px 22px rgba(226,0,26,.28);transition:background .18s,transform .18s}
+.ref .ref-more:hover{background:#c00016;transform:translateY(-1px)}
 
 /* Google summary bar */
 .ref .ref-google{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--rline);border-radius:16px;padding:16px 20px;text-decoration:none;color:var(--rink);box-shadow:0 8px 24px rgba(10,12,24,.05);transition:transform .18s,box-shadow .18s;max-width:720px;margin:0 auto}
@@ -198,8 +197,8 @@ const jsonLdAll = [pageJson, ratingJson, breadcrumbJson];
 .ref .ref-track{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 16px;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;flex:1}
 .ref .ref-track::-webkit-scrollbar{height:8px}.ref .ref-track::-webkit-scrollbar-thumb{background:#d7dded;border-radius:999px}
 .ref .ref-skel{color:var(--rmuted);font-size:14px;padding:40px 4px}
-.ref .ref-nav{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:1px solid var(--rline);background:#fff;color:var(--rnavy);font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(10,12,24,.08);transition:background .15s,color .15s}
-.ref .ref-nav:hover{background:var(--rnavy);color:#fff}
+.ref .ref-nav{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:1px solid var(--rline);background:#fff;color:#111;font-size:24px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(10,12,24,.1);transition:background .15s,color .15s}
+.ref .ref-nav:hover{background:#111;color:#fff}
 @media(min-width:900px){.ref .ref-nav.is-on{display:flex}}
 
 /* ── Autó kártya: PONTOSAN az /autoink kártyastílus ── */
