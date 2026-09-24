@@ -83,6 +83,7 @@ try {
     'egyedi-auto-rendeles/x5-dizel': 'https://www.caradvance.hu/bmw/bmw-x5-og.jpg',
     'egyedi-auto-rendeles/x3-benzin': 'https://www.caradvance.hu/bmw/bmw-x3-og.jpg',
     'egyedi-auto-rendeles/x6-dizel': 'https://www.caradvance.hu/bmw/bmw-x6-og.jpg',
+    'egyedi-auto-rendeles/xm-hibrid': 'https://www.caradvance.hu/bmw/bmw-xm-og.jpg',
     'egyedi-auto-rendeles/m4-benzin': 'https://www.caradvance.hu/bmw/bmw-m4-og.jpg',
   };
   for (const [rel, img] of Object.entries(MODELS)) {
