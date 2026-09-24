@@ -44,15 +44,15 @@ const soldDate = (c) => String(c.elkelt_datum || "").trim().slice(0, 10);
 const tipusOf  = (c) => (String(c.tipus || "").trim().toLowerCase() || "eladas");
 const isBiz    = (c) => tipusOf(c) === "bizomanyos";
 const isRent   = (c) => String(c.berelheto || "").trim().toLowerCase() === "igen" && nEur(c.berlet_2000_eur) > 0;
-// Kézzel bérbeadottnak jelölt autók (slug alapján). A Sheet berbeadva=igen mezője
-// is ide sorol; ez a lista egészen addig hasznos, amíg a Sheetben nincs oszlop.
-const BERB_SLUGS = new Set([
-  "bmw-x6-xdrive30d-m-sport-pro-22-individual",
-  "bmw-m5",
-  "bmw-x5-xdrive30d-m-sport-pro-panorama-22-m-lm-head-up-afas",
+// Kézzel bérbeadottnak jelölt autók: slug -> bérbeadás dátuma (YYYY-MM-DD).
+// A Sheet berbeadva=igen / berbeadva_datum mezője is ide sorol, ha egyszer lesz oszlop.
+const BERB = new Map([
+  ["bmw-x6-xdrive30d-m-sport-pro-22-individual", "2026-09-23"],
+  ["bmw-m5", "2026-09-23"],
+  ["bmw-x5-xdrive30d-m-sport-pro-panorama-22-m-lm-head-up-afas", "2026-09-23"],
 ]);
-const isBerb   = (c) => String(c.berbeadva || "").trim().toLowerCase() === "igen" || BERB_SLUGS.has(slugOf(c));
-const berbDate = (c) => String(c.berbeadva_datum || "").trim().slice(0, 10);
+const isBerb   = (c) => String(c.berbeadva || "").trim().toLowerCase() === "igen" || BERB.has(slugOf(c));
+const berbDate = (c) => String(c.berbeadva_datum || "").trim().slice(0, 10) || BERB.get(slugOf(c)) || "";
 // Tukrozes: kezi lista VAGY a pipeline azt irta, hogy a fokep balra nez.
 const mirrorOf = (c) => {
   // A kezzel valasztott fokepet SOHA nem tukrozzuk: azt mar ugy valasztottuk ki,
@@ -150,7 +150,7 @@ function carCard(c, rate, rel, opts) {
   const p = priceOf(c, rate);
   const href = \`\${rel}auto/\${slugOf(c)}/\`;
   const mir = mirrorOf(c) ? ' class="mir"' : "";
-  const badge = !opts.sold && FEATURED.includes(slugOf(c)) ? '<span class="feat">Kiemelt</span>' : "";`,
+  const badge = !opts.sold && !opts.berb && FEATURED.includes(slugOf(c)) ? '<span class="feat">Kiemelt</span>' : "";`,
 'carCard fej');
 
 rep(
@@ -506,8 +506,9 @@ rep(`  const sold = cars.filter(isSold)
     .sort((a, b) => String(soldDate(b)).localeCompare(String(soldDate(a))));`,
 `  const sold = dedupe(cars.filter(isSold)
     .sort((a, b) => String(soldDate(b)).localeCompare(String(soldDate(a)))));
-  const berb = dedupe(cars.filter(isBerb)
-    .sort((a, b) => String(berbDate(b)).localeCompare(String(berbDate(a)))));`,
+  const berbScore = (c) => (String(c.km || "").replace(/[^0-9]/g, "") ? 2 : 0) + (String(c.slug || "").trim() ? 1 : 0);
+  const berb = dedupe(active.filter((c) => isRent(c) && isBerb(c))
+    .sort((a, b) => (berbScore(b) - berbScore(a)) || String(berbDate(b)).localeCompare(String(berbDate(a)))));`,
 'katalogus: dedup (eladva) + berbeadva');
 
 /* ---- VEDELEM: soha ne kerulhessen ki "0 Ft" ---------------------------- */
