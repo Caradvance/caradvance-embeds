@@ -1,4 +1,4 @@
-// deploy marker: rentals X2/X7/M5 added from Sheet — 2026-09-18 · redeploy 20260924b
+// deploy marker: rentals X2/X7/M5 added from Sheet — 2026-09-18
 // Build-time patcher: a repo gyokereben levo generate.mjs-t alakitja at ugy,
 // hogy a napi keszlet-pipeline (Google Sheet) oszlopaibol dolgozzon.
 //
@@ -102,11 +102,7 @@ rep(
 .card.berb .media img{filter:grayscale(.65) brightness(.9)}
 .berbbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-11deg);background:rgba(31,41,55,.94);color:#fff;font-size:clamp(15px,3vw,25px);font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:9px 22px;border-radius:8px;border:3px solid #fff;box-shadow:0 12px 30px rgba(0,0,0,.34);z-index:4;pointer-events:none;white-space:nowrap}
 .berbdate{position:absolute;bottom:10px;left:10px;background:rgba(16,17,20,.84);color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;z-index:4}
-/* ---- Eladas / Berles kapcsolo ---- */
-.autok-switch{display:inline-flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px;margin:0 0 12px}
-.autok-switch .asw{border:0;background:transparent;font:inherit;font-weight:800;font-size:14px;color:var(--ink);padding:9px 22px;border-radius:999px;cursor:pointer;transition:.2s}
-.autok-switch .asw.on{background:#111;color:#fff}
-.autok-switch .asw:not(.on):hover{background:#F0F3F8}
+/* ---- Elado/Berles nezet: a nem aktiv csoport fulei rejtve ---- */
 .autok-tab[hidden]{display:none}
 /* ---- Berelheto arak ---- */
 .rentprices{margin-top:auto;display:grid;gap:5px;font-size:13.5px}
@@ -201,10 +197,6 @@ rep(
   <div class="grid" id="grid">\${active.map((c) => carCard(c, rate, "../")).join("")}</div>
 </div>`,
 `  <div class="autok-head" id="autok" style="margin:0 0 18px">
-    <div class="autok-switch" role="tablist">
-      <button class="asw on" data-mode="eladas" type="button">Eladás</button>
-      <button class="asw" data-mode="berles" type="button">Bérlés</button>
-    </div>
     <div class="autok-tabs" role="tablist">
       <button class="autok-tab on" data-tab="eladas" data-group="eladas" type="button">Eladó autók (\${sale.length})</button>\${sold.length ? \`
       <button class="autok-tab" data-tab="eladva" data-group="eladas" type="button">Eladva (\${sold.length})</button>\` : ""}
@@ -245,18 +237,17 @@ rep(
  });});
  var goHash=function(scroll){var h=(location.hash||'').replace('#','');if(!h)return;var t=tabs.filter(function(x){return x.getAttribute('data-tab')===h;})[0];if(t){t.click();if(scroll){var el=document.getElementById('autok');if(el)el.scrollIntoView({behavior:'smooth'});}}};
  goHash(false);
- (function(){var swBtns=[].slice.call(document.querySelectorAll('.autok-switch .asw'));if(!swBtns.length)return;
+ (function(){
   var groupOf=function(t){return t.getAttribute('data-group')||'eladas';};
-  function setMode(mode,activate){
-   swBtns.forEach(function(s){s.classList.toggle('on',s.getAttribute('data-mode')===mode);});
-   tabs.forEach(function(t){t.hidden=(groupOf(t)!==mode);});
-   if(activate){var vis=tabs.filter(function(t){return groupOf(t)===mode;});
-    var on=vis.filter(function(t){return t.classList.contains('on');})[0];var pick=on||vis[0];if(pick)pick.click();}
-  }
   var modeFromHash=function(){var h=(location.hash||'').replace('#','');return (h==='berelheto'||h==='berbeadva')?'berles':'eladas';};
-  swBtns.forEach(function(s){s.addEventListener('click',function(){setMode(s.getAttribute('data-mode'),true);});});
-  window.addEventListener('hashchange',function(){setMode(modeFromHash(),false);});
-  setMode(modeFromHash(),false);
+  function applyMode(mode){
+   tabs.forEach(function(t){t.hidden=(groupOf(t)!==mode);});
+   var vis=tabs.filter(function(t){return groupOf(t)===mode;});
+   var on=vis.filter(function(t){return t.classList.contains('on');})[0];
+   if(!on&&vis[0])vis[0].click();
+  }
+  window.addEventListener('hashchange',function(){applyMode(modeFromHash());});
+  applyMode(modeFromHash());
  })();
  window.addEventListener('hashchange',function(){goHash(true);});
 })();
