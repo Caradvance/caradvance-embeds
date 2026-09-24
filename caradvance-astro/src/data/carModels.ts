@@ -680,7 +680,7 @@ export const carModels: Record<string, CarModel> = {
     netEur: 113866,
     orderKey: 'xm', orderFuels: 'Hibrid',
     heroSub: 'A BMW M első önálló modellje az M1 óta — M Hybrid plug-in hajtás akár 748 LE-vel, M xDrive összkerékhajtás, M Lounge luxus utastér, új autóként, egyedi konfigurációval.',
-    heroVideo: '',
+    heroVideo: '/caradvance-hero-xm.mp4',
     heroPoster: '/bmw/bmw-xm-studio-elol34.webp',
     mainImg: '/bmw/bmw-xm-studio-elol34.webp',
     mainAlt: 'BMW XM (G09) – nagy teljesítményű M Hybrid SUV Németországból, egyedi rendelés',
