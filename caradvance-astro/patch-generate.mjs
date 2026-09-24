@@ -44,6 +44,8 @@ const soldDate = (c) => String(c.elkelt_datum || "").trim().slice(0, 10);
 const tipusOf  = (c) => (String(c.tipus || "").trim().toLowerCase() || "eladas");
 const isBiz    = (c) => tipusOf(c) === "bizomanyos";
 const isRent   = (c) => String(c.berelheto || "").trim().toLowerCase() === "igen" && nEur(c.berlet_2000_eur) > 0;
+const isBerb   = (c) => String(c.berbeadva || "").trim().toLowerCase() === "igen";
+const berbDate = (c) => String(c.berbeadva_datum || "").trim().slice(0, 10);
 // Tukrozes: kezi lista VAGY a pipeline azt irta, hogy a fokep balra nez.
 const mirrorOf = (c) => {
   // A kezzel valasztott fokepet SOHA nem tukrozzuk: azt mar ugy valasztottuk ki,
@@ -96,6 +98,16 @@ rep(
 .soldbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-11deg);background:rgba(214,31,44,.93);color:#fff;font-size:clamp(17px,3.4vw,28px);font-weight:900;letter-spacing:.13em;text-transform:uppercase;padding:9px 24px;border-radius:8px;border:3px solid #fff;box-shadow:0 12px 30px rgba(0,0,0,.34);z-index:4;pointer-events:none;white-space:nowrap}
 .solddate{position:absolute;bottom:10px;left:10px;background:rgba(16,17,20,.84);color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;z-index:4}
 .soldnote{background:#FDECEE;border:1px solid #F6C9CE;color:#8E1B25;border-radius:12px;padding:14px 18px;font-weight:700;font-size:14.5px;margin:0 0 18px}
+/* ---- Berbeadva (rented out) ---- */
+.card.berb .media img{filter:grayscale(.65) brightness(.9)}
+.berbbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-11deg);background:rgba(31,41,55,.94);color:#fff;font-size:clamp(15px,3vw,25px);font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:9px 22px;border-radius:8px;border:3px solid #fff;box-shadow:0 12px 30px rgba(0,0,0,.34);z-index:4;pointer-events:none;white-space:nowrap}
+.berbdate{position:absolute;bottom:10px;left:10px;background:rgba(16,17,20,.84);color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;z-index:4}
+/* ---- Eladas / Berles kapcsolo ---- */
+.autok-switch{display:inline-flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px;margin:0 0 12px}
+.autok-switch .asw{border:0;background:transparent;font:inherit;font-weight:800;font-size:14px;color:var(--ink);padding:9px 22px;border-radius:999px;cursor:pointer;transition:.2s}
+.autok-switch .asw.on{background:#111;color:#fff}
+.autok-switch .asw:not(.on):hover{background:#F0F3F8}
+.autok-tab[hidden]{display:none}
 /* ---- Berelheto arak ---- */
 .rentprices{margin-top:auto;display:grid;gap:5px;font-size:13.5px}
 .rentprices .rp{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-weight:700}
@@ -116,6 +128,11 @@ rep(
   const d = soldDate(c);
   return '<span class="soldbadge">Eladva</span>' +
     (d ? '<span class="solddate">Elkelt: ' + esc(fmtDateHu(d)) + '</span>' : "");
+}
+function berbOverlay(c) {
+  const d = berbDate(c);
+  return '<span class="berbbadge">Bérbeadva</span>' +
+    (d ? '<span class="berbdate">Bérbeadva: ' + esc(fmtDateHu(d)) + '</span>' : "");
 }
 function rentPricesHtml(c, rate) {
   const k = nEur(c.kaucio_eur), a2 = nEur(c.berlet_2000_eur), a3 = nEur(c.berlet_3000_eur);
@@ -148,8 +165,8 @@ rep(
   const priceRow = opts.rent
     ? rentPricesHtml(c, rate)
     : \`<div class="pricerow" data-eur="\${p.eur}" data-net="\${nEur(c.vetel_eur_netto)}">\${cross}<span class="price" data-main>\${fmtHUF(p.main)}</span><span class="peur">\${fmtEUR(p.eur)}</span>\${save}</div>\`;
-  const cond = opts.rent ? "Bérelhető" : (opts.sold ? "Elkelt" : "Használt");
-  return \`<a class="card\${opts.sold ? " sold" : ""}" href="\${attr(href)}" data-marka="\${attr(c.marka || "")}" data-kar="\${attr(c.karosszeria || "")}" data-uz="\${attr(c.uzemanyag || "")}"><div class="media">\${img}\${badge}\${opts.sold ? soldOverlay(c) : ujBadge(c, true)}</div>
+  const cond = opts.rent ? "Bérelhető" : (opts.berb ? "Bérbeadva" : (opts.sold ? "Elkelt" : "Használt"));
+  return \`<a class="card\${opts.sold ? " sold" : opts.berb ? " berb" : ""}" href="\${attr(href)}" data-marka="\${attr(c.marka || "")}" data-kar="\${attr(c.karosszeria || "")}" data-uz="\${attr(c.uzemanyag || "")}"><div class="media">\${img}\${badge}\${opts.sold ? soldOverlay(c) : opts.berb ? berbOverlay(c) : ujBadge(c, true)}</div>
   <div class="body"><div class="meta"><span class="cond">\${cond}</span><span class="year">\${esc(c.evjarat || "")}</span></div>
   <h3 class="title">\${esc((c.modell || "").trim())}</h3>
   <div class="specs">\${esc(specStr(c))}</div>
@@ -183,33 +200,34 @@ rep(
 `  <div class="count" id="count">\${active.length} autó</div>
   <div class="grid" id="grid">\${active.map((c) => carCard(c, rate, "../")).join("")}</div>
 </div>`,
-`  <div class="autok-head" style="margin:0 0 18px">
+`  <div class="autok-head" id="autok" style="margin:0 0 18px">
+    <div class="autok-switch" role="tablist">
+      <button class="asw on" data-mode="eladas" type="button">Eladás</button>
+      <button class="asw" data-mode="berles" type="button">Bérlés</button>
+    </div>
     <div class="autok-tabs" role="tablist">
-      <button class="autok-tab on" data-tab="eladas" type="button">Eladó autók (\${sale.length})</button>
-      <button class="autok-tab" data-tab="berelheto" type="button">Bérelhető (\${rent.length})</button>\${biz.length ? \`
-      <button class="autok-tab" data-tab="bizomanyos" type="button">Bizományos (\${biz.length})</button>\` : ""}\${sold.length ? \`
-      <button class="autok-tab" data-tab="eladva" type="button">Eladva (\${sold.length})</button>\` : ""}
+      <button class="autok-tab on" data-tab="eladas" data-group="eladas" type="button">Eladó autók (\${sale.length})</button>\${sold.length ? \`
+      <button class="autok-tab" data-tab="eladva" data-group="eladas" type="button">Eladva (\${sold.length})</button>\` : ""}
+      <button class="autok-tab" data-tab="berelheto" data-group="berles" type="button" hidden>Bérelhető (\${rent.length})</button>
+      <button class="autok-tab" data-tab="berbeadva" data-group="berles" type="button" hidden>Bérbeadva (\${berb.length})</button>
     </div>
   </div>
   <div class="autok-panel on" id="panel-eladas">
     <div class="count" id="count">\${sale.length} autó</div>
     <div class="grid" id="grid">\${sale.map((c) => carCard(c, rate, "../")).join("")}</div>
-  </div>
-  <div class="autok-panel" id="panel-berelheto">
-    <p class="ptab">Bérlés minimum 6 hónapos időtartamtól, havidíjas konstrukcióban. A havi díj a választott km-kerettől függ; a kaució egyszeri, a bérlés végén visszajár.</p>
-    <div class="count">\${rent.length} autó</div>
-    <div class="grid">\${rent.length ? rent.map((c) => carCard(c, rate, "../", { rent: true })).join("") : '<div class="empty">Jelenleg nincs bérelhető autó a készletben.</div>'}</div>
-  </div>\${biz.length ? \`
-  <div class="autok-panel" id="panel-bizomanyos">
-    <p class="ptab">Bizományos autók: magánszemélyek és partnereink autói, amelyeket mi értékesítünk — ugyanazzal a bevizsgálással és ügyintézéssel.</p>
-    <div class="count">\${biz.length} autó</div>
-    <div class="grid">\${biz.map((c) => carCard(c, rate, "../")).join("")}</div>
-  </div>\` : ""}\${sold.length ? \`
+  </div>\${sold.length ? \`
   <div class="autok-panel" id="panel-eladva">
-    <p class="ptab">Ezek az autók már elkeltek — referenciaként hagyjuk fent őket. Ha hasonlót keresel, a teljes német piacról behozzuk neked.</p>
     <div class="count">\${sold.length} autó</div>
     <div class="grid">\${sold.map((c) => carCard(c, rate, "../", { sold: true })).join("")}</div>
   </div>\` : ""}
+  <div class="autok-panel" id="panel-berelheto">
+    <div class="count">\${rent.length} autó</div>
+    <div class="grid">\${rent.length ? rent.map((c) => carCard(c, rate, "../", { rent: true })).join("") : '<div class="empty">Jelenleg nincs bérelhető autó a készletben.</div>'}</div>
+  </div>
+  <div class="autok-panel" id="panel-berbeadva">
+    <div class="count">\${berb.length} autó</div>
+    <div class="grid">\${berb.length ? berb.map((c) => carCard(c, rate, "../", { berb: true })).join("") : '<div class="empty">Jelenleg nincs bérbeadott autó.</div>'}</div>
+  </div>
 </div>`,
 'katalogus fulek');
 
@@ -227,6 +245,19 @@ rep(
  });});
  var goHash=function(scroll){var h=(location.hash||'').replace('#','');if(!h)return;var t=tabs.filter(function(x){return x.getAttribute('data-tab')===h;})[0];if(t){t.click();if(scroll){var el=document.getElementById('autok');if(el)el.scrollIntoView({behavior:'smooth'});}}};
  goHash(false);
+ (function(){var swBtns=[].slice.call(document.querySelectorAll('.autok-switch .asw'));if(!swBtns.length)return;
+  var groupOf=function(t){return t.getAttribute('data-group')||'eladas';};
+  function setMode(mode,activate){
+   swBtns.forEach(function(s){s.classList.toggle('on',s.getAttribute('data-mode')===mode);});
+   tabs.forEach(function(t){t.hidden=(groupOf(t)!==mode);});
+   if(activate){var vis=tabs.filter(function(t){return groupOf(t)===mode;});
+    var on=vis.filter(function(t){return t.classList.contains('on');})[0];var pick=on||vis[0];if(pick)pick.click();}
+  }
+  var modeFromHash=function(){var h=(location.hash||'').replace('#','');return (h==='berelheto'||h==='berbeadva')?'berles':'eladas';};
+  swBtns.forEach(function(s){s.addEventListener('click',function(){setMode(s.getAttribute('data-mode'),true);});});
+  window.addEventListener('hashchange',function(){setMode(modeFromHash(),false);});
+  setMode(modeFromHash(),false);
+ })();
  window.addEventListener('hashchange',function(){goHash(true);});
 })();
 </script>\`;
@@ -413,7 +444,7 @@ rep(`  const priceRow = opts.rent
 `  const priceRow = opts.sold
     ? \`<div class="pricerow" data-eur="\${p.eur}" data-net="\${nEur(c.vetel_eur_netto)}"><span class="price" data-main>\${fmtHUF(p.main)}</span><span class="peur">\${fmtEUR(p.eur)}</span></div>
       <div class="soldprice"><span>Elkelt\${soldDate(c) ? " &middot; " + esc(fmtDateHu(soldDate(c))) : ""} &middot; hasonlót behozunk neked.</span></div>\`
-    : (opts.rent
+    : ((opts.rent || opts.berb)
       ? rentPricesHtml(c, rate)
       : \`<div class="pricerow" data-eur="\${p.eur}" data-net="\${nEur(c.vetel_eur_netto)}">\${cross}<span class="price" data-main>\${fmtHUF(p.main)}</span><span class="peur">\${fmtEUR(p.eur)}</span>\${save}</div>\`);`,
 'kartya: eladott autonal ar + elkelt-jelzes');
@@ -464,20 +495,22 @@ rep(`        <button class="btn btn-soft dlbtn" id="pdfbtn" type="button">\${DL_
 rep(`  const sale = active.filter((c) => !isBiz(c));`,
 `  const dedupe = (list) => { const seen = new Set(); return list.filter((c) => {
     const k = slugOf(c); if (!k || seen.has(k)) return false; seen.add(k); return true; }); };
-  const sale = dedupe(active.filter((c) => !isBiz(c)));`,
+  const sale = dedupe(active.filter((c) => !isBiz(c) && !isBerb(c)));`,
 'katalogus: dedup (elado)');
 
 rep(`  const rent = active.filter(isRent);
   const biz  = active.filter(isBiz);`,
-`  const rent = dedupe(active.filter(isRent));
+`  const rent = dedupe(active.filter((c) => isRent(c) && !isBerb(c)));
   const biz  = dedupe(active.filter(isBiz));`,
 'katalogus: dedup (berelheto, bizomanyos)');
 
 rep(`  const sold = cars.filter(isSold)
     .sort((a, b) => String(soldDate(b)).localeCompare(String(soldDate(a))));`,
 `  const sold = dedupe(cars.filter(isSold)
-    .sort((a, b) => String(soldDate(b)).localeCompare(String(soldDate(a)))));`,
-'katalogus: dedup (eladva)');
+    .sort((a, b) => String(soldDate(b)).localeCompare(String(soldDate(a)))));
+  const berb = dedupe(cars.filter(isBerb)
+    .sort((a, b) => String(berbDate(b)).localeCompare(String(berbDate(a)))));`,
+'katalogus: dedup (eladva) + berbeadva');
 
 /* ---- VEDELEM: soha ne kerulhessen ki "0 Ft" ---------------------------- */
 // 2026.08.28: a Sheetben 18 sajat autonak nem volt ara -> az oldalon 18 kartya
@@ -576,6 +609,9 @@ rep(
 \${heroVar("berelheto", "Bérelhető autóink",
   "Havidíjas konstrukció 6 hónaptól, 2 000 vagy 3 000 km/hó kerettel. A kaució a bérlés végén visszajár.",
   rent.length + " bérelhető autó")}
+\${berb.length ? heroVar("berbeadva", "Bérbeadott autóink",
+  "Ezeket az autókat jelenleg ügyfeleink bérlik. Ha hasonlót bérelnél, szólj — behozzuk vagy a készletünkből megoldjuk.",
+  "Bérelhető autóink", "berelheto") : ""}
 \${biz.length ? heroVar("bizomanyos", "Bizományos autóink",
   "Partnereink és magánszemélyek autói — ugyanazzal a bevizsgálással és ügyintézéssel, mint a saját készletünk.",
   biz.length + " bizományos autó") : ""}
@@ -588,14 +624,7 @@ rep(
   <div class="crumb"><a href="../">Főoldal</a> / <b>Megvásárolható autóink</b></div>`,
 'katalogus hero (fooldal-stilus)');
 
-rep(
-`  <div class="autok-head" style="margin:0 0 18px">
-    <div class="autok-tabs" role="tablist">
-      <button class="autok-tab on" data-tab="eladas"`,
-`  <div class="autok-head" id="autok" style="margin:0 0 18px">
-    <div class="autok-tabs" role="tablist">
-      <button class="autok-tab on" data-tab="eladas"`,
-'hero cta horgony');
+// (hero cta horgony rep torolve: az id="autok" mar a fulek markupban van)
 
 rep(
 `  <div class="chead"><h1>Megvásárolható autóink</h1><p>Prémium autók Németországból, nettó árakkal (áfa nélkül). Az árak élő árfolyammal frissülnek (1 € = <span id="ratev">\${rate}</span> Ft).</p></div>`,
@@ -641,12 +670,7 @@ rep(
   document.querySelectorAll('.autok-panel').forEach(function(p){p.classList.toggle('on',p.id==='panel-'+b.getAttribute('data-tab'));});`,
 'hero valtas a fulekkel');
 
-/* -- a fulek bevezeto mondata mar a hero-ban van, itt csak ismetles volt -- */
-[
-  ['    <p class="ptab">Bérlés minimum 6 hónapos időtartamtól, havidíjas konstrukcióban. A havi díj a választott km-kerettől függ; a kaució egyszeri, a bérlés végén visszajár.</p>\n', 'ptab berlet'],
-  ['    <p class="ptab">Bizományos autók: magánszemélyek és partnereink autói, amelyeket mi értékesítünk — ugyanazzal a bevizsgálással és ügyintézéssel.</p>\n', 'ptab bizomanyos'],
-  ['    <p class="ptab">Ezek az autók már elkeltek — referenciaként hagyjuk fent őket. Ha hasonlót keresel, a teljes német piacról behozzuk neked.</p>\n', 'ptab eladva'],
-].forEach(function (x) { rep(x[0], '', x[1] + ' torlese (a hero mondja el)'); });
+/* -- a ptab bevezeto mondatok mar nincsenek a panelekben (a hero mondja el) -- */
 
 fs.writeFileSync(file, s);
 console.log('patch-generate: ' + log.length + ' modositas rendben');
