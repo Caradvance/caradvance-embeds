@@ -1,0 +1,416 @@
+---
+// Referenciák — cégprofil / track record oldal.
+// Hero (a többi aloldallal azonos, globális .hero), majd:
+//   1) Google-vélemények sor (élő widget hely + valós vélemények tartalék)
+//   2) Bérelt autóink sora        (autók sheet: berelheto = igen)
+//   3) Eladott autóink sora       (autók sheet: elkelt = igen)
+//   4) Bizományos autóink sora    (biz-data.js — window.BIZ)
+//   5) Importált autóink sora     (autók sheet: aktiv = igen, nem bérelhető, nem eladott)
+// A négy autós sor a böngészőben, élőben tölti a Google Sheet CSV-t (mint az /autoink és a bérlés oldal).
+import '../styles/eladom.css';
+import type { Locale } from '../i18n/utils';
+const { lang } = (Astro.props as { lang: Locale });
+
+// Google cégprofil + értékelés (a Media oldallal azonos forrás)
+const GOOGLE_URL = 'https://www.google.com/maps/search/?api=1&query=Caradvance%20GmbH%20Autovermietung';
+const GOOGLE_RATING = '5,0';
+
+// Valós Google-vélemények (a Media oldalról) — a sor mindig tele van, akkor is, ha az élő widget nincs beállítva.
+const reviews = [
+  { name: 'EYG', initials: 'EY', color: '#4285F4', when: '1 éve', text: 'Rendkívül elégedett vagyok a Caradvance-nál vásárolt autómmal! A kiszolgálás profi, barátságos és nagyon hozzáértő volt. Ferataj asszony rengeteg időt szánt rá, hogy megválaszolja minden kérdésemet a szürke BMW X3-mal kapcsolatban.' },
+  { name: 'Bad Martin', initials: 'BM', color: '#7B45D6', when: '2 éve', text: 'Nagyon barátságos és hozzáértő csapat, kifogástalanul karbantartott autók. A Sixttel, Europcarral és a többiekkel ellentétben itt tényleg felveszik a telefont, és pontosan a megígért autót kaptam meg! Messze kiemelkedik az összes bérlő- és flottacég közül. Csak ajánlani tudom.' },
+  { name: 'Riat Nuredini', initials: 'RN', color: '#0F9D58', when: '1 éve', text: 'Örömömre szolgált, hogy a Caradvance GmbH-val dolgozhattam, és csak pozitív tapasztalatokról tudok beszámolni! A kiszolgálás az elejétől a végéig kiváló volt. A csapat rendkívül profi, barátságos és hozzáértő. Igazán időt szántak rám.' },
+  { name: 'Alexandru Ion', initials: 'AI', color: '#D93025', when: '2 éve', text: 'Kiváló munka. Délelőtt 11-re érkeztem, és 14 órára, a fizetés után már vittem is az autót. Az ár stimmelt, az autó minden adata pontos volt. Köszönöm!' },
+  { name: 'Ciccio Grifó', initials: 'CG', color: '#1E8E3E', when: '4 éve', text: 'A Caradvance Münchennel dolgozni igazi öröm. A munkatársak profik, mindenekelőtt udvariasak és barátságosak. A kérdésekre, módosításokra és e-mailekre gyorsan válaszolnak. Külön köszönet Iacobescu asszonynak és Ferataj asszonynak a kiváló kiszolgálásért.' },
+  { name: 'Petar Mičić', initials: 'PM', color: '#E37400', when: '11 hónapja', text: 'Autót vásároltam ennél a cégnél — nagyon egyszerű volt, segítőkész eladókkal. Minden gördülékenyen és bonyodalmak nélkül ment.' },
+  { name: 'Hussam Nader', initials: 'HN', color: '#12B5CB', when: '1 éve', text: 'Szuper kiszolgálás!' },
+  { name: 'Adnan Podgora', initials: 'AP', color: '#9334E6', when: '2 éve', text: 'A legjobb, amit bérelni lehet — itt mindent megtalálsz.' },
+];
+
+const GOOGLE_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>';
+
+const rows = [
+  { key: 'rented',  eyebrow: 'Bérlés',      title: 'Bérelt autóink',      sub: 'A prémium bérflottánk — vadonatúj BMW, MINI, Mercedes és Audi modellek, amelyeket ügyfeleink bérelnek.', more: { t: 'Bérelhető autók', href: '/berelheto' } },
+  { key: 'sold',    eyebrow: 'Értékesítés', title: 'Eladott autóink',     sub: 'Németországból behozott, forgalomba helyezett prémium autók, amelyeket vevőinknek adtunk át.',        more: { t: 'Megvásárolható autók', href: '/autoink' } },
+  { key: 'biz',     eyebrow: 'Bizomány',    title: 'Bizományos autóink',  sub: 'Ügyfeleink megbízásából, bizományban értékesített prémium autók — minden eladásból jótékony célra is juttatunk.', more: { t: 'Bizományos autók', href: '/bizomanyos' } },
+  { key: 'import',  eyebrow: 'Import',      title: 'Importált autóink',   sub: 'Aktuálisan elérhető, Németországból behozott prémium autóink — dokumentált előélettel, honosítással.',   more: { t: 'Autó rendelés', href: '/auto-rendeles' } },
+];
+
+const pageJson = {
+  '@context': 'https://schema.org', '@type': 'WebPage',
+  name: 'Referenciák — CarAdvance',
+  description: 'CarAdvance referenciák: valós Google-vélemények, bérelt, eladott, bizományos és importált prémium autóink egy helyen. Németországi háttér, kulcsrakész folyamat, 5,0-ös Google-értékelés.',
+  url: 'https://www.caradvance.hu/referenciak/',
+  inLanguage: 'hu-HU',
+};
+const ratingJson = {
+  '@context': 'https://schema.org', '@type': 'Organization',
+  name: 'CarAdvance', url: 'https://www.caradvance.hu/',
+  logo: 'https://www.caradvance.hu/caradvance-logo.webp',
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: '5.0', bestRating: '5', worstRating: '1', reviewCount: '24' },
+  review: reviews.map((r) => ({ '@type': 'Review', author: { '@type': 'Person', name: r.name }, reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' }, reviewBody: r.text })),
+};
+const breadcrumbJson = {
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Kezdőlap', item: 'https://www.caradvance.hu/' },
+    { '@type': 'ListItem', position: 2, name: 'Referenciák', item: 'https://www.caradvance.hu/referenciak/' },
+  ],
+};
+const jsonLdAll = [pageJson, ratingJson, breadcrumbJson];
+---
+<section class="ref">
+
+<!-- HERO (a többi aloldallal azonos, globális .hero) -->
+<section class="hero">
+<video autoplay muted loop playsinline preload="auto" poster="https://www.caradvance.hu/caradvance-hero-x5-poster.jpg">
+<source src="https://www.caradvance.hu/caradvance-hero-x5.mp4" type="video/mp4" />
+</video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>Referenciák<br /><span class="accent">amit letettünk az asztalra.</span></h1>
+<p class="sub sub-wide" style="max-width:900px">Valós Google-vélemények és a munkánk kézzelfogható eredménye — bérelt, eladott, bizományos és Németországból importált prémium autóink egy helyen.</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="#velemenyek">Vélemények</a>
+<a class="btn btn-white" href="/kapcsolat">Kapcsolat</a>
+</div>
+</div>
+<button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+</section>
+
+<!-- 1) GOOGLE-VÉLEMÉNYEK -->
+<section class="section" id="velemenyek" style="padding-top:56px;padding-bottom:8px">
+<div class="wrap center">
+<span class="eyebrow">Vélemények</span>
+<h2 class="sec-title">Amit ügyfeleink mondanak</h2>
+<p class="sec-intro">A Caradvance GmbH jelenleg {GOOGLE_RATING}-os átlagértékelést tart a Google-on. Íme néhány valós vélemény.</p>
+</div>
+<div class="wrap">
+<a class="ref-google" href={GOOGLE_URL} target="_blank" rel="noopener noreferrer">
+<span class="ref-g-ico" set:html={GOOGLE_SVG}></span>
+<span class="ref-g-txt"><b>{GOOGLE_RATING} <span class="ref-stars">★★★★★</span></b><span>Kiváló Google-értékelés — valós ügyfélvélemények</span></span>
+<span class="ref-g-link">Összes értékelés ↗</span>
+</a>
+</div>
+
+<!-- ÉLŐ GOOGLE-WIDGET HELYE:
+     Ide illeszd be a Google-véleménywidget beágyazó kódját (pl. Featurable / Elfsight / Trustindex).
+     Amint a widget megjelenik, elrejtjük alatta a beépített (tartalék) véleménykártyákat. -->
+<div class="wrap"><div id="ref-google-widget" class="ref-widget"></div></div>
+
+<div class="wrap" id="ref-reviews-fallback">
+<div class="ref-reviews" role="list">
+{reviews.map((r) => (
+<div class="ref-rev" role="listitem">
+<div class="ref-rev-top">
+<span class="ref-avatar" style={`background:${r.color}`}>{r.initials}</span>
+<span class="ref-rev-id"><b>{r.name}</b><span>{r.when}</span></span>
+<span class="ref-rev-g" set:html={GOOGLE_SVG}></span>
+</div>
+<div class="ref-rev-stars">★★★★★</div>
+<p class="ref-rev-text">{r.text}</p>
+</div>
+))}
+</div>
+<p class="ref-hint">← görgess a további Google-véleményekért →</p>
+</div>
+</section>
+
+<!-- 2–5) AUTÓS SOROK -->
+{rows.map((row) => (
+<section class="section ref-carsec" style="padding-top:18px;padding-bottom:18px">
+<div class="wrap ref-head">
+<div>
+<span class="eyebrow">{row.eyebrow}</span>
+<h2 class="sec-title ref-sectitle">{row.title}</h2>
+<p class="sec-intro">{row.sub}</p>
+</div>
+<a class="ref-more" href={row.more.href}>{row.more.t} →</a>
+</div>
+<div class="wrap ref-rowwrap">
+<button class="ref-nav ref-prev" data-row={row.key} aria-label="Előző" type="button">‹</button>
+<div class="ref-track" id={`row-${row.key}`} data-row={row.key}>
+<div class="ref-skel">Autók betöltése…</div>
+</div>
+<button class="ref-nav ref-next" data-row={row.key} aria-label="Következő" type="button">›</button>
+</div>
+</section>
+))}
+
+<!-- ZÁRÓ CTA -->
+<section class="section" style="padding-top:8px">
+<div class="wrap">
+<div class="ref-cta">
+<div>
+<h2>Legyél te a következő elégedett ügyfelünk.</h2>
+<p>Bérlés, vásárlás, németországi behozatal vagy bizományos értékesítés — mondd el, mit keresel, a többit intézzük.</p>
+</div>
+<div class="ref-cta-btns">
+<a class="btn btn-primary" href="/kapcsolat">Kapcsolatfelvétel</a>
+<a class="btn btn-white" href="/egyedi-auto-rendeles">Autók böngészése</a>
+</div>
+</div>
+</div>
+</section>
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLdAll)}></script>
+
+</section>
+
+<style>
+.ref{--rline:#e6eaf1;--rmuted:#6b7280;--rink:#0d1220;--rnavy:#0d1b3e;--rsoft:#eef2f8;--rred:#e2001a}
+.ref .ref-sectitle{font-size:clamp(24px,3vw,34px);margin:12px 0 10px}
+.ref .ref-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.ref .ref-head .sec-intro{max-width:720px}
+.ref-more{white-space:nowrap;font-weight:700;color:var(--rnavy);text-decoration:none;padding:10px 16px;border:1px solid var(--rline);border-radius:999px;transition:background .18s,color .18s}
+.ref-more:hover{background:var(--rnavy);color:#fff}
+
+/* Google summary bar */
+.ref-google{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--rline);border-radius:16px;padding:16px 20px;text-decoration:none;color:var(--rink);box-shadow:0 8px 24px rgba(10,12,24,.05);transition:transform .18s,box-shadow .18s;max-width:720px;margin:0 auto}
+.ref-google:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(10,12,24,.1)}
+.ref-g-ico{flex:0 0 auto;display:flex}
+.ref-g-txt{display:flex;flex-direction:column;line-height:1.35}
+.ref-g-txt b{font-size:18px}
+.ref-stars{color:#FBBC05;letter-spacing:1px}
+.ref-g-txt span span,.ref-g-txt>span{color:var(--rmuted);font-size:13.5px;font-weight:600}
+.ref-g-link{margin-left:auto;white-space:nowrap;font-weight:700;color:var(--rnavy)}
+@media(max-width:560px){.ref-g-link{display:none}}
+
+/* Live widget mount */
+.ref-widget{margin-top:20px}
+.ref-widget:empty{display:none}
+
+/* Reviews scroller */
+.ref-reviews{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:22px 2px 8px;-webkit-overflow-scrolling:touch}
+.ref-reviews::-webkit-scrollbar{height:8px}.ref-reviews::-webkit-scrollbar-thumb{background:#d7dded;border-radius:999px}
+.ref-rev{scroll-snap-align:start;flex:0 0 320px;max-width:320px;background:#fff;border:1px solid var(--rline);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.ref-rev-top{display:flex;align-items:center;gap:10px}
+.ref-avatar{width:40px;height:40px;border-radius:50%;color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.ref-rev-id{display:flex;flex-direction:column;line-height:1.2}.ref-rev-id b{font-size:14.5px}.ref-rev-id span{color:var(--rmuted);font-size:12.5px}
+.ref-rev-g{margin-left:auto;opacity:.9}
+.ref-rev-stars{color:#FBBC05;letter-spacing:1px}
+.ref-rev-text{color:#39414f;font-size:14px;line-height:1.5;margin:0}
+.ref-hint{text-align:center;color:var(--rmuted);font-size:13px;margin:12px 0 0}
+@media(min-width:900px){.ref-hint{display:none}}
+
+/* Car rows */
+.ref-rowwrap{position:relative;display:flex;align-items:center;gap:8px}
+.ref-track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 14px;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;flex:1}
+.ref-track::-webkit-scrollbar{height:8px}.ref-track::-webkit-scrollbar-thumb{background:#d7dded;border-radius:999px}
+.ref-skel{color:var(--rmuted);font-size:14px;padding:40px 4px}
+.ref-nav{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:1px solid var(--rline);background:#fff;color:var(--rnavy);font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(10,12,24,.08);transition:background .15s,color .15s}
+.ref-nav:hover{background:var(--rnavy);color:#fff}
+@media(min-width:900px){.ref-nav.is-on{display:flex}}
+
+/* Car card (autoink stílus) */
+.ref-card{scroll-snap-align:start;flex:0 0 300px;max-width:300px;background:#fff;border:1px solid var(--rline);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s}
+a.ref-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}
+.ref-card .rc-media{aspect-ratio:4/3;background:linear-gradient(135deg,#1A1B1F,#26272C);position:relative;overflow:hidden}
+.ref-card .rc-media img{width:100%;height:100%;object-fit:cover;display:block}
+.ref-card .rc-badge{position:absolute;top:12px;left:12px;color:#fff;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;z-index:3}
+.ref-card .rc-feat{position:absolute;top:12px;right:12px;background:var(--rred);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;z-index:2}
+.ref-card .rc-body{padding:15px 16px 16px;display:flex;flex-direction:column;flex:1;min-width:0}
+.ref-card .rc-meta{display:flex;gap:8px;align-items:center;color:var(--rmuted);font-size:12px;font-weight:700;margin-bottom:6px}
+.ref-card .rc-title{font-size:15px;font-weight:800;line-height:1.25;margin:0 0 8px;color:var(--rink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:38px}
+.ref-card .rc-specs{color:var(--rmuted);font-size:12.5px;font-weight:600;margin-bottom:12px}
+.ref-card .rc-pricerow{display:flex;align-items:baseline;gap:8px;margin-top:auto;flex-wrap:wrap}
+.ref-card .rc-price{font-size:19px;font-weight:800;color:var(--rink)}
+.ref-card .rc-peur{color:var(--rmuted);font-size:13px;font-weight:700}
+.ref-card .rc-btn{margin-top:12px;display:block;text-align:center;background:var(--rsoft);color:var(--rink);font-weight:700;padding:10px;border-radius:999px;font-size:14px}
+a.ref-card:hover .rc-btn{background:var(--rnavy);color:#fff}
+
+/* Bottom CTA */
+.ref-cta{background:linear-gradient(135deg,#0d1b3e,#12244f);color:#fff;border-radius:24px;padding:34px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.ref-cta h2{font-size:clamp(22px,2.6vw,30px);margin:0 0 8px;font-weight:800}
+.ref-cta p{margin:0;color:#c7cfe2;max-width:560px;line-height:1.5}
+.ref-cta-btns{display:flex;gap:14px;flex-wrap:wrap}
+</style>
+
+<script is:inline>
+(function () {
+  var SHEET = 'https://docs.google.com/spreadsheets/d/1rVdjNPmwPnqZ-whBBs0f_xnAnZRXP-ozeaNkQBvIO2Y/gviz/tq?tqx=out:csv';
+  var RATE = 362; // EUR->HUF fallback, élőben frissül
+  var MAX = 12;   // soronkénti max kártya
+
+  function parseCSV(text) {
+    var rows = [], row = [], cur = '', q = false;
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+        else cur += c;
+      } else {
+        if (c === '"') q = true;
+        else if (c === ',') { row.push(cur); cur = ''; }
+        else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+        else if (c === '\r') { /* skip */ }
+        else cur += c;
+      }
+    }
+    if (cur.length || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+
+  function ft(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  var yn = function (v) { return String(v || '').trim().toLowerCase() === 'igen'; };
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  function imgOf(o) {
+    var m = (o.kep_url_manual || '').trim();
+    if (m) return m;
+    var k = (o.kep_url || '').trim();
+    if (k) return k;
+    var g = (o.galeria || '').split(',')[0];
+    return (g || '').trim();
+  }
+
+  // kártya HTML
+  function card(o, opts) {
+    opts = opts || {};
+    var title = esc(o.modell || o.marka || 'Prémium autó');
+    var im = imgOf(o);
+    if (!im) return ''; // kép nélküli kártyát kihagyunk
+    var km = (o.km || '').replace(/[^\d]/g, '');
+    var kmTxt = km ? (ft(parseFloat(km)) + ' km') : '';
+    var specs = [kmTxt, o.valto, o.uzemanyag].filter(Boolean).join(' · ');
+    var year = esc(o.evjarat || '');
+    var badge = '';
+    if (opts.badge) badge = '<span class="rc-badge" style="background:' + opts.badgeColor + '">' + esc(opts.badge) + '</span>';
+    else if (yn(o.kiemelt)) badge = '<span class="rc-feat">Kiemelt</span>';
+
+    // ár
+    var priceHtml = '';
+    if (opts.rental) {
+      var reur = parseFloat(o.berlet_2000_eur || o.berlet_eur || 0) || 0;
+      if (reur) priceHtml = '<span class="rc-price" data-eur="' + reur + '">' + ft(reur * RATE) + ' Ft/hó</span><span class="rc-peur">' + ft(reur) + ' €/hó</span>';
+    } else {
+      var huf = parseFloat((o.vetel_huf || '').replace(/[^\d.]/g, '')) || 0;
+      var eur = parseFloat(o.vetel_eur || 0) || 0;
+      if (!huf && eur) huf = eur * RATE;
+      if (huf) priceHtml = '<span class="rc-price"' + (eur ? ' data-eur="' + eur + '"' : '') + '>' + ft(huf) + ' Ft</span>' + (eur ? '<span class="rc-peur">' + ft(eur) + ' €</span>' : '');
+    }
+
+    var media = '<div class="rc-media"><img src="' + esc(im) + '" alt="' + title + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest(\'.ref-card\').style.display=\'none\'">' + badge + '</div>';
+    var body = '<div class="rc-body">' +
+      (year ? '<div class="rc-meta"><span>' + year + '</span></div>' : '') +
+      '<h3 class="rc-title">' + title + '</h3>' +
+      (specs ? '<div class="rc-specs">' + esc(specs) + '</div>' : '') +
+      '<div class="rc-pricerow">' + priceHtml + '</div>' +
+      (opts.link ? '<span class="rc-btn">Részletek</span>' : (opts.cta ? '<span class="rc-btn">' + esc(opts.cta) + '</span>' : '')) +
+      '</div>';
+
+    if (opts.link) return '<a class="ref-card" href="' + esc(opts.link) + '">' + media + body + '</a>';
+    return '<div class="ref-card">' + media + body + '</div>';
+  }
+
+  function fill(key, html) {
+    var el = document.getElementById('row-' + key);
+    if (!el) return;
+    if (!html) { el.innerHTML = '<div class="ref-skel">Jelenleg nincs megjeleníthető autó ebben a kategóriában.</div>'; return; }
+    el.innerHTML = html;
+    updateNav(key);
+  }
+
+  function updateNav(key) {
+    var track = document.getElementById('row-' + key);
+    if (!track) return;
+    var wrap = track.closest('.ref-rowwrap');
+    if (!wrap) return;
+    var need = track.scrollWidth > track.clientWidth + 8;
+    wrap.querySelectorAll('.ref-nav').forEach(function (b) { b.classList.toggle('is-on', need); });
+  }
+
+  // scroll gombok
+  document.querySelectorAll('.ref-nav').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-row');
+      var track = document.getElementById('row-' + key);
+      if (!track) return;
+      var dx = Math.round(track.clientWidth * 0.85) * (btn.classList.contains('ref-prev') ? -1 : 1);
+      track.scrollBy({ left: dx, behavior: 'smooth' });
+    });
+  });
+
+  // élő EUR->HUF
+  fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF')
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      var v = j && j.rates && j.rates.HUF;
+      if (v) { RATE = v; document.querySelectorAll('[data-eur]').forEach(function (el) {
+        var e = parseFloat(el.getAttribute('data-eur')) || 0; if (!e) return;
+        var suffix = el.textContent.indexOf('/hó') > -1 ? ' Ft/hó' : ' Ft';
+        el.textContent = ft(e * RATE) + suffix;
+      }); }
+    }).catch(function () {});
+
+  // 1) Autók sheet — bérelt / eladott / importált
+  fetch(SHEET).then(function (r) { return r.text(); }).then(function (txt) {
+    var rows = parseCSV(txt);
+    if (!rows.length) throw 0;
+    var head = rows[0].map(function (h) { return String(h).trim(); });
+    var list = [];
+    for (var i = 1; i < rows.length; i++) {
+      var r = rows[i]; if (!r || !r.length) continue;
+      var o = {}; head.forEach(function (h, k) { o[h] = r[k] != null ? r[k] : ''; });
+      if (!(o.modell || '').trim()) continue;
+      list.push(o);
+    }
+
+    var rented = list.filter(function (o) { return yn(o.berelheto); });
+    var sold   = list.filter(function (o) { return yn(o.elkelt); });
+    var imported = list.filter(function (o) { return yn(o.aktiv) && !yn(o.elkelt) && !yn(o.berelheto); });
+
+    var hRent = rented.slice(0, MAX).map(function (o) {
+      return card(o, { rental: true, link: '/auto/' + (o.slug || '') + '/' });
+    }).join('');
+    var hSold = sold.slice(0, MAX).map(function (o) {
+      return card(o, { badge: 'Elkelt', badgeColor: '#0d1b3e', cta: 'Hasonlót keresek' });
+    }).join('');
+    var hImp = imported.slice(0, MAX).map(function (o) {
+      return card(o, { link: '/auto/' + (o.slug || '') + '/' });
+    }).join('');
+
+    fill('rented', hRent);
+    fill('sold', hSold);
+    fill('import', hImp);
+  }).catch(function () {
+    fill('rented', ''); fill('sold', ''); fill('import', '');
+  });
+
+  // 2) Bizományos — biz-data.js (window.BIZ)
+  function loadBiz() {
+    if (!window.BIZ || !window.BIZ.loadCars) { fill('biz', ''); return; }
+    try {
+      window.BIZ.loadCars(function (cars) {
+        var html = (cars || []).slice(0, MAX).map(function (c) {
+          var o = { modell: c.modell, marka: c.marka, km: c.km, valto: c.valto, uzemanyag: c.uzemanyag, evjarat: c.evjarat, vetel_huf: c.huf ? String(c.huf) : '', vetel_eur: c.eur || '', kep_url_manual: c.img || '' };
+          return card(o, { cta: 'Bizományos autók' });
+        }).join('');
+        fill('biz', html);
+      });
+    } catch (e) { fill('biz', ''); }
+  }
+  var s = document.createElement('script');
+  s.src = '/biz-data.js'; s.async = true;
+  s.onload = loadBiz;
+  s.onerror = function () { fill('biz', ''); };
+  document.head.appendChild(s);
+
+  // widget megjelenik -> tartalék elrejtése
+  var mount = document.getElementById('ref-google-widget');
+  if (mount) {
+    var obs = new MutationObserver(function () {
+      if (mount.children.length > 0) {
+        var fb = document.getElementById('ref-reviews-fallback');
+        if (fb) fb.style.display = 'none';
+        obs.disconnect();
+      }
+    });
+    obs.observe(mount, { childList: true });
+  }
+
+  window.addEventListener('resize', function () {
+    ['rented', 'sold', 'biz', 'import'].forEach(updateNav);
+  });
+})();
+</script>
