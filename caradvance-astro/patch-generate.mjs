@@ -106,8 +106,8 @@ rep(
 .solddate{position:absolute;bottom:10px;left:10px;background:rgba(16,17,20,.84);color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;z-index:4}
 .soldnote{background:#FDECEE;border:1px solid #F6C9CE;color:#8E1B25;border-radius:12px;padding:14px 18px;font-weight:700;font-size:14.5px;margin:0 0 18px}
 /* ---- Berbeadva (rented out) ---- */
-.card.berb .media img{filter:grayscale(.65) brightness(.9)}
-.berbbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-11deg);background:rgba(31,41,55,.94);color:#fff;font-size:clamp(15px,3vw,25px);font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:9px 22px;border-radius:8px;border:3px solid #fff;box-shadow:0 12px 30px rgba(0,0,0,.34);z-index:4;pointer-events:none;white-space:nowrap}
+.card.berb .media img{filter:grayscale(.5) brightness(.86)}
+.berbbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-11deg);background:rgba(214,31,44,.93);color:#fff;font-size:clamp(12px,2.4vw,18px);font-weight:900;letter-spacing:.07em;text-transform:uppercase;padding:7px 16px;border-radius:7px;border:2px solid #fff;box-shadow:0 10px 26px rgba(0,0,0,.32);z-index:4;pointer-events:none;white-space:nowrap}
 .berbdate{position:absolute;bottom:10px;left:10px;background:rgba(16,17,20,.84);color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;z-index:4}
 /* ---- Elado/Berles nezet: a nem aktiv csoport fulei rejtve ---- */
 .autok-tab[hidden]{display:none}
@@ -135,7 +135,7 @@ rep(
 function berbOverlay(c) {
   const d = berbDate(c);
   return '<span class="berbbadge">Bérbeadva</span>' +
-    (d ? '<span class="berbdate">Bérbeadva: ' + esc(fmtDateHu(d)) + '</span>' : "");
+    '<span class="berbdate">' + (d ? 'Bérbe adva: ' + esc(fmtDateHu(d)) : 'Jelenleg bérben') + '</span>';
 }
 function rentPricesHtml(c, rate) {
   const k = nEur(c.kaucio_eur), a2 = nEur(c.berlet_2000_eur), a3 = nEur(c.berlet_3000_eur);
