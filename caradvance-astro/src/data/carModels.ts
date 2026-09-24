@@ -595,7 +595,7 @@ export const carModels: Record<string, CarModel> = {
     netEur: 82773,
     orderKey: 'm4', orderFuels: 'Benzin',
     heroSub: 'A BMW M4 Coupé (G82) Németországból — S58 sor-6 turbó akár 530 LE-vel, M xDrive összkerékhajtás, M karbon tető és kagylóülések, új autóként, egyedi konfigurációval.',
-    heroVideo: '',
+    heroVideo: '/caradvance-hero-m4.mp4',
     heroPoster: '/bmw/bmw-m4-studio-elol34.webp',
     mainImg: '/bmw/bmw-m4-studio-elol34.webp',
     mainAlt: 'BMW M4 Coupé (G82) – nagy teljesítményű M kupé Németországból, egyedi rendelés',
