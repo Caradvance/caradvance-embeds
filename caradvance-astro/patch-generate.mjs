@@ -44,7 +44,14 @@ const soldDate = (c) => String(c.elkelt_datum || "").trim().slice(0, 10);
 const tipusOf  = (c) => (String(c.tipus || "").trim().toLowerCase() || "eladas");
 const isBiz    = (c) => tipusOf(c) === "bizomanyos";
 const isRent   = (c) => String(c.berelheto || "").trim().toLowerCase() === "igen" && nEur(c.berlet_2000_eur) > 0;
-const isBerb   = (c) => String(c.berbeadva || "").trim().toLowerCase() === "igen";
+// Kézzel bérbeadottnak jelölt autók (slug alapján). A Sheet berbeadva=igen mezője
+// is ide sorol; ez a lista egészen addig hasznos, amíg a Sheetben nincs oszlop.
+const BERB_SLUGS = new Set([
+  "bmw-x6-xdrive30d-m-sport-pro-22-individual",
+  "bmw-m5",
+  "bmw-x5-xdrive30d-m-sport-pro-panorama-22-m-lm-head-up-afas",
+]);
+const isBerb   = (c) => String(c.berbeadva || "").trim().toLowerCase() === "igen" || BERB_SLUGS.has(slugOf(c));
 const berbDate = (c) => String(c.berbeadva_datum || "").trim().slice(0, 10);
 // Tukrozes: kezi lista VAGY a pipeline azt irta, hogy a fokep balra nez.
 const mirrorOf = (c) => {
@@ -486,7 +493,7 @@ rep(`        <button class="btn btn-soft dlbtn" id="pdfbtn" type="button">\${DL_
 rep(`  const sale = active.filter((c) => !isBiz(c));`,
 `  const dedupe = (list) => { const seen = new Set(); return list.filter((c) => {
     const k = slugOf(c); if (!k || seen.has(k)) return false; seen.add(k); return true; }); };
-  const sale = dedupe(active.filter((c) => !isBiz(c) && !isBerb(c)));`,
+  const sale = dedupe(active.filter((c) => !isBiz(c)));`,
 'katalogus: dedup (elado)');
 
 rep(`  const rent = active.filter(isRent);
