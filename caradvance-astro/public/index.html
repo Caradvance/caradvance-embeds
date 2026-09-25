@@ -677,7 +677,7 @@ fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-st
     whenObj('RENT',function(){window.RENT.loadRate(function(){RATE=window.RENT.getRate()||RATE;var rn=document.getElementById('ratev');if(rn)rn.textContent=Math.round(RATE);
       window.RENT.loadAll(function(sale){build('cw-elado',pick(sale,true).map(saleCard).join(''));});
       window.RENT.loadCars(function(rent){build('cw-berelheto',pick(rent,true).map(rentCard).join(''));});});});
-    whenObj('BIZ',function(){window.BIZ.loadRate(function(){window.BIZ.loadCars(function(biz){build('cw-bizomanyos',pick(biz.filter(function(c){return String(c.modell||'').toLowerCase().indexOf('fiesta')<0;}),false).map(bizCard).join(''));});});});
+    whenObj('BIZ',function(){window.BIZ.loadRate(function(){window.BIZ.loadCars(function(biz){build('cw-bizomanyos',pick(biz.filter(function(c){return String(c.modell||'').toLowerCase().indexOf('fiesta')<0;}),false).map(bizCard).join(''));if(!window.__bizCyc){window.__bizCyc=setInterval(function(){var B=window.BIZ;if(!B||!B.ORDER)return;[].slice.call(document.querySelectorAll('.biz-cyc')).forEach(function(box){var i=B.ORDER.indexOf(box.getAttribute('data-k'));i=(i+1)%B.ORDER.length;var p=B.PROJECTS[B.ORDER[i]];if(!p)return;box.setAttribute('data-k',B.ORDER[i]);var lg=box.querySelector('.bd-logo'),im=lg&&lg.querySelector('img'),og=box.querySelector('.bd-org');box.style.transition='opacity .28s';box.style.opacity='0';setTimeout(function(){if(lg)lg.className='bd-logo'+(p.blue?' blue':'');if(im)im.src=p.logo;if(og)og.textContent=p.name;box.style.opacity='1';},280);});},2800);}});});});
   }
   loadAllData();
   setInterval(loadAllData,3600000);
