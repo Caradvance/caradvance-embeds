@@ -355,10 +355,13 @@ grid.parentNode.insertBefore(sm,grid.nextSibling);
 tgs.forEach(function(b){b.addEventListener('click',function(){
  tgs.forEach(function(x){x.classList.remove('active')});b.classList.add('active');
  var sold=b.getAttribute('data-tg')==='sold';
+ var sg=document.getElementById('bizsold'), sc=document.getElementById('bizsoldcount');
  grid.style.display=sold?'none':'';
  if(count)count.style.display=sold?'none':'';
  if(empty)empty.style.display='none';
- sm.style.display=sold?'block':'none';
+ if(sg)sg.style.display=sold?'':'none';
+ if(sc)sc.style.display=sold?'':'none';
+ sm.style.display=(sold && (!sg || sg.children.length===0))?'block':'none';
 });});
 });
 </script>
@@ -371,6 +374,8 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
   <div class="biz-toggle"><button type="button" class="biz-tg active" data-tg="stock">Készleten</button><button type="button" class="biz-tg" data-tg="sold">Eladva</button></div>
   <div class="cat-count" id="bizcount">Autók betöltése…</div>
   <div class="grid" id="bizgrid"></div>
+  <div class="cat-count" id="bizsoldcount" style="display:none"></div>
+  <div class="grid" id="bizsold" style="display:none"></div>
   <div id="bizempty" class="cat-empty" style="display:none">Nincs a szűrésnek megfelelő autó.</div>
   <div class="rate-note">Példa autók a bemutatáshoz. A forint összegek a napi EUR/HUF árfolyammal, tájékoztató jelleggel számolódnak (1 € = <span id="bizrate">362</span> Ft). A felajánlás a mi jutalékunkból történik.</div>
 </section>
@@ -418,6 +423,11 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
 .biz-total .bt-l{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.82)}
 .biz-total b{font-size:16px;font-weight:800}
 .biz-total .bt-s{display:block;font-size:9.5px;color:rgba(255,255,255,.6);font-weight:600;text-align:right}
+/* Eladott (sold) bizományos kártya */
+#bizsold .card .media{position:relative}
+#bizsold .card.sold .media img{filter:grayscale(.5) brightness(.86)}
+#bizsold .soldbadge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-9deg);background:rgba(214,31,44,.93);color:#fff;font-size:clamp(13px,1.6vw,17px);font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:6px 15px;border-radius:6px;border:2px solid #fff;box-shadow:0 8px 22px rgba(0,0,0,.3);z-index:4;pointer-events:none;white-space:nowrap}
+#bizsold .solddate{position:absolute;bottom:10px;left:10px;background:rgba(16,17,20,.84);color:#fff;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;z-index:4}
 </style>
 
 <script src="/biz-data.js"></script>
@@ -426,6 +436,9 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
   var B=window.BIZ, grid=document.getElementById('bizgrid'), countEl=document.getElementById('bizcount'), emptyEl=document.getElementById('bizempty');
   var qI=document.getElementById('bq'), mS=document.getElementById('bf-marka'), kS=document.getElementById('bf-kar'), uS=document.getElementById('bf-uz');
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  // Eladott bizományos autók: slug -> {seller, buyer, date}. Az eladó- ÉS a vevő-oldal is ide megy.
+  var SOLD={'ford-fiesta-1-6-gtdi-st200':{seller:'rex',buyer:'rex',date:'2026-09-23'}};
+  function fmtDateHu(d){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(d||'');return m?m[1]+'. '+m[2]+'. '+m[3]+'.':'';}
 
   function chosenHTML(p, buyerFt){
     return '<div class="bb-c"><span class="bd-logo'+(p.blue?' blue':'')+'"><img src="'+esc(p.logo)+'" alt=""></span><span class="bb-cn">'+esc(p.name)+'</span><b class="bb-ca">~'+esc(B.fmtFt(buyerFt))+'</b></div>';
@@ -459,6 +472,35 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
         +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
       +'</div></div>';
   }
+  function soldCard(car, info){
+    var sp=B.PROJECTS[info.seller||car.seller]||B.PROJECTS.sos;
+    var bp=B.PROJECTS[info.buyer]||sp;
+    var side=B.ftOf(B.sideEur(car.eur));
+    var total=B.ftOf(B.totalDonationEur(car.eur));
+    var slug=B.slugify(car.modell);
+    var HUFOV={'ford-fiesta-1-6-gtdi-st200':6999000};
+    var realFt=(car.huf&&car.huf>0)?car.huf:(HUFOV[slug]||0);
+    var ftShown=realFt>0?realFt:B.ftOf(car.eur);
+    var eurShown=realFt>0?Math.round(realFt/B.getRate()):car.eur;
+    var eurPfx=realFt>0?'≈ ':'';
+    var d=fmtDateHu(info.date);
+    var media=(car.img?'<img src="'+esc(car.img)+'" alt="'+esc(car.modell)+'" decoding="async" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="ph" style="display:none">fotó</span>':'<span class="ph" style="display:flex">fotó hamarosan</span>')
+      +'<span class="soldbadge">Eladva</span>'+(d?'<span class="solddate">Elkelt: '+d+'</span>':'');
+    var specs=[car.km,car.teljesitmeny,car.valto,car.uzemanyag].filter(Boolean).join(' · ');
+    return '<div class="card bizcard sold">'
+      +'<a class="bizcard-link" href="/auto/'+slug+'/?biz=1"><div class="media">'+media+'</div>'
+      +'<div class="body"><div class="meta"><span class="cond">Elkelt</span><span class="year">'+esc(car.evjarat)+'</span></div>'
+      +'<h3 class="title">'+esc(car.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
+      +'<div class="pricerow"><span class="price">'+esc(B.fmtFt(ftShown))+'</span><span class="peur">'+eurPfx+eurShown.toLocaleString('hu-HU')+' €</span></div></div></a>'
+      +'<div class="biz-donate">'
+        +'<div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
+          +'<span class="bd-txt"><span class="bd-l">Támogatott ügy · eladó 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
+          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
+        +'<div class="biz-buyer"><span class="bb-l">A vevő döntése · 15%</span>'
+          +'<div class="bb-chosen">'+chosenHTML(bp, side)+'</div></div>'
+        +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
+      +'</div></div>';
+  }
   var ALL=[];
   function fillSel(sel,vals){vals.sort();vals.forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});}
   function apply(){
@@ -479,10 +521,16 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
   });
   [qI,mS,kS,uS].forEach(function(el){el.addEventListener('input',apply);el.addEventListener('change',apply);});
   B.loadRate(function(){ var rv=document.getElementById('bizrate'); if(rv)rv.textContent=Math.round(B.getRate());
-    B.loadCars(function(cars){ ALL=cars;
-      var mk={},kr={},uz={}; cars.forEach(function(c){if(c.marka)mk[c.marka]=1;if(c.karosszeria)kr[c.karosszeria]=1;if(c.uzemanyag)uz[c.uzemanyag]=1;});
+    B.loadCars(function(cars){
+      var stock=[], sold=[];
+      cars.forEach(function(c){ var s=SOLD[B.slugify(c.modell)]; if(s){sold.push({car:c,info:s});} else {stock.push(c);} });
+      ALL=stock;
+      var mk={},kr={},uz={}; stock.forEach(function(c){if(c.marka)mk[c.marka]=1;if(c.karosszeria)kr[c.karosszeria]=1;if(c.uzemanyag)uz[c.uzemanyag]=1;});
       fillSel(mS,Object.keys(mk));fillSel(kS,Object.keys(kr));fillSel(uS,Object.keys(uz));
       apply();
+      var sg=document.getElementById('bizsold'), sc=document.getElementById('bizsoldcount');
+      if(sg)sg.innerHTML=sold.map(function(x){return soldCard(x.car,x.info);}).join('');
+      if(sc)sc.textContent=sold.length+' autó';
     });
   });
 })();
