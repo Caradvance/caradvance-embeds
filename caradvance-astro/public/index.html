@@ -565,13 +565,13 @@ fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-st
           +'<div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
             +'<span class="bd-txt"><span class="bd-l">Eladó döntése · 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
         +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
-        +'<div class="biz-buyerwrap"><div class="biz-inner biz-buyerbox"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span><span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span><span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
+        +'<div class="biz-inner biz-cyc" data-k="'+def+'"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span><span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span><span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
             +'<select class="bb-select" data-side="'+side+'">'+opts+'</select>'
-        +'<span class="bb-cta"><span class="bb-cta-t">Vevőként te választhatsz</span><svg class="bb-cta-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span><select class="bb-select" aria-label="A vevő által választott ügy" data-side="'+side+'">'+opts+'</select></div>'
+        +''
           +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
         +'</div></div>';
     }
-    grid.addEventListener('change',function(e){var sel=e.target.closest('.bb-select');if(!sel)return;var p=B.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyerwrap');if(!box)return;var lg=box.querySelector('.bd-logo'),im=lg&&lg.querySelector('img'),og=box.querySelector('.bd-org');if(lg)lg.className='bd-logo'+(p.blue?' blue':'');if(im)im.src=p.logo;if(og)og.textContent=p.name;});
+  (function(){function cyc(){var B=window.BIZ;if(!B||!B.ORDER)return;[].slice.call(document.querySelectorAll('.biz-cyc')).forEach(function(box){var i=B.ORDER.indexOf(box.getAttribute('data-k'));i=(i+1)%B.ORDER.length;var p=B.PROJECTS[B.ORDER[i]];if(!p)return;box.setAttribute('data-k',B.ORDER[i]);var lg=box.querySelector('.bd-logo'),im=lg&&lg.querySelector('img'),og=box.querySelector('.bd-org');box.style.transition='opacity .28s';box.style.opacity='0';setTimeout(function(){if(lg)lg.className='bd-logo'+(p.blue?' blue':'');if(im)im.src=p.logo;if(og)og.textContent=p.name;box.style.opacity='1';},280);});}setInterval(cyc,2800);})();
     B.loadRate(function(){ B.loadCars(function(cars){
       var pick=TARGET.map(function(sl){for(var i=0;i<cars.length;i++){if(B.slugify(cars[i].modell)===sl)return cars[i];}return null;}).filter(Boolean);
       if(pick.length<3) pick=cars.slice(0,3);
@@ -649,8 +649,8 @@ fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-st
       +'<div class="biz-donate"><div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
         +'<span class="bd-txt"><span class="bd-l">Eladó döntése · 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
         +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
-        +'<div class="biz-buyerwrap"><div class="biz-inner biz-buyerbox"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span><span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span><span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
-        +'<span class="bb-cta"><span class="bb-cta-t">Vevőként te választhatsz</span><svg class="bb-cta-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span><select class="bb-select" aria-label="A vevő által választott ügy" data-side="'+side+'">'+opts+'</select></div>'
+        +'<div class="biz-inner biz-cyc" data-k="'+def+'"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span><span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span><span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
+        +''
         +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
       +'</div></div></div>';}
 
@@ -670,7 +670,7 @@ fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-st
   var CW={};
   function build(id,html){var root=document.getElementById(id);if(!root)return;root.querySelector('.cw-track').innerHTML=html;CW[id]=coverflow(root);}
   document.querySelectorAll('.autok-tab').forEach(function(t){t.addEventListener('click',function(){setTimeout(function(){var id='cw-'+t.dataset.tab;if(CW[id])CW[id].layout();},40);});});
-  document.addEventListener('change',function(e){var sel=e.target.closest&&e.target.closest('.bb-select');if(!sel||!window.BIZ)return;var p=window.BIZ.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyerwrap');if(!box)return;var lg=box.querySelector('.bd-logo'),im=lg&&lg.querySelector('img'),og=box.querySelector('.bd-org');if(lg)lg.className='bd-logo'+(p.blue?' blue':'');if(im)im.src=p.logo;if(og)og.textContent=p.name;});
+  void 0;
 
   function whenObj(name,cb){if(window[name])cb();else{var iv=setInterval(function(){if(window[name]){clearInterval(iv);cb();}},60);setTimeout(function(){clearInterval(iv);},8000);}}
   function loadAllData(){
