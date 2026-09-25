@@ -803,7 +803,7 @@ const serviceJsonld = {
       const body = 'Szeretném eladni az autómat a CarAdvance-en keresztül. Az adataim:\n\n'
         + rows.map(([k, v]) => k + ': ' + v).join('\n')
         + '\n\nKérlek, küldjetek egy személyre szabott eladási ársávot. Köszönöm!';
-      window.location.href = 'mailto:info@caradvance.hu?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      /* mailto kikapcsolva - a bekuldes a /api/lead vegponton tortenik (lasd lentebb) */
     });
   }
 </script>
@@ -811,7 +811,7 @@ const serviceJsonld = {
 
 <script is:inline>
 (function(){
-  var CFG={ SELL_ENDPOINT: "" }; /* <<< ide jön az Apps Script webalkalmazás URL-je */
+  var CFG={ SELL_ENDPOINT: "/api/lead" };
   var form=document.getElementById("sellForm");
   var input=document.getElementById("sellPhotos");
   var prev=document.getElementById("sellPhotoPrev");
@@ -825,11 +825,11 @@ const serviceJsonld = {
   if(!CFG.SELL_ENDPOINT) return;
   form.addEventListener("submit", function(e){
     e.preventDefault(); e.stopImmediatePropagation();
-    var data={}; [].slice.call(form.querySelectorAll("input,select,textarea")).forEach(function(el){ var k=el.name||el.id; if(k&&el.type!=="file") data[k]=el.value; });
+    var LBL={"f-make":"Márka","f-model":"Modell","f-type":"Típusjel","f-year":"Évjárat","f-km":"Futásteljesítmény (km)","f-fuel":"Üzemanyag","f-color":"Szín","f-cond":"Állapot","f-notes":"Megjegyzés","f-price":"Kért ár (Ft)","f-flex":"Ár rugalmassága","f-urgency":"Sürgősség","f-ngo":"Támogatott szervezet","f-name":"Név","f-email":"E-mail","f-phone":"Telefon"}; var data={"Típus":"Autó eladás (bizományos)"}; Object.keys(LBL).forEach(function(id){var el=document.getElementById(id); if(el&&String(el.value||"").trim()) data[LBL[id]]=String(el.value).trim();});
     var q=files.slice(), photos=[];
     function nx(){ if(!q.length){ send(); return; } var f=q.shift(); var r=new FileReader(); r.onload=function(){ photos.push({name:f.name,type:f.type,b64:String(r.result).split(",")[1]}); nx(); }; r.readAsDataURL(f); }
     function send(){ var btn=form.querySelector("[type=submit]"); if(btn){btn.disabled=true;btn.dataset.t=btn.textContent;btn.textContent="Küldés…";}
-      fetch(CFG.SELL_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({fields:data,photos:photos})})
+      fetch(CFG.SELL_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(data)})
         .then(function(r){return r.json();}).then(function(){ alert("Köszönjük! A megkeresésed és a fotók megérkeztek. Hamarosan jelentkezünk az árajánlattal."); form.reset(); prev.innerHTML=""; files=[]; })
         .catch(function(){ alert("Az elküldés nem sikerült. Kérjük próbáld újra, vagy írj a info@caradvance.hu címre."); })
         .then(function(){ if(btn){btn.disabled=false;btn.textContent=btn.dataset.t||"Elküldöm az adatokat";} });
