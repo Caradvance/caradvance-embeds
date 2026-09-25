@@ -411,11 +411,14 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
 .biz-inner .bd-amt{flex:0 0 auto;text-align:right}
 .biz-inner .bd-amt b{display:block;font-size:13.5px;color:var(--red);font-weight:800;white-space:nowrap}
 .biz-inner .bd-amt span{font-size:10px;color:var(--muted);font-weight:700}
-/* buyer picker — matches seller row, whole row is a dropdown */
-.biz-inner.biz-buyerbox{position:relative;cursor:pointer;border-color:rgba(30,60,114,.22);background:rgba(30,60,114,.05)}
-.biz-inner.biz-buyerbox:hover{border-color:#c9d3e2}
-.biz-inner.biz-buyerbox .bd-chev{flex:0 0 auto;font-size:12px;color:#1e3c72;margin-left:2px}
-.biz-inner.biz-buyerbox .bb-select{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}
+/* buyer picker — same compact row as seller, with a clear action bar */
+.biz-buyerwrap{position:relative;cursor:pointer;border-radius:12px}
+.biz-buyerwrap .biz-inner.biz-buyerbox{border-color:rgba(30,60,114,.22);background:rgba(30,60,114,.05);border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:0}
+.biz-buyerwrap .bb-cta{display:flex;align-items:center;justify-content:center;gap:7px;background:#1e3c72;color:#fff;border-radius:0 0 12px 12px;padding:8px 10px;font-size:11.5px;font-weight:800;letter-spacing:.02em;line-height:1}
+.biz-buyerwrap .bb-cta-ic{flex:0 0 auto;opacity:.9}
+.biz-buyerwrap:hover .bb-cta,.biz-buyerwrap:focus-within .bb-cta{background:#16305c}
+.biz-buyerwrap:hover .biz-inner.biz-buyerbox,.biz-buyerwrap:focus-within .biz-inner.biz-buyerbox{border-color:#16305c}
+.biz-buyerwrap .bb-select{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}
 .biz-buyer{background:rgba(30,60,114,.05);border:1px solid rgba(30,60,114,.16);border-radius:12px;padding:10px 11px}
 .biz-buyer .bb-l{display:block;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1e3c72;margin-bottom:6px}
 .biz-buyer .bb-select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:12.5px;background:#fff;color:var(--ink);cursor:pointer}
@@ -469,12 +472,14 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
       +'<div class="biz-donate">'
         +'<div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
           +'<span class="bd-txt"><span class="bd-l">Eladó döntése · 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
-          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
-        +'<div class="biz-inner biz-buyerbox"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span>'
-          +'<span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span>'
-          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span>'
-          +'<span class="bd-chev" aria-hidden="true">▾</span>'
-          +'<select class="bb-select" aria-label="A vevő által választott ügy" data-side="'+side+'">'+opts+'</select></div>'
+          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
+        +'<div class="biz-buyerwrap">'
+          +'<div class="biz-inner biz-buyerbox"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span>'
+            +'<span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span>'
+            +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
+          +'<span class="bb-cta"><svg class="bb-cta-ic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-3l11-11 3 3L7 21z"/><path d="M14 6l3 3"/></svg><span class="bb-cta-t">Válassz másik ügyet</span></span>'
+          +'<select class="bb-select" aria-label="A vevő által választott ügy" data-side="'+side+'">'+opts+'</select>'
+        +'</div>'
         +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
       +'</div></div>';
   }
@@ -501,10 +506,10 @@ tgs.forEach(function(b){b.addEventListener('click',function(){
       +'<div class="biz-donate">'
         +'<div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
           +'<span class="bd-txt"><span class="bd-l">Eladó döntése · 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
-          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
+          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
         +'<div class="biz-inner"><span class="bd-logo'+(bp.blue?' blue':'')+'"><img src="'+esc(bp.logo)+'" alt=""></span>'
           +'<span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(bp.name)+'</span></span>'
-          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
+          +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
         +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
       +'</div></div>';
   }
