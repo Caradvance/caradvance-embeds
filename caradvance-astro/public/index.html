@@ -304,7 +304,7 @@ html.ca-ok #ca-gate{display:none}
 .biz-buyer{background:rgba(30,60,114,.05);border:1px solid rgba(30,60,114,.16);border-radius:12px;padding:10px 11px}
 .biz-buyer .bb-l{display:block;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1e3c72;margin-bottom:6px}
 .biz-buyer .bb-select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:12.5px;background:#fff;color:var(--ink);cursor:pointer}
-.biz-buyer .bb-chosen{margin-top:8px}
+.biz-buyer .bb-chosen{margin-top:8px}.biz-buyerwrap{position:relative;cursor:pointer;display:flex;flex-direction:column;gap:9px}.biz-buyerwrap .biz-inner.biz-buyerbox{border-color:rgba(30,60,114,.22);background:rgba(30,60,114,.05)}.biz-buyerwrap .bb-cta{display:flex;align-items:center;justify-content:center;gap:8px;background:#E2001A;color:#fff;border:0;border-radius:999px;padding:12px 18px;font-size:13px;font-weight:800;line-height:1;box-shadow:0 8px 18px rgba(226,0,26,.30)}.biz-buyerwrap:hover .bb-cta{background:#c40017}.biz-buyerwrap .bb-select{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}
 .bb-c{display:flex;align-items:center;gap:9px}
 .bb-c .bb-cn{flex:1;min-width:0;font-size:12px;font-weight:700;color:var(--navy);line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .bb-c .bb-ca{flex:0 0 auto;font-size:13px;font-weight:800;color:#1e3c72;white-space:nowrap}
@@ -563,15 +563,15 @@ fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-st
         +'<div class="pricerow"><span class="price">'+esc(B.fmtFt(B.ftOf(car.eur)))+'</span><span class="peur">'+car.eur.toLocaleString('hu-HU')+' €</span></div></div></a>'
         +'<div class="biz-donate">'
           +'<div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
-            +'<span class="bd-txt"><span class="bd-l">Támogatott ügy · eladó 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
-            +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
-          +'<div class="biz-buyer"><span class="bb-l">A vevő döntése · 15%</span>'
+            +'<span class="bd-txt"><span class="bd-l">Eladó döntése · 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
+        +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
+        +'<div class="biz-buyerwrap"><div class="biz-inner biz-buyerbox"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span><span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span><span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
             +'<select class="bb-select" data-side="'+side+'">'+opts+'</select>'
-            +'<div class="bb-chosen">'+chosen(B.PROJECTS[def],side)+'</div></div>'
+        +'<span class="bb-cta"><span class="bb-cta-t">Vevőként te választhatsz</span><svg class="bb-cta-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span><select class="bb-select" aria-label="A vevő által választott ügy" data-side="'+side+'">'+opts+'</select></div>'
           +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
         +'</div></div>';
     }
-    grid.addEventListener('change',function(e){var sel=e.target.closest('.bb-select');if(!sel)return;var p=B.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyer').querySelector('.bb-chosen');if(box)box.innerHTML=chosen(p,+sel.getAttribute('data-side')||0);});
+    grid.addEventListener('change',function(e){var sel=e.target.closest('.bb-select');if(!sel)return;var p=B.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyerwrap');if(!box)return;var lg=box.querySelector('.bd-logo'),im=lg&&lg.querySelector('img'),og=box.querySelector('.bd-org');if(lg)lg.className='bd-logo'+(p.blue?' blue':'');if(im)im.src=p.logo;if(og)og.textContent=p.name;});
     B.loadRate(function(){ B.loadCars(function(cars){
       var pick=TARGET.map(function(sl){for(var i=0;i<cars.length;i++){if(B.slugify(cars[i].modell)===sl)return cars[i];}return null;}).filter(Boolean);
       if(pick.length<3) pick=cars.slice(0,3);
@@ -647,10 +647,10 @@ fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-st
       +'<h3 class="title">'+esc(car.modell)+'</h3><div class="specs">'+esc(specs)+'</div>'
       +'<div class="pricerow"><span class="price">'+esc(B.fmtFt(B.ftOf(car.eur)))+'</span><span class="peur">'+car.eur.toLocaleString('hu-HU')+' €</span></div></div></a>'
       +'<div class="biz-donate"><div class="biz-inner"><span class="bd-logo'+(sp.blue?' blue':'')+'"><img src="'+esc(sp.logo)+'" alt=""></span>'
-        +'<span class="bd-txt"><span class="bd-l">Támogatott ügy · eladó 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
-        +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b><span>15%</span></span></div>'
-        +'<div class="biz-buyer"><span class="bb-l">A vevő döntése · 15%</span><select class="bb-select" data-side="'+side+'">'+opts+'</select>'
-        +'<div class="bb-chosen">'+chosen(B.PROJECTS[def],side)+'</div></div>'
+        +'<span class="bd-txt"><span class="bd-l">Eladó döntése · 15%</span><span class="bd-org">'+esc(sp.name)+'</span></span>'
+        +'<span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
+        +'<div class="biz-buyerwrap"><div class="biz-inner biz-buyerbox"><span class="bd-logo'+(B.PROJECTS[def].blue?' blue':'')+'"><img src="'+esc(B.PROJECTS[def].logo)+'" alt=""></span><span class="bd-txt"><span class="bd-l">Vevő döntése · 15%</span><span class="bd-org">'+esc(B.PROJECTS[def].name)+'</span></span><span class="bd-amt"><b>~'+esc(B.fmtFt(side))+'</b></span></div>'
+        +'<span class="bb-cta"><span class="bb-cta-t">Vevőként te választhatsz</span><svg class="bb-cta-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span><select class="bb-select" aria-label="A vevő által választott ügy" data-side="'+side+'">'+opts+'</select></div>'
         +'<div class="biz-total"><span class="bt-l">Teljes felajánlás</span><span><b>~'+esc(B.fmtFt(total))+'</b><span class="bt-s">a jutalék 30%-a</span></span></div>'
       +'</div></div></div>';}
 
@@ -670,14 +670,14 @@ fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF',{cache:'no-st
   var CW={};
   function build(id,html){var root=document.getElementById(id);if(!root)return;root.querySelector('.cw-track').innerHTML=html;CW[id]=coverflow(root);}
   document.querySelectorAll('.autok-tab').forEach(function(t){t.addEventListener('click',function(){setTimeout(function(){var id='cw-'+t.dataset.tab;if(CW[id])CW[id].layout();},40);});});
-  document.addEventListener('change',function(e){var sel=e.target.closest&&e.target.closest('.bb-select');if(!sel||!window.BIZ)return;var p=window.BIZ.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyer').querySelector('.bb-chosen');if(box)box.innerHTML=chosen(p,+sel.getAttribute('data-side')||0);});
+  document.addEventListener('change',function(e){var sel=e.target.closest&&e.target.closest('.bb-select');if(!sel||!window.BIZ)return;var p=window.BIZ.PROJECTS[sel.value];if(!p)return;var box=sel.closest('.biz-buyerwrap');if(!box)return;var lg=box.querySelector('.bd-logo'),im=lg&&lg.querySelector('img'),og=box.querySelector('.bd-org');if(lg)lg.className='bd-logo'+(p.blue?' blue':'');if(im)im.src=p.logo;if(og)og.textContent=p.name;});
 
   function whenObj(name,cb){if(window[name])cb();else{var iv=setInterval(function(){if(window[name]){clearInterval(iv);cb();}},60);setTimeout(function(){clearInterval(iv);},8000);}}
   function loadAllData(){
     whenObj('RENT',function(){window.RENT.loadRate(function(){RATE=window.RENT.getRate()||RATE;var rn=document.getElementById('ratev');if(rn)rn.textContent=Math.round(RATE);
       window.RENT.loadAll(function(sale){build('cw-elado',pick(sale,true).map(saleCard).join(''));});
       window.RENT.loadCars(function(rent){build('cw-berelheto',pick(rent,true).map(rentCard).join(''));});});});
-    whenObj('BIZ',function(){window.BIZ.loadRate(function(){window.BIZ.loadCars(function(biz){build('cw-bizomanyos',pick(biz,false).map(bizCard).join(''));});});});
+    whenObj('BIZ',function(){window.BIZ.loadRate(function(){window.BIZ.loadCars(function(biz){build('cw-bizomanyos',pick(biz.filter(function(c){return String(c.modell||'').toLowerCase().indexOf('fiesta')<0;}),false).map(bizCard).join(''));});});});
   }
   loadAllData();
   setInterval(loadAllData,3600000);
