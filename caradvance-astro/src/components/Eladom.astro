@@ -830,7 +830,7 @@ const serviceJsonld = {
     function nx(){ if(!q.length){ send(); return; } var f=q.shift(); var r=new FileReader(); r.onload=function(){ photos.push({name:f.name,type:f.type,b64:String(r.result).split(",")[1]}); nx(); }; r.readAsDataURL(f); }
     function send(){ var btn=form.querySelector("[type=submit]"); if(btn){btn.disabled=true;btn.dataset.t=btn.textContent;btn.textContent="Küldés…";}
       fetch(CFG.SELL_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(data)})
-        .then(function(r){ if(!r.ok) throw new Error("lead"); return r.json().catch(function(){return {};}); }).then(function(){ form.reset(); if(prev)prev.innerHTML=""; files=[]; if(window.caShowThanks)window.caShowThanks("ok"); else alert("Köszönjük! Hamarosan jelentkezünk."); if(window.caFireLead)window.caFireLead("eladom"); })
+        .then(function(r){ if(!r.ok) throw new Error("lead"); return r.json().catch(function(){return {};}); }).then(function(){ form.reset(); if(prev)prev.innerHTML=""; files=[]; if(window.CA_CFG){window.CA_CFG.THANKS_TITLE="Köszönjük, hogy ránk bíznád az autód!"; window.CA_CFG.THANKS_TEXT="Megkaptuk az autód adatait — hamarosan jelentkezünk a személyre szabott eladási ársávval.";} if(window.caShowThanks)window.caShowThanks("ok"); else alert("Köszönjük! Hamarosan jelentkezünk az eladási ársávval."); if(window.caFireLead)window.caFireLead("eladom"); })
         .catch(function(){ if(window.caShowThanks)window.caShowThanks("error"); else alert("Az elküldés nem sikerült. Kérjük írj a sales@caradvance.hu címre."); })
         .then(function(){ if(btn){btn.disabled=false;btn.textContent=btn.dataset.t||"Elküldöm az adatokat";} });
     }
