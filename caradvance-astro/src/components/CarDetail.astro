@@ -4,7 +4,8 @@
 // CSS) itt van; a modellre jellemző tartalom a data fájlból jön.
 import type { CarModel } from '../data/carModels';
 import { carModels } from '../data/carModels';
-const { model } = Astro.props as { model: CarModel };
+const { model, mode = 'sale' } = Astro.props as { model: CarModel; mode?: string };
+const isRent = mode === 'berles';
 // A "Hasonló modellek" kártyákhoz: ha a hivatkozott modellnek van kész aloldala
 // (azaz szerepel a carModels-ben ezzel a slug-gal), akkor a valódi fotóját mutatjuk.
 const relImg = (href: string) => {
@@ -17,6 +18,12 @@ const FX = 364; // szerveroldali kezdőérték; a kliens élőben frissíti
 const eur = new Intl.NumberFormat('de-DE').format(model.netEur) + ' €';
 const huf = new Intl.NumberFormat('hu-HU').format(Math.round(model.netEur * FX)) + ' Ft';
 const orderPrice = huf + ' · ' + eur;
+const rentEur = (model as any).rentEur || 0;
+const rentHuf = new Intl.NumberFormat('hu-HU').format(Math.round(rentEur * FX)) + ' Ft';
+const kaucioEur = (model as any).kaucioEur || 0;
+const kaucioHuf = new Intl.NumberFormat('hu-HU').format(Math.round(kaucioEur * FX)) + ' Ft';
+const kapcsRent = '/kapcsolat?berles=' + encodeURIComponent(model.name);
+const berlesBack = '/autoink#berelheto';
 
 const brandHref = `/egyedi-auto-rendeles?brand=${model.brandKey}`;
 const orderHref = `${brandHref}&order=${model.orderKey}`;
@@ -75,8 +82,8 @@ const carJson = {
 const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: model.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') } })) };
 const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
   { '@type': 'ListItem', position: 1, name: 'Főoldal', item: ORIGIN + '/' },
-  { '@type': 'ListItem', position: 2, name: `Egyedi ${model.brand} rendelés`, item: ORIGIN + brandHref },
-  { '@type': 'ListItem', position: 3, name: model.name, item: `${ORIGIN}/egyedi-auto-rendeles/${model.slug}` },
+  { '@type': 'ListItem', position: 2, name: isRent ? 'Bérelhető autók' : `Egyedi ${model.brand} rendelés`, item: isRent ? ORIGIN + '/autoink' : ORIGIN + brandHref },
+  { '@type': 'ListItem', position: 3, name: model.name, item: isRent ? `${ORIGIN}/berelheto-auto/${model.slug}-berles` : `${ORIGIN}/egyedi-auto-rendeles/${model.slug}` },
 ] };
 ---
 <div class="cd">
@@ -94,8 +101,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <h1>{model.name}</h1>
       <p class="cd-sub">{model.heroSub}</p>
       <div class="cd-cta">
-        <a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a>
-        <a class="cd-btn cd-btn-white" href="/kapcsolat">Ajánlatot kérek</a>
+        {isRent ? (<Fragment><a class="cd-btn cd-btn-red" href={kapcsRent}>Ajánlatot kérek</a><a class="cd-btn cd-btn-white" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-white" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}
       </div>
     </div>
     <button class="cd-scroll" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
@@ -112,13 +118,14 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <!-- ===== INTRO ===== -->
   <section class="cd-intro">
     <div class="cd-w">
-      <nav class="cd-crumb"><a href="/">Főoldal</a> / <a href={brandHref}>Egyedi {model.brand} rendelés</a> / <b>{model.name}</b></nav>
+      <nav class="cd-crumb"><a href="/">Főoldal</a> / <a href={isRent ? berlesBack : brandHref}>{isRent ? 'Bérelhető autók' : ('Egyedi ' + model.brand + ' rendelés')}</a> / <b>{model.name}</b></nav>
       <div class="cd-intro-grid">
         <div class="cd-info">
           <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}<span class="cd-chip cd-chip-year">{model.yearChip}</span></div>
-          <div class="cd-price"><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
-          <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p>
-          <div class="cd-cta2"><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></div>
+          {isRent ? (<Fragment><div class="cd-price"><span class="cd-huf">{rentHuf}</span><span class="cd-eur">/hó · {rentEur} €/hó -tól</span></div>
+          <p class="cd-note">Havi bérleti díj 2000 km/hó futáskerettel; egyszeri, visszatérítendő kaució: {kaucioHuf} ({kaucioEur} €). A kaució a bérlés végén — káresemény nélkül — visszajár.</p></Fragment>) : (<Fragment><div class="cd-price"><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
+          <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p></Fragment>)}
+          <div class="cd-cta2">{isRent ? (<Fragment><a class="cd-btn cd-btn-red" href={kapcsRent}>Ajánlatot kérek</a><a class="cd-btn cd-btn-dark" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}</div>
           <div class="cd-trust">
             <span><i></i> akár 19% német áfával</span>
             <span><i></i> kulcsrakész behozatal</span>
