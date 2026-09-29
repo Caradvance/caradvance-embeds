@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import CarDetail from '../../components/CarDetail.astro';
+import { carModels } from '../../data/carModels';
+
+const base = carModels['x3-benzin'];
+const model: any = {
+  ...base,
+  slug: 'bmw-x3',
+  title: 'BMW X3 bérlés — tartós autóbérlet havidíjjal | CarAdvance',
+  description: 'Vadonatúj BMW X3 tartós bérlete átlátható havidíjjal, egyszeri kaucióval és teljes körű ügyintézéssel. xDrive, mild-hybrid, dízel és plug-in hibrid — kulcsrakész átadással, hosszú távra is.',
+  heroSub: 'Vadonatúj BMW X3 tartós bérletben — átlátható havi díjjal, egyszeri kaucióval, teljes körű ügyintézéssel. xDrive összkerékhajtás, mild-hybrid, dízel és plug-in hibrid hajtás.',
+  overviewH2: 'BMW X3 tartós bérlet — vadonatúj, havidíjjal',
+  overviewLead: 'A <strong>BMW X3</strong> a márka legnépszerűbb prémium SUV-ja, most <strong>tartós bérletben</strong> is elérhető a CarAdvance-nél: vadonatúj autó, kiszámítható <strong>havi díjjal</strong>, egyszeri <strong>kaucióval</strong> és teljes körű ügyintézéssel. Nem szeretnél tulajdonolni? A bérlettel mindig új, garanciális autót vezetsz — a maradványértékkel és a továbbeladással nem kell foglalkoznod.',
+  rentEur: 1550,
+  kaucioEur: 5000,
+  faq: [
+    { q: 'Mennyibe kerül a BMW X3 bérlése?', a: 'A havi bérleti díj kb. 1550 €-tól indul 2000 km/hó futáskerettel; magasabb futáskeret esetén a díj arányosan változik. Egyszeri, visszatérítendő kaució: 5000 €. Pontos, személyre szabott ajánlatért keress minket.' },
+    { q: 'Mit tartalmaz a havi bérleti díj?', a: 'A feltüntetett havidíj a választott BMW X3 tartós bérletét jelenti a megadott futáskerettel. A teljes körű feltételeket (szerviz, biztosítás, futamidő) minden esetben előre, írásban egyeztetjük.' },
+    { q: 'Mennyi a kaució és visszajár-e?', a: 'A kaució egyszeri, visszatérítendő letét, ennél a modellnél 5000 €. A bérlet végén — káresemény és rendkívüli kopás hiányában — teljes egészében visszajár.' },
+    { q: 'Mennyi a minimális bérlési időtartam?', a: 'A tartós bérlet minimum 6 hónapos időtartamtól érhető el, de hosszú távra is választható. A pontos futamidőt közösen egyeztetjük.' },
+    { q: 'Vadonatúj a bérelt BMW X3?', a: 'Igen, vadonatúj, 0 km-es autót adunk át Németországból, kulcsrakész behozatallal és teljes körű ügyintézéssel.' },
+    { q: 'Meg is vásárolható a BMW X3?', a: 'Igen — ha inkább megvennéd, az X3 egyedi rendeléssel, akár 19% német áfával is a tiéd lehet. Nézd meg az egyedi rendelés oldalt.' },
+  ],
+};
+---
+<Base lang="hu" path="/berelheto-auto/bmw-x3-berles" title={model.title} description={model.description}>
+  <CarDetail model={model} mode="berles" />
+</Base>
