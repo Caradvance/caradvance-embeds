@@ -26,3 +26,4 @@ for (const f of FILES) {
   console.log('[abo] beszurva + hero -> ' + f);
 }
 console.log('[abo] kesz (' + done + ' fajl modositva)');
+// rebuild
