@@ -5,7 +5,10 @@
     "Audi Q4 e-tron": "/audi/q4etron.webp",
     "Audi Q4 Sportback e-tron": "/audi/q4etron.webp",
     "Audi S5 Limousine": "/audi/a5lim.webp",
-    "BMW X5": "/bmw/x5-berles.webp"
+    "BMW X5": "/bmw/x5-berles.webp",
+    "CUPRA Tavascan": "/cupra/cupra-tavascan.webp",
+    "CUPRA Born": "/cupra/cupra-born.webp",
+    "CUPRA Raval": "/cupra/cupra-raval.webp"
   },
   "colors": {}
 }
