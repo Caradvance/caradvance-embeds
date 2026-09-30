@@ -10,25 +10,24 @@ import { listRentals, getRental, rentSlug } from '../../data/rental';
 import { buildRentalModel } from '../../data/rentalPage';
 import { CONTENT } from '../../data/rentalContent';
 
-// Ezekhez külön .astro oldal tartozik (pl. bmw-x3-berles.astro) — itt kihagyjuk őket.
-const OWN_PAGE = ['BMW X3'];
-
-// Régi címek (a korábbi 44 modelles listából) → új cél
-const LEGACY: Record<string, string> = {
-  'bmw-m2-coupe': '', 'bmw-3-as-touring': '', 'bmw-m3-limuzin': '', 'bmw-m3-touring': '', 'bmw-m4-coupe': '',
-  'bmw-m5-limuzin': '', 'bmw-m5-touring': '',
-  'mini-cooper-3-ajtos': 'mini-cooper', 'mini-cooper-5-ajtos': 'mini-cooper', 'mini-john-cooper-works': 'mini-cooper',
-  'mercedes-a-osztaly': '', 'mercedes-b-osztaly': '', 'mercedes-c-osztaly-limuzin': 'mercedes-benz-c-osztaly',
-  'mercedes-amg-c-osztaly-limuzin': 'mercedes-benz-c-osztaly', 'mercedes-c-osztaly-t-modell': 'mercedes-benz-c-osztaly',
-  'mercedes-amg-c-osztaly-t-modell': 'mercedes-benz-c-osztaly', 'mercedes-e-osztaly-limuzin': 'mercedes-benz-e-osztaly-limuzin',
-  'mercedes-amg-e-osztaly-limuzin': 'mercedes-benz-e-osztaly-limuzin', 'mercedes-e-osztaly-t-modell': 'mercedes-benz-e-osztaly-limuzin',
-  'mercedes-amg-e-osztaly-t-modell': 'mercedes-benz-e-osztaly-limuzin', 'mercedes-s-osztaly': '', 'mercedes-cle-cabrio': '',
-  'mercedes-cle-coupe': '', 'mercedes-amg-cle-coupe': '', 'mercedes-gla': 'mercedes-benz-gla', 'mercedes-glb': 'mercedes-benz-glb',
-  'mercedes-glc': 'mercedes-benz-glc', 'mercedes-glc-coupe': 'mercedes-benz-glc-coupe', 'mercedes-gle': 'mercedes-benz-gle',
-  'mercedes-gle-coupe': 'mercedes-benz-gle', 'audi-a3': 'audi-a3-sportback', 'audi-a6': 'audi-a6-avant', 'audi-q5': 'audi-q5-sportback', 'audi-q7': '',
-};
-
 export function getStaticPaths() {
+  // Ezekhez külön .astro oldal tartozik (pl. bmw-x3-berles.astro) — itt kihagyjuk őket.
+  const OWN_PAGE = ['BMW X3'];
+
+  // Régi címek (a korábbi 44 modelles listából) → új cél
+  const LEGACY: Record<string, string> = {
+    'bmw-m2-coupe': '', 'bmw-3-as-touring': '', 'bmw-m3-limuzin': '', 'bmw-m3-touring': '', 'bmw-m4-coupe': '',
+    'bmw-m5-limuzin': '', 'bmw-m5-touring': '',
+    'mini-cooper-3-ajtos': 'mini-cooper', 'mini-cooper-5-ajtos': 'mini-cooper', 'mini-john-cooper-works': 'mini-cooper',
+    'mercedes-a-osztaly': '', 'mercedes-b-osztaly': '', 'mercedes-c-osztaly-limuzin': 'mercedes-benz-c-osztaly',
+    'mercedes-amg-c-osztaly-limuzin': 'mercedes-benz-c-osztaly', 'mercedes-c-osztaly-t-modell': 'mercedes-benz-c-osztaly',
+    'mercedes-amg-c-osztaly-t-modell': 'mercedes-benz-c-osztaly', 'mercedes-e-osztaly-limuzin': 'mercedes-benz-e-osztaly-limuzin',
+    'mercedes-amg-e-osztaly-limuzin': 'mercedes-benz-e-osztaly-limuzin', 'mercedes-e-osztaly-t-modell': 'mercedes-benz-e-osztaly-limuzin',
+    'mercedes-amg-e-osztaly-t-modell': 'mercedes-benz-e-osztaly-limuzin', 'mercedes-s-osztaly': '', 'mercedes-cle-cabrio': '',
+    'mercedes-cle-coupe': '', 'mercedes-amg-cle-coupe': '', 'mercedes-gla': 'mercedes-benz-gla', 'mercedes-glb': 'mercedes-benz-glb',
+    'mercedes-glc': 'mercedes-benz-glc', 'mercedes-glc-coupe': 'mercedes-benz-glc-coupe', 'mercedes-gle': 'mercedes-benz-gle',
+    'mercedes-gle-coupe': 'mercedes-benz-gle', 'audi-a3': 'audi-a3-sportback', 'audi-a6': 'audi-a6-avant', 'audi-q5': 'audi-q5-sportback', 'audi-q7': '',
+  };
   const list = listRentals().filter((x) => !OWN_PAGE.includes(x.key));
   const slugs = new Set<string>();
   const paths: any[] = [];
