@@ -218,3 +218,30 @@ export const OTHERS: Record<string, RentalContent> = {
     faqExtra: [],
   },
 };
+
+// ---------- Sajtó-/gyári fotók hozzárendelése (/berles-press/<modell>-<kulcs>.webp) ----------
+// Források: hyundai.news (Hyundai Europe Newsroom), kia.com/hu, volvocars.com/hu, cupraofficial.hu, seat.hu
+const PH = (m: string, k: string) => `/berles-press/${m}-${k}.webp`;
+function withPhotos(key: string, m: string, name: string, interior: boolean, gal: [string, string][]) {
+  const c = OTHERS[key];
+  if (!c) return;
+  c.mainImg = PH(m, 'main');
+  c.mainAlt = `${name} bérlés — ${name} tartós bérletben`;
+  if (c.design) c.design = { ...c.design, img: PH(m, 'design'), alt: `${name} — külső dizájn` };
+  if (interior && c.interior) c.interior = { ...c.interior, img: PH(m, 'interior'), alt: `${name} belső tér` };
+  c.gallery = gal.map(([k, alt]) => ({ img: PH(m, k), alt: `${name} ${alt}` }));
+}
+withPhotos('CUPRA Born', 'cupra-born', 'CUPRA Born', true, [['g1', 'elölnézet, LED fényszórók'], ['g2', 'stúdiófotó'], ['g3', 'töltés közben, garázsban'], ['g4', 'hátulról, menet közben'], ['g5', 'digitális műszerfal']]);
+withPhotos('CUPRA Raval', 'cupra-raval', 'CUPRA Raval', true, [['g1', 'elölnézet, háromszög fényszórók'], ['g2', 'városi utcán'], ['g3', 'töltés közben'], ['g4', 'hátulról'], ['g5', 'kormány és kijelző']]);
+withPhotos('CUPRA Tavascan', 'cupra-tavascan', 'CUPRA Tavascan', true, [['g1', 'naplementében'], ['g2', 'világító hátsó logó']]);
+withPhotos('Hyundai Tucson', 'hyundai-tucson', 'Hyundai Tucson', true, [['g1', 'oldalnézet'], ['g2', 'oldalnézet, modern épület előtt'], ['g3', 'menet közben'], ['g4', 'elölnézet'], ['g5', 'hátulról'], ['g6', 'városban'], ['g7', 'hátulról, menet közben'], ['g8', 'országúton'], ['g9', 'fehér színben'], ['g10', 'első ülések']]);
+withPhotos('Hyundai IONIQ 6', 'hyundai-ioniq-6', 'Hyundai IONIQ 6', true, [['g1', 'N Line, piros színben'], ['g2', 'elölnézet'], ['g3', 'városban'], ['g4', 'menet közben'], ['g5', 'országúton'], ['g6', 'hátulról'], ['g7', 'hátulról, menet közben'], ['g8', 'keréktárcsa'], ['g9', 'vezetőtér']]);
+withPhotos('Hyundai IONIQ 5 N', 'hyundai-ioniq-5-n', 'Hyundai IONIQ 5 N', false, [['g1', 'kilátóponton'], ['g2', 'szerpentinen'], ['g3', 'kanyarban'], ['g4', 'hegyi úton'], ['g5', 'modern épület előtt'], ['g6', 'menet közben'], ['g7', 'naplementében'], ['g8', 'hátulról, kanyarban'], ['g9', 'N keréktárcsa, piros féknyereg']]);
+withPhotos('Hyundai IONIQ 6 N', 'hyundai-ioniq-6-n', 'Hyundai IONIQ 6 N', true, [['g1', 'hegyi úton'], ['g2', 'versenypályán'], ['g3', 'elölnézet'], ['g4', 'pályán, menet közben'], ['g5', 'box előtt'], ['g6', 'elölnézet, N lökhárító'], ['g7', 'drift közben'], ['g8', 'N keréktárcsa'], ['g9', 'hátsó szárny'], ['g10', 'N kagylóülés']]);
+withPhotos('Hyundai Staria', 'hyundai-staria', 'Hyundai Staria', true, [['g1', 'szabadban'], ['g2', 'hátsó ülések'], ['g3', 'utastér'], ['g4', 'műszerfal'], ['g5', 'kempingezés közben']]);
+withPhotos('Hyundai Santa Fe', 'hyundai-santa-fe', 'Hyundai Santa Fe', true, [['g1', 'elölnézet, H fénygrafika'], ['g2', 'erdei úton'], ['g3', 'kanyarban'], ['g4', 'oldalnézet'], ['g5', 'hátulról, menet közben'], ['g6', 'hátulról'], ['g7', 'LED fénygrafika'], ['g8', 'hátsó lámpák']]);
+withPhotos('Kia EV2', 'kia-ev2', 'Kia EV2', true, [['g1', 'elölnézet'], ['g2', 'naplementében'], ['g3', 'fehér színben'], ['g4', 'hátsó háromnegyedes nézet'], ['g5', 'városban'], ['g6', 'tengerparton'], ['g7', 'hátsó ülések'], ['g8', 'csomagtartó'], ['g9', 'stúdiófotó']]);
+withPhotos('Kia EV4', 'kia-ev4', 'Kia EV4', true, [['g1', 'oldalnézet'], ['g2', 'városban'], ['g3', 'utcán'], ['g4', 'töltés közben'], ['g5', 'garázsban'], ['g6', 'kormány és kijelző'], ['g7', 'LED fényszóró'], ['g8', 'keréktárcsa'], ['g9', 'stúdiófotó']]);
+withPhotos('Volvo XC40', 'volvo-xc40', 'Volvo XC40', true, [['g1', 'oldalnézet'], ['g2', 'oldalnézet, stúdió'], ['g3', 'elölnézet, keréktárcsa'], ['g4', 'nyitott ajtókkal'], ['g5', 'csomagtartó'], ['g6', 'elölnézet']]);
+withPhotos('Volvo V60', 'volvo-v60', 'Volvo V60', true, [['g1', 'oldalnézet'], ['g2', 'elölnézet'], ['g3', 'hűtőrács'], ['g4', 'Thor-kalapács LED fényszóró'], ['g5', 'csomagtartó'], ['g6', 'első ülések'], ['g7', 'panorámatető'], ['g8', 'keréktárcsa']]);
+withPhotos('Seat Leon Sportstourer', 'seat-leon-sportstourer', 'SEAT Leon Sportstourer', true, [['g1', 'felülnézet'], ['g2', 'hátulról'], ['g3', 'töltés közben'], ['g4', 'töltőcsatlakozó'], ['g5', 'utánfutóval'], ['g6', 'műszerfal'], ['g7', 'csomagtartó']]);
