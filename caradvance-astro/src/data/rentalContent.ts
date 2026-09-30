@@ -201,12 +201,16 @@ export const CONTENT: Record<string, RentalContent> = {
   },
 
   'BMW 4er Gran Coupe': {
+    mainImg: P('bmw-4-es-gran-coupe', 'main'), mainAlt: 'BMW 4-es Gran Coupé bérlés — négyajtós sportkupé tartós bérletben',
     heroVideo: '/caradvance-hero-x5.mp4', body: 'Gran Coupé',
+    design: { h3: 'Négyajtós kupé-sziluett', text: 'Hosszú motorháztető, lecsapott tetővonal, keret nélküli ajtóablakok és nagy csomagtérajtó — a 4-es Gran Coupé a kupé eleganciáját a mindennapi praktikummal ötvözi.', bullets: ['Keret nélküli ajtóablakok', 'Adaptív LED fényszórók (felszereltségtől függően)', 'M Sport kivitel, 18–19" keréktárcsák'], img: P('bmw-4-es-gran-coupe', 'design'), alt: 'BMW 4-es Gran Coupé hátsó háromnegyedes nézet' },
+    interior: { h3: 'Sportos, vezetőközpontú utastér', text: 'Sportülések, M bőrkormány, digitális műszerfal és a vezető felé fordított középkonzol — hátul pedig négyajtós kényelem, a lecsapott tető ellenére is.', bullets: ['BMW Live Cockpit / Curved Display (évjárattól függően)', 'Sportülések, M bőrkormány', 'Vezeték nélküli Apple CarPlay / Android Auto'], img: P('bmw-4-es-gran-coupe', 'interior'), alt: 'BMW 4-es Gran Coupé vezetőtér' },
+    gallery: G('bmw-4-es-gran-coupe', 'BMW 4-es Gran Coupé', [['g1', 'piros színben, stúdiófotó'], ['g2', 'oldalnézet, stúdió'], ['g3', 'műszerfal']]),
     overviewH2: 'BMW 4-es Gran Coupé tartós bérlet — négyajtós sportkupé havidíjjal',
     guideIntro: 'A <strong>BMW 4-es Gran Coupé</strong> a kupé eleganciáját ötvözi a négyajtós praktikummal: lecsapott tetővonal, nagy csomagtérajtó és 470 literes csomagtér. <strong>Tartós bérletben</strong> egyetlen havi díjat fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
     guideBlocks: [ { h3: 'BMW 430d xDrive Gran Coupé', html: 'A bérelhető <strong>430d xDrive</strong> hathengeres dízelmotorral (286 LE, 650 Nm) és összkerékhajtással érkezik: erős, nyugodt és hosszú utakon kiemelkedően takarékos — igazi gran turismo.' } ],
     boot: '470–1290 liter',
-    specs: { '430d xDrive': { fuel: 'Dízel (6 henger)', power: '286 LE (210 kW)', torque: '650 Nm', drive: 'xDrive összkerék / 8 fok. Steptronic', accel: '5,3 mp', vmax: '250 km/h', rec: 'Erős, takarékos gran turismo', note: 'hathengeres dízel, összkerékhajtással' } },
+    specs: { '430d xDrive': { fuel: 'Dízel (6 henger)', power: '286 LE (210 kW)', torque: '650 Nm', drive: 'xDrive összkerék / 8 fok. Steptronic', accel: '5,3 mp', vmax: '250 km/h', rec: 'Erős, takarékos gran turismo', note: 'hathengeres dízel, összkerékhajtással', img: P('bmw-4-es-gran-coupe', 'g1') } },
   },
 
   'BMW 5er Limousine': {
