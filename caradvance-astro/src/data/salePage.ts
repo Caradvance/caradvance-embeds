@@ -63,7 +63,12 @@ export function buildSaleModel(car: EgyediCar, f: SaleFacts) {
   const P = (k: string) => (f.press ? `/berles-press/${f.press}-${k}.webp` : '');
   const mainImg = f.press ? P(f.mainKey || 'main') : car.img.split('?')[0];
   const fuels = car.fuels.length ? car.fuels : [car.fuel];
-  const fuelTxt = fuels.map(lcFuel).join(', ').replace(/, ([^,]*)$/, ' és $1');
+  // hajtás-típusok a motorlistából is (a lista kártyáján gyakran csak 'Benzin' szerepel)
+  const engFuels: string[] = [];
+  for (const e of f.engines) { const x = e[1]; const add = (k: string) => { if (!engFuels.includes(k)) engFuels.push(k); };
+    if (/Benzin/.test(x)) add('Benzin'); if (/Dízel/.test(x)) add('Dízel'); if (/hibrid/i.test(x) && !/mild/i.test(x)) add('Hibrid'); if (/Elektromos/.test(x)) add('Elektromos'); }
+  const txtFuels = engFuels.length ? engFuels : fuels;
+  const fuelTxt = txtFuels.map(lcFuel).join(', ').replace(/, ([^,]*)$/, ' és $1');
   const e0 = f.engines[0];
   const powers = f.engines.map((e) => num(e[2], /(\d+)\s*LE/)).filter(Boolean);
   const pMin = powers.length ? Math.min(...powers) : 0, pMax = powers.length ? Math.max(...powers) : 0;
@@ -122,12 +127,12 @@ export function buildSaleModel(car: EgyediCar, f: SaleFacts) {
 
   const kw = num(e0 && e0[2], /\((\d+)\s*kW/);
   return {
-    slug: car.slug, brand: b.name, brandKey: b.key, brandLogo: b.logo, brandLogoInvert: !!b.invert,
+    slug: car.slug, rentHref: f.rent ? rentHref : '', brand: b.name, brandKey: b.key, brandLogo: b.logo, brandLogoInvert: !!b.invert,
     name, modelCode: f.code || '', title, description, netEur: net,
-    orderKey: car.key, orderFuels: fuels.join(','),
+    orderKey: car.key, orderFuels: txtFuels.join(','),
     heroSub: f.tagline, heroVideo: b.video, heroPoster: '', mainImg, mainAlt: `Új ${name} — egyedi rendelés Németországból`,
     mainContain: !f.press,
-    chips: f.chips || [car.body, ...fuels, 'Automata'].slice(0, 4), yearChip: f.year || '2026 · Németország', bodyType: f.bodyType || car.body,
+    chips: f.chips || [car.body, ...txtFuels, 'Automata'].slice(0, 4), yearChip: f.year || '2026 · Németország', bodyType: f.bodyType || car.body,
     overviewH2: `Új ${name} Németországból — ár és egyedi rendelés`, overviewLead, highlights,
     design: { h3: f.design[0], text: f.design[1], bullets: f.design[2], img: f.press ? P('design') : '', alt: `${name} külső dizájn` },
     interior: { h3: f.interior[0], text: f.interior[1], bullets: f.interior[2], img: f.press && !f.noInterior ? P('interior') : '', alt: `${name} belső tér` },
