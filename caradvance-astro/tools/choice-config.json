@@ -10,5 +10,9 @@
     "CUPRA Born": "/cupra/cupra-born.webp",
     "CUPRA Raval": "/cupra/cupra-raval.webp"
   },
-  "colors": {}
+  "colors": {
+    "Frost Blue": "Frost kék",
+    "Carbonschwarz metallic": "Karbonfekete metál",
+    "Dark petrol uni": "Sötét petrol uni"
+  }
 }
