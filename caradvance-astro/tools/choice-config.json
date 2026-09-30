@@ -19,7 +19,9 @@
     "Kia EV2": "/kia/ev2.webp",
     "Kia EV4": "/kia/ev4-left.webp",
     "Volvo XC40": "/volvo/xc40.webp",
-    "Volvo EX30": "/volvo/ex30.webp"
+    "Volvo EX30": "/volvo/ex30.webp",
+    "Volvo V60": "/volvo/v60.webp",
+    "Seat Leon Sportstourer": "/seat/leon-sportstourer.webp"
   },
   "colors": {
     "Frost Blue": "Frost kék",
