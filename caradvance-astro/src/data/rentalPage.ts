@@ -5,7 +5,7 @@
 import type { RentalData } from './rental';
 import { fmtNum } from './rental';
 
-export interface TrimSpec { fuel?: string; power?: string; torque?: string; drive?: string; accel?: string; vmax?: string; cons?: string; boot?: string; rec?: string; note?: string; img?: string; }
+export interface TrimSpec { label?: string; fuel?: string; power?: string; torque?: string; drive?: string; accel?: string; vmax?: string; cons?: string; boot?: string; rec?: string; note?: string; img?: string; }
 export interface RentalContent {
   title?: string; description?: string; h1?: string; heroSub?: string;
   heroVideo?: string; heroPoster?: string; mainImg?: string; mainAlt?: string;
@@ -66,8 +66,11 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   const fuelsTxt = r.fuels.map(fuelHu).join(', ');
   const laterTxt = r.later.map((l) => l.d.replace(/^\d{4}\.\s*/, '') + ': ' + l.c + ' db').join(', ');
   const trimShort = r.trims.map((t) => t.name).join(', ');
-  const kmTxt = km ? `${kmNum} km/hó futáskerettel` : 'egyedi futáskerettel';
-  const moTxt = months ? `${months} hónapos futamidővel` : 'rugalmas futamidővel';
+  const orJoin = (a: string[]) => (a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' vagy ' + a[a.length - 1]);
+  const kmList = orJoin(r.km.map((k) => fmtNum(k)));
+  const moList = orJoin(r.months.map((x) => String(x)));
+  const kmTxt = km ? `${kmList} km/hó futáskerettel` : 'egyedi futáskerettel';
+  const moTxt = months ? `${moList} hónapos futamidővel` : 'rugalmas futamidővel';
   const psTxt = r.psMin && r.psMax ? (r.psMin === r.psMax ? `${r.psMin} LE` : `${r.psMin}–${r.psMax} LE`) : '';
 
   // változatok (bérelhető kivitelek) + műszaki adatok
@@ -76,7 +79,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   const variants = (r.trims.length ? r.trims : [{ name: r.model, eur, huf: r.huf, dep, depHuf: r.depHuf, fuel: r.fuels.join(' / ') }]).map((t, i) => {
     const s: TrimSpec = specs[t.name] || {};
     return {
-      key: 'v' + i, label: (r.trims.length ? name + ' ' + t.name : name),
+      key: 'v' + i, label: (r.trims.length ? (s.label || t.name) : name),
       fuel: s.fuel || fuelCap(t.fuel), power: s.power || '', torque: s.torque || '', drive: s.drive || c.drive || gear,
       accel: s.accel || '', vmax: s.vmax || '', cons: s.cons || '', boot: s.boot || c.boot || '', rec: s.rec || '',
       img: s.img || photo, alt: name + ' ' + t.name + ' bérlés', rentTxt: t.eur + ' €/hó-tól', note: s.note || fuelHu(t.fuel), t,
@@ -84,7 +87,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   });
 
   const title = c.title || `${name} bérlés — tartós bérlet ${eur} €/hó-tól | CarAdvance`;
-  const descBase = `${name} bérlés és tartós bérlet ${huf}/hó-tól${km ? `, ${kmNum} km/hó futáskerettel` : ''}${months ? `, ${months} hónapra` : ''}, kaució ${fmtNum(dep)} €-tól. Vadonatúj, 0 km-es ${lc(body)}`;
+  const descBase = `${name} bérlés és tartós bérlet ${huf}/hó-tól${km ? `, ${kmList} km/hó futáskerettel` : ''}${months ? `, ${moList} hónapra` : ''}, kaució ${fmtNum(dep)} €-tól. Vadonatúj, 0 km-es ${lc(body)}`;
   const descLong = descBase + (trimShort ? ` — ${trimShort}.` : '.');
   const description = c.description || (descLong.length <= 175 ? descLong : descBase + ', azonnal vagy hamarosan elérhető.');
 
@@ -105,16 +108,16 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
 
   const faq = [
     { q: `Mennyibe kerül ${A} ${name} bérlése?`, a: `${cap(A)} ${name} havi bérleti díja ${huf} (${eur} €) -tól indul ${kmTxt} és ${moTxt}.${variants.length > 1 ? ' Változatonként: ' + variants.map((v) => v.t.name + ' ' + v.t.eur + ' €/hó-tól').join(', ') + '.' : ''} Pontos, személyre szabott ajánlatért keress minket.` },
-    ...(km && months ? [{ q: `Mekkora a futáskeret ${A} ${name} tartós bérletnél?`, a: `Havonta ${kmNum} km — a ${months} hónapos futamidő alatt összesen ${fmtNum(km * months)} km fér bele a havidíjba. Ez bőven elég a napi ingázáshoz és a hosszabb utakhoz is.` }] : []),
+    ...(km && months ? [{ q: `Mekkora a futáskeret ${A} ${name} tartós bérletnél?`, a: r.km.length > 1 ? `Választhatsz: havonta ${kmList} km. A ${months} hónapos futamidő alatt így ${fmtNum(km * months)}–${fmtNum(r.km[r.km.length - 1] * months)} km fér bele a havidíjba — a napi ingázáshoz és a hosszabb utakhoz is bőven elég.` : `Havonta ${kmNum} km — a ${months} hónapos futamidő alatt összesen ${fmtNum(km * months)} km fér bele a havidíjba. Ez bőven elég a napi ingázáshoz és a hosszabb utakhoz is.` }] : []),
     { q: 'Mit tartalmaz a havi bérleti díj?', a: `A havidíj a vadonatúj ${name} használatát tartalmazza a megadott futáskerettel; a szervizt, az adót és a nyári-téli gumiszettet mi álljuk. A pontos feltételeket az ajánlatban előre, írásban rögzítjük.` },
     { q: 'Mennyi a kaució és visszajár-e?', a: `A kaució egyszeri, visszatérítendő letét: ${fmtNum(dep)} €-tól${depMax > dep ? `, változattól függően legfeljebb ${fmtNum(depMax)} €` : ''}. A bérlet végén — káresemény és rendkívüli kopás nélkül — teljes egészében visszajár.` },
-    { q: 'Mennyi a bérlési időtartam?', a: `A tartós bérlet futamideje ${months ? months + ' hónap' : 'egyedileg egyeztetett'}. Utána meghosszabbíthatod, vagy új modellre válthatsz — akár félévente új autóval.` },
+    { q: 'Mennyi a bérlési időtartam?', a: `A tartós bérlet futamideje ${months ? moList + ' hónap' : 'egyedileg egyeztetett'}. Utána meghosszabbíthatod, vagy új modellre válthatsz — akár félévente új autóval.` },
     { q: `Mikor vehetem át a bérelt autót?`, a: `${r.now ? r.now + ` db ${name} azonnal elérhető` : 'Jelenleg nincs azonnal elérhető darab'}${laterTxt ? '; további autók: ' + laterTxt : ''}. Vadonatúj, 0 km-es autót adunk át.` },
     ...(c.faqExtra || []),
     { q: `Magánszemélyként és cégként is bérelhető ${A} ${name}?`, a: `Igen, ${A} ${name} tartós bérlet magánszemélyeknek és cégeknek is elérhető. Cégként a bérleti díj a könyvelésben elszámolható költség.` },
   ];
 
-  const chips = c.chips || [body, ...(r.fuels.length ? [r.fuels.map(fuelCap).join(' · ')] : []), gear, ...(km ? [`${kmNum} km/hó`] : [])];
+  const chips = c.chips || [body, ...(r.fuels.length ? [r.fuels.map(fuelCap).join(' · ')] : []), gear, ...(km ? [`${r.km.map((k) => fmtNum(k)).join(' / ')} km/hó`] : [])];
 
   return {
     slug: r.slug, name, brand: r.brand === 'VW' ? 'Volkswagen' : r.brand, brandKey: br.key,
