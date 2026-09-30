@@ -197,14 +197,14 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <!-- ===== EDITORIAL ===== -->
   {model.design && (<section class="cd-sec">
     <div class="cd-w">
-      <div class="cd-edi">
+      <div class={'cd-edi' + (model.design.img ? '' : ' cd-edi-noimg')}>
         <div class="cd-txt">
           <span class="cd-eyebrow">Dizájn</span>
           <h3 class="cd-h3">{model.design.h3}</h3>
           <p>{model.design.text}</p>
           <ul>{(model.design.bullets || []).map((b) => (<li set:html={b}></li>))}</ul>
         </div>
-        <img class="cd-shot cd-shot-edi" src={model.design.img} alt={model.design.alt} width="1200" height="900" loading="lazy" />
+        {model.design.img && (<img class="cd-shot cd-shot-edi" src={model.design.img} alt={model.design.alt} width="1200" height="900" loading="lazy" />)}
       </div>
       {model.interior && (<div class={'cd-edi cd-rev' + (model.interior.img ? '' : ' cd-edi-noimg')}>
         <div class="cd-txt">
