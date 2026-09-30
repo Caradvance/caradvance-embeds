@@ -4,7 +4,7 @@
 // CSS) itt van; a modellre jellemző tartalom a data fájlból jön.
 import type { CarModel } from '../data/carModels';
 import { carModels } from '../data/carModels';
-const { model, mode = 'sale' } = Astro.props as { model: CarModel; mode?: string };
+const { model, mode = 'sale', rent = null } = Astro.props as { model: CarModel; mode?: string; rent?: any };
 const isRent = mode === 'berles';
 // A "Hasonló modellek" kártyákhoz: ha a hivatkozott modellnek van kész aloldala
 // (azaz szerepel a carModels-ben ezzel a slug-gal), akkor a valódi fotóját mutatjuk.
@@ -18,10 +18,15 @@ const FX = 364; // szerveroldali kezdőérték; a kliens élőben frissíti
 const eur = new Intl.NumberFormat('de-DE').format(model.netEur) + ' €';
 const huf = new Intl.NumberFormat('hu-HU').format(Math.round(model.netEur * FX)) + ' Ft';
 const orderPrice = huf + ' · ' + eur;
-const rentEur = (model as any).rentEur || 0;
-const rentHuf = new Intl.NumberFormat('hu-HU').format(Math.round(rentEur * FX)) + ' Ft';
-const kaucioEur = (model as any).kaucioEur || 0;
-const kaucioHuf = new Intl.NumberFormat('hu-HU').format(Math.round(kaucioEur * FX)) + ' Ft';
+// Bérlés: ha a lap átadja a Choice-adatot (rent), minden szám abból jön (ld. src/data/rental.ts).
+const nf = (n: number) => new Intl.NumberFormat('hu-HU').format(n);
+const rentEur = (rent && rent.eur) || (model as any).rentEur || 0;
+const rentHuf = nf(rent && rent.huf ? rent.huf : Math.ceil((rentEur * FX) / 10000) * 10000) + ' Ft';
+const kaucioEur = (rent && rent.dep) || (model as any).kaucioEur || 0;
+const kaucioHuf = nf(rent && rent.depHuf ? rent.depHuf : Math.round((kaucioEur * FX) / 1000) * 1000) + ' Ft';
+const rentKm = rent && rent.km && rent.km.length ? rent.km[0] : ((model as any).rentKm || 0);
+const rentMonths = rent && rent.months && rent.months.length ? rent.months[0] : ((model as any).rentMonths || 0);
+const saleHref = (model as any).saleSlug ? '/egyedi-auto-rendeles/' + (model as any).saleSlug : '/egyedi-auto-rendeles?brand=' + model.brandKey;
 const kapcsRent = '/kapcsolat?berles=' + encodeURIComponent(model.name);
 const berlesBack = '/autoink#berelheto';
 
@@ -32,7 +37,7 @@ const v0 = model.variants[0];
 
 // változó-váltó adatai (kliensoldali JSON)
 const varMap: Record<string, any> = {};
-for (const v of model.variants) varMap[v.key] = { img: v.img, alt: v.alt, fuel: v.fuel, power: v.power, torque: v.torque, drive: v.drive, accel: v.accel, vmax: v.vmax, cons: v.cons, boot: v.boot };
+for (const v of model.variants) varMap[v.key] = { img: v.img, alt: v.alt, fuel: v.fuel, power: v.power, torque: v.torque, drive: v.drive, accel: v.accel, vmax: v.vmax, cons: v.cons, boot: v.boot, rent: (v as any).rentTxt || '' };
 
 // összehasonlító tábla a változókból
 const cmpShort = model.variants.map((v) => v.label.replace(/^BMW\s*/, '').replace(/\s*\(.*\)/, ''));
@@ -47,13 +52,14 @@ const cmpRows = [
   ['Váltó / hajtás', ...model.variants.map((v) => v.drive)],
   ['Kinek ajánljuk', ...model.variants.map((v) => v.rec)],
 ];
+if (isRent) cmpRows.push(['Havidíj -tól', ...model.variants.map((v) => (v as any).rentTxt || '—')]);
 
 // schema képek (dedup, abszolút URL)
 const imgSet = new Set<string>();
 [model.mainImg, model.design.img, model.interior.img, ...model.gallery.map((g) => g.img), ...model.variants.map((v) => v.img)].forEach((p) => imgSet.add(ORIGIN + p));
 const carImages = Array.from(imgSet);
 
-const pageUrl = `${ORIGIN}/egyedi-auto-rendeles/${model.slug}`;
+const pageUrl = isRent ? `${ORIGIN}/berelheto-auto/${model.slug}-berles` : `${ORIGIN}/egyedi-auto-rendeles/${model.slug}`;
 // Ár érvényessége: mai naptól +1 év (a Google Offer-hez ajánlott priceValidUntil).
 const priceValid = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 const carJson = {
@@ -72,7 +78,13 @@ const carJson = {
   cargoVolume: { '@type': 'QuantitativeValue', value: model.schema.cargoL, unitCode: 'LTR' },
   fuelConsumption: model.schema.consL ? { '@type': 'QuantitativeValue', value: model.schema.consL, unitText: 'l/100km' } : undefined,
   image: carImages,
-  offers: {
+  offers: isRent ? {
+    '@type': 'Offer', price: rentEur, priceCurrency: 'EUR', businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
+    priceSpecification: { '@type': 'UnitPriceSpecification', price: rentEur, priceCurrency: 'EUR', unitCode: 'MON', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MON' } },
+    availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition',
+    priceValidUntil: priceValid, url: pageUrl,
+    seller: { '@type': 'Organization', name: 'CarAdvance', url: ORIGIN },
+  } : {
     '@type': 'Offer', price: model.netEur, priceCurrency: 'EUR',
     availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition',
     priceValidUntil: priceValid, url: pageUrl,
@@ -98,7 +110,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     <div class="cd-ov"></div>
     <div class="cd-inner">
       <img class="cd-brandlogo" src={model.brandLogo} alt={model.brand} width="120" height="120" />
-      <h1>{model.name}</h1>
+      <h1>{model.h1 || model.name}</h1>
       <p class="cd-sub">{model.heroSub}</p>
       <div class="cd-cta">
         {isRent ? (<Fragment><a class="cd-btn cd-btn-red" href={kapcsRent}>Ajánlatot kérek</a><a class="cd-btn cd-btn-white" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-white" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}
@@ -122,14 +134,16 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <div class="cd-intro-grid">
         <div class="cd-info">
           <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}<span class="cd-chip cd-chip-year">{model.yearChip}</span></div>
-          {isRent ? (<Fragment><div class="cd-price"><span class="cd-huf">{rentHuf}</span><span class="cd-eur">/hó · {rentEur} €/hó -tól</span></div>
-          <p class="cd-note">Havi bérleti díj 2000 km/hó futáskerettel; egyszeri, visszatérítendő kaució: {kaucioHuf} ({kaucioEur} €). A kaució a bérlés végén — káresemény nélkül — visszajár.</p></Fragment>) : (<Fragment><div class="cd-price"><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
+          {isRent ? (<Fragment><div class="cd-price"><span class="cd-huf cd-rent-live" data-eur={rentEur}>{rentHuf}</span><span class="cd-eur">/hó · {rentEur} €/hó -tól</span></div>
+          <p class="cd-note">Havi bérleti díj {rentKm ? nf(rentKm) + ' km/hó futáskerettel' : 'egyedi futáskerettel'}{rentMonths ? ', ' + rentMonths + ' hónapos futamidőre' : ''}; egyszeri, visszatérítendő kaució: <span class="cd-dep-live" data-eur={kaucioEur}>{kaucioHuf}</span> ({nf(kaucioEur)} €)-tól. A kaució a bérlés végén — káresemény nélkül — visszajár.</p></Fragment>) : (<Fragment><div class="cd-price"><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
           <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p></Fragment>)}
           <div class="cd-cta2">{isRent ? (<Fragment><a class="cd-btn cd-btn-red" href={kapcsRent}>Ajánlatot kérek</a><a class="cd-btn cd-btn-dark" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}</div>
           <div class="cd-trust">
+            {isRent ? (<Fragment><span><i></i> vadonatúj, 0 km-es autó</span><span><i></i> {rent && rent.now ? rent.now + ' db azonnal elérhető' : 'hamarosan elérhető'}</span><span><i></i> szerviz, adó és gumi a díjban</span></Fragment>) : (<Fragment>
             <span><i></i> akár 19% német áfával</span>
             <span><i></i> kulcsrakész behozatal</span>
             <span><i></i> 2003 óta a német piacon</span>
+            </Fragment>)}
           </div>
         </div>
         <div class="cd-photo">
@@ -146,12 +160,13 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         <a href="#attekintes">Áttekintés</a>
         <a href="#elonyok">Miért ez a modell</a>
         <a href="#adatok">Műszaki adatok</a>
-        <a href="#szolg">Bérlés &amp; import</a>
+        <a href="#szolg">{isRent ? 'Bérlési lehetőségek' : 'Bérlés & import'}</a>
         <a href="#gyik">GYIK</a>
       </div>
       <div class="cd-nav-cta">
-        <span class="cd-nav-price"><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</span>
-        <a class="cd-nav-btn" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Rendeld meg</a>
+        {isRent ? (<Fragment><span class="cd-nav-price"><span class="cd-rent-live" data-eur={rentEur}>{rentHuf}</span>/hó-tól</span>
+        <a class="cd-nav-btn" href={kapcsRent}>Ajánlatot kérek</a></Fragment>) : (<Fragment><span class="cd-nav-price"><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</span>
+        <a class="cd-nav-btn" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Rendeld meg</a></Fragment>)}
       </div>
     </div>
   </div>
@@ -205,7 +220,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <!-- ===== BUYING GUIDE ===== -->
   <section class="cd-sec">
     <div class="cd-w cd-prose">
-      <span class="cd-eyebrow">Vásárlási útmutató</span>
+      <span class="cd-eyebrow">{isRent ? 'Bérlési útmutató' : 'Vásárlási útmutató'}</span>
       <h2 class="cd-h2">{model.prose.h2}</h2>
       {model.prose.blocks.map((b) => (
         <>
@@ -234,7 +249,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
           <div class="r"><span class="k">Végsebesség</span><span class="v" id="svVmax">{v0.vmax}</span></div>
           <div class="r"><span class="k">Fogyasztás (WLTP)</span><span class="v" id="svCons">{v0.cons}</span></div>
           <div class="r"><span class="k">Csomagtér</span><span class="v" id="svBoot">{v0.boot}</span></div>
-          <div class="r"><span class="k">Nettó ár -tól</span><span class="v">{eur} · <span class="cd-huf-live" data-net={model.netEur}>{huf}</span></span></div>
+          {isRent ? (<div class="r"><span class="k">Havidíj -tól</span><span class="v" id="svRent">{v0.rentTxt || (rentEur + ' €/hó-tól')}</span></div>) : (<div class="r"><span class="k">Nettó ár -tól</span><span class="v">{eur} · <span class="cd-huf-live" data-net={model.netEur}>{huf}</span></span></div>)}
         </div>
       </div>
       <script type="application/json" id="cdVarData" set:html={JSON.stringify(varMap)}></script>
@@ -243,7 +258,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         var el=document.getElementById('cdVarData'); if(!el) return;
         var V={}; try{ V=JSON.parse(el.textContent); }catch(e){ return; }
         function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
-        function apply(k){var d=V[k];if(!d)return;var img=document.getElementById('cdStageImg');if(img){img.src=d.img;img.alt=d.alt;}set('svFuel',d.fuel);set('svPower',d.power);set('svTorque',d.torque);set('svDrive',d.drive);set('svAccel',d.accel);set('svVmax',d.vmax);set('svCons',d.cons);set('svBoot',d.boot);}
+        function apply(k){var d=V[k];if(!d)return;var img=document.getElementById('cdStageImg');if(img){img.src=d.img;img.alt=d.alt;}set('svFuel',d.fuel);set('svPower',d.power);set('svTorque',d.torque);set('svDrive',d.drive);set('svAccel',d.accel);set('svVmax',d.vmax);set('svCons',d.cons);set('svBoot',d.boot);if(d.rent)set('svRent',d.rent);}
         [].forEach.call(document.querySelectorAll('.cd-varsel button'),function(b){
           b.addEventListener('click',function(){
             [].forEach.call(document.querySelectorAll('.cd-varsel button'),function(x){x.classList.remove('on');});
@@ -252,7 +267,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         });
       })();
       </script>
-      <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek. A végleges specifikációt a rendeléskor rögzítjük.</p>
+      <p class="cd-specnote">Az adatok tájékoztató jellegűek, a konkrét konfigurációtól függően eltérhetnek. {isRent ? 'A bérelhető változatok és havidíjak a napi bérlési kínálatot követik.' : 'A végleges specifikációt a rendeléskor rögzítjük.'}</p>
     </div>
   </section>
 
@@ -277,14 +292,23 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <section class="cd-sec" id="szolg">
     <div class="cd-w">
       <span class="cd-eyebrow">Ahogy neked a legjobb</span>
-      <h2 class="cd-h2">Vedd meg, béreld, vagy hozasd be — mi mindent intézünk</h2>
+      <h2 class="cd-h2">{isRent ? 'Béreld, lízingeld vagy vedd meg — mi mindent intézünk' : 'Vedd meg, béreld, vagy hozasd be — mi mindent intézünk'}</h2>
       <div class="cd-svc">
+        {isRent ? (<Fragment>
+        <a href="/autoink#berelheto"><h3>Bérelhető autók</h3><p>Nézd meg az összes <strong>bérelhető autót</strong> — BMW, Mercedes-Benz, Audi, Volkswagen és más márkák, havidíjjal, azonnal vagy hamarosan elérhető darabokkal.</p><span class="go">Bérelhető autóink →</span></a>
+        <a href="/berlesi-folyamat"><h3>Hogyan működik a bérlés?</h3><p>Ajánlatkéréstől az átadásig: így zajlik a <strong>tartós autóbérlés</strong> lépésről lépésre, egyszerűen és átláthatóan.</p><span class="go">Bérlési folyamat →</span></a>
+        <a href="/berles-elonyei"><h3>A tartós bérlet előnyei</h3><p>Kedvező kaució, szerviz, adó és gumi a díjban, akár félévente új modell — ezért éri meg a <strong>tartós bérlet</strong>.</p><span class="go">Bérlés előnyei →</span></a>
+        <a href="/finanszirozas-lizing"><h3>Finanszírozás &amp; lízing</h3><p>Inkább lízingelnéd? Nézd meg a <strong>{model.name} lízing</strong> és finanszírozás lehetőségeit a kalkulátorral.</p><span class="go">Lízing kalkulátor →</span></a>
+        <a href={saleHref}><h3>Meg is vásárolnád?</h3><p>A {model.name} <strong>egyedi rendeléssel</strong> is a tiéd lehet Németországból — akár 19% német áfával, kulcsrakészen.</p><span class="go">Egyedi rendelés →</span></a>
+        <a href={kapcsRent}><h3>Személyes bérlési ajánlat</h3><p>Mondd el, melyik {model.name} változat, szín és kezdési időpont érdekel — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Ajánlatot kérek →</span></a>
+        </Fragment>) : (<Fragment>
         <a href={`/uj-auto-berlese?brand=${model.brandKey}`}><h3>{model.name} tartós bérlet</h3><p>Nem szeretnél venni? A {model.name} <strong>tartós bérletben</strong> is a tiéd lehet, egyetlen havi díjjal — szerviz és biztosítás beépítve.</p><span class="go">Bérlési ajánlatok →</span></a>
         <a href="/blog/auto-behozatal-nemetorszagbol"><h3>Autó behozatal Németországból</h3><p>Regisztrációs adó, áfa, honosítás, szállítás — nézd meg, hogyan zajlik a <strong>német autó behozatal</strong> lépésről lépésre.</p><span class="go">Import útmutató →</span></a>
         <a href={brandHref}><h3>{model.brand} konfigurátor</h3><p>Állítsd össze a saját {model.brand}-det a <strong>{model.brand} konfigurátorban</strong>, a kész specifikációt pedig bízd ránk.</p><span class="go">Összes {model.brand} modell →</span></a>
         <a href="/finanszirozas-lizing"><h3>Finanszírozás &amp; lízing</h3><p>Kiszámítható havi díj: nézd meg a <strong>{model.name} lízing</strong> lehetőségeket és a kalkulátort.</p><span class="go">Lízing kalkulátor →</span></a>
         <a href="/blog/nemet-hasznaltauto-vasarlas"><h3>Német használtautó?</h3><p>Ha alig használt darabot keresel, mutatjuk, hogyan válaszd ki és ellenőrizd a <strong>német használtautót</strong>.</p><span class="go">Vásárlási tippek →</span></a>
         <a href="/kapcsolat"><h3>Személyes ajánlat</h3><p>Mondd el, milyen {model.name} modellt szeretnél — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Kapcsolatfelvétel →</span></a>
+        </Fragment>)}
       </div>
     </div>
   </section>
@@ -302,7 +326,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <section class="cd-sec" id="gyik">
     <div class="cd-w cd-faqwrap">
       <span class="cd-eyebrow">GYIK</span>
-      <h2 class="cd-h2">Gyakori kérdések a {model.name} modellről</h2>
+      <h2 class="cd-h2">{isRent ? 'Gyakori kérdések a ' + model.name + ' bérléséről' : 'Gyakori kérdések a ' + model.name + ' modellről'}</h2>
       {model.faq.map((f, i) => (
         <details open={i === 0}><summary>{f.q}<span class="cd-plus">+</span></summary><p set:html={f.a}></p></details>
       ))}
@@ -313,10 +337,10 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <section class="cd-sec cd-soft">
     <div class="cd-w">
       <span class="cd-eyebrow">Kapcsolódó modellek</span>
-      <h2 class="cd-h2">Hasonló {model.brand} modellek</h2>
+      <h2 class="cd-h2">{isRent ? 'Hasonló bérelhető ' + model.brand + ' modellek' : 'Hasonló ' + model.brand + ' modellek'}</h2>
       <div class="cd-rel">
         {model.related.map((r) => (
-          <a class="cd-relc" href={r.href}>{(() => { const ri = relImg(r.href); return ri ? (<div class="cd-ph cd-ph-img"><img src={ri.img} alt={ri.alt} loading="lazy" /></div>) : (<div class="cd-ph"><span>{r.name}</span></div>); })()}<div class="b"><div class="n">{r.name}</div></div></a>
+          <a class="cd-relc" href={r.href}>{(() => { const own = r.img; const ri = own ? { img: own, alt: r.name + ' bérlés' } : relImg(r.href); return ri ? (<div class={own ? 'cd-ph cd-ph-img cd-ph-rent' : 'cd-ph cd-ph-img'}><img src={ri.img} alt={ri.alt} loading="lazy" /></div>) : (<div class="cd-ph"><span>{r.name}</span></div>); })()}<div class="b"><div class="n">{r.name}</div>{r.sub && <div class="s">{r.sub}</div>}</div></a>
         ))}
       </div>
     </div>
@@ -324,7 +348,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
 
   <!-- ===== CTA BAND ===== -->
   <section class="cd-sec">
-    <div class="cd-w"><div class="cd-band"><div><h2>{model.name} — rendeld meg egyedileg</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div><a class="cd-btn cd-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a></div></div>
+    <div class="cd-w"><div class="cd-band">{isRent ? (<Fragment><div><h2>{model.name} bérlés — kérj ajánlatot</h2><p>Mondd el, melyik változat és mikortól érdekel — {rentHuf}/hó-tól, egyszeri, visszajáró kaucióval.</p></div><a class="cd-btn cd-btn-white" href={kapcsRent}>Ajánlatot kérek →</a></Fragment>) : (<Fragment><div><h2>{model.name} — rendeld meg egyedileg</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div><a class="cd-btn cd-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a></Fragment>)}</div></div>
   </section>
 
   <!-- ===== LIGHTBOX ===== -->
@@ -493,6 +517,8 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       if(d&&d.rates&&d.rates.HUF){var fx=Math.round(d.rates.HUF);
         var f=document.getElementById('cdFx'); if(f) f.textContent=fx;
         [].forEach.call(document.querySelectorAll('.cd-huf-live'),function(h){var n=Number(h.getAttribute('data-net')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx))+' Ft';});
+        [].forEach.call(document.querySelectorAll('.cd-rent-live'),function(h){var n=Number(h.getAttribute('data-eur')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.ceil(n*fx/10000)*10000)+' Ft';});
+        [].forEach.call(document.querySelectorAll('.cd-dep-live'),function(h){var n=Number(h.getAttribute('data-eur')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx/1000)*1000)+' Ft';});
       }
     }).catch(function(){});
   }catch(e){}})();
@@ -658,6 +684,8 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   .cd-relc .cd-ph{aspect-ratio:16/10;border:0;border-bottom:1px dashed #dfe4ec;border-radius:0;}
   .cd-relc .cd-ph-img{padding:0;border-bottom:0;background:#000;overflow:hidden;}
   .cd-relc .cd-ph-img img{width:100%;height:100%;object-fit:cover;display:block;}
+  .cd-relc .cd-ph-rent{background:#fff;} .cd-relc .cd-ph-rent img{object-fit:contain;padding:10px 12px;}
+  .cd-relc .s{font-size:13px;color:var(--muted);font-weight:600;margin-top:4px;}
   .cd-relc .b{padding:14px 16px;} .cd-relc .n{font-weight:700;color:var(--navy);font-size:15px;}
 
   .cd-band{background:var(--navy);color:#fff;border-radius:22px;padding:40px 42px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;}
