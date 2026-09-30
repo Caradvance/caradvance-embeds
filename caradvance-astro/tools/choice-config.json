@@ -8,7 +8,14 @@
     "BMW X5": "/bmw/x5-berles.webp",
     "CUPRA Tavascan": "/cupra/cupra-tavascan.webp",
     "CUPRA Born": "/cupra/cupra-born.webp",
-    "CUPRA Raval": "/cupra/cupra-raval.webp"
+    "CUPRA Raval": "/cupra/cupra-raval.webp",
+    "Hyundai Tucson": "/hyundai/tucson.webp",
+    "Hyundai IONIQ 6": "/hyundai/ioniq-6.webp",
+    "Hyundai IONIQ 6 N": "/hyundai/ioniq-6-n.webp",
+    "Hyundai IONIQ 5 N": "/hyundai/ioniq-5-n.webp",
+    "Hyundai Staria": "/hyundai/staria.webp",
+    "Hyundai Santa Fe": "/hyundai/santa-fe.webp",
+    "MAN TGE Kombi Basic": "/man/tge-kombi.webp"
   },
   "colors": {
     "Frost Blue": "Frost kék",
