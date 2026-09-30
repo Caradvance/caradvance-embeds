@@ -6,6 +6,7 @@
 import type { RentalContent } from './rentalPage';
 import { carModels } from './carModels';
 import { MINI } from './rentalMini';
+import { AUDI } from './rentalAudi';
 
 const P = (m: string, k: string) => `/berles-press/${m}-${k}.webp`;
 const G = (m: string, name: string, items: [string, string][]) => items.map(([k, alt]) => ({ img: P(m, k), alt: `${name} ${alt}` }));
@@ -245,4 +246,5 @@ export const CONTENT: Record<string, RentalContent> = {
   },
   // ---------- további márkák: src/data/rental<Márka>.ts ----------
   ...MINI,
+  ...AUDI,
 };
