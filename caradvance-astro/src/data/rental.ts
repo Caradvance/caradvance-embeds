@@ -2,21 +2,25 @@
 //
 // A napi Choice-szinkron (11:15) a seo-abo.mjs-t frissíti: abban van a kártyák adata
 // (window.SUB), a foglaló ablak konfigurációja (window.__ABCFG) és a fotók (PHOTO).
-// Ez a modul a build elején kiolvassa ezeket, így a Részletek oldalak (pl. BMW X3 bérlés)
-// ára, futáskerete, futamideje, kauciója, változatai és elérhetősége mindig egyezik a
-// kártyával — kézzel beírt számok nélkül. Hiba esetén null-t ad, a build nem áll meg.
+// Ez a modul a build elején kiolvassa ezeket, így a Részletek oldalak ára, futáskerete,
+// futamideje, kauciója, változatai és elérhetősége mindig egyezik a kártyával — kézzel
+// beírt számok nélkül. Hiba esetén null-t / üres listát ad, a build nem áll meg.
+//
+// FONTOS: a huName() / rentSlug() logikát a kártya JS-e (seo-abo.mjs, rslug) is ugyanígy
+// számolja, hogy a "Részletek" gomb a helyes oldalra mutasson.
 import fs from 'node:fs';
 import path from 'node:path';
 
 export interface RentalTrim { name: string; eur: number; huf: number; dep: number; depHuf: number; fuel: string; }
-export interface RentalRelated { name: string; href: string; img: string; eur: number; huf: number; }
+export interface RentalRelated { key: string; name: string; href: string; img: string; eur: number; huf: number; }
 export interface RentalData {
-  key: string; brand: string; model: string; cat: string;
+  key: string; brand: string; model: string; name: string; slug: string; cat: string;
   count: number; now: number; later: { d: string; c: number }[];
   fuels: string[]; gears: string[]; km: number[]; months: number[];
+  psMin: number; psMax: number; packages: string[];
   eur: number; huf: number; dep: number; depHuf: number;
   trims: RentalTrim[]; colors: string[]; avail: string[]; rate: number;
-  related: RentalRelated[];
+  photo: string; related: RentalRelated[];
 }
 
 const MARGIN = 650; // ugyanaz, mint a kártyán: effNet = net + 650
@@ -60,9 +64,33 @@ function load() {
   return cache;
 }
 
-const dn = (s: string) => String(s).replace(/(\d)er\b/g, '$1').replace(/^VW(?=\s|$)/, 'Volkswagen');
+// ---- magyar modellnév + URL-slug (a kártya JS-e ugyanezt számolja) ----
+const DIG: Record<string, string> = { '1': '1-es', '2': '2-es', '3': '3-as', '4': '4-es', '5': '5-ös', '6': '6-os', '7': '7-es', '8': '8-as' };
+export function huName(brand: string, model: string): string {
+  const b = brand === 'VW' ? 'Volkswagen' : brand;
+  const m = String(model)
+    .replace(/\b(\d)er\b/g, (_: string, d: string) => DIG[d] || d)
+    .replace(/\bLimousine\b/g, 'Limuzin')
+    .replace(/\bCoupe\b/g, 'Coupé')
+    .replace(/\b([A-Z])-Klasse\b/g, '$1-osztály');
+  return b + ' ' + m;
+}
+export function slugify(s: string): string {
+  return String(s).toLowerCase()
+    .replace(/[áà]/g, 'a').replace(/[éè]/g, 'e').replace(/í/g, 'i').replace(/[óöő]/g, 'o').replace(/[úüű]/g, 'u')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+export const rentSlug = (brand: string, model: string) => slugify(huName(brand, model));
+export const rentHref = (brand: string, model: string) => '/berelheto-auto/' + rentSlug(brand, model) + '-berles';
+
 const toHuf = (eur: number, R: number) => Math.ceil((eur * R) / 10000) * 10000;
 const toDepHuf = (eur: number, R: number) => Math.round((eur * R) / 1000) * 1000;
+
+export function listRentals(): { brand: string; model: string; key: string }[] {
+  const d = load();
+  if (!d) return [];
+  return (d.SUB.models || []).filter((m: any) => m && m.brand && m.model && m.net).map((m: any) => ({ brand: m.brand, model: m.model, key: m.brand + ' ' + m.model }));
+}
 
 export function getRental(brand: string, model: string): RentalData | null {
   const d = load();
@@ -87,25 +115,26 @@ export function getRental(brand: string, model: string): RentalData | null {
       return { name, eur: tEur, huf: toHuf(tEur, R), dep: tDep, depHuf: toDepHuf(tDep, R), fuel };
     }).filter(Boolean) as RentalTrim[];
     trims.sort((a, b) => a.eur - b.eur);
-    dep = Math.min(...c.X.map((r: number[]) => r[6]));
+    if (c.X.length) dep = Math.min(...c.X.map((r: number[]) => r[6]));
   }
 
   const related: RentalRelated[] = (SUB.models || [])
-    .filter((x: any) => x.brand === brand && x.model !== model && x.net && String(x.cat) === String(m.cat))
-    .sort((a: any, b: any) => Math.abs(a.net - m.net) - Math.abs(b.net - m.net))
+    .filter((x: any) => x.brand === brand && x.model !== model && x.net)
+    .sort((a: any, b: any) => (String(a.cat) === String(m.cat) ? 0 : 1) - (String(b.cat) === String(m.cat) ? 0 : 1) || Math.abs(a.net - m.net) - Math.abs(b.net - m.net))
     .slice(0, 4)
     .map((x: any) => {
       const e = x.net + MARGIN;
-      return { name: dn(brand + ' ' + x.model), href: '/autoink#berelheto', img: String(PHOTO[brand + ' ' + x.model] || ''), eur: e, huf: toHuf(e, R) };
+      return { key: brand + ' ' + x.model, name: huName(brand, x.model), href: rentHref(brand, x.model), img: String(PHOTO[brand + ' ' + x.model] || ''), eur: e, huf: toHuf(e, R) };
     });
 
   return {
-    key, brand, model, cat: m.cat || '',
+    key, brand, model, name: huName(brand, model), slug: rentSlug(brand, model), cat: m.cat || '',
     count: m.count || 0, now: m.now || 0, later: m.later || [],
     fuels: m.fuels || [], gears: m.gears || [], km: m.km || [], months: m.months || [],
+    psMin: m.psMin || 0, psMax: m.psMax || 0, packages: m.packages || [],
     eur, huf: toHuf(eur, R), dep, depHuf: toDepHuf(dep, R),
     trims, colors: (m.colors || []).map((x: any) => x.n), avail: (c && c.A) || [], rate: R,
-    related,
+    photo: String(PHOTO[key] || ''), related,
   };
 }
 
