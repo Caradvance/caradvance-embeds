@@ -195,26 +195,26 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   </section>
 
   <!-- ===== EDITORIAL ===== -->
-  {model.design && model.interior && (<section class="cd-sec">
+  {model.design && (<section class="cd-sec">
     <div class="cd-w">
       <div class="cd-edi">
         <div class="cd-txt">
           <span class="cd-eyebrow">Dizájn</span>
           <h3 class="cd-h3">{model.design.h3}</h3>
           <p>{model.design.text}</p>
-          <ul>{model.design.bullets.map((b) => (<li set:html={b}></li>))}</ul>
+          <ul>{(model.design.bullets || []).map((b) => (<li set:html={b}></li>))}</ul>
         </div>
         <img class="cd-shot cd-shot-edi" src={model.design.img} alt={model.design.alt} width="1200" height="900" loading="lazy" />
       </div>
-      <div class="cd-edi cd-rev">
+      {model.interior && (<div class={'cd-edi cd-rev' + (model.interior.img ? '' : ' cd-edi-noimg')}>
         <div class="cd-txt">
           <span class="cd-eyebrow">Belső tér</span>
           <h3 class="cd-h3">{model.interior.h3}</h3>
           <p>{model.interior.text}</p>
-          <ul>{model.interior.bullets.map((b) => (<li set:html={b}></li>))}</ul>
+          <ul>{(model.interior.bullets || []).map((b) => (<li set:html={b}></li>))}</ul>
         </div>
-        <img class="cd-shot cd-shot-edi" src={model.interior.img} alt={model.interior.alt} width="1200" height="900" loading="lazy" />
-      </div>
+        {model.interior.img && (<img class="cd-shot cd-shot-edi" src={model.interior.img} alt={model.interior.alt} width="1200" height="900" loading="lazy" />)}
+      </div>)}
     </div>
   </section>)}
 
@@ -639,6 +639,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
 
   .cd-edi{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:46px;}
   .cd-edi:last-child{margin-bottom:0;}
+  .cd-edi-noimg{grid-template-columns:1fr;max-width:860px;}
   .cd-rev .cd-txt{order:2;}
   @media(max-width:820px){.cd-edi{grid-template-columns:1fr;gap:20px;}.cd-rev .cd-txt{order:0;}}
   .cd-edi p{font-size:16px;color:var(--muted);line-height:1.75;margin:0 0 14px;}
