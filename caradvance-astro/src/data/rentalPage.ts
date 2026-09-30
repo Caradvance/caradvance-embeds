@@ -12,7 +12,7 @@ export interface RentalContent {
   body?: string; chips?: string[];
   overviewH2?: string; overviewLead?: string;
   highlights?: { icon: string; title: string; text: string }[];
-  design?: { h3: string; text: string; bullets: string[]; img: string; alt: string };
+  design?: { h3: string; text: string; bullets: string[]; img?: string; alt?: string };
   interior?: { h3: string; text: string; bullets: string[]; img?: string; alt?: string };
   guideIntro?: string; guideBlocks?: { h3: string; html: string }[];
   drive?: string; boot?: string;
