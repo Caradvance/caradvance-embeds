@@ -1,0 +1,10 @@
+{
+  "_info": "CarAdvance – Choice sync config. photos: model key -> image path in caradvance-astro/public. colors: German Choice colour -> Hungarian.",
+  "photos": {
+    "BMW 1er": "/bmw/1er.webp",
+    "Audi Q4 e-tron": "/audi/q4etron.webp",
+    "Audi Q4 Sportback e-tron": "/audi/q4etron.webp",
+    "Audi S5 Limousine": "/audi/a5lim.webp"
+  },
+  "colors": {}
+}
