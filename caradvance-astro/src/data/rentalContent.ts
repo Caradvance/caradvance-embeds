@@ -176,8 +176,8 @@ export const CONTENT: Record<string, RentalContent> = {
     design: { h3: 'Alacsony sziluett, markáns arc', text: 'A 4-es Coupé széles nyomtávja, lecsapott tetővonala és a nagy, függőleges veserács azonnal felismerhetővé teszi. A frissített modell keskenyebb fényszórókat és átrajzolt hátsó lámpákat kapott.', bullets: ['Függőleges BMW veserács', 'Adaptív LED fényszórók', 'M Sport kivitel, 18–19" keréktárcsák'], img: P('bmw-4-es-coupe', 'design'), alt: 'BMW 4-es Coupé és Cabrio' },
     interior: { h3: 'Sportos, digitális utastér', text: 'A BMW Curved Display, a sportülések és a vezetőre fordított kezelőfelület teszik teljessé a kupé-élményt. Elöl bőséges a hely, hátul alkalmi utasoknak kényelmes, a csomagtér 440 literes.', bullets: ['BMW Curved Display', 'Sportülések, M bőrkormány', 'Vezeték nélküli okostelefon-integráció'], img: P('bmw-4-es-coupe', 'interior'), alt: 'BMW 4-es Coupé belső tér' },
     boot: '440 liter', drive: 'Hátsókerék / 8 fok. Steptronic',
-    specs: { '420i': { fuel: 'Benzin', power: '184 LE (135 kW)', torque: '300 Nm', accel: '7,5 mp', vmax: '240 km/h', rec: 'Kulturált, dinamikus kupé', note: 'négyhengeres benzines', img: P('bmw-4-es-coupe', 'main') } },
-    gallery: G('bmw-4-es-coupe', 'BMW 4-es Coupé', [['main', 'stúdiófotó'], ['design', 'a Cabrio mellett'], ['interior', 'utastér']]),
+    specs: { '420i': { fuel: 'Benzin', power: '184 LE (135 kW)', torque: '300 Nm', accel: '7,5 mp', vmax: '240 km/h', rec: 'Kulturált, dinamikus kupé', note: 'négyhengeres benzines', img: P('bmw-4-es-coupe', 'g1') } },
+    gallery: G('bmw-4-es-coupe', 'BMW 4-es Coupé', [['g1', 'piros színben, Alpokban'], ['g2', 'stúdiófotó'], ['g3', 'fehér színben, pályán'], ['g4', 'kék színben, hegyi úton'], ['g5', 'elölnézet, hegyek között'], ['g6', 'hátsó háromnegyedes nézet'], ['g7', 'oldalnézet'], ['g8', 'LED fényszóró'], ['g9', 'hátulról, hegyek előtt'], ['g10', 'kék színben, mezőn']]),
   },
 
   'BMW 4er Cabrio': {
