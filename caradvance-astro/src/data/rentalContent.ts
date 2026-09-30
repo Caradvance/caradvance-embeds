@@ -8,6 +8,7 @@ import { carModels } from './carModels';
 import { MINI } from './rentalMini';
 import { AUDI } from './rentalAudi';
 import { VW } from './rentalVW';
+import { MERCEDES } from './rentalMercedes';
 
 const P = (m: string, k: string) => `/berles-press/${m}-${k}.webp`;
 const G = (m: string, name: string, items: [string, string][]) => items.map(([k, alt]) => ({ img: P(m, k), alt: `${name} ${alt}` }));
@@ -249,4 +250,5 @@ export const CONTENT: Record<string, RentalContent> = {
   ...MINI,
   ...AUDI,
   ...VW,
+  ...MERCEDES,
 };
