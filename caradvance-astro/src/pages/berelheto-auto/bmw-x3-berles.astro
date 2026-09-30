@@ -2,28 +2,91 @@
 import Base from '../../layouts/Base.astro';
 import CarDetail from '../../components/CarDetail.astro';
 import { carModels } from '../../data/carModels';
+import { getRental, fmtNum } from '../../data/rental';
 
-const base = carModels['x3-benzin'];
+// A bérlési adatok (ár, futáskeret, futamidő, kaució, változatok, elérhetőség, színek)
+// a napi Choice-szinkronnal frissülő seo-abo.mjs-ből jönnek — ugyanaz, mint az /autoink kártya.
+const base: any = carModels['x3-benzin'];
+const r = getRental('BMW', 'X3');
+
+const eur = r ? r.eur : 1199;
+const huf = (r ? fmtNum(r.huf) : '440 000') + ' Ft';
+const km = r && r.km.length ? r.km[0] : 4000;
+const months = r && r.months.length ? r.months[0] : 6;
+const dep = r ? r.dep : 3000;
+const depHuf = (r ? fmtNum(r.depHuf) : '1 092 000') + ' Ft';
+const trims = r && r.trims.length ? r.trims : [];
+const depMax = trims.length ? Math.max(...trims.map((t) => t.dep)) : dep;
+const count = r ? r.count : 0;
+const now = r ? r.now : 0;
+const later = r ? r.later : [];
+const colors = r ? r.colors : [];
+const kmNum = fmtNum(km);
+const fuelList = r && r.fuels.length ? r.fuels.join(' · ') : 'Benzin · Dízel · PHEV';
+
+// Műszaki adatok változatonként (BMW gyári adatok, G45). A lista a bérelhető változatokat követi.
+const SPEC: Record<string, any> = {
+  '20 xDrive':  { key: 'x3-20',  fuel: 'Benzin (mild-hybrid)', power: '208 LE (153 kW)', torque: '330 Nm', accel: '7,8 mp', vmax: '215 km/h', cons: '~7,6 l/100 km', boot: '570–1700 liter', rec: 'Kulturált, erős benzines belépő', note: 'kulturált, erős benzines belépő', img: '/bmw/bmw-x3-hero.webp' },
+  '20d xDrive': { key: 'x3-20d', fuel: 'Dízel (mild-hybrid)', power: '197 LE (145 kW)', torque: '400 Nm', accel: '7,7 mp', vmax: '215 km/h', cons: '~6,0 l/100 km', boot: '570–1700 liter', rec: 'Sokat autózóknak, hosszú utakra', note: 'a sokat autózók kedvence', img: '/bmw/bmw-x3-studio.webp' },
+  '30e xDrive': { key: 'x3-30e', fuel: 'Plug-in hibrid (benzin + elektromos)', power: '299 LE (220 kW)', torque: '450 Nm', accel: '6,2 mp', vmax: '215 km/h', cons: '~1,0 l/100 km (súlyozott), kb. 90 km elektromosan', boot: '460–1600 liter', rec: 'Városba és ingázásra, töltési lehetőséggel', note: 'plug-in hibrid, kb. 90 km tisztán elektromos hatótávval', img: '/bmw/bmw-x3-elol34.webp' },
+  '40d xDrive': { key: 'x3-40d', fuel: 'Dízel (mild-hybrid, 6 henger)', power: '303 LE (223 kW)', torque: '670 Nm', accel: '5,4 mp', vmax: '245 km/h', cons: '~6,9 l/100 km', boot: '570–1700 liter', rec: 'A legerősebb bérelhető X3', note: 'hathengeres dízel, a legerősebb bérelhető X3', img: '/bmw/bmw-x3-kek-eleje.webp' },
+};
+const variants = trims.length
+  ? trims.map((t, i) => {
+      const s = SPEC[t.name] || { key: 'x3-v' + i, fuel: t.fuel, power: '—', torque: '—', accel: '—', vmax: '—', cons: '—', boot: '570–1700 liter', rec: '—', note: t.fuel.toLowerCase(), img: '/bmw/bmw-x3-hero.webp' };
+      return { key: s.key, label: 'BMW X3 ' + t.name, fuel: s.fuel, power: s.power, torque: s.torque, drive: 'xDrive összkerék / 8 fok. aut.', accel: s.accel, vmax: s.vmax, cons: s.cons, boot: s.boot, rec: s.rec, img: s.img, alt: 'BMW X3 ' + t.name + ' bérlés', rentTxt: t.eur + ' €/hó-tól', note: s.note, t };
+    })
+  : base.variants;
+
+const trimShort = trims.map((t) => t.name).join(', ');
+const laterTxt = later.map((l) => l.d.replace(/^\d{4}\.\s*/, '') + ': ' + l.c + ' db').join(', ');
+const related = r && r.related.length ? r.related.map((x) => ({ name: x.name, href: x.href, img: x.img, sub: fmtNum(x.huf) + ' Ft/hó-tól' })) : base.related;
+const relNames = r && r.related.length ? r.related.slice(0, 2).map((x) => x.name).join(' és ') : 'BMW X5 és X6';
+
 const model: any = {
   ...base,
   slug: 'bmw-x3',
-  title: 'BMW X3 bérlés — tartós autóbérlet havidíjjal | CarAdvance',
-  description: 'Vadonatúj BMW X3 tartós bérlete átlátható havidíjjal, egyszeri kaucióval és teljes körű ügyintézéssel. xDrive, mild-hybrid, dízel és plug-in hibrid — kulcsrakész átadással, hosszú távra is.',
-  heroSub: 'Vadonatúj BMW X3 tartós bérletben — átlátható havi díjjal, egyszeri kaucióval, teljes körű ügyintézéssel. xDrive összkerékhajtás, mild-hybrid, dízel és plug-in hibrid hajtás.',
-  overviewH2: 'BMW X3 tartós bérlet — vadonatúj, havidíjjal',
-  overviewLead: 'A <strong>BMW X3</strong> a márka legnépszerűbb prémium SUV-ja, most <strong>tartós bérletben</strong> is elérhető a CarAdvance-nél: vadonatúj autó, kiszámítható <strong>havi díjjal</strong>, egyszeri <strong>kaucióval</strong> és teljes körű ügyintézéssel. Nem szeretnél tulajdonolni? A bérlettel mindig új, garanciális autót vezetsz — a maradványértékkel és a továbbeladással nem kell foglalkoznod.',
-  rentEur: 1550,
-  kaucioEur: 5000,
+  saleSlug: 'x3-benzin',
+  h1: 'BMW X3 bérlés',
+  title: `BMW X3 bérlés — tartós bérlet ${eur} €/hó-tól | CarAdvance`,
+  description: `BMW X3 bérlés és tartós bérlet ${huf}/hó-tól: ${kmNum} km/hó futáskeret, ${months} hónap, kaució ${fmtNum(dep)} €-tól. ${trimShort || '20 xDrive, 20d, 30e'} — vadonatúj, 0 km-es prémium SUV.`,
+  heroSub: `Vadonatúj BMW X3 tartós bérletben ${huf}/hó-tól — ${kmNum} km/hó futáskerettel, ${months} hónapos futamidővel és egyszeri, visszajáró kaucióval. Benzin, dízel és plug-in hibrid, xDrive összkerékhajtással.`,
+  chips: ['Prémium SUV', 'xDrive', fuelList, 'Automata', `${kmNum} km/hó`],
+  yearChip: 'Vadonatúj · 0 km',
+  overviewH2: 'BMW X3 tartós bérlet — vadonatúj prémium SUV havidíjjal',
+  overviewLead: `A <strong>BMW X3 bérlés</strong> a legegyszerűbb út egy vadonatúj prémium SUV-hoz: <strong>tartós bérletben</strong> ${huf}/hó-tól vezetheted, ${kmNum} km/hó futáskerettel és ${months} hónapos futamidővel. ${count ? `Jelenleg ${count} db BMW X3 közül választhatsz${now ? ` (${now} db azonnal elérhető)` : ''}` : 'Több változat közül választhatsz'}${trimShort ? `, ${trimShort} kivitelben` : ''}. Egyszeri, visszajáró <strong>kaució</strong> ${fmtNum(dep)} €-tól; a szervizt, az adót és a nyári-téli gumit mi álljuk. Nem kell tulajdonolnod: a bérlet végén egyszerűen visszaadod, vagy új modellre váltasz.`,
+  rentEur: eur,
+  kaucioEur: dep,
+  highlights: [
+    { icon: '€', title: `${huf}/hó-tól`, text: `Átlátható havi bérleti díj ${kmNum} km/hó futáskerettel és ${months} hónapos futamidővel — ugyanaz az ár, mint a bérelhető autóink között.` },
+    { icon: '⛽', title: 'Benzin, dízel vagy PHEV', text: variants.length && (variants[0] as any).t ? 'Bérelhető: ' + variants.map((v: any) => v.t.name + ' (' + v.t.fuel.toLowerCase() + ')').join(', ') + ' — mind xDrive összkerékhajtással.' : 'Takarékos dízel, erős benzines mild-hybrid vagy tölthető plug-in hibrid — mind xDrive összkerékhajtással.' },
+    { icon: '◈', title: count ? `${count} db BMW X3` : 'Bérelhető BMW X3', text: `${now ? now + ' db azonnal elérhető' : 'Hamarosan elérhető'}${laterTxt ? '; további autók — ' + laterTxt : ''}. Vadonatúj, 0 km-es autók.` },
+    { icon: '✓', title: 'Szerviz, adó, gumi a díjban', text: `A szervizt, az adót és a nyári-téli gumiszettet mi álljuk — egyszeri, visszajáró kaució ${fmtNum(dep)} €-tól.` },
+  ],
+  design: { ...base.design, text: String(base.design.text).replace(/\s*Pontosan úgy konfigurálva[^.]*\./, '') + (colors.length ? ` Bérelhető színek: ${colors.join(', ')}.` : '') },
+  prose: {
+    h2: 'BMW X3 bérlés — így működik a tartós bérlet',
+    blocks: [
+      { html: `A <strong>BMW X3</strong> évek óta a közepes prémium SUV-k egyik legkeresettebb modellje — tágas, sokoldalú és sportos. <strong>Tartós bérletben</strong> úgy vezetheted, hogy nem kötsz le benne nagy összeget: egyetlen <strong>havi díjat</strong> fizetsz, a szervizt, az adót és a gumikat mi intézzük. Ez a <a href="/berles-elonyei">hosszú távú autóbérlés</a> lényege: kiszámítható költség, új autó, továbbeladási gond nélkül.` },
+      { h3: 'Melyik BMW X3 bérelhető?', html: variants.length && (variants[0] as any).t ? `Jelenleg ${variants.length} változat közül választhatsz: ` + variants.map((v: any) => `<strong>${v.t.name}</strong> — ${v.note}, ${v.t.eur} €/hó-tól`).join('; ') + '. Mindegyik xDrive összkerékhajtással és 8 fokozatú automatával érkezik.' : 'A bérelhető BMW X3 változatokat a bérelhető autóink között látod.' },
+      { h3: 'Mennyibe kerül a BMW X3 bérlése?', html: `A <strong>BMW X3 bérlés</strong> havidíja ${huf} (${eur} €) -tól indul ${kmNum} km/hó futáskerettel és ${months} hónapos futamidővel. Az egyszeri, visszatérítendő <strong>kaució</strong> ${depHuf} (${fmtNum(dep)} €) -tól indul${depMax > dep ? `, az erősebb változatoknál ${fmtNum(depMax)} €` : ''}. A pontos díj a változattól, a színtől és a felszereltségi csomagtól függ — a <a href="/autoink#berelheto">bérelhető autóink</a> között minden X3 havidíját és elérhetőségét látod.` },
+      { h3: 'Tartós bérlet, lízing vagy vásárlás?', html: `Ha nem szeretnél tulajdonolni, a <strong>tartós autóbérlés</strong> a legrugalmasabb: nincs önerő, nincs maradványérték-kockázat, és akár félévente új modellre válthatsz. Cégként a bérleti díj elszámolható költség — hasonlóan az <strong>operatív lízinghez</strong>, de hosszú kötöttség nélkül. Ha mégis a sajátod lenne, az X3 <a href="/finanszirozas-lizing">lízinggel</a> vagy <a href="/egyedi-auto-rendeles/x3-benzin">egyedi rendeléssel</a> is elérhető. Más SUV-t keresel? Nézd meg a bérelhető <a href="/autoink#berelheto">${relNames}</a> modelleket is.` },
+    ],
+  },
+  variants,
+  related,
   faq: [
-    { q: 'Mennyibe kerül a BMW X3 bérlése?', a: 'A havi bérleti díj kb. 1550 €-tól indul 2000 km/hó futáskerettel; magasabb futáskeret esetén a díj arányosan változik. Egyszeri, visszatérítendő kaució: 5000 €. Pontos, személyre szabott ajánlatért keress minket.' },
-    { q: 'Mit tartalmaz a havi bérleti díj?', a: 'A feltüntetett havidíj a választott BMW X3 tartós bérletét jelenti a megadott futáskerettel. A teljes körű feltételeket (szerviz, biztosítás, futamidő) minden esetben előre, írásban egyeztetjük.' },
-    { q: 'Mennyi a kaució és visszajár-e?', a: 'A kaució egyszeri, visszatérítendő letét, ennél a modellnél 5000 €. A bérlet végén — káresemény és rendkívüli kopás hiányában — teljes egészében visszajár.' },
-    { q: 'Mennyi a minimális bérlési időtartam?', a: 'A tartós bérlet minimum 6 hónapos időtartamtól érhető el, de hosszú távra is választható. A pontos futamidőt közösen egyeztetjük.' },
-    { q: 'Vadonatúj a bérelt BMW X3?', a: 'Igen, vadonatúj, 0 km-es autót adunk át Németországból, kulcsrakész behozatallal és teljes körű ügyintézéssel.' },
-    { q: 'Meg is vásárolható a BMW X3?', a: 'Igen — ha inkább megvennéd, az X3 egyedi rendeléssel, akár 19% német áfával is a tiéd lehet. Nézd meg az egyedi rendelés oldalt.' },
+    { q: 'Mennyibe kerül a BMW X3 bérlése?', a: `A BMW X3 havi bérleti díja ${huf} (${eur} €) -tól indul ${kmNum} km/hó futáskerettel és ${months} hónapos futamidővel.${variants.length && (variants[0] as any).t ? ' Változatonként: ' + variants.map((v: any) => v.t.name + ' ' + v.t.eur + ' €/hó-tól').join(', ') + '.' : ''} Pontos, személyre szabott ajánlatért keress minket.` },
+    { q: 'Mekkora a futáskeret a BMW X3 tartós bérletnél?', a: `Havonta ${kmNum} km — a ${months} hónapos futamidő alatt összesen ${fmtNum(km * months)} km fér bele a havidíjba. Ez bőven elég a napi ingázáshoz és a hosszabb utakhoz is.` },
+    { q: 'Mit tartalmaz a havi bérleti díj?', a: 'A havidíj a vadonatúj BMW X3 használatát tartalmazza a megadott futáskerettel; a szervizt, az adót és a nyári-téli gumiszettet mi álljuk. A pontos feltételeket az ajánlatban előre, írásban rögzítjük.' },
+    { q: 'Mennyi a kaució és visszajár-e?', a: `A kaució egyszeri, visszatérítendő letét: ${fmtNum(dep)} €-tól (${depHuf})${depMax > dep ? `, változattól függően legfeljebb ${fmtNum(depMax)} €` : ''}. A bérlet végén — káresemény és rendkívüli kopás nélkül — teljes egészében visszajár.` },
+    { q: 'Mennyi a bérlési időtartam?', a: `A tartós bérlet futamideje ${months} hónap. Utána meghosszabbíthatod, vagy új modellre válthatsz — akár félévente új autóval.` },
+    { q: 'Mikor vehetem át a bérelt BMW X3-at?', a: `${now ? now + ' db BMW X3 azonnal elérhető' : 'Jelenleg nincs azonnal elérhető darab'}${laterTxt ? '; további autók: ' + laterTxt : ''}. Vadonatúj, 0 km-es autót adunk át.` },
+    { q: 'Magánszemélyként és cégként is bérelhető a BMW X3?', a: 'Igen, a BMW X3 tartós bérlet magánszemélyeknek és cégeknek is elérhető. Cégként a bérleti díj a könyvelésben elszámolható költség.' },
+    { q: 'Meg is vásárolható a BMW X3?', a: 'Igen — ha inkább megvennéd, az X3 <a href="/egyedi-auto-rendeles/x3-benzin">egyedi rendeléssel</a>, akár 19% német áfával is a tiéd lehet.' },
   ],
 };
 ---
 <Base lang="hu" path="/berelheto-auto/bmw-x3-berles" title={model.title} description={model.description}>
-  <CarDetail model={model} mode="berles" />
+  <CarDetail model={model} mode="berles" rent={r} />
 </Base>
