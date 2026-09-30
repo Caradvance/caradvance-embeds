@@ -15,7 +15,11 @@
     "Hyundai IONIQ 5 N": "/hyundai/ioniq-5-n.webp",
     "Hyundai Staria": "/hyundai/staria.webp",
     "Hyundai Santa Fe": "/hyundai/santa-fe.webp",
-    "MAN TGE Kombi Basic": "/man/tge-kombi.webp"
+    "MAN TGE Kombi Basic": "/man/tge-kombi.webp",
+    "Kia EV2": "/kia/ev2.webp",
+    "Kia EV4": "/kia/ev4.webp",
+    "Volvo XC40": "/volvo/xc40.webp",
+    "Volvo EX30": "/volvo/ex30.webp"
   },
   "colors": {
     "Frost Blue": "Frost kék",
