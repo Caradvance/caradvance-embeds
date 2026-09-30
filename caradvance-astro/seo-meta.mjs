@@ -113,6 +113,35 @@ try {
     else { console.log('seo-meta(og): ' + rel + ' - mar van'); }
   }
 
+  // 5. Generikus modelloldalak (egyedi rendelés [slug] + bérlés): og:image a Car JSON-LD első képéből.
+  for (const dir of ['egyedi-auto-rendeles', 'berelheto-auto']) {
+    const base = path.join(DIST, dir);
+    if (!fs.existsSync(base)) continue;
+    for (const sub of fs.readdirSync(base)) {
+      const file = path.join(base, sub, 'index.html');
+      if (!fs.existsSync(file)) continue;
+      let h = fs.readFileSync(file, 'utf8');
+      if (/property="og:image"/.test(h)) continue;
+      const m = h.match(/"@type":"Car"[\s\S]*?"image":\[?"([^"]+)"/);
+      if (!m) continue;
+      const img = m[1].startsWith('http') ? m[1] : 'https://www.caradvance.hu' + m[1];
+      const t = (h.match(/<title>([\s\S]*?)<\/title>/) || [,''])[1];
+      const d = (h.match(/<meta name="description" content="([^"]*)"/) || [,''])[1];
+      const url = 'https://www.caradvance.hu/' + dir + '/' + sub;
+      const tags = [
+        '<meta property="og:type" content="product">',
+        '<meta property="og:url" content="' + url + '">',
+        '<meta property="og:title" content="' + t + '">',
+        '<meta property="og:description" content="' + d + '">',
+        '<meta property="og:image" content="' + img + '">',
+        '<meta name="twitter:card" content="summary_large_image">',
+        '<meta name="twitter:image" content="' + img + '">',
+      ].join('\n');
+      h = h.replace('</head>', tags + '\n</head>');
+      fs.writeFileSync(file, h); changed++;
+    }
+  }
+
   console.log('seo-meta: kesz (' + changed + ' fajl modositva, ' + warn + ' figyelmeztetes)');
 } catch (e) {
   console.log('seo-meta: FIGYELEM - ' + (e && e.message) + ' (a build megy tovabb)');
