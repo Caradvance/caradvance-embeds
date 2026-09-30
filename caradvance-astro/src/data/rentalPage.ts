@@ -17,6 +17,9 @@ export interface RentalContent {
   guideIntro?: string; guideBlocks?: { h3: string; html: string }[];
   drive?: string; boot?: string;
   specs?: Record<string, TrimSpec>;
+  // Sok, hasonló nevű Choice-kivitelnél: [regex a kivitel nevére, műszaki adat]. Az azonos label-ű kivitelek
+  // egy oszlopba vonódnak össze (a legolcsóbb ára látszik), a felszereltségi szintek a megjegyzésbe kerülnek.
+  specMatch?: [string, TrimSpec][];
   gallery?: { img: string; alt: string }[];
   faqExtra?: { q: string; a: string }[];
   egyediSlug?: string;
@@ -76,38 +79,57 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   // változatok (bérelhető kivitelek) + műszaki adatok
   const specs = c.specs || {};
   const photo = c.mainImg || r.photo;
-  const variants = (r.trims.length ? r.trims : [{ name: r.model, eur, huf: r.huf, dep, depHuf: r.depHuf, fuel: r.fuels.join(' / ') }]).map((t, i) => {
-    const s: TrimSpec = specs[t.name] || {};
+  const LINE_RE = /\b(ENERGY|Life|Style|R-Line|Elegance|Business|Highline|Comfortline|EDITION 50|FINAL EDITION|Pro S|Pro)\b/g;
+  const matchSpec = (n: string): TrimSpec | null => { for (const [re, sp] of c.specMatch || []) { if (new RegExp(re, 'i').test(n)) return sp; } return null; };
+  let trimList = r.trims.length ? r.trims : [{ name: r.model, eur, huf: r.huf, dep, depHuf: r.depHuf, fuel: r.fuels.join(' / ') }];
+  const groupLines: Record<string, string[]> = {};
+  if (c.specMatch && r.trims.length) {
+    const seen = new Set<string>();
+    trimList = trimList.filter((t) => {
+      const sp = matchSpec(t.name);
+      const g = (sp && sp.label) || t.name;
+      const lines = Array.from(new Set((t.name.match(LINE_RE) || []).map((x) => ({ ENERGY: 'Energy', 'EDITION 50': 'Edition 50', 'FINAL EDITION': 'Final Edition' } as Record<string, string>)[x] || x)));
+      groupLines[g] = Array.from(new Set([...(groupLines[g] || []), ...lines]));
+      if (seen.has(g)) return false;
+      seen.add(g);
+      return true;
+    });
+  }
+  const variants = trimList.map((t, i) => {
+    const sm = c.specMatch ? matchSpec(t.name) : null;
+    const s: TrimSpec = specs[t.name] || sm || {};
+    const gl = sm && sm.label ? groupLines[sm.label] || [] : [];
     return {
       key: 'v' + i, label: (r.trims.length ? (s.label || t.name) : name),
       fuel: s.fuel || fuelCap(t.fuel), power: s.power || '', torque: s.torque || '', drive: s.drive || c.drive || gear,
       accel: s.accel || '', vmax: s.vmax || '', cons: s.cons || '', boot: s.boot || c.boot || '', rec: s.rec || '',
-      img: s.img || photo, alt: name + ' ' + t.name + ' bérlés', rentTxt: t.eur + ' €/hó-tól', note: s.note || fuelHu(t.fuel), t,
+      img: s.img || photo, alt: name + ' ' + t.name + ' bérlés', rentTxt: t.eur + ' €/hó-tól', note: (s.note || fuelHu(t.fuel)) + (gl.length ? ` · felszereltség: ${gl.join(', ')}` : ''), t,
     };
   });
 
   const title = c.title || `${name} bérlés — tartós bérlet ${eur} €/hó-tól | CarAdvance`;
   const descBase = `${name} bérlés és tartós bérlet ${huf}/hó-tól${km ? `, ${kmList} km/hó futáskerettel` : ''}${months ? `, ${moList} hónapra` : ''}, kaució ${fmtNum(dep)} €-tól. Vadonatúj, 0 km-es ${lc(body)}`;
-  const descLong = descBase + (trimShort ? ` — ${trimShort}.` : '.');
+  const trimLbl = variants.length > 1 ? variants.map((v) => v.label).join(', ') : '';
+  const descLong = descBase + (trimLbl ? ` — ${trimLbl}.` : '.');
   const description = c.description || (descLong.length <= 175 ? descLong : descBase + ', azonnal vagy hamarosan elérhető.');
 
   const highlights = c.highlights || [
     { icon: '€', title: `${huf}/hó-tól`, text: `Átlátható havi bérleti díj ${kmTxt} és ${moTxt} — ugyanaz az ár, mint a bérelhető autóink között.` },
-    { icon: '⛽', title: r.fuels.length > 1 ? 'Több hajtás közül' : cap(fuelHu(r.fuels[0] || 'benzin')) + ' hajtás', text: variants.length > 1 ? 'Bérelhető: ' + variants.map((v) => v.t.name + ' (' + fuelHu(v.t.fuel) + ')').join(', ') + '.' : `${cap(fuelsTxt || 'benzin')} hajtás${psTxt ? ', ' + psTxt : ''}, ${gear.toLowerCase()} váltóval.` },
+    { icon: '⛽', title: r.fuels.length > 1 ? 'Több hajtás közül' : cap(fuelHu(r.fuels[0] || 'benzin')) + ' hajtás', text: variants.length > 1 ? 'Bérelhető: ' + variants.map((v) => v.label + ' (' + fuelHu(v.t.fuel) + ')').join(', ') + '.' : `${cap(fuelsTxt || 'benzin')} hajtás${psTxt ? ', ' + psTxt : ''}, ${gear.toLowerCase()} váltóval.` },
     { icon: '◈', title: r.count ? `${r.count} db ${name}` : `Bérelhető ${name}`, text: `${r.now ? r.now + ' db azonnal elérhető' : 'Hamarosan elérhető'}${laterTxt ? '; további autók — ' + laterTxt : ''}. Vadonatúj, 0 km-es autók.` },
     { icon: '✓', title: 'Szerviz, adó, gumi a díjban', text: `A szervizt, az adót és a nyári-téli gumiszettet mi álljuk — egyszeri, visszajáró kaució ${fmtNum(dep)} €-tól.` },
   ];
 
   const guideBlocks = [
     { html: c.guideIntro || `${cap(A)} <strong>${name}</strong> ${lc(body)} kategóriájában népszerű választás. <strong>Tartós bérletben</strong> úgy vezetheted, hogy nem kötsz le benne nagy összeget: egyetlen <strong>havi díjat</strong> fizetsz, a szervizt, az adót és a gumikat mi intézzük. Ez a <a href="/berles-elonyei">hosszú távú autóbérlés</a> lényege: kiszámítható költség, új autó, továbbeladási gond nélkül.` },
-    { h3: `Melyik ${name} bérelhető?`, html: variants.length > 1 ? `Jelenleg ${variants.length} változat közül választhatsz: ` + variants.map((v) => `<strong>${v.t.name}</strong> — ${v.note}, ${v.t.eur} €/hó-tól`).join('; ') + '.' : `Jelenleg a(z) <strong>${variants[0].t.name}</strong> kivitel bérelhető (${fuelHu(variants[0].t.fuel)}), ${eur} €/hó-tól.` },
+    { h3: `Melyik ${name} bérelhető?`, html: variants.length > 1 ? `Jelenleg ${variants.length} változat közül választhatsz: ` + variants.map((v) => `<strong>${v.label}</strong> — ${v.note}, ${v.t.eur} €/hó-tól`).join('; ') + '.' : `Jelenleg a(z) <strong>${variants[0].label}</strong> kivitel bérelhető (${fuelHu(variants[0].t.fuel)}), ${eur} €/hó-tól.` },
     ...(c.guideBlocks || []),
     { h3: `Mennyibe kerül ${A} ${name} bérlése?`, html: `${cap(A)} <strong>${name} bérlés</strong> havidíja ${huf} (${eur} €) -tól indul ${kmTxt} és ${moTxt}. Az egyszeri, visszatérítendő <strong>kaució</strong> ${fmtNum(dep)} €-tól indul${depMax > dep ? `, az erősebb változatoknál ${fmtNum(depMax)} €` : ''}. A pontos díj a változattól, a színtől és a felszereltségi csomagtól függ — a <a href="/autoink#berelheto">bérelhető autóink</a> között minden modell havidíját és elérhetőségét látod.` },
     { h3: 'Tartós bérlet, lízing vagy vásárlás?', html: `Ha nem szeretnél tulajdonolni, a <strong>tartós autóbérlés</strong> a legrugalmasabb: nincs önerő, nincs maradványérték-kockázat, és akár félévente új modellre válthatsz. Cégként a bérleti díj elszámolható költség — hasonlóan az <strong>operatív lízinghez</strong>, de hosszú kötöttség nélkül. Ha mégis a sajátod lenne, nézd meg a <a href="/finanszirozas-lizing">lízing</a> és az <a href="${c.egyediSlug ? '/egyedi-auto-rendeles/' + c.egyediSlug : '/egyedi-auto-rendeles'}">egyedi rendelés</a> lehetőségeit.${r.related.length ? ` Más modellt keresel? Nézd meg a bérelhető <a href="${r.related[0].href}">${r.related[0].name}</a>${r.related[1] ? ` és <a href="${r.related[1].href}">${r.related[1].name}</a>` : ''} modelleket is.` : ''}` },
   ];
 
   const faq = [
-    { q: `Mennyibe kerül ${A} ${name} bérlése?`, a: `${cap(A)} ${name} havi bérleti díja ${huf} (${eur} €) -tól indul ${kmTxt} és ${moTxt}.${variants.length > 1 ? ' Változatonként: ' + variants.map((v) => v.t.name + ' ' + v.t.eur + ' €/hó-tól').join(', ') + '.' : ''} Pontos, személyre szabott ajánlatért keress minket.` },
+    { q: `Mennyibe kerül ${A} ${name} bérlése?`, a: `${cap(A)} ${name} havi bérleti díja ${huf} (${eur} €) -tól indul ${kmTxt} és ${moTxt}.${variants.length > 1 ? ' Változatonként: ' + variants.map((v) => v.label + ' ' + v.t.eur + ' €/hó-tól').join(', ') + '.' : ''} Pontos, személyre szabott ajánlatért keress minket.` },
     ...(km && months ? [{ q: `Mekkora a futáskeret ${A} ${name} tartós bérletnél?`, a: r.km.length > 1 ? `Választhatsz: havonta ${kmList} km. A ${months} hónapos futamidő alatt így ${fmtNum(km * months)}–${fmtNum(r.km[r.km.length - 1] * months)} km fér bele a havidíjba — a napi ingázáshoz és a hosszabb utakhoz is bőven elég.` : `Havonta ${kmNum} km — a ${months} hónapos futamidő alatt összesen ${fmtNum(km * months)} km fér bele a havidíjba. Ez bőven elég a napi ingázáshoz és a hosszabb utakhoz is.` }] : []),
     { q: 'Mit tartalmaz a havi bérleti díj?', a: `A havidíj a vadonatúj ${name} használatát tartalmazza a megadott futáskerettel; a szervizt, az adót és a nyári-téli gumiszettet mi álljuk. A pontos feltételeket az ajánlatban előre, írásban rögzítjük.` },
     { q: 'Mennyi a kaució és visszajár-e?', a: `A kaució egyszeri, visszatérítendő letét: ${fmtNum(dep)} €-tól${depMax > dep ? `, változattól függően legfeljebb ${fmtNum(depMax)} €` : ''}. A bérlet végén — káresemény és rendkívüli kopás nélkül — teljes egészében visszajár.` },
@@ -131,7 +153,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
     chips, yearChip: 'Vadonatúj · 0 km',
     bodyType: body,
     overviewH2: c.overviewH2 || `${name} tartós bérlet — vadonatúj ${lc(body)} havidíjjal`,
-    overviewLead: c.overviewLead || `${cap(A)} <strong>${name} bérlés</strong> a legegyszerűbb út egy vadonatúj autóhoz: <strong>tartós bérletben</strong> ${huf}/hó-tól vezetheted, ${kmTxt} és ${moTxt}. ${r.count ? `Jelenleg ${r.count} db ${name} közül választhatsz${r.now ? ` (${r.now} db azonnal elérhető)` : ''}` : 'Több változat közül választhatsz'}${trimShort && variants.length > 1 ? `, ${trimShort} kivitelben` : ''}. Egyszeri, visszajáró <strong>kaució</strong> ${fmtNum(dep)} €-tól; a szervizt, az adót és a nyári-téli gumit mi álljuk. Nem kell tulajdonolnod: a bérlet végén egyszerűen visszaadod, vagy új modellre váltasz.`,
+    overviewLead: c.overviewLead || `${cap(A)} <strong>${name} bérlés</strong> a legegyszerűbb út egy vadonatúj autóhoz: <strong>tartós bérletben</strong> ${huf}/hó-tól vezetheted, ${kmTxt} és ${moTxt}. ${r.count ? `Jelenleg ${r.count} db ${name} közül választhatsz${r.now ? ` (${r.now} db azonnal elérhető)` : ''}` : 'Több változat közül választhatsz'}${variants.length > 1 ? `, ${variants.map((v) => v.label).join(', ')} kivitelben` : ''}. Egyszeri, visszajáró <strong>kaució</strong> ${fmtNum(dep)} €-tól; a szervizt, az adót és a nyári-téli gumit mi álljuk. Nem kell tulajdonolnod: a bérlet végén egyszerűen visszaadod, vagy új modellre váltasz.`,
     highlights,
     design: c.design ? { ...c.design, text: c.design.text + (r.colors.length ? ` Bérelhető színek: ${r.colors.join(', ')}.` : '') } : null,
     interior: c.interior || null,
