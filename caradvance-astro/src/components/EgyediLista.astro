@@ -356,48 +356,48 @@ const _rebuild='rebuild-nudge-3';
   var HUF = function(eur){ return new Intl.NumberFormat('hu-HU').format(Math.round(eur*FX)) + ' Ft'; };
   var EUR = function(eur){ return new Intl.NumberFormat('de-DE').format(eur) + ' €'; };
   var net = function(g){ return Math.round(g/1.19); };
-  var SOON = ['ix5-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','7erb-dizel'];
+  var SOON = ['bmw-ix5','bmw-i3','q9-benzin','ix5-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','7erb-dizel'];
   var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
 
   var MINIS = [
-    {brand:'MINI',key:'coopers',name:'MINI Cooper',body:'Ferdehátú',fuel:'Benzin',img:'/cooper-s.webp?v=2',logo:'mini',from:26450},
-    {brand:'MINI',key:'cooper',name:'MINI Cooper 5 ajtós',body:'Ferdehátú',fuel:'Benzin',img:'/cooper.webp?v=2',logo:'mini',from:27450},
-    {brand:'MINI',key:'coopercab',name:'MINI Cooper Cabrio',body:'Kabrió',fuel:'Benzin',img:'/cooper-cabrio.webp?v=2',logo:'mini',from:32450},
-    {brand:'MINI',key:'countryman',name:'MINI Countryman',body:'SUV',fuel:'Benzin',img:'/countryman.webp?v=2',logo:'mini',from:38120},
-    {brand:'MINI',key:'jcwhatch',name:'MINI John Cooper Works',body:'Ferdehátú',fuel:'Benzin',img:'/jcw-hatch.webp?v=2',logo:'jcw',from:40950},
-    {brand:'MINI',key:'jcwcabrio',name:'MINI John Cooper Works Cabrio',body:'Kabrió',fuel:'Benzin',img:'/jcw-cabrio.webp?v=2',logo:'jcw',from:44950},
-    {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=2',logo:'jcw',from:54220}
+    {brand:'MINI',key:'coopers',name:'MINI Cooper',body:'Ferdehátú',fuel:'Benzin',img:'/cooper-s.webp?v=2',logo:'mini',from:26450,slug:'mini-cooper'},
+    {brand:'MINI',key:'cooper',name:'MINI Cooper 5 ajtós',body:'Ferdehátú',fuel:'Benzin',img:'/cooper.webp?v=2',logo:'mini',from:27450,slug:'mini-cooper-5-ajtos'},
+    {brand:'MINI',key:'coopercab',name:'MINI Cooper Cabrio',body:'Kabrió',fuel:'Benzin',img:'/cooper-cabrio.webp?v=2',logo:'mini',from:32450,slug:'mini-cooper-cabrio'},
+    {brand:'MINI',key:'countryman',name:'MINI Countryman',body:'SUV',fuel:'Benzin',img:'/countryman.webp?v=2',logo:'mini',from:38120,slug:'mini-countryman'},
+    {brand:'MINI',key:'jcwhatch',name:'MINI John Cooper Works',body:'Ferdehátú',fuel:'Benzin',img:'/jcw-hatch.webp?v=2',logo:'jcw',from:40950,slug:'mini-john-cooper-works'},
+    {brand:'MINI',key:'jcwcabrio',name:'MINI John Cooper Works Cabrio',body:'Kabrió',fuel:'Benzin',img:'/jcw-cabrio.webp?v=2',logo:'jcw',from:44950,slug:'mini-john-cooper-works-cabrio'},
+    {brand:'MINI',key:'jcwcountryman',name:'MINI John Cooper Works Countryman ALL4',body:'SUV',fuel:'Benzin',img:'/jcw-countryman.webp?v=2',logo:'jcw',from:54220,slug:'mini-john-cooper-works-countryman'}
   ];
 
   var MB = [
-    {brand:'MB',key:'mbs',name:'Mercedes-Benz S-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-s.webp?v=1',logo:'mb',from:109221},
-    {brand:'MB',key:'mba',name:'Mercedes-Benz A-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-a.webp?v=1',logo:'mb',from:32297},
-    {brand:'MB',key:'mbb',name:'Mercedes-Benz B-osztály',body:'Egyterű',fuel:'Benzin',img:'/mb-b.webp?v=1',logo:'mb',from:35559},
-    {brand:'MB',key:'mbc',name:'Mercedes-Benz C-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-c.webp?v=1',logo:'mb',from:42427},
-    {brand:'MB',key:'mbct',name:'Mercedes-Benz C-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-ct.webp?v=1',logo:'mb',from:46221},
-    {brand:'MB',key:'mbclec',name:'Mercedes-Benz CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-cle-coupe.webp?v=1',logo:'mb',from:49521},
-    {brand:'MB',key:'mbclecab',name:'Mercedes-Benz CLE Cabrio',body:'Kabrió',fuel:'Benzin',img:'/mb-cle-cabrio.webp?v=1',logo:'mb',from:56814},
-    {brand:'MB',key:'mbe',name:'Mercedes-Benz E-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-e.webp?v=1',logo:'mb',from:52586},
-    {brand:'MB',key:'mbet',name:'Mercedes-Benz E-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-et.webp?v=1',logo:'mb',from:54835},
-    {brand:'MB',key:'mbgla',name:'Mercedes-Benz GLA',body:'SUV',fuel:'Benzin',img:'/mb-gla.webp?v=1',logo:'mb',from:41685},
-    {brand:'MB',key:'mbglb',name:'Mercedes-Benz GLB',body:'SUV',fuel:'Benzin',img:'/mb-glb.webp?v=1',logo:'mb',from:46869},
-    {brand:'MB',key:'mbglc',name:'Mercedes-Benz GLC',body:'SUV',fuel:'Benzin',img:'/mb-glc.webp?v=1',logo:'mb',from:54017},
-    {brand:'MB',key:'mbglcc',name:'Mercedes-Benz GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-glc-coupe.webp?v=1',logo:'mb',from:57820},
-    {brand:'MB',key:'mbgle',name:'Mercedes-Benz GLE',body:'SUV',fuel:'Benzin',img:'/mb-gle.webp?v=1',logo:'mb',from:87461},
-    {brand:'MB',key:'mbglec',name:'Mercedes-Benz GLE Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-gle-coupe.webp?v=1',logo:'mb',from:94205},
-    {brand:'MB',key:'mbamga',name:'Mercedes-AMG A-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-a.webp?v=1',logo:'mb',from:51177},
-    {brand:'MB',key:'mbamgc',name:'Mercedes-AMG C-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-c.webp?v=1',logo:'mb'},
-    {brand:'MB',key:'mbamgct',name:'Mercedes-AMG C-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-amg-ct.webp?v=1',logo:'mb'},
-    {brand:'MB',key:'mbamgclec',name:'Mercedes-AMG CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-amg-cle-coupe.webp?v=1',logo:'mb',from:85674},
-    {brand:'MB',key:'mbamgclecab',name:'Mercedes-AMG CLE Cabrio',body:'Kabrió',fuel:'Benzin',img:'/mb-amg-cle-cabrio.webp?v=1',logo:'mb',from:93092},
-    {brand:'MB',key:'mbamge',name:'Mercedes-AMG E-osztály',body:'Limuzin',fuel:'Hibrid',img:'/mb-amg-e.webp?v=1',logo:'mb',from:98318},
-    {brand:'MB',key:'mbamget',name:'Mercedes-AMG E-osztály T-Modell',body:'Kombi',fuel:'Hibrid',img:'/mb-amg-et.webp?v=1',logo:'mb',from:100567},
-    {brand:'MB',key:'mbamggla',name:'Mercedes-AMG GLA',body:'SUV',fuel:'Benzin',img:'/mb-amg-gla.webp?v=1',logo:'mb',from:62940},
-    {brand:'MB',key:'mbamgglb',name:'Mercedes-AMG GLB',body:'SUV',fuel:'Benzin',img:'/mb-amg-glb.webp?v=1',logo:'mb'},
-    {brand:'MB',key:'mbamgglc',name:'Mercedes-AMG GLC',body:'SUV',fuel:'Benzin',img:'/mb-amg-glc.webp?v=1',logo:'mb',from:78464},
-    {brand:'MB',key:'mbamgglcc',name:'Mercedes-AMG GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-amg-glc-coupe.webp?v=1',logo:'mb',from:82519},
-    {brand:'MB',key:'mbamggle',name:'Mercedes-AMG GLE',body:'SUV',fuel:'Hibrid',img:'/mb-amg-gle.webp?v=1',logo:'mb',from:114045},
-    {brand:'MB',key:'mbamgglec',name:'Mercedes-AMG GLE Coupé',body:'SUV Coupé',fuel:'Hibrid',img:'/mb-amg-gle-coupe.webp?v=1',logo:'mb',from:120053}
+    {brand:'MB',key:'mbs',name:'Mercedes-Benz S-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-s.webp?v=1',logo:'mb',from:109221,slug:'mercedes-benz-s-osztaly'},
+    {brand:'MB',key:'mba',name:'Mercedes-Benz A-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-a.webp?v=1',logo:'mb',from:32297,slug:'mercedes-benz-a-osztaly'},
+    {brand:'MB',key:'mbb',name:'Mercedes-Benz B-osztály',body:'Egyterű',fuel:'Benzin',img:'/mb-b.webp?v=1',logo:'mb',from:35559,slug:'mercedes-benz-b-osztaly'},
+    {brand:'MB',key:'mbc',name:'Mercedes-Benz C-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-c.webp?v=1',logo:'mb',from:42427,slug:'mercedes-benz-c-osztaly'},
+    {brand:'MB',key:'mbct',name:'Mercedes-Benz C-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-ct.webp?v=1',logo:'mb',from:46221,slug:'mercedes-benz-c-osztaly-t-modell'},
+    {brand:'MB',key:'mbclec',name:'Mercedes-Benz CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-cle-coupe.webp?v=1',logo:'mb',from:49521,slug:'mercedes-benz-cle-coupe'},
+    {brand:'MB',key:'mbclecab',name:'Mercedes-Benz CLE Cabrio',body:'Kabrió',fuel:'Benzin',img:'/mb-cle-cabrio.webp?v=1',logo:'mb',from:56814,slug:'mercedes-benz-cle-cabrio'},
+    {brand:'MB',key:'mbe',name:'Mercedes-Benz E-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-e.webp?v=1',logo:'mb',from:52586,slug:'mercedes-benz-e-osztaly'},
+    {brand:'MB',key:'mbet',name:'Mercedes-Benz E-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-et.webp?v=1',logo:'mb',from:54835,slug:'mercedes-benz-e-osztaly-t-modell'},
+    {brand:'MB',key:'mbgla',name:'Mercedes-Benz GLA',body:'SUV',fuel:'Benzin',img:'/mb-gla.webp?v=1',logo:'mb',from:41685,slug:'mercedes-benz-gla'},
+    {brand:'MB',key:'mbglb',name:'Mercedes-Benz GLB',body:'SUV',fuel:'Benzin',img:'/mb-glb.webp?v=1',logo:'mb',from:46869,slug:'mercedes-benz-glb'},
+    {brand:'MB',key:'mbglc',name:'Mercedes-Benz GLC',body:'SUV',fuel:'Benzin',img:'/mb-glc.webp?v=1',logo:'mb',from:54017,slug:'mercedes-benz-glc'},
+    {brand:'MB',key:'mbglcc',name:'Mercedes-Benz GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-glc-coupe.webp?v=1',logo:'mb',from:57820,slug:'mercedes-benz-glc-coupe'},
+    {brand:'MB',key:'mbgle',name:'Mercedes-Benz GLE',body:'SUV',fuel:'Benzin',img:'/mb-gle.webp?v=1',logo:'mb',from:87461,slug:'mercedes-benz-gle'},
+    {brand:'MB',key:'mbglec',name:'Mercedes-Benz GLE Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-gle-coupe.webp?v=1',logo:'mb',from:94205,slug:'mercedes-benz-gle-coupe'},
+    {brand:'MB',key:'mbamga',name:'Mercedes-AMG A-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-a.webp?v=1',logo:'mb',from:51177,slug:'mercedes-amg-a-osztaly'},
+    {brand:'MB',key:'mbamgc',name:'Mercedes-AMG C-osztály',body:'Limuzin',fuel:'Benzin',img:'/mb-amg-c.webp?v=1',logo:'mb',slug:'mercedes-amg-c-osztaly'},
+    {brand:'MB',key:'mbamgct',name:'Mercedes-AMG C-osztály T-Modell',body:'Kombi',fuel:'Benzin',img:'/mb-amg-ct.webp?v=1',logo:'mb',slug:'mercedes-amg-c-osztaly-t-modell'},
+    {brand:'MB',key:'mbamgclec',name:'Mercedes-AMG CLE Coupé',body:'Coupé',fuel:'Benzin',img:'/mb-amg-cle-coupe.webp?v=1',logo:'mb',from:85674,slug:'mercedes-amg-cle-coupe'},
+    {brand:'MB',key:'mbamgclecab',name:'Mercedes-AMG CLE Cabrio',body:'Kabrió',fuel:'Benzin',img:'/mb-amg-cle-cabrio.webp?v=1',logo:'mb',from:93092,slug:'mercedes-amg-cle-cabrio'},
+    {brand:'MB',key:'mbamge',name:'Mercedes-AMG E-osztály',body:'Limuzin',fuel:'Hibrid',img:'/mb-amg-e.webp?v=1',logo:'mb',from:98318,slug:'mercedes-amg-e-osztaly'},
+    {brand:'MB',key:'mbamget',name:'Mercedes-AMG E-osztály T-Modell',body:'Kombi',fuel:'Hibrid',img:'/mb-amg-et.webp?v=1',logo:'mb',from:100567,slug:'mercedes-amg-e-osztaly-t-modell'},
+    {brand:'MB',key:'mbamggla',name:'Mercedes-AMG GLA',body:'SUV',fuel:'Benzin',img:'/mb-amg-gla.webp?v=1',logo:'mb',from:62940,slug:'mercedes-amg-gla'},
+    {brand:'MB',key:'mbamgglb',name:'Mercedes-AMG GLB',body:'SUV',fuel:'Benzin',img:'/mb-amg-glb.webp?v=1',logo:'mb',slug:'mercedes-amg-glb'},
+    {brand:'MB',key:'mbamgglc',name:'Mercedes-AMG GLC',body:'SUV',fuel:'Benzin',img:'/mb-amg-glc.webp?v=1',logo:'mb',from:78464,slug:'mercedes-amg-glc'},
+    {brand:'MB',key:'mbamgglcc',name:'Mercedes-AMG GLC Coupé',body:'SUV Coupé',fuel:'Benzin',img:'/mb-amg-glc-coupe.webp?v=1',logo:'mb',from:82519,slug:'mercedes-amg-glc-coupe'},
+    {brand:'MB',key:'mbamggle',name:'Mercedes-AMG GLE',body:'SUV',fuel:'Hibrid',img:'/mb-amg-gle.webp?v=1',logo:'mb',from:114045,slug:'mercedes-amg-gle'},
+    {brand:'MB',key:'mbamgglec',name:'Mercedes-AMG GLE Coupé',body:'SUV Coupé',fuel:'Hibrid',img:'/mb-amg-gle-coupe.webp?v=1',logo:'mb',from:120053,slug:'mercedes-amg-gle-coupe'}
   ];
 
   var AUDI = [
@@ -430,21 +430,21 @@ const _rebuild='rebuild-nudge-3';
     {brand:'AUDI',key:'rsetrongt',name:'Audi RS e-tron GT',body:'Coupé',fuel:'Elektromos',img:'/audi/rsetrongt.webp'}
   ];
   var CARS = MINIS.concat(MB).concat(AUDI).concat([
-    {key:'ix',name:'BMW iX',body:'SUV',fuel:'Elektromos',from:83500},
+    {key:'ix',name:'BMW iX',body:'SUV',fuel:'Elektromos',from:83500,slug:'bmw-ix'},
     {key:'ixm',name:'BMW iX M',body:'SUV',fuel:'Elektromos',from:126500,hide:true},
-    {key:'ix5',name:'BMW iX5',body:'SUV',fuel:'Elektromos',from:100000},
+    {key:'ix5',name:'BMW iX5',body:'SUV',fuel:'Elektromos',from:100000,slug:'bmw-ix5'},
     {key:'ix3',name:'BMW iX3',body:'SUV',fuel:'Elektromos',from:63400},
-    {key:'ix2',name:'BMW iX2',body:'SUV Coupé',fuel:'Elektromos',from:51000},
-    {key:'ix1',name:'BMW iX1',body:'SUV',fuel:'Elektromos',from:49400},
-    {key:'i7',name:'BMW i7',body:'Limuzin',fuel:'Elektromos',from:121400},
+    {key:'ix2',name:'BMW iX2',body:'SUV Coupé',fuel:'Elektromos',from:51000,slug:'bmw-ix2'},
+    {key:'ix1',name:'BMW iX1',body:'SUV',fuel:'Elektromos',from:49400,slug:'bmw-ix1'},
+    {key:'i7',name:'BMW i7',body:'Limuzin',fuel:'Elektromos',from:121400,slug:'bmw-i7'},
     {key:'i7m',name:'BMW i7 M',body:'Limuzin',fuel:'Elektromos',from:182400,hide:true},
-    {key:'i5s',name:'BMW i5',body:'Limuzin',fuel:'Elektromos',from:70900},
+    {key:'i5s',name:'BMW i5',body:'Limuzin',fuel:'Elektromos',from:70900,slug:'bmw-i5'},
     {key:'i5m',name:'BMW i5 M',body:'Limuzin',fuel:'Elektromos',from:100200,hide:true},
-    {key:'i5ts',name:'BMW i5 Touring',body:'Touring',fuel:'Elektromos',from:72900},
+    {key:'i5ts',name:'BMW i5 Touring',body:'Touring',fuel:'Elektromos',from:72900,slug:'bmw-i5-touring'},
     {key:'i5tm',name:'BMW i5 Touring M',body:'Touring',fuel:'Elektromos',from:102200,hide:true},
-    {key:'i4s',name:'BMW i4',body:'Gran Coupé',fuel:'Elektromos',from:58200},
+    {key:'i4s',name:'BMW i4',body:'Gran Coupé',fuel:'Elektromos',from:58200,slug:'bmw-i4'},
     {key:'i4m',name:'BMW i4 M',body:'Gran Coupé',fuel:'Elektromos',from:73700,hide:true},
-    {key:'i3',name:'BMW i3',body:'Limuzin',fuel:'Elektromos',from:47900},
+    {key:'i3',name:'BMW i3',body:'Limuzin',fuel:'Elektromos',from:47900,slug:'bmw-i3'},
     {key:'xm',name:'BMW XM',body:'SUV',fuel:'Hibrid',from:135500},
     {key:'x5h',name:'BMW X5',body:'SUV',fuel:'Hibrid',from:86700,hide:true},
     {key:'x5m',name:'BMW X5 M',body:'SUV',fuel:'Hibrid',from:102900,hide:true},
@@ -457,40 +457,40 @@ const _rebuild='rebuild-nudge-3';
     {key:'3erh',name:'BMW 3-as',body:'Limuzin',fuel:'Hibrid',from:63300,hide:true},
     {key:'3erth',name:'BMW 3-as Touring',body:'Touring',fuel:'Hibrid',from:64600,hide:true},
     {key:'2erat',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Hibrid',from:49150,hide:true},
-    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Benzin',fuels:['Benzin','Dízel'],from:106500},
+    {key:'x7',name:'BMW X7',body:'SUV',fuel:'Benzin',fuels:['Benzin','Dízel'],from:106500,slug:'bmw-x7'},
     {key:'x7m',name:'BMW X7 M',body:'SUV',fuel:'Benzin',from:138000,hide:true},
     {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Benzin',from:102800,hide:true},
     {key:'x6b',name:'BMW X6 M',body:'SUV Coupé',fuel:'Benzin',from:123500,hide:true},
     {key:'x5',name:'BMW X5',body:'SUV',fuel:'Benzin',from:99750,hide:true},
     {key:'x3',name:'BMW X3',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/x3mw.webp?v=6',from:60300},
     {key:'x3mw',name:'BMW X3 M',body:'SUV',fuel:'Benzin',from:85200,hide:true},
-    {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:48600},
+    {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:48600,slug:'bmw-x2'},
     {key:'x2m',name:'BMW X2 M',body:'SUV Coupé',fuel:'Benzin',from:67100,hide:true},
-    {key:'x1b',name:'BMW X1',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:45100},
+    {key:'x1b',name:'BMW X1',body:'SUV',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:45100,slug:'bmw-x1'},
     {key:'x1m',name:'BMW X1 M',body:'SUV',fuel:'Benzin',from:65600,hide:true},
-    {key:'7erb',name:'BMW 7-es',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/m760e.webp?v=6',from:117900},
-    {key:'5erb',name:'BMW 5-ös',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:60000},
-    {key:'5ertb',name:'BMW 5-ös Touring',body:'Touring',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:62000},
-    {key:'m5',name:'BMW M5',body:'Limuzin',fuel:'Hibrid',from:145200},
-    {key:'m5t',name:'BMW M5 Touring',body:'Touring',fuel:'Hibrid',from:147200},
-    {key:'4erc',name:'BMW 4-es Coupé',body:'Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900},
-    {key:'4ergc',name:'BMW 4-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900},
-    {key:'4ercab',name:'BMW 4-es Cabrio',body:'Cabrio',fuel:'Benzin',fuels:['Benzin','Dízel'],from:61400},
+    {key:'7erb',name:'BMW 7-es',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/m760e.webp?v=6',from:117900,slug:'bmw-7-es'},
+    {key:'5erb',name:'BMW 5-ös',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:60000,slug:'bmw-5-os'},
+    {key:'5ertb',name:'BMW 5-ös Touring',body:'Touring',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:62000,slug:'bmw-5-os-touring'},
+    {key:'m5',name:'BMW M5',body:'Limuzin',fuel:'Hibrid',from:145200,slug:'bmw-m5'},
+    {key:'m5t',name:'BMW M5 Touring',body:'Touring',fuel:'Hibrid',from:147200,slug:'bmw-m5-touring'},
+    {key:'4erc',name:'BMW 4-es Coupé',body:'Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900,slug:'bmw-4-es-coupe'},
+    {key:'4ergc',name:'BMW 4-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:53900,slug:'bmw-4-es-gran-coupe'},
+    {key:'4ercab',name:'BMW 4-es Cabrio',body:'Cabrio',fuel:'Benzin',fuels:['Benzin','Dízel'],from:61400,slug:'bmw-4-es-cabrio'},
     {key:'m4b',name:'BMW M4',body:'Coupé',fuel:'Benzin',from:98500,slug:'m4-benzin'},
-    {key:'m4cab',name:'BMW M4 Cabrio',body:'Cabrio',fuel:'Benzin',from:114100},
+    {key:'m4cab',name:'BMW M4 Cabrio',body:'Cabrio',fuel:'Benzin',from:114100,slug:'bmw-m4-cabrio'},
     {key:'m4',name:'BMW 4-es Coupé M',body:'Coupé',fuel:'Benzin',from:77600,hide:true},
     {key:'m4gc',name:'BMW 4-es Gran Coupé M',body:'Gran Coupé',fuel:'Benzin',from:77600,hide:true},
     {key:'m4cabb',name:'BMW 4-es Cabrio M',body:'Cabrio',fuel:'Benzin',from:85200,hide:true},
-    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:47000},
-    {key:'3ert',name:'BMW 3-as Touring',body:'Touring',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:48300},
-    {key:'m3',name:'BMW M3',body:'Limuzin',fuel:'Benzin',from:96500},
-    {key:'m3t',name:'BMW M3 Touring',body:'Touring',fuel:'Benzin',from:108900},
+    {key:'3er',name:'BMW 3-as',body:'Limuzin',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:47000,slug:'bmw-3-as'},
+    {key:'3ert',name:'BMW 3-as Touring',body:'Touring',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],from:48300,slug:'bmw-3-as-touring'},
+    {key:'m3',name:'BMW M3',body:'Limuzin',fuel:'Benzin',from:96500,slug:'bmw-m3'},
+    {key:'m3t',name:'BMW M3 Touring',body:'Touring',fuel:'Benzin',from:108900,slug:'bmw-m3-touring'},
     {key:'m3b',name:'BMW 3-as M',body:'Limuzin',fuel:'Benzin',from:77500,hide:true},
     {key:'m3tb',name:'BMW 3-as Touring M',body:'Touring',fuel:'Benzin',from:78800,hide:true},
     {key:'2eratb',name:'BMW 2-es Active Tourer',body:'Egyterű',fuel:'Benzin',fuels:['Benzin','Hibrid','Dízel'],img:'/bmw/2erat.webp?v=6',from:36750},
     {key:'2ercb',name:'BMW 2-es Coupé',body:'Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:46300},
     {key:'2ergc',name:'BMW 2-es Gran Coupé',body:'Gran Coupé',fuel:'Benzin',fuels:['Benzin','Dízel'],from:37750},
-    {key:'m2',name:'BMW M2',body:'Coupé',fuel:'Benzin',from:81300},
+    {key:'m2',name:'BMW M2',body:'Coupé',fuel:'Benzin',from:81300,slug:'bmw-m2'},
     {key:'m2b',name:'BMW 2-es Coupé M',body:'Coupé',fuel:'Benzin',from:63600,hide:true},
     {key:'m2gc',name:'BMW 2-es Gran Coupé M',body:'Gran Coupé',fuel:'Benzin',from:60650,hide:true},
     {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Benzin',fuels:['Benzin','Dízel'],from:34250},
@@ -498,8 +498,8 @@ const _rebuild='rebuild-nudge-3';
     {key:'z4',name:'BMW Z4',body:'Roadster',fuel:'Benzin',from:49900,hide:true},
     {key:'z4m',name:'BMW Z4 M',body:'Roadster',fuel:'Benzin',from:68900,hide:true},
     {key:'x7',name:'BMW X7',body:'SUV',fuel:'Dízel',from:108500,hide:true},
-    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Dízel',fuels:['Benzin','Dízel'],from:98100},
-    {key:'x6',name:'BMW X6 M Competition',body:'SUV Coupé',fuel:'Benzin',from:171900},
+    {key:'x6b',name:'BMW X6',body:'SUV Coupé',fuel:'Dízel',fuels:['Benzin','Dízel'],from:98100,slug:'x6-dizel'},
+    {key:'x6',name:'BMW X6 M Competition',body:'SUV Coupé',fuel:'Benzin',from:171900,slug:'bmw-x6-m-competition'},
     {key:'x5',name:'BMW X5',body:'SUV',fuel:'Dízel',fuels:['Benzin','Hibrid','Dízel'],from:95750},
     {key:'x3m',name:'BMW X3',body:'SUV',fuel:'Dízel',from:62800,hide:true},
     {key:'x2',name:'BMW X2',body:'SUV Coupé',fuel:'Dízel',from:49200,hide:true},
@@ -522,7 +522,7 @@ const _rebuild='rebuild-nudge-3';
     {key:'1erb',name:'BMW 1-es',body:'Kompakt',fuel:'Dízel',from:39350,hide:true}
   ]);
 
-  var NEW=['ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel','m4-benzin'];
+  var NEW=['bmw-ix5','bmw-i7','bmw-i3','bmw-7-es','ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel','m4-benzin'];
   function slug(c){ return c.slug || (c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel])); }
   function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
   function att(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
@@ -551,7 +551,7 @@ const _rebuild='rebuild-nudge-3';
     } else {
       priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
     }
-    var href = isAudi ? ('/egyedi-auto-rendeles/'+slug(c)) : ((isMini||isMB) ? '/kapcsolat' : '/egyedi-auto-rendeles/'+slug(c));
+    var href = '/egyedi-auto-rendeles/'+slug(c);
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var fuelList = c.fuels || [c.fuel];
     var fuelBadges = fuelList.map(function(fu){ return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>'; }).join('');
