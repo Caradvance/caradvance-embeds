@@ -5,6 +5,7 @@
 // Sajtófotók: /berles-press/<modell>-<kulcs>.webp (gyártói sajtóoldalakról, 1200×900).
 import type { RentalContent } from './rentalPage';
 import { carModels } from './carModels';
+import { MINI } from './rentalMini';
 
 const P = (m: string, k: string) => `/berles-press/${m}-${k}.webp`;
 const G = (m: string, name: string, items: [string, string][]) => items.map(([k, alt]) => ({ img: P(m, k), alt: `${name} ${alt}` }));
@@ -242,4 +243,6 @@ export const CONTENT: Record<string, RentalContent> = {
     gallery: G('bmw-5-os-touring', 'BMW 5-ös Touring', [['g1', 'menet közben'], ['g2', 'piros színben'], ['g3', 'veserács és fényszóró'], ['g4', 'oldalnézet'], ['g5', 'téli úton'], ['g6', 'csomagtartó használat közben'], ['g7', 'vezetőtér']]),
     faqExtra: [ { q: 'Mekkora a BMW 5-ös Touring csomagtartója?', a: 'A csomagtér 570 literes, a hátsó ülések döntésével akár 1700 literre bővíthető (550e: 500–1630 liter).' } ],
   },
+  // ---------- további márkák: src/data/rental<Márka>.ts ----------
+  ...MINI,
 };

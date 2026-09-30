@@ -13,7 +13,7 @@ export interface RentalContent {
   overviewH2?: string; overviewLead?: string;
   highlights?: { icon: string; title: string; text: string }[];
   design?: { h3: string; text: string; bullets: string[]; img: string; alt: string };
-  interior?: { h3: string; text: string; bullets: string[]; img: string; alt: string };
+  interior?: { h3: string; text: string; bullets: string[]; img?: string; alt?: string };
   guideIntro?: string; guideBlocks?: { h3: string; html: string }[];
   drive?: string; boot?: string;
   specs?: Record<string, TrimSpec>;
