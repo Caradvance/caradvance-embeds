@@ -29,6 +29,11 @@ const rentKm = rent && rent.km && rent.km.length ? rent.km[0] : ((model as any).
 const rentMonths = rent && rent.months && rent.months.length ? rent.months[0] : ((model as any).rentMonths || 0);
 const saleHref = (model as any).saleSlug ? '/egyedi-auto-rendeles/' + (model as any).saleSlug : '/egyedi-auto-rendeles?brand=' + model.brandKey;
 const kapcsRent = '/kapcsolat?berles=' + encodeURIComponent(model.name);
+// A bérlési konfigurátor (ugyanaz, mint az /autoink kártyáin) — seo-abo.mjs illeszti be az oldalra.
+const rentBtn: Record<string, string> = isRent && rent ? {
+  'data-name': rent.key || '', 'data-photo': rent.photo || model.mainImg || '', 'data-logo': model.brandLogo || '',
+  'data-price': rentHuf + ' · ' + nf(rentEur) + ' €/hó-tól', 'data-colors': (rent.colorsHex || []).join('~'),
+} : {};
 const berlesBack = '/autoink#berelheto';
 
 const brandHref = `/egyedi-auto-rendeles?brand=${model.brandKey}`;
@@ -118,7 +123,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <h1>{model.h1 || model.name}</h1>
       <p class="cd-sub">{model.heroSub}</p>
       <div class="cd-cta">
-        {isRent ? (<Fragment><a class="cd-btn cd-btn-red" href={kapcsRent}>Ajánlatot kérek</a><a class="cd-btn cd-btn-white" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-white" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}
+        {isRent ? (<Fragment><a class="cd-btn cd-btn-red sub-rent" href={kapcsRent} {...rentBtn}>Ajánlatot kérek</a><a class="cd-btn cd-btn-white" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-white" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}
       </div>
     </div>
     <button class="cd-scroll" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
@@ -143,7 +148,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
           <p class="cd-note">Havi bérleti díj {rentKm ? nf(rentKm) + ' km/hó futáskerettel' : 'egyedi futáskerettel'}{rentMonths ? ', ' + rentMonths + ' hónapos futamidőre' : ''}; egyszeri, visszatérítendő kaució: <span class="cd-dep-live" data-eur={kaucioEur}>{kaucioHuf}</span> ({nf(kaucioEur)} €)-tól. A kaució a bérlés végén — káresemény nélkül — visszajár.</p></Fragment>) : (<Fragment>{poa ? (<Fragment><div class="cd-price"><span class="cd-huf">Ár kérésre</span></div>
           <p class="cd-note">Ez a modell egyedi ajánlat alapján rendelhető — a pontos árat a kiválasztott motor és felszereltség alapján adjuk meg.</p></Fragment>) : (<Fragment><div class="cd-price"><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
           <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p></Fragment>)}</Fragment>)}
-          <div class="cd-cta2">{isRent ? (<Fragment><a class="cd-btn cd-btn-red" href={kapcsRent}>Ajánlatot kérek</a><a class="cd-btn cd-btn-dark" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}</div>
+          <div class="cd-cta2">{isRent ? (<Fragment><a class="cd-btn cd-btn-red sub-rent" href={kapcsRent} {...rentBtn}>Ajánlatot kérek</a><a class="cd-btn cd-btn-dark" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}</div>
           <div class="cd-trust">
             {isRent ? (<Fragment><span><i></i> vadonatúj, 0 km-es autó</span><span><i></i> {rent && rent.now ? rent.now + ' db azonnal elérhető' : 'hamarosan elérhető'}</span><span><i></i> szerviz, adó és gumi a díjban</span></Fragment>) : (<Fragment>
             <span><i></i> akár 19% német áfával</span>
@@ -171,7 +176,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       </div>
       <div class="cd-nav-cta">
         {isRent ? (<Fragment><span class="cd-nav-price"><span class="cd-rent-live" data-eur={rentEur}>{rentHuf}</span>/hó-tól</span>
-        <a class="cd-nav-btn" href={kapcsRent}>Ajánlatot kérek</a></Fragment>) : (<Fragment><span class="cd-nav-price">{poa ? 'Ár kérésre' : (<Fragment><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</Fragment>)}</span>
+        <a class="cd-nav-btn sub-rent" href={kapcsRent} {...rentBtn}>Ajánlatot kérek</a></Fragment>) : (<Fragment><span class="cd-nav-price">{poa ? 'Ár kérésre' : (<Fragment><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</Fragment>)}</span>
         <a class="cd-nav-btn" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Rendeld meg</a></Fragment>)}
       </div>
     </div>
@@ -306,7 +311,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         <a href="/berles-elonyei"><h3>A tartós bérlet előnyei</h3><p>Kedvező kaució, szerviz, adó és gumi a díjban, akár félévente új modell — ezért éri meg a <strong>tartós bérlet</strong>.</p><span class="go">Bérlés előnyei →</span></a>
         <a href="/finanszirozas-lizing"><h3>Finanszírozás &amp; lízing</h3><p>Inkább lízingelnéd? Nézd meg a <strong>{model.name} lízing</strong> és finanszírozás lehetőségeit a kalkulátorral.</p><span class="go">Lízing kalkulátor →</span></a>
         <a href={saleHref}><h3>Meg is vásárolnád?</h3><p>{AZC(model.name)} {model.name} <strong>egyedi rendeléssel</strong> is a tiéd lehet Németországból — akár 19% német áfával, kulcsrakészen.</p><span class="go">Egyedi rendelés →</span></a>
-        <a href={kapcsRent}><h3>Személyes bérlési ajánlat</h3><p>Mondd el, melyik {model.name} változat, szín és kezdési időpont érdekel — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Ajánlatot kérek →</span></a>
+        <a class="sub-rent" href={kapcsRent} {...rentBtn}><h3>Személyes bérlési ajánlat</h3><p>Mondd el, melyik {model.name} változat, szín és kezdési időpont érdekel — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Ajánlatot kérek →</span></a>
         </Fragment>) : (<Fragment>
         <a href={model.rentHref || `/uj-auto-berlese?brand=${model.brandKey}`}><h3>{model.name} tartós bérlet</h3><p>Nem szeretnél venni? {AZC(model.name)} {model.name} <strong>tartós bérletben</strong> is a tiéd lehet, egyetlen havi díjjal — szerviz és biztosítás beépítve.</p><span class="go">Bérlési ajánlatok →</span></a>
         <a href="/blog/auto-behozatal-nemetorszagbol"><h3>Autó behozatal Németországból</h3><p>Regisztrációs adó, áfa, honosítás, szállítás — nézd meg, hogyan zajlik a <strong>német autó behozatal</strong> lépésről lépésre.</p><span class="go">Import útmutató →</span></a>
@@ -354,7 +359,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
 
   <!-- ===== CTA BAND ===== -->
   <section class="cd-sec">
-    <div class="cd-w"><div class="cd-band">{isRent ? (<Fragment><div><h2>{model.name} bérlés — kérj ajánlatot</h2><p>Mondd el, melyik változat és mikortól érdekel — {rentHuf}/hó-tól, egyszeri, visszajáró kaucióval.</p></div><a class="cd-btn cd-btn-white" href={kapcsRent}>Ajánlatot kérek →</a></Fragment>) : (<Fragment><div><h2>{model.name} — rendeld meg egyedileg</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div><a class="cd-btn cd-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a></Fragment>)}</div></div>
+    <div class="cd-w"><div class="cd-band">{isRent ? (<Fragment><div><h2>{model.name} bérlés — kérj ajánlatot</h2><p>Mondd el, melyik változat és mikortól érdekel — {rentHuf}/hó-tól, egyszeri, visszajáró kaucióval.</p></div><a class="cd-btn cd-btn-white sub-rent" href={kapcsRent} {...rentBtn}>Ajánlatot kérek →</a></Fragment>) : (<Fragment><div><h2>{model.name} — rendeld meg egyedileg</h2><p>Mondd el, milyen konfigurációban gondolkodsz — a többit mi intézzük, kulcsrakészen, német áfával.</p></div><a class="cd-btn cd-btn-white" href="/kapcsolat">Kapcsolatfelvétel →</a></Fragment>)}</div></div>
   </section>
 
   <!-- ===== LIGHTBOX ===== -->
