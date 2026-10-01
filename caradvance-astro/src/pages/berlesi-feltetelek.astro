@@ -1,0 +1,236 @@
+---
+import Base from '../layouts/Base.astro';
+import LegalPage from '../components/LegalPage.astro';
+const lang = 'hu';
+
+const toc = [
+  { id: 'kaucio', t: 'A kaució — mi történik vele?' },
+  { id: 'kaucio-osszeg', t: 'Mekkora a kaució?' },
+  { id: 'levonasok', t: 'Mit vonhatunk le belőle?' },
+  { id: 'pelda', t: 'Számolási példa' },
+  { id: 'kezdet', t: 'Szerződés, átadás, időtartam' },
+  { id: 'dij', t: 'Bérleti díj és fizetés' },
+  { id: 'km', t: 'Kilométerkeret' },
+  { id: 'tartalom', t: 'Mit tartalmaz a díj, és mit nem' },
+  { id: 'biztositas', t: 'Biztosítás és önrész' },
+  { id: 'kar', t: 'Kár, baleset, lopás' },
+  { id: 'gumi', t: 'Nyári és téli gumi' },
+  { id: 'birsag', t: 'Bírságok és útdíjak' },
+  { id: 'hasznalat', t: 'Használat, vezetők, külföld' },
+  { id: 'szerviz', t: 'Szerviz és csereautó' },
+  { id: 'visszaadas', t: 'Az autó visszaadása' },
+  { id: 'gyik', t: 'Gyakori kérdések' },
+];
+
+const deposits = [
+  { amount: '3 000 €', cars: 'BMW 1-es, 2-es, X1, X2 · MINI Cooper (3- és 5-ajtós, Cabrio), Countryman, JCW · Mercedes A-osztály, B-osztály' },
+  { amount: '5 000 €', cars: 'BMW M2 Coupé, 3-as, 4-es, X3 · Mercedes A AMG, C-osztály, CLE, GLA, GLB, GLC, GLC Coupé' },
+  { amount: '7 500 €', cars: 'BMW M3, M4, 5-ös, X6, X7 · Mercedes C AMG, CLE AMG, E-osztály, GLA/GLB/GLC AMG, GLE, GLE Coupé' },
+  { amount: '10 000 €', cars: 'BMW M5, 7-es, X6 M · Mercedes E AMG, GLE AMG, GLE Coupé AMG, S-osztály' },
+];
+
+const faqs = [
+  ['Visszakapom a kauciót?', 'Igen. A kaució nem bérleti díj, hanem biztosíték. Az autó visszaadása és az esetleges nyitott kár- vagy bírságügyek lezárása után, legkésőbb 30 napon belül visszautaljuk — a szerződés szerinti levonások után fennmaradó teljes összeget.'],
+  ['Mikor vonhattok le a kaucióból?', 'Csak a szerződésben felsorolt tételeket: a casco önrészt, a független szakértő által megállapított értékcsökkenést, a biztosítás által nem fedezett kárt, a meg nem fizetett bérleti díjat, a túlfutott kilométereket, a bírságokat és ügyintézési díjukat, a hiányzó üzemanyagot és tartozékokat, valamint a takarítási költséget. Minden levonást tételesen elszámolunk.'],
+  ['Kamatozik a kaució?', 'Nem. A kaució nem kamatozik, és nem számít bele a bérleti díjba — a bérlet teljes ideje alatt biztosítékként szolgál.'],
+  ['Mi történik, ha bérlés közben vonnak le a kaucióból?', 'Ha a bérleti idő alatt a kaucióból levonás történik (például egy káresemény önrésze miatt), azt a felszólítástól számított 8 napon belül a teljes összegre ki kell egészíteni.'],
+  ['Van olyan bérlet, ahol induláskor nem kell kauciót fizetni?', 'Igen, egyes bérleteknél az induláskor nem kell kauciót fizetni. Ilyenkor a kaució összege a szerződésben rögzített biztosíték marad: csak káresemény esetén, írásbeli felhívásra, 8 napon belül kell megfizetni. Ha ilyen nem történik, nincs mit befizetni és nincs mit visszakapni.'],
+  ['A kaució korlátozza a felelősségemet?', 'Nem. A kár, az önrész, a biztosítás által nem fedezett kár, a bírságok és a túlfutás akkor is a bérlőt terhelik, ha az összeg meghaladja a kauciót, vagy ha kaució nem áll rendelkezésre.'],
+  ['Mennyi a casco önrész?', 'Töréskár esetén a kár 10%-a, lopás és rablás esetén 20%-a, de mindkét esetben legalább 1 000 € káreseményenként.'],
+  ['Mennyi a minimális bérleti idő?', 'Az átadástól számított 6 teljes hónap. Utána a szerződés azonos feltételekkel határozatlan időre folytatódik, és 30 napos felmondással, bérleti hónap végére mondható fel — vagy átülhetsz egy másik autóba.'],
+];
+const faqJson = {
+  '@context': 'https://schema.org', '@type': 'FAQPage',
+  mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+};
+---
+<Base lang={lang} path="/berlesi-feltetelek" title="Bérlési feltételek és kaució — így működik | CarAdvance" description="Mi történik a kaucióval? Mikor jár vissza, mit lehet levonni belőle, mennyi a casco önrész, a km-keret, a túlfutás díja és mit tartalmaz a havi díj — a CarAdvance tartós bérleti szerződésének feltételei érthetően.">
+  <script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
+  <LegalPage title="Bérlési feltételek és kaució" kicker="Prémium autóbérlés" tabs={false} updLabel="Frissítve" lead="Minden, ami a bérleti szerződésben áll — érthetően. Különösen a kaucióról: mikor fizeted, mire szolgál, mit vonhatunk le belőle és mikor kapod vissza." toc={toc}>
+    <div class="bf-sum">
+      <div><b>Kaució</b><span>3 000 – 10 000 €, modelltől függően</span></div>
+      <div><b>Visszajár</b><span>30 napon belül a visszaadás és a nyitott ügyek lezárása után</span></div>
+      <div><b>Minimum</b><span>6 hónap, utána 30 napos felmondás</span></div>
+      <div><b>Díjban benne</b><span>szerviz, adó, casco, kgfb, nyári + téli gumi</span></div>
+    </div>
+
+    <h2 id="kaucio">1. A kaució — mi történik vele?</h2>
+    <p>A kaució (a szerződésben: <em>óvadék</em>) <strong>biztosíték, nem bérleti díj</strong>. Nem kamatozik, a bérlet teljes ideje alatt biztosítékként szolgál, és a bérlet végén elszámolás után visszajár.</p>
+    <ol class="bf-steps">
+      <li><b>Szerződéskötés</b><span>A szerződés rögzíti az autóra irányadó kaució összegét. Hogy induláskor be kell-e fizetni, azt az ajánlat és a szerződés tartalmazza.</span></li>
+      <li><b>A bérlés alatt</b><span>A kaució biztosítékként áll rendelkezésre. Ha belőle levonás történik (például egy káresemény önrésze), a felszólítástól számított <strong>8 napon belül</strong> ki kell egészíteni a teljes összegre.</span></li>
+      <li><b>Visszaadás</b><span>Az autó állapotát közösen rögzítjük az átadás-átvételi jegyzőkönyvben (sérülésrajz, km-óra, üzemanyagszint, kulcsok, tartozékok). Vita esetén közösen felkért független szakértő dönt.</span></li>
+      <li><b>Elszámolás</b><span>Csak a szerződésben felsorolt tételeket vonhatjuk le — tételesen, számlával (lásd <a href="#levonasok">3. pont</a>).</span></li>
+      <li><b>Visszafizetés</b><span>A fennmaradó összeget az autó visszaadását és a nyitott kár- vagy bírságügyek lezárását követő <strong>30 napon belül</strong> visszautaljuk.</span></li>
+    </ol>
+    <div class="lg-box">
+      <p><strong>Ha induláskor nem kell kauciót fizetni:</strong> egyes bérleteknél eltekintünk a kaució átadáskori befizetésétől. Ilyenkor az összeg a szerződésben rögzített biztosíték marad, és csak <strong>káresemény esetén</strong>, írásbeli felhívásra, <strong>8 napon belül</strong> kell megfizetni. Ha nem fizettél kauciót, nincs mit visszautalnunk. A felhívásra be nem fizetett kaució azonnali hatályú felmondásra ad okot.</p>
+    </div>
+    <p><strong>Fontos:</strong> a kaució nem felső határ. A kárt, az önrészt, a biztosítás által nem fedezett kárt, a bírságokat és a túlfutást akkor is a bérlő fizeti, ha az összeg meghaladja a kauciót, vagy ha kaució nincs.</p>
+
+    <h2 id="kaucio-osszeg">2. Mekkora a kaució?</h2>
+    <p>Az autó kategóriájától függ. A pontos összeget minden modell kártyáján, az ajánlatban és a szerződésben is feltüntetjük.</p>
+    <div class="lg-tw"><table>
+      <thead><tr><th style="width:120px">Kaució</th><th>Modellek</th></tr></thead>
+      <tbody>{deposits.map((d) => <tr><td><strong>{d.amount}</strong></td><td>{d.cars}</td></tr>)}</tbody>
+    </table></div>
+
+    <h2 id="levonasok">3. Mit vonhatunk le a kaucióból?</h2>
+    <div class="lg-tw"><table>
+      <thead><tr><th>Tétel</th><th>Mennyi</th></tr></thead>
+      <tbody>
+        <tr><td>Casco önrész káreseményenként</td><td>töréskár: 10%, lopás/rablás: 20% — legalább 1 000 €</td></tr>
+        <tr><td>Értékcsökkenés</td><td>független szakértő megállapítása szerint</td></tr>
+        <tr><td>Biztosítás által nem fedezett kár (pl. téves tankolás, belső tér sérülése, gumi- és felnisérülés)</td><td>a javítás tényleges költsége</td></tr>
+        <tr><td>Meg nem fizetett bérleti díj</td><td>a szerződés szerint</td></tr>
+        <tr><td>Túlfutott kilométerek</td><td>a szerződésben rögzített díj (pl. BMW X6 xDrive30d: 0,85 € / km)</td></tr>
+        <tr><td>Bírságok és ügyintézésük</td><td>a bírság összege; az első ügy díjmentes, a másodiktól 30 € / ügy</td></tr>
+        <tr><td>Hiányzó üzemanyag</td><td>kútári ár + 30 € tankolási díj</td></tr>
+        <tr><td>Tisztítatlan visszaadás</td><td>150 €</td></tr>
+        <tr><td>Dohányzás az autóban</td><td>300 € takarítási díj</td></tr>
+        <tr><td>Elveszett kulcs</td><td>költségár + 250 €</td></tr>
+        <tr><td>Hiányzó tartozék, sérülés a rendeltetésszerű kopáson túl (horpadás, mély karc, felni, kárpit)</td><td>a javítás / pótlás költsége</td></tr>
+      </tbody>
+    </table></div>
+    <p>A futásteljesítménynek megfelelő, rendeltetésszerű kopást elfogadjuk — azért nem vonunk le.</p>
+
+    <h2 id="pelda">4. Számolási példa</h2>
+    <div class="lg-box">
+      <p>BMW X6 xDrive30d, kaució <strong>7 500 €</strong>, 6 hónap × 2 000 km = 12 000 km keret. Visszaadáskor az autó 13 200 km-t futott, és a bérlés alatt két gyorshajtási bírság érkezett.</p>
+      <p>Túlfutás: 1 200 km × 0,85 € = <strong>1 020 €</strong>. A két bírságot a hatóság a bérlővel szemben folytatja, azokat a bérlő fizeti; az ügyintézés közül az első díjmentes, a második <strong>30 €</strong>.<br />Visszajár: 7 500 − 1 020 − 30 = <strong>6 450 €</strong>, legkésőbb 30 nappal a visszaadás és a bírságügyek lezárása után.</p>
+    </div>
+
+    <h2 id="kezdet">5. Szerződés, átadás, időtartam</h2>
+    <ul>
+      <li>A szerződés aláírása egyben az autó <strong>megrendelése</strong>: ezután beszerezzük, behozzuk, forgalomba helyezzük és előkészítjük az autót. A bérlet nem az aláíráskor, hanem az <strong>átadás napján</strong> indul.</li>
+      <li>Ha a vállalt határidőt követő 30 napon belül sem tudjuk átadni az autót, költségmentesen elállhatsz, és a már befizetett összeget 8 napon belül visszafizetjük.</li>
+      <li>A <strong>minimális bérleti idő 6 teljes hónap</strong> az átadástól. Korábbi visszaadás esetén is jár a 6 havi díj (kivéve a mi szerződésszegésünket vagy a nem neked felróható totálkárt).</li>
+      <li>A 6 hónap után a szerződés azonos feltételekkel, határozatlan időre folytatódik; <strong>30 napos írásbeli felmondással</strong>, bérleti hónap végére bármelyik fél felmondhatja. Átülhetsz egy másik autónkba is — ilyenkor új szerződés és új minimális idő indul.</li>
+      <li>Azonnali hatályú felmondásnak van helye 15 napot meghaladó fizetési késedelem, szerződésellenes használat, a szervizre való bemutatás megtagadása vagy valótlan adatközlés esetén; ilyenkor az autót 3 napon belül vissza kell adni.</li>
+      <li>A szerződést házastárs bérlőtársként is aláírhatja: ilyenkor mindketten jogosult vezetők, és egyetemlegesen felelnek.</li>
+    </ul>
+
+    <h2 id="dij">6. Bérleti díj és fizetés</h2>
+    <ul>
+      <li>A havi díj a teljes időtartam alatt <strong>fix</strong>.</li>
+      <li>Az <strong>első havi díj az átadás előtt</strong> fizetendő, a továbbiak előre, a bérleti hónap <strong>5. napjáig</strong>.</li>
+      <li>Fizethetsz átutalással vagy készpénzben, átvételi elismervény ellenében; euróban vagy forintban — forintnál az <strong>MNB fizetési napi középárfolyamán</strong>.</li>
+      <li>A bérleti hónap az átadás napjától számít (pl. 12-étől a következő hónap 11-éig); az utolsó töredékhónapot napra arányosan számlázzuk.</li>
+      <li>Késedelem esetén a jegybanki alapkamat kétszeresének megfelelő késedelmi kamat jár; 15 napot meghaladó késedelemnél felszólítás után az autót üzemképtelenné tehetjük vagy visszavehetjük.</li>
+    </ul>
+
+    <h2 id="km">7. Kilométerkeret</h2>
+    <ul>
+      <li>A díj havi km-keretet tartalmaz (pl. 2 000 km / hó), amely a bérlet teljes idejére <strong>összeadódik</strong>: a végén a teljes futást a teljes kerettel vetjük össze.</li>
+      <li>A kereten felüli kilométerek díját a szerződés rögzíti, és visszaadáskor számoljuk el. A fel nem használt kilométereket nem térítjük vissza.</li>
+      <li>A km-óra állását átadáskor és visszaadáskor jegyzőkönyvezzük; az óra manipulálása súlyos szerződésszegés.</li>
+    </ul>
+
+    <h2 id="tartalom">8. Mit tartalmaz a havi díj, és mit nem</h2>
+    <div class="bf-two">
+      <div class="bf-yes"><h3>Benne van</h3><ul>
+        <li>gyári előírás szerinti szerviz és karbantartás, kopó alkatrészek (fékbetét, féktárcsa, ablaktörlő)</li>
+        <li>magyar gépjárműadó, hatósági díjak, kötelező műszaki vizsga</li>
+        <li>nyári és téli gumiszett, szezonális csere és tárolás</li>
+        <li>kötelező felelősségbiztosítás (kgfb) és casco</li>
+        <li>átadás-átvétel, forgalmi engedély, biztosítási kártya</li>
+        <li>assistance Magyarországon és az engedélyezett országokban</li>
+      </ul></div>
+      <div class="bf-no"><h3>Nincs benne — a bérlőt terheli</h3><ul>
+        <li>üzemanyag és AdBlue</li>
+        <li>autópálya-matrica, útdíjak, parkolás, mosatás</li>
+        <li>bírságok és ügyintézési díjuk</li>
+        <li>biztosítási önrész és a biztosítás által nem fedezett kár</li>
+        <li>gumi- és felnisérülés használatból</li>
+        <li>kulcs vagy okmány elvesztése, rendkívüli takarítás</li>
+        <li>hazaszállítás külföldről, ha nem a megbeszélt helyen adod vissza</li>
+      </ul></div>
+    </div>
+    <p>Az olaj- és hűtőfolyadékszintet, valamint a guminyomást ésszerű időközönként ellenőrizni kell; a visszajelző lámpa ellenére folytatott használatból eredő kár a bérlőt terheli.</p>
+
+    <h2 id="biztositas">9. Biztosítás és önrész</h2>
+    <ul>
+      <li>Az autóra kötelező gépjármű-felelősségbiztosítás és casco vonatkozik — ezt mi kötjük és fizetjük.</li>
+      <li><strong>Casco önrész:</strong> töréskár esetén 10%, lopás és rablás esetén 20%, de mindkét esetben <strong>legalább 1 000 €</strong> káreseményenként. Nem kell megfizetni, ha egy azonosított harmadik fél felelőssége bizonyított, és a biztosítója a kárt teljesen megtéríti.</li>
+      <li>A fedezet megszűnik, és a bérlő a teljes kárért felel, ha nem jogosult személy vezet; alkohol vagy kábítószer hatása alatt, érvényes jogosítvány nélkül, versenyen vagy pályanapon, illetve közúton kívül vezetik az autót; ha a bérlő elhagyja a baleset helyszínét, vagy elmulasztja a bejelentést.</li>
+    </ul>
+
+    <h2 id="kar">10. Kár, baleset, lopás — mit kell tenni?</h2>
+    <ol>
+      <li>Harmadik fél, személyi sérülés, lopás vagy rongálás esetén hívj rendőrt, és kérj jegyzőkönyvet.</li>
+      <li>Töltsd ki az európai baleseti bejelentőt, és fotózd le a helyszínt és a sérülést.</li>
+      <li>Értesíts minket haladéktalanul, de legkésőbb <strong>24 órán belül</strong>: <a href="tel:+36302336060">+36 30 233 6060</a> · <a href="mailto:info@caradvance.hu">info@caradvance.hu</a>.</li>
+      <li>Felelősséget a nevünkben ne ismerj el, és harmadik féllel ne egyezz meg közvetlenül.</li>
+    </ol>
+    <p>A javítás csak az általunk kijelölt szervizben történhet. Káreseményenként a bérlő fizeti az önrészt, a szakértő által megállapított értékcsökkenést, és ha a kárt ő okozta, a javítás első 10 munkanapján túli állásidő bérleti díját. Az első 10 munkanapra — ha a flottában elérhető — hasonló kategóriájú csereautót adunk. A biztosítás által nem fedezett kárt a számla kézhezvételétől számított 8 napon belül kell megfizetni. Lopás vagy totálkár esetén a szerződés a biztosítói visszaigazolás napján szűnik meg; mindkét kulcsot és minden okmányt vissza kell adni.</p>
+
+    <h2 id="gumi">11. Nyári és téli gumi</h2>
+    <ul>
+      <li>Mindkét szett a díj része; a nem használt szettet díjmentesen tároljuk.</li>
+      <li>A téli gumi <strong>november 1-jétől március 31-éig</strong> van fent. A cserét az időpont előtti két hétben egyeztesd velünk; ennek elmulasztásából eredő kár és bírság a bérlőt terheli.</li>
+      <li>A törvényes minimumig kopott abroncsot saját költségünkön cseréljük. Járdaszegély, kátyú, defekt, helytelen légnyomás miatti gumi- és felnisérülést a bérlő költségáron téríti meg.</li>
+    </ul>
+
+    <h2 id="birsag">12. Bírságok és útdíjak</h2>
+    <ul>
+      <li>A bérlés ideje alatt keletkezett minden bírság (gyorshajtás, parkolás, úthasználat, matrica) a bérlőt terheli — akkor is, ha a visszaadás után érkezik.</li>
+      <li>Mivel az autó nem a bérlő nevén van, a felszólítás hozzánk érkezik; az eljáró hatóságnak — itthon és külföldön — megadjuk a bérlő adatait.</li>
+      <li>Az <strong>első bírság ügyintézése díjmentes</strong>, a másodiktól ügyenként <strong>30 €</strong> ügyintézési díj jár a bírságon felül. A matricát (itthon és külföldön) a bérlő vásárolja meg.</li>
+    </ul>
+
+    <h2 id="hasznalat">13. Használat, vezetők, külföld</h2>
+    <ul>
+      <li>Vezethet a bérlő, a bérlőtárs és a szerződés mellékletében megnevezett további vezető, aki <strong>legalább 25 éves</strong>, és <strong>legalább 3 éve</strong> van érvényes jogosítványa.</li>
+      <li>Tilos az albérletbe vagy díj ellenében kölcsönadás, a verseny, pályanap, rali, oktatás, díjas személy- vagy áruszállítás, a túlterhelés és a burkolt úton kívüli közlekedés.</li>
+      <li>Az autóban tilos a dohányzás (300 € takarítási díj); állat csak szállítóboxban utazhat.</li>
+      <li><strong>Külföld:</strong> az EU tagállamai, Svájc, Norvégia és az Egyesült Királyság — legalább 3 munkanappal előtte írásban jelezd; a zöldkártyát mi adjuk. Ukrajnába, Oroszországba, Fehéroroszországba, Moldovába, Törökországba és Európán kívülre az autó nem vihető.</li>
+      <li>Az autón kis CarAdvance embléma van; fóliázás, felirat, vonóhorog vagy átalakítás csak előzetes írásbeli hozzájárulással.</li>
+    </ul>
+
+    <h2 id="szerviz">14. Szerviz, meghibásodás, csereautó</h2>
+    <ul>
+      <li>A szervizjelzéstől vagy felhívásunktól számított <strong>14 napon belül</strong> be kell mutatni az autót a kijelölt szervizben (általában egy munkanap).</li>
+      <li>Meghibásodáskor hívd az okmányokban szereplő assistance számot, és értesíts minket. Ha az autó nem neked felróható okból <strong>2 munkanapnál tovább</strong> áll, csereautót adunk, vagy a kiesett napokra arányosan jóváírjuk a díjat.</li>
+      <li>Javítást csak a hozzájárulásunkkal szabad megrendelni.</li>
+    </ul>
+
+    <h2 id="visszaadas">15. Az autó visszaadása</h2>
+    <ul>
+      <li>Egyeztetett helyen, munkaidőben, kívül-belül tisztán, mindkét kulccsal, minden okmánnyal és tartozékkal, az átadáskori üzemanyagszinttel.</li>
+      <li>Az állapotot jegyzőkönyvben rögzítjük; a rendeltetésszerű kopást elfogadjuk.</li>
+      <li>Késedelmes visszaadás esetén a napi bérleti díj (a havi díj harmincad része) és további 50 € / megkezdett nap fizetendő.</li>
+      <li>Ezután jön az elszámolás és a <a href="#kaucio">kaució visszafizetése</a>.</li>
+    </ul>
+
+    <h2 id="gyik">16. Gyakori kérdések</h2>
+    <div class="bf-faq">
+      {faqs.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}
+    </div>
+
+    <div class="lg-box" style="margin-top:22px">
+      <p>Ez az oldal a CarAdvance tartós bérleti szerződésének feltételeit foglalja össze tájékoztató jelleggel. Az egyes bérletek pontos adatait (havidíj, km-keret, túlfutási díj, kaució) mindig az ajánlat és az aláírt szerződés tartalmazza. Kérdésed van? <a href="tel:+36302336060">+36 30 233 6060</a> · <a href="mailto:info@caradvance.hu">info@caradvance.hu</a></p>
+      <p style="margin-top:10px"><a class="lg-btn" href="/berelheto/">Bérelhető autóink →</a> &nbsp; <a class="lg-btn" style="background:#14151A" href="/uj-auto-berlese/">Új autó bérlése →</a></p>
+    </div>
+  </LegalPage>
+</Base>
+
+<style is:global>
+  .bf-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 26px}
+  .bf-sum div{background:#F7F8FA;border:1px solid var(--line,#E6EAF1);border-radius:12px;padding:14px 16px}
+  .bf-sum b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#E2001A;margin-bottom:4px}
+  .bf-sum span{font-size:14px;line-height:1.45;font-weight:600}
+  .bf-steps{list-style:none;padding:0;margin:0 0 18px;counter-reset:bf}
+  .bf-steps li{counter-increment:bf;position:relative;padding:0 0 16px 52px;margin:0}
+  .bf-steps li::before{content:counter(bf);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:#E2001A;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .bf-steps li:not(:last-child)::after{content:'';position:absolute;left:16px;top:36px;bottom:2px;width:2px;background:#f3c3c9}
+  .bf-steps b{display:block;font-size:16px;margin-bottom:2px}
+  .bf-steps span{display:block}
+  .bf-two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 14px}
+  .bf-two>div{border-radius:12px;padding:14px 18px;border:1px solid var(--line,#E6EAF1)}
+  .bf-yes{background:#f2faf5}.bf-no{background:#fdf3f4}
+  .bf-two h3{margin:0 0 6px!important}
+  .bf-faq details{border:1px solid var(--line,#E6EAF1);border-radius:12px;padding:12px 16px;margin:0 0 10px;background:#fff}
+  .bf-faq summary{font-weight:700;cursor:pointer}
+  .bf-faq p{margin:8px 0 0}
+  @media(max-width:860px){.bf-sum{grid-template-columns:1fr 1fr}.bf-two{grid-template-columns:1fr}}
+</style>
