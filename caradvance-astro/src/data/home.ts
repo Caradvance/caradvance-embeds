@@ -73,7 +73,7 @@ const hu: HomeContent = {
     title: 'Kik vagyunk?',
     paras: [
       'A Caradvance a müncheni Caradvance GmbH márkája — Magyarországon a BH Group Zrt. képviseli, Caradvance Hungary néven.',
-      'A Caradvance GmbH 2003 óta a német autópiac megbízható szereplője: Sauerlachban, München mellett működő kereskedésük több mint két évtizede foglalkozik prémium használt autókkal — a mobile.de-n 5 csillagos értékeléssel.',
+      'A Caradvance GmbH 2003 óta a német autópiac megbízható szereplője: Geretsriedben, München közelében működő kereskedésük több mint két évtizede foglalkozik prémium használt autókkal — a mobile.de-n 5 csillagos értékeléssel.',
       'A BH Group Zrt. kizárólag a Caradvance GmbH hivatalos magyarországi képviselete. Te egy több mint két évtizedes múltú német kereskedéssel szerződsz, mi pedig végigkísérünk itthonról: leinformált, bevizsgált autók, kulcsrakész átadás, 1 év szavatossággal.',
     ],
   },
