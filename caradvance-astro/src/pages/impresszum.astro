@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import LegalPage from '../components/LegalPage.astro';
+const lang = 'hu';
+const org = {
+  '@context': 'https://schema.org', '@type': 'Organization',
+  name: 'BH Group Zrt.', alternateName: 'Caradvance Hungary', url: 'https://www.caradvance.hu/',
+  email: 'info@caradvance.hu', telephone: '+36 30 233 6060', taxID: '32488447-2-09',
+  address: { '@type': 'PostalAddress', streetAddress: 'Petőfi utca 23.', postalCode: '4143', addressLocality: 'Vekerd', addressCountry: 'HU' },
+};
+---
+<Base lang={lang} path="/impresszum" title="Impresszum — CarAdvance (BH Group Zrt.)" description="A caradvance.hu üzemeltetőjének adatai: BH Group Zrt., Cg. 09-10-000660, adószám 32488447-2-09, iroda: 2083 Solymár, Ibolya utca 18. Tárhelyszolgáltató: Cloudflare, Inc.">
+  <script type="application/ld+json" set:html={JSON.stringify(org)} />
+  <LegalPage title="Impresszum">
+    <h2>A weboldal üzemeltetője</h2>
+    <dl>
+      <dt>Cégnév</dt><dd>BH Group Zártkörűen Működő Részvénytársaság (BH Group Zrt.)</dd>
+      <dt>Márkanév</dt><dd>Caradvance Hungary / CarAdvance</dd>
+      <dt>Székhely</dt><dd>4143 Vekerd, Petőfi utca 23.</dd>
+      <dt>Iroda, ügyfélfogadás</dt><dd>2083 Solymár, Ibolya utca 18. — hétfőtől péntekig 9:00–17:00</dd>
+      <dt>Cégjegyzékszám</dt><dd>09-10-000660</dd>
+      <dt>Nyilvántartó cégbíróság</dt><dd>Debreceni Törvényszék Cégbírósága</dd>
+      <dt>Adószám</dt><dd>32488447-2-09</dd>
+      <dt>E-mail</dt><dd><a href="mailto:info@caradvance.hu">info@caradvance.hu</a></dd>
+      <dt>Telefon</dt><dd><a href="tel:+36302336060">+36 30 233 6060</a></dd>
+      <dt>Weboldal</dt><dd><a href="https://www.caradvance.hu/">www.caradvance.hu</a></dd>
+    </dl>
+
+    <h2>Német partner</h2>
+    <p>A bérlési és értékesítési szerződések jelentős része közvetlenül a német partnerrel jön létre; ilyenkor a szerződő fél:</p>
+    <dl>
+      <dt>Cégnév</dt><dd>Caradvance GmbH</dd>
+      <dt>Székhely</dt><dd>Mitterfeldstr. 2, 82054 Sauerlach, Németország</dd>
+      <dt>Cégjegyzék</dt><dd>Amtsgericht München, HRB 151009</dd>
+    </dl>
+    <p>Hogy egy adott ügyletben ki a szerződő fél, azt minden esetben az ajánlat és a szerződés tartalmazza.</p>
+
+    <h2>Tárhelyszolgáltató</h2>
+    <dl>
+      <dt>Név</dt><dd>Cloudflare, Inc. (Cloudflare Pages)</dd>
+      <dt>Cím</dt><dd>101 Townsend St., San Francisco, CA 94107, USA</dd>
+      <dt>Elérhetőség</dt><dd><a href="https://www.cloudflare.com/contact/" target="_blank" rel="noopener">www.cloudflare.com/contact</a></dd>
+    </dl>
+
+    <h2>Szerzői jog</h2>
+    <p>A weboldal szövegei, grafikai elemei és saját készítésű fotói a BH Group Zrt. szellemi tulajdonát képezik; előzetes írásbeli engedély nélkül nem másolhatók és nem terjeszthetők. A gyártói sajtófotók és márkajelzések a jogtulajdonosok (pl. BMW AG, Mercedes-Benz AG, AUDI AG) tulajdonai, azokat kizárólag tájékoztató céllal használjuk.</p>
+
+    <h2>Kapcsolódó dokumentumok</h2>
+    <ul>
+      <li><a href="/adatkezeles/">Adatkezelési tájékoztató</a> (GDPR és sütik)</li>
+      <li><a href="/aszf/">Általános Szerződési Feltételek (ÁSZF)</a></li>
+    </ul>
+  </LegalPage>
+</Base>

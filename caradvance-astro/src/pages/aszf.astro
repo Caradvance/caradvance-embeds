@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import LegalPage from '../components/LegalPage.astro';
+const lang = 'hu';
+const toc = [
+  { id: 'szolgaltato', t: 'A szolgáltató' },
+  { id: 'hatalya', t: 'Az ÁSZF hatálya' },
+  { id: 'szolgaltatasok', t: 'Szolgáltatások' },
+  { id: 'ajanlatkeres', t: 'Ajánlatkérés, szerződéskötés' },
+  { id: 'arak', t: 'Árak, adók, árfolyam' },
+  { id: 'jarmuadatok', t: 'Járműadatok, képek' },
+  { id: 'berles', t: 'Autóbérlés' },
+  { id: 'vasarlas', t: 'Vásárlás, egyedi rendelés, import' },
+  { id: 'bizomany', t: 'Bizományos értékesítés' },
+  { id: 'szavatossag', t: 'Szavatosság, jótállás' },
+  { id: 'elallas', t: 'Elállási jog' },
+  { id: 'felelosseg', t: 'Felelősség' },
+  { id: 'panasz', t: 'Panaszkezelés, jogorvoslat' },
+  { id: 'zaro', t: 'Záró rendelkezések' },
+];
+---
+<Base lang={lang} path="/aszf" title="Általános Szerződési Feltételek (ÁSZF) — CarAdvance" description="A CarAdvance (BH Group Zrt.) általános szerződési feltételei: ajánlatkérés, autóbérlés, vásárlás, egyedi rendelés, import, bizományos értékesítés, szavatosság, elállás és panaszkezelés.">
+  <LegalPage title="Általános Szerződési Feltételek" toc={toc}>
+    <h2 id="szolgaltato">1. A szolgáltató</h2>
+    <dl>
+      <dt>Név</dt><dd>BH Group Zrt. (Caradvance Hungary) — a továbbiakban: Szolgáltató</dd>
+      <dt>Székhely</dt><dd>4143 Vekerd, Petőfi utca 23.</dd>
+      <dt>Iroda</dt><dd>2083 Solymár, Ibolya utca 18. (hétfő–péntek 9:00–17:00)</dd>
+      <dt>Cégjegyzékszám</dt><dd>09-10-000660 (Debreceni Törvényszék Cégbírósága)</dd>
+      <dt>Adószám</dt><dd>32488447-2-09</dd>
+      <dt>E-mail / telefon</dt><dd><a href="mailto:info@caradvance.hu">info@caradvance.hu</a> · <a href="tel:+36302336060">+36 30 233 6060</a></dd>
+    </dl>
+    <p>A Szolgáltató a müncheni Caradvance GmbH (Mitterfeldstr. 2, 82054 Sauerlach, Amtsgericht München HRB 151009) magyarországi képviselője. Az egyes ügyletekben a szerződő fél a Szolgáltató vagy a Caradvance GmbH lehet; ezt minden esetben az ajánlat és a szerződés egyértelműen megjelöli.</p>
+
+    <h2 id="hatalya">2. Az ÁSZF hatálya</h2>
+    <p>Ez az ÁSZF a www.caradvance.hu weboldal (a továbbiakban: Weboldal) használatára, a Weboldalon, telefonon, e-mailben vagy személyesen leadott ajánlatkérésekre, valamint — ha az egyedi szerződés eltérően nem rendelkezik — a Szolgáltatóval kötött szerződésekre vonatkozik. Az egyedi szerződés rendelkezései elsőbbséget élveznek ezzel az ÁSZF-fel szemben.</p>
+    <p>A Weboldal nem webáruház: rajta keresztül szerződés nem jön létre, és fizetési kötelezettség nem keletkezik. A szerződések írásban, külön dokumentumban jönnek létre. Az ÁSZF nyelve magyar.</p>
+
+    <h2 id="szolgaltatasok">3. Szolgáltatások</h2>
+    <ul>
+      <li><strong>Prémium autóbérlés</strong> — rövid, hosszú távú és tartós bérlet, új és használt autókra;</li>
+      <li><strong>Megvásárolható autók</strong> — azonnal elérhető, bevizsgált használt prémium autók;</li>
+      <li><strong>Egyedi autó rendelés és import</strong> — új autó gyári rendelése, illetve használt autó felkutatása, bevizsgálása, behozatala és honosítása Németországból;</li>
+      <li><strong>Bizományos értékesítés</strong> — ügyfeleink autójának értékesítése;</li>
+      <li><strong>Finanszírozás</strong> — tájékoztatás partner pénzügyi intézmények (lízing, hitel) ajánlatairól. A finanszírozást minden esetben a pénzügyi intézmény nyújtja, saját feltételei és hitelbírálata alapján.</li>
+    </ul>
+
+    <h2 id="ajanlatkeres">4. Ajánlatkérés és szerződéskötés</h2>
+    <ol>
+      <li>Az ajánlatkérő űrlapok elküldése, illetve a telefonos vagy e-mailes érdeklődés <strong>ajánlatkérésnek</strong> minősül, amely sem Önt, sem a Szolgáltatót nem kötelezi szerződéskötésre, és ingyenes.</li>
+      <li>Az űrlap elküldését a rendszer automatikus e-mailben visszaigazolja. Ez a visszaigazolás nem ajánlat és nem szerződés.</li>
+      <li>A Szolgáltató munkaidőben jellemzően rövid időn belül, legkésőbb 2 munkanapon belül személyre szabott ajánlattal jelentkezik.</li>
+      <li>A szerződés az ajánlat elfogadásával, írásban (papíron vagy elektronikus aláírással) jön létre. A szerződés tartalmazza a pontos árat, a fizetési és átadási feltételeket, illetve a szerződő felet.</li>
+      <li>Az ajánlatkéréshez szükséges adatokat a Szolgáltató az <a href="/adatkezeles/">Adatkezelési tájékoztató</a> szerint kezeli.</li>
+    </ol>
+
+    <h2 id="arak">5. Árak, adók, árfolyam</h2>
+    <ul>
+      <li>A Weboldalon szereplő árak <strong>tájékoztató jellegűek</strong>, nem minősülnek ajánlattételnek. A végleges árat az írásos ajánlat és a szerződés tartalmazza.</li>
+      <li>Az árak egy része euróban szerepel. A forintban megjelenített összegek tájékoztató jellegű, napi árfolyamon számolt átváltások; az elszámolás a szerződés szerinti pénznemben és árfolyamon történik.</li>
+      <li>Ahol a Weboldal nettó árat vagy 19%-os német áfát tüntet fel, az az adott ügylet (pl. a Caradvance GmbH-tól történő vásárlás) feltételeinek teljesülése esetén érvényes. Az alkalmazandó adót, a regisztrációs adót és a honosítás költségeit az ajánlat részletezi.</li>
+      <li>Nyilvánvalóan hibás (pl. elírásból vagy rendszerhibából eredő) ár a Szolgáltatót nem köti.</li>
+    </ul>
+
+    <h2 id="jarmuadatok">6. Járműadatok és képek</h2>
+    <p>A járművek adatait, felszereltségét és fotóit a lehető legnagyobb gondossággal tesszük közzé. Új autóknál a képek gyakran gyártói sajtófotók, amelyek eltérő felszereltséget vagy színt is mutathatnak. Az autó pontos specifikációját minden esetben az ajánlat és a szerződés tartalmazza. Az elérhetőség a szerződéskötésig változhat.</p>
+
+    <h2 id="berles">7. Autóbérlés</h2>
+    <ul>
+      <li>A bérlés részletes feltételeit — bérleti díj, futamidő, havi kilométerkeret, kaució, biztosítás, átadás-átvétel helye és módja, többletkilométer-díj, sérülések elszámolása — a bérleti szerződés tartalmazza.</li>
+      <li>A bérléshez egyszeri, <strong>visszatérítendő kaució</strong> szükséges, amelynek összege a modelltől függ, és a bérleti szerződés szerint jár vissza.</li>
+      <li>A Weboldalon szereplő havidíjak a feltüntetett futamidőre és km-keretre vonatkozó tájékoztató árak.</li>
+    </ul>
+
+    <h2 id="vasarlas">8. Vásárlás, egyedi rendelés, import</h2>
+    <ul>
+      <li>Megvásárolható autóknál az adásvételi szerződés aláírásáig az autót más vevő is lefoglalhatja vagy megvásárolhatja.</li>
+      <li>Egyedi (gyári) rendelésnél a szerződésben rögzített konfiguráció alapján rendeljük meg az autót. A gyártói szállítási határidő tájékoztató jellegű; a szerződés foglalót vagy előleget írhat elő.</li>
+      <li>Importnál a Szolgáltató az autót leinformálja és helyszínen bevizsgálja, intézi a szállítást, a honosítást és a forgalomba helyezést; ennek díjait és a hatósági költségeket az ajánlat részletezi.</li>
+    </ul>
+
+    <h2 id="bizomany">9. Bizományos értékesítés</h2>
+    <p>A bizományos értékesítés feltételeit (eladási ár, jutalék, időtartam, a jármű tárolása és bemutatása, a jótékonysági felajánlás) a bizományi szerződés tartalmazza. A Weboldalon megadott kért ár és a kalkulátorok eredménye tájékoztató jellegű.</p>
+
+    <h2 id="szavatossag">10. Szavatosság, jótállás</h2>
+    <ul>
+      <li><strong>Használt autókra</strong> — fogyasztó vevő esetén — a Szolgáltató, illetve a szerződő fél 1 év kellékszavatosságot vállal (Ptk. 6:163. §). Kellékszavatossági igény alapján Ön kijavítást vagy kicserélést, ha ez nem lehetséges, árleszállítást kérhet, vagy elállhat a szerződéstől. A hibát felfedezése után késedelem nélkül jelezze. A teljesítéstől számított egy éven belül felismert hibáról — az ellenkező bizonyításáig — vélelmezni kell, hogy már a teljesítéskor megvolt.</li>
+      <li>A rendeltetésszerű használattal járó kopás és a szerződéskötéskor ismertetett hibák szavatossági igényt nem alapoznak meg.</li>
+      <li><strong>Új autókra</strong> a gyártói garancia, illetve a szerződésben vállalt jótállás érvényes.</li>
+      <li>Nem fogyasztó (vállalkozás) vevő esetén a szavatosság és a jótállás feltételeit az egyedi szerződés határozza meg.</li>
+    </ul>
+
+    <h2 id="elallas">11. Elállási jog</h2>
+    <p>A szerződések jellemzően személyesen, az irodában vagy az autó átadásakor jönnek létre; ilyenkor a távollévők között kötött szerződésekre vonatkozó elállási jog nem áll fenn.</p>
+    <p>Ha fogyasztóval a szerződést kizárólag távollévők közötti kommunikáció útján kötjük meg, a fogyasztót a 45/2014. (II. 26.) Korm. rendelet szerint 14 napos indokolás nélküli elállási jog illeti meg, kivéve különösen:</p>
+    <ul>
+      <li>a fogyasztó utasításai alapján, egyedileg konfigurált és megrendelt jármű esetén (29. § (1) c) pont);</li>
+      <li>meghatározott időpontra vagy időszakra szóló gépjármű-bérlés esetén (29. § (1) l) pont).</li>
+    </ul>
+    <p>Az elállási nyilatkozatot a <a href="mailto:info@caradvance.hu">info@caradvance.hu</a> címre vagy a Szolgáltató irodájába kell eljuttatni.</p>
+
+    <h2 id="felelosseg">12. Felelősség</h2>
+    <p>A Szolgáltató a Weboldal folyamatos elérhetőségére törekszik, de nem felel a karbantartásból, üzemzavarból vagy harmadik fél szolgáltatásának kieséséből eredő elérhetetlenségért. A Weboldalon található kalkulátorok (pl. honosítás, átírási illeték, lízing) eredményei tájékoztató jellegű becslések. A külső oldalakra mutató hivatkozások tartalmáért a Szolgáltató nem felel.</p>
+
+    <h2 id="panasz">13. Panaszkezelés és jogorvoslat</h2>
+    <p>Panaszát szóban (telefonon vagy az irodában) vagy írásban (<a href="mailto:info@caradvance.hu">info@caradvance.hu</a>, 2083 Solymár, Ibolya utca 18.) jelezheti. Az írásbeli panaszra 30 napon belül írásban, érdemben válaszolunk. A panasz elutasítása esetén Ön az alábbiakhoz fordulhat:</p>
+    <ul>
+      <li><strong>Fogyasztóvédelmi hatóság</strong>: a lakóhelye szerint illetékes vármegyei (fővárosi) kormányhivatal — <a href="https://kormanyhivatal.hu" target="_blank" rel="noopener">kormanyhivatal.hu</a>;</li>
+      <li><strong>Békéltető testület</strong>: a Szolgáltató székhelye szerint illetékes Hajdú-Bihar Vármegyei Békéltető Testület (4025 Debrecen, Petőfi tér 10.), vagy a lakóhelye szerinti békéltető testület — az elérhetőségek listája: <a href="https://bekeltetes.hu" target="_blank" rel="noopener">bekeltetes.hu</a>. A Szolgáltatót a békéltető testületi eljárásban együttműködési kötelezettség terheli;</li>
+      <li><strong>Bíróság</strong>: a polgári perrendtartás szerint illetékes bíróság.</li>
+    </ul>
+
+    <h2 id="zaro">14. Záró rendelkezések</h2>
+    <p>Az ÁSZF-ben nem szabályozott kérdésekben a magyar jog, különösen a Ptk., a fogyasztóvédelemről szóló 1997. évi CLV. törvény és a 45/2014. (II. 26.) Korm. rendelet az irányadó. A Szolgáltató az ÁSZF-et jogosult egyoldalúan módosítani; a módosítás a már megkötött szerződéseket nem érinti. Az ÁSZF 2026. október 1-jétől hatályos.</p>
+    <p>Kapcsolódó dokumentumok: <a href="/adatkezeles/">Adatkezelési tájékoztató</a> · <a href="/impresszum/">Impresszum</a></p>
+  </LegalPage>
+</Base>
