@@ -259,7 +259,7 @@ export const SALE_MB: Record<string, SaleFacts> = {
       ['Mercedes-AMG C 43 4MATIC', 'Benzin (mild-hybrid)', '408 LE (300 kW)', '500 Nm', AMG9, '4,6 mp', '250 km/h'],
       ['Mercedes-AMG C 63 S E PERFORMANCE', 'Plug-in hibrid', '680 LE (500 kW) rendszer', '1020 Nm', 'AMG 4MATIC+ / AMG SPEEDSHIFT MCT 9G', '3,4 mp', '280 km/h'],
     ],
-    boot: '455 liter (C 43)', drive: 'AWD', rent: 'mercedes-amg-c-osztaly-limuzin', press: 'mercedes-amg-c-osztaly', gal: [['g1', 'napsütésben'], ['g2', 'menet közben'], ['g3', 'hegyi úton'], ['g4', 'naplementében'], ['g5', 'AMG hátsó lámpa'], ['g6', 'AMG vezetőtér']],
+    boot: '455 liter (C 43)', drive: 'AWD', rent: 'mercedes-amg-c-osztaly-limuzin', press: 'mercedes-amg-c-osztaly', gal: [['g1', 'napsütésben'], ['g2', 'menet közben'], ['g3', 'hegyi úton'], ['g4', 'AMG hátsó lámpa'], ['g5', 'AMG vezetőtér'], ['g6', 'versenypályán']],
     design: ['AMG sportlimuzin', 'Panamericana hűtőrács, szélesített sárvédők és négy kipufogóvég.', ['AMG Panamericana hűtőrács', 'AMG Night csomag (opció)', '19–20" AMG keréktárcsák']],
     interior: ['AMG vezetőtér', 'AMG Performance ülések, AMG kormány és AMG kijelzőnézetek.', ['AMG Performance ülések (opció)', 'AMG Track Pace', MBUX]],
     faq: [AMG_FAQ],

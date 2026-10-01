@@ -298,10 +298,9 @@ export const INTERIOR: Record<string, string[]> = {
   "/bmw/bmw-x6-konzol.webp"
  ],
  "bmw-m4-cabrio": [
-  "/bmw/bmw-m4-muszerfal.webp",
+  "/berles-press/bmw-m4-cabrio-interior.webp",
   "/bmw/bmw-m4-ulesek.webp",
-  "/bmw/bmw-m4-kormany.webp",
-  "/berles-press/bmw-m4-cabrio-interior.webp"
+  "/bmw/bmw-m4-kormany.webp"
  ],
  "cupra-tavascan": [
   "/berles-press/cupra-tavascan-interior.webp"
@@ -399,20 +398,20 @@ export const INTERIOR_PAGES: Record<string, string> = {
 };
 
 const ALT = ['belső tér, műszerfal', 'utastér és ülések', 'vezetőtér részlete', 'belső tér'];
-const IRX = /belső|utastér|vezetőtér|műszerfal|ülés|csomagtér|kokpit|cockpit|interior/i;
+const IRX = /belső|beltér|utastér|vezetőtér|műszerfal|ülés|csomagtér|kokpit|cockpit|interior|kijelző|kormány/i;
+const IMG_RX = /-int\d|interior|belso|muszerfal|ulesek|sportules|cockpit|konzol|kormany|csomagter/i;
+// kézi javítás, ahol a képaláírás nem árulja el, hogy belső fotó
+const FORCE_INT = new Set(['/berles-press/kia-ev2-g8.webp', '/berles-press/volvo-v60-g7.webp']);
+const isInt = (g: { img: string; alt: string }) => FORCE_INT.has(g.img) || IRX.test(g.alt || '') || IMG_RX.test(g.img || '');
 
+// Sorrend: előbb az összes külső fotó, utána a belső-tér képek (a meglévők + az új sajtófotók).
 export function withInterior(path: string, gallery: { img: string; alt: string }[] = [], name = ''): { img: string; alt: string }[] {
   const key = INTERIOR_PAGES[String(path || '').replace(/^\/+|\/+$/g, '')];
   const imgs = key ? INTERIOR[key] || [] : [];
-  if (!imgs.length) return gallery;
   const have = new Set(gallery.map((g) => g.img));
   const add = imgs.filter((p) => !have.has(p)).map((p, i) => ({ img: p, alt: `${name} ${ALT[i % ALT.length]}`.trim() }));
-  if (!add.length) return gallery;
-  const out = gallery.slice(0, 3);
-  out.push(...add.slice(0, 2));
-  out.push(...gallery.slice(3, 6));
-  out.push(...add.slice(2));
-  out.push(...gallery.slice(6));
-  return out;
+  const ext = gallery.filter((g) => !isInt(g));
+  const int = gallery.filter((g) => isInt(g));
+  return [...ext, ...int, ...add];
 }
-export const hasInteriorShot = (g: { img: string; alt: string }[] = []) => g.some((x) => IRX.test(x.alt) || /interior|-int\d/.test(x.img));
+export const hasInteriorShot = (g: { img: string; alt: string }[] = []) => g.some(isInt);
