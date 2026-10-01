@@ -449,7 +449,6 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
 
   <script is:inline>
   (function(){
-    var ORDER_API=atob('aHR0cHM6Ly9jYXJhZHZhbmNlLWNoYXRib3QuZmxhdC1maXJlLTdlMjUud29ya2Vycy5kZXYvYXBpL29yZGVy');
     var SALES_EMAIL='info@caradvance.hu';
     var FX=364;
     function att(s){return String(s==null?'':s).replace(/"/g,'&quot;');}
@@ -506,14 +505,26 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       if(payment==='Finanszírozással'&&!fd.get('financing')){ showMsg('err','Kérlek válaszd ki a finanszírozás módját.'); return; }
       if(!fd.get('consent')){ showMsg('err','Kérlek fogadd el az adatkezelési tájékoztatót.'); return; }
       var btn=oForm.querySelector('.egl-fsubmit'); btn.disabled=true; btn.textContent='Küldés…';
-      fetch(ORDER_API,{method:'POST',body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
-        showMsg('ok','Köszönjük! Megkaptuk a rendelési igényed — hamarosan keresünk.');
-        oForm.reset(); setBuyer('Magánszemély'); btn.disabled=false; btn.textContent='Rendelés elküldése';
-      }).catch(function(){
-        var body='Autó: '+(fd.get('car')||'')+'\nÜzemanyag: '+(fd.get('fuel')||'')+'\nVásárló típusa: '+(buyer||'')+'\nVásárlás módja: '+(mode||'')+'\nFizetés: '+(payment||'')+'\nFinanszírozás: '+(fd.get('financing')||'')+'\nNév: '+name+'\nE-mail: '+email+'\nTelefon: '+(fd.get('phone')||'')+'\nCég: '+company+'\nAdószám: '+(fd.get('taxid')||'')+'\nMegjegyzés: '+(fd.get('message')||'');
-        window.location.href='mailto:'+SALES_EMAIL+'?subject='+encodeURIComponent('Autó rendelés – '+(fd.get('car')||''))+'&body='+encodeURIComponent(body);
-        showMsg('ok','Megnyitottuk az e-mail vázlatot. Ha van specifikációs fájlod, csatold az e-mailhez.');
-        btn.disabled=false; btn.textContent='Rendelés elküldése';
+      var P={'Típus':'Egyedi rendelés','Autó':fd.get('car')||'','Üzemanyag':fd.get('fuel')||'','Vásárló':buyer||'','Cégnév':company,'Adószám':(fd.get('taxid')||'').trim(),'Vásárlás módja':mode||'','Fizetés':payment||'','Finanszírozás':fd.get('financing')||'','Vezetéknév':last,'Keresztnév':first,'Név':name,'Telefon':(fd.get('phone')||'').trim(),'E-mail':email,'Megjegyzés':(fd.get('message')||'').trim(),'Ár (tájékoztató)':(document.getElementById('eglOrderPrice')||{}).textContent||'','page':location.href};
+      try{ if(window.caLeadExtras) Object.assign(P, window.caLeadExtras()); }catch(_e){}
+      P['Típus']='Egyedi rendelés';
+      var file=fd.get('spec');
+      var withFile=function(cb){
+        if(!file || !file.size){ cb(); return; }
+        if(file.size>5*1024*1024){ P['Csatolmány']=file.name+' (túl nagy, nem csatolva — kérjük, küldd e-mailben)'; cb(); return; }
+        var fr=new FileReader(); fr.onload=function(){ P._attachment={filename:file.name, content:String(fr.result).split(',')[1]||''}; cb(); }; fr.onerror=function(){ cb(); }; fr.readAsDataURL(file);
+      };
+      withFile(function(){
+        fetch('/api/lead',{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(P)}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
+          try{ if(window.caFireLead) window.caFireLead('egyedi-rendeles'); }catch(_e){}
+          oForm.reset(); setBuyer('Magánszemély'); btn.disabled=false; btn.textContent='Rendelés elküldése';
+          closeOrder();
+          if(window.caShowThanks){ window.caShowThanks('ok'); } else { alert('Köszönjük! Megkaptuk a rendelési igényed — hamarosan keresünk.'); }
+        }).catch(function(){
+          btn.disabled=false; btn.textContent='Rendelés elküldése';
+          showMsg('err','A küldés nem sikerült. Kérjük, hívj minket: +36 30 233 6060, vagy írj az '+SALES_EMAIL+' címre.');
+          if(window.caShowThanks) window.caShowThanks('error');
+        });
       });
     }); }
   })();
