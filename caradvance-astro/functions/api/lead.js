@@ -87,6 +87,7 @@ export async function onRequestPost(context) {
     ip: request.headers.get('cf-connecting-ip') || '',
     fbp: String(data.fbp || ''),
     fbc: String(data.fbc || ''),
+    mkt: data.mkt_consent === true || data.mkt_consent === 'true',
     attr: data.ca_attr && typeof data.ca_attr === 'object' ? data.ca_attr : {},
     received_at: new Date().toISOString()
   };
@@ -242,7 +243,7 @@ async function createNotionLead(env, data, contact, meta) {
 
 /** Az űrlap teljes tartalma a Notion-lap törzsébe, hogy semmi ne vesszen el. */
 function notionBlocks(data, meta) {
-  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token']);
+  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent']);
   const items = Object.entries(data)
     .filter(([k, v]) => !skip.has(k) && v != null && v !== '' && typeof v !== 'object')
     .slice(0, 90)
@@ -333,6 +334,8 @@ async function sendEmail(env, record, contact, attachment) {
 
 async function sendMetaCapi(env, contact, meta) {
   if (!env.META_PIXEL_ID || !env.META_CAPI_TOKEN) return { status: 'skipped' };
+  // GDPR: a Meta felé csak marketing-hozzájárulás esetén küldünk adatot.
+  if (!meta.mkt) return { status: 'skipped_no_consent' };
   const user_data = {};
   if (contact.email) user_data.em = [await sha256(contact.email)];
   if (contact.phone) user_data.ph = [await sha256(contact.phone)];
@@ -378,7 +381,7 @@ function leadKind(data) {
 async function sendCustomerConfirm(env, data, contact) {
   if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
   const k = leadKind(data);
-  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent']);
+  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent']);
   const rows = Object.entries(data)
     .filter(([key, v]) => !skip.has(key) && v != null && v !== '' && typeof v !== 'object')
     .slice(0, 40)
@@ -421,7 +424,7 @@ function pick(obj, keys) {
 }
 function stripInternal(data) {
   const out = {};
-  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token']);
+  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent']);
   for (const [k, v] of Object.entries(data)) {
     if (skip.has(k)) continue;
     if (typeof v === 'object') continue;
