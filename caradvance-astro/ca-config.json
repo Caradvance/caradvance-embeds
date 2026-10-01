@@ -6,7 +6,7 @@
   "META_PIXEL_ID": "1631688538313921",
   "GTM_ID": "",
   "LEAD_ENDPOINT": "/api/lead",
-  "COOKIE_POLICY_URL": "/adatvedelem/",
+  "COOKIE_POLICY_URL": "/adatkezeles/#cookie",
   "DEBUG": false,
   "THANKS_TITLE": "Köszönjük az érdeklődésed!",
   "THANKS_TEXT": "Megkaptuk a kérésed, és hamarosan jelentkezünk a személyre szabott ajánlattal.",
