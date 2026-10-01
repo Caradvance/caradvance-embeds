@@ -100,7 +100,7 @@
       style = el('style', { id: 'cacb-css' }); style.textContent = CSS;
       document.head.appendChild(style);
     }
-    var pol = CFG.COOKIE_POLICY_URL || '/adatvedelem/';
+    var pol = CFG.COOKIE_POLICY_URL || '/adatkezeles/#cookie';
     var st = existing || { analytics: true, marketing: true };
 
     box = el('div', { class: 'cacb', role: 'dialog', 'aria-live': 'polite', 'aria-label': 'Süti-beállítások' });

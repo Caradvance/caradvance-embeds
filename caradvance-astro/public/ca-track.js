@@ -302,7 +302,8 @@
       fbp: cookie('_fbp'),
       fbc: cookie('_fbc') || (window.CA_ATTR && window.CA_ATTR.fbclid ? 'fb.1.' + Date.now() + '.' + window.CA_ATTR.fbclid : ''),
       page: location.href,
-      user_agent: navigator.userAgent
+      user_agent: navigator.userAgent,
+      mkt_consent: !!((consentState() || {}).marketing)
     };
   }
   window.caLeadExtras = leadPayloadExtras;

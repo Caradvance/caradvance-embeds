@@ -492,7 +492,7 @@
           '<div class="cain-grid"><input type="text" name="lastname" placeholder="Vezetéknév *"/><input type="text" name="firstname" placeholder="Keresztnév *"/></div>'+
           '<div class="cain-grid"><input type="tel" name="phone" placeholder="Telefonszám"/><input type="email" name="email" placeholder="E-mail *"/></div>'+
           '<textarea name="message" rows="3" placeholder="Megjegyzés, kérdés…"></textarea>'+
-          '<label class="cain-consent"><input type="checkbox" name="consent"/><span>Elfogadom az <a href="/adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>'+
+          '<label class="cain-consent"><input type="checkbox" name="consent"/><span>Elolvastam és elfogadom az <a href="/aszf/" target="_blank" rel="noopener">ÁSZF</a>-et és az <a href="/adatkezeles/" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>'+
           '<div class="cain-msg"></div>'+
           '<button type="submit" class="cain-submit">Érdeklődés elküldése</button>'+
           '<p class="cain-note">Felvesszük veled a kapcsolatot a megadott elérhetőségen.</p>'+
@@ -571,7 +571,7 @@
     }
     if(buyer==="Cég" && !company){ showMsg("err","Kérlek add meg a cég nevét."); return; }
     if(!last||!first||!email){ showMsg("err","Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed."); return; }
-    if(!fd.get("consent")){ showMsg("err","Kérlek fogadd el az adatkezelési tájékoztatót."); return; }
+    if(!fd.get("consent")){ showMsg("err","Kérlek fogadd el az ÁSZF-et és az adatkezelési tájékoztatót."); return; }
     var btn=mForm.querySelector(".cain-submit"); btn.disabled=true; btn.textContent="Küldés…";
     fd.append("kind", isRent ? "Bérlési érdeklődés" : "Érdeklődés (készletautó)");
     fetch(INQ_API,{method:"POST",body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
