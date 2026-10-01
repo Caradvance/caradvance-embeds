@@ -29,7 +29,8 @@
  * Titok soha nem kerül a válaszba és nem jut ki a böngészőbe.
  */
 
-const MAX_BODY = 64 * 1024;
+const MAX_BODY = 8 * 1024 * 1024; // csatolmánnyal (base64) együtt
+const MAX_ATTACH = 5 * 1024 * 1024;
 const META_API = 'v21.0';
 
 export async function onRequestPost(context) {
@@ -52,6 +53,18 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'bad_json' }, 400);
   }
   if (!data || typeof data !== 'object') return json({ ok: false, error: 'bad_json' }, 400);
+
+  // Csatolmány (pl. kész specifikáció) — nem kerül a Notionbe / webhookba, csak a belső e-mailbe.
+  let attachment = null;
+  if (data._attachment && typeof data._attachment === 'object') {
+    const a = data._attachment;
+    const content = String(a.content || '');
+    if (content && content.length * 0.75 <= MAX_ATTACH) {
+      attachment = { filename: String(a.filename || 'specifikacio').slice(0, 120), content };
+      data['Csatolmány'] = attachment.filename;
+    }
+  }
+  delete data._attachment;
 
   // Mézesbödön: ha ez ki van töltve, robot küldte. Csendben elfogadjuk.
   if (data.website || data.url_field) return json({ ok: true, skipped: true });
@@ -89,12 +102,18 @@ export async function onRequestPost(context) {
 
   const results = await Promise.allSettled([
     createNotionLead(env, data, contact, meta),
-    sendEmail(env, record, contact),
+    sendEmail(env, record, contact, attachment),
     forwardWebhook(env, record),
     sendMetaCapi(env, contact, meta)
   ]);
 
   const [notion, mail, hook, capi] = results.map(describe);
+
+  // Automatikus visszaigazolás az ügyfélnek (csak ha a belső kézbesítés sikerült).
+  let confirm = { status: 'skipped' };
+  if ((notion.ok || mail.ok || hook.ok) && contact.email) {
+    try { confirm = await sendCustomerConfirm(env, data, contact); } catch (e) { confirm = { status: 'error: ' + String(e && e.message || e).slice(0, 120) }; }
+  }
   const delivered = notion.ok || mail.ok || hook.ok;
   const configured = [notion, mail, hook].some((c) => c.status !== 'skipped');
 
@@ -112,7 +131,8 @@ export async function onRequestPost(context) {
     notion: notion.status,
     email: mail.status,
     webhook: hook.status,
-    capi: capi.status
+    capi: capi.status,
+    confirm: confirm.status
   });
 }
 
@@ -188,7 +208,7 @@ async function createNotionLead(env, data, contact, meta) {
   const props = {
     'Név': { title: [{ text: { content: String(title).slice(0, 200) } }] },
     'Státusz': { select: { name: 'Új érdeklődő' } },
-    'Címkék': { multi_select: [{ name: 'Autóimport' }] },
+    'Címkék': { multi_select: [{ name: leadKind(data).tag }] },
     'Forrás': { select: { name: sourceFromAttr(meta.attr) } },
     'Következő lépés': { date: { start: meta.received_at.slice(0, 10) } }
   };
@@ -285,7 +305,7 @@ async function forwardWebhook(env, record) {
   return { status: 'sent' };
 }
 
-async function sendEmail(env, record, contact) {
+async function sendEmail(env, record, contact, attachment) {
   if (!env.RESEND_API_KEY || !env.LEAD_EMAIL_TO) return { status: 'skipped' };
   const rows = Object.entries(record)
     .filter(([, v]) => v !== '' && v != null)
@@ -299,9 +319,10 @@ async function sendEmail(env, record, contact) {
       from: env.LEAD_EMAIL_FROM || 'CarAdvance <lead@caradvance.hu>',
       to: String(env.LEAD_EMAIL_TO).split(',').map((s) => s.trim()).filter(Boolean),
       reply_to: contact.email || undefined,
-      subject: 'Új import-érdeklődés — ' + (title || 'weboldal'),
+      subject: leadKind(record).internal + ' — ' + (title || 'weboldal'),
+      attachments: attachment ? [attachment] : undefined,
       html: `<div style="font:14px/1.5 Arial,sans-serif;color:#111">
-        <h2 style="margin:0 0 4px">Új import-érdeklődés</h2>
+        <h2 style="margin:0 0 4px">${esc(leadKind(record).internal)}</h2>
         <p style="margin:0 0 14px;color:#666">Válaszidő-vállalás: <b>1 óra munkaidőben</b>.</p>
         <table style="border-collapse:collapse">${rows}</table></div>`
     })
@@ -342,6 +363,57 @@ async function sendMetaCapi(env, contact, meta) {
 }
 
 /* ------------------------- segédek ------------------------- */
+
+/** A lead típusa: belső tárgy, Notion-címke és az ügyfélnek szóló szöveg. */
+function leadKind(data) {
+  const t = String(pick(data, ['Típus', 'type', 'form']) || '').toLowerCase();
+  const car = pick(data, ['Autó', 'car']) || [pick(data, ['Márka']), pick(data, ['Modell'])].filter(Boolean).join(' ');
+  if (/bérl|berl|abo/.test(t)) return { key: 'berles', tag: 'Bérlés', internal: 'Új bérlési igény' + (car ? ' · ' + car : ''), subj: 'Megkaptuk a bérlési igényed' + (car ? ' — ' + car : ''), what: 'bérlési igényedet' + (car ? ' (' + car + ')' : '') };
+  if (/rendel|order|egyedi/.test(t)) return { key: 'rendeles', tag: 'Egyedi rendelés', internal: 'Új autórendelés' + (car ? ' · ' + car : ''), subj: 'Megkaptuk az autórendelési igényed' + (car ? ' — ' + car : ''), what: 'autórendelési igényedet' + (car ? ' (' + car + ')' : '') };
+  if (/bizom|eladás|eladas|eladom/.test(t)) return { key: 'eladas', tag: 'Bizományos értékesítés', internal: 'Új autóeladási ajánlat' + (car ? ' · ' + car : ''), subj: 'Megkaptuk az autód adatait' + (car ? ' — ' + car : ''), what: 'az autód eladásával kapcsolatos megkeresésedet' + (car ? ' (' + car + ')' : '') };
+  return { key: 'import', tag: 'Autóimport', internal: 'Új import-érdeklődés', subj: 'Megkaptuk az autókeresési kérésed' + (car ? ' — ' + car : ''), what: 'autókeresési / import kérésedet' + (car ? ' (' + car + ')' : '') };
+}
+
+/** Visszaigazoló e-mail az ügyfélnek: köszönet + a beküldött adatok összefoglalója. */
+async function sendCustomerConfirm(env, data, contact) {
+  if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
+  const k = leadKind(data);
+  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent']);
+  const rows = Object.entries(data)
+    .filter(([key, v]) => !skip.has(key) && v != null && v !== '' && typeof v !== 'object')
+    .slice(0, 40)
+    .map(([key, v]) => `<tr><td style="padding:5px 14px 5px 0;color:#6b7280;white-space:nowrap;vertical-align:top">${esc(key)}</td><td style="padding:5px 0;color:#111"><b>${esc(String(v))}</b></td></tr>`)
+    .join('');
+  const first = String(pick(data, ['Keresztnév']) || String(contact.name || '').split(' ').slice(-1)[0] || '').trim();
+  const hello = first ? 'Kedves ' + esc(first) + '!' : 'Kedves Érdeklődő!';
+  const phone = env.CONTACT_PHONE || '+36 30 233 6060';
+  const replyTo = env.CUSTOMER_REPLY_TO || 'info@caradvance.hu';
+  const html = `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
+    <div style="background:#0b0b0d;padding:18px 24px"><img src="https://www.caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" height="34" style="height:34px;display:block"></div>
+    <div style="padding:24px">
+      <p style="margin:0 0 12px">${hello}</p>
+      <p style="margin:0 0 12px">Köszönjük, megkaptuk a ${esc(k.what)}. Kollégánk <b>munkaidőben 1 órán belül</b> felveszi veled a kapcsolatot a részletekkel és a személyre szabott ajánlattal.</p>
+      ${rows ? `<p style="margin:18px 0 6px;font-weight:bold">A beküldött adatok</p><table style="border-collapse:collapse;font-size:14px">${rows}</table>` : ''}
+      <p style="margin:18px 0 0">Ha sürgős, hívj minket bátran: <a href="tel:${esc(phone.replace(/[^\d+]/g, ''))}" style="color:#e2001a;font-weight:bold;text-decoration:none">${esc(phone)}</a>, vagy egyszerűen válaszolj erre az e-mailre.</p>
+      <p style="margin:18px 0 0">Üdvözlettel,<br><b>A CarAdvance csapata</b></p>
+    </div>
+    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px">CarAdvance · BH Group Zrt. · <a href="https://www.caradvance.hu" style="color:#6b7280">caradvance.hu</a><br>Ezt az üzenetet azért kaptad, mert kitöltötted az űrlapunkat a caradvance.hu oldalon. Az elküldés nem végleges megrendelés.</div>
+  </div></div>`;
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: env.CUSTOMER_EMAIL_FROM || env.LEAD_EMAIL_FROM || 'CarAdvance <lead@caradvance.hu>',
+      to: [contact.email],
+      reply_to: replyTo,
+      subject: k.subj + ' | CarAdvance',
+      html
+    })
+  });
+  if (!r.ok) throw new Error('resend ' + r.status);
+  return { status: 'sent' };
+}
 
 function pick(obj, keys) {
   for (const k of keys) if (obj[k]) return String(obj[k]);
