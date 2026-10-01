@@ -19,7 +19,7 @@ export interface RentalData {
   fuels: string[]; gears: string[]; km: number[]; months: number[];
   psMin: number; psMax: number; packages: string[];
   eur: number; huf: number; dep: number; depHuf: number;
-  trims: RentalTrim[]; colors: string[]; avail: string[]; rate: number;
+  trims: RentalTrim[]; colors: string[]; colorsHex?: string[]; avail: string[]; rate: number;
   photo: string; related: RentalRelated[];
 }
 
@@ -133,7 +133,7 @@ export function getRental(brand: string, model: string): RentalData | null {
     fuels: m.fuels || [], gears: m.gears || [], km: m.km || [], months: m.months || [],
     psMin: m.psMin || 0, psMax: m.psMax || 0, packages: m.packages || [],
     eur, huf: toHuf(eur, R), dep, depHuf: toDepHuf(dep, R),
-    trims, colors: (m.colors || []).map((x: any) => x.n), avail: (c && c.A) || [], rate: R,
+    trims, colors: (m.colors || []).map((x: any) => x.n), colorsHex: (m.colors || []).map((x: any) => x.n + '¦' + (x.h || '#ccc')), avail: (c && c.A) || [], rate: R,
     photo: String(PHOTO[key] || ''), related,
   };
 }
