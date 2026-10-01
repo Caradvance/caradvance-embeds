@@ -36,7 +36,7 @@ const RULES = {
     ['<title>A bérlés előnyei — prémium autóbérlés | CarAdvance</title>',
      '<title>Autó tartós bérlet magánszemélyeknek és cégeknek | CarAdvance</title>'],
     ['Prémium német autók kedvező bérleti feltételekkel és alacsony kaucióval — akár félévente új modell, szervizköltség és adók nélkül, nyári-téli gumival.',
-     'Tartós bérlet prémium német autókra, fix havidíjjal: szerviz, adó, biztosítás és gumi az árban. Akár félévente új modell, alacsony kaucióval, 2 000 vagy 3 000 km havi kerettel.'],
+     'Tartós bérlet prémium német autókra, fix havidíjjal: szerviz, biztosítás és gumi az árban. Akár félévente új modell, alacsony kaucióval, 2 000 vagy 3 000 km havi kerettel.'],
     ['A bérlés előnyei —', 'A tartós bérlet előnyei —'],
     ['Miért érdemes tőlünk bérelni?', 'Miért éri meg a tartós bérlet?'],
     ['Prémium autóbérlés Magyarországon — miért éri meg?',
