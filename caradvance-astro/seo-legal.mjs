@@ -23,6 +23,7 @@ const COLS = [
     ['Új autó bérlése', '/uj-auto-berlese/'],
     ['A bérlés előnyei', '/berles-elonyei/'],
     ['Bérlési folyamat', '/berlesi-folyamat/'],
+    ['Feltételek és kaució', '/berlesi-feltetelek/'],
     ['Bérlés – gyakori kérdések', '/berles-gyakori-kerdesek/'],
   ]],
   ['Vásárlás és import', [
@@ -125,6 +126,8 @@ for await (const file of walk(ROOT)) {
   // 2–3. jogi hivatkozások
   h = h.replace(/href="\/adatkezeles"/g, 'href="/adatkezeles/"');
   h = h.replace(CONSENT_OLD, CONSENT_NEW);
+  // régi menük: a "Feltételek" pont eddig sehova (#) mutatott
+  h = h.replace(/href="#"([^>]*)>Feltételek<\/a>/g, 'href="/berlesi-feltetelek/"$1>Feltételek és kaució</a>');
 
   if (h !== orig) { await writeFile(file, h); n++; }
 }
