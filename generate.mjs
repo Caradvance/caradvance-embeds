@@ -1051,9 +1051,9 @@ function f(){var q=(document.getElementById('q').value||'').toLowerCase(),m=docu
 const absUrl = (u) => SITE_BASE + "/" + String(u).replace(/^\//, "");
 const hufUpR = (e, rate) => Math.ceil((Number(e) || 0) * rate / 10000) * 10000;
 const SALES_EMAIL = "sales@caradvance.hu";
-const TEAM = ["Tóth Károly", "Csadi Ferenc", "Vadnai Zsombor"];
+const TEAM = ["Tóth Károly", "Bajzáth Balázs", "Vadnai Zsombor"];
 const EMP = {
-  "Csadi Ferenc": { role: "Kereskedelmi vezető", tel: "+36 30 094 2081", wa: "36300942081", img: "caradvance-emp-csadi.webp" },
+  "Bajzáth Balázs": { role: "Sales Manager", tel: "+36 30 094 2081", wa: "36300942081", img: "bajzath-balazs.webp" },
   "Tóth Károly": { role: "Import igazgató", tel: "+36 30 214 6989", wa: "36302146989", img: "caradvance-emp-toth.webp" },
   "Vadnai Zsombor": { role: "Értékesítési vezető", tel: "+36 30 094 2105", wa: "36300942105", img: "caradvance-emp-vadnai.webp" },
 };
