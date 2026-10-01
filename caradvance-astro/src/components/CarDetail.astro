@@ -4,6 +4,7 @@
 // CSS) itt van; a modellre jellemző tartalom a data fájlból jön.
 import type { CarModel } from '../data/carModels';
 import { carModels } from '../data/carModels';
+import { withInterior } from '../data/interiorGallery';
 const { model, mode = 'sale', rent = null } = Astro.props as { model: CarModel; mode?: string; rent?: any };
 const isRent = mode === 'berles';
 // A "Hasonló modellek" kártyákhoz: ha a hivatkozott modellnek van kész aloldala
@@ -64,9 +65,11 @@ const cmpRows = [
 ];
 if (isRent) cmpRows.push(['Havidíj -tól', ...model.variants.map((v) => (v as any).rentTxt || '—')]);
 
+// galéria + belső-tér sajtófotók (ld. src/data/interiorGallery.ts)
+const gal = withInterior(Astro.url.pathname, model.gallery || [], model.name);
 // schema képek (dedup, abszolút URL)
 const imgSet = new Set<string>();
-[model.mainImg, model.design && model.design.img, model.interior && model.interior.img, ...(model.gallery || []).map((g) => g.img), ...model.variants.map((v) => v.img)].filter(Boolean).forEach((p) => imgSet.add(ORIGIN + p));
+[model.mainImg, model.design && model.design.img, model.interior && model.interior.img, ...gal.map((g) => g.img), ...model.variants.map((v) => v.img)].filter(Boolean).forEach((p) => imgSet.add(ORIGIN + p));
 const carImages = Array.from(imgSet);
 
 const pageUrl = isRent ? `${ORIGIN}/berelheto-auto/${model.slug}-berles` : `${ORIGIN}/egyedi-auto-rendeles/${model.slug}`;
@@ -325,11 +328,11 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   </section>
 
   <!-- ===== GALLERY ===== -->
-  {model.gallery && model.gallery.length > 0 && (<section class="cd-sec cd-soft">
+  {gal.length > 0 && (<section class="cd-sec cd-soft">
     <div class="cd-w">
       <span class="cd-eyebrow">Galéria</span>
       <h2 class="cd-h2">{model.name} képek</h2>
-      <div class="cd-gal">{model.gallery.map((g) => (<img class="cd-shot" src={g.img} alt={g.alt} width="900" height="675" loading="lazy" />))}</div>
+      <div class="cd-gal">{gal.map((g) => (<img class="cd-shot" src={g.img} alt={g.alt} width="900" height="675" loading="lazy" />))}</div>
     </div>
   </section>)}
 
