@@ -1,7 +1,7 @@
 ---
 /* Közös keret a jogi oldalakhoz (Adatkezelési tájékoztató, ÁSZF, Impresszum). */
-const { title, kicker = 'Jogi információk', updated = '2026. október 1.', toc = [] } = Astro.props as {
-  title: string; kicker?: string; updated?: string; toc?: { id: string; t: string }[];
+const { title, kicker = 'Jogi információk', updated = '2026. október 1.', toc = [], tabs = true, lead = '', updLabel = 'Hatályos' } = Astro.props as {
+  title: string; kicker?: string; updated?: string; toc?: { id: string; t: string }[]; tabs?: boolean; lead?: string; updLabel?: string;
 };
 const links = [
   { href: '/adatkezeles/', t: 'Adatkezelési tájékoztató' },
@@ -15,10 +15,12 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
     <div class="lg-hero-in">
       <div class="lg-kicker">{kicker}</div>
       <h1>{title}</h1>
-      <p class="lg-upd">Hatályos: {updated}</p>
-      <nav class="lg-tabs" aria-label="Jogi dokumentumok">
+      {lead && <p class="lg-lead">{lead}</p>}
+      <p class="lg-upd">{updLabel}: {updated}</p>
+      {tabs && <nav class="lg-tabs" aria-label="Jogi dokumentumok">
         {links.map((l) => <a href={l.href} class={here === l.href ? 'on' : ''} aria-current={here === l.href ? 'page' : undefined}>{l.t}</a>)}
-      </nav>
+      </nav>}
+      <slot name="hero" />
     </div>
   </header>
   <div class="lg-body">
@@ -41,6 +43,7 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
   .lg-kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#E2001A;font-weight:800;margin-bottom:10px}
   .lg-hero h1{font-size:clamp(30px,4.4vw,46px);line-height:1.1;margin:0 0 10px;font-weight:800}
   .lg-upd{margin:0 0 22px;color:#aab1bf;font-size:14px}
+  .lg-lead{margin:0 0 14px;color:#dfe3ea;font-size:17px;line-height:1.6;max-width:62ch}
   .lg-tabs{display:flex;flex-wrap:wrap;gap:8px}
   .lg-tabs a{color:#fff;text-decoration:none;font-size:14px;font-weight:700;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.22)}
   .lg-tabs a:hover{border-color:#fff}
@@ -53,6 +56,7 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
   .lg-toc li{margin:0 0 7px}
   .lg-toc a{color:var(--muted,#5A6B82);text-decoration:none}
   .lg-toc a:hover{color:#E2001A}
+  .lg-body>*{min-width:0}
   .lg-doc{background:#fff;border:1px solid var(--line,#E6EAF1);border-radius:16px;padding:36px 40px;font-size:15.5px;line-height:1.7}
   .lg-doc h2{font-size:22px;margin:34px 0 10px;scroll-margin-top:calc(var(--navh,80px) + 20px)}
   .lg-doc h2:first-child{margin-top:0}
