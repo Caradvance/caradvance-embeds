@@ -390,15 +390,15 @@ async function sendCustomerConfirm(env, data, contact) {
   const replyTo = env.CUSTOMER_REPLY_TO || 'info@caradvance.hu';
   const html = `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
-    <div style="background:#0b0b0d;padding:18px 24px"><img src="https://www.caradvance.hu/caradvance-logo-white.webp" alt="CarAdvance" height="34" style="height:34px;display:block"></div>
+    <div style="background:#0b0b0d;padding:18px 24px"><img src="https://www.caradvance.hu/caradvance-logo-email.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
     <div style="padding:24px">
       <p style="margin:0 0 12px">${hello}</p>
-      <p style="margin:0 0 12px">Köszönjük, megkaptuk a ${esc(k.what)}. Kollégánk <b>munkaidőben 1 órán belül</b> felveszi veled a kapcsolatot a részletekkel és a személyre szabott ajánlattal.</p>
+      <p style="margin:0 0 12px">Köszönjük, megkaptuk a ${esc(k.what)}. Kollégánk <b>a lehető leghamarabb</b> felveszi veled a kapcsolatot a részletekkel és a személyre szabott ajánlattal.</p>
       ${rows ? `<p style="margin:18px 0 6px;font-weight:bold">A beküldött adatok</p><table style="border-collapse:collapse;font-size:14px">${rows}</table>` : ''}
       <p style="margin:18px 0 0">Ha sürgős, hívj minket bátran: <a href="tel:${esc(phone.replace(/[^\d+]/g, ''))}" style="color:#e2001a;font-weight:bold;text-decoration:none">${esc(phone)}</a>, vagy egyszerűen válaszolj erre az e-mailre.</p>
-      <p style="margin:18px 0 0">Üdvözlettel,<br><b>A CarAdvance csapata</b></p>
+      <p style="margin:18px 0 0">Üdvözlettel,</p><p style="margin:6px 0 0;line-height:1.45"><b>Tóth Károly</b><br><span style="color:#6b7280">Kereskedelmi Vezető</span><br>CarAdvance · Caradvance GmbH<br><a href="tel:+36302146989" style="color:#141519;text-decoration:none">+36 30 214 6989</a> · <a href="mailto:info@caradvance.hu" style="color:#141519;text-decoration:none">info@caradvance.hu</a></p>
     </div>
-    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px">CarAdvance · BH Group Zrt. · <a href="https://www.caradvance.hu" style="color:#6b7280">caradvance.hu</a><br>Ezt az üzenetet azért kaptad, mert kitöltötted az űrlapunkat a caradvance.hu oldalon. Az elküldés nem végleges megrendelés.</div>
+    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px;line-height:1.55"><b style="color:#141519">Caradvance GmbH</b> · Kistlerhofstraße 170 · D-81379 München · Németország<br>Tel.: +49 89 1894141-0 · info@caradvance.de · <a href="https://www.caradvance.hu" style="color:#6b7280">caradvance.hu</a><br>Amtsgericht München, HRB 151009 · USt-IdNr.: DE232664616<br>Ügyvezetők: Peter van den Berg, Dr. Alexander Röther<br><br>Ezt az üzenetet azért kaptad, mert kitöltötted az űrlapunkat a caradvance.hu oldalon. Az elküldés nem végleges megrendelés.</div>
   </div></div>`;
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
