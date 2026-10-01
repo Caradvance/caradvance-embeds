@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import LegalPage from '../components/LegalPage.astro';
 const lang = 'hu';
 const toc = [
-  { id: 'adatkezelo', t: 'Az adatkezelő' },
+  { id: 'adatkezelo', t: 'Az adatkezelő és a képviselő' },
   { id: 'fogalmak', t: 'Alapelvek, jogszabályok' },
   { id: 'celok', t: 'Milyen adatot, mire, meddig' },
   { id: 'urlapok', t: 'Űrlapok és ajánlatkérés' },
@@ -16,56 +16,61 @@ const toc = [
   { id: 'modositas', t: 'Módosítás' },
 ];
 ---
-<Base lang={lang} path="/adatkezeles" title="Adatkezelési tájékoztató (GDPR) — CarAdvance" description="Hogyan kezeli a BH Group Zrt. (CarAdvance) a személyes adatokat: ajánlatkérés, bérlés, vásárlás, autóeladás, chat, sütik, adatfeldolgozók, megőrzési idők és az Ön jogai.">
+<Base lang={lang} path="/adatkezeles" title="Adatkezelési tájékoztató (GDPR) — CarAdvance" description="Hogyan kezeli a Caradvance GmbH és magyarországi képviselője, a BH Group Zrt. a személyes adatokat: ajánlatkérés, bérlés, vásárlás, autóeladás, szállítás, chat, sütik, megőrzési idők és az Ön jogai.">
   <LegalPage title="Adatkezelési tájékoztató" toc={toc}>
     <div class="lg-box">
-      <p>Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete (GDPR) 13–14. cikke alapján mutatja be, hogyan kezeljük a <strong>www.caradvance.hu</strong> weboldalon, valamint telefonon, e-mailben és WhatsAppon megadott személyes adatait.</p>
+      <p>Ez a tájékoztató az (EU) 2016/679 általános adatvédelmi rendelet (GDPR) 13–14. cikke alapján mutatja be, hogyan kezeljük a <strong>www.caradvance.hu</strong> weboldalon, valamint telefonon, e-mailben és WhatsAppon megadott személyes adatait.</p>
     </div>
 
-    <h2 id="adatkezelo">1. Az adatkezelő</h2>
+    <h2 id="adatkezelo">1. Az adatkezelő és a magyarországi képviselő</h2>
+    <h3>Adatkezelő</h3>
+    <dl>
+      <dt>Név</dt><dd>Caradvance GmbH</dd>
+      <dt>Székhely</dt><dd>Mitterfeldstr. 2, 82054 Sauerlach, Németország</dd>
+      <dt>Cégjegyzék</dt><dd>Amtsgericht München, HRB 151009</dd>
+      <dt>Ügyvezetők</dt><dd>Peter van den Berg, Dr. Alexander Röther</dd>
+      <dt>Elérhetőség</dt><dd><a href="mailto:info@caradvance.de">info@caradvance.de</a> · <a href="tel:+498918941410">+49 89 1894141-0</a></dd>
+    </dl>
+    <p>A Caradvance GmbH a weboldalon kínált autók eladója és bérbeadója; az ajánlatkérések, a szerződések és a járművekkel kapcsolatos ügyletek adatainak adatkezelője.</p>
+    <h3>Magyarországi képviselő</h3>
     <dl>
       <dt>Név</dt><dd>BH Group Zrt. (Caradvance Hungary)</dd>
       <dt>Székhely</dt><dd>4143 Vekerd, Petőfi utca 23.</dd>
       <dt>Iroda</dt><dd>2083 Solymár, Ibolya utca 18.</dd>
-      <dt>Cégjegyzékszám</dt><dd>09-10-000660 (Debreceni Törvényszék Cégbírósága)</dd>
-      <dt>Adószám</dt><dd>32488447-2-09</dd>
-      <dt>Adatvédelmi kapcsolattartás</dt><dd><a href="mailto:info@caradvance.hu">info@caradvance.hu</a> · <a href="tel:+36302336060">+36 30 233 6060</a></dd>
+      <dt>Cégjegyzékszám, adószám</dt><dd>09-10-000660 · 32488447-2-09</dd>
+      <dt>Elérhetőség</dt><dd><a href="mailto:info@caradvance.hu">info@caradvance.hu</a> · <a href="tel:+36302336060">+36 30 233 6060</a></dd>
     </dl>
-    <p>Adatvédelmi tisztviselő kijelölésére nem vagyunk kötelesek; adatvédelmi kérdésben a fenti elérhetőségeken állunk rendelkezésre.</p>
-    <p>Ha bérlési vagy vásárlási szerződés a német <strong>Caradvance GmbH</strong>-val (Mitterfeldstr. 2, 82054 Sauerlach, Amtsgericht München HRB 151009) jön létre, a szerződés teljesítéséhez szükséges adatokat a Caradvance GmbH önálló adatkezelőként kezeli; erről a szerződéskötéskor külön is tájékoztatjuk.</p>
+    <p>A BH Group Zrt. a Caradvance GmbH megbízásából és utasításai szerint, <strong>adatfeldolgozóként</strong> üzemelteti a weboldalt, fogadja az ajánlatkéréseket és tartja a kapcsolatot az ügyfelekkel. A saját szolgáltatásaihoz — papírmunka, a jármű Németországból Magyarországra szállítása, honosítás és forgalomba helyezés segítése, valamint a saját számlázása — szükséges adatokat <strong>önálló adatkezelőként</strong> kezeli.</p>
+    <p>Adatvédelmi kérdésben, illetve jogai gyakorlásához bármelyik fenti elérhetőséget használhatja — magyar nyelven a <a href="mailto:info@caradvance.hu">info@caradvance.hu</a> címen válaszolunk. Kérelmét szükség esetén továbbítjuk az illetékes társaságnak.</p>
 
     <h2 id="fogalmak">2. Alapelvek, irányadó jogszabályok</h2>
     <p>Csak annyi adatot kérünk, amennyi a kérése teljesítéséhez szükséges, és csak addig őrizzük, ameddig arra jogszerű okunk van. Az adatkezelésre különösen az alábbi jogszabályok vonatkoznak:</p>
     <ul>
       <li>(EU) 2016/679 általános adatvédelmi rendelet (GDPR);</li>
-      <li>2011. évi CXII. törvény az információs önrendelkezési jogról és az információszabadságról (Infotv.);</li>
-      <li>2013. évi V. törvény a Polgári Törvénykönyvről (Ptk.);</li>
-      <li>2000. évi C. törvény a számvitelről (Számviteli tv.);</li>
-      <li>2001. évi CVIII. törvény az elektronikus kereskedelmi szolgáltatásokról (Ekertv.);</li>
-      <li>2003. évi C. törvény az elektronikus hírközlésről (Eht.) — a sütik tekintetében.</li>
+      <li>a német szövetségi adatvédelmi törvény (BDSG) és a digitális szolgáltatások adatvédelméről szóló törvény (TDDDG) — a sütik tekintetében;</li>
+      <li>a magyar 2011. évi CXII. törvény (Infotv.), a 2013. évi V. törvény (Ptk.) és a 2000. évi C. törvény (Számviteli tv.) — a BH Group Zrt. adatkezelése tekintetében.</li>
     </ul>
 
     <h2 id="celok">3. Milyen adatot, milyen célból és meddig kezelünk</h2>
     <div class="lg-tw"><table>
-      <thead><tr><th>Cél</th><th>Kezelt adatok</th><th>Jogalap</th><th>Megőrzés</th></tr></thead>
+      <thead><tr><th>Cél</th><th>Adatkezelő</th><th>Kezelt adatok</th><th>Jogalap</th><th>Megőrzés</th></tr></thead>
       <tbody>
-        <tr><td><strong>Ajánlatkérés, kapcsolatfelvétel</strong> (bérlés, megvásárolható autó, egyedi rendelés, import, autókeresés, finanszírozás)</td><td>név, e-mail, telefonszám, a keresett/kiválasztott autó és konfiguráció, időtartam, km-keret, költségkeret, megjegyzés; céges ügyfélnél cégnév, adószám, közösségi adószám, székhely, kapcsolattartó</td><td>GDPR 6. cikk (1) b) — a szerződéskötést megelőzően, az Ön kérésére tett lépések</td><td>az utolsó kapcsolatfelvételtől számított 1 év, ha nem jön létre szerződés</td></tr>
-        <tr><td><strong>Autó eladása, bizományos értékesítés</strong></td><td>a fentieken túl: az autó adatai (márka, modell, évjárat, km, állapot), kért ár, feltöltött fotók, a választott jótékonysági szervezet</td><td>GDPR 6. cikk (1) b)</td><td>szerződés hiányában 1 év; szerződés esetén lásd lent</td></tr>
-        <tr><td><strong>Szerződés megkötése és teljesítése</strong> (bérlés, adásvétel, bizomány, behozatal, honosítás)</td><td>személyazonosító és lakcímadatok, jogosítvány- és okmányadatok, számlázási adatok, a jármű adatai, kaució és fizetési adatok</td><td>GDPR 6. cikk (1) b); igényérvényesítésre 6. cikk (1) f)</td><td>a szerződés megszűnésétől számított 5 év (Ptk. 6:22. § elévülés)</td></tr>
-        <tr><td><strong>Számlázás, könyvelés</strong></td><td>számlán szereplő adatok</td><td>GDPR 6. cikk (1) c) — Számviteli tv. 169. §</td><td>8 év</td></tr>
-        <tr><td><strong>Telefonos, e-mailes és WhatsApp kapcsolattartás</strong></td><td>név, telefonszám, e-mail, az üzenetek tartalma</td><td>GDPR 6. cikk (1) b), illetve f) — az érdeklődés megválaszolása</td><td>az ügy lezárásától számított 1 év</td></tr>
-        <tr><td><strong>Chat-asszisztens</strong> a weboldalon</td><td>a beírt üzenetek; ha érdeklődést küld: név, e-mail, telefon</td><td>GDPR 6. cikk (1) b), illetve f)</td><td>legfeljebb 1 év</td></tr>
-        <tr><td><strong>Ügyfélkapcsolati nyilvántartás</strong> (érdeklődők követése)</td><td>a fenti kapcsolati és ajánlatkérési adatok, az érdeklődés forrása (pl. kampány, hirdetés)</td><td>GDPR 6. cikk (1) f) — jogos érdek az ajánlatok nyomon követésére</td><td>az adott cél megőrzési idejéig</td></tr>
-        <tr><td><strong>Weboldal működése, biztonság</strong></td><td>IP-cím, böngésző típusa, időpont, technikai naplók</td><td>GDPR 6. cikk (1) f) — biztonságos működés, visszaélések megelőzése</td><td>legfeljebb 30 nap (a tárhelyszolgáltató naplói szerint)</td></tr>
-        <tr><td><strong>Statisztika és hirdetésmérés</strong> (sütik)</td><td>süti-azonosítók, látogatott oldalak, eszközadatok, kampányazonosítók; hozzájárulás esetén a Meta felé titkosított (hash-elt) e-mail és telefonszám</td><td>GDPR 6. cikk (1) a) — hozzájárulás; Eht. 155. § (4)</td><td>a sütitáblázat szerint, illetve a hozzájárulás visszavonásáig</td></tr>
+        <tr><td><strong>Ajánlatkérés, kapcsolatfelvétel</strong> (bérlés, megvásárolható autó, egyedi rendelés, import, autókeresés, finanszírozás)</td><td>Caradvance GmbH (a BH Group Zrt. adatfeldolgozóként)</td><td>név, e-mail, telefonszám, a keresett/kiválasztott autó és konfiguráció, időtartam, km-keret, költségkeret, megjegyzés; céges ügyfélnél cégnév, adószám, közösségi adószám, székhely, kapcsolattartó</td><td>GDPR 6. cikk (1) b) — a szerződéskötést megelőzően, az Ön kérésére tett lépések</td><td>az utolsó kapcsolatfelvételtől számított 1 év, ha nem jön létre szerződés</td></tr>
+        <tr><td><strong>Autó eladása, bizományos értékesítés</strong></td><td>Caradvance GmbH</td><td>a fentieken túl: az autó adatai (márka, modell, évjárat, km, állapot), kért ár, feltöltött fotók, a választott jótékonysági szervezet</td><td>GDPR 6. cikk (1) b)</td><td>szerződés hiányában 1 év; szerződés esetén lásd lent</td></tr>
+        <tr><td><strong>Szerződés megkötése és teljesítése</strong> (bérlés, adásvétel, bizomány)</td><td>Caradvance GmbH</td><td>személyazonosító és lakcímadatok, jogosítvány- és okmányadatok, számlázási adatok, a jármű adatai, kaució és fizetési adatok</td><td>GDPR 6. cikk (1) b); igényérvényesítésre 6. cikk (1) f)</td><td>a szerződés megszűnésétől számított 3 év (BGB 195. §), igényérvényesítés esetén annak lezárásáig</td></tr>
+        <tr><td><strong>Szállítás, papírmunka, honosítás és forgalomba helyezés</strong></td><td>BH Group Zrt.</td><td>név, lakcím, okmányadatok, a jármű adatai és dokumentumai, a hatósági eljáráshoz szükséges adatok</td><td>GDPR 6. cikk (1) b), illetve c) — hatósági eljárás</td><td>az ügy lezárásától számított 5 év (Ptk. 6:22. §)</td></tr>
+        <tr><td><strong>Számlázás, könyvelés</strong></td><td>a számlát kiállító társaság</td><td>számlán szereplő adatok</td><td>GDPR 6. cikk (1) c) — Caradvance GmbH: HGB 257. §, AO 147. §; BH Group Zrt.: Számviteli tv. 169. §</td><td>a vonatkozó előírás szerint 8–10 év</td></tr>
+        <tr><td><strong>Telefonos, e-mailes és WhatsApp kapcsolattartás</strong></td><td>Caradvance GmbH (a BH Group Zrt. adatfeldolgozóként)</td><td>név, telefonszám, e-mail, az üzenetek tartalma</td><td>GDPR 6. cikk (1) b), illetve f) — az érdeklődés megválaszolása</td><td>az ügy lezárásától számított 1 év</td></tr>
+        <tr><td><strong>Chat-asszisztens</strong> a weboldalon</td><td>Caradvance GmbH (a BH Group Zrt. adatfeldolgozóként)</td><td>a beírt üzenetek; ha érdeklődést küld: név, e-mail, telefon</td><td>GDPR 6. cikk (1) b), illetve f)</td><td>legfeljebb 1 év</td></tr>
+        <tr><td><strong>Weboldal működése, biztonság</strong></td><td>Caradvance GmbH (a BH Group Zrt. adatfeldolgozóként)</td><td>IP-cím, böngésző típusa, időpont, technikai naplók</td><td>GDPR 6. cikk (1) f) — biztonságos működés, visszaélések megelőzése</td><td>legfeljebb 30 nap</td></tr>
+        <tr><td><strong>Statisztika és hirdetésmérés</strong> (sütik)</td><td>Caradvance GmbH (a BH Group Zrt. adatfeldolgozóként)</td><td>süti-azonosítók, látogatott oldalak, eszközadatok, kampányazonosítók; hozzájárulás esetén a Meta felé titkosított (hash-elt) e-mail és telefonszám</td><td>GDPR 6. cikk (1) a) — hozzájárulás; TDDDG 25. §</td><td>a sütitáblázat szerint, illetve a hozzájárulás visszavonásáig</td></tr>
       </tbody>
     </table></div>
     <p>Az adatok megadása önkéntes, de ajánlatot vagy szerződést nélkülük nem tudunk adni. 16 év alatti személy adatait nem kezeljük tudatosan; szerződést kizárólag nagykorú személlyel kötünk.</p>
 
     <h2 id="urlapok">4. Űrlapok és ajánlatkérés</h2>
-    <p>Az oldal űrlapjain (bérlés, egyedi autó rendelés, autókeresés, autó eladása, chat-érdeklődés) elküldött adatokat biztonságos kapcsolaton fogadjuk, belső e-mailben továbbítjuk kollégáinknak, és ügyfélnyilvántartásunkban rögzítjük. Az űrlap elküldésekor e-mailben visszaigazolást küldünk.</p>
+    <p>Az oldal űrlapjain (bérlés, egyedi autó rendelés, autókeresés, autó eladása, chat-érdeklődés) elküldött adatokat a BH Group Zrt. biztonságos kapcsolaton fogadja, belső e-mailben továbbítja a kollégáknak, rögzíti az ügyfélnyilvántartásban, és az ajánlat elkészítéséhez megosztja a Caradvance GmbH-val. Az űrlap elküldésekor e-mailben visszaigazolást küldünk.</p>
     <p>Az űrlapok alján lévő jelölőnégyzet bejelölésével Ön megerősíti, hogy ezt a tájékoztatót és az <a href="/aszf/">ÁSZF</a>-et megismerte. Az ajánlatkérés nem kötelező érvényű, és nem jelent szerződéskötést.</p>
-    <p>Az <strong>egyedi konfigurátor</strong> „Ajánlatkérés” gombja a saját levelezőprogramját nyitja meg; ilyenkor az adatok csak akkor jutnak el hozzánk, ha a levelet Ön elküldi.</p>
 
     <h2 id="cookie">5. Sütik (cookie-k)</h2>
     <p>A süti egy kis adatfájl, amelyet a böngésző tárol. A működéshez szükséges sütiken kívül statisztikai és marketing sütit <strong>csak az Ön hozzájárulásával</strong> használunk (Google Consent Mode v2: hozzájárulás nélkül ezek a szolgáltatások nem tárolnak sütit). Döntését bármikor megváltoztathatja:</p>
@@ -83,22 +88,24 @@ const toc = [
     <p>Beágyazott YouTube-videó lejátszásakor a YouTube (Google) saját sütiket helyezhet el; ahol lehetséges, a sütimentes (youtube-nocookie.com) módot használjuk. A böngészője beállításaiban a sütiket bármikor törölheti vagy letilthatja; ez a szükséges sütik esetén az oldal egyes funkcióit korlátozhatja.</p>
 
     <h2 id="feldolgozok">6. Adatfeldolgozók és címzettek</h2>
-    <p>Az alábbi szolgáltatók a megbízásunkból, utasításaink szerint kezelik az adatokat (adatfeldolgozók):</p>
+    <p>Az alábbi szolgáltatók megbízásunkból, utasításaink szerint kezelik az adatokat (adatfeldolgozók):</p>
     <div class="lg-tw"><table>
       <thead><tr><th>Szolgáltató</th><th>Feladat</th><th>Helye</th></tr></thead>
       <tbody>
+        <tr><td>BH Group Zrt. — 4143 Vekerd, Petőfi utca 23.</td><td>a weboldal üzemeltetése, ajánlatkérések fogadása, ügyfélkapcsolat (a Caradvance GmbH megbízásából)</td><td>Magyarország</td></tr>
         <tr><td>Cloudflare, Inc. — 101 Townsend St., San Francisco, CA 94107, USA</td><td>tárhely, űrlapfogadás, chat-asszisztens futtatása, biztonsági szűrés</td><td>EU / USA</td></tr>
         <tr><td>Google Ireland Ltd. — Gordon House, Barrow Street, Dublin 4, Írország</td><td>e-mail és dokumentumkezelés (Google Workspace), Google Analytics, Google Ads</td><td>EU / USA</td></tr>
+        <tr><td>Microsoft Ireland Operations Ltd. — One Microsoft Place, Leopardstown, Dublin 18, Írország</td><td>e-mail (Outlook / Microsoft 365)</td><td>EU / USA</td></tr>
         <tr><td>Notion Labs, Inc. — 2300 Harrison St., San Francisco, CA 94110, USA</td><td>ügyfélnyilvántartás (érdeklődők kezelése)</td><td>USA</td></tr>
         <tr><td>Resend (resend.com)</td><td>értesítő és visszaigazoló e-mailek kiküldése</td><td>USA</td></tr>
         <tr><td>Meta Platforms Ireland Ltd. — Merrion Road, Dublin 4, D04 X2K5, Írország</td><td>Meta Pixel és Conversions API (csak hozzájárulással), WhatsApp üzenetek</td><td>EU / USA</td></tr>
         <tr><td>A chat-asszisztenshez használt nyelvi modell szolgáltatója</td><td>a chatben beírt kérdések megválaszolása</td><td>EU / USA</td></tr>
       </tbody>
     </table></div>
-    <p>Címzettek, akik a szerződés teljesítéséhez önálló adatkezelőként kapják meg az adatokat (csak a szükséges mértékben): a <strong>Caradvance GmbH</strong> (Németország), az Ön által választott finanszírozó vagy lízingtársaság, biztosító, szállítmányozó, valamint a honosításban és forgalomba helyezésben eljáró hatóságok és szolgáltatók. Jogszabály alapján hatóságok és bíróságok részére is továbbíthatunk adatot. Adatait nem adjuk el, és harmadik félnek marketingcélra nem adjuk át.</p>
+    <p>Címzettek, akik önálló adatkezelőként kapják meg az adatokat (csak a szükséges mértékben): az Ön által választott finanszírozó vagy lízingtársaság, biztosító, szállítmányozó, valamint a honosításban és forgalomba helyezésben eljáró hatóságok és szolgáltatók. Jogszabály alapján hatóságok és bíróságok részére is továbbíthatunk adatot. Adatait nem adjuk el, és harmadik félnek marketingcélra nem adjuk át.</p>
 
     <h2 id="harmadik-orszag">7. Adattovábbítás az EU-n kívülre</h2>
-    <p>Egyes szolgáltatóink (Cloudflare, Google, Notion, Resend, Meta) az Amerikai Egyesült Államokban is kezelhetnek adatot. Az adattovábbítás az EU–USA adatvédelmi keretrendszer (Data Privacy Framework) szerinti megfelelőségi határozaton, ennek hiányában az Európai Bizottság általános szerződési feltételein (GDPR 46. cikk) alapul.</p>
+    <p>Egyes szolgáltatóink (Cloudflare, Google, Microsoft, Notion, Resend, Meta) az Amerikai Egyesült Államokban is kezelhetnek adatot. Az adattovábbítás az EU–USA adatvédelmi keretrendszer (Data Privacy Framework) szerinti megfelelőségi határozaton, ennek hiányában az Európai Bizottság általános szerződési feltételein (GDPR 46. cikk) alapul.</p>
 
     <h2 id="biztonsag">8. Adatbiztonság</h2>
     <p>Az adatokat titkosított (HTTPS) kapcsolaton fogadjuk, hozzáférésüket a munkájukhoz szükséges munkatársakra korlátozzuk, és a szolgáltatóinktól is megfelelő technikai és szervezési intézkedéseket várunk el. Adatvédelmi incidens esetén a GDPR 33–34. cikke szerint járunk el.</p>
@@ -113,18 +120,15 @@ const toc = [
       <li><strong>Tiltakozás</strong> (21. cikk): tiltakozhat a jogos érdeken alapuló adatkezelés ellen.</li>
       <li><strong>Hozzájárulás visszavonása</strong>: a sütikhez adott hozzájárulását bármikor visszavonhatja a <button type="button" class="lg-btn" style="padding:3px 10px;font-size:13px" onclick="window.CAConsent&&window.CAConsent.open()">süti-beállításokban</button>; ez a korábbi adatkezelés jogszerűségét nem érinti.</li>
     </ul>
-    <p>Kérelmét a <a href="mailto:info@caradvance.hu">info@caradvance.hu</a> címre küldheti. Legkésőbb egy hónapon belül válaszolunk (GDPR 12. cikk); ez indokolt esetben további két hónappal meghosszabbítható, amiről értesítjük.</p>
+    <p>Kérelmét a <a href="mailto:info@caradvance.hu">info@caradvance.hu</a> vagy az <a href="mailto:info@caradvance.de">info@caradvance.de</a> címre küldheti. Legkésőbb egy hónapon belül válaszolunk (GDPR 12. cikk); ez indokolt esetben további két hónappal meghosszabbítható, amiről értesítjük.</p>
 
     <h2 id="jogorvoslat">10. Panasz és jogorvoslat</h2>
-    <p>Ha úgy érzi, hogy adatait jogsértő módon kezeltük, kérjük, először írjon nekünk — igyekszünk gyorsan orvosolni a problémát. Ezen túl panaszt tehet a felügyeleti hatóságnál:</p>
+    <p>Ha úgy érzi, hogy adatait jogsértő módon kezeltük, kérjük, először írjon nekünk — igyekszünk gyorsan orvosolni a problémát. Panaszt tehet a lakóhelye szerinti vagy az adatkezelő székhelye szerinti felügyeleti hatóságnál (GDPR 77. cikk):</p>
     <dl>
-      <dt>Hatóság</dt><dd>Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH)</dd>
-      <dt>Cím</dt><dd>1055 Budapest, Falk Miksa utca 9–11.</dd>
-      <dt>Postacím</dt><dd>1363 Budapest, Pf. 9.</dd>
-      <dt>Telefon</dt><dd>+36 1 391 1400</dd>
-      <dt>E-mail, web</dt><dd><a href="mailto:ugyfelszolgalat@naih.hu">ugyfelszolgalat@naih.hu</a> · <a href="https://www.naih.hu" target="_blank" rel="noopener">www.naih.hu</a></dd>
+      <dt>Magyarország</dt><dd>Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH) — 1055 Budapest, Falk Miksa utca 9–11.; postacím: 1363 Budapest, Pf. 9.; +36 1 391 1400; <a href="mailto:ugyfelszolgalat@naih.hu">ugyfelszolgalat@naih.hu</a>; <a href="https://www.naih.hu" target="_blank" rel="noopener">www.naih.hu</a></dd>
+      <dt>Németország (a Caradvance GmbH felügyeleti hatósága)</dt><dd>Bayerisches Landesamt für Datenschutzaufsicht (BayLDA) — Promenade 18, 91522 Ansbach; <a href="https://www.lda.bayern.de" target="_blank" rel="noopener">www.lda.bayern.de</a></dd>
     </dl>
-    <p>Jogainak megsértése esetén bírósághoz is fordulhat; a pert — választása szerint — a lakóhelye vagy tartózkodási helye szerint illetékes törvényszék előtt is megindíthatja (Infotv. 23. §).</p>
+    <p>Jogainak megsértése esetén bírósághoz is fordulhat; a pert a lakóhelye szerinti bíróság előtt is megindíthatja (GDPR 79. cikk).</p>
 
     <h2 id="modositas">11. A tájékoztató módosítása</h2>
     <p>Ezt a tájékoztatót a szolgáltatások vagy a jogszabályok változása esetén frissítjük; az aktuális változat mindig ezen az oldalon érhető el. Hatályos: 2026. október 1-jétől.</p>

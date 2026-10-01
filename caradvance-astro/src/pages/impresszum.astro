@@ -4,36 +4,42 @@ import LegalPage from '../components/LegalPage.astro';
 const lang = 'hu';
 const org = {
   '@context': 'https://schema.org', '@type': 'Organization',
-  name: 'BH Group Zrt.', alternateName: 'Caradvance Hungary', url: 'https://www.caradvance.hu/',
-  email: 'info@caradvance.hu', telephone: '+36 30 233 6060', taxID: '32488447-2-09',
-  address: { '@type': 'PostalAddress', streetAddress: 'Petőfi utca 23.', postalCode: '4143', addressLocality: 'Vekerd', addressCountry: 'HU' },
+  name: 'Caradvance GmbH', url: 'https://www.caradvance.hu/', email: 'info@caradvance.de', telephone: '+49 89 1894141-0',
+  vatID: 'DE232664616', foundingDate: '2003',
+  address: { '@type': 'PostalAddress', streetAddress: 'Mitterfeldstr. 2', postalCode: '82054', addressLocality: 'Sauerlach', addressCountry: 'DE' },
+  subOrganization: {
+    '@type': 'Organization', name: 'BH Group Zrt.', alternateName: 'Caradvance Hungary', taxID: '32488447-2-09',
+    email: 'info@caradvance.hu', telephone: '+36 30 233 6060',
+    address: { '@type': 'PostalAddress', streetAddress: 'Petőfi utca 23.', postalCode: '4143', addressLocality: 'Vekerd', addressCountry: 'HU' },
+  },
 };
 ---
-<Base lang={lang} path="/impresszum" title="Impresszum — CarAdvance (BH Group Zrt.)" description="A caradvance.hu üzemeltetőjének adatai: BH Group Zrt., Cg. 09-10-000660, adószám 32488447-2-09, iroda: 2083 Solymár, Ibolya utca 18. Tárhelyszolgáltató: Cloudflare, Inc.">
+<Base lang={lang} path="/impresszum" title="Impresszum — CarAdvance (Caradvance GmbH)" description="Szolgáltató: Caradvance GmbH (Sauerlach, Amtsgericht München HRB 151009). Magyarországi képviselet: BH Group Zrt., iroda: 2083 Solymár, Ibolya utca 18. Tárhely: Cloudflare, Inc.">
   <script type="application/ld+json" set:html={JSON.stringify(org)} />
   <LegalPage title="Impresszum">
-    <h2>A weboldal üzemeltetője</h2>
-    <dl>
-      <dt>Cégnév</dt><dd>BH Group Zártkörűen Működő Részvénytársaság (BH Group Zrt.)</dd>
-      <dt>Márkanév</dt><dd>Caradvance Hungary / CarAdvance</dd>
-      <dt>Székhely</dt><dd>4143 Vekerd, Petőfi utca 23.</dd>
-      <dt>Iroda, ügyfélfogadás</dt><dd>2083 Solymár, Ibolya utca 18. — hétfőtől péntekig 9:00–17:00</dd>
-      <dt>Cégjegyzékszám</dt><dd>09-10-000660</dd>
-      <dt>Nyilvántartó cégbíróság</dt><dd>Debreceni Törvényszék Cégbírósága</dd>
-      <dt>Adószám</dt><dd>32488447-2-09</dd>
-      <dt>E-mail</dt><dd><a href="mailto:info@caradvance.hu">info@caradvance.hu</a></dd>
-      <dt>Telefon</dt><dd><a href="tel:+36302336060">+36 30 233 6060</a></dd>
-      <dt>Weboldal</dt><dd><a href="https://www.caradvance.hu/">www.caradvance.hu</a></dd>
-    </dl>
-
-    <h2>Német partner</h2>
-    <p>A bérlési és értékesítési szerződések jelentős része közvetlenül a német partnerrel jön létre; ilyenkor a szerződő fél:</p>
+    <h2>Szolgáltató</h2>
+    <p>A weboldalon kínált autók eladója, bérbeadója és a járművekkel kapcsolatos szerződések megkötője:</p>
     <dl>
       <dt>Cégnév</dt><dd>Caradvance GmbH</dd>
       <dt>Székhely</dt><dd>Mitterfeldstr. 2, 82054 Sauerlach, Németország</dd>
       <dt>Cégjegyzék</dt><dd>Amtsgericht München, HRB 151009</dd>
+      <dt>Közösségi adószám (USt-IdNr.)</dt><dd>DE232664616</dd>
+      <dt>Ügyvezetők</dt><dd>Peter van den Berg, Dr. Alexander Röther</dd>
+      <dt>Telefon</dt><dd><a href="tel:+498918941410">+49 89 1894141-0</a></dd>
+      <dt>E-mail</dt><dd><a href="mailto:info@caradvance.de">info@caradvance.de</a></dd>
     </dl>
-    <p>Hogy egy adott ügyletben ki a szerződő fél, azt minden esetben az ajánlat és a szerződés tartalmazza.</p>
+
+    <h2>Magyarországi képviselet és a weboldal üzemeltetője</h2>
+    <dl>
+      <dt>Cégnév</dt><dd>BH Group Zártkörűen Működő Részvénytársaság (BH Group Zrt.) — Caradvance Hungary</dd>
+      <dt>Székhely</dt><dd>4143 Vekerd, Petőfi utca 23.</dd>
+      <dt>Iroda, ügyfélfogadás</dt><dd>2083 Solymár, Ibolya utca 18. — hétfőtől péntekig 9:00–17:00</dd>
+      <dt>Cégjegyzékszám</dt><dd>09-10-000660 (Debreceni Törvényszék Cégbírósága)</dd>
+      <dt>Adószám</dt><dd>32488447-2-09</dd>
+      <dt>Telefon</dt><dd><a href="tel:+36302336060">+36 30 233 6060</a></dd>
+      <dt>E-mail</dt><dd><a href="mailto:info@caradvance.hu">info@caradvance.hu</a></dd>
+    </dl>
+    <p>A BH Group Zrt. a Caradvance GmbH magyarországi képviselője: üzemelteti ezt a weboldalt, fogadja az érdeklődéseket, magyar nyelven tartja a kapcsolatot az ügyfelekkel, intézi a papírmunkát, a jármű Németországból Magyarországra szállítását, és segít a forgalomba helyezésben. A járművek adásvételével és bérlésével kapcsolatos szerződések minden esetben a Caradvance GmbH-val jönnek létre.</p>
 
     <h2>Tárhelyszolgáltató</h2>
     <dl>
@@ -43,7 +49,7 @@ const org = {
     </dl>
 
     <h2>Szerzői jog</h2>
-    <p>A weboldal szövegei, grafikai elemei és saját készítésű fotói a BH Group Zrt. szellemi tulajdonát képezik; előzetes írásbeli engedély nélkül nem másolhatók és nem terjeszthetők. A gyártói sajtófotók és márkajelzések a jogtulajdonosok (pl. BMW AG, Mercedes-Benz AG, AUDI AG) tulajdonai, azokat kizárólag tájékoztató céllal használjuk.</p>
+    <p>A weboldal szövegei, grafikai elemei és saját készítésű fotói a Caradvance GmbH és a BH Group Zrt. szellemi tulajdonát képezik; előzetes írásbeli engedély nélkül nem másolhatók és nem terjeszthetők. A gyártói sajtófotók és márkajelzések a jogtulajdonosok (pl. BMW AG, Mercedes-Benz AG, AUDI AG) tulajdonai, azokat kizárólag tájékoztató céllal használjuk.</p>
 
     <h2>Kapcsolódó dokumentumok</h2>
     <ul>
