@@ -231,6 +231,7 @@ const faqJsonld = {
           <label class="sf-field"><span>Székhely / város <small style="font-weight:600;color:var(--muted)">(opc.)</small></span><input id="b-caddr" type="text" placeholder="Irányítószám, város" /></label>
         </div>
 
+        <label class="ca-consent"><input type="checkbox" name="consent" id="kwConsent" required /><span>Elolvastam és elfogadom az <a href="/aszf/" target="_blank" rel="noopener">ÁSZF</a>-et és az <a href="/adatkezeles/" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
         <p class="kw-note" style="margin-top:16px">Az adatok elküldésével felveszed velünk a kapcsolatot — a keresés ingyenes és nem kötelez semmire.</p>
       </div>
 
@@ -243,6 +244,7 @@ const faqJsonld = {
       </div>
     </form>
   </div>
+<style>.ca-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45;cursor:pointer;margin:14px 0 4px;color:inherit;text-align:left}.ca-consent input{width:18px;height:18px;accent-color:#E2001A;flex:0 0 auto;margin:1px 0 0}.ca-consent a{color:#E2001A;font-weight:700}.ca-consent.err span{color:#E2001A}</style>
 </section>
 
 <style>
@@ -580,6 +582,7 @@ const faqJsonld = {
   form.addEventListener('submit', function(e){
     e.preventDefault();
     if(!validateStep()) return;
+    var kc=document.getElementById('kwConsent'); if(kc&&!kc.checked){ kc.closest('label').classList.add('err'); kc.focus(); alert('Kérlek fogadd el az ÁSZF-et és az adatkezelési tájékoztatót.'); return; }
     var comp = radioVal('who')==='Cég';
     var yrs = (val('b-year-from')||val('b-year-to')) ? ((val('b-year-from')||'?')+' – '+(val('b-year-to')||'?')) : '';
     var kms = (val('b-km-from')||val('b-km-to')) ? ((val('b-km-from')||'0')+' – '+(val('b-km-to')||'?')+' km') : '';
@@ -593,7 +596,8 @@ const faqJsonld = {
       ['Vásárlás módja (ÁFA)', radioVal('vat')],
       ['Fizetés', radioVal('pay')], ['Finanszírozás konstrukció', val('b-fin-type')], ['Futamidő (hó)', val('b-fin-term')],
       ['Önerő', val('b-fin-down')], ['Havi keret', val('b-fin-monthly')],
-      ['Vásárló típusa', radioVal('who')]
+      ['Vásárló típusa', radioVal('who')],
+      ['Adatkezelés', 'ÁSZF és adatkezelési tájékoztató elfogadva']
     ];
     if(comp){
       rows.push(['Cégnév', val('b-cname')], ['Adószám', val('b-tax')], ['Közösségi (EU) adószám', val('b-euvat')], ['Kapcsolattartó', val('b-contact')], ['E-mail', val('b-cemail')], ['Telefon', val('b-cphone')], ['Székhely', val('b-caddr')]);

@@ -274,12 +274,14 @@ const serviceJsonld = {
         <label class="sf-field"><span>Telefonszám</span><input id="f-phone" type="tel" placeholder="+36 …" /></label>
       </div>
 
+      <label class="ca-consent"><input type="checkbox" name="consent" id="sellConsent" required /><span>Elolvastam és elfogadom az <a href="/aszf/" target="_blank" rel="noopener">ÁSZF</a>-et és az <a href="/adatkezeles/" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
       <div class="sf-submit-row">
         <button type="submit" class="btn btn-primary" id="sellSubmit">Elküldöm az adatokat →</button>
         <span class="sf-submit-note">Kötelezettségmentes. Hamarosan jelentkezünk az ársávval.</span>
       </div>
     </form>
   </div>
+<style>.ca-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45;cursor:pointer;margin:14px 0 4px;color:inherit;text-align:left}.ca-consent input{width:18px;height:18px;accent-color:#E2001A;flex:0 0 auto;margin:1px 0 0}.ca-consent a{color:#E2001A;font-weight:700}.ca-consent.err span{color:#E2001A}</style>
 </section>
 
 <!-- ÍGY DOLGOZUNK + DÍJSZABÁS -->
@@ -825,7 +827,7 @@ const serviceJsonld = {
   if(!CFG.SELL_ENDPOINT) return;
   form.addEventListener("submit", function(e){
     e.preventDefault(); e.stopImmediatePropagation();
-    var LBL={"f-make":"Márka","f-model":"Modell","f-type":"Típusjel","f-year":"Évjárat","f-km":"Futásteljesítmény (km)","f-fuel":"Üzemanyag","f-color":"Szín","f-cond":"Állapot","f-notes":"Megjegyzés","f-price":"Kért ár (Ft)","f-flex":"Ár rugalmassága","f-urgency":"Sürgősség","f-ngo":"Támogatott szervezet","f-name":"Név","f-email":"E-mail","f-phone":"Telefon"}; var data={"Típus":"Autó eladás (bizományos)"}; Object.keys(LBL).forEach(function(id){var el=document.getElementById(id); if(el&&String(el.value||"").trim()) data[LBL[id]]=String(el.value).trim();});
+    var LBL={"f-make":"Márka","f-model":"Modell","f-type":"Típusjel","f-year":"Évjárat","f-km":"Futásteljesítmény (km)","f-fuel":"Üzemanyag","f-color":"Szín","f-cond":"Állapot","f-notes":"Megjegyzés","f-price":"Kért ár (Ft)","f-flex":"Ár rugalmassága","f-urgency":"Sürgősség","f-ngo":"Támogatott szervezet","f-name":"Név","f-email":"E-mail","f-phone":"Telefon"}; var cb=document.getElementById("sellConsent"); if(cb&&!cb.checked){ cb.closest("label").classList.add("err"); cb.focus(); alert("Kérlek fogadd el az ÁSZF-et és az adatkezelési tájékoztatót."); return; } var data={"Típus":"Autó eladás (bizományos)","Adatkezelés":"ÁSZF és adatkezelési tájékoztató elfogadva ("+new Date().toISOString()+")"}; Object.keys(LBL).forEach(function(id){var el=document.getElementById(id); if(el&&String(el.value||"").trim()) data[LBL[id]]=String(el.value).trim();});
     var q=files.slice(), photos=[];
     function nx(){ if(!q.length){ send(); return; } var f=q.shift(); var r=new FileReader(); r.onload=function(){ photos.push({name:f.name,type:f.type,b64:String(r.result).split(",")[1]}); nx(); }; r.readAsDataURL(f); }
     function send(){ var btn=form.querySelector("[type=submit]"); if(btn){btn.disabled=true;btn.dataset.t=btn.textContent;btn.textContent="Küldés…";}

@@ -442,7 +442,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
             <label class="egl-radio"><input type="radio" name="financing" value="Saját finanszírozás" /><span>Saját finanszírozásom van</span></label>
           </div>
         </div>
-        <label class="egl-consent"><input type="checkbox" name="consent" id="eglConsent" /><span>Elfogadom az <a href="/adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
+        <label class="egl-consent"><input type="checkbox" name="consent" id="eglConsent" /><span>Elolvastam és elfogadom az <a href="/aszf/" target="_blank" rel="noopener">ÁSZF</a>-et és az <a href="/adatkezeles/" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
         <div class="egl-fmsg" id="eglOrderMsg"></div>
         <button type="submit" class="egl-fsubmit">Rendelés elküldése</button>
         <p class="egl-fnote">Az elküldés nem végleges megrendelés — felvesszük veled a kapcsolatot a részletekhez.</p>
@@ -506,7 +506,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       var payment=fd.get('payment');
       if(!payment){ showMsg('err','Kérlek válaszd ki a fizetés módját.'); return; }
       if(payment==='Finanszírozással'&&!fd.get('financing')){ showMsg('err','Kérlek válaszd ki a finanszírozás módját.'); return; }
-      if(!fd.get('consent')){ showMsg('err','Kérlek fogadd el az adatkezelési tájékoztatót.'); return; }
+      if(!fd.get('consent')){ showMsg('err','Kérlek fogadd el az ÁSZF-et és az adatkezelési tájékoztatót.'); return; }
       var btn=oForm.querySelector('.egl-fsubmit'); btn.disabled=true; btn.textContent='Küldés…';
       var P={'Típus':'Egyedi rendelés','Autó':fd.get('car')||'','Üzemanyag':fd.get('fuel')||'','Vásárló':buyer||'','Cégnév':company,'Adószám':(fd.get('taxid')||'').trim(),'Vásárlás módja':mode||'','Fizetés':payment||'','Finanszírozás':fd.get('financing')||'','Vezetéknév':last,'Keresztnév':first,'Név':name,'Telefon':(fd.get('phone')||'').trim(),'E-mail':email,'Megjegyzés':(fd.get('message')||'').trim(),'Ár (tájékoztató)':(document.getElementById('eglOrderPrice')||{}).textContent||'','page':location.href};
       try{ if(window.caLeadExtras) Object.assign(P, window.caLeadExtras()); }catch(_e){}

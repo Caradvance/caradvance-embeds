@@ -1,0 +1,82 @@
+---
+/* Közös keret a jogi oldalakhoz (Adatkezelési tájékoztató, ÁSZF, Impresszum). */
+const { title, kicker = 'Jogi információk', updated = '2026. október 1.', toc = [] } = Astro.props as {
+  title: string; kicker?: string; updated?: string; toc?: { id: string; t: string }[];
+};
+const links = [
+  { href: '/adatkezeles/', t: 'Adatkezelési tájékoztató' },
+  { href: '/aszf/', t: 'ÁSZF' },
+  { href: '/impresszum/', t: 'Impresszum' },
+];
+const here = Astro.url.pathname.replace(/\/?$/, '/');
+---
+<div class="lg">
+  <header class="lg-hero">
+    <div class="lg-hero-in">
+      <div class="lg-kicker">{kicker}</div>
+      <h1>{title}</h1>
+      <p class="lg-upd">Hatályos: {updated}</p>
+      <nav class="lg-tabs" aria-label="Jogi dokumentumok">
+        {links.map((l) => <a href={l.href} class={here === l.href ? 'on' : ''} aria-current={here === l.href ? 'page' : undefined}>{l.t}</a>)}
+      </nav>
+    </div>
+  </header>
+  <div class="lg-body">
+    {toc.length > 0 && (
+      <aside class="lg-toc">
+        <div class="lg-toc-t">Tartalom</div>
+        <ol>{toc.map((x) => <li><a href={'#' + x.id}>{x.t}</a></li>)}</ol>
+      </aside>
+    )}
+    <article class="lg-doc">
+      <slot />
+    </article>
+  </div>
+</div>
+
+<style is:global>
+  .lg{background:var(--page,#F4F5F7);color:var(--ink,#14151A);font-family:var(--font,system-ui)}
+  .lg-hero{background:linear-gradient(135deg,#0B0B0D 0%,#1b1d24 100%);color:#fff;padding:calc(var(--navh,80px) + 48px) 24px 40px}
+  .lg-hero-in{max-width:1100px;margin:0 auto}
+  .lg-kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#E2001A;font-weight:800;margin-bottom:10px}
+  .lg-hero h1{font-size:clamp(30px,4.4vw,46px);line-height:1.1;margin:0 0 10px;font-weight:800}
+  .lg-upd{margin:0 0 22px;color:#aab1bf;font-size:14px}
+  .lg-tabs{display:flex;flex-wrap:wrap;gap:8px}
+  .lg-tabs a{color:#fff;text-decoration:none;font-size:14px;font-weight:700;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.22)}
+  .lg-tabs a:hover{border-color:#fff}
+  .lg-tabs a.on{background:#E2001A;border-color:#E2001A}
+  .lg-body{max-width:1100px;margin:0 auto;padding:40px 24px 72px;display:grid;grid-template-columns:260px 1fr;gap:32px;align-items:start}
+  .lg-body:not(:has(.lg-toc)){grid-template-columns:1fr;max-width:860px}
+  .lg-toc{position:sticky;top:calc(var(--navh,80px) + 20px);background:#fff;border:1px solid var(--line,#E6EAF1);border-radius:14px;padding:18px 18px 12px;font-size:14px}
+  .lg-toc-t{font-weight:800;margin-bottom:8px}
+  .lg-toc ol{margin:0;padding-left:20px}
+  .lg-toc li{margin:0 0 7px}
+  .lg-toc a{color:var(--muted,#5A6B82);text-decoration:none}
+  .lg-toc a:hover{color:#E2001A}
+  .lg-doc{background:#fff;border:1px solid var(--line,#E6EAF1);border-radius:16px;padding:36px 40px;font-size:15.5px;line-height:1.7}
+  .lg-doc h2{font-size:22px;margin:34px 0 10px;scroll-margin-top:calc(var(--navh,80px) + 20px)}
+  .lg-doc h2:first-child{margin-top:0}
+  .lg-doc h3{font-size:17px;margin:22px 0 6px}
+  .lg-doc p{margin:0 0 12px}
+  .lg-doc ul,.lg-doc ol{margin:0 0 14px;padding-left:22px}
+  .lg-doc li{margin:0 0 6px}
+  .lg-doc a{color:#E2001A;font-weight:600}
+  .lg-doc .lg-box{background:#F7F8FA;border:1px solid var(--line,#E6EAF1);border-radius:12px;padding:16px 20px;margin:0 0 16px}
+  .lg-doc .lg-box p:last-child{margin:0}
+  .lg-tw{overflow-x:auto;margin:0 0 18px;border:1px solid var(--line,#E6EAF1);border-radius:12px}
+  .lg-doc table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;min-width:640px}
+  .lg-doc th,.lg-doc td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line,#E6EAF1)}
+  .lg-doc th{background:#F7F8FA;font-weight:800}
+  .lg-doc tr:last-child td{border-bottom:0}
+  .lg-doc dl{display:grid;grid-template-columns:220px 1fr;gap:8px 18px;margin:0 0 16px}
+  .lg-doc dt{font-weight:700;color:var(--muted,#5A6B82)}
+  .lg-doc dd{margin:0}
+  .lg-btn{display:inline-block;background:#E2001A;color:#fff!important;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:800;cursor:pointer;text-decoration:none}
+  @media(max-width:860px){
+    .lg-body{grid-template-columns:1fr}
+    .lg-toc{position:static}
+    .lg-doc{padding:24px 20px}
+    .lg-doc dl{grid-template-columns:1fr;gap:2px}
+    .lg-doc dd{margin-bottom:10px}
+  }
+</style>

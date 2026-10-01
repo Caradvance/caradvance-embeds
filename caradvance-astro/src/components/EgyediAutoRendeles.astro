@@ -98,11 +98,13 @@ const { lang = 'hu' } = Astro.props;
         </div>
         <input type="email" id="ecfgEmail" placeholder="E-mail cím" required />
         <textarea id="ecfgMsg" rows="3" placeholder="Megjegyzés (opcionális)"></textarea>
+        <label class="ca-consent"><input type="checkbox" name="consent" id="ecfgConsent" required /><span>Elolvastam és elfogadom az <a href="/aszf/" target="_blank" rel="noopener">ÁSZF</a>-et és az <a href="/adatkezeles/" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
         <button type="submit" class="ecfg-btn">Ajánlatkérés elküldése</button>
         <span class="ecfg-form-note">A gombra kattintva megnyílik a leveleződ a konfiguráció részleteivel,
           címzett: info@caradvance.hu</span>
       </form>
     </div>
+<style>.ca-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45;cursor:pointer;margin:14px 0 4px;color:inherit;text-align:left}.ca-consent input{width:18px;height:18px;accent-color:#E2001A;flex:0 0 auto;margin:1px 0 0}.ca-consent a{color:#E2001A;font-weight:700}.ca-consent.err span{color:#E2001A}</style>
 
     <!-- How it works -->
     <div class="ecfg-how">
@@ -439,6 +441,7 @@ const { lang = 'hu' } = Astro.props;
     L.push('Telefon: '+phone);
     L.push('E-mail: '+email);
     if(msg) L.push('Megjegyzés: '+msg);
+    L.push('Adatkezelés: ÁSZF és adatkezelési tájékoztató elfogadva');
     var subject='Egyedi autó rendelés – '+state.model.name+' '+state.model.engines[state.engine].n;
     var body=L.join('\n');
     window.location.href='mailto:info@caradvance.hu?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
