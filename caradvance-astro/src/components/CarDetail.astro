@@ -42,7 +42,10 @@ const varMap: Record<string, any> = {};
 for (const v of model.variants) varMap[v.key] = { img: v.img, alt: v.alt, fuel: v.fuel, power: v.power, torque: v.torque, drive: v.drive, accel: v.accel, vmax: v.vmax, cons: v.cons, boot: v.boot, rent: (v as any).rentTxt || '' };
 
 // összehasonlító tábla a változókból
-const cmpShort = model.variants.map((v) => v.label.replace(/^BMW\s*/, '').replace(/\s*\(.*\)/, ''));
+const AZ = (x: string) => (/^[AEIOUÁÉÍÓÖŐÚÜŰ]/i.test(String(x).trim()) ? 'az' : 'a');
+const AZC = (x: string) => (AZ(x) === 'az' ? 'Az' : 'A');
+const cmpBrand = /^Mercedes-AMG/.test(model.variants[0] ? model.variants[0].label : '') ? 'Mercedes-AMG' : model.brand;
+const cmpShort = model.variants.map((v) => v.label.replace(/^(BMW|Audi|MINI|Mercedes-AMG|Mercedes-Benz)\s*/, '').replace(/\s*\(.*\)/, ''));
 const cmpHead = model.variants.map((v) => v.label.replace(/\s*\(.*\)/, ''));
 const cmpRows = [
   ['Üzemanyag', ...model.variants.map((v) => v.fuel)],
@@ -186,7 +189,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <!-- ===== HIGHLIGHTS ===== -->
   <section class="cd-sec cd-soft" id="elonyok">
     <div class="cd-w">
-      <span class="cd-eyebrow">Miért a {model.name}</span>
+      <span class="cd-eyebrow">Miért {AZ(model.name)} {model.name}</span>
       <h2 class="cd-h2">Amiért szeretni fogod</h2>
       <div class="cd-hl">
         {model.highlights.map((h) => (
@@ -278,7 +281,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <section class="cd-sec">
     <div class="cd-w">
       <span class="cd-eyebrow">Összehasonlítás</span>
-      <h2 class="cd-h2">{isRent ? model.name + ' változatok összehasonlítása' : model.brand + ' ' + cmpShort.join(' vs ')}</h2>
+      <h2 class="cd-h2">{isRent ? model.name + ' változatok összehasonlítása' : (cmpShort.length > 1 ? cmpBrand + ' ' + cmpShort.join(' vs ') : model.name + ' műszaki adatai')}</h2>
       <div class="cd-cmpwrap">
       <table class="cd-cmp">
         <thead><tr><th>Jellemző</th>{cmpHead.map((h) => (<th>{h}</th>))}</tr></thead>
@@ -302,12 +305,12 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         <a href="/berlesi-folyamat"><h3>Hogyan működik a bérlés?</h3><p>Ajánlatkéréstől az átadásig: így zajlik a <strong>tartós autóbérlés</strong> lépésről lépésre, egyszerűen és átláthatóan.</p><span class="go">Bérlési folyamat →</span></a>
         <a href="/berles-elonyei"><h3>A tartós bérlet előnyei</h3><p>Kedvező kaució, szerviz, adó és gumi a díjban, akár félévente új modell — ezért éri meg a <strong>tartós bérlet</strong>.</p><span class="go">Bérlés előnyei →</span></a>
         <a href="/finanszirozas-lizing"><h3>Finanszírozás &amp; lízing</h3><p>Inkább lízingelnéd? Nézd meg a <strong>{model.name} lízing</strong> és finanszírozás lehetőségeit a kalkulátorral.</p><span class="go">Lízing kalkulátor →</span></a>
-        <a href={saleHref}><h3>Meg is vásárolnád?</h3><p>A {model.name} <strong>egyedi rendeléssel</strong> is a tiéd lehet Németországból — akár 19% német áfával, kulcsrakészen.</p><span class="go">Egyedi rendelés →</span></a>
+        <a href={saleHref}><h3>Meg is vásárolnád?</h3><p>{AZC(model.name)} {model.name} <strong>egyedi rendeléssel</strong> is a tiéd lehet Németországból — akár 19% német áfával, kulcsrakészen.</p><span class="go">Egyedi rendelés →</span></a>
         <a href={kapcsRent}><h3>Személyes bérlési ajánlat</h3><p>Mondd el, melyik {model.name} változat, szín és kezdési időpont érdekel — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Ajánlatot kérek →</span></a>
         </Fragment>) : (<Fragment>
-        <a href={model.rentHref || `/uj-auto-berlese?brand=${model.brandKey}`}><h3>{model.name} tartós bérlet</h3><p>Nem szeretnél venni? A {model.name} <strong>tartós bérletben</strong> is a tiéd lehet, egyetlen havi díjjal — szerviz és biztosítás beépítve.</p><span class="go">Bérlési ajánlatok →</span></a>
+        <a href={model.rentHref || `/uj-auto-berlese?brand=${model.brandKey}`}><h3>{model.name} tartós bérlet</h3><p>Nem szeretnél venni? {AZC(model.name)} {model.name} <strong>tartós bérletben</strong> is a tiéd lehet, egyetlen havi díjjal — szerviz és biztosítás beépítve.</p><span class="go">Bérlési ajánlatok →</span></a>
         <a href="/blog/auto-behozatal-nemetorszagbol"><h3>Autó behozatal Németországból</h3><p>Regisztrációs adó, áfa, honosítás, szállítás — nézd meg, hogyan zajlik a <strong>német autó behozatal</strong> lépésről lépésre.</p><span class="go">Import útmutató →</span></a>
-        <a href={brandHref}><h3>{model.brand} konfigurátor</h3><p>Állítsd össze a saját {model.brand}-det a <strong>{model.brand} konfigurátorban</strong>, a kész specifikációt pedig bízd ránk.</p><span class="go">Összes {model.brand} modell →</span></a>
+        <a href={brandHref}><h3>{model.brand} konfigurátor</h3><p>Állítsd össze a saját {model.brand}-det {AZ(model.brand)} <strong>{model.brand} konfigurátorban</strong>, a kész specifikációt pedig bízd ránk.</p><span class="go">Összes {model.brand} modell →</span></a>
         <a href="/finanszirozas-lizing"><h3>Finanszírozás &amp; lízing</h3><p>Kiszámítható havi díj: nézd meg a <strong>{model.name} lízing</strong> lehetőségeket és a kalkulátort.</p><span class="go">Lízing kalkulátor →</span></a>
         <a href="/blog/nemet-hasznaltauto-vasarlas"><h3>Német használtautó?</h3><p>Ha alig használt darabot keresel, mutatjuk, hogyan válaszd ki és ellenőrizd a <strong>német használtautót</strong>.</p><span class="go">Vásárlási tippek →</span></a>
         <a href="/kapcsolat"><h3>Személyes ajánlat</h3><p>Mondd el, milyen {model.name} modellt szeretnél — díjmentes, személyre szabott ajánlatot adunk.</p><span class="go">Kapcsolatfelvétel →</span></a>
@@ -329,7 +332,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <section class="cd-sec" id="gyik">
     <div class="cd-w cd-faqwrap">
       <span class="cd-eyebrow">GYIK</span>
-      <h2 class="cd-h2">{isRent ? 'Gyakori kérdések a ' + model.name + ' bérléséről' : 'Gyakori kérdések a ' + model.name + ' modellről'}</h2>
+      <h2 class="cd-h2">{isRent ? 'Gyakori kérdések ' + AZ(model.name) + ' ' + model.name + ' bérléséről' : 'Gyakori kérdések ' + AZ(model.name) + ' ' + model.name + ' modellről'}</h2>
       {model.faq.map((f, i) => (
         <details open={i === 0}><summary>{f.q}<span class="cd-plus">+</span></summary><p set:html={f.a}></p></details>
       ))}
