@@ -86,7 +86,7 @@ const FOOTER = `<footer class="cafoot" data-cafoot="1">
   ${COLS.map(col).join('\n  ')}
   <div class="cafoot-legal"><h4>Jogi információk</h4>${LEGAL.map(([t, u]) => `<a href="${u}">${t}</a>`).join('')}<button type="button" class="cafoot-link" onclick="if(window.CAConsent){window.CAConsent.open()}else{location.href='/adatkezeles/#cookie'}">Süti-beállítások</button></div>
 </div>
-<div class="cafoot-copy"><span>© ${YEAR} CarAdvance · BH Group Zrt.</span><span>Székhely: 4143 Vekerd, Petőfi utca 23. · Cg. 09-10-000660 · Adószám: 32488447-2-09</span></div>
+<div class="cafoot-copy"><span>© ${YEAR} Caradvance GmbH · Mitterfeldstr. 2, 82054 Sauerlach · Amtsgericht München HRB 151009 · USt-IdNr. DE232664616</span><span>Magyarországi képviselet: BH Group Zrt. · Cg. 09-10-000660 · Adószám: 32488447-2-09</span></div>
 </footer>`;
 
 const CONSENT_OLD = /Elfogadom az <a href="\/adatkezeles\/?"([^>]*)>adatkezelési tájékoztatót<\/a>\./g;
