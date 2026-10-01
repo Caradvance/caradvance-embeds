@@ -72,9 +72,9 @@ const hu: HomeContent = {
     eyebrow: 'Történetünk',
     title: 'Kik vagyunk?',
     paras: [
-      'A Caradvance a müncheni Caradvance GmbH márkája — Magyarországon a BH Group Zrt. képviseli, Caradvance Hungary néven.',
+      'A Caradvance a németországi Caradvance GmbH márkája — Magyarországon a BH Group Zrt. képviseli.',
       'A Caradvance GmbH 2003 óta a német autópiac megbízható szereplője: Geretsriedben, München közelében működő kereskedésük több mint két évtizede foglalkozik prémium használt autókkal — a mobile.de-n 5 csillagos értékeléssel.',
-      'A BH Group Zrt. kizárólag a Caradvance GmbH hivatalos magyarországi képviselete. Te egy több mint két évtizedes múltú német kereskedéssel szerződsz, mi pedig végigkísérünk itthonról: leinformált, bevizsgált autók, kulcsrakész átadás, 1 év szavatossággal.',
+      'A BH Group Zrt. a Caradvance GmbH hivatalos magyarországi képviselete: magyarul, helyben, személyesen kísérünk végig — leinformált, bevizsgált autók, kulcsrakész átadás, 1 év szavatossággal.',
     ],
   },
   values: {
@@ -105,7 +105,7 @@ const hu: HomeContent = {
       { q: 'Hogyan működik az autóimport Németországból?', a: 'Elmondod, milyen autót keresel, mi pedig a teljes német piacról ajánlunk: az autót leinformáljuk, a helyszínen bevizsgáljuk, majd intézzük a szállítást, a honosítást és a teljes papírmunkát. Az importált autókra 1 év szavatosságot vállalunk.' },
       { q: 'Milyen garanciát kapok a megvásárolt autóra?', a: 'Minden importált és eladó autónkra 1 év szavatosságot vállalunk. Minden jármű előélete ismert és dokumentált, az átadás előtt helyszíni bevizsgáláson esik át.' },
       { q: 'Hogyan tudom eladni az autómat a Caradvance-szal?', a: 'Bizományos értékesítésben teljes körűen kezeljük az eladást: profi fotókat és videót készítünk, a legnagyobb platformokon hirdetünk, és mi tárgyalunk a vevőkkel — te csak átveszed a vételárat. A jutalék egy részét magyar jótékonysági szervezeteknek ajánljuk fel.' },
-      { q: 'Hol találom a Caradvance irodáját és mikor vagytok elérhetők?', a: 'Irodánk címe: 2083 Solymár, Ibolya utca 12. — Budapesttől 15 percre. Munkaidő: hétfőtől péntekig 9:00–17:00. Telefon: +36 30 233 6060, e-mail: info@caradvance.hu.' },
+      { q: 'Hol találom az irodátokat, és mikor vagytok elérhetők?', a: 'Magyarországi irodánk a BH Group Zrt. irodája: 2083 Solymár, Ibolya utca 18. — Budapesttől 15 percre. A Caradvance GmbH-nak Magyarországon nincs irodája; itthon minden ügyet a BH Group Zrt. intéz. Munkaidő: hétfőtől péntekig 9:00–17:00. Telefon: +36 30 233 6060, e-mail: info@caradvance.hu.' },
     ],
   },
   closing: {
