@@ -100,6 +100,55 @@ const FOOTER = `<footer class="cafoot" data-cafoot="1">
 <div class="cafoot-copy"><span>© ${YEAR} Caradvance GmbH · Bgm-Graf-Ring 21, 82538 Geretsried · Amtsgericht München HRB 151009 · USt-IdNr. DE232664616</span><span>Magyarországi képviselet: BH Group Zrt. · Cg. 09-10-000660 · Adószám: 32488447-2-09</span></div>
 </footer>`;
 
+// ---- Idegen nyelvű lábléc (külföldiek Magyarországon) — a <html lang> alapján választjuk ----
+import { readFileSync } from 'node:fs';
+let IMAP = { pages: {} };
+try { IMAP = JSON.parse(readFileSync('src/i18n/intl-map.json', 'utf8')); } catch {}
+const ip = (k, l) => (IMAP.pages[k] && IMAP.pages[k][l]) || '/';
+const FT = {
+  en: { tag: 'Premium cars from Germany for people living in Hungary — long-term rental, import and registration, in English.', contact: 'Contact', home: 'CarAdvance home',
+        s: 'Services', rental: 'Long-term car rental', imp: 'Car import from Germany', reg: 'Registration tax calculator',
+        c: 'Cars', avail: 'Available cars (HU)', newc: 'New car configurator (HU)', hu: 'Magyar oldal',
+        co: 'Company', blog: 'Blog (HU)', legal: 'Legal (in Hungarian)', priv: 'Privacy notice', terms: 'Terms & conditions', imp2: 'Imprint', cookie: 'Cookie settings', rep: 'Hungarian representative' },
+  de: { tag: 'Premium-Autos aus Deutschland für Menschen in Ungarn — Langzeitmiete, Import und Zulassung, auf Deutsch.', contact: 'Kontakt', home: 'CarAdvance Startseite',
+        s: 'Leistungen', rental: 'Auto-Langzeitmiete', imp: 'Autoimport aus Deutschland', reg: 'Registrierungssteuer-Rechner',
+        c: 'Autos', avail: 'Verfügbare Autos (HU)', newc: 'Neuwagen-Konfigurator (HU)', hu: 'Magyar oldal',
+        co: 'Unternehmen', blog: 'Blog (HU)', legal: 'Rechtliches (auf Ungarisch)', priv: 'Datenschutz', terms: 'AGB', imp2: 'Impressum', cookie: 'Cookie-Einstellungen', rep: 'Vertretung in Ungarn' },
+  fr: { tag: 'Voitures premium d’Allemagne pour les résidents en Hongrie — location longue durée, import et immatriculation.', contact: 'Contact', home: 'Accueil CarAdvance',
+        s: 'Services', rental: 'Location longue durée', imp: 'Import de voiture d’Allemagne', reg: 'Calculateur de taxe d’immatriculation',
+        c: 'Voitures', avail: 'Voitures disponibles (HU)', newc: 'Configurateur voiture neuve (HU)', hu: 'Magyar oldal',
+        co: 'Société', blog: 'Blog (HU)', legal: 'Mentions légales (en hongrois)', priv: 'Confidentialité', terms: 'CGV', imp2: 'Mentions légales', cookie: 'Paramètres des cookies', rep: 'Représentant en Hongrie' },
+  uk: { tag: 'Преміальні авто з Німеччини для тих, хто живе в Угорщині — довгострокова оренда, імпорт і реєстрація.', contact: 'Контакти', home: 'Головна CarAdvance',
+        s: 'Послуги', rental: 'Довгострокова оренда авто', imp: 'Авто з Німеччини', reg: 'Калькулятор реєстраційного податку',
+        c: 'Авто', avail: 'Доступні авто (HU)', newc: 'Конфігуратор нових авто (HU)', hu: 'Magyar oldal',
+        co: 'Компанія', blog: 'Блог (HU)', legal: 'Правова інформація (угорською)', priv: 'Політика конфіденційності', terms: 'Умови', imp2: 'Вихідні дані', cookie: 'Налаштування cookie', rep: 'Представник в Угорщині' },
+  zh: { tag: '为在匈牙利生活的外国人提供来自德国的高端汽车——长期租车、进口与上牌。', contact: '联系我们', home: 'CarAdvance 首页',
+        s: '服务', rental: '长期租车', imp: '德国汽车进口', reg: '登记税计算器',
+        c: '汽车', avail: '现有车辆（匈牙利语）', newc: '新车配置（匈牙利语）', hu: 'Magyar oldal',
+        co: '公司', blog: '博客（匈牙利语）', legal: '法律信息（匈牙利语）', priv: '隐私政策', terms: '条款', imp2: '公司信息', cookie: 'Cookie 设置', rep: '匈牙利代表' },
+};
+function footerFor(l) {
+  const t = FT[l]; if (!t) return FOOTER;
+  const cols = [
+    [t.s, [[t.rental, ip('rental', l)], [t.imp, ip('import', l)], [t.reg, ip('regtax', l)]]],
+    [t.c, [[t.avail, '/autoink/'], [t.newc, '/egyedi-auto-rendeles/'], [t.hu, '/']]],
+    [t.co, [[t.contact, ip('contact', l)], [t.blog, '/blog/']]],
+  ];
+  return `<footer class="cafoot" data-cafoot="1" lang="${l === 'zh' ? 'zh-Hans' : l}">
+<div class="cafoot-in">
+  <div class="cafoot-brand">
+    <a href="${ip('home', l)}" aria-label="${t.home}"><img src="/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133" loading="lazy"></a>
+    <p>${t.tag}</p>
+    <div class="cafoot-ct"><a href="tel:+36302336060">+36 30 233 6060</a><a href="mailto:info@caradvance.hu">info@caradvance.hu</a><a href="${ip('contact', l)}" style="font-weight:600;color:#cfd4de">${t.contact} →</a></div>
+    <div class="cafoot-soc">${SOC}</div>
+  </div>
+  ${cols.map(col).join('\n  ')}
+  <div class="cafoot-legal"><h4>${t.legal}</h4><a href="/adatkezeles/">${t.priv}</a><a href="/aszf/">${t.terms}</a><a href="/impresszum/">${t.imp2}</a><button type="button" class="cafoot-link" onclick="if(window.CAConsent){window.CAConsent.open()}else{location.href='/adatkezeles/#cookie'}">${t.cookie}</button></div>
+</div>
+<div class="cafoot-copy"><span>© ${YEAR} Caradvance GmbH · Bgm-Graf-Ring 21, 82538 Geretsried · Amtsgericht München HRB 151009 · USt-IdNr. DE232664616</span><span>${t.rep}: BH Group Zrt. · Cg. 09-10-000660 · 32488447-2-09</span></div>
+</footer>`;
+}
+
 const CONSENT_OLD = /Elfogadom az <a href="\/adatkezeles\/?"([^>]*)>adatkezelési tájékoztatót<\/a>\./g;
 const CONSENT_NEW = 'Elolvastam és elfogadom az <a href="/aszf/"$1>ÁSZF</a>-et és az <a href="/adatkezeles/"$1>adatkezelési tájékoztatót</a>.';
 
@@ -119,17 +168,19 @@ for await (const file of walk(ROOT)) {
   const orig = h;
   if (/http-equiv=["']?refresh/i.test(h) || !/<\/body>/i.test(h)) { skipped++; continue; }
 
-  // 1. lábléc
+  // 1. lábléc (nyelv a <html lang> alapján)
+  const HL = ((h.match(/<html[^>]*\slang="([a-z]{2})/i) || [])[1] || 'hu').toLowerCase();
+  const FOOT_L = HL === 'hu' ? FOOTER : footerFor(HL);
   h = h.replace(/<style id="cafoot-css">[\s\S]*?<\/style>/g, '');
   h = h.replace(/<footer class="cafoot"[\s\S]*?<\/footer>/g, '<!--cafoot-->');
   let had = false;
   h = h.replace(/<footer class="footer"[\s\S]*?<\/footer>/g, () => { had = true; return '<!--cafoot-->'; });
   if (h.includes('<!--cafoot-->')) {
     let first = true;
-    h = h.replace(/<!--cafoot-->/g, () => { if (first) { first = false; return CSS + FOOTER; } return ''; });
+    h = h.replace(/<!--cafoot-->/g, () => { if (first) { first = false; return CSS + FOOT_L; } return ''; });
     if (had) replaced++; else replaced++;
   } else {
-    h = h.replace(/<\/body>/i, CSS + FOOTER + '</body>');
+    h = h.replace(/<\/body>/i, CSS + FOOT_L + '</body>');
     inserted++;
   }
 

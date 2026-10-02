@@ -29,6 +29,12 @@ const DIST = 'dist';
 const SITE = (process.env.SITE_BASE || 'https://www.caradvance.hu').replace(/\/+$/, '');
 // Magyar tartalom idegen nyelvi kod alatt -> duplikatum, nem indexelheto.
 const DUP_LANGS = ['en', 'de', 'fr', 'uk', 'zh'];
+// Kivétel: a már LEFORDÍTOTT, élő idegen nyelvű oldalak (src/i18n/intl-map.json → live) indexelhetők és a sitemapba kerülnek.
+let LIVE_URLS = new Set();
+try {
+  const M = JSON.parse(fs.readFileSync('src/i18n/intl-map.json', 'utf8'));
+  for (const k of Object.keys(M.pages)) for (const l of M.live) if (M.pages[k][l]) LIVE_URLS.add(M.pages[k][l]);
+} catch (e) { console.log('golive: intl-map.json nem olvasható (' + (e && e.message) + ')'); }
 
 // Nem nyilvanos / nem indexelheto utvonalak. A kapu eddig ezeket is takarta,
 // elesites utan viszont a Google-nek sem a belso iranyitopult, sem az egyedi
@@ -84,7 +90,7 @@ try {
     // 4. noindex
     const relPath = urlOf(file).slice(SITE.length);
     const priv = PRIVATE_PATHS.includes(relPath);
-    const dup = DUP_LANGS.includes(firstSeg(file)) || priv;
+    const dup = (DUP_LANGS.includes(firstSeg(file)) && !LIVE_URLS.has(relPath)) || priv;
     h = h.replace(/[ \t]*<meta\s+name=["']robots["'][^>]*>\s*\n?/gi, (m) => {
       if (/noindex\s*,\s*nofollow/i.test(m)) nNoindex++;
       return '';

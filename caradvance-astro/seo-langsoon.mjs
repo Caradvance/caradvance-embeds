@@ -21,6 +21,7 @@
  * Hibára exit 0 — a buildet sosem állítja meg.
  */
 import { readFile, writeFile, readdir, stat } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 const DIST = 'dist';
@@ -53,10 +54,28 @@ const RE = /<a class="(langopt|m-langopt)"([^>]*)>([\s\S]*?)<\/a>/g;
 // Ezek a nyelvek NEM a caradvance.hu-n lesznek (saját domain: .sk / .cz / .pl) — kivesszük a választóból.
 const DROP = new Set(['Slovenčina', 'Čeština', 'Polski']);
 
-function transform(html) {
+// Élő (lefordított) nyelvek: src/i18n/intl-map.json → live. Ezek kattinthatók maradnak, és az
+// adott oldal megfelelőjére (vagy a nyelv főoldalára) mutatnak.
+const CODE = { 'Magyar': 'hu', 'English': 'en', 'Deutsch': 'de', 'Français': 'fr', 'Українська': 'uk', '中文': 'zh' };
+let MAP = { live: [], pages: {} };
+try { MAP = JSON.parse(readFileSync('src/i18n/intl-map.json', 'utf8')); } catch {}
+function altFor(pagePath, code) {
+  for (const k of Object.keys(MAP.pages)) {
+    const g = MAP.pages[k];
+    if (Object.values(g).includes(pagePath)) return g[code] || (code === 'hu' ? '/' : '/' + code + '/');
+  }
+  return code === 'hu' ? '/' : '/' + code + '/';
+}
+
+function transform(html, pagePath = '/') {
   return html.replace(RE, (m, cls, _attrs, inner) => {
     const lbl = (inner.match(/<span>([^<]+)<\/span>/) || [, ''])[1].trim();
     if (DROP.has(lbl)) return '';                          // sk / cs / pl: törölve
+    const code = CODE[lbl];
+    if (code && (code === 'hu' || MAP.live.includes(code))) {   // élő nyelv: link a megfelelő oldalra
+      const href = altFor(pagePath, code);
+      return m.replace(/href="[^"]*"/, 'href="' + href + '"').replace(/^<a /, '<a hreflang="' + (code === 'zh' ? 'zh-Hans' : code) + '" ');
+    }
     if (inner.includes('>Magyar<')) return m;               // magyar marad kattintható
     const label = (inner.match(/<span>([^<]+)<\/span>/) || [, ''])[1].trim();
     const word = SOON[label] || SOON_FALLBACK;              // "hamarosan" az adott nyelven
@@ -86,7 +105,9 @@ async function run() {
     try { html = await readFile(f, 'utf8'); } catch { continue; }
     if (!/class="(langopt|m-langopt)"/.test(html)) { noMenu++; continue; }
     if (html.includes(MARKER)) { skipped++; continue; }      // már kész
-    let updated = transform(html);
+    const rel = path.relative(DIST, f).split(path.sep).join('/');
+    const pagePath = '/' + rel.replace(/index\.html$/, '');
+    let updated = transform(html, pagePath);
     const idx = updated.lastIndexOf('</head>');
     if (idx !== -1) updated = updated.slice(0, idx) + STYLE + '\n' + updated.slice(idx);
     if (updated !== html) { try { await writeFile(f, updated, 'utf8'); changed++; } catch { skipped++; } }
