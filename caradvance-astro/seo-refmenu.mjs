@@ -53,6 +53,22 @@ const M_BESZ = '<a href="/beszerzesi-folyamat">Beszerzési folyamat</a>';
 const M_HON = '<a href="/honositas-kalkulator/">Honosítás kalkulátor</a>';
 const M_ATI = '<a href="/atiras-kalkulator/">Átírás kalkulátor</a>';
 const GARBAGE = /\}\}beszerzesi-folyamat">Beszerzési folyamat<\/a><div class="ddi-sub">[\s\S]*?<\/div><\/div>/g;
+const KALK = [['Honosítás kalkulátor', '/honositas-kalkulator/'], ['Átírás kalkulátor', '/atiras-kalkulator/'], ['Lízing kalkulátor', '/finanszirozas-lizing/']];
+// Saját osztálynevek (kalk-*), hogy a caradvance-chat.js márka-lenyíló szkriptje (".ddi-sub" esetén kilép) ne álljon le.
+const KALK_D = '<div class="kalk-sub"><a class="ddi kalk-parent" href="/honositas-kalkulator/">Kalkulátorok<span class="subchev">›</span></a><div class="kalk-fly">'
+  + KALK.map(([t, u]) => `<a class="ddi" href="${u}">${t}</a>`).join('') + '</div></div>';
+const KALK_M = '<a href="/honositas-kalkulator/">Kalkulátorok</a>'
+  + KALK.map(([t, u]) => `<a class="m-subitem" href="${u}"><span>${t}</span></a>`).join('');
+const KALK_CSS = '<style id="kalkSubCss">.ca-navwrap .kalk-sub{position:relative}'
+  + '.ca-navwrap .kalk-parent{display:flex;align-items:center;justify-content:space-between;gap:12px}'
+  + '.ca-navwrap .kalk-parent .subchev{opacity:.55;font-size:1.15em;line-height:1;transform:translateY(-1px)}'
+  + '.ca-navwrap .kalk-fly{position:absolute;top:-6px;left:100%;min-width:186px;background:#fff;border:1px solid #e8e8ea;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.14);padding:6px;display:none;z-index:1000}'
+  + '.ca-navwrap .kalk-sub:hover>.kalk-fly,.ca-navwrap .kalk-sub.open>.kalk-fly{display:block}'
+  + '.ca-navwrap .kalk-fly .ddi{white-space:nowrap}'
+  + '.ca-navwrap .m-sub .m-subitem{display:flex;align-items:center;gap:10px;padding-left:30px;opacity:.85;font-size:.95em}</style>'
+  + '<script>document.addEventListener("click",function(e){var p=e.target.closest&&e.target.closest(".kalk-parent");if(!p)return;var s=p.parentNode;'
+  + 'if(window.matchMedia&&window.matchMedia("(hover: none)").matches&&!s.classList.contains("open")){e.preventDefault();s.classList.add("open");}});</script>';
+
 export function fixCalcMenu(h) {
   h = h.replace(GARBAGE, '}}');
   // régi fejléc: halott "#" linkek az Import menüben
@@ -60,21 +76,22 @@ export function fixCalcMenu(h) {
        .join('<a class="ddi" href="/auto-rendeles">Autó rendelés</a>' + D_BESZ + '<a class="ddi" href="/elonyok">Előnyök</a><a class="ddi" href="/egyedul-vagy-velunk">Egyedül vagy velünk?</a>');
   h = h.split('<a href="#">Autó rendelés</a><a href="#">Beszerzési folyamat</a><a href="#">Előnyök</a>')
        .join('<a href="/auto-rendeles">Autó rendelés</a>' + M_BESZ + '<a href="/elonyok">Előnyök</a><a href="/egyedul-vagy-velunk">Egyedül vagy velünk?</a>');
-  const fix = (h, besz, hon, ati) => {
+  const fix = (h, besz, keep, strip, block) => {
     let out = '', i = 0, j;
     while ((j = h.indexOf(besz, i)) !== -1) {
-      const end = j + besz.length;
+      let end = j + besz.length;
       out += h.slice(i, end);
-      const rest = h.slice(end, end + 400);
-      if (rest.startsWith('<div class="ddi-sub">') || rest.startsWith('<a href="/honositas-kalkulator/">Kalkulátorok')) { /* Astro lenyíló — marad */ }
-      else if (rest.startsWith(hon)) { if (!rest.slice(hon.length).startsWith(ati)) { out += hon + ati; i = end + hon.length; continue; } }
-      else out += hon + ati;
+      if (!keep.some((k) => h.startsWith(k, end))) {
+        for (const st of strip) if (h.startsWith(st, end)) end += st.length;
+        out += block;
+      }
       i = end;
     }
     return out + h.slice(i);
   };
-  h = fix(h, D_BESZ, D_HON, D_ATI);
-  h = fix(h, M_BESZ, M_HON, M_ATI);
+  h = fix(h, D_BESZ, ['<div class="ddi-sub">', '<div class="kalk-sub">'], [D_HON, D_ATI], KALK_D);
+  h = fix(h, M_BESZ, ['<a href="/honositas-kalkulator/">Kalkulátorok'], [M_HON, M_ATI], KALK_M);
+  if (h.includes('class="kalk-sub"') && !h.includes('id="kalkSubCss"')) h = h.replace('</head>', KALK_CSS + '</head>');
   return h;
 }
 

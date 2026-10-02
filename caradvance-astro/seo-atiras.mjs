@@ -167,6 +167,9 @@ const TORZS = `<div class="lk" id="kalkulator">
     <h2 class="lk-title">Gépjármű átírási költség kalkulátor</h2>
     <p class="lk-lead">Add meg a motor teljesítményét és az autó korát — azonnal megmutatjuk a
     fizetendő vagyonszerzési illetéket és az átírás teljes költségét a 2026-os hivatalos díjakkal.</p>
+    <p class="lk-lead" style="margin-top:10px;padding:10px 14px;border-radius:12px;background:#fbe9ec;color:#141519"><b>Külföldről hozott autó?</b>
+    Az első magyar forgalomba helyezés honosítás — annak költségét (regisztrációs adó + illeték) a
+    <a href="/honositas-kalkulator/" style="color:#E2001A;font-weight:800">honosítás kalkulátor</a> számolja ki.</p>
   </div>
 
   <div class="lk-grid">

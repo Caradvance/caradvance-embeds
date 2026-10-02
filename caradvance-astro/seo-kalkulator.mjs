@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 /**
- * seo-kalkulator.mjs  —  v2  (2026-09-18)
+ * seo-kalkulator.mjs  —  v3  (2026-10-02)
+ *
+ * v3: a honosítás TELJES becsült költsége (regadó + vagyonszerzési illeték + eredetiségvizsgálat
+ *     + okmányok), „A honosítás költségei 2026” táblázat, bővített GYIK — a „honosítás kalkulátor”,
+ *     „autó honosítás ára / költségei”, „honosítás menete” keresésekre.
  *
  * Legenerálja a  /honositas-kalkulator/  oldalt a dist/ mappába, egy meglévő
  * oldal fejlécét és láblécét sablonként használva, majd felveszi a sitemap.xml-be.
@@ -27,8 +31,8 @@ const SITEMAP  = path.join(DIST, 'sitemap.xml');
 const BAZIS    = 'https://www.caradvance.hu';
 const URL_PATH = '/honositas-kalkulator/';
 
-const CIM  = 'Honosítás kalkulátor 2026 — regisztrációs adó számítás | CarAdvance';
-const LEIR = 'Számold ki a külföldről behozott autó regisztrációs adóját a NAV 2026-os hivatalos táblájával. Teljesítmény, környezetvédelmi osztály és életkor alapján, azonnal.';
+const CIM  = 'Honosítás kalkulátor 2026 – autó honosítás költsége, regadó | CarAdvance';
+const LEIR = 'Ingyenes honosítás kalkulátor: a külföldről hozott autó regisztrációs adója és a honosítás teljes költsége (vagyonszerzési illeték, eredetiségvizsgálat, okmányok) a NAV 2026-os táblái alapján.';
 
 // A hero az Import (beszerzési folyamat) oldal heroját tükrözi. A .hero, .scrim,
 // .inner, .partners, .sub, .cta-row, .btn, .scrolldown osztályokat az örökölt
@@ -39,9 +43,9 @@ const HERO = `<section class="hero">
   </video>
   <div class="scrim"></div>
   <div class="inner">
-    <h1>Honosítás kalkulátor 2026 —<br><span class="accent">regisztrációs adó másodpercek alatt</span></h1>
-    <p class="sub sub-wide">Számold ki a külföldről behozott autó regisztrációs adóját a NAV
-    hivatalos táblájával, majd bízd ránk a teljes honosítást — eredetiségvizsgálat, műszaki,
+    <h1>Honosítás kalkulátor 2026 —<br><span class="accent">az autó honosításának teljes költsége</span></h1>
+    <p class="sub sub-wide">Számold ki a külföldről behozott autó regisztrációs adóját, vagyonszerzési
+    illetékét és a honosítás teljes költségét a NAV hivatalos tábláival, majd bízd ránk a teljes honosítást — eredetiségvizsgálat, műszaki,
     forgalomba helyezés és a teljes papírmunka. Te csak átveszed a magyar forgalmival.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#kalkulator">Adó kiszámítása</a>
@@ -160,10 +164,10 @@ const STILUS = `#ca-kalk{
 const TORZS = `<div class="lk" id="kalkulator">
   <div class="lk-head">
     <span class="lk-eyebrow">Kalkulátor</span>
-    <h2 class="lk-title">Regisztrációs adó kalkulátor</h2>
+    <h2 class="lk-title">Honosítás költség kalkulátor — regisztrációs adó + illeték</h2>
     <p class="lk-lead">Állítsd be a teljesítményt, a környezetvédelmi osztályt és az autó korát —
-    azonnal megmutatjuk a fizetendő regisztrációs adót a NAV 2026.01.01-től hatályos táblája
-    alapján. Minden módosításkor újraszámol.</p>
+    azonnal megmutatjuk a fizetendő regisztrációs adót (NAV, 2026.01.01-től hatályos tábla), a
+    vagyonszerzési illetéket és a honosítás becsült teljes költségét. Minden módosításkor újraszámol.</p>
   </div>
 
   <div class="lk-grid">
@@ -223,8 +227,8 @@ const TORZS = `<div class="lk" id="kalkulator">
 
     <div class="lk-result">
       <div class="lk-monthly">
-        <span class="lk-mlabel">Fizetendő regisztrációs adó</span>
-        <div class="lk-mval"><span class="lk-mnum" id="fizetendo">—</span></div>
+        <span class="lk-mlabel">Honosítás becsült költsége</span>
+        <div class="lk-mval"><span class="lk-mnum" id="honOssz">—</span></div>
         <span id="mentesBadge" hidden><span class="lk-badge">Adómentes</span></span>
       </div>
       <div class="lk-rows">
@@ -233,11 +237,17 @@ const TORZS = `<div class="lk" id="kalkulator">
         <div class="lk-row" id="lineKor"><span>Eltelt hónapok</span><b id="oHonap">—</b></div>
         <div class="lk-row" id="lineSzorzo"><span>Korkedvezmény szorzója</span><b id="oSzorzo">—</b></div>
         <div class="lk-row" id="lineCsokk"><span>Adócsökkenés</span><b id="oCsokk">—</b></div>
-        <div class="lk-row lk-total"><span>Fizetendő</span><b id="oFiz">—</b></div>
+        <div class="lk-row"><span>Fizetendő regisztrációs adó</span><b id="oFiz">—</b></div>
+        <div class="lk-row"><span>Vagyonszerzési illeték <small id="oIlKulcs" style="opacity:.7"></small></span><b id="oIlletek">—</b></div>
+        <div class="lk-row"><span>Eredetiségvizsgálat</span><b id="oEredet">—</b></div>
+        <div class="lk-row"><span>Forgalmi engedély + törzskönyv</span><b id="oOkmany">—</b></div>
+        <div class="lk-row lk-total"><span>Honosítás összesen</span><b id="oOssz">—</b></div>
       </div>
+      <span id="fizetendo" hidden></span>
       <a class="lk-cta" href="/kapcsolat">Kérek segítséget a honosításban →</a>
-      <p class="lk-disc"><b>A kalkulátor tájékoztató jellegű.</b> A fizetendő adót minden esetben
-      a NAV állapítja meg az eljárás során. Adótábla forrása: NAV, 2026.01.01.</p>
+      <p class="lk-disc"><b>A kalkulátor tájékoztató jellegű.</b> Nem tartalmazza a honosítási műszaki
+      vizsga és a rendszám díját (vizsgaállomásonként eltér), valamint a szállítást. A fizetendő adót
+      minden esetben a NAV állapítja meg. Forrás: NAV regadó- és illetéktábla, 2026.01.01.</p>
     </div>
   </div>
 </div>
@@ -270,8 +280,29 @@ const TORZS = `<div class="lk" id="kalkulator">
   </div>
 </section>
 
+<section class="sec">
+  <h2>A honosítás költségei 2026-ban</h2>
+  <p class="lede">Egy külföldről behozott autó honosításának ára több tételből áll össze. A fenti
+  kalkulátor a hatósági tételeket számolja ki; a vizsgadíjak állomásonként eltérhetnek.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Tétel</th><th>Mitől függ?</th><th class="n">Összeg</th></tr></thead>
+      <tbody>
+        <tr><td>Regisztrációs adó</td><td>kW, környezetvédelmi osztály, életkor</td><td class="n">kalkulátor szerint</td></tr>
+        <tr><td>Vagyonszerzési illeték</td><td>kW és az autó kora (Ft/kW)</td><td class="n">kalkulátor szerint</td></tr>
+        <tr><td>Eredetiségvizsgálat</td><td>személygépkocsi</td><td class="n">24 975 Ft</td></tr>
+        <tr><td>Forgalmi engedély</td><td>okmánydíj</td><td class="n">6 000 Ft</td></tr>
+        <tr><td>Törzskönyv</td><td>okmánydíj</td><td class="n">6 000 Ft</td></tr>
+        <tr><td>Honosítási műszaki vizsga, rendszám</td><td>vizsgaállomás, jármű</td><td class="n">állomásonként eltér</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="lede">Az 5E / 5Z (elektromos, nulla emissziós) autók regisztrációs adója és vagyonszerzési
+  illetéke is 0 Ft — náluk csak a vizsgák és az okmányok díja marad.</p>
+</section>
+
 <section class="ca-proc">
-  <span class="ca-eyebrow">Hogyan zajlik?</span>
+  <span class="ca-eyebrow">Honosítás menete</span>
   <h2 class="ca-sectitle">Négy lépés egy külföldi autó honosításáig</h2>
   <p class="ca-secintro">A külföldről behozott autó forgalomba helyezése néhány jól követhető
   lépésből áll — a végén magyar forgalmival és rendszámmal.</p>
@@ -308,6 +339,15 @@ const TORZS = `<div class="lk" id="kalkulator">
       1 128 000 Ft. Ha 2019 júniusában helyezték először forgalomba, és most indul az eljárás,
       88 hónap telt el — a szorzó 0,30, a fizetendő adó <b>338 400 Ft</b>. A pontos összeget
       mindig a fenti kalkulátor adja meg, mert egyetlen hónap is számít.</p></details>
+    <details><summary>Mennyibe kerül egy autó honosítása 2026-ban?</summary>
+      <p>A legnagyobb tétel a regisztrációs adó, amely teljesítménytől, környezetvédelmi osztálytól
+      és kortól függ — néhány tízezer forinttól több millióig terjedhet. Ehhez jön a vagyonszerzési
+      illeték (kW × Ft/kW), az eredetiségvizsgálat (24 975 Ft), az okmánydíjak (12 000 Ft), valamint a
+      honosítási műszaki vizsga és a rendszám. A fenti kalkulátor ezeket egy összegben mutatja.</p></details>
+    <details><summary>Kell vagyonszerzési illetéket fizetni honosításkor?</summary>
+      <p>Igen. A külföldről behozott autó első magyarországi forgalomba helyezésekor vagyonszerzési
+      illetéket kell fizetni, amelyet a motor teljesítménye és az autó kora határoz meg. Elektromos
+      (5E) és nulla emissziós (5Z) autónál ez sem fizetendő.</p></details>
     <details><summary>Elektromos autó után kell regisztrációs adót fizetni?</summary>
       <p>Nem. Az 5E (tisztán elektromos) és 5Z (egyéb nulla emissziós) környezetvédelmi
       osztályú személyautók adómentesek, függetlenül a teljesítménytől és a kortól.</p></details>
@@ -361,6 +401,23 @@ const SZORZOK=[[0,1.00],[1,0.97],[3,0.92],[5,0.87],[7,0.82],[13,0.77],[19,0.72],
 const HONAPNEV=['január','február','március','április','május','június','július',
  'augusztus','szeptember','október','november','december'];
 const LE_KW=0.7355;
+const IL_SAVOK=[40,80,120,Infinity];
+const ILLETEK=[[550,450,300],[750,550,450],[850,750,550],[950,850,750]];
+const EREDETISEG=24975, OKMANY=12000;
+function ilSav(kw){for(let i=0;i<IL_SAVOK.length;i++) if(kw<=IL_SAVOK[i]) return i; return 3;}
+function ilKor(k){ if(k<=3) return 0; if(k<=8) return 1; return 2; }
+function osszesit(regado,kw,kod){
+  const kor = ujAuto ? 0 : Math.max(0, (+$('regEv').value) - (+$('elsoEv').value));
+  const kulcs = ILLETEK[ilSav(kw)][ilKor(kor)];
+  const illetek = kod===0 ? 0 : Math.round(kw)*kulcs;
+  $('oIlKulcs').textContent = kod===0 ? '(mentes)' : '('+kulcs+' Ft/kW)';
+  $('oIlletek').textContent = ft(illetek);
+  $('oEredet').textContent = ft(EREDETISEG);
+  $('oOkmany').textContent = ft(OKMANY);
+  const ossz = regado + illetek + EREDETISEG + OKMANY;
+  $('oOssz').textContent = ft(ossz);
+  $('honOssz').textContent = ft(ossz);
+}
 const ft=n=>new Intl.NumberFormat('hu-HU').format(Math.round(n))+' Ft';
 const $=id=>document.getElementById(id);
 
@@ -434,6 +491,7 @@ function szamol(){
     $('fizetendo').textContent='0 Ft';
     ['oAlap','oHonap','oSzorzo','oCsokk','oFiz'].forEach(x=>$(x).textContent='—');
     $('oAlap').textContent='0 Ft'; $('oFiz').textContent='0 Ft';
+    osszesit(0,kw,0);
     return;
   }
   const alap=ALAPADO[i][kod-1];
@@ -450,6 +508,7 @@ function szamol(){
   $('oCsokk').textContent='− '+ft(alap-fiz);
   $('oFiz').textContent=ft(fiz);
   $('fizetendo').textContent=ft(fiz);
+  osszesit(fiz,kw,kod);
 }
 init();
 `;
@@ -473,6 +532,8 @@ const JSONLD = `<script type="application/ld+json">
       "@type":"FAQPage",
       "mainEntity":[
       {"@type":"Question","name":"Mennyi a regisztrációs adó egy 2019-es, 150 kW-os dízelre?","acceptedAnswer":{"@type":"Answer","text":"A környezetvédelmi osztálytól függ. Egy 141–180 kW-os, „12–14” osztályú autó alapadója 1 128 000 Ft. Ha 2019 júniusában helyezték először forgalomba, és most indul az eljárás, 88 hónap telt el — a szorzó 0,30, a fizetendő adó 338 400 Ft."}},
+      {"@type":"Question","name":"Mennyibe kerül egy autó honosítása 2026-ban?","acceptedAnswer":{"@type":"Answer","text":"A legnagyobb tétel a regisztrációs adó, amely teljesítménytől, környezetvédelmi osztálytól és kortól függ. Ehhez jön a vagyonszerzési illeték (kW × Ft/kW), az eredetiségvizsgálat (24 975 Ft), az okmánydíjak (12 000 Ft), valamint a honosítási műszaki vizsga és a rendszám."}},
+      {"@type":"Question","name":"Kell vagyonszerzési illetéket fizetni honosításkor?","acceptedAnswer":{"@type":"Answer","text":"Igen. A külföldről behozott autó első magyarországi forgalomba helyezésekor vagyonszerzési illetéket kell fizetni, amelyet a motor teljesítménye és az autó kora határoz meg. Elektromos (5E) és nulla emissziós (5Z) autónál ez sem fizetendő."}},
       {"@type":"Question","name":"Elektromos autó után kell regisztrációs adót fizetni?","acceptedAnswer":{"@type":"Answer","text":"Nem. Az 5E (tisztán elektromos) és 5Z (egyéb nulla emissziós) környezetvédelmi osztályú személyautók adómentesek, függetlenül a teljesítménytől és a kortól."}},
       {"@type":"Question","name":"Hogyan számítja a NAV az eltelt hónapokat?","acceptedAnswer":{"@type":"Answer","text":"Az első külföldi forgalomba helyezés hónapját megelőző hónap végétől a regisztrációs eljárás hónapját követő hónap elejéig. Gyakorlatilag a két dátum közötti teljes hónapok száma plusz egy."}},
       {"@type":"Question","name":"Mi kerül még pénzbe a regisztrációs adón kívül?","acceptedAnswer":{"@type":"Answer","text":"Eredetiségvizsgálat, honosítási műszaki vizsga, forgalomba helyezés és okmányok, rendszám, vagyonszerzési illeték, valamint a szállítás. Használt, EU-s kereskedőtől különbözeti adózással vásárolt autónál magyar áfa jellemzően nem merül fel; hat hónapnál fiatalabb vagy 6 000 km-nél kevesebbet futott autó viszont új járműnek minősül, és utána itthon kell áfát fizetni."}},
