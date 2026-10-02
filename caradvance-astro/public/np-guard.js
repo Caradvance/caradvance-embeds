@@ -6,7 +6,7 @@
   var L = 'Ár kérésre';
   var NUM = '(?:\\d{1,3}(?:[ \\u00a0\\u202f.,]\\d{3})+|\\d+)(?:,\\d{1,2})?';
   var CUR = '(?:€|EUR\\b|Ft\\b|HUF\\b)';
-  var CORE = new RegExp('(?:[−–-]\\s?)?' + NUM + '\\s?(?:[–-]\\s?' + NUM + '\\s?)?' + CUR + '|€\\s?' + NUM, 'g');
+  var CORE = new RegExp('(?:[−–-]\\s?)?' + NUM + '\\s?(?:[–-]\\s?' + NUM + '\\s?)?(?:(?:M|millió|ezer)[\\s\\u00a0]?)?' + CUR + '|€\\s?' + NUM, 'g');
   var NAN = /NaN\s?(?:€|Ft)/g;
   var RATE = /1\s?€\s?[≈=]\s?\d[\d \u00a0]*\s?Ft|1\s?€(?=\s?[≈=])|[≈=]\s?\d{3}(?:[.,]\d+)?\s?Ft/g;
   var SUFFIX = new RegExp(L + '(?:\\s?\\/\\s?(?:hó|hónap|km))?(?:\\s?[-‑–]?\\s?(?:tól|től|ig))?(?:\\s?\\/\\s?(?:hó|hónap))?', 'g');
