@@ -21,6 +21,25 @@ for (const f of FILES) {
   const hb = h.indexOf('data-hero="berelheto"');
   if (hb > -1) { const bi = h.indexOf(BERL, hb); if (bi > -1 && bi < hb + 1600) { let j = bi; while (j > 0 && h[j-1] >= '0' && h[j-1] <= '9') j--; const numStr = h.slice(j, bi); if (numStr) { const n = parseInt(numStr, 10) + SUB_TOTAL; h = h.slice(0, j) + n + h.slice(bi); } } }
   { const _hb = h.indexOf('data-hero="berelheto"'); if (_hb > -1) { const _seg = h.slice(_hb, _hb + 600); const _m = _seg.match(/<img class="brand-logo"[^>]*>/); if (_m) { h = h.slice(0, _hb) + _seg.replace(_m[0], STRIP) + h.slice(_hb + 600); } } }
+  // ---- Prémium fül: a raktári bérelhető autók külön fülre; a Bérelhető fülön csak az új autós kínálat ----
+  {
+    const tabRe = /(<button class="autok-tab" data-tab="berelheto" data-group="berles" type="button" hidden>)Bérelhető \((\d+)\)(<\/button>)/;
+    const tm = h.match(tabRe);
+    const pi = h.indexOf(ANCHOR);
+    const be = h.indexOf('<div class="autok-panel" id="panel-berbeadva">', pi);
+    if (tm && pi > -1 && h.indexOf('id="panel-premium"') < 0) {
+      const cnt = '<div class="count">' + tm[2] + ' autó</div>';
+      const ci = h.lastIndexOf(cnt, be > -1 ? be : h.length);
+      if (ci > pi) {
+        h = h.slice(0, ci) + '</div>\n  <div class="autok-panel" id="panel-premium">\n    ' + h.slice(ci);
+        h = h.replace(tabRe, (m, a1, n, c) => a1 + 'Bérelhető (' + SUB_TOTAL + ')' + c +
+          '\n      <button class="autok-tab" data-tab="premium" data-group="berles" type="button" hidden>Prémium (' + n + ')</button>');
+        h = h.replace("(h==='berelheto'||h==='berbeadva')", "(h==='berelheto'||h==='premium'||h==='berbeadva')");
+        h = h.replace("heroSwap(b.getAttribute('data-tab'));", "heroSwap(b.getAttribute('data-tab')==='premium'?'berelheto':b.getAttribute('data-tab'));");
+        console.log('[abo] Prémium fül: ' + n + ' autó, Bérelhető: ' + SUB_TOTAL);
+      }
+    }
+  }
   fs.writeFileSync(f, h);
   done++;
   console.log('[abo] beszurva + hero -> ' + f);
