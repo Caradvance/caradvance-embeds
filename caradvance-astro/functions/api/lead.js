@@ -85,6 +85,7 @@ export async function onRequestPost(context) {
     page: String(data.page || request.headers.get('referer') || ''),
     ua: String(data.user_agent || request.headers.get('user-agent') || ''),
     ip: request.headers.get('cf-connecting-ip') || '',
+    country: (request.cf && request.cf.country) || request.headers.get('cf-ipcountry') || '',
     fbp: String(data.fbp || ''),
     fbc: String(data.fbc || ''),
     mkt: data.mkt_consent === true || data.mkt_consent === 'true',
@@ -93,7 +94,7 @@ export async function onRequestPost(context) {
   };
 
   // A továbbítandó rekord: az űrlap minden mezője + a kampányadatok.
-  const record = { ...stripInternal(data), ...flattenAttr(meta.attr), event_id: meta.event_id, beerkezett: meta.received_at, forras_oldal: meta.page };
+  const record = { ...stripInternal(data), ...flattenAttr(meta.attr), event_id: meta.event_id, beerkezett: meta.received_at, forras_oldal: meta.page, 'Ország (IP alapján)': meta.country };
 
   // Captcha-ellenőrzés még a kézbesítés előtt, hogy robot ne kerüljön a Notionbe.
   const guard = await verifyTurnstile(env, data.turnstile_token, meta.ip);
@@ -381,7 +382,7 @@ function leadKind(data) {
 async function sendCustomerConfirm(env, data, contact) {
   if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
   const k = leadKind(data);
-  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent']);
+  const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'event_id']);
   const rows = Object.entries(data)
     .filter(([key, v]) => !skip.has(key) && v != null && v !== '' && typeof v !== 'object')
     .slice(0, 40)
