@@ -1,0 +1,125 @@
+---
+// Magyar regisztrációs adó + honosítási költség kalkulátor — idegen nyelvű oldalakhoz.
+// A számítás azonos a /honositas-kalkulator/ oldaléval (NAV 2026.01.01-i táblák).
+import type { CalcStrings } from '../i18n/intl/types';
+const { s, ctaHref = '#ajanlat', locale = 'en-GB' } = Astro.props as { s: CalcStrings; ctaHref?: string; locale?: string };
+---
+<div class="rtc" id="kalkulator">
+  <div class="rtc-head">
+    <h2>{s.h2}</h2>
+    <p class="rtc-lead">{s.lead}</p>
+  </div>
+  <div class="rtc-grid">
+    <div class="rtc-in">
+      <label class="rtc-f"><span class="rtc-l">{s.cls}</span>
+        <select id="rtcCls" class="rtc-i">
+          <option value="1">{s.clsOpts[0]}</option><option value="2">{s.clsOpts[1]}</option>
+          <option value="3" selected>{s.clsOpts[2]}</option><option value="4">{s.clsOpts[3]}</option>
+          <option value="5">{s.clsOpts[4]}</option><option value="0">{s.clsOpts[5]}</option>
+        </select><small>{s.clsHint}</small></label>
+      <div class="rtc-f"><span class="rtc-l">{s.power}</span>
+        <div class="rtc-row"><input id="rtcPow" class="rtc-i" type="number" value="150" min="1" max="2000" inputmode="numeric" aria-label={s.power}>
+          <div class="rtc-seg"><button type="button" id="rtcKw" aria-pressed="true">kW</button><button type="button" id="rtcHp" aria-pressed="false">{s.hp}</button></div></div>
+        <small id="rtcConv">{s.powerHint}</small></div>
+      <label class="rtc-f"><span class="rtc-l">{s.cc}</span>
+        <select id="rtcCc" class="rtc-i"><option value="22950">{s.ccOpts[0]}</option><option value="24975" selected>{s.ccOpts[1]}</option><option value="27000">{s.ccOpts[2]}</option></select></label>
+      <div class="rtc-f"><span class="rtc-l">{s.kind}</span>
+        <div class="rtc-seg rtc-seg2"><button type="button" id="rtcUsed" aria-pressed="true">{s.used}</button><button type="button" id="rtcNew" aria-pressed="false">{s.newHu}</button></div>
+        <small>{s.newHint}</small></div>
+      <div class="rtc-f" id="rtcAge"><span class="rtc-l">{s.firstReg}</span>
+        <div class="rtc-row"><select id="rtcFy" class="rtc-i" aria-label={s.firstReg}></select><select id="rtcFm" class="rtc-i" aria-label={s.firstReg}></select></div></div>
+      <div class="rtc-f" id="rtcProc"><span class="rtc-l">{s.procStart}</span>
+        <div class="rtc-row"><select id="rtcPy" class="rtc-i" aria-label={s.procStart}></select><select id="rtcPm" class="rtc-i" aria-label={s.procStart}></select></div>
+        <small>{s.procHint}</small></div>
+    </div>
+    <div class="rtc-out">
+      <div class="rtc-big"><span>{s.total}</span><b id="rtcTotal">—</b><em id="rtcFree" hidden>{s.exempt}</em></div>
+      <div class="rtc-rows">
+        <div><span>{s.band}</span><b id="rtcBand">—</b></div>
+        <div><span>{s.base}</span><b id="rtcBase">—</b></div>
+        <div class="rtc-agerow"><span>{s.elapsed}</span><b id="rtcMon">—</b></div>
+        <div class="rtc-agerow"><span>{s.mult}</span><b id="rtcMul">—</b></div>
+        <div><span>{s.regtax}</span><b id="rtcTax">—</b></div>
+        <div><span>{s.duty} <small id="rtcRate"></small></span><b id="rtcDuty">—</b></div>
+        <div><span>{s.origin}</span><b id="rtcOrig">—</b></div>
+        <div><span>{s.docs}</span><b>12 000 Ft</b></div>
+        <div class="rtc-sum"><span>{s.sum}</span><b id="rtcSum">—</b></div>
+      </div>
+      <a class="rtc-cta" href={ctaHref}>{s.cta}</a>
+      <p class="rtc-disc" set:html={s.disc}></p>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ MONTHS: s.months, UNIT: s.monthsUnit, EX: s.dutyExempt, HP: s.hp, LOC: locale }}>
+(function(){
+  var B=[80,100,120,140,180,250,1e9], BL=['0–80 kW','81–100 kW','101–120 kW','121–140 kW','141–180 kW','181–250 kW','250+ kW'];
+  var A=[[47000,70500,282000,564000,1128000],[70500,105750,423000,846000,1692000],[94000,141000,564000,1128000,2256000],[141000,211500,846000,1692000,3384000],[188000,282000,1128000,2256000,4512000],[282000,423000,1692000,3384000,6768000],[423000,634500,2538000,5076000,10152000]];
+  var S=[[0,1],[1,.97],[3,.92],[5,.87],[7,.82],[13,.77],[19,.72],[25,.67],[31,.62],[37,.55],[49,.47],[61,.41],[73,.35],[85,.3],[97,.26],[109,.22],[121,.19],[133,.16],[145,.14],[157,.12],[169,.1]];
+  var IB=[40,80,120,1e9], IL=[[550,450,300],[750,550,450],[850,750,550],[950,850,750]];
+  var $=function(i){return document.getElementById(i)}, kw=true, isNew=false;
+  var ft=function(n){return new Intl.NumberFormat('hu-HU').format(Math.round(n))+' Ft'};
+  function band(k,arr){for(var i=0;i<arr.length;i++) if(k<=arr[i]) return i; return arr.length-1}
+  function mult(h){var m=1; for(var i=0;i<S.length;i++) if(h>=S[i][0]) m=S[i][1]; return m}
+  var now=new Date(), y=now.getFullYear();
+  function yrs(a,b){var o='';for(var i=b;i>=a;i--)o+='<option value="'+i+'">'+i+'</option>';return o}
+  var mo=MONTHS.map(function(n,i){return '<option value="'+(i+1)+'">'+n+'</option>'}).join('');
+  $('rtcFy').innerHTML=yrs(y-35,y); $('rtcFm').innerHTML=mo; $('rtcPy').innerHTML=yrs(y-5,y+1); $('rtcPm').innerHTML=mo;
+  $('rtcFy').value=String(y-5); $('rtcFm').value='6'; $('rtcPy').value=String(y); $('rtcPm').value=String(now.getMonth()+1);
+  function calc(){
+    var raw=parseFloat($('rtcPow').value)||0, k=kw?raw:raw*0.7355;
+    $('rtcConv').textContent = raw>0 ? (kw ? Math.round(raw/0.7355)+' '+HP : Math.round(k)+' kW') : '';
+    var cls=parseInt($('rtcCls').value,10), bi=band(k,B);
+    $('rtcBand').textContent=BL[bi];
+    var base = cls===0 ? 0 : A[bi][cls-1], h=0, m=1, tax=base;
+    if(!isNew && cls!==0){ h=(+$('rtcPy').value*12 + +$('rtcPm').value)-(+$('rtcFy').value*12 + +$('rtcFm').value)+1; if(h<0)h=0; m=mult(h); tax=Math.round(base*m); }
+    $('rtcBase').textContent=ft(base); $('rtcMon').textContent=h+' '+UNIT; $('rtcMul').textContent=m.toFixed(2); $('rtcTax').textContent=ft(tax);
+    var age = isNew ? 0 : Math.max(0, +$('rtcPy').value - +$('rtcFy').value);
+    var rate = IL[band(k,IB)][age<=3?0:(age<=8?1:2)], duty = cls===0 ? 0 : Math.round(k)*rate;
+    $('rtcRate').textContent = cls===0 ? EX : '('+rate+' Ft/kW)'; $('rtcDuty').textContent=ft(duty);
+    var orig = cls===0 ? 22950 : (parseInt($('rtcCc').value,10)||24975); $('rtcOrig').textContent=ft(orig);
+    var sum=tax+duty+orig+12000; $('rtcSum').textContent=ft(sum); $('rtcTotal').textContent=ft(sum);
+    $('rtcFree').hidden = cls!==0;
+    document.querySelectorAll('.rtc-agerow').forEach(function(r){r.style.display=isNew?'none':''});
+    $('rtcAge').style.display=isNew?'none':''; $('rtcProc').style.display=isNew?'none':'';
+  }
+  function seg(a,b,v){a.setAttribute('aria-pressed',String(v)); b.setAttribute('aria-pressed',String(!v))}
+  $('rtcKw').onclick=function(){kw=true;seg($('rtcKw'),$('rtcHp'),true);calc()};
+  $('rtcHp').onclick=function(){kw=false;seg($('rtcKw'),$('rtcHp'),false);calc()};
+  $('rtcUsed').onclick=function(){isNew=false;seg($('rtcUsed'),$('rtcNew'),true);calc()};
+  $('rtcNew').onclick=function(){isNew=true;seg($('rtcUsed'),$('rtcNew'),false);calc()};
+  ['rtcCls','rtcPow','rtcCc','rtcFy','rtcFm','rtcPy','rtcPm'].forEach(function(i){$(i).addEventListener('input',calc);$(i).addEventListener('change',calc)});
+  calc();
+})();
+</script>
+
+<style>
+.rtc{background:#fff;border:1px solid #E6EAF1;border-radius:22px;padding:26px 28px;box-shadow:0 12px 34px rgba(8,8,10,.06);scroll-margin-top:90px}
+.rtc-eyebrow{display:inline-block;background:#fbe9ec;color:#E2001A;font-weight:800;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;border-radius:999px}
+.rtc h2{font-size:clamp(22px,2.8vw,28px);font-weight:800;letter-spacing:-.02em;margin:10px 0 6px;color:#141519}
+.rtc-lead{color:#5A6B82;font-size:15px;line-height:1.6;margin:0 0 18px;max-width:75ch}
+.rtc-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:26px}
+.rtc-in{display:flex;flex-direction:column;gap:16px;min-width:0}
+.rtc-f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.rtc-l{font-weight:800;font-size:14px;color:#141519}
+.rtc-f small{color:#5A6B82;font-size:12.5px;line-height:1.45}
+.rtc-i{width:100%;min-width:0;border:1px solid #E6EAF1;border-radius:12px;padding:12px 13px;font-size:16px;font-weight:700;color:#141519;background:#fbfcfe;font-family:inherit}
+.rtc-row{display:flex;gap:10px}
+.rtc-seg{display:flex;gap:6px}
+.rtc-seg button{border:1px solid #E6EAF1;background:#fbfcfe;border-radius:12px;padding:10px 14px;font-weight:700;font-family:inherit;cursor:pointer;color:#141519;white-space:nowrap}
+.rtc-seg2 button{flex:1 1 0;white-space:normal}
+.rtc-seg button[aria-pressed="true"]{background:#141519;color:#fff;border-color:#141519}
+.rtc-out{background:linear-gradient(#0f1622,#0b0b0d);color:#fff;border-radius:18px;padding:22px;align-self:start;position:sticky;top:90px}
+.rtc-big{text-align:center;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)}
+.rtc-big span{display:block;color:#9aa7b8;font-size:13px;font-weight:600}
+.rtc-big b{display:block;font-size:clamp(28px,4.4vw,36px);font-weight:800;margin-top:4px}
+.rtc-big em{display:inline-block;margin-top:6px;font-style:normal;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;background:rgba(29,158,117,.16);color:#8fe3b8}
+.rtc-rows{margin:12px 0}
+.rtc-rows>div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13.5px}
+.rtc-rows span{color:#c4cddb}.rtc-rows b{white-space:nowrap}
+.rtc-rows small{opacity:.7}
+.rtc-sum{border-bottom:0!important;border-top:1px solid rgba(255,255,255,.18);font-size:14.5px!important}
+.rtc-cta{display:block;text-align:center;background:#E2001A;color:#fff;font-weight:800;text-decoration:none;padding:13px;border-radius:12px}
+.rtc-disc{color:#8b98a9;font-size:11.5px;line-height:1.55;margin:12px 0 0}.rtc-disc b{color:#c4cddb}
+@media(max-width:860px){.rtc-grid{grid-template-columns:1fr}.rtc-out{position:static}.rtc{padding:20px 16px}}
+</style>

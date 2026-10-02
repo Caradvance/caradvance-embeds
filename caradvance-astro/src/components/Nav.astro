@@ -1,6 +1,7 @@
 ---
 import { localizedPath, type Locale } from '../i18n/utils';
 import { localeList, flagCode, languageNames } from '../i18n/ui';
+import { contentFor, keyForPath, pathFor } from '../i18n/intl/index';
 const { lang, path = '/' } = Astro.props as { lang: Locale; path?: string };
 
 const home = localizedPath(lang, '/');
@@ -9,7 +10,7 @@ const jotekonysag = localizedPath(lang, '/jotekonysag');
 const autoink = localizedPath(lang, '/autoink/');
 
 // Menu mirrors the real caradvance.hu landing-page header exactly.
-const menu = [
+const huMenu = [
   { label: 'Prémium autóbérlés', items: [
     { t: 'Bérelhető autóink', href: '/berelheto' }, { t: 'Új autó bérlése', href: '/uj-auto-berlese', sub: [
       { t: 'BMW', href: '/uj-auto-berlese?brand=bmw', logo: '/bmw-hero-logo.png' },
@@ -51,6 +52,21 @@ const menu = [
     { t: 'Partnereink', href: '#' }, { t: 'Media', href: '/media' }, { t: 'Blog', href: '/blog' },
   ]},
 ];
+// Idegen nyelvű oldalak (külföldiek Magyarországon): saját, lefordított menü.
+const IC = lang !== 'hu' ? contentFor(lang) : undefined;
+const N = IC ? IC.ui.nav : undefined;
+const intlMenu = N ? [
+  { label: N.services, items: [ { t: N.rental, href: pathFor('rental', lang) }, { t: N.import, href: pathFor('import', lang) }, { t: N.regtax, href: pathFor('regtax', lang) } ] },
+  { label: N.cars, items: [ { t: N.carsAvail + ' (HU)', href: '/autoink/' }, { t: N.carsNew + ' (HU)', href: '/egyedi-auto-rendeles' } ] },
+  { label: N.company, items: [ { t: N.contact, href: pathFor('contact', lang) }, { t: N.hu, href: '/' } ] },
+] : [];
+const menu = N ? intlMenu : huMenu;
+const contactHref = N ? pathFor('contact', lang) : '/kapcsolat';
+const contactLabel = N ? N.contact : 'Kapcsolat';
+// Nyelvváltó: ha az oldalnak van megfelelője a többi nyelven, oda mutat; különben a nyelv főoldalára.
+const curFull = localizedPath(lang, path);
+const curKey = keyForPath(curFull);
+const altHref = (loc: Locale) => (curKey ? pathFor(curKey, loc) : localizedPath(loc, '/'));
 const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
 ---
 <div class="ca-navwrap"><nav class="ca-nav" aria-label="Főmenü">
@@ -66,10 +82,10 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
     ))}
   </ul>
   <div class="navright">
-    <a class="kapcsolat" href="/kapcsolat">Kapcsolat</a>
+    <a class="kapcsolat" href={contactHref}>{contactLabel}</a>
     <div class="lang"><button class="langbtn" type="button" aria-label="Nyelvváltás"><span class="navflag" style={`background-image:url(${flagUrl(lang)})`}></span><span class="lchev"></span></button><div class="langmenu">
       {localeList.map((loc) => (
-        <a class="langopt" href={localizedPath(loc, path)} aria-current={loc === lang ? 'true' : undefined}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
+        <a class="langopt" href={altHref(loc)} aria-current={loc === lang ? 'true' : undefined}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
       ))}
     </div></div>
     <button class="burger" type="button" aria-label="Menü"><span></span><span></span><span></span></button>
@@ -84,11 +100,11 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
       )}
     </div></div>
   ))}
-  <a class="m-kapcsolat" href="/kapcsolat">Kapcsolat</a>
-  <div class="m-langtitle">Nyelv</div>
+  <a class="m-kapcsolat" href={contactHref}>{contactLabel}</a>
+  <div class="m-langtitle">{N ? 'Language' : 'Nyelv'}</div>
   <div class="m-langs">
     {localeList.map((loc) => (
-      <a class="m-langopt" href={localizedPath(loc, path)}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
+      <a class="m-langopt" href={altHref(loc)}><span class="lf" style={`background-image:url(${flagUrl(loc)})`}></span><span>{languageNames[loc]}</span></a>
     ))}
   </div>
 </div>

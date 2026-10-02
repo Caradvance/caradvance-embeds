@@ -1,0 +1,214 @@
+---
+// Idegen nyelvű szolgáltatásoldal (külföldiek Magyarországon): hero, szekciók,
+// kalkulátor, ajánlatkérő űrlap, GYIK + teljes JSON-LD (Organization/AutoDealer,
+// Service, WebApplication, FAQPage, BreadcrumbList).
+import '../styles/eladom.css';
+import RegTaxCalc from './RegTaxCalc.astro';
+import type { PageKey } from '../i18n/intl/types';
+import { contentFor, resolveHref, pathFor } from '../i18n/intl/index';
+
+const { lang, pageKey } = Astro.props as { lang: string; pageKey: PageKey };
+const C = contentFor(lang)!;
+const P = C.pages[pageKey];
+const u = C.ui;
+const SITE = 'https://www.caradvance.hu';
+const href = (t: string) => resolveHref(t, lang);
+const url = SITE + pathFor(pageKey, lang);
+const localeTag = u.ogLocale.replace('_', '-');
+
+const org = {
+  '@type': 'AutoDealer',
+  '@id': SITE + '/#caradvance',
+  name: 'CarAdvance',
+  legalName: 'Caradvance GmbH',
+  url: SITE + pathFor('home', lang),
+  logo: SITE + '/caradvance-logo.webp',
+  image: SITE + '/caradvance-iroda.webp',
+  telephone: '+36 30 233 6060',
+  email: 'info@caradvance.hu',
+  foundingDate: '2003',
+  address: { '@type': 'PostalAddress', streetAddress: 'Ibolya utca 18.', addressLocality: 'Solymár', postalCode: '2083', addressRegion: 'Pest', addressCountry: 'HU' },
+  openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '17:00' }],
+  areaServed: [{ '@type': 'City', name: 'Budapest' }, { '@type': 'Country', name: 'Hungary' }],
+  knowsLanguage: ['en', 'de', 'hu'],
+  brand: ['BMW', 'MINI', 'Mercedes-Benz', 'Audi'].map((n) => ({ '@type': 'Brand', name: n })),
+  sameAs: ['https://www.facebook.com/share/19BfQsJxSk/', 'https://www.instagram.com/caradvance_hungary', 'https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw'],
+  parentOrganization: { '@type': 'Organization', name: 'Caradvance GmbH', address: { '@type': 'PostalAddress', streetAddress: 'Bgm-Graf-Ring 21', addressLocality: 'Geretsried', postalCode: '82538', addressCountry: 'DE' } },
+};
+const graph: any[] = [];
+graph.push({ '@type': 'WebPage', '@id': url, url, name: P.title, description: P.desc, inLanguage: localeTag, isPartOf: { '@type': 'WebSite', url: SITE + '/', name: 'CarAdvance' }, about: { '@id': org['@id'] } });
+graph.push(pageKey === 'contact' ? { ...org, '@type': ['AutoDealer'], contactPoint: [{ '@type': 'ContactPoint', telephone: '+36 30 233 6060', email: 'info@caradvance.hu', contactType: 'customer service', availableLanguage: ['English', 'German', 'Hungarian'] }] } : org);
+if (P.service) graph.push({ '@type': 'Service', name: P.service, serviceType: P.service, provider: { '@id': org['@id'] }, areaServed: { '@type': 'Country', name: 'Hungary' }, availableLanguage: ['English', 'German', 'Hungarian'], url });
+if (pageKey === 'regtax') graph.push({ '@type': 'WebApplication', name: u.calc.h2, url: url + '#kalkulator', applicationCategory: 'FinanceApplication', operatingSystem: 'All', inLanguage: localeTag, offers: { '@type': 'Offer', price: '0', priceCurrency: 'HUF' } });
+if (P.faq.length) graph.push({ '@type': 'FAQPage', mainEntity: P.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a.replace(/<[^>]+>/g, '') } })) });
+const crumbs = [{ n: u.common.home, p: pathFor('home', lang) }];
+if (pageKey !== 'home') crumbs.push({ n: P.breadcrumb, p: pathFor(pageKey, lang) });
+graph.push({ '@type': 'BreadcrumbList', itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.n, item: SITE + c.p })) });
+const ld = { '@context': 'https://schema.org', '@graph': graph };
+const interest = P.formInterest || 'other';
+const TYPE: Record<string, string> = { rental: 'Bérlés', import: 'Autóimport', regtax: 'Honosítás', other: 'Egyéb kérdés' };
+---
+<section class="hero ip-hero">
+  <video autoplay muted loop playsinline preload="metadata" poster={P.poster}><source src={P.video} type="video/mp4" /></video>
+  <div class="scrim"></div>
+  <div class="inner">
+    <span class="ip-kicker">{P.kicker}</span>
+    <h1 set:html={P.h1}></h1>
+    <p class="sub sub-wide" style="max-width:860px">{P.sub}</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href={href(P.cta1[1])}>{P.cta1[0]}</a>
+      {P.cta2 && <a class="btn btn-white" href={href(P.cta2[1])}>{P.cta2[0]}</a>}
+    </div>
+  </div>
+</section>
+
+<nav class="ip-crumbs" aria-label="Breadcrumb">
+  {crumbs.map((c, i) => (i < crumbs.length - 1 ? <><a href={c.p}>{c.n}</a><span>›</span></> : <span aria-current="page">{c.n}</span>))}
+</nav>
+
+<div class="ip">
+  <div class="ip-trust">
+    {u.trust.map(([n, l]) => (<div><b>{n}</b><span>{l}</span></div>))}
+  </div>
+
+  {pageKey === 'regtax' && <RegTaxCalc s={u.calc} locale={localeTag} />}
+
+  {P.secs.map((s) => (
+    <section class="ip-sec" id={s.id}>
+      {s.kicker && <span class="ip-tag">{s.kicker}</span>}
+      <h2>{s.h2}</h2>
+      {s.lead && <p class="ip-lead">{s.lead}</p>}
+      {s.p && s.p.map((x) => <p set:html={x}></p>)}
+      {s.ul && <ul class="ip-ul">{s.ul.map((x) => <li set:html={x}></li>)}</ul>}
+      {s.cards && <div class="ip-cards">{s.cards.map(([t, x]) => (<div class="ip-card"><h3>{t}</h3><p set:html={x}></p></div>))}</div>}
+      {s.steps && <ol class="ip-steps">{s.steps.map(([t, x], i) => (<li><span class="ip-n">{i + 1}</span><div><h3>{t}</h3><p set:html={x}></p></div></li>))}</ol>}
+      {s.table && <div class="ip-scroll"><table class="ip-table">{s.table.head.some(Boolean) && <thead><tr>{s.table.head.map((h) => <th>{h}</th>)}</tr></thead>}<tbody>{s.table.rows.map((r) => <tr>{r.map((c, i) => (i === 0 ? <th scope="row" set:html={c}></th> : <td set:html={c}></td>))}</tr>)}</tbody></table></div>}
+      {s.note && <p class="ip-note" set:html={s.note}></p>}
+      {s.links && <div class="ip-links">{s.links.map(([t, l]) => <a href={href(l)}>{t} →</a>)}</div>}
+    </section>
+  ))}
+
+  <section class="ip-form" id="ajanlat">
+    <div class="ip-form-l">
+      <span class="ip-tag">{u.nav.contact}</span>
+      <h2>{u.form.h2}</h2>
+      <p>{u.form.lead}</p>
+      <div class="ip-ct">
+        <a href="tel:+36302336060"><b>{u.common.call}</b> +36 30 233 6060</a>
+        <a href="https://wa.me/36302336060" target="_blank" rel="noopener"><b>{u.common.whatsapp}</b> +36 30 233 6060</a>
+        <a href="mailto:info@caradvance.hu"><b>{u.common.email}</b> info@caradvance.hu</a>
+        <span><b>{u.common.office}</b> 2083 Solymár, Ibolya utca 18. · {u.common.hours}</span>
+      </div>
+    </div>
+    <form class="ip-f" id="ipForm" novalidate data-lang={lang.toUpperCase()} data-page={P.title}>
+      <label><span>{u.form.name}</span><input name="name" autocomplete="name" required></label>
+      <div class="ip-f2">
+        <label><span>{u.form.email}</span><input name="email" type="email" autocomplete="email"></label>
+        <label><span>{u.form.phone}</span><input name="phone" type="tel" autocomplete="tel"></label>
+      </div>
+      <label><span>{u.form.interest}</span>
+        <select name="interest">
+          {(['rental', 'import', 'regtax', 'other'] as const).map((k) => <option value={TYPE[k]} selected={k === interest}>{u.form.interests[k]}</option>)}
+        </select></label>
+      <label><span>{u.form.msg}</span><textarea name="msg" rows="4" placeholder={u.form.msgPh}></textarea></label>
+      <input name="website" tabindex="-1" autocomplete="off" class="ip-hp" aria-hidden="true">
+      <label class="ip-chk"><input type="checkbox" name="consent"><span set:html={u.form.consent}></span></label>
+      <button type="submit" class="btn btn-primary">{u.form.submit}</button>
+      <p class="ip-msg" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  {P.faq.length > 0 && (
+    <section class="ip-sec ip-faqsec">
+      <span class="ip-tag">FAQ</span>
+      <h2>{u.faqTitle}</h2>
+      <div class="ip-faq">{P.faq.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p set:html={a}></p></details>))}</div>
+    </section>
+  )}
+</div>
+
+<script type="application/ld+json" set:html={JSON.stringify(ld)}></script>
+<script define:vars={{ T: u.form }}>
+(function(){
+  var f=document.getElementById('ipForm'); if(!f) return;
+  var msg=f.querySelector('.ip-msg'), btn=f.querySelector('button[type=submit]');
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var v=function(n){var el=f.elements[n]; return el?String(el.value||'').trim():''};
+    if((!v('email') && !v('phone')) || !f.elements.consent.checked){ msg.textContent=T.need; msg.className='ip-msg err'; return; }
+    var P={ 'Típus': v('interest'), 'Név': v('name'), 'E-mail': v('email'), 'Telefon': v('phone'), 'Üzenet': v('msg'),
+      'Nyelv': f.dataset.lang, 'Oldal': f.dataset.page, website: v('website'), page: location.href, user_agent: navigator.userAgent, mkt_consent: false };
+    try{ if(window.caLeadExtras) Object.assign(P, window.caLeadExtras()); }catch(_e){}
+    btn.disabled=true; var old=btn.textContent; btn.textContent=T.sending; msg.textContent=''; msg.className='ip-msg';
+    fetch('/api/lead',{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(P)})
+      .then(function(r){return r.json().catch(function(){return {ok:r.ok}})})
+      .then(function(j){ if(j&&j.ok){ msg.textContent=T.ok; msg.className='ip-msg ok'; f.reset(); try{ if(window.gtag) gtag('event','generate_lead',{method:'intl_'+P['Nyelv']}); }catch(_e){} } else { throw 0; } })
+      .catch(function(){ msg.textContent=T.err; msg.className='ip-msg err'; })
+      .finally(function(){ btn.disabled=false; btn.textContent=old; });
+  });
+})();
+</script>
+
+<style>
+.ip-hero .ip-kicker{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;font-weight:700;font-size:13px;letter-spacing:.02em;padding:7px 14px;border-radius:999px;margin-bottom:16px;backdrop-filter:blur(6px)}
+.ip-crumbs{max-width:1080px;margin:0 auto;padding:4px 20px 0;font-size:13px;color:#5A6B82;display:flex;gap:8px;flex-wrap:wrap}
+.ip-crumbs a{color:#5A6B82;text-decoration:none}.ip-crumbs a:hover{color:#E2001A}
+.ip{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;max-width:1080px;margin:0 auto;padding:18px 20px 72px;display:flex;flex-direction:column;gap:56px;color:var(--ink)}
+.ip-trust{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.ip-trust>div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 8px 24px rgba(8,8,10,.04)}
+.ip-trust b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.ip-trust span{color:var(--muted);font-size:13.5px;line-height:1.45}
+.ip-tag{display:inline-block;background:#fdeaec;color:var(--red);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:12px}
+.ip-sec h2,.ip-form h2{font-size:clamp(24px,3.2vw,34px);font-weight:800;letter-spacing:-.02em;margin:0 0 14px;line-height:1.15}
+.ip-sec>p,.ip-lead{color:var(--muted);font-size:16.5px;line-height:1.7;margin:0 0 14px;max-width:80ch}
+.ip-sec p strong{color:var(--ink)}
+.ip-sec a{color:var(--red);font-weight:700}
+.ip-ul{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.ip-ul li{position:relative;padding-left:28px;color:var(--muted);font-size:16px;line-height:1.6}
+.ip-ul li:before{content:"";position:absolute;left:0;top:7px;width:16px;height:16px;border-radius:50%;background:#fdeaec;box-shadow:inset 0 0 0 5px var(--red)}
+.ip-ul li strong{color:var(--ink)}
+.ip-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:6px}
+.ip-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 20px;box-shadow:0 8px 24px rgba(8,8,10,.04)}
+.ip-card h3{font-size:17px;font-weight:800;margin:0 0 8px}
+.ip-card p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0}
+.ip-steps{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:12px;counter-reset:s}
+.ip-steps li{display:flex;gap:16px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.ip-n{flex:0 0 34px;height:34px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.ip-steps h3{font-size:16.5px;font-weight:800;margin:4px 0 4px}
+.ip-steps p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0}
+.ip-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
+.ip-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.ip-table th,.ip-table td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+.ip-table thead th{background:#f6f8fb;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.ip-table tbody th{font-weight:800;white-space:nowrap;width:1%}
+.ip-table td{color:var(--muted)}
+.ip-table tr:last-child>*{border-bottom:0}
+.ip-note{background:#f6f8fb;border-left:4px solid var(--red);border-radius:10px;padding:12px 16px;font-size:14.5px!important}
+.ip-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.ip-links a{background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 16px;text-decoration:none;font-size:14px}
+.ip-links a:hover{border-color:var(--red)}
+.ip-form{display:grid;grid-template-columns:1fr 1.15fr;gap:28px;background:linear-gradient(#0f1622,#0b0b0d);color:#fff;border-radius:24px;padding:32px;scroll-margin-top:90px}
+.ip-form p{color:#b9c3d2;font-size:15.5px;line-height:1.6}
+.ip-form .ip-tag{background:rgba(226,0,26,.18);color:#ff8a96}
+.ip-ct{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.ip-ct a,.ip-ct span{color:#e7eaf0;text-decoration:none;font-size:14.5px;line-height:1.5}
+.ip-ct b{display:block;color:#9aa7b8;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.ip-f{display:flex;flex-direction:column;gap:12px;background:#fff;color:var(--ink);border-radius:18px;padding:22px}
+.ip-f label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13.5px}
+.ip-f input,.ip-f select,.ip-f textarea{border:1px solid var(--line);border-radius:12px;padding:12px 13px;font-size:15px;font-family:inherit;background:#fbfcfe;color:var(--ink);width:100%;min-width:0}
+.ip-f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ip-chk{flex-direction:row!important;align-items:flex-start;font-weight:500!important;font-size:13px!important;line-height:1.5;color:var(--muted)}
+.ip-chk input{width:18px!important;height:18px;flex:0 0 auto;margin-top:2px;accent-color:var(--red)}
+.ip-chk a{color:var(--red)}
+.ip-hp{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0}
+.ip-msg{margin:0;font-size:14px;font-weight:700}.ip-msg.ok{color:#1D9E75}.ip-msg.err{color:var(--red)}
+.ip-faq{display:flex;flex-direction:column;gap:10px}
+.ip-faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px 18px}
+.ip-faq summary{cursor:pointer;list-style:none;font-weight:800;padding:14px 0;display:flex;justify-content:space-between;gap:12px}
+.ip-faq summary::-webkit-details-marker{display:none}
+.ip-faq .pl{color:var(--red);font-size:20px;line-height:1}
+.ip-faq details[open] .pl{transform:rotate(45deg)}
+.ip-faq p{color:var(--muted);line-height:1.65;margin:0 0 14px}
+@media(max-width:860px){.ip-cards{grid-template-columns:1fr 1fr}.ip-trust{grid-template-columns:1fr 1fr}.ip-form{grid-template-columns:1fr;padding:22px}}
+@media(max-width:560px){.ip-cards,.ip-f2{grid-template-columns:1fr}.ip{gap:44px}}
+</style>
