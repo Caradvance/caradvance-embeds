@@ -14,7 +14,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Mennyi idő alatt érkezik meg az autó?', a: 'Új, gyári rendelés esetén a szállítási idő a konfigurációtól függ; készletről elérhető darabnál akár néhány hét. Konkrét határidőt a kiválasztott konfigurációra adunk.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett, ami a listaár jelentős részét jelentheti.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett, ami a listaár jelentős részét jelentheti.' },
     ],
   },
   RS3: {
@@ -32,7 +32,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'A végsebesség hogyan emelhető?', a: 'Az RS dinamikus csomaggal a gyárilag korlátozott 250 km/h akár 290 km/h-ra emelhető. A pontos elérhetőséget a konfigurációnál egyeztetjük.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   A5: {
@@ -50,7 +50,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Limousine vagy Avant — melyiket válasszam?', a: 'A Limousine elegáns, sedan forma; az Avant kombi, nagyobb és rugalmasabb csomagtérrel. Mindkettő azonos hajtásláncokkal és felszereltségi szintekkel elérhető.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   RS5: {
@@ -68,7 +68,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Az RS 5 hétköznap is használható?', a: 'Igen. Komfort üzemmódban kulturált és kényelmes hosszú úton is; a sportos karakter dinamikus módban hívható elő. Ideális egyautós megoldás azoknak, akik prémium sportautót és mindennapi használhatóságot is szeretnének.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   A6: {
@@ -86,7 +86,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Mi a különbség az A6 és az A6 e-tron között?', a: 'Az A6 hagyományos benzin/dízel és tölthető hibrid hajtásláncokkal érhető el, az A6 e-tron pedig teljesen elektromos modell. Mindkettőt rendeljük Németországból — segítünk kiválasztani a használatodhoz illő változatot.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   A6ETRON: {
@@ -104,7 +104,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Mennyi a valós hatótáv?', a: 'A kiépítéstől és a vezetési stílustól függően a WLTP hatótáv akár 600–750 km is lehet. A pontos értéket a kiválasztott akkumulátorra és felszereltségre adjuk meg a konfigurációnál.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   A8: {
@@ -140,7 +140,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Van quattro összkerékhajtás?', a: 'Igen, a magasabb teljesítményű változatokhoz quattro összkerékhajtás is választható, ami rosszabb útviszonyok között is magabiztos tapadást ad.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   Q5: {
@@ -158,7 +158,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Q5 vagy Q5 Sportback?', a: 'A Q5 klasszikus SUV forma maximális térrel és csomagtérrel; a Q5 Sportback coupé-szerű, dinamikusabb megjelenéssel, minimális helyveszteséggel. A hajtásláncok és felszereltség megegyeznek.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   Q6ETRON: {
@@ -176,7 +176,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Mennyi idő a töltés?', a: 'A 800 voltos architektúrának köszönhetően megfelelő gyorstöltőn 10-ről 80%-ra kb. 21 perc alatt tölthető. Otthoni AC töltés is támogatott.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   Q7: {
@@ -194,7 +194,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Tényleg hétszemélyes?', a: 'Igen, a Q7 gyárilag akár három üléssorral, hét üléssel rendelhető. A harmadik sor alkalmi használatra ideális, és nem használatkor a padlóba süllyeszthető a nagyobb csomagtérért.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   Q8: {
@@ -212,7 +212,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Mennyi a csomagtér a coupé forma ellenére?', a: 'A Q8 a coupé-szerű tetővonal ellenére is bőséges, több mint 600 literes csomagteret kínál, ami a legtöbb mindennapi és utazási igényt kényelmesen kiszolgálja.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   RSQ8: {
@@ -230,7 +230,7 @@ export const FAMILIES = {
     ],
     faq: [
       { q: 'Mennyi a gyorsulás és a végsebesség?', a: 'Az RS Q8 performance 0–100 km/h-ra kb. 3,6 mp alatt gyorsul, végsebessége pedig a megfelelő csomaggal akár 305 km/h. Mindezt öt személy és teljes SUV-praktikum mellett.' },
-      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a müncheni Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
+      { q: 'Mennyit spórolok a német áfával?', a: 'Magánszemélyként a München melletti (geretsriedi) Caradvance GmbH-n keresztül akár 19%-os német áfával vásárolhatsz a hazai 27% helyett.' },
     ],
   },
   Q9: {
