@@ -36,7 +36,7 @@ for (const f of FILES) {
           '\n      <button class="autok-tab" data-tab="premium" data-group="berles" type="button" hidden>Prémium (' + n + ')</button>');
         h = h.replace("(h==='berelheto'||h==='berbeadva')", "(h==='berelheto'||h==='premium'||h==='berbeadva')");
         h = h.replace("heroSwap(b.getAttribute('data-tab'));", "heroSwap(b.getAttribute('data-tab')==='premium'?'berelheto':b.getAttribute('data-tab'));");
-        console.log('[abo] Prémium fül: ' + n + ' autó, Bérelhető: ' + SUB_TOTAL);
+        console.log('[abo] Prémium fül: ' + tm[2] + ' autó, Bérelhető: ' + SUB_TOTAL);
       }
     }
   }
