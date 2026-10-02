@@ -77,9 +77,11 @@ export function buildSaleModel(car: EgyediCar, f: SaleFacts) {
   const priceTxt = net ? `${huf} (${ef(net)} € nettó)-tól` : 'egyedi ajánlat alapján';
   const rentHref = f.rent ? `/berelheto-auto/${f.rent}-berles` : `/uj-auto-berlese?brand=${b.key}`;
 
-  const tBase = `Új ${name} eladó — ${net ? 'ár ' + ef(net) + ' €-tól' : 'ár kérésre'}`;
+  // Keresési cím: a magyar kereső "ár / ára / új ára" kifejezéseket használ, forintban gondolkodik.
+  const mft = net ? (net * FX / 1e6).toFixed(1).replace('.', ',') : '';
+  const tBase = net ? `Új ${name} ára: nettó ${mft} M Ft-tól` : `Új ${name} — ár kérésre, rendelés Németországból`;
   const title = tBase.length <= 44 ? `${tBase}, Németországból | CarAdvance` : tBase.length <= 60 ? `${tBase} | CarAdvance` : tBase;
-  const description = `Új ${name} egyedi rendelése Németországból${net ? ', ' + huf + '-tól (nettó)' : ''}. ${cap(fuelTxt)}${pTxt ? ', ' + pTxt : ''}. Kulcsrakész behozatal, akár 19% német áfa, lízing és tartós bérlet.`;
+  const description = `Új ${name} rendelése Németországból${net ? ' nettó ' + ef(net) + ' €-tól (kb. ' + mft + ' M Ft)' : ''}. ${cap(fuelTxt)}${pTxt ? ', ' + pTxt : ''}. Kulcsrakész behozatal és forgalomba helyezés, akár 19% német áfával — kérj ajánlatot!`;
 
   const highlights = f.hl ? f.hl.map(([icon, t, x]) => ({ icon, title: t, text: x })) : [
     { icon: '◈', title: pTxt ? pTxt : 'Erős hajtás', text: `${cap(fuelTxt)} hajtás${f.engines.length > 1 ? ', ' + f.engines.length + ' motorváltozat' : ''} — ${e0 ? e0[0] + ': ' + e0[2] : ''}.` },
