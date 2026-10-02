@@ -464,8 +464,7 @@
           '<div class="cain-toggle"><button type="button" class="cain-tgl active" data-buyer="Magánszemély">Magánszemélyként</button><button type="button" class="cain-tgl" data-buyer="Cég">Cégként</button></div>'+
           '<div class="cain-block cain-buy">'+
             '<div class="cain-flabel">Hogyan szeretnéd megvásárolni?</div>'+
-            '<label class="cain-radio"><input type="radio" name="mode" class="cain-mode1" value="19% német áfával, Németországból (Caradvance GmbH)"/><span class="cain-mode1lbl">19% német áfával, Németországból (Caradvance GmbH)</span></label>'+
-            '<label class="cain-radio"><input type="radio" name="mode" value="27% magyar áfával, BH Group Zrt."/><span>27% magyar áfával, a BH Group Zrt.-n keresztül</span></label>'+
+            '<label class="cain-radio"><input type="radio" name="mode" class="cain-mode1" value="19% német áfával, Németországból (Caradvance GmbH)" checked/><span class="cain-mode1lbl">19% német áfával, Németországból (Caradvance GmbH)</span></label>'+
             '<div class="cain-sublabel">Fizetés módja</div>'+
             '<label class="cain-radio"><input type="radio" name="payment" value="Egy összegben"/><span>Egy összegben</span></label>'+
             '<label class="cain-radio"><input type="radio" name="payment" value="Finanszírozással"/><span>Finanszírozással</span></label>'+
