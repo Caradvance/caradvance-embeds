@@ -1,0 +1,98 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'eredetisegvizsgalat';
+const title = 'Eredetiségvizsgálat 2026 — ára, menete, érvényessége és a behozott autó';
+const lead = 'Mennyibe kerül az eredetiségvizsgálat 2026-ban, mikor kötelező, mit visz magával az ember, és mi a teendő, ha Németországból hozott autót helyeznél forgalomba?';
+const description = 'Eredetiségvizsgálat 2026: díjak (22 950–27 000 Ft személyautónál), mikor kötelező, mi kell hozzá, meddig érvényes (60 nap), mit ellenőriznek — és hogyan zajlik a külföldről behozott autónál.';
+const faqs = [
+  ['Mennyibe kerül az eredetiségvizsgálat 2026-ban?', 'Személyautónál 22 950 Ft (1400 cm³-ig és tisztán elektromos autónál), 24 975 Ft (1401–2000 cm³) vagy 27 000 Ft (2000 cm³ felett). Motorkerékpárnál 20 925–22 950 Ft, kisteherautónál 27 000 Ft.'],
+  ['Meddig érvényes az eredetiségvizsgálat?', 'A vizsgálat eredménye 60 napig és egy alkalommal használható fel a közlekedési igazgatási ügyintézéshez. Ha lejár, újra el kell végeztetni, és a díjat ismét meg kell fizetni.'],
+  ['Ki fizeti az eredetiségvizsgálatot, az eladó vagy a vevő?', 'Erről a felek szabadon megállapodhatnak. A gyakorlatban többnyire a vevő intézi és fizeti, mert az átíráshoz neki van rá szüksége.'],
+  ['Kell eredetiségvizsgálat a Németországból behozott autóra?', 'A külföldről behozott használt autó magyarországi forgalomba helyezése jellemzően eredetiségvizsgálattal indul, a honosítási műszaki vizsga, a regisztrációs adó és az okmányok mellett. A pontos eljárás a jármű és az okmányai alapján dől el.'],
+  ['Mikor nem kell eredetiségvizsgálat?', 'Örökléskor, bizonyos közeli hozzátartozók közötti tulajdonátruházáskor, valamint a megfelelő járműkísérő lappal rendelkező új járműnél főszabály szerint nincs rá szükség.'],
+  ['Mi történik, ha eltérést találnak?', 'Az eltérés nem jelenti automatikusan, hogy a jármű lopott — lehet egyszerű adateltérés is. Ha viszont további hatósági tisztázás kell, az átírás vagy a forgalomba helyezés addig nem folytatható.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={`${title} | CarAdvance`} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["regisztracios-ado-2026","auto-behozatal-nemetorszagbol"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>Az <strong>eredetiségvizsgálat</strong> (köznyelvben eredetvizsga) során egy erre jogosult vizsgálóállomás ellenőrzi, hogy a jármű azonosítói — alvázszám, motorszám, adattábla — és okmányai valódiak-e és egyeznek-e egymással. <strong>Személyautónál 2026-ban 22 950–27 000 Ft</strong>, az eredmény <strong>60 napig, egyszer</strong> használható fel. Használt autó átírásához és a külföldről behozott autó forgalomba helyezéséhez jellemzően szükséges.</p>
+    </div>
+
+    <p>Ha használt autót veszel, vagy Németországból hozol autót, az eredetiségvizsgálat az egyik első kötelező lépés. Ebben az útmutatóban összeszedtük a <strong>2026-os díjakat</strong>, a vizsgálat menetét, a szükséges iratokat, és azt is, mire figyelj, ha behozott autót helyeznél forgalomba Magyarországon.</p>
+
+    <h2>Mi az eredetiségvizsgálat?</h2>
+    <p>Az eredetiségvizsgálat hatósági jellegű ellenőrzés: a vizsgálóállomás összeveti a jármű egyedi azonosítóit a dokumentumokban szereplő adatokkal, és megnézi, nem nyúltak-e hozzájuk. Nem azonos a műszaki vizsgával — itt nem a fékeket vagy a futóművet vizsgálják, hanem azt, hogy <strong>az autó az-e, aminek a papírjai mondják</strong>. Az eredményt hatósági bizonyítvány igazolja, amelyre az okmányirodai (kormányablakos) ügyintézésnél szükség van.</p>
+
+    <h2>Eredetiségvizsgálat ára 2026-ban</h2>
+    <p>A díj hatóságilag meghatározott, és a jármű fajtájától, személyautónál a hengerűrtartalomtól függ:</p>
+    <table>
+      <thead><tr><th>Jármű</th><th>Kategória</th><th>Díj</th></tr></thead>
+      <tbody>
+        <tr><td>Személyautó</td><td>1400 cm³-ig</td><td>22 950 Ft</td></tr>
+        <tr><td>Személyautó</td><td>1401–2000 cm³</td><td>24 975 Ft</td></tr>
+        <tr><td>Személyautó</td><td>2000 cm³ felett</td><td>27 000 Ft</td></tr>
+        <tr><td>Tisztán elektromos személyautó</td><td>—</td><td>22 950 Ft</td></tr>
+        <tr><td>Motorkerékpár</td><td>500 cm³-ig / felett</td><td>20 925 / 22 950 Ft</td></tr>
+        <tr><td>Kistehergépkocsi</td><td>3,5 tonnáig</td><td>27 000 Ft</td></tr>
+        <tr><td>Könnyű pótkocsi, lakókocsi</td><td>—</td><td>21 600 Ft</td></tr>
+      </tbody>
+    </table>
+    <p>Egy tipikus prémium autónál — például egy 2.0-s vagy 3.0-s BMW-nél, Mercedesnél vagy Audinál — tehát 24 975 vagy 27 000 Ft-tal érdemes számolni.</p>
+
+    <h2>Mikor kötelező az eredetiségvizsgálat?</h2>
+    <ul>
+      <li><strong>Használt autó vásárlásakor</strong> — főszabály szerint az átírás előtt el kell végezni.</li>
+      <li><strong>Külföldről behozott autó forgalomba helyezésekor</strong> — a honosítás jellemzően ezzel indul (lásd lent).</li>
+      <li><strong>Ajándékozáskor</strong> — ha nem vonatkozik rá mentesség.</li>
+    </ul>
+    <p><strong>Nem kell</strong> főszabály szerint öröklésnél, bizonyos közeli hozzátartozók közötti tulajdonátruházásnál, és a megfelelő járműkísérő lappal rendelkező új járműnél.</p>
+
+    <h2>Meddig érvényes?</h2>
+    <p>Az eredetiségvizsgálat eredménye <strong>60 napig és egyetlen alkalommal</strong> használható fel. Ha az ügyintézés csúszik, és a 60 nap letelik, újra kell vizsgáztatni — ezért érdemes az időpontot az átírás vagy a forgalomba helyezés ütemezéséhez igazítani. Belföldi adásvételnél a tulajdonosváltást 15 napon belül kell bejelenteni, így a vizsgát nem érdemes az utolsó pillanatra hagyni.</p>
+
+    <h2>Mit kell vinni az eredetiségvizsgálatra?</h2>
+    <ul>
+      <li>Magát a <strong>járművet</strong> — az azonosítókat fizikailag ellenőrzik.</li>
+      <li>A jármű <strong>forgalmi engedélyét</strong> (behozott autónál a külföldi forgalmit, pl. a német Zulassungsbescheinigung Teil I-et, és ha van, a Teil II-t).</li>
+      <li>A tulajdonszerzést igazoló iratot: <strong>adásvételi szerződést vagy számlát</strong>.</li>
+      <li><strong>Meghatalmazást</strong>, ha nem a tulajdonos vagy a vevő jár el.</li>
+    </ul>
+
+    <h2>Hogyan zajlik a vizsgálat?</h2>
+    <ol>
+      <li><strong>Időpontfoglalás</strong> egy jogosult vizsgálóállomáson.</li>
+      <li><strong>Okmányok ellenőrzése</strong> — a forgalmi, az adásvételi és a jármű adatai.</li>
+      <li><strong>Az azonosítók ellenőrzése</strong> — alvázszám, motorszám, adattáblák, és a gyári jelölések sértetlensége.</li>
+      <li><strong>Fotódokumentáció</strong> és az eredmény rögzítése.</li>
+      <li><strong>Hatósági bizonyítvány</strong> — ezzel mehetsz tovább a kormányablakba.</li>
+    </ol>
+    <p>Maga a vizsgálat általában nem hosszú, de az időtartam függ a jármű típusától és az állomás leterheltségétől.</p>
+
+    <h2>Eredetiségvizsgálat a Németországból behozott autónál</h2>
+    <p>A külföldről behozott használt autó magyarországi forgalomba helyezése (a <strong>honosítás</strong>) több lépésből áll, és az eredetiségvizsgálat jellemzően ennek az első lépése:</p>
+    <ol>
+      <li><strong>Eredetiségvizsgálat</strong> — a külföldi okmányok és az azonosítók ellenőrzése.</li>
+      <li><strong>Honosítási műszaki vizsga</strong> — elkészül a magyar műszaki adatlap.</li>
+      <li><strong>Regisztrációs adó</strong> — a NAV állapítja meg teljesítmény, környezetvédelmi osztály és kor alapján. Részletek a <a href="/blog/regisztracios-ado-2026">regisztrációs adó 2026 útmutatóban</a>.</li>
+      <li><strong>Forgalomba helyezés</strong> — vagyonszerzési illeték, KGFB, magyar forgalmi, törzskönyv és rendszám.</li>
+    </ol>
+    <p>A hatósági tételeket — regisztrációs adó, vagyonszerzési illeték, eredetiségvizsgálat, okmányok — egy összegben kiszámolja a <a href="/honositas-kalkulator/">honosítás kalkulátorunk</a>. Magyar rendszámos használt autó átírásának költségét pedig az <a href="/atiras-kalkulator/">átírás kalkulátor</a> mutatja.</p>
+    <p><strong>Tipp:</strong> a behozott autónál a leggyakoribb fennakadás a hiányos külföldi okmány. Már vásárláskor ellenőrizd, hogy megvan-e a forgalmi mindkét része, az adásvételi vagy számla, és hogy az alvázszám mindenhol egyezik.</p>
+
+    <h2>Mi történik, ha eltérést találnak?</h2>
+    <p>Az eltérés nem jelenti automatikusan, hogy a jármű lopott vagy manipulált: lehet egyszerű adateltérés is, például egy műszaki adat az okmányban. Ha viszont további hatósági tisztázás szükséges, az átírás vagy a forgalomba helyezés addig nem folytatható. Ezért éri meg <strong>vásárlás előtt</strong> ellenőrizni az autó azonosítóit és előéletét — főleg külföldi vásárlásnál.</p>
+
+    <h2>Mi intézzük helyetted</h2>
+    <p>A CarAdvance-nél a Németországból hozott autó teljes honosítását átvállaljuk: az eredetiségvizsgálattól a műszaki vizsgán és a regisztrációs adón át a magyar forgalmiig és rendszámig. Az autót már a nevedre írt magyar okmányokkal kapod meg. Nézd meg az <a href="/auto-rendeles">autóbehozatal Németországból</a> szolgáltatásunkat, vagy kérj ajánlatot a <a href="/kapcsolat">kapcsolat oldalon</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">A cikk tájékoztató jellegű, a díjak a 2026. októberi állapotot tükrözik. Konkrét ügyben a vizsgálóállomás és a közlekedési hatóság tájékoztatása az irányadó.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>

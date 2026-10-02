@@ -1,0 +1,111 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'regisztracios-ado-2026';
+const title = 'Regisztrációs adó 2026 — számítás, táblázat, példák és NAV ügyintézés';
+const lead = 'Hogyan számolja a NAV a regisztrációs adót 2026-ban, mennyi egy Németországból behozott autó regadója, és mikor nem kell fizetni? Táblázatok és kiszámolt példák.';
+const description = 'Regisztrációs adó 2026: számítás kW és környezetvédelmi osztály alapján, a NAV 2026-os adótáblája, korkedvezmény, kiszámolt példák behozott autókra, elektromos és hibrid autók, NAV ügyintézés és visszaigénylés.';
+const faqs = [
+  ['Mennyi a regisztrációs adó 2026-ban?', 'A regisztrációs adó a motor teljesítményétől (kW), a környezetvédelmi osztálytól és az autó korától függ. Az alapadó a NAV 2026-os táblája szerint 47 000 Ft-tól (80 kW alatt, legjobb besorolás) több millió forintig terjed; ebből a korkedvezmény akár 90%-ot is levonhat.'],
+  ['Kell regisztrációs adót fizetni elektromos autó után?', 'Nem. A tisztán elektromos (5E) és nulla emissziós (5Z) személyautók mentesek. A plug-in hibrid (5P) és a növelt hatótávú (5N) autók viszont 2025. március 1. óta adókötelesek — a legkedvezőbb oszlopba tartoznak.'],
+  ['Ki állapítja meg a regisztrációs adót?', 'A NAV, a benyújtott Regisztrációs Adó Adatlap és a jármű műszaki adatai alapján, határozatban. A fizetés a forgalomba helyezés feltétele. Az online kalkulátorok tájékoztató becslést adnak.'],
+  ['Mennyi egy 3 éves, Németországból behozott BMW X5 regisztrációs adója?', 'Egy 2023 júniusában forgalomba helyezett, 219 kW-os X5 xDrive30d („14-nél jobb” besorolás, 2020 utáni) alapadója 282 000 Ft; 2026 októberi eljárásnál 41 hónap telt el, a szorzó 0,55, így a fizetendő adó kb. 155 100 Ft.'],
+  ['Visszaigényelhető a regisztrációs adó?', 'Bizonyos esetekben igen, például ha a megfizetett adó után a járművet végül forgalomba helyezés nélkül, végleg kiviszik az országból, vagy ha a forgalomba helyezést elutasították. A magyar rendszámos autó későbbi eladása vagy külföldre vitele önmagában nem ad visszaigénylési jogot.'],
+  ['Mi a különbség a regisztrációs adó és az átírási illeték között?', 'A regisztrációs adót a jármű első magyarországi forgalomba helyezésekor kell fizetni (például behozott autónál). A vagyonszerzési (átírási) illeték a tulajdonszerzés után jár — behozott autónál mindkettő felmerül, magyar rendszámos autó vásárlásakor csak az illeték.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={`${title} | CarAdvance`} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["eredetisegvizsgalat","auto-behozatal-nemetorszagbol"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>regisztrációs adót</strong> (regadó) a jármű első magyarországi forgalomba helyezésekor kell megfizetni — tipikusan a külföldről behozott autónál. 2025. március 1. óta a NAV a motor <strong>teljesítménye (kW)</strong>, a <strong>környezetvédelmi osztály</strong> és az autó <strong>kora</strong> alapján számolja. A modern, 2020 utáni prémium autók regadója gyakran meglepően alacsony; a tisztán elektromos autók <strong>adómentesek</strong>. A pontos összeget a <a href="/honositas-kalkulator/">honosítás kalkulátorunk</a> másodpercek alatt kiszámolja.</p>
+    </div>
+
+    <p>Aki Németországból hoz autót, annak a regisztrációs adó az egyik legfontosabb költségtétele — és sokszor a legtöbb félreértés is ehhez kötődik. Ebben az útmutatóban megmutatjuk, <strong>hogyan számol a NAV 2026-ban</strong>, melyik oszlopba tartozik az autód, mennyit csökkent az adón az autó kora, és kiszámolt példákon végig is megyünk.</p>
+
+    <h2>Mi a regisztrációs adó, és mikor kell fizetni?</h2>
+    <p>A regisztrációs adó a Magyarországon <strong>először forgalomba helyezett</strong> személyautó, lakóautó és motorkerékpár egyszeri adója. Akkor merül fel, ha a jármű még soha nem volt magyar forgalomban — vagyis jellemzően külföldről behozott használt vagy új autónál. Magyar rendszámos autó vásárlásakor nem kell újra megfizetni: ott a <a href="/atiras-kalkulator/">vagyonszerzési (átírási) illeték</a> a releváns tétel.</p>
+
+    <h2>Hogyan számolják 2026-ban?</h2>
+    <p>A számítás három adatból áll:</p>
+    <ol>
+      <li><strong>Teljesítmény (kW)</strong> — a forgalmi engedély P.2 rovata, a német okmányon is.</li>
+      <li><strong>Környezetvédelmi osztály</strong> — a magyar forgalmi V.9 rovata; behozott autónál a külföldi okmány Euro-besorolásából vezetik le.</li>
+      <li><strong>Életkor</strong> — az első (külföldi) forgalomba helyezéstől a magyarországi eljárás kezdetéig eltelt hónapok száma.</li>
+    </ol>
+    <p>A teljesítménysáv és az osztály adja az <strong>alapadót</strong>, amelyet a kor szerinti <strong>szorzó</strong> csökkent. Képlet: <em>fizetendő adó = alapadó × korkedvezmény szorzója</em>.</p>
+
+    <h2>A NAV 2026-os alapadó-táblája</h2>
+    <p>Alapadó forintban, a 2026. január 1-től hatályos tábla szerint:</p>
+    <table>
+      <thead><tr><th>Teljesítmény</th><th>14-nél jobb + 2020 után, vagy hibrid</th><th>14-nél jobb</th><th>12–14</th><th>9–11</th><th>8 vagy rosszabb</th></tr></thead>
+      <tbody>
+        <tr><td>0–80 kW</td><td>47 000</td><td>70 500</td><td>282 000</td><td>564 000</td><td>1 128 000</td></tr>
+        <tr><td>81–100 kW</td><td>70 500</td><td>105 750</td><td>423 000</td><td>846 000</td><td>1 692 000</td></tr>
+        <tr><td>101–120 kW</td><td>94 000</td><td>141 000</td><td>564 000</td><td>1 128 000</td><td>2 256 000</td></tr>
+        <tr><td>121–140 kW</td><td>141 000</td><td>211 500</td><td>846 000</td><td>1 692 000</td><td>3 384 000</td></tr>
+        <tr><td>141–180 kW</td><td>188 000</td><td>282 000</td><td>1 128 000</td><td>2 256 000</td><td>4 512 000</td></tr>
+        <tr><td>181–250 kW</td><td>282 000</td><td>423 000</td><td>1 692 000</td><td>3 384 000</td><td>6 768 000</td></tr>
+        <tr><td>250 kW felett</td><td>423 000</td><td>634 500</td><td>2 538 000</td><td>5 076 000</td><td>10 152 000</td></tr>
+      </tbody>
+    </table>
+    <p>Látszik, hogy a <strong>környezetvédelmi osztály</strong> a legnagyobb tényező: egy modern, „14-nél jobb” besorolású autó alapadója töredéke egy régebbi, rosszabb besorolásúénak azonos teljesítmény mellett.</p>
+
+    <h2>Korkedvezmény — mennyit csökken az adó?</h2>
+    <table>
+      <thead><tr><th>Eltelt hónapok</th><th>Szorzó</th><th>Csökkenés</th></tr></thead>
+      <tbody>
+        <tr><td>1–2. hónap</td><td>0,97</td><td>3%</td></tr>
+        <tr><td>7–12. hónap</td><td>0,82</td><td>18%</td></tr>
+        <tr><td>25–30. hónap</td><td>0,67</td><td>33%</td></tr>
+        <tr><td>37–48. hónap</td><td>0,55</td><td>45%</td></tr>
+        <tr><td>61–72. hónap</td><td>0,41</td><td>59%</td></tr>
+        <tr><td>85–96. hónap</td><td>0,30</td><td>70%</td></tr>
+        <tr><td>121–132. hónap</td><td>0,19</td><td>81%</td></tr>
+        <tr><td>169. hónaptól</td><td>0,10</td><td>90%</td></tr>
+      </tbody>
+    </table>
+    <p>A teljes, havi bontású táblát a <a href="/honositas-kalkulator/">honosítás kalkulátor</a> oldalán találod. Magyarországon új autóként forgalomba helyezett járműnél nincs korkedvezmény.</p>
+
+    <h2>Kiszámolt példák</h2>
+    <table>
+      <thead><tr><th>Autó</th><th>Alapadó</th><th>Eltelt idő</th><th>Szorzó</th><th>Fizetendő</th></tr></thead>
+      <tbody>
+        <tr><td>BMW X5 xDrive30d, 219 kW, 2023.06., „14-nél jobb” (2020 utáni)</td><td>282 000 Ft</td><td>41 hónap</td><td>0,55</td><td><b>155 100 Ft</b></td></tr>
+        <tr><td>BMW 530d, 195 kW, 2018.03., „14-nél jobb”</td><td>423 000 Ft</td><td>104 hónap</td><td>0,26</td><td><b>109 980 Ft</b></td></tr>
+        <tr><td>Dízel, 150 kW, 2019.06., „12–14”</td><td>1 128 000 Ft</td><td>89 hónap</td><td>0,30</td><td><b>338 400 Ft</b></td></tr>
+        <tr><td>NAV saját példája: 90 kW, „9–11”, 2021.07. → 2024.11.</td><td>846 000 Ft</td><td>41 hónap</td><td>0,55</td><td><b>465 300 Ft</b></td></tr>
+        <tr><td>BMW iX3 / bármely tisztán elektromos (5E)</td><td>—</td><td>—</td><td>—</td><td><b>0 Ft</b></td></tr>
+      </tbody>
+    </table>
+    <p>A példák 2026. októberi eljárással számolnak. Egyetlen hónap is számíthat, ezért a saját autódat mindig a kalkulátorral ellenőrizd.</p>
+
+    <h2>Elektromos és hibrid autók</h2>
+    <ul>
+      <li><strong>Tisztán elektromos (5E) és nulla emissziós (5Z):</strong> adómentes — de a 0 Ft-os adót is meg kell állapíttatni a forgalomba helyezéshez.</li>
+      <li><strong>Plug-in hibrid (5P) és növelt hatótávú (5N):</strong> 2025. március 1. óta adóköteles, a legkedvezőbb (első) oszlop szerint.</li>
+    </ul>
+
+    <h2>A NAV ügyintézés menete</h2>
+    <ol>
+      <li>Összegyűjtöd a jármű okmányait és műszaki adatait (külföldi forgalmi, adásvételi vagy számla, a honosítási műszaki vizsgán kapott műszaki adatlap).</li>
+      <li>Benyújtod a <strong>Regisztrációs Adó Adatlapot</strong> a mellékletekkel — meghatalmazott útján is lehet.</li>
+      <li>A NAV megállapítja az adót <strong>határozatban</strong>, szükség esetén hiánypótlást kér.</li>
+      <li>Megfizeted az adót — ez a <strong>forgalomba helyezés feltétele</strong>.</li>
+    </ol>
+
+    <h2>Visszaigényelhető a regadó?</h2>
+    <p>Csak meghatározott esetekben: ha a megfizetett adó után a járművet végül <strong>forgalomba helyezés nélkül, végleg kiviszik</strong> az országból, ha a forgalomba helyezést elutasították, ha a jármű igazoltan alkalmatlanná vált, ellopták vagy megsemmisült a forgalomba helyezés előtt. A már magyar rendszámos autó eladása vagy későbbi külföldre vitele önmagában nem ad visszaigénylési jogot.</p>
+
+    <h2>A regadó csak egy tétel a honosításban</h2>
+    <p>A behozott autó teljes honosítási költsége a regisztrációs adón túl a vagyonszerzési illetékből, az <a href="/blog/eredetisegvizsgalat">eredetiségvizsgálatból</a> (22 950–27 000 Ft), a honosítási műszaki vizsgából, az okmányokból (forgalmi + törzskönyv 12 000 Ft) és a rendszámból áll. A hatósági tételeket egy összegben mutatja a <a href="/honositas-kalkulator/">honosítás kalkulátor</a>.</p>
+    <p>A CarAdvance-nél a regadó megállapítását és a teljes honosítást mi intézzük — a Németországból hozott autót már magyar forgalmival és rendszámmal adjuk át. Nézd meg az <a href="/auto-rendeles">autóbehozatal Németországból</a> szolgáltatásunkat, vagy kérj tételes kalkulációt egy konkrét autóra.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">A cikk tájékoztató jellegű, a NAV 2026.01.01-től hatályos táblája alapján. A fizetendő adót minden esetben a NAV állapítja meg; a cikk nem minősül adótanácsadásnak.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
