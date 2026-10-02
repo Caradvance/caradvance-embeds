@@ -195,6 +195,17 @@ const TORZS = `<div class="lk" id="kalkulator">
         </div>
         <span class="lk-hint" id="atvaltas">&nbsp;</span>
       </div>
+      <div class="lk-field">
+        <label><span class="lk-lbl">Hengerűrtartalom
+          <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button>
+          <span class="lk-tiptext">Ettől függ az eredetiségvizsgálat díja (forgalmi P.1 rovat). Tisztán elektromos autónál 22 950 Ft.</span></span>
+        </span></label>
+        <select id="hengerur" class="lk-in lk-sel">
+          <option value="22950">1400 cm³-ig vagy elektromos — eredetvizsga 22 950 Ft</option>
+          <option value="24975" selected>1401–2000 cm³ — eredetvizsga 24 975 Ft</option>
+          <option value="27000">2000 cm³ felett — eredetvizsga 27 000 Ft</option>
+        </select>
+      </div>
 
       <div class="lk-field">
         <label><span class="lk-lbl">Milyen autóról van szó?</span></label>
@@ -290,7 +301,7 @@ const TORZS = `<div class="lk" id="kalkulator">
       <tbody>
         <tr><td>Regisztrációs adó</td><td>kW, környezetvédelmi osztály, életkor</td><td class="n">kalkulátor szerint</td></tr>
         <tr><td>Vagyonszerzési illeték</td><td>kW és az autó kora (Ft/kW)</td><td class="n">kalkulátor szerint</td></tr>
-        <tr><td>Eredetiségvizsgálat</td><td>személygépkocsi</td><td class="n">24 975 Ft</td></tr>
+        <tr><td>Eredetiségvizsgálat</td><td>hengerűrtartalom szerint (elektromos: 22 950 Ft)</td><td class="n">22 950–27 000 Ft</td></tr>
         <tr><td>Forgalmi engedély</td><td>okmánydíj</td><td class="n">6 000 Ft</td></tr>
         <tr><td>Törzskönyv</td><td>okmánydíj</td><td class="n">6 000 Ft</td></tr>
         <tr><td>Honosítási műszaki vizsga, rendszám</td><td>vizsgaállomás, jármű</td><td class="n">állomásonként eltér</td></tr>
@@ -328,6 +339,8 @@ const TORZS = `<div class="lk" id="kalkulator">
     forgalomba helyezés után a tulajdonjog átírásának költségét az
     <a href="/atiras-kalkulator/">átírás kalkulátorral</a> tudod kiszámolni — a teljes ügyintézést
     pedig a CarAdvance kulcsrakészen elvégzi helyetted.</p>
+    <p>Részletes útmutatók: <a href="/blog/regisztracios-ado-2026">regisztrációs adó 2026 — számítás és példák</a>,
+    valamint <a href="/blog/eredetisegvizsgalat">eredetiségvizsgálat — ára, menete, érvényessége</a>.</p>
   </div>
 </section>
 
@@ -342,7 +355,7 @@ const TORZS = `<div class="lk" id="kalkulator">
     <details><summary>Mennyibe kerül egy autó honosítása 2026-ban?</summary>
       <p>A legnagyobb tétel a regisztrációs adó, amely teljesítménytől, környezetvédelmi osztálytól
       és kortól függ — néhány tízezer forinttól több millióig terjedhet. Ehhez jön a vagyonszerzési
-      illeték (kW × Ft/kW), az eredetiségvizsgálat (24 975 Ft), az okmánydíjak (12 000 Ft), valamint a
+      illeték (kW × Ft/kW), az eredetiségvizsgálat (22 950–27 000 Ft), az okmánydíjak (12 000 Ft), valamint a
       honosítási műszaki vizsga és a rendszám. A fenti kalkulátor ezeket egy összegben mutatja.</p></details>
     <details><summary>Kell vagyonszerzési illetéket fizetni honosításkor?</summary>
       <p>Igen. A külföldről behozott autó első magyarországi forgalomba helyezésekor vagyonszerzési
@@ -403,7 +416,8 @@ const HONAPNEV=['január','február','március','április','május','június','j
 const LE_KW=0.7355;
 const IL_SAVOK=[40,80,120,Infinity];
 const ILLETEK=[[550,450,300],[750,550,450],[850,750,550],[950,850,750]];
-const EREDETISEG=24975, OKMANY=12000;
+const OKMANY=12000;
+function eredetDij(kod){ return kod===0 ? 22950 : (parseInt($("hengerur").value,10)||24975); }
 function ilSav(kw){for(let i=0;i<IL_SAVOK.length;i++) if(kw<=IL_SAVOK[i]) return i; return 3;}
 function ilKor(k){ if(k<=3) return 0; if(k<=8) return 1; return 2; }
 function osszesit(regado,kw,kod){
@@ -412,6 +426,7 @@ function osszesit(regado,kw,kod){
   const illetek = kod===0 ? 0 : Math.round(kw)*kulcs;
   $('oIlKulcs').textContent = kod===0 ? '(mentes)' : '('+kulcs+' Ft/kW)';
   $('oIlletek').textContent = ft(illetek);
+  const EREDETISEG = eredetDij(kod);
   $('oEredet').textContent = ft(EREDETISEG);
   $('oOkmany').textContent = ft(OKMANY);
   const ossz = regado + illetek + EREDETISEG + OKMANY;
@@ -450,7 +465,7 @@ function init(){
   $('egysegLe').onclick=()=>{egysegKw=false;szinkronEgyseg();};
   $('ujGomb').onclick=()=>{ujAuto=true;szinkronUj();};
   $('hasznaltGomb').onclick=()=>{ujAuto=false;szinkronUj();};
-  ['osztaly','teljesitmeny','elsoEv','elsoHo','regEv','regHo'].forEach(id=>{
+  ['osztaly','teljesitmeny','hengerur','elsoEv','elsoHo','regEv','regHo'].forEach(id=>{
     $(id).addEventListener('input',szamol); $(id).addEventListener('change',szamol);});
 
   /* info-buborékok érintésre (mobil) */
@@ -532,7 +547,7 @@ const JSONLD = `<script type="application/ld+json">
       "@type":"FAQPage",
       "mainEntity":[
       {"@type":"Question","name":"Mennyi a regisztrációs adó egy 2019-es, 150 kW-os dízelre?","acceptedAnswer":{"@type":"Answer","text":"A környezetvédelmi osztálytól függ. Egy 141–180 kW-os, „12–14” osztályú autó alapadója 1 128 000 Ft. Ha 2019 júniusában helyezték először forgalomba, és most indul az eljárás, 88 hónap telt el — a szorzó 0,30, a fizetendő adó 338 400 Ft."}},
-      {"@type":"Question","name":"Mennyibe kerül egy autó honosítása 2026-ban?","acceptedAnswer":{"@type":"Answer","text":"A legnagyobb tétel a regisztrációs adó, amely teljesítménytől, környezetvédelmi osztálytól és kortól függ. Ehhez jön a vagyonszerzési illeték (kW × Ft/kW), az eredetiségvizsgálat (24 975 Ft), az okmánydíjak (12 000 Ft), valamint a honosítási műszaki vizsga és a rendszám."}},
+      {"@type":"Question","name":"Mennyibe kerül egy autó honosítása 2026-ban?","acceptedAnswer":{"@type":"Answer","text":"A legnagyobb tétel a regisztrációs adó, amely teljesítménytől, környezetvédelmi osztálytól és kortól függ. Ehhez jön a vagyonszerzési illeték (kW × Ft/kW), az eredetiségvizsgálat (22 950–27 000 Ft), az okmánydíjak (12 000 Ft), valamint a honosítási műszaki vizsga és a rendszám."}},
       {"@type":"Question","name":"Kell vagyonszerzési illetéket fizetni honosításkor?","acceptedAnswer":{"@type":"Answer","text":"Igen. A külföldről behozott autó első magyarországi forgalomba helyezésekor vagyonszerzési illetéket kell fizetni, amelyet a motor teljesítménye és az autó kora határoz meg. Elektromos (5E) és nulla emissziós (5Z) autónál ez sem fizetendő."}},
       {"@type":"Question","name":"Elektromos autó után kell regisztrációs adót fizetni?","acceptedAnswer":{"@type":"Answer","text":"Nem. Az 5E (tisztán elektromos) és 5Z (egyéb nulla emissziós) környezetvédelmi osztályú személyautók adómentesek, függetlenül a teljesítménytől és a kortól."}},
       {"@type":"Question","name":"Hogyan számítja a NAV az eltelt hónapokat?","acceptedAnswer":{"@type":"Answer","text":"Az első külföldi forgalomba helyezés hónapját megelőző hónap végétől a regisztrációs eljárás hónapját követő hónap elejéig. Gyakorlatilag a két dátum közötti teljes hónapok száma plusz egy."}},

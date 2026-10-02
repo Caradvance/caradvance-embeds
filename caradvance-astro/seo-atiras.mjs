@@ -188,6 +188,17 @@ const TORZS = `<div class="lk" id="kalkulator">
         </div>
         <span class="lk-hint" id="atvaltas">&nbsp;</span>
       </div>
+      <div class="lk-field">
+        <label><span class="lk-lbl">Hengerűrtartalom
+          <span class="lk-tip"><button type="button" class="lk-i" aria-label="Információ">i</button>
+          <span class="lk-tiptext">Ettől függ az eredetiségvizsgálat díja (forgalmi P.1 rovat). Tisztán elektromos autónál 22 950 Ft.</span></span>
+        </span></label>
+        <select id="hengerur" class="lk-in lk-sel">
+          <option value="22950">1400 cm³-ig vagy elektromos — eredetvizsga 22 950 Ft</option>
+          <option value="24975" selected>1401–2000 cm³ — eredetvizsga 24 975 Ft</option>
+          <option value="27000">2000 cm³ felett — eredetvizsga 27 000 Ft</option>
+        </select>
+      </div>
 
       <div class="lk-field">
         <label><span class="lk-lbl">Gyártási év
@@ -242,8 +253,8 @@ const TORZS = `<div class="lk" id="kalkulator">
       <tbody id="tablaBody"></tbody>
     </table>
   </div>
-  <p class="lede">Ezen felül fizetendő az <b>eredetiségvizsgálat</b> (személygépkocsira 24 975 Ft,
-  kategóriától függően eltérhet) és az <b>okmánydíjak</b>: forgalmi engedély 6 000 Ft, törzskönyv 6 000 Ft.
+  <p class="lede">Ezen felül fizetendő az <b>eredetiségvizsgálat</b> (személygépkocsira 22 950–27 000 Ft a hengerűrtartalomtól
+  függően; elektromos autónál 22 950 Ft) és az <b>okmánydíjak</b>: forgalmi engedély 6 000 Ft, törzskönyv 6 000 Ft.
   A rendszám átíráskor a járművön marad, így általában nincs új rendszámtábla-díj.</p>
 </section>
 
@@ -254,7 +265,7 @@ const TORZS = `<div class="lk" id="kalkulator">
   15 napon belül kell kezdeményeznie az átírást; az eladó pedig 8 napon belül bejelenti az adásvételt.</p>
   <div class="ca-steps">
     <div class="ca-step"><div class="ca-sn">1</div><h3>Adásvételi szerződés</h3><p>Két, teljes bizonyító erejű magánokiratba foglalt példány, a felek adataival, a jármű azonosítóival és a vételárral.</p></div>
-    <div class="ca-step"><div class="ca-sn">2</div><h3>Eredetiségvizsgálat</h3><p>A vevő nevére, vizsgálóállomáson — az átírás előfeltétele. Díja személygépkocsira 24 975 Ft.</p></div>
+    <div class="ca-step"><div class="ca-sn">2</div><h3>Eredetiségvizsgálat</h3><p>A vevő nevére, vizsgálóállomáson — az átírás előfeltétele. Díja személygépkocsira 22 950–27 000 Ft.</p></div>
     <div class="ca-step"><div class="ca-sn">3</div><h3>Kötelező biztosítás</h3><p>A vevő a tulajdonszerzés napjától köteles KGFB-t kötni a járműre.</p></div>
     <div class="ca-step"><div class="ca-sn">4</div><h3>Átírás a kormányablakban</h3><p>Az illeték és az okmánydíjak megfizetése után kiállítják az új forgalmit és a törzskönyvet a vevő nevére.</p></div>
   </div>
@@ -268,7 +279,7 @@ const TORZS = `<div class="lk" id="kalkulator">
     kezdeményeznie az átírást a kormányablakban; a határidő elmulasztása bírságot vonhat maga után.
     Az eladó ezzel párhuzamosan <strong>8 napon belül</strong> bejelenti az adásvételt, így mentesül
     a jármű utáni későbbi kötelezettségek alól. Az illetéken felül fizetendő az
-    <strong>eredetiségvizsgálat</strong> (24 975 Ft) és az <strong>okmánydíjak</strong>: forgalmi
+    <strong>eredetiségvizsgálat</strong> (22 950–27 000 Ft) és az <strong>okmánydíjak</strong>: forgalmi
     engedély 6 000 Ft, törzskönyv 6 000 Ft — a rendszám átíráskor a járművön marad.</p>
     <p>Az átíráshoz általában szükséges az <strong>adásvételi szerződés</strong>, a felek
     <strong>személyazonosító okmányai és lakcímkártyája</strong>, az érvényes
@@ -286,7 +297,7 @@ const TORZS = `<div class="lk" id="kalkulator">
   <div class="faq">
     <details><summary>Mennyi egy 110 kW-os, 8 évnél idősebb autó átírása?</summary>
       <p>A 81–120 kW-os sávban, 8 év felett az illeték 550 Ft/kW, azaz 110 × 550 = <b>60 500 Ft</b>.
-      Ehhez jön az eredetiségvizsgálat (24 975 Ft) és az okmánydíjak (12 000 Ft), így a teljes
+      Ehhez jön az eredetiségvizsgálat (1401–2000 cm³-nél 24 975 Ft) és az okmánydíjak (12 000 Ft), így a teljes
       költség kb. <b>97 475 Ft</b>. A pontos összeget mindig a fenti kalkulátor adja meg.</p></details>
     <details><summary>Kell illetéket fizetni elektromos autó átírásakor?</summary>
       <p>Nem. A tisztán elektromos és a nulla emissziós (5E/5Z) járművek vagyonszerzési illeték alól
@@ -322,7 +333,7 @@ const SZKRIPT = `
 const KW_SAVOK=[{max:40,cimke:'0–40 kW'},{max:80,cimke:'41–80 kW'},{max:120,cimke:'81–120 kW'},{max:Infinity,cimke:'120 kW felett'}];
 const ILLETEK=[[550,450,300],[750,550,450],[850,750,550],[950,850,750]];
 const KOR_CIMKE=['0–3 év','4–8 év','8 év felett'];
-const EREDETISEG=24975;
+function eredetDij(){ return parseInt($("hengerur").value,10)||24975; }
 const FORGALMI=6000, TORZSKONYV=6000;
 const OKMANY=FORGALMI+TORZSKONYV;
 const LE_KW=0.7355;
@@ -346,7 +357,7 @@ function init(){
 
   $('egysegKw').onclick=()=>{egysegKw=true;szinkronEgyseg();};
   $('egysegLe').onclick=()=>{egysegKw=false;szinkronEgyseg();};
-  ['teljesitmeny','gyartasiEv','mentes'].forEach(id=>{
+  ['teljesitmeny','hengerur','gyartasiEv','mentes'].forEach(id=>{
     $(id).addEventListener('input',szamol); $(id).addEventListener('change',szamol);});
 
   document.querySelectorAll('#ca-kalk .lk-i').forEach(function(b){
@@ -384,6 +395,7 @@ function szamol(){
   const illetek = mentes ? 0 : Math.round(kw)*kulcs;
   $('oKulcs').textContent = kulcs+' Ft/kW';
   $('oIlletek').textContent = ft(illetek);
+  const EREDETISEG = eredetDij();
   $('oEredet').textContent = ft(EREDETISEG);
   $('oOkmany').textContent = ft(OKMANY);
   const ossz = illetek + EREDETISEG + OKMANY;
@@ -412,7 +424,7 @@ const JSONLD = `<script type="application/ld+json">
     {
       "@type":"FAQPage",
       "mainEntity":[
-      {"@type":"Question","name":"Mennyi egy 110 kW-os, 8 évnél idősebb autó átírása?","acceptedAnswer":{"@type":"Answer","text":"A 81–120 kW-os sávban, 8 év felett az illeték 550 Ft/kW, azaz 110 × 550 = 60 500 Ft. Ehhez jön az eredetiségvizsgálat (24 975 Ft) és az okmánydíjak (12 000 Ft), így a teljes költség kb. 97 475 Ft."}},
+      {"@type":"Question","name":"Mennyi egy 110 kW-os, 8 évnél idősebb autó átírása?","acceptedAnswer":{"@type":"Answer","text":"A 81–120 kW-os sávban, 8 év felett az illeték 550 Ft/kW, azaz 110 × 550 = 60 500 Ft. Ehhez jön az eredetiségvizsgálat (1401–2000 cm³-nél 24 975 Ft) és az okmánydíjak (12 000 Ft), így a teljes költség kb. 97 475 Ft."}},
       {"@type":"Question","name":"Kell illetéket fizetni elektromos autó átírásakor?","acceptedAnswer":{"@type":"Answer","text":"Nem. A tisztán elektromos és a nulla emissziós (5E/5Z) járművek vagyonszerzési illeték alól mentesek — csak az eredetiségvizsgálat és az okmányok díját kell megfizetni."}},
       {"@type":"Question","name":"Rokon közötti átírásnál is kell illetéket fizetni?","acceptedAnswer":{"@type":"Answer","text":"Egyenes ági rokonok (szülő–gyermek) és házastársak közötti átírás illetékmentes. Az eredetiségvizsgálat és az okmánydíjak ilyenkor is felmerülnek."}},
       {"@type":"Question","name":"Hogyan számolja a NAV az autó életkorát?","acceptedAnswer":{"@type":"Answer","text":"A jármű gyártási évétől eltelt évek száma alapján: 0–3 év, 4–8 év, illetve 8 év felett. Minél idősebb az autó, annál alacsonyabb a fajlagos (Ft/kW) illeték."}},
