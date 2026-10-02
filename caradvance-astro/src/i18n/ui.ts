@@ -1,16 +1,19 @@
 // ── Language config ──────────────────────────────────────────────
-// All 9 locales the site routes for. Order = order shown in switcher.
-export const localeList = ['hu', 'en', 'de', 'fr', 'sk', 'cs', 'pl', 'uk', 'zh'] as const;
+// caradvance.hu nyelvei (2026-10): hu + en, de, fr, uk, zh. Order = order shown in switcher.
+// A szlovák, cseh és lengyel piacnak saját oldala lesz (caradvance.sk / .cz / .pl).
+export const localeList = ['hu', 'en', 'de', 'fr', 'uk', 'zh'] as const;
 export type Locale = (typeof localeList)[number];
+// Lefordított, élő (indexelhető) nyelvek — csak ezek kapnak hreflang-ot. Fordítás után ide kell felvenni.
+export const liveLocales: readonly Locale[] = ['hu'];
 export const defaultLang: Locale = 'hu';
 
 // Human names + flag codes (flagcdn.com) for the language switcher.
 export const languageNames: Record<Locale, string> = {
   hu: 'Magyar', en: 'English', de: 'Deutsch', fr: 'Français',
-  sk: 'Slovenčina', cs: 'Čeština', pl: 'Polski', uk: 'Українська', zh: '中文',
+  uk: 'Українська', zh: '中文',
 };
 export const flagCode: Record<Locale, string> = {
-  hu: 'hu', en: 'gb', de: 'de', fr: 'fr', sk: 'sk', cs: 'cz', pl: 'pl', uk: 'ua', zh: 'cn',
+  hu: 'hu', en: 'gb', de: 'de', fr: 'fr', uk: 'ua', zh: 'cn',
 };
 
 // ── Translation dictionary ───────────────────────────────────────
