@@ -14,7 +14,7 @@ const en: IntlContent = {
       ['23 years', 'Caradvance GmbH, Germany — since 2003'],
       ['5000+', 'premium cars delivered to happy customers'],
       ['5.0 ★', 'Google rating'],
-      ['English', 'personal service — also in German'],
+      ['English', 'personal service — also in German and French'],
     ],
     form: {
       h2: 'Tell us what you need',
@@ -94,7 +94,7 @@ const en: IntlContent = {
         },
       ],
       faq: [
-        ['Do you speak English?', 'Yes. Our team works in English and German as well as Hungarian — you can handle the whole process with us in English, and we send your offer in English.'],
+        ['Do you speak English?', 'Yes. Our team works in English, German and French as well as Hungarian — you can handle the whole process with us in English, and we send your offer in English.'],
         ['Can I rent a car long term in Budapest as a foreigner?', 'Yes. Our long-term rental starts at 6 months and is available to private individuals and companies living or working in Hungary. Service, Hungarian vehicle tax, comprehensive (casco) and third-party insurance and summer/winter tyres are included in the monthly fee.'],
         ['Can you import a car from Germany for me?', 'Yes — new or used. We search the German market, check the car’s history, inspect it on site, transport it to Hungary and complete the Hungarian registration, so you receive it with Hungarian plates.'],
         ['I am moving to Hungary with my own car. Can you help?', 'Yes. Registering a foreign car in Hungary involves an originality inspection, a technical inspection, the registration tax (NAV) and the government office. Use our registration tax calculator for a first estimate, then let us handle the process.'],
@@ -303,7 +303,7 @@ const en: IntlContent = {
         },
       ],
       faq: [
-        ['Which languages do you speak?', 'English, German and Hungarian.'],
+        ['Which languages do you speak?', 'English, German, French and Hungarian.'],
         ['When are you available?', 'Monday to Friday, 9:00–17:00. Messages sent outside office hours are answered on the next working day.'],
         ['Can I visit the office?', 'Yes, by appointment — our office is in Solymár, just outside Budapest.'],
       ],

@@ -1,9 +1,13 @@
 import type { IntlContent, PageKey } from './types';
 import map from '../intl-map.json';
 import en from './en';
+import de from './de';
+import fr from './fr';
+import uk from './uk';
+import zh from './zh';
 
 // Az elkészült nyelvek tartalma. Új nyelv: fájl + import + ide felvenni.
-export const CONTENT: Partial<Record<string, IntlContent>> = { en };
+export const CONTENT: Partial<Record<string, IntlContent>> = { en, de, fr, uk, zh };
 
 export const INTL_MAP = map as { live: string[]; pages: Record<PageKey, Record<string, string>> };
 export const PAGE_KEYS = Object.keys(INTL_MAP.pages) as PageKey[];
