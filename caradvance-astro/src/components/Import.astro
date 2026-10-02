@@ -45,10 +45,12 @@ const faqs = [
 ['Milyen költségekkel kell számolnom?', 'Az autó ára mellett: regisztrációs adó, műszaki vizsga, eredetvizsga, vagyonszerzési illeték, forgalmi/rendszám/törzskönyv, szállítás és ügyintézési díj. A kalkulátorunkban tételesen látod.'],
 ['Kapok garanciát a behozott autóra?', 'Igen — magánszemélyként kötelező 1 éves jótállást adunk, és a biztosítás (KGFB, Casco) megkötésében is segítünk.'],
 ['Mennyi ideig tart egy autó behozatala Németországból?', 'A kiválasztott autótól függően általában 1–3 hét: a német piaci keresés és bevizsgálás után elszállítjuk, elvégezzük a honosítást és a magyar forgalomba helyezést.'],
+['Mennyibe kerül behozni egy autót Németországból?', 'A vételáron felül a szállítás, a regisztrációs adó (teljesítmény, környezetvédelmi osztály és kor alapján), a vagyonszerzési illeték, az eredetiségvizsgálat (24 975 Ft), a honosítási műszaki vizsga, az okmányok (12 000 Ft) és a rendszám. A hatósági tételeket a honosítás kalkulátorunk egy összegben mutatja; a teljes, tételes ajánlatot mi készítjük el.'],
+['Megéri autót hozni Németországból?', 'A legtöbb prémium modellnél igen: a német piacon jóval nagyobb a választék, a használt autók jellemzően jobb állapotúak és dokumentált szervizmúltúak, az ár pedig sokszor kedvezőbb. Hogy az adott autónál mennyit nyersz, azt a tételes kalkulációnk megmutatja.'],
 ['Mennyibe kerül a német autó behozatala és honosítása?', 'Az árat előre, tételesen kiszámoljuk: vételár, szállítás, regisztrációs adó, vizsga és a teljes ügyintézés — így pontosan tudod a végösszeget, rejtett költségek nélkül. Kérj német autó behozatal kalkulációt.'],
 ['Milyen autókat tudtok behozni Németországból?', 'Szinte bármilyen német használtautót vagy új autót: a teljes német kínálatból keresünk a megadott paramétereid alapján, prémium márkáktól a családi modellekig.'],
 ['Ti intézitek a külföldi autó behozatal ügyintézését és a honosítást?', 'Igen, a teljes külföldi autó behozatal ügyintézést átvállaljuk: adásvétel, szállítás, regisztrációs adó, műszaki vizsga és a magyar okmányok — kulcsrakészen kapod az autót.'],
-['Kapok áfás számlát a német vásárlásról?', 'Igen, magánszemélyként is vásárolhatsz 19%-os német áfával a müncheni Caradvance GmbH-tól, és áfás számlát adunk a behozott német használtautóról.'],
+['Kapok áfás számlát a német vásárlásról?', 'Igen, magánszemélyként is vásárolhatsz 19%-os német áfával a München melletti (geretsriedi) Caradvance GmbH-tól, és áfás számlát adunk a behozott német használtautóról.'],
 ];
 
 const faqJson = {
@@ -64,8 +66,8 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 <div class="scrim"></div>
 <div class="inner">
 <div class="partners" style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" style="height:34px;width:auto;display:block;border-radius:6px" /><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" style="height:34px;width:auto;display:block;border-radius:6px" /></div>
-<h1>Hozd haza álmaid autóját —<br /><span class="accent">mi mindent elintézünk</span></h1>
-<p class="sub sub-wide" style="max-width:900px">Nagyobb választék, jobb állapotú autók és kedvezőbb ár a német piacról — mi megkeressük, behozzuk és kulcsrakészen, a nevedre írt forgalmival adjuk&nbsp;át.</p>
+<h1>Autóbehozatal Németországból —<br /><span class="accent">mi mindent elintézünk</span></h1>
+<p class="sub sub-wide" style="max-width:900px">Hozd haza álmaid autóját: nagyobb választék, jobb állapotú autók és kedvezőbb ár a német piacról — mi megkeressük, behozzuk, honosítjuk és kulcsrakészen, a nevedre írt forgalmival adjuk&nbsp;át.</p>
 <div class="cta-row">
 <a class="btn btn-primary" href="#rendeles">Autót rendelek</a>
 <a class="btn btn-white" href="/beszerzesi-folyamat">Hogyan működik?</a>
@@ -107,12 +109,29 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 <div class="imp-team-note"><b>Mögöttünk a németországi Caradvance GmbH 10 fős csapata 🇩🇪</b><span>Német kollégáink közvetlen hozzáférést biztosítanak a piac teljes kínálatához és a helyi ügyintézéshez — így minden behozatal a forrásnál, helyben indul.</span></div>
 </div>
 
+<div class="imp-cost" id="koltsegek">
+<div class="imp-head" style="margin-top:84px"><span class="imp-tag">Költségek</span><h2>Mennyibe kerül az autó behozatala Németországból?</h2><p>Egy Németországból behozott autó végösszege a vételárból és a behozatal tételeiből áll össze. Mi előre, tételesen kiszámoljuk — rejtett költségek nélkül.</p></div>
+<div class="ic-grid">
+<div class="ic-card"><span class="ic-n">1</span><h3>Vételár</h3><p>A német kereskedő vagy magáneladó ára. Magánszemélyként akár 19%-os német áfával vásárolhatsz a Caradvance GmbH-tól.</p></div>
+<div class="ic-card"><span class="ic-n">2</span><h3>Szállítás</h3><p>Tréleres szállítás Németországból, magas értékű biztosítással — az autótól és a helyszíntől függően, az ajánlatban tételesen.</p></div>
+<div class="ic-card"><span class="ic-n">3</span><h3>Regisztrációs adó</h3><p>A NAV veti ki teljesítmény, környezetvédelmi osztály és kor alapján. Elektromos (5E) autónál 0 Ft.</p><a href="/honositas-kalkulator/">Honosítás kalkulátor →</a></div>
+<div class="ic-card"><span class="ic-n">4</span><h3>Vagyonszerzési illeték</h3><p>kW × Ft/kW, az autó korától függően. Elektromos autónál ez sem fizetendő.</p><a href="/atiras-kalkulator/">Illeték kiszámítása →</a></div>
+<div class="ic-card"><span class="ic-n">5</span><h3>Vizsgák és okmányok</h3><p>Eredetiségvizsgálat (24 975 Ft), honosítási műszaki vizsga, forgalmi engedély és törzskönyv (12 000 Ft), rendszám.</p></div>
+<div class="ic-card"><span class="ic-n">6</span><h3>Ügyintézés</h3><p>Keresés, leinformálás, helyszíni bevizsgálás, tárgyalás és a teljes honosítás — egy csomagban, előre rögzített díjjal.</p></div>
+</div>
+<div class="ic-cta"><div><b>Számold ki a honosítás költségét most</b><span>Regisztrációs adó + illeték + okmányok egy összegben, a NAV 2026-os tábláival.</span></div><a class="ic-btn" href="/honositas-kalkulator/">Honosítás kalkulátor</a><a class="ic-btn ic-btn-w" href="#rendeles">Pontos ajánlatot kérek</a></div>
+<div class="ic-two">
+<a class="ic-opt" href="/autoink/"><b>Használt autó Németországból</b><span>Ellenőrzött, dokumentált múltú német használtautók — vagy megkeressük, amit szeretnél.</span></a>
+<a class="ic-opt" href="/egyedi-auto-rendeles"><b>Új autó Németországból</b><span>Gyári, egyedi konfigurációban: BMW, MINI, Mercedes, Audi — német áron.</span></a>
+</div>
+</div>
+
 <div class="imp-seo">
 <span class="imp-tag">Jó tudni</span>
-<h2 class="imp-seo-h">Autó rendelés Németországból — a teljes import egy kézből</h2>
+<h2 class="imp-seo-h">Autóbehozatal Németországból és autó rendelés — a teljes import egy kézből</h2>
 <p>Ha pontosan tudod, milyen autót keresel, nem kell órákat böngészned a német piactereken: bízd ránk az <strong>autó rendelést</strong>. A teljes <span class="kw">autóimport Németországból</span> folyamatát átvállaljuk — kereséstől a leinformáláson és bevizsgáláson át a kulcsrakész átadásig.</p>
 <p>Az <strong>egyedi autó rendelés</strong> nálad azt jelenti, hogy megadod a paramétereket, mi pedig a teljes német kínálatból kikeressük a hozzád illő darabot. Az <span class="kw">autó behozatal Németországból</span> árát előre, tételesen rögzítjük — regisztrációs adó, szállítás, honosítás és ügyintézés, meglepetések nélkül.</p>
-<p>Magánszemélyként akár 19%-os német áfával vásárolhatsz a müncheni Caradvance GmbH-tól, és minden behozott <strong>német használtautó</strong> mögött 1 év jótállás áll. Töltsd ki a rendelési űrlapot, és a többit intézzük.</p>
+<p>Magánszemélyként akár 19%-os német áfával vásárolhatsz a München melletti (geretsriedi) Caradvance GmbH-tól, és minden behozott <strong>német használtautó</strong> mögött 1 év jótállás áll. Töltsd ki a rendelési űrlapot, és a többit intézzük.</p>
 </div>
 
 <div class="imp-head" id="gyik"><span class="imp-tag">GYIK</span><h2>Gyakori kérdések</h2><p>A leggyakoribb kérdések a németországi autóimportról — a megrendeléstől az átadásig.</p></div>
@@ -122,7 +141,7 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 </div>
 
 <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
-<script type="application/ld+json" set:html={JSON.stringify({'@context':'https://schema.org','@type':'Service',name:'Autó rendelés és import Németországból',serviceType:'Autóimport, behozatal és honosítás',areaServed:'HU',provider:{'@type':'Organization',name:'CarAdvance',url:'https://www.caradvance.hu'},description:'Teljes körű autóimport Németországból: keresés, bevizsgálás, szállítás, regisztrációs adó, honosítás és kulcsrakész átadás.'})}></script>
+<script type="application/ld+json" set:html={JSON.stringify({'@context':'https://schema.org','@type':'Service',name:'Autóbehozatal Németországból — autó rendelés és import',serviceType:'Autóbehozatal, autóimport és honosítás',areaServed:'HU',provider:{'@type':'Organization',name:'Caradvance GmbH',url:'https://www.caradvance.hu'},description:'Teljes körű autóimport Németországból: keresés, bevizsgálás, szállítás, regisztrációs adó, honosítás és kulcsrakész átadás.'})}></script>
 </section>
 
 <style>
@@ -227,6 +246,23 @@ mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer
 .imp-faq .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
 .imp-faq details[open] .pl{transform:rotate(45deg)}
 .imp-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+.imp-cost .ic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.imp-cost .ic-card{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 20px 20px;box-shadow:0 8px 24px rgba(8,8,10,.04)}
+.imp-cost .ic-n{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#fdeaec;color:var(--red);font-weight:800;font-size:14px;margin-bottom:10px}
+.imp-cost .ic-card h3{font-size:17px;font-weight:800;color:var(--ink);margin:0 0 6px}
+.imp-cost .ic-card p{color:var(--muted);font-size:14px;line-height:1.6;margin:0}
+.imp-cost .ic-card a{display:inline-block;margin-top:10px;color:var(--red);font-weight:800;font-size:14px;text-decoration:none}
+.imp-cost .ic-cta{margin-top:22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(#0f1622,#0b0b0d);color:#fff;border-radius:18px;padding:20px 22px}
+.imp-cost .ic-cta>div{flex:1 1 280px;display:flex;flex-direction:column;gap:4px}
+.imp-cost .ic-cta b{font-size:17px}.imp-cost .ic-cta span{color:#b9c3d2;font-size:14px}
+.imp-cost .ic-btn{background:var(--red);color:#fff;font-weight:800;text-decoration:none;padding:12px 18px;border-radius:12px;white-space:nowrap}
+.imp-cost .ic-btn-w{background:#fff;color:var(--ink)}
+.imp-cost .ic-two{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.imp-cost .ic-opt{display:flex;flex-direction:column;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:18px 20px;text-decoration:none}
+.imp-cost .ic-opt b{color:var(--ink);font-size:16px}.imp-cost .ic-opt b:after{content:" →";color:var(--red)}
+.imp-cost .ic-opt span{color:var(--muted);font-size:14px;line-height:1.55}
+@media(max-width:860px){.imp-cost .ic-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.imp-cost .ic-grid,.imp-cost .ic-two{grid-template-columns:1fr}.imp-cost .ic-btn{flex:1 1 100%;text-align:center}}
 .imp-seo{max-width:820px;margin:96px auto 0;text-align:left}
 .imp-seo-h{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:10px 0 18px}
 .imp-seo p{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 16px}
