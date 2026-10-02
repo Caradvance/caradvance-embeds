@@ -30,15 +30,15 @@ const org = {
   address: { '@type': 'PostalAddress', streetAddress: 'Ibolya utca 18.', addressLocality: 'Solymár', postalCode: '2083', addressRegion: 'Pest', addressCountry: 'HU' },
   openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '17:00' }],
   areaServed: [{ '@type': 'City', name: 'Budapest' }, { '@type': 'Country', name: 'Hungary' }],
-  knowsLanguage: ['en', 'de', 'hu'],
+  knowsLanguage: ['en', 'de', 'fr', 'hu'],
   brand: ['BMW', 'MINI', 'Mercedes-Benz', 'Audi'].map((n) => ({ '@type': 'Brand', name: n })),
   sameAs: ['https://www.facebook.com/share/19BfQsJxSk/', 'https://www.instagram.com/caradvance_hungary', 'https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw'],
   parentOrganization: { '@type': 'Organization', name: 'Caradvance GmbH', address: { '@type': 'PostalAddress', streetAddress: 'Bgm-Graf-Ring 21', addressLocality: 'Geretsried', postalCode: '82538', addressCountry: 'DE' } },
 };
 const graph: any[] = [];
 graph.push({ '@type': 'WebPage', '@id': url, url, name: P.title, description: P.desc, inLanguage: localeTag, isPartOf: { '@type': 'WebSite', url: SITE + '/', name: 'CarAdvance' }, about: { '@id': org['@id'] } });
-graph.push(pageKey === 'contact' ? { ...org, '@type': ['AutoDealer'], contactPoint: [{ '@type': 'ContactPoint', telephone: '+36 30 233 6060', email: 'info@caradvance.hu', contactType: 'customer service', availableLanguage: ['English', 'German', 'Hungarian'] }] } : org);
-if (P.service) graph.push({ '@type': 'Service', name: P.service, serviceType: P.service, provider: { '@id': org['@id'] }, areaServed: { '@type': 'Country', name: 'Hungary' }, availableLanguage: ['English', 'German', 'Hungarian'], url });
+graph.push(pageKey === 'contact' ? { ...org, '@type': ['AutoDealer'], contactPoint: [{ '@type': 'ContactPoint', telephone: '+36 30 233 6060', email: 'info@caradvance.hu', contactType: 'customer service', availableLanguage: ['English', 'German', 'French', 'Hungarian'] }] } : org);
+if (P.service) graph.push({ '@type': 'Service', name: P.service, serviceType: P.service, provider: { '@id': org['@id'] }, areaServed: { '@type': 'Country', name: 'Hungary' }, availableLanguage: ['English', 'German', 'French', 'Hungarian'], url });
 if (pageKey === 'regtax') graph.push({ '@type': 'WebApplication', name: u.calc.h2, url: url + '#kalkulator', applicationCategory: 'FinanceApplication', operatingSystem: 'All', inLanguage: localeTag, offers: { '@type': 'Offer', price: '0', priceCurrency: 'HUF' } });
 if (P.faq.length) graph.push({ '@type': 'FAQPage', mainEntity: P.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a.replace(/<[^>]+>/g, '') } })) });
 const crumbs = [{ n: u.common.home, p: pathFor('home', lang) }];
