@@ -48,7 +48,9 @@ async function handle(context) {
     }
   }
 
-  if (await priceAllowed(request)) {
+  // ?ca_np=1 — előnézet: így látja egy külföldi látogató (teszteléshez; árat nem fed fel)
+  const preview = url.searchParams.get('ca_np') === '1';
+  if (!preview && (await priceAllowed(request))) {
     const r = await next();
     return withHeaders(r, { 'Vary': 'Cookie' });
   }
