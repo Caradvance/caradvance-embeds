@@ -27,13 +27,16 @@ const SKIP = [/^_np\//, /^belso\//, /^ajanlat\//, /^api\//, /^aszf\//, /^adatkez
   /^eladom\//, /^jotekonysag\//, /^(en|de|fr|sk|cs|pl|uk|zh)\//];
 
 // ---------- ár-felismerés ----------
-const NUM = '(?:\\d{1,3}(?:[ \\u00a0\\u202f.,]\\d{3})+|\\d+)(?:,\\d{1,2})?';
+const NUM = '(?:\\d{1,3}(?:[ \\u00a0\\u202f\\u2009.,]\\d{3})+|\\d+)(?:,\\d{1,2})?';
 const CUR = '(?:€|EUR\\b|Ft\\b|HUF\\b)';
-const CORE = new RegExp(`(?:[−–-]\\s?)?${NUM}\\s?(?:[–-]\\s?${NUM}\\s?)?${CUR}|€\\s?${NUM}`, 'g');
+const CORE = new RegExp(`(?:[−–-]\\s?)?${NUM}[\\s\\u2009]?(?:[–-]\\s?${NUM}\\s?)?${CUR}|€\\s?${NUM}`, 'g');
 const RATE = /1\s?€\s?[≈=]\s?\d[\d  ]*\s?Ft/g;
 
 export function strip(s) {
-  if (!s || !/[€]|Ft\b|EUR\b|HUF\b/.test(s)) return s;
+  if (!s) return s;
+  // HTML-entitás szóközök (&nbsp; stb.) a számokban: alakítsuk valódi szóközzé, hogy a minta felismerje
+  if (/&(?:nbsp|#160|#xa0|#8239|#x202f|#8201|thinsp|euro|#8364);/i.test(s)) s = s.replace(/&(?:nbsp|#160|#xa0);/gi, '\u00a0').replace(/&(?:#8239|#x202f|#8201|thinsp);/gi, '\u202f').replace(/&(?:euro|#8364);/gi, '€');
+  if (!/[€]|Ft\b|EUR\b|HUF\b/.test(s)) return s;
   const keep = [];
   s = s.replace(RATE, (m) => { keep.push(m); return '⁣R' + (keep.length - 1) + '⁣'; });
   s = s.replace(CORE, '⁢');
