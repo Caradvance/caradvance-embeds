@@ -34,8 +34,8 @@ for (const f of FILES) {
         h = h.slice(0, ci) + '</div>\n  <div class="autok-panel" id="panel-premium">\n    ' + h.slice(ci);
         h = h.replace(tabRe, (m, a1, n, c) => a1 + 'Bérelhető (' + SUB_TOTAL + ')' + c +
           '\n      <button class="autok-tab" data-tab="premium" data-group="berles" type="button" hidden>Prémium (' + n + ')</button>');
-        h = h.replace("(h==='berelheto'||h==='berbeadva')", "(h==='berelheto'||h==='premium'||h==='berbeadva')");
-        h = h.replace("heroSwap(b.getAttribute('data-tab'));", "heroSwap(b.getAttribute('data-tab')==='premium'?'berelheto':b.getAttribute('data-tab'));");
+        h = h.split("(h==='berelheto'||h==='berbeadva')").join("(h==='berelheto'||h==='premium'||h==='berbeadva')");
+        h = h.split("heroSwap(b.getAttribute('data-tab'));").join("heroSwap(b.getAttribute('data-tab')==='premium'?'berelheto':b.getAttribute('data-tab'));");
         console.log('[abo] Prémium fül: ' + tm[2] + ' autó, Bérelhető: ' + SUB_TOTAL);
       }
     }
