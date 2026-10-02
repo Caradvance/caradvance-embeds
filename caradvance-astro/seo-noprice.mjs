@@ -29,7 +29,7 @@ const SKIP = [/^_np\//, /^belso\//, /^ajanlat\//, /^api\//, /^aszf\//, /^adatkez
 // ---------- ár-felismerés ----------
 const NUM = '(?:\\d{1,3}(?:[ \\u00a0\\u202f\\u2009.,]\\d{3})+|\\d+)(?:,\\d{1,2})?';
 const CUR = '(?:€|EUR\\b|Ft\\b|HUF\\b)';
-const CORE = new RegExp(`(?:[−–-]\\s?)?${NUM}[\\s\\u2009]?(?:[–-]\\s?${NUM}\\s?)?${CUR}|€\\s?${NUM}`, 'g');
+const CORE = new RegExp(`(?:[−–-]\\s?)?${NUM}[\\s\\u2009]?(?:[–-]\\s?${NUM}\\s?)?(?:(?:M|millió|ezer)[\\s\\u00a0]?)?${CUR}|€\\s?${NUM}`, 'g');
 const RATE = /1\s?€\s?[≈=]\s?\d[\d  ]*\s?Ft/g;
 
 export function strip(s) {
@@ -44,6 +44,7 @@ export function strip(s) {
   s = s.replace(/\s?\(\s?⁢\s?\)/g, '');
   s = s.replace(/⁢(?:\s?[·|,\/]\s?⁢)+/g, '⁢');
   s = s.replace(/⁢/g, LABEL);
+  s = s.replace(/nettó Ár kérésre/g, LABEL).replace(/\s?\(kb\. Ár kérésre\)/g, '');
   s = s.replace(/⁣R(\d+)⁣/g, (_, i) => keep[+i]);
   return s;
 }

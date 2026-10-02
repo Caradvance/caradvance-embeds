@@ -19,8 +19,8 @@ const DIST = 'dist';
 
 const PAGES = {
   'egyedi-auto-rendeles': {
-    title:   'BMW konfigurátor – egyedi autó rendelés | CarAdvance',
-    desc:    'BMW konfigurátor: állítsd össze az új autód, mi behozzuk Németországból — gyári felszereltség, kedvező ár, kulcsrakész átadás. BMW, MINI, Mercedes, Audi.',
+    title:   'BMW konfigurátor magyarul – új BMW német áron, árlistával | CarAdvance',
+    desc:    'BMW konfigurátor magyarul, árlistával: állítsd össze az új BMW-d (vagy MINI, Mercedes, Audi), mi német áron behozzuk — akár 19% német áfával, kulcsrakész forgalomba helyezéssel.',
     ogTitle: 'BMW konfigurátor – egyedi autó rendelés Németországból',
   },
   'uj-auto-berlese': {
