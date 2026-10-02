@@ -6,3 +6,10 @@
 /cookie/ /adatkezeles/#cookie 301
 /altalanos-szerzodesi-feltetelek /aszf/ 301
 /altalanos-szerzodesi-feltetelek/ /aszf/ 301
+# sk / cs / pl: saját domain lesz (caradvance.sk / .cz / .pl). Addig az angol oldalra (302 = ideiglenes).
+/sk /en/ 302
+/sk/* /en/ 302
+/cs /en/ 302
+/cs/* /en/ 302
+/pl /en/ 302
+/pl/* /en/ 302
