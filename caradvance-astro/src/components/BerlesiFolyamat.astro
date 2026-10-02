@@ -20,7 +20,7 @@ const steps = [
   { t: 'Kaució befizetése', html: 'A kauciót a németországi Caradvance GmbH részére fizeted be, az autó kategóriájának megfelelő összegben.<sup>6</sup> Az alábbi táblázat mutatja, melyik autóhoz mekkora kaució tartozik — hogy mi történik vele a bérlés alatt és végén, azt a <a href="/berlesi-feltetelek/#kaucio">Feltételek és kaució</a> oldalon írjuk le részletesen:', table: true },
   { t: 'Beszerzés és szállítás', html: 'Megvásároljuk a kiválasztott autót Németországban, és házhoz szállítjuk neked.<sup>7</sup>' },
   { t: 'Átvételi ellenőrzés', html: 'Amikor az autó megérkezik, alaposan átnézzük: fotókat készítünk a külsőről, a belső térről, valamint a kilométeróra- és üzemanyagszintről. Ekkor töltjük ki az átadási jegyzőkönyvet is.<sup>8</sup>', btns: [{ label: 'Átadási jegyzőkönyv →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
-  { t: 'Végleges szerződés', html: 'Mindkét fél aláírja a végleges szerződést, amely tartalmazza az átadási jegyzőkönyvet is.', btns: [{ label: 'Végleges szerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Végleges szerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
+  { t: 'Végleges szerződés', html: 'Mindkét fél aláírja a végleges szerződést, amely tartalmazza az átadási jegyzőkönyvet is. A szerződés feltételeit előre, érthetően összefoglalva itt nézheted át: <a href="/berlesi-feltetelek/">Bérlési feltételek és kaució</a>.', btns: [{ label: 'Végleges szerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Végleges szerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Az autó a tiéd', html: 'Az autó a következő hat hónapra a tiéd — nincs más dolgod, mint vezetni.' },
 ];
 
@@ -29,6 +29,7 @@ const faqs = [
   ['Magánszemélyként és cégként is bérelhetek?', 'Igen. Már az elején eldöntheted, hogy magánszemélyként vagy cégként szeretnél bérelni — az ajánlatot, a leinformálást és az előszerződést ennek megfelelően állítjuk össze.'],
   ['Mekkora kauciót kell fizetnem?', 'A kaució az autó kategóriájától függ: 3 000 €, 5 000 €, 7 500 € vagy 10 000 €. A pontos összeget a fenti táblázatban láthatod, és az ajánlatban is rögzítjük.'],
   ['Kinek fizetem a kauciót?', 'A kauciót a németországi Caradvance GmbH részére fizeted be, az előszerződés aláírása után.'],
+  ['Hol találom a pontos bérlési feltételeket?', 'A bérleti szerződés minden fontos pontját — kaució, kilométerkeret, biztosítás és önrész, kár esetén teendők, gumik, bírságok, külföldi használat és visszaadás — érthetően összefoglaltuk a Bérlési feltételek és kaució oldalon (caradvance.hu/berlesi-feltetelek).'],
   ['Mi van benne a bérleti díjban?', 'A szervizköltséget és az adókat mi álljuk, sőt a nyári és téli gumiszettet is tőlünk kapod. Neked csak a vezetés marad.'],
 ];
 const faqJson = {
@@ -62,6 +63,7 @@ const serviceJson = {
 <div class="cta-row">
 <a class="btn btn-primary" href="/berelheto">Bérelhető autóink</a>
 <a class="btn btn-white" href="/berles-elonyei">A bérlés előnyei</a>
+<a class="btn btn-white" href="/berlesi-feltetelek/">Bérlési feltételek</a>
 </div>
 </div>
 <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
@@ -121,6 +123,29 @@ const serviceJson = {
 <p><sup>6</sup> A kaució a legtöbb esetben fix, de fenntartjuk a jogot a módosítására, ha a hitelképesség túl alacsony, vagy azt más ok indokolja.</p>
 <p><sup>7</sup> A beszerzésről és a szállításról végig tájékoztatunk. Fontos, hogy számos külső tényező — gyártási problémák, hivatali ügyintézés, biztosítás, casco, szállítási nehézségek stb. — megnehezíti a pontos időzítést, és további csúszást okozhat. Mindent megteszünk, hogy a lehető leghamarabb megkapd az autót.</p>
 <p><sup>8</sup> Az átvételkor együtt, pontról pontra átnézzük az autó állapotát, és videó- és fotódokumentációt készítünk mindkét fél biztonsága érdekében. Ugyanez történik az autó visszaadásakor is, amikor összevetjük, keletkezett-e sérülés vagy egyéb probléma. A kisebb, könnyen kezelhető esetekre is ezért szolgál a kaució.</p>
+</div>
+</div>
+</section>
+
+<section class="section" style="padding-top:8px">
+<div class="wrap">
+<div class="bf-box">
+<div class="bf-head">
+<div>
+<span class="eyebrow">Bérlési feltételek</span>
+<h2 class="sec-title" style="margin:6px 0 6px">Mi áll a bérleti szerződésben?</h2>
+<p class="bf-lead">A legfontosabb pontok röviden — a részleteket a Bérlési feltételek és kaució oldalon találod.</p>
+</div>
+<a class="btn btn-primary" href="/berlesi-feltetelek/">Összes bérlési feltétel →</a>
+</div>
+<div class="bf-grid">
+<a class="bf-card" href="/berlesi-feltetelek/#kaucio"><b>Kaució</b><span>Biztosíték, nem bérleti díj, nem kamatozik. A visszaadás és a nyitott ügyek lezárása után 30 napon belül visszajár.</span><em>Mi történik vele? →</em></a>
+<a class="bf-card" href="/berlesi-feltetelek/#kezdet"><b>Időtartam</b><span>Minimum 6 teljes hónap az átadástól, utána 30 napos felmondással, bérleti hónap végére mondható fel.</span><em>Részletek →</em></a>
+<a class="bf-card" href="/berlesi-feltetelek/#tartalom"><b>A díjban benne van</b><span>Szerviz és karbantartás, nyári és téli gumi, kgfb és casco, műszaki vizsga, assistance.</span><em>Mi nincs benne? →</em></a>
+<a class="bf-card" href="/berlesi-feltetelek/#km"><b>Kilométerkeret</b><span>Havi keret, amely a teljes bérleti időre összeadódik; a túlfutást visszaadáskor számoljuk el.</span><em>Részletek →</em></a>
+<a class="bf-card" href="/berlesi-feltetelek/#biztositas"><b>Biztosítás és önrész</b><span>Casco önrész: töréskárnál 10%, lopásnál 20%, legalább 1 000 € káreseményenként.</span><em>Kár esetén teendők →</em></a>
+<a class="bf-card" href="/berlesi-feltetelek/#visszaadas"><b>Visszaadás</b><span>Tisztán, mindkét kulccsal, az átadáskori üzemanyagszinttel — közös állapotfelmérés jegyzőkönyvvel.</span><em>Részletek →</em></a>
+</div>
 </div>
 </div>
 </section>
@@ -207,4 +232,15 @@ a.pf-lnk:hover{opacity:.9}
 .bl-notes p{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 6px}
 .bl-notes sup{color:var(--red);font-weight:700}
 @media(max-width:640px){.bl-term-box{flex:1 1 100%;font-size:28px;padding:26px}}
+.bf-box{max-width:1080px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px 32px;box-shadow:0 10px 30px rgba(8,8,10,.05)}
+.bf-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:20px}
+.bf-lead{color:var(--muted);margin:0;font-size:15px}
+.bf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+a.bf-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;background:#F7F8FA;border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;transition:border-color .15s,transform .15s}
+a.bf-card:hover{border-color:var(--red);transform:translateY(-2px)}
+a.bf-card b{color:var(--ink);font-size:16px;font-weight:800}
+a.bf-card span{color:var(--muted);font-size:14px;line-height:1.55;flex:1}
+a.bf-card em{font-style:normal;color:var(--red);font-weight:700;font-size:13.5px}
+@media(max-width:860px){.bf-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.bf-grid{grid-template-columns:1fr}.bf-box{padding:22px 18px}}
 </style>
