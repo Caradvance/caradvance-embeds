@@ -1,0 +1,11 @@
+{
+  "_doc": "Többnyelvű oldalak térképe. live = élő (indexelhető, kattintható) nyelvek. pages = oldal-kulcs -> nyelv -> URL. A build-lépések (golive, seo-i18n, seo-langsoon, seo-legal) és az Astro oldalak is ebből dolgoznak.",
+  "live": ["en"],
+  "pages": {
+    "home":    { "hu": "/",                      "en": "/en/",                                       "de": "/de/",                                   "fr": "/fr/",                                        "uk": "/uk/",                                     "zh": "/zh/" },
+    "rental":  { "hu": "/uj-auto-berlese/",      "en": "/en/car-rental-budapest/",                   "de": "/de/auto-mieten-budapest/",              "fr": "/fr/location-voiture-budapest/",              "uk": "/uk/orenda-avto-budapesht/",               "zh": "/zh/budapest-car-rental/" },
+    "import":  { "hu": "/auto-rendeles/",        "en": "/en/car-import-from-germany/",               "de": "/de/auto-import-aus-deutschland/",       "fr": "/fr/importer-voiture-allemagne/",             "uk": "/uk/avto-z-nimechchyny/",                  "zh": "/zh/germany-car-import/" },
+    "regtax":  { "hu": "/honositas-kalkulator/", "en": "/en/hungary-registration-tax-calculator/",   "de": "/de/registrierungssteuer-ungarn-rechner/","fr": "/fr/taxe-immatriculation-hongrie/",          "uk": "/uk/reiestratsiinyi-podatok-uhorshchyna/", "zh": "/zh/hungary-registration-tax/" },
+    "contact": { "hu": "/kapcsolat/",            "en": "/en/contact/",                               "de": "/de/kontakt/",                           "fr": "/fr/contact/",                                "uk": "/uk/kontakty/",                            "zh": "/zh/contact/" }
+  }
+}
