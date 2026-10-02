@@ -1,0 +1,24 @@
+---
+// /<nyelv>/<oldal>/ — idegen nyelvű szolgáltatásoldalak (intl-map.json + src/i18n/intl/<nyelv>.ts)
+import Base from '../../layouts/Base.astro';
+import IntlPage from '../../components/IntlPage.astro';
+import { CONTENT, PAGE_KEYS, slugFor } from '../../i18n/intl/index';
+import type { PageKey } from '../../i18n/intl/types';
+
+export function getStaticPaths() {
+  const out: any[] = [];
+  for (const lang of Object.keys(CONTENT)) {
+    for (const key of PAGE_KEYS) {
+      if (key === 'home') continue;
+      out.push({ params: { lang, slug: slugFor(key, lang) }, props: { key } });
+    }
+  }
+  return out;
+}
+const { lang, slug } = Astro.params as { lang: string; slug: string };
+const { key } = Astro.props as { key: PageKey };
+const P = CONTENT[lang]!.pages[key];
+---
+<Base lang={lang as any} path={`/${slug}/`} title={P.title} description={P.desc}>
+  <IntlPage lang={lang} pageKey={key} />
+</Base>
