@@ -50,8 +50,13 @@ const STYLE =
 // A magyar opció felirata "<span>Magyar</span>" — azt békén hagyjuk (marad aktív).
 const RE = /<a class="(langopt|m-langopt)"([^>]*)>([\s\S]*?)<\/a>/g;
 
+// Ezek a nyelvek NEM a caradvance.hu-n lesznek (saját domain: .sk / .cz / .pl) — kivesszük a választóból.
+const DROP = new Set(['Slovenčina', 'Čeština', 'Polski']);
+
 function transform(html) {
   return html.replace(RE, (m, cls, _attrs, inner) => {
+    const lbl = (inner.match(/<span>([^<]+)<\/span>/) || [, ''])[1].trim();
+    if (DROP.has(lbl)) return '';                          // sk / cs / pl: törölve
     if (inner.includes('>Magyar<')) return m;               // magyar marad kattintható
     const label = (inner.match(/<span>([^<]+)<\/span>/) || [, ''])[1].trim();
     const word = SOON[label] || SOON_FALLBACK;              // "hamarosan" az adott nyelven

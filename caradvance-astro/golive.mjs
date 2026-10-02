@@ -28,7 +28,7 @@ import path from 'node:path';
 const DIST = 'dist';
 const SITE = (process.env.SITE_BASE || 'https://www.caradvance.hu').replace(/\/+$/, '');
 // Magyar tartalom idegen nyelvi kod alatt -> duplikatum, nem indexelheto.
-const DUP_LANGS = ['en', 'cs', 'de', 'fr', 'pl', 'sk', 'uk', 'zh'];
+const DUP_LANGS = ['en', 'de', 'fr', 'uk', 'zh'];
 
 // Nem nyilvanos / nem indexelheto utvonalak. A kapu eddig ezeket is takarta,
 // elesites utan viszont a Google-nek sem a belso iranyitopult, sem az egyedi

@@ -14,11 +14,14 @@
 import fs from 'node:fs';
 
 const DIST = 'dist';
-const SITE = 'https://caradvance.hu';
+const SITE = 'https://www.caradvance.hu';
+const LIVE = new Set(['hu']);
 const LOCS = [
-  ['hu', '/'], ['en', '/en'], ['de', '/de'], ['fr', '/fr'],
-  ['sk', '/sk'], ['cs', '/cs'], ['pl', '/pl'], ['uk', '/uk'], ['zh', '/zh'],
-];
+  ['hu', '/'], ['en', '/en/'], ['de', '/de/'], ['fr', '/fr/'], ['uk', '/uk/'], ['zh', '/zh/'],
+].filter(([l]) => LIVE.has(l));
+// Csak a KÉSZ (lefordított, indexelhető) nyelvek kapnak hreflang-ot — noindex oldalra mutató
+// hreflang ellentmondásos jel a Google-nek. Ha egy nyelv elkészül, ide kell felvenni.
+// (sk / cs / pl: külön domain — caradvance.sk / .cz / .pl — majd domainközi hreflang.)
 
 const block =
   LOCS.map(([l, p]) => '<link rel="alternate" hreflang="' + l + '" href="' + SITE + p + '">').join('\n')
