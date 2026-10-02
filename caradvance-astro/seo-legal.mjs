@@ -59,10 +59,10 @@ const CSS = `<style id="cafoot-css">
 .cafoot a,.cafoot button.cafoot-link{display:block;color:#cfd4de;text-decoration:none;font-size:14px;line-height:1.4;padding:5px 0;background:none;border:0;font-family:inherit;cursor:pointer;text-align:left}
 .cafoot a:hover,.cafoot button.cafoot-link:hover{color:#fff}
 .cafoot .cafoot-ct a{padding:3px 0;color:#fff;font-weight:700}
-.cafoot-soc{display:flex;gap:10px;margin-top:14px}
-.cafoot-soc a{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;padding:0}
-.cafoot-soc a:hover{border-color:#E2001A;background:#E2001A}
-.cafoot-soc svg{width:16px;height:16px;fill:#fff}
+.cafoot-soc{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.cafoot-soc a{width:40px;height:40px;border-radius:11px;display:block;padding:0;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.cafoot-soc a:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.45)}
+.cafoot-soc svg{width:40px;height:40px;display:block}
 .cafoot-legal a{font-weight:600}
 .cafoot-copy{max-width:1200px;margin:36px auto 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);font-size:12.5px;color:#8a91a0;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
 .cafoot-copy span{white-space:nowrap}
@@ -70,8 +70,15 @@ const CSS = `<style id="cafoot-css">
 @media(max-width:620px){.cafoot{padding:44px 20px 24px}.cafoot-in{grid-template-columns:1fr 1fr;gap:26px 18px}.cafoot-copy{display:block}.cafoot-copy span{display:block;white-space:normal;margin-bottom:4px}}
 </style>`;
 
-const IG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 4.9a4.9 4.9 0 1 0 0 9.8 4.9 4.9 0 0 0 0-9.8zm0 8.1a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zm5.1-9.4a1.1 1.1 0 1 0 0 2.3 1.1 1.1 0 0 0 0-2.3z"/></svg>';
-const FB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8.2h2.8l.4-3.2h-3.2V7.6c0-.9.3-1.6 1.6-1.6h1.7V3.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3v3.2h2.8V21h3.4z"/></svg>';
+// Színes közösségi ikonok (40×40, lekerekített négyzet). URL nélkül a gomb nem jelenik meg.
+const SOCIAL = [
+  ['Google értékelések', 'https://www.google.com/maps/search/?api=1&query=Caradvance%20GmbH%20Autovermietung', '<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#fff"/><g transform="translate(10 10) scale(.5833)"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></g></svg>'],
+  ['Facebook', 'https://www.facebook.com/share/19BfQsJxSk/', '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="cfFb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18ACFE"/><stop offset="1" stop-color="#0163E0"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#cfFb)"/><path fill="#fff" d="M26.6 40V26.4h4.6l.7-5.4h-5.3v-3.4c0-1.6.4-2.6 2.7-2.6H32v-4.8c-.5-.1-2.2-.2-4.1-.2-4.1 0-6.9 2.5-6.9 7.1V21h-4.6v5.4H21V40h5.6z"/></svg>'],
+  ['Instagram', 'https://www.instagram.com/caradvance_hungary', '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="cfIg" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285AEB"/></radialGradient></defs><rect width="48" height="48" rx="12" fill="url(#cfIg)"/><rect x="11" y="11" width="26" height="26" rx="8" fill="none" stroke="#fff" stroke-width="3.2"/><circle cx="24" cy="24" r="6.2" fill="none" stroke="#fff" stroke-width="3.2"/><circle cx="31.6" cy="16.4" r="2" fill="#fff"/></svg>'],
+  ['TikTok', '', '<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#000"/><g transform="translate(1.2 0)"><path fill="#25F4EE" d="M29.6 9.5c.6 3.6 2.9 6.2 6.5 6.6v5.1c-2.4 0-4.6-.7-6.5-2v9.6c0 5.3-4.3 9.6-9.6 9.6s-9.6-4.3-9.6-9.6 4.3-9.6 9.6-9.6c.5 0 1 0 1.5.1v5.3c-.5-.2-1-.2-1.5-.2-2.4 0-4.4 2-4.4 4.4s2 4.4 4.4 4.4 4.4-2 4.4-4.4V9.5h5.2z" transform="translate(-1.4 -1.2)"/><path fill="#FE2C55" d="M29.6 9.5c.6 3.6 2.9 6.2 6.5 6.6v5.1c-2.4 0-4.6-.7-6.5-2v9.6c0 5.3-4.3 9.6-9.6 9.6s-9.6-4.3-9.6-9.6 4.3-9.6 9.6-9.6c.5 0 1 0 1.5.1v5.3c-.5-.2-1-.2-1.5-.2-2.4 0-4.4 2-4.4 4.4s2 4.4 4.4 4.4 4.4-2 4.4-4.4V9.5h5.2z" transform="translate(1 1)"/><path fill="#fff" d="M29.6 9.5c.6 3.6 2.9 6.2 6.5 6.6v5.1c-2.4 0-4.6-.7-6.5-2v9.6c0 5.3-4.3 9.6-9.6 9.6s-9.6-4.3-9.6-9.6 4.3-9.6 9.6-9.6c.5 0 1 0 1.5.1v5.3c-.5-.2-1-.2-1.5-.2-2.4 0-4.4 2-4.4 4.4s2 4.4 4.4 4.4 4.4-2 4.4-4.4V9.5h5.2z"/></g></svg>'],
+  ['YouTube', '', '<svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#FF0033"/><path fill="#fff" d="M19.5 15.5v17l14-8.5z"/></svg>'],
+];
+const SOC = SOCIAL.filter(([, u]) => u).map(([t, u, svg]) => `<a href="${u}" target="_blank" rel="noopener" aria-label="${t}" title="${t}">${svg}</a>`).join('');
 
 const col = ([h, links]) => `<div><h4>${h}</h4>${links.map(([t, u]) => `<a href="${u}">${t}</a>`).join('')}</div>`;
 
@@ -81,7 +88,7 @@ const FOOTER = `<footer class="cafoot" data-cafoot="1">
     <a href="/" aria-label="CarAdvance főoldal"><img src="/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133" loading="lazy"></a>
     <p>Prémium autók Németországból — bérlés, vásárlás, egyedi rendelés, import és bizományos értékesítés.</p>
     <div class="cafoot-ct"><a href="tel:+36302336060">+36 30 233 6060</a><a href="mailto:info@caradvance.hu">info@caradvance.hu</a><a href="/kapcsolat/" style="font-weight:600;color:#cfd4de">Kapcsolat →</a></div>
-    <div class="cafoot-soc"><a href="https://www.facebook.com/share/19BfQsJxSk/" target="_blank" rel="noopener" aria-label="Facebook">${FB}</a><a href="https://www.instagram.com/caradvance_hungary" target="_blank" rel="noopener" aria-label="Instagram">${IG}</a></div>
+    <div class="cafoot-soc">${SOC}</div>
   </div>
   ${COLS.map(col).join('\n  ')}
   <div class="cafoot-legal"><h4>Jogi információk</h4>${LEGAL.map(([t, u]) => `<a href="${u}">${t}</a>`).join('')}<button type="button" class="cafoot-link" onclick="if(window.CAConsent){window.CAConsent.open()}else{location.href='/adatkezeles/#cookie'}">Süti-beállítások</button></div>
