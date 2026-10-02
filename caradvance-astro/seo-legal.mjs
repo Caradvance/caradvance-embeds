@@ -80,7 +80,6 @@ const FOOTER = `<footer class="cafoot" data-cafoot="1">
   <div class="cafoot-brand">
     <a href="/" aria-label="CarAdvance főoldal"><img src="/caradvance-logo-white.webp" alt="CarAdvance" width="403" height="133" loading="lazy"></a>
     <p>Prémium autók Németországból — bérlés, vásárlás, egyedi rendelés, import és bizományos értékesítés.</p>
-    <p>Iroda: 2083 Solymár, Ibolya utca 18.<br>Hétfő–péntek 9:00–17:00</p>
     <div class="cafoot-ct"><a href="tel:+36302336060">+36 30 233 6060</a><a href="mailto:info@caradvance.hu">info@caradvance.hu</a><a href="/kapcsolat/" style="font-weight:600;color:#cfd4de">Kapcsolat →</a></div>
     <div class="cafoot-soc"><a href="https://www.facebook.com/share/19BfQsJxSk/" target="_blank" rel="noopener" aria-label="Facebook">${FB}</a><a href="https://www.instagram.com/caradvance_hungary" target="_blank" rel="noopener" aria-label="Instagram">${IG}</a></div>
   </div>
