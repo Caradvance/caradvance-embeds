@@ -382,6 +382,9 @@ function leadKind(data) {
 async function sendCustomerConfirm(env, data, contact) {
   if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
   const k = leadKind(data);
+  // Idegen nyelvű oldalakról érkező megkeresés: angol (német oldalról német) visszaigazolás.
+  const L = String(data['Nyelv'] || 'HU').toLowerCase();
+  if (L !== 'hu') return sendIntlConfirm(env, data, contact, L === 'de' ? 'de' : 'en');
   const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'event_id']);
   const rows = Object.entries(data)
     .filter(([key, v]) => !skip.has(key) && v != null && v !== '' && typeof v !== 'object')
@@ -417,6 +420,41 @@ async function sendCustomerConfirm(env, data, contact) {
   });
   if (!r.ok) throw new Error('resend ' + r.status);
   return { status: 'sent' };
+}
+
+const INTL_CONFIRM = {
+  en: { subj: 'We received your request', hello: (n) => n ? 'Dear ' + n + ',' : 'Hello,', body: 'thank you for your message. A member of our team will contact you <b>as soon as possible</b> with the details and a personal offer.',
+        data: 'Your request', urgent: 'If it is urgent, call us on', or: 'or simply reply to this e-mail.', bye: 'Kind regards,', role: 'Head of Sales', country: 'Germany', rep: 'Hungarian representative: BH Group Zrt.',
+        labels: { 'Név': 'Name', 'E-mail': 'E-mail', 'Telefon': 'Phone', 'Üzenet': 'Message', 'Nyelv': 'Language', 'Oldal': 'Page', 'Típus': 'Request' } },
+  de: { subj: 'Wir haben Ihre Anfrage erhalten', hello: (n) => n ? 'Hallo ' + n + ',' : 'Guten Tag,', body: 'vielen Dank für Ihre Nachricht. Ein Mitglied unseres Teams meldet sich <b>so bald wie möglich</b> mit den Details und einem persönlichen Angebot.',
+        data: 'Ihre Anfrage', urgent: 'Wenn es eilt, rufen Sie uns an:', or: 'oder antworten Sie einfach auf diese E-Mail.', bye: 'Mit freundlichen Grüßen', role: 'Vertriebsleiter', country: 'Deutschland', rep: 'Vertretung in Ungarn: BH Group Zrt.',
+        labels: { 'Név': 'Name', 'E-mail': 'E-Mail', 'Telefon': 'Telefon', 'Üzenet': 'Nachricht', 'Nyelv': 'Sprache', 'Oldal': 'Seite', 'Típus': 'Anfrage' } },
+};
+async function sendIntlConfirm(env, data, contact, lang) {
+  const T = INTL_CONFIRM[lang];
+  const show = ['Név', 'E-mail', 'Telefon', 'Üzenet'];
+  const rows = show.filter((key) => data[key]).map((key) => `<tr><td style="padding:5px 14px 5px 0;color:#6b7280;white-space:nowrap;vertical-align:top">${esc(T.labels[key] || key)}</td><td style="padding:5px 0;color:#111"><b>${esc(String(data[key]))}</b></td></tr>`).join('');
+  const first = String(contact.name || '').trim().split(' ')[0] || '';
+  const phone = env.CONTACT_PHONE || '+36 30 233 6060';
+  const html = `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
+    <div style="background:#0b0b0d;padding:18px 24px"><img src="https://www.caradvance.hu/caradvance-logo-email.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
+    <div style="padding:24px">
+      <p style="margin:0 0 12px">${esc(T.hello(first))}</p>
+      <p style="margin:0 0 12px">${T.body}</p>
+      ${rows ? `<p style="margin:18px 0 6px;font-weight:bold">${T.data}</p><table style="border-collapse:collapse;font-size:14px">${rows}</table>` : ''}
+      <p style="margin:18px 0 0">${T.urgent} <a href="tel:${esc(phone.replace(/[^\d+]/g, ''))}" style="color:#e2001a;font-weight:bold;text-decoration:none">${esc(phone)}</a> ${T.or}</p>
+      <p style="margin:18px 0 0">${T.bye}</p><p style="margin:6px 0 0;line-height:1.45"><b>Tóth Károly</b><br><span style="color:#6b7280">${T.role}</span><br>CarAdvance · Caradvance GmbH<br><a href="tel:+36302146989" style="color:#141519;text-decoration:none">+36 30 214 6989</a> · <a href="mailto:info@caradvance.hu" style="color:#141519;text-decoration:none">info@caradvance.hu</a></p>
+    </div>
+    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px;line-height:1.55"><b style="color:#141519">Caradvance GmbH</b> · Bgm-Graf-Ring 21 · D-82538 Geretsried · ${T.country}<br>Amtsgericht München, HRB 151009 · USt-IdNr.: DE232664616<br>${T.rep}</div>
+  </div></div>`;
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: env.CUSTOMER_EMAIL_FROM || env.LEAD_EMAIL_FROM || 'CarAdvance <lead@caradvance.hu>', to: [contact.email], reply_to: env.CUSTOMER_REPLY_TO || 'info@caradvance.hu', subject: T.subj + ' | CarAdvance', html })
+  });
+  if (!r.ok) throw new Error('resend ' + r.status);
+  return { status: 'sent-' + lang };
 }
 
 function pick(obj, keys) {
