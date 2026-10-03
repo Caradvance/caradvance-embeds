@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parse, serialize, visit, finishLd } from './i18n-core.mjs';
 import { loadIntl, applyExpat } from './i18n-expat.mjs';
+import { writeRuntime } from './i18n-runtime.mjs';
 
 const DIST = 'dist';
 const SITE = 'https://www.caradvance.hu';
@@ -21,6 +22,7 @@ const SKIPDIR = /^(_np|en|de|fr|uk|zh|sk|cs|pl|belso|ajanlat|api)(\/|$)/;
 const HREFLANG = { hu: 'hu', en: 'en', de: 'de', fr: 'fr', uk: 'uk', zh: 'zh-Hans' };
 const OG = { hu: 'hu_HU', en: 'en_GB', de: 'de_DE', fr: 'fr_FR', uk: 'uk_UA', zh: 'zh_CN' };
 const MIN_COVER = 0.85;
+const FLAG = { en: 'gb', de: 'de', fr: 'fr', uk: 'ua', zh: 'cn' };
 const LEGAL = /^(aszf|adatkezeles|impresszum|berlesi-feltetelek)\//;
 const NOTE = {
   en: 'This is a translation for information only — the Hungarian version is legally binding.',
@@ -59,6 +61,8 @@ try {
   });
   const PAGESET = new Set(pages.map(huPath));
   const sitemapAdd = []; const stats = {};
+  const rtn = writeRuntime(DIST, LANGS); const RTV = Date.now().toString(36);
+  console.log('[mirror] runtime szótár: ' + Object.entries(rtn).map(([l, n]) => l + ' ' + n).join(', '));
 
   const linkFix = (html, l) => html.replace(/(\shref=")((?:https?:\/\/(?:www\.)?caradvance\.hu)?)(\/[^"]*)"/g, (m, pre, host, p) => {
     if (/^\/(en|de|fr|uk|zh|_np|api)\//.test(p)) return m;
@@ -87,7 +91,9 @@ try {
       if (!/<html[^>]*\slang=/i.test(h)) h = h.replace(/<html/i, `<html lang="${HREFLANG[l]}"`);
       h = linkFix(h, l);
       h = switcher(h, l, p);
+      h = h.replace(/(class="navflag" style="background-image:url\(https:\/\/flagcdn\.com\/w80\/)hu(\.png\))/g, `$1${FLAG[l]}$2`);
       if (KEY[p]) h = applyExpat(h, KEY[p], l, INTL[l], M);
+      h = h.replace(/<\/body>/i, `<script src="/i18n/rt-${l}.js?v=${RTV}" defer></script>\n</body>`);
       h = dropAlt(h).replace(/<\/head>/i, cluster + '\n</head>');
       const url = `${SITE}${L(l, p)}`;
       h = /<link rel="canonical"[^>]*>/i.test(h) ? h.replace(/<link rel="canonical"[^>]*>/i, `<link rel="canonical" href="${url}">`) : h.replace(/<\/head>/i, `<link rel="canonical" href="${url}">\n</head>`);
