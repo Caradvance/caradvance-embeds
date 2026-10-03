@@ -7,23 +7,23 @@ const W = {
   en: { sale: '$1 for sale · $2 · $3 km | CarAdvance', sold: 'Sold: $1 · $2 · $3 km | CarAdvance',
         saleD: '$1 for sale, $2, $3 km, $4 hp, $5, $6. Price $7 Ft. German import with verified history from CarAdvance.',
         soldD: 'Sold: $1, $2, $3 km, $4 hp, $5, $6. Looking for something similar? See our current stock.',
-        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ' — year ' + y : ''}, ${km} driven, ${f}, ${b}. ${p} ${u === 'LE' ? 'hp' : u}, ${g}, ${d}. Net price (excl. VAT) with warranty, imported by CarAdvance.` },
+        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ' — year ' + y : ''}, ${km ? km + ' driven, ' : ''}${f}, ${b}. ${p} ${u === 'LE' ? 'hp' : u}, ${g}, ${d}. Net price (excl. VAT) with warranty, imported by CarAdvance.` },
   de: { sale: '$1 kaufen · $2 · $3 km | CarAdvance', sold: 'Verkauft: $1 · $2 · $3 km | CarAdvance',
         saleD: '$1 zu verkaufen, $2, $3 km, $4 PS, $5, $6. Preis $7 Ft. Deutscher Import mit geprüfter Historie von CarAdvance.',
         soldD: 'Verkauft: $1, $2, $3 km, $4 PS, $5, $6. Suchen Sie etwas Ähnliches? Sehen Sie sich unseren aktuellen Bestand an.',
-        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', Baujahr ' + y : ''}, ${km} gelaufen, ${f}, ${b}. ${p} ${u === 'LE' ? 'PS' : u}, ${g}, ${d}. Nettopreis (ohne MwSt.) mit Garantie, Import durch CarAdvance.` },
+        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', Baujahr ' + y : ''}, ${km ? km + ' gelaufen, ' : ''}${f}, ${b}. ${p} ${u === 'LE' ? 'PS' : u}, ${g}, ${d}. Nettopreis (ohne MwSt.) mit Garantie, Import durch CarAdvance.` },
   fr: { sale: '$1 à vendre · $2 · $3 km | CarAdvance', sold: 'Vendu : $1 · $2 · $3 km | CarAdvance',
         saleD: '$1 à vendre, $2, $3 km, $4 ch, $5, $6. Prix $7 Ft. Import allemand à l’historique vérifié par CarAdvance.',
         soldD: 'Vendu : $1, $2, $3 km, $4 ch, $5, $6. Vous cherchez un modèle similaire ? Découvrez notre stock actuel.',
-        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', année ' + y : ''}, ${km} parcourus, ${f}, ${b}. ${p} ${u === 'LE' ? 'ch' : u}, ${g}, ${d}. Prix HT avec garantie, importé par CarAdvance.` },
+        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', année ' + y : ''}, ${km ? km + ' parcourus, ' : ''}${f}, ${b}. ${p} ${u === 'LE' ? 'ch' : u}, ${g}, ${d}. Prix HT avec garantie, importé par CarAdvance.` },
   uk: { sale: '$1 на продаж · $2 · $3 км | CarAdvance', sold: 'Продано: $1 · $2 · $3 км | CarAdvance',
         saleD: '$1 на продаж, $2, $3 км, $4 к.с., $5, $6. Ціна $7 Ft. Імпорт з Німеччини з перевіреною історією від CarAdvance.',
         soldD: 'Продано: $1, $2, $3 км, $4 к.с., $5, $6. Шукаєте схоже? Перегляньте наші авто в наявності.',
-        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', ' + y + ' р.' : ''}, пробіг ${km}, ${f}, ${b}. ${p} ${u === 'LE' ? 'к.с.' : u}, ${g}, ${d}. Ціна нетто (без ПДВ) з гарантією, імпорт CarAdvance.` },
+        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', ' + y + ' р.' : ''}, ${km ? 'пробіг ' + km + ', ' : ''}${f}, ${b}. ${p} ${u === 'LE' ? 'к.с.' : u}, ${g}, ${d}. Ціна нетто (без ПДВ) з гарантією, імпорт CarAdvance.` },
   zh: { sale: '在售 $1 · $2 · $3 公里 | CarAdvance', sold: '已售：$1 · $2 · $3 公里 | CarAdvance',
         saleD: '在售 $1，$2，$3 公里，$4 马力，$5，$6。价格 $7 Ft。CarAdvance 德国进口，车史已核实。',
         soldD: '已售：$1，$2，$3 公里，$4 马力，$5，$6。想找类似的车？请查看我们的现有库存。',
-        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? '，' + y + ' 年款' : ''}，已行驶 ${km}，${f}，${b}。${p} ${u === 'LE' ? '马力' : u}，${g}，${d}。含质保净价（不含增值税），由 CarAdvance 进口。` },
+        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? '，' + y + ' 年款' : ''}，${km ? '已行驶 ' + km + '，' : ''}${f}，${b}。${p} ${u === 'LE' ? '马力' : u}，${g}，${d}。含质保净价（不含增值税），由 CarAdvance 进口。` },
 };
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const HUSIG = /[őűŐŰ]|[áéíóöúü]|\b(és|az|egy|a|hogy|nem|vagy|autó|Eladó|Elkelt|Főoldal|Autóink)\b/;
@@ -38,7 +38,7 @@ export function makeTemplater(l, D) {
     if ((m = k.match(/^Elkelt (.+) · (\{\d+\}) · (\{\d+\}) km \| CarAdvance$/))) return sub(w.sold, m);
     if ((m = k.match(/^Eladó (.+), (\{\d+\}), (\{\d+\}) km, (\{\d+\}) LE, ([^,]+), ([^.]+)\. Ára (\{\d+\}) Ft\. Ellenőrzött előéletű német import a CarAdvance-től\.$/))) { m[5] = word(m[5]); m[6] = word(m[6]); return sub(w.saleD, m); }
     if ((m = k.match(/^Elkelt: (.+), (\{\d+\}), (\{\d+\}) km, (\{\d+\}) LE, ([^,]+), ([^.]+)\. Hasonlót keresel\? Nézd meg az aktuális készletet\.$/))) { m[5] = word(m[5]); m[6] = word(m[6]); return sub(w.soldD, m); }
-    if ((m = k.match(/^A\(z\) (.+?)(?: (\{\d+\}(?:\/\{\d+\})?))? évjáratú, (.+?) futott, (.+?) üzemű (.+?)\. (\{\d+\}) (kW|LE), ([^,]+), ([^.]+)\. Nettó ár \(áfa nélkül\) garanciával, CarAdvance import\.$/)))
+    if ((m = k.match(/^A\(z\) (.+?)(?: (\{\d+\}(?:\/\{\d+\})?))? évjáratú, (?:(.+?) futott, )?(.+?) üzemű (.+?)\. (\{\d+\}) (kW|LE), ([^,]+), ([^.]+)\. Nettó ár \(áfa nélkül\) garanciával, CarAdvance import\.$/)))
       return w.desc(m[1], m[2], m[3], word(m[4]), word(m[5]), m[6], m[7], word(m[8]), word(m[9]));
     if (/^<g0>Főoldal<\/g0> \/ <g1>Autóink<\/g1> \/ /.test(k))
       return k.replace(/<g0>Főoldal<\/g0>/, `<g0>${D['Főoldal'] || 'Home'}</g0>`).replace(/<g1>Autóink<\/g1>/, `<g1>${D['Autóink'] || 'Cars'}</g1>`).replace(/<g2>Eladva<\/g2>/, `<g2>${D['Eladva'] || 'Sold'}</g2>`);

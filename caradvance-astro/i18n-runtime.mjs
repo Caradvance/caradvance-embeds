@@ -45,7 +45,7 @@ new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var m=ms[i];if(m.
 .observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:AT.concat(['href'])});
 var _a=window.alert;window.alert=function(s){var t=tr(String(s));return _a.call(window,t!=null?t:s)};
 var _c=window.confirm;window.confirm=function(s){var t=tr(String(s));return _c.call(window,t!=null?t:s)};}
-if(document.body)run();else document.addEventListener('DOMContentLoaded',run);`;
+document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a.langopt,a.m-langopt');if(a&&location.hash){var h=a.getAttribute('href')||'';if(h.indexOf('#')<0)a.setAttribute('href',h+location.hash);}},true);if(document.body)run();else document.addEventListener('DOMContentLoaded',run);`;
 
 export function writeRuntime(DIST, langs, pages = [], slugs = {}, redir = {}) {
   const PG = {}; for (const p of pages) PG[p] = 1;
