@@ -48,5 +48,12 @@
       "uk": "/uk/kontakty/",
       "zh": "/zh/contact/"
     }
-  }
+  },
+  "mirror": [
+    "en",
+    "de",
+    "fr",
+    "uk",
+    "zh"
+  ]
 }
