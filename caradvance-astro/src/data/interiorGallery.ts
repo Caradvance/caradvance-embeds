@@ -347,7 +347,6 @@ export const INTERIOR_PAGES: Record<string, string> = {
  "berelheto-auto/bmw-5-os-limuzin-berles": "bmw-5-os-limuzin",
  "egyedi-auto-rendeles/bmw-5-os": "bmw-5-os-limuzin",
  "egyedi-auto-rendeles/bmw-i5": "bmw-5-os-limuzin",
- "berelheto-auto/bmw-x5-berles": "bmw-x5",
  "egyedi-auto-rendeles/bmw-ix5": "bmw-x5",
  "berelheto-auto/bmw-x6-berles": "bmw-x6",
  "egyedi-auto-rendeles/bmw-3-as-touring": "bmw-3-as-touring",
