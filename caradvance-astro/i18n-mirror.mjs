@@ -100,6 +100,8 @@ try {
       if (!/<html[^>]*\slang=/i.test(h)) h = h.replace(/<html/i, `<html lang="${HREFLANG[l]}"`);
       if (KEY[p]) h = applyExpat(h, KEY[p], l, INTL[l], M);
       h = linkFix(h, l);
+      // nyelvi képváltozat: ha van dist/l10n/<nyelv>/<fájlnév>, azt használjuk (pl. feliratos grafikák)
+      h = h.replace(/(\s(?:src|srcset|content|poster)=")((?:https?:\/\/(?:www\.)?caradvance\.hu)?\/)([^"\/?#]+\.(?:webp|png|jpe?g|avif))"/g, (m, pre, host, f) => (fs.existsSync(path.join(DIST, 'l10n', l, f)) ? `${pre}${host}l10n/${l}/${f}"` : m));
       h = h.replace(/(location\.href\s*=\s*')(\/[^'#?]*)/g, (m, pre, p0) => { const n = p0.endsWith('/') ? p0 : p0 + '/'; return PAGESET.has(n) ? pre + L(l, n) : m; });
       h = switcher(h, l, p);
       h = h.replace(/(class="navflag" style="background-image:url\(https:\/\/flagcdn\.com\/w80\/)hu(\.png\))/g, `$1${FLAG[l]}$2`);
