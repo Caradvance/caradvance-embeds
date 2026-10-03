@@ -72,6 +72,7 @@ try {
   const linkFix = (html, l) => html.replace(/(\shref=")((?:https?:\/\/(?:www\.)?caradvance\.hu)?)(\/[^"]*)"/g, (m, pre, host, p) => {
     if (/^\/(en|de|fr|uk|zh|_np|api)\//.test(p)) return m;
     const clean = p.split(/[?#]/)[0]; const rest = p.slice(clean.length);
+    if (/^\/berelheto\/?$/.test(clean)) return `${pre}${L(l, '/autoink/')}#berelheto"`; // a /berelheto/ oldal = /autoink/ Bérelhető fül
     const norm = clean.endsWith('/') ? clean : clean + '/';
     if (/\.[a-z0-9]{2,5}$/i.test(clean)) return m;        // fájl
     const tgt = PAGESET.has(norm) ? norm : (REDIR[norm] && PAGESET.has(REDIR[norm]) ? REDIR[norm] : null);
@@ -112,6 +113,7 @@ try {
       h = h.replace(/[ \t]*<meta\s+name=["']robots["'][^>]*>\s*\n?/gi, '');
       if (cover < MIN_COVER) h = h.replace(/<\/head>/i, '<meta name="robots" content="noindex,follow">\n</head>');
       else sitemapAdd.push(url);
+      if (p === '/berelheto/') { const t = L(l, '/autoink/') + '#berelheto'; h = `<!DOCTYPE html><html lang="${HREFLANG[l]}"><head><meta charset="utf-8"><meta name="robots" content="noindex,follow"><link rel="canonical" href="${SITE}${L(l, '/autoink/')}"><meta http-equiv="refresh" content="0;url=${t}"><script>location.replace(${JSON.stringify(t)})</script></head><body><a href="${t}">${t}</a></body></html>`; }
       const out = path.join(DIST, L(l, p).replace(/^\//, ''), 'index.html'); fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, h);
       const s = stats[l] || (stats[l] = { pages: 0, indexed: 0, hit: 0, miss: 0 }); s.pages++; s.hit += hit; s.miss += miss; if (cover >= MIN_COVER) s.indexed++;
     }
@@ -120,7 +122,7 @@ try {
   const smf = path.join(DIST, 'sitemap.xml');
   if (fs.existsSync(smf) && sitemapAdd.length) {
     let sm = fs.readFileSync(smf, 'utf8'); const now = new Date().toISOString().slice(0, 10);
-    const add = sitemapAdd.filter((u) => !sm.includes(`<loc>${u}</loc>`)).map((u) => `  <url><loc>${u}</loc><lastmod>${now}</lastmod></url>`).join('\n');
+    const add = sitemapAdd.filter((u) => !/\/berelheto\/$/.test(u) && !sm.includes(`<loc>${u}</loc>`)).map((u) => `  <url><loc>${u}</loc><lastmod>${now}</lastmod></url>`).join('\n');
     sm = sm.replace('</urlset>', add + '\n</urlset>'); fs.writeFileSync(smf, sm);
   }
   for (const [l, s] of Object.entries(stats)) console.log(`[mirror] ${l}: ${s.pages} oldal, indexelve ${s.indexed}, lefedettség ${(100 * s.hit / Math.max(1, s.hit + s.miss)).toFixed(1)}%`);
