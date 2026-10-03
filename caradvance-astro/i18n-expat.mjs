@@ -11,7 +11,7 @@
  */
 import fs from 'node:fs';
 
-const FAQ_T = { en: 'Questions from expats', de: 'Fragen von Expats', fr: 'Questions fréquentes des expatriés', uk: 'Запитання від експатів', zh: '外籍人士常见问题' };
+const FAQ_T = { en: 'Questions from expats', de: 'Fragen von Expats', fr: 'Questions fréquentes des expatriés', uk: 'Запитання від бізнес-клієнтів', zh: '企业客户常见问题' };
 
 export function loadIntl(l) {
   try {
