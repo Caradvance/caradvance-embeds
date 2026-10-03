@@ -36,10 +36,11 @@ export function makeTemplater(l, D) {
     let m;
     if ((m = k.match(/^Eladó (.+) · (\{\d+\}) · (\{\d+\}) km \| CarAdvance$/))) return sub(w.sale, m);
     if ((m = k.match(/^Elkelt (.+) · (\{\d+\}) · (\{\d+\}) km \| CarAdvance$/))) return sub(w.sold, m);
+    if ((m = k.match(/^Eladó (.+) · (\{\d+\}) \| CarAdvance$/))) return w.sale.replace(/ · \$3 km| · \$3 км| · \$3 公里/, '').replace('$1', m[1]).replace('$2', m[2]);
     if ((m = k.match(/^Eladó (.+), (\{\d+\}), (\{\d+\}) km, (\{\d+\}) LE, ([^,]+), ([^.]+)\. Ára (\{\d+\}) Ft\. Ellenőrzött előéletű német import a CarAdvance-től\.$/))) { m[5] = word(m[5]); m[6] = word(m[6]); return sub(w.saleD, m); }
     if ((m = k.match(/^Elkelt: (.+), (\{\d+\}), (\{\d+\}) km, (\{\d+\}) LE, ([^,]+), ([^.]+)\. Hasonlót keresel\? Nézd meg az aktuális készletet\.$/))) { m[5] = word(m[5]); m[6] = word(m[6]); return sub(w.soldD, m); }
-    if ((m = k.match(/^A\(z\) (.+?)(?: (\{\d+\}(?:\/\{\d+\})?))? évjáratú, (?:(.+?) futott, )?(.+?) üzemű (.+?)\. (\{\d+\}) (kW|LE), ([^,]+), ([^.]+)\. Nettó ár \(áfa nélkül\) garanciával, CarAdvance import\.$/)))
-      return w.desc(m[1], m[2], m[3], word(m[4]), word(m[5]), m[6], m[7], word(m[8]), word(m[9]));
+    if ((m = k.match(/^A\(z\) (.+?)(?: (\{\d+\}(?:\/\{\d+\})?))? évjáratú, (?:(.+?) futott, )?(.+?) üzemű (.+?)\. (\{\d+\}) (kW|LE)(?:, ([^,.]*))?(?:, ([^.]*))?\s*\. Nettó ár \(áfa nélkül\) garanciával, CarAdvance import\.$/)))
+      return w.desc(m[1], m[2], m[3], word(m[4]), word(m[5]), m[6], m[7], word(m[8] || '') || '', word(m[9] || '') || '').replace(/, , \./, '.').replace(/, \./, '.').replace(/，，。/, '。').replace(/，。/, '。');
     if (/^<g0>Főoldal<\/g0> \/ <g1>Autóink<\/g1> \/ /.test(k))
       return k.replace(/<g0>Főoldal<\/g0>/, `<g0>${D['Főoldal'] || 'Home'}</g0>`).replace(/<g1>Autóink<\/g1>/, `<g1>${D['Autóink'] || 'Cars'}</g1>`).replace(/<g2>Eladva<\/g2>/, `<g2>${D['Eladva'] || 'Sold'}</g2>`);
     if (k.includes(' · ') && !/<[gx]\d/.test(k)) {

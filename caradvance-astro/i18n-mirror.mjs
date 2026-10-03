@@ -17,6 +17,7 @@ import { loadIntl, applyExpat } from './i18n-expat.mjs';
 import { writeRuntime } from './i18n-runtime.mjs';
 import { makeTemplater, neutral } from './i18n-templates.mjs';
 import { navSync } from './i18n-navsync.mjs';
+import { makeRental } from './i18n-rental.mjs';
 
 const DIST = 'dist';
 const SITE = 'https://www.caradvance.hu';
@@ -65,7 +66,7 @@ try {
   });
   const PAGESET = new Set(pages.map(huPath));
   const sitemapAdd = []; const stats = {};
-  const TPL = {}; for (const l of LANGS) TPL[l] = makeTemplater(l, dicts[l]);
+  const TPL = {}; for (const l of LANGS) { const t1 = makeTemplater(l, dicts[l]); let rt = {}; try { rt = JSON.parse(fs.readFileSync(`src/i18n/dict/rt-${l}.json`, 'utf8')); } catch {} const t2 = makeRental(l, dicts[l], rt); TPL[l] = (k) => t1(k) || t2(k); }
   const rtn = writeRuntime(DIST, LANGS, [...PAGESET], SLUG, REDIR); const RTV = Date.now().toString(36);
   console.log('[mirror] runtime szótár: ' + Object.entries(rtn).map(([l, n]) => l + ' ' + n).join(', '));
 
