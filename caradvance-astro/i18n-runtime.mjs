@@ -31,6 +31,7 @@ var NUM=/\\d+(?:[.,\\u00a0\\u202f ]\\d+)*/g,SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,CO
 function tr(s){var k=s.replace(/\\s+/g,' ').trim();if(!k||!/[A-Za-z\\u00c0-\\u017f]/.test(k))return null;var r=M[k];
 if(r==null){var n=[],mk=k.replace(NUM,function(m){n.push(m);return '{'+n.length+'}'});if(n.length&&M[mk]!=null)r=M[mk].replace(/\\{(\\d+)\\}/g,function(_,i){return n[i-1]||''});}
 if(r==null&&k.indexOf(' · ')>0){var ch=0,ps=k.split(' · ').map(function(p){var x=tr(p);if(x!=null){ch=1;return x.trim()}return p});if(ch)r=ps.join(' · ');}
+if(r==null&&/[.!?] +\\S/.test(k)){var ss=k.split(/(?<=[.!?]) +/);if(ss.length>1){var ok=1,oo=ss.map(function(x){var y=tr(x);if(y==null){ok=0;return x}return y.trim()});if(ok)r=oo.join(LG==='zh'?'':' ');}}
 if(r==null)for(var i=0;i<P.length;i++){var re=new RegExp('^(.*)'+P[i][0]);var m=k.match(re);if(m){var x=tr(m[1]);r=P[i][1].replace('$1',x!=null?x.trim():m[1]);break;}}
 if(r==null||r===k)return null;var a=s.match(/^\\s*/)[0],b=s.match(/\\s*$/)[0];return a+r+b;}
 function txt(n){if(n.parentNode&&SKIP[n.parentNode.nodeName])return;var o=n.nodeValue,t=tr(o);if(t!=null&&t!==o){var p=n.parentNode;if(p&&p.nodeName==='OPTION'&&!p.hasAttribute('value'))p.setAttribute('value',o.trim());n.nodeValue=t;}}
