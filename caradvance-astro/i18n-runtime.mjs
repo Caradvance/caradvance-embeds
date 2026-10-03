@@ -26,12 +26,17 @@ const EXTRA = {
   'Elektromos': { en: 'Electric', de: 'Elektro', fr: 'Électrique', uk: 'Електро', zh: '纯电动' },
 };
 
+const UNITS_JS = 'var UNITS={en:{m:"/month",f:" and up"},de:{m:"/Monat",f:" ab"},fr:{m:"/mois",f:" et plus"},uk:{m:"/міс.",f:" і більше"},zh:{m:"/月",f:" 起"}};';
 const ENGINE = `
+var U=UNITS[LG]||UNITS.en;function UN(x){return x.replace(/\\/hó(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g,U.m).replace(/\\s?-t[óő]l(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g,U.f)}function NEU(x){return !/[áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(x)&&!/(^|\\s)(és|vagy|hó|db)(\\s|$)/.test(x)}
 var DEEP=0,NUM=/\\d+(?:[.,\\u00a0\\u202f ]\\d+)*/g,SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,CODE:1,PRE:1,NOSCRIPT:1};
 function tr(s){var k=s.replace(/\\s+/g,' ').trim();if(!k||!/[A-Za-z\\u00c0-\\u017f]/.test(k))return null;var r=M[k];
 if(r==null){var n=[],mk=k.replace(NUM,function(m){n.push(m);return '{'+n.length+'}'});if(n.length&&M[mk]!=null)r=M[mk].replace(/\\{(\\d+)\\}/g,function(_,i){return n[i-1]||''});}
-if(r==null&&k.indexOf(' · ')>0){var ch=0,ps=k.split(' · ').map(function(p){var x=tr(p);if(x!=null){ch=1;return x.trim()}return p});if(ch)r=ps.join(' · ');}
+if(r==null&&k.indexOf(' · ')>0){var ch=0,bad=0,ps=k.split(' · ').map(function(p){var x=tr(p);if(x!=null){ch=1;return x.trim()}if(!NEU(p))bad=1;return p});if(ch&&!bad)r=ps.join(' · ');}
 if(r==null&&!DEEP&&/[.!?] +\\S/.test(k)){var ss=k.split(/(?<=[.!?]) +/);if(ss.length>1&&ss.length<12){DEEP=1;var oo=[],i=0,ok=1;while(i<ss.length){var got=null,j;for(j=ss.length;j>i;j--){if(j-i===ss.length)continue;var y=tr(ss.slice(i,j).join(' '));if(y!=null){got=y.trim();break;}}if(got==null){ok=0;break;}oo.push(got);i=j;}DEEP=0;if(ok)r=oo.join(LG==='zh'?'':' ');}}
+if(r==null){var nm=k.match(/^(\\d+[.)]\\s*)(.+)$/);if(nm&&!/^\\d/.test(nm[2])){var nx=tr(nm[2]);if(nx!=null)r=nm[1]+nx.trim();}}
+if(r==null){var cm=k.match(/^([^:]{2,40}):\\s+(.+)$/);if(cm){var cl=tr(cm[1]);if(cl!=null){var cv=tr(cm[2]);if(cv==null&&NEU(UN(cm[2])))cv=UN(cm[2]);if(cv!=null)r=cl.trim()+(LG==='zh'?'：':': ')+cv.trim();}}}
+if(r==null&&/\\/hó|-tól|-től/.test(k)){var uu=UN(k);if(uu!==k&&NEU(uu))r=uu;}
 if(r==null)for(var i=0;i<P.length;i++){var re=new RegExp('^(.*)'+P[i][0]);var m=k.match(re);if(m){var x=tr(m[1]);r=P[i][1].replace('$1',x!=null?x.trim():m[1]);break;}}
 if(r==null||r===k)return null;var a=s.match(/^\\s*/)[0],b=s.match(/\\s*$/)[0];return a+r+b;}
 function txt(n){if(n.parentNode&&SKIP[n.parentNode.nodeName])return;var o=n.nodeValue,t=tr(o);if(t!=null&&t!==o){var p=n.parentNode;if(p&&p.nodeName==='OPTION'&&!p.hasAttribute('value'))p.setAttribute('value',o.trim());n.nodeValue=t;}}
@@ -65,7 +70,7 @@ export function writeRuntime(DIST, langs, pages = [], slugs = {}, redir = {}) {
     for (const [k, t] of Object.entries(EXTRA)) if (t[l] && !M[k]) M[k] = t[l];
     for (const [k, v] of Object.entries(rt)) if (v && v !== k) M[k] = v;
     const SL = {}; for (const [hu, g] of Object.entries(slugs)) if (g[l]) SL[hu] = g[l];
-    const js = `/* CarAdvance i18n runtime (${l}) */(function(){var LG=${JSON.stringify(l)};var PG=${JSON.stringify(PG)};var SL=${JSON.stringify(SL)};var M=${JSON.stringify(M)};var P=${JSON.stringify(PAT[l] || [])};${ENGINE}})();`;
+    const js = `/* CarAdvance i18n runtime (${l}) */(function(){var LG=${JSON.stringify(l)};var PG=${JSON.stringify(PG)};var SL=${JSON.stringify(SL)};var M=${JSON.stringify(M)};var P=${JSON.stringify(PAT[l] || [])};${UNITS_JS}${ENGINE}})();`;
     fs.mkdirSync(path.join(DIST, 'i18n'), { recursive: true });
     fs.writeFileSync(path.join(DIST, 'i18n', `rt-${l}.js`), js);
     out[l] = Object.keys(M).length;
