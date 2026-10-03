@@ -53,21 +53,21 @@ const CSS = `<style id="cafoot-css">
 .cafoot{background:#0B0B0D;color:#cfd4de;font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;padding:56px 24px 28px;margin:0}
 .cafoot *{box-sizing:border-box}
 .cafoot-in{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:32px}
-.cafoot-brand img{height:44px;width:auto;display:block;margin:0 0 14px}
+.cafoot-brand img{height:68px;width:auto;max-width:100%;display:block;margin:0 0 18px}
 .cafoot-brand p{margin:0 0 12px;font-size:14px;line-height:1.6;max-width:34ch;color:#aab1bf}
 .cafoot h4{color:#fff;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:4px 0 14px;font-weight:800}
 .cafoot a,.cafoot button.cafoot-link{display:block;color:#cfd4de;text-decoration:none;font-size:14px;line-height:1.4;padding:5px 0;background:none;border:0;font-family:inherit;cursor:pointer;text-align:left}
 .cafoot a:hover,.cafoot button.cafoot-link:hover{color:#fff}
 .cafoot .cafoot-ct a{padding:3px 0;color:#fff;font-weight:700}
-.cafoot-soc{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
-.cafoot-soc a{width:40px;height:40px;border-radius:11px;display:block;padding:0;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.cafoot-soc{display:grid;grid-template-columns:repeat(4,44px);gap:12px;margin-top:18px}
+.cafoot-soc a{width:44px;height:44px;border-radius:11px;display:block;padding:0;overflow:hidden;transition:transform .15s,box-shadow .15s}
 .cafoot-soc a:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.45)}
-.cafoot-soc svg{width:40px;height:40px;display:block}
+.cafoot-soc svg{width:100%;height:100%;display:block}
 .cafoot-legal a{font-weight:600}
 .cafoot-copy{max-width:1200px;margin:36px auto 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);font-size:12.5px;color:#8a91a0;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
 .cafoot-copy span{white-space:nowrap}
 @media(max-width:1000px){.cafoot-in{grid-template-columns:1fr 1fr 1fr}.cafoot-brand{grid-column:1/-1}}
-@media(max-width:620px){.cafoot{padding:44px 20px 24px}.cafoot-in{grid-template-columns:1fr 1fr;gap:26px 18px}.cafoot-copy{display:block}.cafoot-copy span{display:block;white-space:normal;margin-bottom:4px}}
+@media(max-width:620px){.cafoot-brand img{height:60px}.cafoot-soc{grid-template-columns:repeat(8,minmax(0,44px));gap:8px}.cafoot-soc a{width:auto;height:auto;aspect-ratio:1/1}.cafoot{padding:44px 20px 24px}.cafoot-in{grid-template-columns:1fr 1fr;gap:26px 18px}.cafoot-copy{display:block}.cafoot-copy span{display:block;white-space:normal;margin-bottom:4px}}
 </style>`;
 
 // IDEIGLENES: TikTok / LinkedIn / Reddit egyelőre keresőoldalra mutat — a saját profil URL-jére cserélendő.
