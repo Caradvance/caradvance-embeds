@@ -64,7 +64,7 @@ const fr: IntlContent = {
         {
           kicker: 'Nos services', h2: 'Trois façons d’aider les étrangers vivant en Hongrie',
           cards: [
-            ['Location longue durée', 'Une voiture premium neuve à partir de 6 mois, entretien, taxe, assurance et pneus été/hiver compris — un loyer mensuel fixe.'],
+            ['Location longue durée', 'Une voiture premium neuve à plaques allemandes, pour 6 mois minimum — entretien, taxe, assurance et pneus été/hiver compris dans un loyer mensuel fixe.'],
             ['Import d’Allemagne', 'Nous trouvons la bonne voiture sur le marché allemand, l’inspectons sur place, l’amenons en Hongrie et vous la remettons immatriculée.'],
             ['Immatriculation & formalités', 'Vous vous installez en Hongrie avec votre voiture ? Nous calculons la taxe d’immatriculation et gérons les contrôles, la NAV et le bureau gouvernemental.'],
           ],
@@ -88,14 +88,14 @@ const fr: IntlContent = {
           steps: [
             ['Votre besoin', 'Location ou achat, modèle, budget et délai — par formulaire, téléphone, WhatsApp ou e-mail.'],
             ['Une offre claire', 'Une offre transparente et détaillée — sans frais cachés.'],
-            ['Nous gérons tout', 'Commande ou recherche, transport depuis l’Allemagne, immatriculation hongroise, assurance.'],
-            ['Prenez la route', 'Vous recevez la voiture prête à rouler, avec plaques et papiers hongrois.'],
+            ['Nous gérons tout', 'Commande ou recherche, transport depuis l’Allemagne, assurance — et pour les voitures achetées, l’immatriculation hongroise.'],
+            ['Prenez la route', 'Vous recevez la voiture prête à rouler — les voitures de location avec plaques allemandes, les voitures achetées avec plaques et papiers hongrois.'],
           ],
         },
       ],
       faq: [
         ['Parlez-vous français ?', 'Oui. Notre directeur import, Károly Tóth, parle français ; l’équipe travaille aussi en anglais, en allemand et en hongrois. Vous pouvez mener tout le projet avec nous en français.'],
-        ['Puis-je louer une voiture longue durée à Budapest en tant qu’étranger ?', 'Oui. Notre location longue durée commence à 6 mois et s’adresse aux particuliers et aux entreprises qui vivent ou travaillent en Hongrie. Entretien, taxe hongroise sur les véhicules, assurances tous risques et responsabilité civile ainsi que pneus été/hiver sont inclus dans le loyer.'],
+        ['Puis-je louer une voiture longue durée à Budapest en tant qu’étranger ?', 'Oui. Notre location longue durée commence à 6 mois et s’adresse aux particuliers et aux entreprises qui vivent ou travaillent en Hongrie. Les voitures gardent leurs plaques allemandes ; entretien, taxe sur les véhicules, assurances tous risques et responsabilité civile ainsi que pneus été/hiver sont inclus dans le loyer.'],
         ['Pouvez-vous importer une voiture d’Allemagne pour moi ?', 'Oui — neuve ou d’occasion. Nous cherchons sur le marché allemand, vérifions l’historique, inspectons la voiture sur place, la transportons en Hongrie et réalisons l’immatriculation hongroise.'],
         ['Je m’installe en Hongrie avec ma propre voiture. Pouvez-vous m’aider ?', 'Oui. L’immatriculation d’une voiture étrangère en Hongrie comprend un contrôle d’origine, un contrôle technique, la taxe d’immatriculation (NAV) et le bureau gouvernemental. Utilisez notre calculateur pour une première estimation — nous nous occupons du reste.'],
         ['Où êtes-vous situés ?', 'Notre bureau hongrois se trouve à Solymár, aux portes de Budapest (2083 Solymár, Ibolya utca 18.), ouvert du lundi au vendredi de 9h00 à 17h00. La société contractante est Caradvance GmbH à Geretsried (Allemagne).'],
@@ -108,7 +108,7 @@ const fr: IntlContent = {
       desc: 'Location de voiture longue durée à Budapest dès 6 mois : BMW, MINI, Mercedes et Audi neuves, entretien, taxe, assurance et pneus hiver inclus. Service pour les expatriés en Hongrie.',
       kicker: 'Location de voiture longue durée à Budapest',
       h1: 'Location voiture Budapest —<br><span class="accent">voitures premium neuves dès 6 mois</span>',
-      sub: 'Un loyer mensuel fixe incluant entretien, taxe hongroise sur les véhicules, assurance tous risques et pneus été/hiver. BMW, MINI, Mercedes-Benz et Audi neuves — idéal pour les expatriés et les entreprises internationales en Hongrie.',
+      sub: 'Plaques allemandes, un loyer mensuel fixe incluant entretien, taxe sur les véhicules, assurance tous risques et pneus été/hiver. BMW, MINI, Mercedes-Benz et Audi neuves — idéal pour les expatriés et les entreprises internationales en Hongrie.',
       video: '/caradvance-hero-x5.mp4', poster: '/caradvance-hero-x5-poster.jpg',
       cta1: ['Demander une offre de location', '#ajanlat'], cta2: ['Voitures disponibles', '/autoink/#berelheto'],
       breadcrumb: 'Location voiture Budapest',
@@ -118,8 +118,8 @@ const fr: IntlContent = {
           kicker: 'Tout compris', h2: 'Ce qui est inclus dans le loyer mensuel',
           cards: [
             ['Entretien', 'Entretien selon le constructeur et pièces d’usure (plaquettes, disques, essuie-glaces).'],
-            ['Taxe & frais officiels', 'Taxe hongroise sur les véhicules, frais officiels et contrôle technique obligatoire.'],
-            ['Assurance', 'Responsabilité civile (KGFB) et tous risques (casco) — souscrites et payées par nous.'],
+            ['Plaques allemandes, taxe & frais', 'La voiture est immatriculée en Allemagne au nom de Caradvance GmbH — taxe sur les véhicules, frais officiels et contrôles obligatoires inclus.'],
+            ['Assurance', 'Responsabilité civile et tous risques — souscrites et payées par nous.'],
             ['Pneus été & hiver', 'Les deux jeux sont inclus, avec changement saisonnier et stockage.'],
             ['Assistance', 'Assistance routière en Hongrie et dans les pays autorisés.'],
             ['Véhicule de remplacement', 'En cas de réparation après sinistre, un véhicule similaire pendant les 10 premiers jours ouvrés (selon disponibilité).'],
@@ -153,7 +153,7 @@ const fr: IntlContent = {
           kicker: 'Pourquoi la longue durée', h2: 'Pourquoi les expatriés louent plutôt que d’acheter',
           ul: [
             '<strong>Pas de gros investissement</strong> — un loyer mensuel prévisible.',
-            '<strong>Aucune formalité hongroise</strong> — immatriculation, taxe, assurance et contrôles sont notre affaire.',
+            '<strong>Aucune formalité hongroise</strong> — la voiture reste immatriculée en Allemagne, avec plaques allemandes ; taxe, assurance et contrôles sont notre affaire.',
             '<strong>Flexible</strong> — après 6 mois, résiliable avec 30 jours de préavis, idéal pour les missions de durée incertaine.',
             '<strong>Toujours une voiture neuve</strong> — aucun risque de revente lorsque vous quittez la Hongrie.',
           ],
@@ -162,7 +162,8 @@ const fr: IntlContent = {
       faq: [
         ['S’agit-il de location à la journée ?', 'Non — nous sommes spécialisés dans la location longue durée à Budapest et dans toute la Hongrie, à partir de 6 mois. Pour quelques jours, un loueur classique est plus adapté.'],
         ['Un étranger peut-il louer une voiture longue durée en Hongrie ?', 'Oui. Les particuliers et les entreprises qui vivent ou travaillent en Hongrie peuvent louer chez nous. Il faut un permis de conduire valide et une pièce d’identité ; nous précisons les documents nécessaires dans l’offre.'],
-        ['Que comprend le loyer mensuel ?', 'Entretien, pièces d’usure, taxe hongroise sur les véhicules et frais officiels, responsabilité civile et tous risques, pneus été/hiver avec stockage, et assistance. Carburant, péages, stationnement, amendes et franchise ne sont pas inclus.'],
+        ['Que comprend le loyer mensuel ?', 'Entretien, pièces d’usure, taxe sur les véhicules et frais officiels, responsabilité civile et tous risques, pneus été/hiver avec stockage, et assistance. Carburant, péages, stationnement, amendes et franchise ne sont pas inclus.'],
+        ['Quelles plaques porte la voiture de location ?', 'Des plaques allemandes. La voiture est immatriculée en Allemagne au nom du loueur, Caradvance GmbH — aucune immatriculation hongroise n’est nécessaire ; vous recevez le certificat d’immatriculation allemand et la carte d’assurance avec la voiture.'],
         ['Quel est le montant du dépôt de garantie ?', 'Entre 3 000 € et 10 000 € selon la catégorie. C’est une garantie, pas un frais, remboursée sous 30 jours après la restitution et la clôture des dossiers en cours. Certaines locations démarrent sans dépôt initial.'],
         ['Puis-je résilier plus tôt ?', 'La durée minimale est de 6 mois complets. Ensuite, le contrat se poursuit aux mêmes conditions et peut être résilié par écrit avec 30 jours de préavis à la fin d’un mois de location — ou vous changez de voiture.'],
         ['Puis-je rouler à l’étranger ?', 'Oui, dans les pays autorisés indiqués au contrat ; l’assistance est valable en Hongrie et dans ces pays.'],

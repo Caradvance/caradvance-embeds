@@ -64,7 +64,7 @@ const de: IntlContent = {
         {
           kicker: 'Was wir tun', h2: 'Drei Wege, wie wir Ausländern in Ungarn helfen',
           cards: [
-            ['Auto-Langzeitmiete', 'Ein neues Premium-Auto ab 6 Monaten — Service, Steuer, Versicherung sowie Sommer- und Winterreifen inklusive, zu einer festen Monatsrate.'],
+            ['Auto-Langzeitmiete', 'Ein neues Premium-Auto mit deutschem Kennzeichen, Mindestlaufzeit 6 Monate — Service, Steuer, Versicherung sowie Sommer- und Winterreifen in einer festen Monatsrate.'],
             ['Autoimport aus Deutschland', 'Wir finden das passende Auto auf dem deutschen Markt, prüfen es vor Ort, bringen es nach Ungarn und übergeben es mit ungarischem Kennzeichen.'],
             ['Zulassung & Behördengänge', 'Sie ziehen mit Ihrem Auto nach Ungarn? Wir berechnen die Registrierungssteuer und erledigen Prüfungen, NAV und Regierungsamt für Sie.'],
           ],
@@ -88,14 +88,14 @@ const de: IntlContent = {
           steps: [
             ['Wunsch mitteilen', 'Miete oder Kauf, Modell, Budget und Zeitplan — per Formular, Telefon, WhatsApp oder E-Mail.'],
             ['Klares Angebot erhalten', 'Ein transparentes, aufgeschlüsseltes Angebot — ohne versteckte Kosten.'],
-            ['Wir erledigen alles', 'Bestellung oder Suche, Transport aus Deutschland, ungarische Zulassung, Versicherung.'],
-            ['Losfahren', 'Sie erhalten das Auto fahrbereit, mit ungarischem Kennzeichen und Papieren.'],
+            ['Wir erledigen alles', 'Bestellung oder Suche, Transport aus Deutschland, Versicherung — bei Kaufautos auch die ungarische Zulassung.'],
+            ['Losfahren', 'Sie erhalten das Auto fahrbereit — Mietwagen mit deutschem Kennzeichen, Kaufautos mit ungarischem Kennzeichen und Papieren.'],
           ],
         },
       ],
       faq: [
         ['Sprechen Sie Deutsch?', 'Ja. Unser Team arbeitet auf Deutsch, Englisch, Französisch und Ungarisch — Sie können den gesamten Ablauf mit uns auf Deutsch abwickeln, und Ihr Angebot erhalten Sie auf Deutsch.'],
-        ['Kann ich als Ausländer in Budapest ein Auto langfristig mieten?', 'Ja. Unsere Langzeitmiete beginnt bei 6 Monaten und steht Privatpersonen und Unternehmen offen, die in Ungarn leben oder arbeiten. Service, ungarische Kfz-Steuer, Vollkasko- und Haftpflichtversicherung sowie Sommer- und Winterreifen sind in der Monatsrate enthalten.'],
+        ['Kann ich als Ausländer in Budapest ein Auto langfristig mieten?', 'Ja. Unsere Langzeitmiete beginnt bei 6 Monaten und steht Privatpersonen und Unternehmen offen, die in Ungarn leben oder arbeiten. Die Autos behalten ihr deutsches Kennzeichen; Service, Kfz-Steuer, Vollkasko- und Haftpflichtversicherung sowie Sommer- und Winterreifen sind in der Monatsrate enthalten.'],
         ['Können Sie ein Auto aus Deutschland für mich importieren?', 'Ja — neu oder gebraucht. Wir suchen auf dem deutschen Markt, prüfen die Historie, besichtigen das Auto vor Ort, transportieren es nach Ungarn und erledigen die ungarische Zulassung.'],
         ['Ich ziehe mit meinem eigenen Auto nach Ungarn. Können Sie helfen?', 'Ja. Die Zulassung eines ausländischen Autos in Ungarn umfasst Identitätsprüfung, technische Prüfung, Registrierungssteuer (NAV) und das Regierungsamt. Nutzen Sie unseren Rechner für eine erste Schätzung — den Ablauf übernehmen wir.'],
         ['Wo sind Sie?', 'Unser ungarisches Büro befindet sich in Solymár direkt bei Budapest (2083 Solymár, Ibolya utca 18.), geöffnet Montag–Freitag 9:00–17:00. Vertragspartner ist die Caradvance GmbH in Geretsried.'],
@@ -108,7 +108,7 @@ const de: IntlContent = {
       desc: 'Auto mieten in Budapest langfristig: neue BMW, MINI, Mercedes & Audi ab 6 Monaten — Service, Steuer, Versicherung und Winterreifen inklusive. Deutschsprachiger Service in Ungarn.',
       kicker: 'Auto-Langzeitmiete in Budapest',
       h1: 'Auto mieten in Budapest —<br><span class="accent">neue Premium-Autos ab 6 Monaten</span>',
-      sub: 'Eine feste Monatsrate inklusive Service, ungarischer Kfz-Steuer, Vollkasko und Sommer-/Winterreifen. Neue BMW-, MINI-, Mercedes-Benz- und Audi-Modelle — ideal für Expats und internationale Unternehmen in Ungarn.',
+      sub: 'Deutsches Kennzeichen, eine feste Monatsrate inklusive Service, Kfz-Steuer, Vollkasko und Sommer-/Winterreifen. Neue BMW-, MINI-, Mercedes-Benz- und Audi-Modelle — ideal für Expats und internationale Unternehmen in Ungarn.',
       video: '/caradvance-hero-x5.mp4', poster: '/caradvance-hero-x5-poster.jpg',
       cta1: ['Mietangebot anfordern', '#ajanlat'], cta2: ['Verfügbare Autos', '/autoink/#berelheto'],
       breadcrumb: 'Auto mieten Budapest',
@@ -118,8 +118,8 @@ const de: IntlContent = {
           kicker: 'Alles inklusive', h2: 'Das ist in der Monatsrate enthalten',
           cards: [
             ['Service & Wartung', 'Wartung nach Herstellervorgabe sowie Verschleißteile wie Bremsbeläge, Bremsscheiben und Wischer.'],
-            ['Steuer & Gebühren', 'Ungarische Kfz-Steuer, amtliche Gebühren und die vorgeschriebene technische Prüfung.'],
-            ['Versicherung', 'Haftpflicht (KGFB) und Vollkasko (Casco) — von uns abgeschlossen und bezahlt.'],
+            ['Deutsches Kennzeichen, Steuer & Gebühren', 'Das Auto ist in Deutschland auf die Caradvance GmbH zugelassen — Kfz-Steuer, amtliche Gebühren und vorgeschriebene Prüfungen sind enthalten.'],
+            ['Versicherung', 'Haftpflicht und Vollkasko — von uns abgeschlossen und bezahlt.'],
             ['Sommer- & Winterreifen', 'Beide Sätze inklusive, mit Saisonwechsel und Einlagerung.'],
             ['Assistance', 'Pannenhilfe in Ungarn und in den erlaubten Ländern.'],
             ['Ersatzwagen', 'Bei einer Reparatur nach einem Schaden ein vergleichbares Auto für die ersten 10 Werktage (je nach Verfügbarkeit).'],
@@ -153,7 +153,7 @@ const de: IntlContent = {
           kicker: 'Warum Langzeitmiete', h2: 'Warum Expats mieten statt kaufen',
           ul: [
             '<strong>Keine große Anfangsinvestition</strong> — eine planbare Monatsrate.',
-            '<strong>Kein ungarischer Papierkram</strong> — Zulassung, Steuer, Versicherung und Prüfungen übernehmen wir.',
+            '<strong>Kein ungarischer Papierkram</strong> — das Auto bleibt in Deutschland zugelassen, mit deutschem Kennzeichen; Steuer, Versicherung und Prüfungen übernehmen wir.',
             '<strong>Flexibel</strong> — nach 6 Monaten mit 30 Tagen Frist kündbar, ideal für Entsendungen unbestimmter Dauer.',
             '<strong>Immer ein neues Auto</strong> — kein Wiederverkaufsrisiko, wenn Sie Ungarn verlassen.',
           ],
@@ -162,7 +162,8 @@ const de: IntlContent = {
       faq: [
         ['Ist das eine Tagesmiete?', 'Nein — wir sind auf die Langzeitmiete in Budapest und ganz Ungarn spezialisiert, ab 6 Monaten. Für Kurztrips von wenigen Tagen ist eine klassische Autovermietung die bessere Wahl.'],
         ['Können Ausländer in Ungarn ein Auto langfristig mieten?', 'Ja. Privatpersonen und Unternehmen, die in Ungarn leben oder arbeiten, können bei uns mieten. Sie benötigen einen gültigen Führerschein und einen Ausweis; die nötigen Unterlagen nennen wir Ihnen im Angebot.'],
-        ['Was ist in der Monatsrate enthalten?', 'Service und Wartung, Verschleißteile, ungarische Kfz-Steuer und Gebühren, Haftpflicht und Vollkasko, Sommer- und Winterreifen mit Einlagerung sowie Assistance. Kraftstoff, Maut, Parken, Bußgelder und die Selbstbeteiligung sind nicht enthalten.'],
+        ['Was ist in der Monatsrate enthalten?', 'Service und Wartung, Verschleißteile, Kfz-Steuer und Gebühren, Haftpflicht und Vollkasko, Sommer- und Winterreifen mit Einlagerung sowie Assistance. Kraftstoff, Maut, Parken, Bußgelder und die Selbstbeteiligung sind nicht enthalten.'],
+        ['Welches Kennzeichen hat der Mietwagen?', 'Ein deutsches. Das Auto ist in Deutschland auf den Vermieter, die Caradvance GmbH, zugelassen — eine ungarische Zulassung ist nicht nötig; Fahrzeugschein und Versicherungskarte erhalten Sie mit dem Auto.'],
         ['Wie hoch ist die Kaution?', 'Zwischen 3.000 € und 10.000 € je nach Fahrzeugkategorie. Sie ist eine Sicherheit, keine Gebühr, und wird innerhalb von 30 Tagen nach Rückgabe und Abschluss offener Vorgänge erstattet. Manche Mieten starten ohne Kaution vorab.'],
         ['Kann ich vorzeitig kündigen?', 'Die Mindestlaufzeit beträgt 6 volle Monate. Danach läuft der Vertrag zu gleichen Bedingungen weiter und kann mit 30 Tagen Frist schriftlich zum Ende eines Mietmonats gekündigt werden — oder Sie wechseln auf ein anderes Auto.'],
         ['Darf ich mit dem Auto ins Ausland fahren?', 'Ja, in die im Vertrag genannten erlaubten Länder; die Assistance gilt in Ungarn und in diesen Ländern.'],

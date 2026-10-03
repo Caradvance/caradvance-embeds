@@ -64,7 +64,7 @@ const en: IntlContent = {
         {
           kicker: 'What we do', h2: 'Three ways we help foreigners living in Hungary',
           cards: [
-            ['Long-term car rental', 'A new premium car for 6 months or longer, with service, tax, insurance and summer/winter tyres included — one fixed monthly fee.'],
+            ['Long-term car rental', 'A new premium car with German plates for a minimum of 6 months — service, tax, insurance and summer/winter tyres included in one fixed monthly fee.'],
             ['Car import from Germany', 'We find the right car on the German market, inspect it on site, bring it to Hungary and hand it over with Hungarian plates.'],
             ['Registration & paperwork', 'Bringing your own car to Hungary? We calculate the registration tax and handle the inspections, NAV and the government office for you.'],
           ],
@@ -88,14 +88,14 @@ const en: IntlContent = {
           steps: [
             ['Tell us what you need', 'Rental or purchase, model, budget and timing — by form, phone, WhatsApp or e-mail.'],
             ['Receive a clear offer', 'A transparent, itemised offer in English — no hidden costs.'],
-            ['We handle everything', 'Ordering or sourcing, transport from Germany, Hungarian registration, insurance.'],
-            ['Drive away', 'You receive the car ready to drive, with Hungarian plates and documents.'],
+            ['We handle everything', 'Ordering or sourcing, transport from Germany, insurance — and for purchased cars the Hungarian registration.'],
+            ['Drive away', 'You receive the car ready to drive — rental cars with German plates, purchased cars with Hungarian plates and documents.'],
           ],
         },
       ],
       faq: [
         ['Do you speak English?', 'Yes. Our team works in English, German and French as well as Hungarian — you can handle the whole process with us in English, and we send your offer in English.'],
-        ['Can I rent a car long term in Budapest as a foreigner?', 'Yes. Our long-term rental starts at 6 months and is available to private individuals and companies living or working in Hungary. Service, Hungarian vehicle tax, comprehensive (casco) and third-party insurance and summer/winter tyres are included in the monthly fee.'],
+        ['Can I rent a car long term in Budapest as a foreigner?', 'Yes. Our long-term rental starts at 6 months and is available to private individuals and companies living or working in Hungary. The cars keep their German plates; service, vehicle tax, comprehensive and third-party insurance and summer/winter tyres are included in the monthly fee.'],
         ['Can you import a car from Germany for me?', 'Yes — new or used. We search the German market, check the car’s history, inspect it on site, transport it to Hungary and complete the Hungarian registration, so you receive it with Hungarian plates.'],
         ['I am moving to Hungary with my own car. Can you help?', 'Yes. Registering a foreign car in Hungary involves an originality inspection, a technical inspection, the registration tax (NAV) and the government office. Use our registration tax calculator for a first estimate, then let us handle the process.'],
         ['Where are you located?', 'Our Hungarian office is in Solymár, just outside Budapest (2083 Solymár, Ibolya utca 18.), open Monday–Friday 9:00–17:00. The contracting company is Caradvance GmbH in Geretsried, Germany.'],
@@ -108,7 +108,7 @@ const en: IntlContent = {
       desc: 'Long-term car rental in Budapest from 6 months: new BMW, MINI, Mercedes & Audi with service, tax, insurance and winter tyres included. English-speaking service for expats in Hungary.',
       kicker: 'Long-term car rental in Budapest',
       h1: 'Car rental Budapest —<br><span class="accent">new premium cars from 6 months</span>',
-      sub: 'One fixed monthly fee with service, Hungarian vehicle tax, comprehensive insurance and summer/winter tyres included. New BMW, MINI, Mercedes-Benz and Audi models — ideal for expats and international companies in Hungary.',
+      sub: 'German plates, one fixed monthly fee with service, vehicle tax, comprehensive insurance and summer/winter tyres included. New BMW, MINI, Mercedes-Benz and Audi models — ideal for expats and international companies in Hungary.',
       video: '/caradvance-hero-x5.mp4', poster: '/caradvance-hero-x5-poster.jpg',
       cta1: ['Request a rental offer', '#ajanlat'], cta2: ['See available cars', '/autoink/#berelheto'],
       breadcrumb: 'Car rental Budapest',
@@ -118,8 +118,8 @@ const en: IntlContent = {
           kicker: 'All-inclusive', h2: 'What is included in the monthly fee',
           cards: [
             ['Service & maintenance', 'Scheduled service according to the manufacturer, plus wear parts such as brake pads, discs and wipers.'],
-            ['Tax & official fees', 'Hungarian vehicle tax, official fees and the mandatory technical inspection.'],
-            ['Insurance', 'Third-party liability (KGFB) and comprehensive (casco) insurance — arranged and paid by us.'],
+            ['German plates, tax & fees', 'The car is registered in Germany to Caradvance GmbH — vehicle tax, official fees and the mandatory inspections are included.'],
+            ['Insurance', 'Third-party liability and comprehensive insurance — arranged and paid by us.'],
             ['Summer & winter tyres', 'Both sets included, with seasonal change and storage.'],
             ['Assistance', 'Roadside assistance in Hungary and in the permitted countries.'],
             ['Replacement car', 'If your car is being repaired after damage, a similar car for the first 10 working days (subject to fleet availability).'],
@@ -153,7 +153,7 @@ const en: IntlContent = {
           kicker: 'Why long-term', h2: 'Why expats choose long-term rental instead of buying',
           ul: [
             '<strong>No large upfront investment</strong> — one predictable monthly fee.',
-            '<strong>No Hungarian paperwork</strong> — registration, tax, insurance and inspections are our job.',
+            '<strong>No Hungarian paperwork</strong> — the car stays registered in Germany with German plates; tax, insurance and inspections are our job.',
             '<strong>Flexible</strong> — after 6 months you can end the contract with 30 days’ notice, ideal for assignments of uncertain length.',
             '<strong>Always a new car</strong> — no resale risk when you leave Hungary.',
           ],
@@ -162,7 +162,8 @@ const en: IntlContent = {
       faq: [
         ['Is this a daily car rental?', 'No — we specialise in long-term car rental in Budapest and across Hungary, starting at 6 months. For short trips of a few days, a classic rental company is the better choice.'],
         ['Can foreigners rent a car long term in Hungary?', 'Yes. Private individuals and companies living or working in Hungary can rent from us. You need a valid driving licence and identification; we explain the required documents in your offer.'],
-        ['What is included in the monthly price?', 'Service and maintenance, wear parts, Hungarian vehicle tax and official fees, third-party liability and comprehensive insurance, summer and winter tyres with storage, and assistance. Fuel, tolls, parking, fines and the insurance excess are not included.'],
+        ['What is included in the monthly price?', 'Service and maintenance, wear parts, vehicle tax and official fees, third-party liability and comprehensive insurance, summer and winter tyres with storage, and assistance. Fuel, tolls, parking, fines and the insurance excess are not included.'],
+        ['Which number plates does the rental car have?', 'German plates. The car is registered in Germany to Caradvance GmbH, the lessor — no Hungarian registration is needed, and you receive the German registration document and the insurance card with the car.'],
         ['How much is the deposit?', 'Between 3,000 € and 10,000 € depending on the car category. It is a security, not a fee, and is refunded within 30 days after the car is returned and any open matters are closed. Some rentals start without an upfront deposit.'],
         ['Can I end the contract early?', 'The minimum term is 6 full months. After that the contract continues on the same terms and can be ended with 30 days’ written notice to the end of a rental month — or you can switch to another car.'],
         ['Can I drive the car abroad?', 'Yes, within the permitted countries listed in the contract; assistance is valid in Hungary and in those countries.'],
