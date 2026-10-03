@@ -53,7 +53,7 @@ function unitKey(children) {
 /** fordítás → node-ok (az eredeti inline elemek attribútumaival) */
 function buildNodes(tr, tags, parentNode) {
   const res = []; const stack = [{ kids: res }]; const re = /<(\/?)([gx])(\d+)(\/?)>|([^<]+)/g; let m;
-  const txt = (v) => ({ nodeName: '#text', value: v.replace(/‹/g, '<').replace(/›/g, '>'), parentNode });
+  const txt = (v) => ({ nodeName: '#text', value: v, parentNode /* a ‹ › a forrásban mindig valódi nyíl (› menü, morzsa) — változatlanul marad */ });
   while ((m = re.exec(tr))) {
     const top = stack[stack.length - 1];
     if (m[5] !== undefined) { top.kids.push(txt(m[5])); continue; }

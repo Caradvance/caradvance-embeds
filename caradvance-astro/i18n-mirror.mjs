@@ -16,6 +16,7 @@ import { parse, serialize, visit, finishLd } from './i18n-core.mjs';
 import { loadIntl, applyExpat } from './i18n-expat.mjs';
 import { writeRuntime } from './i18n-runtime.mjs';
 import { makeTemplater, neutral } from './i18n-templates.mjs';
+import { navSync } from './i18n-navsync.mjs';
 
 const DIST = 'dist';
 const SITE = 'https://www.caradvance.hu';
@@ -49,6 +50,7 @@ try {
   walk(DIST);
   const pages = [];
   for (const rel of files) { const h = fs.readFileSync(path.join(DIST, rel), 'utf8'); if (/http-equiv=["']?refresh/i.test(h)) continue; pages.push(rel); }
+  console.log('[mirror] egységes menü: ' + navSync(DIST, pages) + ' oldal frissítve');
   const huPath = (rel) => '/' + rel.replace(/index\.html$/, '');
   // kulcsoldalak SEO-URL-je (intl-map.json pages): /uj-auto-berlese/ -> /en/car-rental-budapest/ …
   const SLUG = {}; const KEY = {};
