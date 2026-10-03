@@ -26,9 +26,9 @@ const EXTRA = {
   'Elektromos': { en: 'Electric', de: 'Elektro', fr: 'Électrique', uk: 'Електро', zh: '纯电动' },
 };
 
-const UNITS_JS = 'var UNITS={en:{m:"/month",f:" and up"},de:{m:"/Monat",f:" ab"},fr:{m:"/mois",f:" et plus"},uk:{m:"/міс.",f:" і більше"},zh:{m:"/月",f:" 起"}};';
+const UNITS_JS = 'var UNITS={en:{m:"/month",p:"from"},de:{m:"/Monat",p:"ab"},fr:{m:"/mois",p:"dès"},uk:{m:"/міс.",p:"від"},zh:{m:"/月",f:"起"}};';
 const ENGINE = `
-var U=UNITS[LG]||UNITS.en;function UN(x){return x.replace(/\\/hó(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g,U.m).replace(/\\s?-t[óő]l(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g,U.f)}function NEU(x){return !/[áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(x)&&!/(^|\\s)(és|vagy|hó|db)(\\s|$)/.test(x)}
+var U=UNITS[LG]||UNITS.en;function UN(x){x=x.replace(/\\/hó(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g,U.m);var re=/((?:≈\\s*)?\\d[\\d\\s.,\\u00a0\\u202f]*\\s?(?:Ft|€|EUR|km|LE|kW|PS|hp)?(?:\\s?\\([^)]*\\))?(?:\\/\\S+?)?)\\s?-t[óő]l(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g;return U.p?x.replace(re,function(_,a){var m=a.match(/^(≈\\s*)?(.*)$/);return (m[1]||'')+U.p+' '+m[2]}):x.replace(re,function(_,a){return a+U.f})}function NEU(x){return !/[áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(x)&&!/(^|\\s)(és|vagy|hó|db)(\\s|$)/.test(x)}
 var DEEP=0,NUM=/\\d+(?:[.,\\u00a0\\u202f ]\\d+)*/g,SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,CODE:1,PRE:1,NOSCRIPT:1};
 function tr(s){var k=s.replace(/\\s+/g,' ').trim();if(!k||!/[A-Za-z\\u00c0-\\u017f]/.test(k))return null;var r=M[k];
 if(r==null){var n=[],mk=k.replace(NUM,function(m){n.push(m);return '{'+n.length+'}'});if(n.length&&M[mk]!=null)r=M[mk].replace(/\\{(\\d+)\\}/g,function(_,i){return n[i-1]||''});}
@@ -51,11 +51,11 @@ while((m=re.exec(t))){var top=st[st.length-1];if(m[5]!==undefined){top.appendChi
 while(e.firstChild)e.removeChild(e.firstChild);e.appendChild(root);}
 var AT=['placeholder','title','aria-label','alt'];
 function lk(e){if(e.nodeName!=='A'||e.hasAttribute('hreflang')||/langopt/.test(e.className))return;var h=e.getAttribute('href');if(!h)return;var m=h.match(/^(?:https?:\\/\\/(?:www\\.)?caradvance\\.hu)?(\\/[^?#]*)([?#].*)?$/);if(!m)return;var p=m[1];if(/^\\/(en|de|fr|uk|zh|_np|api|i18n)\\//.test(p)||/\\.[a-z0-9]{2,5}$/i.test(p))return;var n=p.slice(-1)==='/'?p:p+'/';if(n==='/berelheto/'){e.setAttribute('href',(SL['/autoink/']||'/'+LG+'/autoink/')+'#berelheto');return;}if(!PG[n])return;if(typeof PG[n]==='string')n=PG[n];var t=SL[n]||('/'+LG+n);e.setAttribute('href',t+(m[2]||''));}
-function el(e){inl(e);lk(e);for(var i=0;i<AT.length;i++){var v=e.getAttribute&&e.getAttribute(AT[i]);if(v){var t=tr(v);if(t!=null)e.setAttribute(AT[i],t)}}
+function el(e){inl(e);lk(e);if(U.p&&e.classList&&e.classList.contains('tol')&&!e.__mv&&e.parentNode&&/sub-price|egl-price/.test(e.parentNode.className)&&!/\\d/.test(e.textContent)){e.__mv=1;e.parentNode.insertBefore(e,e.parentNode.firstChild);}for(var i=0;i<AT.length;i++){var v=e.getAttribute&&e.getAttribute(AT[i]);if(v){var t=tr(v);if(t!=null)e.setAttribute(AT[i],t)}}
 if(e.nodeName==='INPUT'&&/^(submit|button)$/i.test(e.type)&&e.value){var t2=tr(e.value);if(t2!=null)e.value=t2}}
 function walk(root){if(root.nodeType===3)return txt(root);if(root.nodeType!==1||SKIP[root.nodeName])return;el(root);
 var w=document.createTreeWalker(root,5,null),n;while((n=w.nextNode())){if(n.nodeType===3)txt(n);else if(SKIP[n.nodeName])continue;else el(n)}}
-function run(){walk(document.body);var t=tr(document.title);if(t)document.title=t;
+function run(){if(U.p){var st=document.createElement('style');st.id='ca-i18n-css';st.textContent='.sub-price{flex-wrap:nowrap!important;gap:4px!important;white-space:nowrap;min-width:0}.sub-price b{font-size:18px!important;letter-spacing:-.015em}.sub-price .mo{margin-left:-2px!important;font-size:12px!important}.sub-price .eur{font-size:12.5px!important}.sub-price .tol{font-size:12px!important}.sub-price .sub-info{flex:0 0 auto}.egl-price{flex-wrap:nowrap!important;white-space:nowrap}@media(max-width:380px){.sub-price b{font-size:16px!important}.sub-price .eur,.sub-price .mo,.sub-price .tol{font-size:11.5px!important}}';(document.head||document.body).appendChild(st);}walk(document.body);var t=tr(document.title);if(t)document.title=t;
 new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var m=ms[i];if(m.type==='characterData')txt(m.target);else if(m.type==='attributes')el(m.target);else for(var j=0;j<m.addedNodes.length;j++)walk(m.addedNodes[j])}})
 .observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:AT.concat(['href'])});
 var _a=window.alert;window.alert=function(s){var t=tr(String(s));return _a.call(window,t!=null?t:s)};
