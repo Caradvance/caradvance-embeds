@@ -22,9 +22,12 @@ const NP = path.join(ROOT, '_np');
 const LABEL = 'Ár kérésre';
 
 // Oldalak, amelyek nem kapnak ár nélküli változatot (jogi szöveg, kalkulátor, belső, ügyfélajánlat).
-const SKIP = [/^_np\//, /^belso\//, /^ajanlat\//, /^api\//, /^aszf\//, /^adatkezeles\//, /^impresszum\//,
-  /^berlesi-feltetelek\//, /^honositas-kalkulator\//, /^atiras-kalkulator\//, /^finanszirozas-lizing\//,
-  /^eladom\//, /^jotekonysag\//, /^(en|de|fr|sk|cs|pl|uk|zh)\//];
+// A lefordított tükör (/en/ /de/ /fr/ /uk/ /zh/) is kap ár nélküli változatot — ugyanazokkal a kivételekkel.
+const LP = '^(?:(?:en|de|fr|uk|zh)\\/)?';
+const SKIP = [/^_np\//, /^(sk|cs|pl)\//, ...['belso', 'ajanlat', 'api', 'aszf', 'adatkezeles', 'impresszum', 'berlesi-feltetelek',
+  'honositas-kalkulator', 'atiras-kalkulator', 'finanszirozas-lizing', 'eladom', 'jotekonysag',
+  'hungary-registration-tax-calculator', 'registrierungssteuer-ungarn-rechner', 'taxe-immatriculation-hongrie',
+  'reiestratsiinyi-podatok-uhorshchyna', 'hungary-registration-tax'].map((d) => new RegExp(LP + d + '\\/'))];
 
 // ---------- ár-felismerés ----------
 const NUM = '(?:\\d{1,3}(?:[ \\u00a0\\u202f\\u2009.,]\\d{3})+|\\d+)(?:,\\d{1,2})?';
