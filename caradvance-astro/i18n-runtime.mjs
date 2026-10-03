@@ -35,18 +35,21 @@ if(r==null)for(var i=0;i<P.length;i++){var re=new RegExp('^(.*)'+P[i][0]);var m=
 if(r==null||r===k)return null;var a=s.match(/^\\s*/)[0],b=s.match(/\\s*$/)[0];return a+r+b;}
 function txt(n){if(n.parentNode&&SKIP[n.parentNode.nodeName])return;var o=n.nodeValue,t=tr(o);if(t!=null&&t!==o){var p=n.parentNode;if(p&&p.nodeName==='OPTION'&&!p.hasAttribute('value'))p.setAttribute('value',o.trim());n.nodeValue=t;}}
 var AT=['placeholder','title','aria-label','alt'];
-function el(e){for(var i=0;i<AT.length;i++){var v=e.getAttribute&&e.getAttribute(AT[i]);if(v){var t=tr(v);if(t!=null)e.setAttribute(AT[i],t)}}
+function lk(e){if(e.nodeName!=='A')return;var h=e.getAttribute('href');if(!h)return;var m=h.match(/^(?:https?:\\/\\/(?:www\\.)?caradvance\\.hu)?(\\/[^?#]*)([?#].*)?$/);if(!m)return;var p=m[1];if(/^\\/(en|de|fr|uk|zh|_np|api|i18n)\\//.test(p)||/\\.[a-z0-9]{2,5}$/i.test(p))return;var n=p.slice(-1)==='/'?p:p+'/';if(!PG[n])return;if(typeof PG[n]==='string')n=PG[n];var t=SL[n]||('/'+LG+n);e.setAttribute('href',t+(m[2]||''));}
+function el(e){lk(e);for(var i=0;i<AT.length;i++){var v=e.getAttribute&&e.getAttribute(AT[i]);if(v){var t=tr(v);if(t!=null)e.setAttribute(AT[i],t)}}
 if(e.nodeName==='INPUT'&&/^(submit|button)$/i.test(e.type)&&e.value){var t2=tr(e.value);if(t2!=null)e.value=t2}}
 function walk(root){if(root.nodeType===3)return txt(root);if(root.nodeType!==1||SKIP[root.nodeName])return;el(root);
 var w=document.createTreeWalker(root,5,null),n;while((n=w.nextNode())){if(n.nodeType===3)txt(n);else if(SKIP[n.nodeName])continue;else el(n)}}
 function run(){walk(document.body);var t=tr(document.title);if(t)document.title=t;
 new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var m=ms[i];if(m.type==='characterData')txt(m.target);else if(m.type==='attributes')el(m.target);else for(var j=0;j<m.addedNodes.length;j++)walk(m.addedNodes[j])}})
-.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:AT});
+.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:AT.concat(['href'])});
 var _a=window.alert;window.alert=function(s){var t=tr(String(s));return _a.call(window,t!=null?t:s)};
 var _c=window.confirm;window.confirm=function(s){var t=tr(String(s));return _c.call(window,t!=null?t:s)};}
 if(document.body)run();else document.addEventListener('DOMContentLoaded',run);`;
 
-export function writeRuntime(DIST, langs) {
+export function writeRuntime(DIST, langs, pages = [], slugs = {}, redir = {}) {
+  const PG = {}; for (const p of pages) PG[p] = 1;
+  for (const [o, t] of Object.entries(redir)) if (PG[t] && !PG[o]) PG[o] = t; // régi slug → új oldal
   const out = {};
   let keys = [];
   try { keys = JSON.parse(fs.readFileSync('src/i18n/dict/rt-keys.json', 'utf8')); } catch {}
@@ -60,7 +63,8 @@ export function writeRuntime(DIST, langs) {
     for (const [k, v] of Object.entries(main)) if (v && !/<\/?[gx]\d|‹/.test(k) && (k.length <= 24 || (/\{\d+\}/.test(k) && k.length <= 40)) && v !== k) M[k] = v;
     for (const [k, t] of Object.entries(EXTRA)) if (t[l] && !M[k]) M[k] = t[l];
     for (const [k, v] of Object.entries(rt)) if (v && v !== k) M[k] = v;
-    const js = `/* CarAdvance i18n runtime (${l}) */(function(){var M=${JSON.stringify(M)};var P=${JSON.stringify(PAT[l] || [])};${ENGINE}})();`;
+    const SL = {}; for (const [hu, g] of Object.entries(slugs)) if (g[l]) SL[hu] = g[l];
+    const js = `/* CarAdvance i18n runtime (${l}) */(function(){var LG=${JSON.stringify(l)};var PG=${JSON.stringify(PG)};var SL=${JSON.stringify(SL)};var M=${JSON.stringify(M)};var P=${JSON.stringify(PAT[l] || [])};${ENGINE}})();`;
     fs.mkdirSync(path.join(DIST, 'i18n'), { recursive: true });
     fs.writeFileSync(path.join(DIST, 'i18n', `rt-${l}.js`), js);
     out[l] = Object.keys(M).length;

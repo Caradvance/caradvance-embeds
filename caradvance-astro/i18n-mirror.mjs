@@ -49,7 +49,8 @@ try {
   const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); const rel = path.relative(DIST, p).split(path.sep).join('/'); if (e.isDirectory()) { if (!SKIPDIR.test(rel + '/')) walk(p); } else if (e.name === 'index.html') files.push(rel); } };
   walk(DIST);
   const pages = [];
-  for (const rel of files) { const h = fs.readFileSync(path.join(DIST, rel), 'utf8'); if (/http-equiv=["']?refresh/i.test(h)) continue; pages.push(rel); }
+  const REDIR = {}; // régi slug → új oldal (meta refresh oldalak)
+  for (const rel of files) { const h = fs.readFileSync(path.join(DIST, rel), 'utf8'); if (/http-equiv=["']?refresh/i.test(h)) { const m = h.match(/http-equiv=["']?refresh["']?[^>]*url=([^"'>]+)/i); if (m) { let t = m[1].replace(/^https?:\/\/(?:www\.)?caradvance\.hu/, '').split(/[?#]/)[0]; if (t.startsWith('/')) REDIR['/' + rel.replace(/index\.html$/, '')] = t.endsWith('/') ? t : t + '/'; } continue; } pages.push(rel); }
   console.log('[mirror] egységes menü: ' + navSync(DIST, pages) + ' oldal frissítve');
   const huPath = (rel) => '/' + rel.replace(/index\.html$/, '');
   // kulcsoldalak SEO-URL-je (intl-map.json pages): /uj-auto-berlese/ -> /en/car-rental-budapest/ …
@@ -65,7 +66,7 @@ try {
   const PAGESET = new Set(pages.map(huPath));
   const sitemapAdd = []; const stats = {};
   const TPL = {}; for (const l of LANGS) TPL[l] = makeTemplater(l, dicts[l]);
-  const rtn = writeRuntime(DIST, LANGS); const RTV = Date.now().toString(36);
+  const rtn = writeRuntime(DIST, LANGS, [...PAGESET], SLUG, REDIR); const RTV = Date.now().toString(36);
   console.log('[mirror] runtime szótár: ' + Object.entries(rtn).map(([l, n]) => l + ' ' + n).join(', '));
 
   const linkFix = (html, l) => html.replace(/(\shref=")((?:https?:\/\/(?:www\.)?caradvance\.hu)?)(\/[^"]*)"/g, (m, pre, host, p) => {
@@ -73,8 +74,9 @@ try {
     const clean = p.split(/[?#]/)[0]; const rest = p.slice(clean.length);
     const norm = clean.endsWith('/') ? clean : clean + '/';
     if (/\.[a-z0-9]{2,5}$/i.test(clean)) return m;        // fájl
-    if (!PAGESET.has(norm)) return m;
-    return `${pre}${L(l, norm)}${rest}"`;
+    const tgt = PAGESET.has(norm) ? norm : (REDIR[norm] && PAGESET.has(REDIR[norm]) ? REDIR[norm] : null);
+    if (!tgt) return m;
+    return `${pre}${L(l, tgt)}${rest}"`;
   });
 
   for (const rel of pages) {
@@ -94,10 +96,11 @@ try {
       let h = serialize(doc);
       h = h.replace(/<html([^>]*)\slang="[^"]*"/i, `<html$1 lang="${HREFLANG[l]}"`);
       if (!/<html[^>]*\slang=/i.test(h)) h = h.replace(/<html/i, `<html lang="${HREFLANG[l]}"`);
+      if (KEY[p]) h = applyExpat(h, KEY[p], l, INTL[l], M);
       h = linkFix(h, l);
+      h = h.replace(/(location\.href\s*=\s*')(\/[^'#?]*)/g, (m, pre, p0) => { const n = p0.endsWith('/') ? p0 : p0 + '/'; return PAGESET.has(n) ? pre + L(l, n) : m; });
       h = switcher(h, l, p);
       h = h.replace(/(class="navflag" style="background-image:url\(https:\/\/flagcdn\.com\/w80\/)hu(\.png\))/g, `$1${FLAG[l]}$2`);
-      if (KEY[p]) h = applyExpat(h, KEY[p], l, INTL[l], M);
       h = h.replace(/<\/body>/i, `<script src="/i18n/rt-${l}.js?v=${RTV}" defer></script>\n</body>`);
       h = dropAlt(h).replace(/<\/head>/i, cluster + '\n</head>');
       const url = `${SITE}${L(l, p)}`;
