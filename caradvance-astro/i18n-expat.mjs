@@ -113,7 +113,8 @@ export function applyExpat(h, key, l, C, M) {
   if (hm) {
     const at = hm.index;
     const attrs = hm[0].startsWith('<div') ? hm[1].replace(/>$/, '') + ' style="margin:0"' : hm[1];
-    const newH1 = `${P.kicker ? `<div class="xp-kicker">${P.kicker}</div>` : ''}<h1${attrs}>${P.h1}</h1>`;
+    const isDiv = hm[0].startsWith('<div'); // márkalogós hero (pl. bérlés): ott nincs hely a kis feliratnak
+    const newH1 = `${P.kicker && !isDiv ? `<div class="xp-kicker">${P.kicker}</div>` : ''}<h1${attrs}>${P.h1}</h1>`;
     h = h.slice(0, at) + newH1 + h.slice(at + hm[0].length);
     const after = at + newH1.length;
     const rest = h.slice(after, after + 4000);
