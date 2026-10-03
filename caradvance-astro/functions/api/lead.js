@@ -114,7 +114,7 @@ export async function onRequestPost(context) {
   // Automatikus visszaigazolás az ügyfélnek (csak ha a belső kézbesítés sikerült).
   let confirm = { status: 'skipped' };
   if ((notion.ok || mail.ok || hook.ok) && contact.email) {
-    try { confirm = await sendCustomerConfirm(env, data, contact); } catch (e) { confirm = { status: 'error: ' + String(e && e.message || e).slice(0, 120) }; }
+    try { confirm = await sendCustomerConfirm(env, data, contact, meta.page); } catch (e) { confirm = { status: 'error: ' + String(e && e.message || e).slice(0, 120) }; }
   }
   const delivered = notion.ok || mail.ok || hook.ok;
   const configured = [notion, mail, hook].some((c) => c.status !== 'skipped');
@@ -379,12 +379,14 @@ function leadKind(data) {
 }
 
 /** Visszaigazoló e-mail az ügyfélnek: köszönet + a beküldött adatok összefoglalója. */
-async function sendCustomerConfirm(env, data, contact) {
+async function sendCustomerConfirm(env, data, contact, page) {
   if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
   const k = leadKind(data);
   // Idegen nyelvű oldalakról érkező megkeresés: angol (német oldalról német) visszaigazolás.
-  const L = String(data['Nyelv'] || 'HU').toLowerCase();
-  if (L !== 'hu') return sendIntlConfirm(env, data, contact, L === 'de' ? 'de' : 'en');
+  // A lefordított tükör-oldalak (/en/ /de/ /fr/ /uk/ /zh/) magyar űrlapjai nem küldenek Nyelv mezőt: az oldal URL-jéből vesszük.
+  const pm = String(page || '').match(/^(?:https?:\/\/[^/]+)?\/(en|de|fr|uk|zh)\//);
+  const L = String(data['Nyelv'] || (pm && pm[1]) || 'HU').toLowerCase();
+  if (L !== 'hu') return sendIntlConfirm(env, data, contact, INTL_CONFIRM[L] ? L : 'en');
   const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'event_id']);
   const rows = Object.entries(data)
     .filter(([key, v]) => !skip.has(key) && v != null && v !== '' && typeof v !== 'object')
@@ -429,6 +431,15 @@ const INTL_CONFIRM = {
   de: { subj: 'Wir haben Ihre Anfrage erhalten', hello: (n) => n ? 'Hallo ' + n + ',' : 'Guten Tag,', body: 'vielen Dank für Ihre Nachricht. Ein Mitglied unseres Teams meldet sich <b>so bald wie möglich</b> mit den Details und einem persönlichen Angebot.',
         data: 'Ihre Anfrage', urgent: 'Wenn es eilt, rufen Sie uns an:', or: 'oder antworten Sie einfach auf diese E-Mail.', bye: 'Mit freundlichen Grüßen', role: 'Vertriebsleiter', country: 'Deutschland', rep: 'Vertretung in Ungarn: BH Group Zrt.',
         labels: { 'Név': 'Name', 'E-mail': 'E-Mail', 'Telefon': 'Telefon', 'Üzenet': 'Nachricht', 'Nyelv': 'Sprache', 'Oldal': 'Seite', 'Típus': 'Anfrage' } },
+  fr: { subj: 'Nous avons bien reçu votre demande', hello: (n) => n ? 'Bonjour ' + n + ',' : 'Bonjour,', body: 'merci pour votre message. Un membre de notre équipe vous contactera <b>dans les plus brefs délais</b> avec les détails et une offre personnalisée.',
+        data: 'Votre demande', urgent: 'En cas d’urgence, appelez-nous au', or: 'ou répondez simplement à cet e-mail.', bye: 'Cordialement,', role: 'Directeur commercial', country: 'Allemagne', rep: 'Représentant en Hongrie : BH Group Zrt.',
+        labels: { 'Név': 'Nom', 'E-mail': 'E-mail', 'Telefon': 'Téléphone', 'Üzenet': 'Message', 'Nyelv': 'Langue', 'Oldal': 'Page', 'Típus': 'Demande' } },
+  uk: { subj: 'Ми отримали ваш запит', hello: (n) => n ? 'Вітаємо, ' + n + '!' : 'Вітаємо!', body: 'Дякуємо за ваше повідомлення. Наш співробітник зв’яжеться з вами <b>найближчим часом</b> з деталями та персональною пропозицією.',
+        data: 'Ваш запит', urgent: 'Якщо питання термінове, зателефонуйте нам:', or: 'або просто дайте відповідь на цей лист.', bye: 'З повагою,', role: 'Комерційний директор', country: 'Німеччина', rep: 'Представник в Угорщині: BH Group Zrt.',
+        labels: { 'Név': 'Ім’я', 'E-mail': 'E-mail', 'Telefon': 'Телефон', 'Üzenet': 'Повідомлення', 'Nyelv': 'Мова', 'Oldal': 'Сторінка', 'Típus': 'Запит' } },
+  zh: { subj: '我们已收到您的咨询', hello: (n) => n ? n + '，您好：' : '您好：', body: '感谢您的留言。我们的团队成员将<b>尽快</b>与您联系，为您提供详细信息和个性化报价。',
+        data: '您的咨询', urgent: '如有急事，请致电', or: '或直接回复此邮件。', bye: '此致敬礼', role: '销售总监', country: '德国', rep: '匈牙利代表：BH Group Zrt.',
+        labels: { 'Név': '姓名', 'E-mail': '电子邮箱', 'Telefon': '电话', 'Üzenet': '留言', 'Nyelv': '语言', 'Oldal': '页面', 'Típus': '咨询类型' } },
 };
 async function sendIntlConfirm(env, data, contact, lang) {
   const T = INTL_CONFIRM[lang];
