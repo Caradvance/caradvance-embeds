@@ -15,6 +15,7 @@ import path from 'node:path';
 import { parse, serialize, visit, finishLd } from './i18n-core.mjs';
 import { loadIntl, applyExpat } from './i18n-expat.mjs';
 import { writeRuntime } from './i18n-runtime.mjs';
+import { makeTemplater, neutral } from './i18n-templates.mjs';
 
 const DIST = 'dist';
 const SITE = 'https://www.caradvance.hu';
@@ -61,6 +62,7 @@ try {
   });
   const PAGESET = new Set(pages.map(huPath));
   const sitemapAdd = []; const stats = {};
+  const TPL = {}; for (const l of LANGS) TPL[l] = makeTemplater(l, dicts[l]);
   const rtn = writeRuntime(DIST, LANGS); const RTV = Date.now().toString(36);
   console.log('[mirror] runtime szótár: ' + Object.entries(rtn).map(([l, n]) => l + ' ' + n).join(', '));
 
@@ -84,7 +86,8 @@ try {
     for (const l of LANGS) {
       const D = dicts[l]; let hit = 0, miss = 0;
       const doc = parse(src);
-      visit(doc, (kind, k, apply) => { const tr = D[k]; if (tr && placeholdersOk(k, tr)) { try { apply(tr); hit++; } catch { miss++; } } else miss++; });
+      const TP = TPL[l];
+      visit(doc, (kind, k, apply) => { const tr = D[k] || TP(k); if (tr && placeholdersOk(k, tr)) { try { apply(tr); hit++; } catch { miss++; } } else if (neutral(k)) hit++; else miss++; });
       finishLd(doc);
       let h = serialize(doc);
       h = h.replace(/<html([^>]*)\slang="[^"]*"/i, `<html$1 lang="${HREFLANG[l]}"`);
