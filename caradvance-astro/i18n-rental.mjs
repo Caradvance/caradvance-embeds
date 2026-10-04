@@ -82,15 +82,43 @@ const P = {
     pcs: ' 辆', availList: '可租版本：', colors: '可选颜色：',
     related: (a, b) => ` 在找其他车型？也看看可租的 <g4>${a}</g4>${b ? ` 和 <g5>${b}</g5>` : ''} 车型。`,
   },
+  sk: {
+    vintro: (n) => `Momentálne si môžete vybrať z ${n} verzií: `, vprice: (x) => `od ${x} €/mes.`, trim: 'výbava', series: (n) => `rad ${n}`, rent: (n) => `Prenájom ${n}`,
+    or: ' alebo ', km: (l) => (l ? `limitom ${l} km/mes.` : 'individuálnym limitom kilometrov'), mo: (l) => (l ? `dobou prenájmu ${l} mesiacov` : 'flexibilnou dobou prenájmu'),
+    hero: (n, huf, km, mo, f, g) => `Úplne nový ${n} v dlhodobom prenájme od ${huf} Ft/mes. — s ${km}, ${mo} a jednorazovou vratnou kauciou. Pohon: ${f}, prevodovka: ${g}.`,
+    lead: (n, huf, km, mo, cnt, now, vars, dep, n2) => `<g0>Prenájom ${n}</g0> je najjednoduchšia cesta k úplne novému autu: v <g1>dlhodobom prenájme</g1> ho môžete jazdiť od ${huf} Ft/mes., s ${km} a ${mo}. ${cnt ? `Momentálne si môžete vybrať z ${cnt} áut ${n2}${now ? ` (${now} k dispozícii ihneď)` : ''}` : 'Na výber je viacero verzií'}${vars ? `, vo verziách ${vars}` : ''}. Jednorazová vratná <g2>kaucia</g2> od ${dep} €; servis, daň a letné aj zimné pneumatiky hradíme my. Auto nemusíte vlastniť: na konci prenájmu ho jednoducho vrátite alebo prejdete na nový model.`,
+    price: (n, huf, eur, km, mo, dep, depMax) => `<g0>Prenájom ${n}</g0> začína na ${huf} Ft (${eur} €) mesačne, s ${km} a ${mo}. Jednorazová vratná <g1>kaucia</g1> začína na ${dep} €${depMax ? `, pri výkonnejších verziách ${depMax} €` : ''}. Presná cena závisí od verzie, farby a balíka výbavy — mesačnú splátku a dostupnosť každého modelu nájdete medzi našimi <g2>autami na prenájom</g2>.`,
+    faqPrice: (n, huf, eur, km, mo, vars) => `Mesačný poplatok za prenájom ${n} začína na ${huf} Ft (${eur} €), s ${km} a ${mo}.${vars ? ' Podľa verzie: ' + vars + '.' : ''} Pre presnú individuálnu ponuku nás kontaktujte.`,
+    perMonth: ' €/mes. od',
+    desc: (n, huf, km, mo, dep, z, body, soon) => `Prenájom ${n} a dlhodobý prenájom od ${huf} Ft/mes.${km ? `, ${km} km/mes.` : ''}${mo ? `, na ${mo} mesiacov` : ''}, kaucia od ${dep} €. Úplne nové, ${z} km, ${body}${soon ? ', k dispozícii ihneď alebo čoskoro.' : ''}`,
+    term: (l) => `Doba dlhodobého prenájmu je ${l} mesiacov. Potom ho môžete predĺžiť alebo prejsť na nový model — kľudne aj na nové auto každý polrok.`,
+    avail: (now, n, later) => `${now ? `${now} ${n} k dispozícii ihneď` : 'Momentálne nie je žiadne auto k dispozícii ihneď'}${later ? '; ďalšie autá: ' + later : ''}. Odovzdávame úplne nové auto s 0 km.`,
+    pcs: ' ks', availList: 'Na prenájom: ', colors: 'Farby na prenájom: ',
+    related: (a, b) => ` Hľadáte iný model? Pozrite si aj modely <g4>${a}</g4>${b ? ` a <g5>${b}</g5>` : ''} na prenájom.`,
+  },
+  cs: {
+    vintro: (n) => `Aktuálně si můžete vybrat z ${n} verzí: `, vprice: (x) => `od ${x} €/měs.`, trim: 'výbava', series: (n) => `řada ${n}`, rent: (n) => `Pronájem ${n}`,
+    or: ' nebo ', km: (l) => (l ? `limitem ${l} km/měs.` : 'individuálním limitem kilometrů'), mo: (l) => (l ? `dobou pronájmu ${l} měsíců` : 'flexibilní dobou pronájmu'),
+    hero: (n, huf, km, mo, f, g) => `Zcela nový ${n} v dlouhodobém pronájmu od ${huf} Ft/měs. — s ${km}, ${mo} a jednorázovou vratnou kaucí. Pohon: ${f}, převodovka: ${g}.`,
+    lead: (n, huf, km, mo, cnt, now, vars, dep, n2) => `<g0>Pronájem ${n}</g0> je nejjednodušší cesta ke zcela novému vozu: v <g1>dlouhodobém pronájmu</g1> s ním můžete jezdit od ${huf} Ft/měs., s ${km} a ${mo}. ${cnt ? `Aktuálně si můžete vybrat z ${cnt} vozů ${n2}${now ? ` (${now} k dispozici ihned)` : ''}` : 'Na výběr je několik verzí'}${vars ? `, ve verzích ${vars}` : ''}. Jednorázová vratná <g2>kauce</g2> od ${dep} €; servis, daň i letní a zimní pneumatiky hradíme my. Vůz nemusíte vlastnit: na konci pronájmu ho jednoduše vrátíte nebo přejdete na nový model.`,
+    price: (n, huf, eur, km, mo, dep, depMax) => `<g0>Pronájem ${n}</g0> začíná na ${huf} Ft (${eur} €) měsíčně, s ${km} a ${mo}. Jednorázová vratná <g1>kauce</g1> začíná na ${dep} €${depMax ? `, u výkonnějších verzí ${depMax} €` : ''}. Přesná cena závisí na verzi, barvě a balíčku výbavy — měsíční splátku a dostupnost každého modelu najdete mezi našimi <g2>vozy k pronájmu</g2>.`,
+    faqPrice: (n, huf, eur, km, mo, vars) => `Měsíční poplatek za pronájem ${n} začíná na ${huf} Ft (${eur} €), s ${km} a ${mo}.${vars ? ' Podle verze: ' + vars + '.' : ''} Pro přesnou individuální nabídku nás kontaktujte.`,
+    perMonth: ' €/měs. od',
+    desc: (n, huf, km, mo, dep, z, body, soon) => `Pronájem ${n} a dlouhodobý pronájem od ${huf} Ft/měs.${km ? `, ${km} km/měs.` : ''}${mo ? `, na ${mo} měsíců` : ''}, kauce od ${dep} €. Zcela nový, ${z} km, ${body}${soon ? ', k dispozici ihned nebo brzy.' : ''}`,
+    term: (l) => `Doba dlouhodobého pronájmu je ${l} měsíců. Poté ho můžete prodloužit nebo přejít na nový model — klidně i na nový vůz každého půl roku.`,
+    avail: (now, n, later) => `${now ? `${now} ${n} k dispozici ihned` : 'Aktuálně není žádný vůz k dispozici ihned'}${later ? '; další vozy: ' + later : ''}. Předáváme zcela nový vůz s 0 km.`,
+    pcs: ' ks', availList: 'K pronájmu: ', colors: 'Barvy k pronájmu: ',
+    related: (a, b) => ` Hledáte jiný model? Podívejte se také na modely <g4>${a}</g4>${b ? ` a <g5>${b}</g5>` : ''} k pronájmu.`,
+  },
 };
 
 const BODY = {
-  kombi: { en: 'estate', de: 'Kombi', fr: 'break', uk: 'універсал', zh: '旅行车' }, limuzin: { en: 'saloon', de: 'Limousine', fr: 'berline', uk: 'седан', zh: '轿车' },
-  kabrió: { en: 'convertible', de: 'Cabrio', fr: 'cabriolet', uk: 'кабріолет', zh: '敞篷车' }, suv: { en: 'SUV', de: 'SUV', fr: 'SUV', uk: 'SUV', zh: 'SUV' },
-  'suv coupé': { en: 'SUV coupé', de: 'SUV-Coupé', fr: 'SUV coupé', uk: 'SUV-купе', zh: '轿跑SUV' }, egyterű: { en: 'MPV', de: 'Van', fr: 'monospace', uk: 'мінівен', zh: 'MPV' },
-  ferdehátú: { en: 'hatchback', de: 'Schrägheck', fr: 'compacte', uk: 'хетчбек', zh: '掀背车' }, kupé: { en: 'coupé', de: 'Coupé', fr: 'coupé', uk: 'купе', zh: '轿跑车' },
-  coupé: { en: 'coupé', de: 'Coupé', fr: 'coupé', uk: 'купе', zh: '轿跑车' }, crossover: { en: 'crossover', de: 'Crossover', fr: 'crossover', uk: 'кросовер', zh: '跨界车' },
-  kisautó: { en: 'small car', de: 'Kleinwagen', fr: 'citadine', uk: 'малолітражка', zh: '小型车' }, 'prémium autó': { en: 'premium car', de: 'Premium-Auto', fr: 'voiture premium', uk: 'преміум-авто', zh: '高端汽车' },
+  kombi: { en: 'estate', de: 'Kombi', fr: 'break', uk: 'універсал', zh: '旅行车', sk: 'kombi', cs: 'kombi' }, limuzin: { en: 'saloon', de: 'Limousine', fr: 'berline', uk: 'седан', zh: '轿车', sk: 'limuzína', cs: 'limuzína' },
+  kabrió: { en: 'convertible', de: 'Cabrio', fr: 'cabriolet', uk: 'кабріолет', zh: '敞篷车', sk: 'kabriolet', cs: 'kabriolet' }, suv: { en: 'SUV', de: 'SUV', fr: 'SUV', uk: 'SUV', zh: 'SUV', sk: 'SUV', cs: 'SUV' },
+  'suv coupé': { en: 'SUV coupé', de: 'SUV-Coupé', fr: 'SUV coupé', uk: 'SUV-купе', zh: '轿跑SUV', sk: 'SUV kupé', cs: 'SUV kupé' }, egyterű: { en: 'MPV', de: 'Van', fr: 'monospace', uk: 'мінівен', zh: 'MPV', sk: 'MPV', cs: 'MPV' },
+  ferdehátú: { en: 'hatchback', de: 'Schrägheck', fr: 'compacte', uk: 'хетчбек', zh: '掀背车', sk: 'hatchback', cs: 'hatchback' }, kupé: { en: 'coupé', de: 'Coupé', fr: 'coupé', uk: 'купе', zh: '轿跑车', sk: 'kupé', cs: 'kupé' },
+  coupé: { en: 'coupé', de: 'Coupé', fr: 'coupé', uk: 'купе', zh: '轿跑车', sk: 'kupé', cs: 'kupé' }, crossover: { en: 'crossover', de: 'Crossover', fr: 'crossover', uk: 'кросовер', zh: '跨界车', sk: 'crossover', cs: 'crossover' },
+  kisautó: { en: 'small car', de: 'Kleinwagen', fr: 'citadine', uk: 'малолітражка', zh: '小型车', sk: 'malé auto', cs: 'malý vůz' }, 'prémium autó': { en: 'premium car', de: 'Premium-Auto', fr: 'voiture premium', uk: 'преміум-авто', zh: '高端汽车', sk: 'prémiové auto', cs: 'prémiový vůz' },
 };
 const MONTHS_HU = ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
 const MONTHS = {
@@ -99,6 +127,8 @@ const MONTHS = {
   fr: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
   uk: ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'],
   zh: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+  sk: ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'],
+  cs: ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'],
 };
 
 export function makeRental(l, D, RT = {}) {

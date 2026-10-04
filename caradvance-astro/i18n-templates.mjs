@@ -24,6 +24,14 @@ const W = {
         saleD: '在售 $1，$2，$3 公里，$4 马力，$5，$6。价格 $7 Ft。CarAdvance 德国进口，车史已核实。',
         soldD: '已售：$1，$2，$3 公里，$4 马力，$5，$6。想找类似的车？请查看我们的现有库存。',
         desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? '，' + y + ' 年款' : ''}，${km ? '已行驶 ' + km + '，' : ''}${f}，${b}。${p} ${u === 'LE' ? '马力' : u}，${g}，${d}。含质保净价（不含增值税），由 CarAdvance 进口。` },
+  sk: { sale: '$1 na predaj · $2 · $3 km | CarAdvance', sold: 'Predané: $1 · $2 · $3 km | CarAdvance',
+        saleD: '$1 na predaj, $2, $3 km, $4 k, $5, $6. Cena $7 Ft. Dovoz z Nemecka s overenou históriou od CarAdvance.',
+        soldD: 'Predané: $1, $2, $3 km, $4 k, $5, $6. Hľadáte niečo podobné? Pozrite si našu aktuálnu ponuku.',
+        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', rok výroby ' + y : ''}, ${km ? 'najazdené ' + km + ', ' : ''}${f}, ${b}. ${p} ${u === 'LE' ? 'k' : u}, ${g}, ${d}. Cena bez DPH so zárukou, dovoz CarAdvance.` },
+  cs: { sale: '$1 na prodej · $2 · $3 km | CarAdvance', sold: 'Prodáno: $1 · $2 · $3 km | CarAdvance',
+        saleD: '$1 na prodej, $2, $3 km, $4 k, $5, $6. Cena $7 Ft. Dovoz z Německa s ověřenou historií od CarAdvance.',
+        soldD: 'Prodáno: $1, $2, $3 km, $4 k, $5, $6. Hledáte něco podobného? Podívejte se na naši aktuální nabídku.',
+        desc: (n, y, km, f, b, p, u, g, d) => `${n}${y ? ', rok výroby ' + y : ''}, ${km ? 'najeto ' + km + ', ' : ''}${f}, ${b}. ${p} ${u === 'LE' ? 'k' : u}, ${g}, ${d}. Cena bez DPH se zárukou, dovoz CarAdvance.` },
 };
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const HUSIG = /[őűŐŰ]|[áéíóöúü]|\b(és|az|egy|a|hogy|nem|vagy|autó|Eladó|Elkelt|Főoldal|Autóink)\b/;

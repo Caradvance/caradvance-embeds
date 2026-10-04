@@ -26,7 +26,7 @@ const EXTRA = {
   'Elektromos': { en: 'Electric', de: 'Elektro', fr: 'Électrique', uk: 'Електро', zh: '纯电动' },
 };
 
-const UNITS_JS = 'var UNITS={en:{m:"/month",p:"from"},de:{m:"/Monat",p:"ab"},fr:{m:"/mois",p:"dès"},uk:{m:"/міс.",p:"від"},zh:{m:"/月",f:"起"}};';
+const UNITS_JS = 'var UNITS={en:{m:"/month",p:"from"},de:{m:"/Monat",p:"ab"},fr:{m:"/mois",p:"dès"},uk:{m:"/міс.",p:"від"},zh:{m:"/月",f:"起"},sk:{m:"/mes.",p:"od"},cs:{m:"/měs.",p:"od"}};';
 const ENGINE = `
 var U=UNITS[LG]||UNITS.en;function UN(x){x=x.replace(/\\/hó(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g,U.m);var re=/((?:≈\\s*)?\\d[\\d\\s.,\\u00a0\\u202f]*\\s?(?:Ft|€|EUR|km|LE|kW|PS|hp)?(?:\\s?\\([^)]*\\))?(?:\\/\\S+?)?)\\s?-t[óő]l(?![a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ])/g;return U.p?x.replace(re,function(_,a){var m=a.match(/^(≈\\s*)?(.*)$/);return (m[1]||'')+U.p+' '+m[2]}):x.replace(re,function(_,a){return a+U.f})}function NEU(x){return !/[áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(x)&&!/(^|\\s)(és|vagy|hó|db)(\\s|$)/.test(x)}
 var DEEP=0,NUM=/\\d+(?:[.,\\u00a0\\u202f ]\\d+)*/g,SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,CODE:1,PRE:1,NOSCRIPT:1};
@@ -40,7 +40,7 @@ if(r==null&&/\\/hó|-tól|-től/.test(k)){var uu=UN(k);if(uu!==k&&NEU(uu))r=uu;}
 if(r==null){var sm=k.match(/^(.+?)(\\s*[:*]+(?:\\s*[:*]+)*)$/);if(sm){var sx=tr(sm[1]);if(sx!=null)r=sx.trim()+(LG==='zh'?sm[2].replace(':','：'):sm[2]);}}
 if(r==null)for(var i=0;i<P.length;i++){var re=new RegExp('^(.*)'+P[i][0]);var m=k.match(re);if(m){var x=tr(m[1]);r=P[i][1].replace('$1',x!=null?x.trim():m[1]);break;}}
 if(r==null||r===k)return null;var a=s.match(/^\\s*/)[0],b=s.match(/\\s*$/)[0];return a+r+b;}
-function txt(n){if(n.parentNode&&SKIP[n.parentNode.nodeName])return;var o=n.nodeValue,t=tr(o);if(t!=null&&t!==o){var p=n.parentNode;if(p&&p.nodeName==='OPTION'&&!p.hasAttribute('value'))p.setAttribute('value',o.trim());n.nodeValue=t;}}
+function txt(n){if(n.parentNode&&SKIP[n.parentNode.nodeName])return;var o=n.nodeValue,t=tr(o);if(CUR){var cb=t!=null?t:o,cc=CUR(cb);if(cc!==cb)t=cc;}if(t!=null&&t!==o){var p=n.parentNode;if(p&&p.nodeName==='OPTION'&&!p.hasAttribute('value'))p.setAttribute('value',o.trim());n.nodeValue=t;}}
 var IL={A:1,B:1,STRONG:1,EM:1,I:1,U:1,SPAN:1,SMALL:1,MARK:1,SUP:1,SUB:1,ABBR:1,BR:1,WBR:1},VD={BR:1,WBR:1,IMG:1};
 function ukey(e){var tags=[],out='',ok=1,hasEl=0,hasTx=0;(function w(ns){for(var i=0;i<ns.length&&ok;i++){var c=ns[i];if(c.nodeType===3){out+=c.nodeValue;if(/\\S/.test(c.nodeValue))hasTx=1;}else if(c.nodeType===1){if(!IL[c.nodeName]){ok=0;return;}hasEl=1;var j=tags.length;tags.push(c);if(VD[c.nodeName])out+='<x'+j+'/>';else{out+='<g'+j+'>';w(c.childNodes);out+='</g'+j+'>';}}}})(e.childNodes);
 if(!ok||!hasEl||!hasTx)return null;return {k:out.replace(/\\s+/g,' ').trim(),tags:tags};}
@@ -50,7 +50,7 @@ if(t==null)return;e.__ig=1;var used={},root=document.createDocumentFragment(),st
 while((m=re.exec(t))){var top=st[st.length-1];if(m[5]!==undefined){top.appendChild(document.createTextNode(m[5]));continue;}var o=u.tags[+m[3]];if(!o)continue;if(m[1]){if(st.length>1)st.pop();continue;}var n=used[m[3]]?o.cloneNode(false):o;used[m[3]]=1;if(n===o&&m[2]==='g')while(n.firstChild)n.removeChild(n.firstChild);top.appendChild(n);if(m[2]==='g'&&!m[4])st.push(n);}
 while(e.firstChild)e.removeChild(e.firstChild);e.appendChild(root);}
 var AT=['placeholder','title','aria-label','alt'];
-function lk(e){if(e.nodeName!=='A'||e.hasAttribute('hreflang')||/langopt/.test(e.className))return;var h=e.getAttribute('href');if(!h)return;var m=h.match(/^(?:https?:\\/\\/(?:www\\.)?caradvance\\.hu)?(\\/[^?#]*)([?#].*)?$/);if(!m)return;var p=m[1];if(/^\\/(en|de|fr|uk|zh|_np|api|i18n)\\//.test(p)||/\\.[a-z0-9]{2,5}$/i.test(p))return;var n=p.slice(-1)==='/'?p:p+'/';if(n==='/berelheto/'){e.setAttribute('href',(SL['/autoink/']||'/'+LG+'/autoink/')+'#berelheto');return;}if(!PG[n])return;if(typeof PG[n]==='string')n=PG[n];var t=SL[n]||('/'+LG+n);e.setAttribute('href',t+(m[2]||''));}
+function lk(e){if(e.nodeName!=='A'||e.hasAttribute('hreflang')||/langopt/.test(e.className))return;var h=e.getAttribute('href');if(!h)return;var m=h.match(/^(?:https?:\\/\\/(?:www\\.)?caradvance\\.hu)?(\\/[^?#]*)([?#].*)?$/);if(!m)return;var p=m[1];if(/^\\/(en|de|fr|uk|zh|sk|cs|_np|api|i18n)\\//.test(p)||/\\.[a-z0-9]{2,5}$/i.test(p))return;var n=p.slice(-1)==='/'?p:p+'/';if(n==='/berelheto/'){e.setAttribute('href',(SL['/autoink/']||'/'+LG+'/autoink/')+'#berelheto');return;}if(!PG[n])return;if(typeof PG[n]==='string')n=PG[n];var t=SL[n]||('/'+LG+n);if(DOMSTRIP)t=t.replace(DOMSTRIP,'/');e.setAttribute('href',t+(m[2]||''));}
 function el(e){inl(e);lk(e);if(U.p&&e.classList&&e.classList.contains('tol')&&!e.__mv&&e.parentNode&&/sub-price|egl-price/.test(e.parentNode.className)&&!/\\d/.test(e.textContent)){e.__mv=1;e.parentNode.insertBefore(e,e.parentNode.firstChild);}for(var i=0;i<AT.length;i++){var v=e.getAttribute&&e.getAttribute(AT[i]);if(v){var t=tr(v);if(t!=null)e.setAttribute(AT[i],t)}}
 if(e.nodeName==='INPUT'&&/^(submit|button)$/i.test(e.type)&&e.value){var t2=tr(e.value);if(t2!=null)e.value=t2}}
 function walk(root){if(root.nodeType===3)return txt(root);if(root.nodeType!==1||SKIP[root.nodeName])return;el(root);
@@ -90,7 +90,7 @@ function jsUnitKeys(DIST, langs) {
   return out;
 }
 
-export function writeRuntime(DIST, langs, pages = [], slugs = {}, redir = {}) {
+export function writeRuntime(DIST, langs, pages = [], slugs = {}, redir = {}, extra = {}) {
   const PG = {}; for (const p of pages) PG[p] = 1;
   for (const [o, t] of Object.entries(redir)) if (PG[t] && !PG[o]) PG[o] = t; // régi slug → új oldal
   const out = {};
@@ -110,7 +110,7 @@ export function writeRuntime(DIST, langs, pages = [], slugs = {}, redir = {}) {
     const G = {};
     for (const k of gkeys) if (main[k] && main[k] !== k) G[k] = main[k];
     const SL = {}; for (const [hu, g] of Object.entries(slugs)) if (g[l]) SL[hu] = g[l];
-    const js = `/* CarAdvance i18n runtime (${l}) */(function(){var LG=${JSON.stringify(l)};var PG=${JSON.stringify(PG)};var SL=${JSON.stringify(SL)};var M=${JSON.stringify(M)};var G=${JSON.stringify(G)};var GN=${Object.keys(G).length};var P=${JSON.stringify(PAT[l] || [])};${UNITS_JS}${ENGINE}})();`;
+    const js = `/* CarAdvance i18n runtime (${l}) */(function(){var LG=${JSON.stringify(l)};var PG=${JSON.stringify(PG)};var SL=${JSON.stringify(SL)};var M=${JSON.stringify(M)};var G=${JSON.stringify(G)};var GN=${Object.keys(G).length};var P=${JSON.stringify(PAT[l] || [])};var CUR=null,DOMSTRIP=null;${extra[l] || ''}${UNITS_JS}${ENGINE}})();`;
     fs.mkdirSync(path.join(DIST, 'i18n'), { recursive: true });
     fs.writeFileSync(path.join(DIST, 'i18n', `rt-${l}.js`), js);
     out[l] = Object.keys(M).length;
