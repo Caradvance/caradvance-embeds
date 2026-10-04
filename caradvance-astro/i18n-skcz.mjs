@@ -158,10 +158,10 @@ export function skczPost(h, l, F, legal = false) {
   const parts = h.split(/(<script\b[^>]*>[\s\S]*?<\/script>|<style\b[^>]*>[\s\S]*?<\/style>)/i);
   // árfolyam-megjegyzés: "(1 € = <span id="rtFx">368</span> Ft)" → cs: "(1 € = 24,47 Kč)", sk: elhagyva (az id-s span rejtve marad a JS miatt)
   const rateTxt = F.S === '€' ? '' : `1 € = ${String(F.T).replace('.', ',')} ${F.S}`;
-  const RATE_SPAN = /\s?\(\s?1\s?€\s?[=≈]\s?<span id="(\w+)">[^<]*<\/span>\s?(?:Ft|HUF|Kč|€)\s?\)/g;
+  const RATE_SPAN = /(\s?\(\s?|\s?[—–-]\s?)1\s?€\s?[=≈]\s?<span id="(\w+)">[^<]*<\/span>\s?(?:Ft|HUF|Kč|€)(\s?\))?/g;
   const RATE_TXT = /\s?\(\s?1\s?€\s?[=≈]\s?\d[\d\s., ]*\s?(?:Ft|HUF)\s?\)/g;
   for (let i = 0; i < parts.length; i += 2) {
-    parts[i] = parts[i].replace(RATE_SPAN, (m, id) => (rateTxt ? ` (${rateTxt})` : '') + `<span id="${id}" style="display:none"></span>`)
+    parts[i] = parts[i].replace(RATE_SPAN, (m, pre, id, post) => (rateTxt ? (/\(/.test(pre) ? ` (${rateTxt})` : pre + rateTxt) : '') + `<span id="${id}" style="display:none"></span>`)
       .replace(RATE_TXT, () => (rateTxt ? ` (${rateTxt})` : ''));
   }
   for (let i = 0; i < parts.length; i++) {
