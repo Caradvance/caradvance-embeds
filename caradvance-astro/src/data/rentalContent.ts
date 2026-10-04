@@ -75,18 +75,18 @@ export const CONTENT: Record<string, RentalContent> = {
 
   'BMW X5': {
     mainAlt: 'BMW X5 bérlés — nagy prémium SUV tartós bérletben',
-    heroVideo: '', heroPoster: '', // a régi (G05) X5 bérelhető — az új generációs (G65) videó/fotók nem ide valók
+    heroVideo: '', heroPoster: P('bmw-x5', 'hero'), // a régi (G05) X5 bérelhető — sajtófotók: BMW PressClub, X5 M Competition „On location dynamic” (08/23)
     overviewH2: 'BMW X5 tartós bérlet — a nagy prémium SUV havidíjjal',
     guideIntro: 'A <strong>BMW X5</strong> a nagy prémium SUV-k mércéje: tágas, kifinomult, hosszú utakon is kivételesen kényelmes, ugyanakkor meglepően dinamikus. <strong>Tartós bérletben</strong> úgy vezetheted, hogy a jelentős vételár és az értékvesztés kockázata nem téged terhel — egyetlen <strong>havi díjat</strong> fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
     guideBlocks: [
       { h3: 'Miért a BMW X5 xDrive30d?', html: 'A hathengeres <strong>xDrive30d</strong> dízel az X5 legkedveltebb változata: nagy nyomatékú, takarékos, és utánfutóval is magabiztos (akár 3,5 tonna vontatható tömeg). Az xDrive összkerékhajtás télen és rossz útviszonyok között is biztonságot ad — ideális céges és családi autónak egyaránt.' },
       { h3: 'BMW X5 méretek és csomagtér', html: 'Hossz 4935 mm, szélesség 2004 mm, magasság 1765 mm, tengelytáv 2975 mm. A csomagtartó 650 literes, a hátsó ülések döntésével akár 1870 literre bővíthető.' },
     ],
-    design: x5.design ? { ...x5.design, img: undefined, alt: undefined, bullets: ['Opcionálisan világító BMW Iconic Glow veserács', 'Adaptív LED / Matrix fényszórók', '20–22" könnyűfém keréktárcsák, M Sport csomag'], text: 'Az X5 markáns, mégis elegáns: nagy, választhatóan világító veserács, keskeny fényszóró-grafika és tiszta oldalfelületek. Az M Sport kivitel sportosabb lökhárítókkal és nagyobb keréktárcsákkal érkezik.' } : undefined,
+    design: x5.design ? { ...x5.design, img: P('bmw-x5', 'g6'), alt: 'BMW X5 oldalról — markáns SUV-forma, M Sport kivitel', bullets: ['Opcionálisan világító BMW Iconic Glow veserács', 'Adaptív LED / Matrix fényszórók', '20–22" könnyűfém keréktárcsák, M Sport csomag'], text: 'Az X5 markáns, mégis elegáns: nagy, választhatóan világító veserács, keskeny fényszóró-grafika és tiszta oldalfelületek. Az M Sport kivitel sportosabb lökhárítókkal és nagyobb keréktárcsákkal érkezik.' } : undefined,
     interior: x5.interior ? { ...x5.interior, img: undefined, alt: undefined, h3: 'BMW Curved Display, tágas prémium utastér', text: 'Az X5 utastere a hosszú utakra készült: BMW Curved Display, kiváló hangszigetelés, kényelmes ülések és hatalmas csomagtér. A bőséges hátsó lábtér és a széles ajtónyílás a családi használatot is kényelmessé teszi.', bullets: ['BMW Curved Display, iDrive', 'Prémium ülések, négyzónás klíma (felszereltségtől függően)', 'Vezeték nélküli Apple CarPlay / Android Auto'] } : undefined,
     boot: '650–1870 liter',
     specs: { 'xDrive30d': { fuel: 'Dízel (mild-hybrid, 6 henger)', power: '298 LE (219 kW)', torque: '670 Nm', drive: 'xDrive összkerék / 8 fok. Steptronic', accel: '6,1 mp', vmax: '230 km/h', rec: 'Nagy nyomaték, takarékos hosszú utakra', note: 'hathengeres dízel, xDrive összkerékhajtással', img: '/berles/bmw-x5.webp' } },
-    gallery: [],
+    gallery: G('bmw-x5', 'BMW X5', [['g1', 'elölről, menet közben'], ['g2', 'oldalnézet, dinamikus'], ['g3', 'vidéki úton'], ['g4', 'naplementében'], ['g5', 'első háromnegyed nézet'], ['g6', 'oldalról'], ['g7', 'hátsó háromnegyed nézet, menet közben'], ['g8', 'országúton, alkonyatkor'], ['g9', 'hátulról'], ['g10', 'hátsó háromnegyed nézet']]),
     egyediSlug: 'x5-dizel',
     faqExtra: [
       { q: 'Mekkora a BMW X5 csomagtartója?', a: 'A BMW X5 csomagtartója 650 literes, a hátsó ülések döntésével akár 1870 literre bővíthető.' },
