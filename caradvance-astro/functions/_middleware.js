@@ -26,10 +26,46 @@ export async function onRequest(context) {
   }
 }
 
+// Saját domainek: caradvance.sk → dist/sk/… , caradvance.cz → dist/cs/… (a build i18n-mirror.mjs lépése készíti)
+const DOMAINS = { 'caradvance.sk': 'sk', 'www.caradvance.sk': 'sk', 'caradvance.cz': 'cs', 'www.caradvance.cz': 'cs' };
+const HU_SITE = 'https://www.caradvance.hu';
+
+async function serveDomain(context, url, l) {
+  const { request, env, next } = context;
+  const p = url.pathname;
+  if (!url.hostname.startsWith('www.')) { url.hostname = 'www.' + url.hostname; return Response.redirect(url.toString(), 301); }
+  if (p.startsWith('/api/')) return next();
+  const pre = '/' + l + '/';
+  if (p === '/' + l || p.startsWith(pre)) { url.pathname = p.slice(l.length + 1) || '/'; return Response.redirect(url.toString(), 301); }
+  if (p === '/robots.txt' || p === '/sitemap.xml') return env.ASSETS.fetch(new Request(new URL('/' + l + p, url.origin).toString()));
+  if (/\.[a-z0-9]{1,5}$/i.test(p)) return next();                  // közös fájlok: képek, js, css, videó
+  if (!p.endsWith('/')) { url.pathname = p + '/'; return Response.redirect(url.toString(), 301); }
+  if (request.method !== 'GET' && request.method !== 'HEAD') return next();
+  const r = await env.ASSETS.fetch(new Request(new URL('/' + l + p, url.origin).toString(), { method: request.method }));
+  if (r.status !== 200) return Response.redirect(new URL('/', url.origin).toString(), 302);
+  const isFileUrl = (v) => /\.[a-z0-9]{1,5}$/i.test(v.split(/[?#]/)[0]);
+  class Fix {
+    constructor(a) { this.a = a; }
+    element(e) {
+      const v = e.getAttribute(this.a); if (!v) return;
+      let n = v;
+      if (v.startsWith(pre)) n = v.slice(l.length + 1);
+      else if (v === '/' + l) n = '/';
+      else if (v.startsWith('/') && !v.startsWith('//') && !v.startsWith('/api/') && !isFileUrl(v)) n = HU_SITE + v; // magyar / más nyelvű oldal
+      if (n !== v) e.setAttribute(this.a, n);
+    }
+  }
+  const out = new HTMLRewriter().on('a[href]', new Fix('href')).on('form[action]', new Fix('action')).transform(r);
+  return withHeaders(out, { 'X-CA-Domain': l, 'Cache-Control': 'public, max-age=0, must-revalidate' });
+}
+
 async function handle(context) {
   const { request, env, next } = context;
   const url = new URL(request.url);
   const p = url.pathname;
+
+  const dl = DOMAINS[url.hostname];
+  if (dl) return serveDomain(context, url, dl);
 
   if (p.startsWith('/api/')) return next();
   if (p.startsWith('/_np/')) return withHeaders(await next(), { 'X-Robots-Tag': 'noindex, nofollow' });
