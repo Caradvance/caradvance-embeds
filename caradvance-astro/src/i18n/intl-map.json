@@ -55,5 +55,15 @@
     "fr",
     "uk",
     "zh"
-  ]
+  ],
+  "domains": {
+    "sk": "https://www.caradvance.sk",
+    "cs": "https://www.caradvance.cz"
+  },
+  "domainsLive": false,
+  "fx": {
+    "HUF": 368,
+    "CZK": 24.47,
+    "_doc": "1 EUR = HUF Ft (a magyar bérlési lista árfolyama) / CZK Kč — a sk/cs oldalak ezzel váltják át a Ft-összegeket"
+  }
 }
