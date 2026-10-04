@@ -541,8 +541,16 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       if(d&&d.rates&&d.rates.HUF){var fx=Math.round(d.rates.HUF);
         var f=document.getElementById('cdFx'); if(f) f.textContent=fx;
         [].forEach.call(document.querySelectorAll('.cd-huf-live'),function(h){var n=Number(h.getAttribute('data-net')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx))+' Ft';});
+        // a szövegben (áttekintés, GYIK, útmutató) is ugyanaz az élő árfolyamos összeg legyen, mint a fejlécben
+        var swaps=[];
+        function grab(sel,calc){var h=document.querySelector(sel);if(!h)return;var n=Number(h.getAttribute('data-eur')||0);if(!n)return;var old=(h.textContent||'').replace(/[^0-9]/g,'');var nu=calc(n);if(old&&old!==String(nu))swaps.push([old,new Intl.NumberFormat('hu-HU').format(nu)]);}
+        grab('.cd-rent-live',function(n){return Math.ceil(n*fx/10000)*10000;});
+        grab('.cd-dep-live',function(n){return Math.round(n*fx/1000)*1000;});
         [].forEach.call(document.querySelectorAll('.cd-rent-live'),function(h){var n=Number(h.getAttribute('data-eur')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.ceil(n*fx/10000)*10000)+' Ft';});
         [].forEach.call(document.querySelectorAll('.cd-dep-live'),function(h){var n=Number(h.getAttribute('data-eur')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx/1000)*1000)+' Ft';});
+        if(swaps.length){var res=swaps.map(function(w){return [new RegExp('(^|[^0-9])'+w[0].replace(/\B(?=(\d{3})+$)/g,'[\\s\\u00a0\\u202f]?')+'(?=[\\s\\u00a0\\u202f]*Ft)','g'),w[1]];});
+          var tw=document.createTreeWalker(document.querySelector('main')||document.body,4,null),t;
+          while((t=tw.nextNode())){var p=t.parentNode;if(!p||/SCRIPT|STYLE/.test(p.nodeName))continue;var v=t.nodeValue,v2=v;res.forEach(function(r){v2=v2.replace(r[0],function(m,a){return a+r[1];});});if(v2!==v)t.nodeValue=v2;}}
       }
     }).catch(function(){});
   }catch(e){}})();
