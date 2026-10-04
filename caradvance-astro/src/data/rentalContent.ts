@@ -74,7 +74,7 @@ export const CONTENT: Record<string, RentalContent> = {
   },
 
   'BMW X5': {
-    mainAlt: 'BMW X5 bérlés — nagy prémium SUV tartós bérletben',
+    mainImg: P('bmw-x5', 'g5'), mainAlt: 'BMW X5 bérlés — nagy prémium SUV tartós bérletben',
     heroVideo: '', heroPoster: P('bmw-x5', 'hero'), // a régi (G05) X5 bérelhető — sajtófotók: BMW PressClub, X5 M Competition „On location dynamic” (08/23)
     overviewH2: 'BMW X5 tartós bérlet — a nagy prémium SUV havidíjjal',
     guideIntro: 'A <strong>BMW X5</strong> a nagy prémium SUV-k mércéje: tágas, kifinomult, hosszú utakon is kivételesen kényelmes, ugyanakkor meglepően dinamikus. <strong>Tartós bérletben</strong> úgy vezetheted, hogy a jelentős vételár és az értékvesztés kockázata nem téged terhel — egyetlen <strong>havi díjat</strong> fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
