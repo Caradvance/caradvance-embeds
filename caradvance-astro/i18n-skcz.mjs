@@ -150,6 +150,7 @@ export function headFx(F) {
 export function runtimeJs(F) {
   return `var FX=${JSON.stringify({ HUF: F.HUF, T: F.T, S: F.S, R: F.R, cur: F.cur })};var CONV=${CONV.toString()};` +
     `CUR=function(s){return CONV(s,FX)};` +
+    `try{var CC=window.CA_CFG;if(CC){CC.PHONE=${JSON.stringify(CONTACT.phone)};CC.WHATSAPP='https://wa.me/${CONTACT.wa}';}}catch(e){}` +
     `if(/(^|\\.)caradvance\\.(sk|cz)$/.test(location.hostname))DOMSTRIP=/^\\/(sk|cs)\\//;`;
 }
 
