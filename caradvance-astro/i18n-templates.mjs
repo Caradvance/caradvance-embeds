@@ -45,6 +45,11 @@ export function makeTemplater(l, D) {
     if ((m = k.match(/^Eladó (.+) · (\{\d+\}) · (\{\d+\}) km \| CarAdvance$/))) return sub(w.sale, m);
     if ((m = k.match(/^Elkelt (.+) · (\{\d+\}) · (\{\d+\}) km \| CarAdvance$/))) return sub(w.sold, m);
     if ((m = k.match(/^Eladó (.+) · (\{\d+\}) \| CarAdvance$/))) return w.sale.replace(/ · \$3 km| · \$3 км| · \$3 公里/, '').replace('$1', m[1]).replace('$2', m[2]);
+    if ((m = k.match(/^(Eladó|Elkelt) (.+?)(?: · (\{\d+\}))? \| CarAdvance$/))) {
+      let t = (m[1] === 'Eladó' ? w.sale : w.sold).replace(/ · \$3 (?:km|км|公里)/, '');
+      if (!m[3]) t = t.replace(/ · \$2/, '');
+      return t.replace('$1', m[2]).replace('$2', m[3] || '');
+    }
     if ((m = k.match(/^Eladó (.+), (\{\d+\}), (\{\d+\}) km, (\{\d+\}) LE, ([^,]+), ([^.]+)\. Ára (\{\d+\}) Ft\. Ellenőrzött előéletű német import a CarAdvance-től\.$/))) { m[5] = word(m[5]); m[6] = word(m[6]); return sub(w.saleD, m); }
     if ((m = k.match(/^Elkelt: (.+), (\{\d+\}), (\{\d+\}) km, (\{\d+\}) LE, ([^,]+), ([^.]+)\. Hasonlót keresel\? Nézd meg az aktuális készletet\.$/))) { m[5] = word(m[5]); m[6] = word(m[6]); return sub(w.soldD, m); }
     if ((m = k.match(/^A\(z\) (.+?)(?: (\{\d+\}(?:\/\{\d+\})?))? évjáratú, (?:(.+?) futott, )?(.+?) üzemű (.+?)\. (\{\d+\}) (kW|LE)(?:, ([^,.]*))?(?:, ([^.]*))?\s*\. Nettó ár \(áfa nélkül\) garanciával, CarAdvance import\.$/)))

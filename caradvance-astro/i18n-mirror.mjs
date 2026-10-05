@@ -96,7 +96,7 @@ try {
     const cluster = ['hu', ...BASE, ...(DLIVE ? DL : [])].map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${ABS(l, p)}">`).join('\n') + `\n<link rel="alternate" hreflang="x-default" href="${SITE}${p}">`;
     const dropAlt = (h) => h.replace(/[ \t]*<link rel="alternate" hreflang="[^"]*" href="[^"]*"\s*\/?>\s*\n?/g, '');
     // magyar oldal: teljes klaszter
-    let huh = switcher(dropAlt(src), 'hu', p); if (DLIVE && DL.length) huh = addSwitch(huh, DL, (c) => DU(c, p), 'hu');
+    let huh = linkFix(switcher(dropAlt(src), 'hu', p), 'hu'); // belső linkek perjellel (eddig minden menükattintás 308-as átirányítás volt) if (DLIVE && DL.length) huh = addSwitch(huh, DL, (c) => DU(c, p), 'hu');
     fs.writeFileSync(path.join(DIST, rel), huh.replace(/<\/head>/i, cluster + '\n</head>'));
 
     for (const l of LANGS) {
