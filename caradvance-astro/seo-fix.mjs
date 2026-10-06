@@ -178,7 +178,7 @@ function rentalSeo() {
     const u = ujs.find((x) => match(x.slug) === c);
     if (u && !/data-ca-xlink/.test(h)) {
       const un = decode(((rd(u.rel).match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim() || c.name;
-      h = h.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i, `$1<p data-ca-xlink style="margin:6px 0 0;font-size:14px;opacity:.85">Inkább vadonatúj autót szeretnél? <a href="/uj-auto-berlese/${u.slug}/">Új ${escAttr(un)} tartós bérlet rendelésre →</a></p>`);
+      h = h.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i, `$1<p data-ca-xlink style="display:inline-block;margin:12px 0 0;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.14);font-size:13.5px;line-height:1.3">Inkább vadonatúj autót szeretnél? <a style="color:inherit;font-weight:800;text-decoration:underline" href="/uj-auto-berlese/${u.slug}/">Új ${escAttr(un)} tartós bérlet rendelésre →</a></p>`);
     }
     wr(c.rel, h); nB++;
   }
@@ -191,7 +191,7 @@ function rentalSeo() {
     if (t.length > 60) t = `Új ${name} tartós bérlet rendelésre`;
     h = h.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escAttr(t).replace(/&quot;/g, '"')}</title>`)
       .replace(/(<meta[^>]+(?:property="og:title"|name="twitter:title")[^>]+content=")[^"]*(")/gi, `$1${escAttr(t)}$2`);
-    if (!/data-ca-xlink/.test(h)) h = h.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i, `$1<p data-ca-xlink style="margin:6px 0 0;font-size:14px;opacity:.85">Azonnal elérhető autó kell? <a href="/berelheto-auto/${c.slug}/">${escAttr(c.name)} bérlés ${ftFmt(c.ft)} Ft/hó-tól →</a></p>`);
+    if (!/data-ca-xlink/.test(h)) h = h.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i, `$1<p data-ca-xlink style="display:inline-block;margin:12px 0 0;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.14);font-size:13.5px;line-height:1.3">Azonnal elérhető autó kell? <a style="color:inherit;font-weight:800;text-decoration:underline" href="/berelheto-auto/${c.slug}/">${escAttr(c.name)} bérlés ${ftFmt(c.ft)} Ft/hó-tól →</a></p>`);
     wr(u.rel, h); nU++;
   }
   // 3) /autoink/ — a fő bérlési (és vásárlási) gyűjtőoldal
@@ -210,15 +210,36 @@ function rentalSeo() {
       ['Mekkora kauciót kell fizetni?', `A kaució modelltől függően ${ftFmt(min('dep'))} €-tól indul; az összeget minden autó oldalán feltüntetjük.`],
       ['Hogyan bérelhetek autót a CarAdvance-től?', 'Válaszd ki az autót, küldd el az ajánlatkérést az oldalon, vagy hívj minket: +36 30 233 6060. Munkatársunk egyeztet veled a részletekről és az átadásról.'],
     ];
-    const block = `\n<section class="ca-rent-seo" style="margin:34px 0 10px;padding:26px 28px;border-radius:18px;background:#f6f6f7;color:#16171a">
-<h2 style="font-size:24px;font-weight:800;margin:0 0 10px">Prémium autóbérlés és tartós bérlet – bérelhető autóink</h2>
-<p style="margin:0 0 10px;line-height:1.6">Prémium autókat kínálunk tartós bérletre Németországból: ${Object.keys(byBrand).slice(0, 8).join(', ')} és más márkák. A havidíj ${ftFmt(min('ft'))} Ft/hó-tól indul, átlátható futáskerettel és kaucióval. Az alábbi listában minden bérelhető modell saját oldalát megtalálod a pontos feltételekkel.</p>
-${Object.entries(byBrand).map(([b, cs]) => `<h3 style="font-size:16px;font-weight:800;margin:16px 0 6px">${escAttr(b)} bérlés</h3>\n<ul style="margin:0;padding-left:18px;columns:2;column-gap:28px;line-height:1.7">${cs.map((c) => `<li><a href="/berelheto-auto/${c.slug}/">${escAttr(c.name)} bérlés</a> – ${ftFmt(c.ft)} Ft/hó-tól</li>`).join('')}</ul>`).join('\n')}
-<h3 style="font-size:18px;font-weight:800;margin:22px 0 8px">Gyakori kérdések a bérlésről</h3>
-${faq.map(([q, aa]) => `<details style="background:#fff;border-radius:12px;padding:12px 16px;margin:0 0 8px"><summary style="font-weight:700;cursor:pointer">${escAttr(q)}</summary><p style="margin:8px 0 0;line-height:1.6">${escAttr(aa)}</p></details>`).join('\n')}
-<p style="margin:14px 0 0">Vadonatúj autót szeretnél rendelésre? Nézd meg <a href="/uj-auto-berlese/">új autó tartós bérlet ajánlatainkat</a>.</p>
+    const RS_CSS = `.ca-rent-seo{padding:56px 0 24px;font-family:inherit}
+.ca-rent-seo .rs-eye{display:inline-block;color:#E2001A;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.ca-rent-seo h2{font-size:36px;font-weight:800;letter-spacing:-.02em;line-height:1.15;color:#0B0B0D;margin:8px 0 14px}
+.ca-rent-seo .rs-lead{color:#5A6B82;font-size:15.5px;line-height:1.65;max-width:820px;margin:0 0 8px}
+.ca-rent-seo h3{font-size:18px;font-weight:800;color:#0B0B0D;margin:28px 0 12px}
+.ca-rent-seo .rs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.ca-rent-seo .rs-card{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1px solid #E6EAF1;border-radius:14px;padding:14px 16px;text-decoration:none;color:#141519;font-weight:700;font-size:14.5px;line-height:1.35;transition:border-color .15s ease,transform .15s ease}
+.ca-rent-seo .rs-card:hover{border-color:#E2001A;transform:translateY(-1px)}
+.ca-rent-seo .rs-card span{color:#E2001A;font-weight:800;font-size:13.5px;white-space:nowrap}
+.ca-rent-seo .rs-faq{max-width:900px;margin-top:56px}
+.ca-rent-seo .rs-faq h2{margin-bottom:22px}
+.ca-rent-seo .rs-more{color:#5A6B82;font-size:15px;margin:18px 0 0}
+.ca-rent-seo .rs-more a{color:#E2001A;font-weight:700}
+@media(max-width:640px){.ca-rent-seo{padding-top:40px}.ca-rent-seo h2{font-size:27px}}`;
+    const block = `\n<section class="ca-rent-seo"><style>${RS_CSS}</style>
+<span class="rs-eye">Bérlés</span>
+<h2>Prémium autóbérlés és tartós bérlet</h2>
+<p class="rs-lead">Prémium autókat kínálunk tartós bérletre Németországból: ${Object.keys(byBrand).slice(0, 8).join(', ')} és más márkák. A havidíj ${ftFmt(min('ft'))} Ft/hó-tól indul, átlátható futáskerettel és kaucióval. Válaszd ki a modellt, és nézd meg a pontos feltételeket.</p>
+${Object.entries(byBrand).map(([b, cs]) => `<h3>${escAttr(b)} bérlés</h3>\n<div class="rs-grid">${cs.map((c) => `<a class="rs-card" href="/berelheto-auto/${c.slug}/">${escAttr(c.name)} bérlés <span>${ftFmt(c.ft)} Ft/hó-tól</span></a>`).join('')}</div>`).join('\n')}
+<div class="rs-faq"><span class="rs-eye">GYIK</span>
+<h2>Gyakori kérdések a bérlésről</h2>
+${faq.map(([q, aa]) => `<details><summary>${escAttr(q)}</summary><p>${escAttr(aa)}</p></details>`).join('\n')}
+<p class="rs-more">Vadonatúj autót szeretnél rendelésre? Nézd meg <a href="/uj-auto-berlese/">új autó tartós bérlet ajánlatainkat</a>.</p>
+</div>
 </section>\n`;
     if (!/class="ca-rent-seo"/.test(a)) a = a.replace(/(<\/div>\s*)(<div class="autok-panel" id="panel-premium")/, block + '$1$2');
+    // egységes GYIK-stílus (ugyanaz, mint a többi oldalon — a seo-faq.mjs stíluslapja)
+    if (!/id="ca-faq-unify"/.test(a)) {
+      try { const css = (fs.readFileSync('seo-faq.mjs', 'utf8').match(/const CSS = `([\s\S]*?)`\.trim\(\)/) || [])[1]; if (css) a = a.replace(/<\/head>/i, `<style id="ca-faq-unify">${css.trim()}</style>\n</head>`); } catch {}
+    }
     if (!/"@type":"OfferCatalog"/.test(a)) {
       a = addLd(a, { '@context': 'https://schema.org', '@type': 'OfferCatalog', name: 'Bérelhető autóink – prémium autóbérlés és tartós bérlet', url: SITE + '/autoink/#berelheto', provider: { '@id': SITE + '/#dealer' },
         itemListElement: cars.map((c, i) => ({ '@type': 'Offer', position: i + 1, url: c.url, priceCurrency: 'HUF', price: c.ft, businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
