@@ -122,6 +122,104 @@ function trimDesc(d) {
   const w = cut.lastIndexOf(' ');
   return (w > 100 ? cut.slice(0, w) : cut).replace(/[,;:–—\-\s]+$/, '') + '…';
 }
+
+/* ---- Bérlés: /autoink/#berelheto a fő bérlési oldal; modelloldalak Ft-ár, JSON-LD, kannibalizáció kezelése ---- */
+const BRANDS2 = ['Mercedes-Benz', 'Mercedes-AMG', 'Land Rover', 'Alfa Romeo', 'Range Rover', 'Aston Martin'];
+const brandOf = (n) => { const b = BRANDS2.find((x) => n.startsWith(x)); return b ? (b === 'Mercedes-AMG' ? 'Mercedes-Benz' : b) : n.split(' ')[0]; };
+const ftNum = (s) => parseInt(String(s).replace(/[^\d]/g, ''), 10);
+const ftFmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const keyOf = (slug) => slug.replace(/-berles$/, '').replace(/^mercedes-benz-/, 'mercedes-').replace(/^mercedes-amg-/, 'mercedes-amg-');
+function rentalSeo() {
+  const rd = (rel) => { const f = path.join(DIST, rel); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; };
+  const wr = (rel, h) => fs.writeFileSync(path.join(DIST, rel), h);
+  const dirOf = (d) => { try { return fs.readdirSync(path.join(DIST, d), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; } };
+  const cars = [];
+  for (const slug of dirOf('berelheto-auto')) {
+    const rel = `berelheto-auto/${slug}/index.html`; const h = rd(rel); if (!h) continue;
+    const name = decode(((h.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim().replace(/ bérlés$/i, '');
+    const desc = decode((h.match(/<meta[^>]+name="description"[^>]+content="([^"]*)"/i) || [])[1] || '');
+    const ft = ftNum((desc.match(/([\d   ]{3,})\s?Ft\/hó/) || [])[1] || '');
+    if (!name || !ft) continue;
+    const km = +((desc.match(/(\d{3,5})\s?km\/hó/) || [])[1] || 0), mo = +((desc.match(/(\d{1,2})\s?hónap/) || [])[1] || 0), dep = ftNum((desc.match(/kaució ([\d  ]+)\s?€/) || [])[1] || '');
+    const img = (h.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i) || [])[1] || '';
+    cars.push({ slug, rel, name, brand: brandOf(name), ft, km, mo, dep, desc, img, url: `${SITE}/berelheto-auto/${slug}/`, key: keyOf(slug) });
+  }
+  if (!cars.length) { console.log('[seo-fix rental] nincs bérelhető modelloldal'); return; }
+  const ujs = dirOf('uj-auto-berlese').map((slug) => ({ slug, rel: `uj-auto-berlese/${slug}/index.html` })).filter((u) => rd(u.rel));
+  const match = (ujSlug) => cars.filter((c) => ujSlug === c.key || ujSlug.startsWith(c.key + '-')).sort((a, b) => b.key.length - a.key.length)[0];
+  let nB = 0, nU = 0;
+  // 1) bérelhető modelloldalak
+  for (const c of cars) {
+    let h = rd(c.rel);
+    let t = `${c.name} bérlés ${ftFmt(c.ft)} Ft/hó-tól – tartós bérlet`;
+    if (t.length > 60) t = `${c.name} bérlés ${ftFmt(c.ft)} Ft/hó-tól`;
+    if (t.length > 60) t = `${c.name} bérlés – tartós bérlet`;
+    h = h.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escAttr(t).replace(/&quot;/g, '"')}</title>`)
+      .replace(/(<meta[^>]+(?:property="og:title"|name="twitter:title")[^>]+content=")[^"]*(")/gi, `$1${escAttr(t)}$2`);
+    if (!/"@type":"Product"/.test(h)) {
+      const prod = { '@context': 'https://schema.org', '@type': 'Product', name: `${c.name} bérlés`, description: c.desc, brand: { '@type': 'Brand', name: c.brand }, url: c.url,
+        ...(c.img ? { image: c.img } : {}),
+        offers: { '@type': 'Offer', url: c.url, priceCurrency: 'HUF', price: c.ft, availability: 'https://schema.org/InStock', businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
+          priceSpecification: { '@type': 'UnitPriceSpecification', price: c.ft, priceCurrency: 'HUF', unitCode: 'MON', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MON' } },
+          seller: { '@id': SITE + '/#dealer' } } };
+      h = addLd(h, prod);
+      h = addLd(h, crumbs([['Főoldal', '/'], ['Bérelhető autóink', '/autoink/'], [`${c.name} bérlés`, `/berelheto-auto/${c.slug}/`]]));
+    }
+    // kereszt-link az új autós (rendelésre) oldalra, ha van ilyen modell
+    const u = ujs.find((x) => match(x.slug) === c);
+    if (u && !/data-ca-xlink/.test(h)) {
+      const un = decode(((rd(u.rel).match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim() || c.name;
+      h = h.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i, `$1<p data-ca-xlink style="margin:6px 0 0;font-size:14px;opacity:.85">Inkább vadonatúj autót szeretnél? <a href="/uj-auto-berlese/${u.slug}/">Új ${escAttr(un)} tartós bérlet rendelésre →</a></p>`);
+    }
+    wr(c.rel, h); nB++;
+  }
+  // 2) új autós (rendelésre) modelloldalak: más kulcsszó + link a bérelhető oldalra
+  for (const u of ujs) {
+    const c = match(u.slug); if (!c) continue;
+    let h = rd(u.rel);
+    const name = decode(((h.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim() || c.name;
+    let t = `Új ${name} tartós bérlet – vadonatúj autó rendelésre`;
+    if (t.length > 60) t = `Új ${name} tartós bérlet rendelésre`;
+    h = h.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escAttr(t).replace(/&quot;/g, '"')}</title>`)
+      .replace(/(<meta[^>]+(?:property="og:title"|name="twitter:title")[^>]+content=")[^"]*(")/gi, `$1${escAttr(t)}$2`);
+    if (!/data-ca-xlink/.test(h)) h = h.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i, `$1<p data-ca-xlink style="margin:6px 0 0;font-size:14px;opacity:.85">Azonnal elérhető autó kell? <a href="/berelheto-auto/${c.slug}/">${escAttr(c.name)} bérlés ${ftFmt(c.ft)} Ft/hó-tól →</a></p>`);
+    wr(u.rel, h); nU++;
+  }
+  // 3) /autoink/ — a fő bérlési (és vásárlási) gyűjtőoldal
+  const ar = 'autoink/index.html'; let a = rd(ar);
+  if (a) {
+    const min = (k) => Math.min(...cars.map((c) => c[k]).filter(Boolean)), max = (k) => Math.max(...cars.map((c) => c[k]).filter(Boolean));
+    const t = 'Eladó és bérelhető prémium autók – tartós bérlet | CarAdvance';
+    const d = `Eladó és bérelhető prémium autók Németországból: BMW, Mercedes-Benz, Audi, MINI és más márkák. Tartós bérlet ${ftFmt(min('ft'))} Ft/hó-tól, átlátható kaucióval.`;
+    a = a.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escAttr(t)}</title>`)
+      .replace(/(<meta[^>]+(?:property="og:title"|name="twitter:title")[^>]+content=")[^"]*(")/gi, `$1${escAttr(t)}$2`)
+      .replace(/(<meta[^>]+(?:name="description"|property="og:description"|name="twitter:description")[^>]+content=")[^"]*(")/gi, `$1${escAttr(d)}$2`);
+    const byBrand = {}; for (const c of [...cars].sort((x, y) => x.name.localeCompare(y.name, 'hu'))) (byBrand[c.brand] = byBrand[c.brand] || []).push(c);
+    const faq = [
+      ['Mennyibe kerül egy prémium autó tartós bérlete?', `A havidíj modelltől függ: bérelhető autóink ${ftFmt(min('ft'))} Ft/hó-tól ${ftFmt(max('ft'))} Ft/hó-ig érhetők el. A pontos díjat minden modell oldalán megtalálod.`],
+      ['Milyen hosszú a bérleti idő és mekkora a futáskeret?', `A minimális bérleti idő modelltől függően ${min('mo')}–${max('mo')} hónap, a havi futáskeret ${ftFmt(min('km'))}–${ftFmt(max('km'))} km.`],
+      ['Mekkora kauciót kell fizetni?', `A kaució modelltől függően ${ftFmt(min('dep'))} €-tól indul; az összeget minden autó oldalán feltüntetjük.`],
+      ['Hogyan bérelhetek autót a CarAdvance-től?', 'Válaszd ki az autót, küldd el az ajánlatkérést az oldalon, vagy hívj minket: +36 30 233 6060. Munkatársunk egyeztet veled a részletekről és az átadásról.'],
+    ];
+    const block = `\n<section class="ca-rent-seo" style="margin:34px 0 10px;padding:26px 28px;border-radius:18px;background:#f6f6f7;color:#16171a">
+<h2 style="font-size:24px;font-weight:800;margin:0 0 10px">Prémium autóbérlés és tartós bérlet – bérelhető autóink</h2>
+<p style="margin:0 0 10px;line-height:1.6">Prémium autókat kínálunk tartós bérletre Németországból: ${Object.keys(byBrand).slice(0, 8).join(', ')} és más márkák. A havidíj ${ftFmt(min('ft'))} Ft/hó-tól indul, átlátható futáskerettel és kaucióval. Az alábbi listában minden bérelhető modell saját oldalát megtalálod a pontos feltételekkel.</p>
+${Object.entries(byBrand).map(([b, cs]) => `<h3 style="font-size:16px;font-weight:800;margin:16px 0 6px">${escAttr(b)} bérlés</h3>\n<ul style="margin:0;padding-left:18px;columns:2;column-gap:28px;line-height:1.7">${cs.map((c) => `<li><a href="/berelheto-auto/${c.slug}/">${escAttr(c.name)} bérlés</a> – ${ftFmt(c.ft)} Ft/hó-tól</li>`).join('')}</ul>`).join('\n')}
+<h3 style="font-size:18px;font-weight:800;margin:22px 0 8px">Gyakori kérdések a bérlésről</h3>
+${faq.map(([q, aa]) => `<details style="background:#fff;border-radius:12px;padding:12px 16px;margin:0 0 8px"><summary style="font-weight:700;cursor:pointer">${escAttr(q)}</summary><p style="margin:8px 0 0;line-height:1.6">${escAttr(aa)}</p></details>`).join('\n')}
+<p style="margin:14px 0 0">Vadonatúj autót szeretnél rendelésre? Nézd meg <a href="/uj-auto-berlese/">új autó tartós bérlet ajánlatainkat</a>.</p>
+</section>\n`;
+    if (!/class="ca-rent-seo"/.test(a)) a = a.replace(/(<\/div>\s*)(<div class="autok-panel" id="panel-premium")/, block + '$1$2');
+    if (!/"@type":"OfferCatalog"/.test(a)) {
+      a = addLd(a, { '@context': 'https://schema.org', '@type': 'OfferCatalog', name: 'Bérelhető autóink – prémium autóbérlés és tartós bérlet', url: SITE + '/autoink/#berelheto', provider: { '@id': SITE + '/#dealer' },
+        itemListElement: cars.map((c, i) => ({ '@type': 'Offer', position: i + 1, url: c.url, priceCurrency: 'HUF', price: c.ft, businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
+          priceSpecification: { '@type': 'UnitPriceSpecification', price: c.ft, priceCurrency: 'HUF', unitCode: 'MON' }, itemOffered: { '@type': 'Product', name: `${c.name} bérlés`, brand: { '@type': 'Brand', name: c.brand }, url: c.url } })) });
+      a = addLd(a, { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map(([q, aa]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: aa } })) });
+    }
+    wr(ar, a);
+  }
+  console.log(`[seo-fix rental] bérelhető modelloldal: ${nB}, új autós oldal kereszt-linkkel: ${nU}, /autoink/ gyűjtőoldal: ${a ? 'kész' : 'nincs'}`);
+}
 /* Ahrefs-audit javítások (2026-10-06) */
 // belső linkek, amelyek 404-re mutattak → létező oldal (minden nyelvi előtaggal) + 301
 const LINKFIX = {
@@ -197,6 +295,7 @@ function altFor(tagStart, html, idx, pageH1) {
   return '';
 }
 function post() {
+  try { rentalSeo(); } catch (e) { console.log('[seo-fix rental] ' + e.message); }
   const files = walk(DIST);
   const redirects = [];
   const dropFromSitemap = new Set();
