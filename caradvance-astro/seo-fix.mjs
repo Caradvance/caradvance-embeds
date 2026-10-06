@@ -205,30 +205,37 @@ function rentalSeo() {
       .replace(/(<meta[^>]+(?:name="description"|property="og:description"|name="twitter:description")[^>]+content=")[^"]*(")/gi, `$1${escAttr(d)}$2`);
     const byBrand = {}; for (const c of [...cars].sort((x, y) => x.name.localeCompare(y.name, 'hu'))) (byBrand[c.brand] = byBrand[c.brand] || []).push(c);
     const faq = [
-      ['Mennyibe kerül egy prémium autó tartós bérlete?', `A havidíj modelltől függ: bérelhető autóink ${ftFmt(min('ft'))} Ft/hó-tól ${ftFmt(max('ft'))} Ft/hó-ig érhetők el. A pontos díjat minden modell oldalán megtalálod.`],
-      ['Milyen hosszú a bérleti idő és mekkora a futáskeret?', `A minimális bérleti idő modelltől függően ${min('mo')}–${max('mo')} hónap, a havi futáskeret ${ftFmt(min('km'))}–${ftFmt(max('km'))} km.`],
+      ['Mennyibe kerül egy autó tartós bérlete?', `A havidíj modelltől függ: bérelhető autóink ${ftFmt(min('ft'))} Ft/hó-tól ${ftFmt(max('ft'))} Ft/hó-ig érhetők el. A pontos díjat minden modell oldalán megtalálod.`],
+      ['Milyen hosszú a bérleti idő és mekkora a futáskeret?', `A minimális bérleti idő ${min('mo') === max('mo') ? min('mo') : 'modelltől függően ' + min('mo') + '–' + max('mo')} hónap, a havi futáskeret ${min('km') === max('km') ? ftFmt(min('km')) : ftFmt(min('km')) + '–' + ftFmt(max('km'))} km.`],
       ['Mekkora kauciót kell fizetni?', `A kaució modelltől függően ${ftFmt(min('dep'))} €-tól indul; az összeget minden autó oldalán feltüntetjük.`],
       ['Hogyan bérelhetek autót a CarAdvance-től?', 'Válaszd ki az autót, küldd el az ajánlatkérést az oldalon, vagy hívj minket: +36 30 233 6060. Munkatársunk egyeztet veled a részletekről és az átadásról.'],
     ];
-    const RS_CSS = `.ca-rent-seo{padding:56px 0 24px;font-family:inherit}
+    const RS_CSS = `.ca-rent-seo{padding:48px 0 24px;font-family:inherit;max-width:900px}
 .ca-rent-seo .rs-eye{display:inline-block;color:#E2001A;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-.ca-rent-seo h2{font-size:36px;font-weight:800;letter-spacing:-.02em;line-height:1.15;color:#0B0B0D;margin:8px 0 14px}
-.ca-rent-seo .rs-lead{color:#5A6B82;font-size:15.5px;line-height:1.65;max-width:820px;margin:0 0 8px}
-.ca-rent-seo h3{font-size:18px;font-weight:800;color:#0B0B0D;margin:28px 0 12px}
-.ca-rent-seo .rs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
-.ca-rent-seo .rs-card{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1px solid #E6EAF1;border-radius:14px;padding:14px 16px;text-decoration:none;color:#141519;font-weight:700;font-size:14.5px;line-height:1.35;transition:border-color .15s ease,transform .15s ease}
-.ca-rent-seo .rs-card:hover{border-color:#E2001A;transform:translateY(-1px)}
-.ca-rent-seo .rs-card span{color:#E2001A;font-weight:800;font-size:13.5px;white-space:nowrap}
-.ca-rent-seo .rs-faq{max-width:900px;margin-top:56px}
-.ca-rent-seo .rs-faq h2{margin-bottom:22px}
+.ca-rent-seo h2{font-size:36px;font-weight:800;letter-spacing:-.02em;line-height:1.15;color:#0B0B0D;margin:8px 0 12px}
+.ca-rent-seo .rs-lead{color:#5A6B82;font-size:15.5px;line-height:1.65;margin:0 0 22px}
+.ca-rent-seo .rs-models>summary{font-size:16px}
+.ca-rent-seo .rs-models .rs-row{margin:0 0 10px;font-size:14.5px;line-height:1.75}
+.ca-rent-seo .rs-models .rs-row b{color:#141519;margin-right:6px}
+.ca-rent-seo .rs-models .rs-row a{color:#141519!important;text-decoration:none;font-weight:600;white-space:nowrap}
+.ca-rent-seo .rs-models .rs-row a:hover{color:#E2001A!important}
+.ca-rent-seo .rs-models .rs-row small{color:#E2001A;font-weight:700;font-size:12.5px;margin-left:3px}
+.ca-rent-seo .rs-models .rs-row .rs-sep{color:#C5CCD8;margin:0 6px}
+.ca-rent-seo .rs-faq{margin-top:44px}
+.ca-rent-seo .rs-faq h2{margin-bottom:20px}
 .ca-rent-seo .rs-more{color:#5A6B82;font-size:15px;margin:18px 0 0}
 .ca-rent-seo .rs-more a{color:#E2001A;font-weight:700}
-@media(max-width:640px){.ca-rent-seo{padding-top:40px}.ca-rent-seo h2{font-size:27px}}`;
+@media(max-width:640px){.ca-rent-seo{padding-top:36px}.ca-rent-seo h2{font-size:27px}}`;
+    const PREF = ['BMW', 'Mercedes-Benz', 'Audi', 'MINI', 'Volkswagen'];
+    const leadBrands = [...PREF.filter((b) => byBrand[b]), ...Object.keys(byBrand).filter((b) => !PREF.includes(b))].slice(0, 5);
+    const short = (c) => c.name.startsWith(c.brand + ' ') ? c.name.slice(c.brand.length + 1) : c.name;
     const block = `\n<section class="ca-rent-seo"><style>${RS_CSS}</style>
 <span class="rs-eye">Bérlés</span>
-<h2>Prémium autóbérlés és tartós bérlet</h2>
-<p class="rs-lead">Prémium autókat kínálunk tartós bérletre Németországból: ${Object.keys(byBrand).slice(0, 8).join(', ')} és más márkák. A havidíj ${ftFmt(min('ft'))} Ft/hó-tól indul, átlátható futáskerettel és kaucióval. Válaszd ki a modellt, és nézd meg a pontos feltételeket.</p>
-${Object.entries(byBrand).map(([b, cs]) => `<h3>${escAttr(b)} bérlés</h3>\n<div class="rs-grid">${cs.map((c) => `<a class="rs-card" href="/berelheto-auto/${c.slug}/">${escAttr(c.name)} bérlés <span>${ftFmt(c.ft)} Ft/hó-tól</span></a>`).join('')}</div>`).join('\n')}
+<h2>Autóbérlés és tartós bérlet</h2>
+<p class="rs-lead">Tartós bérlet Németországból: ${leadBrands.join(', ')} és más márkák, ${ftFmt(min('ft'))} Ft/hó-tól, átlátható futáskerettel és kaucióval.</p>
+<details class="rs-models"><summary>Összes bérelhető modell (${cars.length})</summary><div>
+${Object.entries(byBrand).map(([b, cs]) => `<p class="rs-row"><b>${escAttr(b)}:</b>${cs.map((c) => `<a href="/berelheto-auto/${c.slug}/" title="${escAttr(c.name)} bérlés">${escAttr(short(c))}</a><small>${ftFmt(c.ft)} Ft</small>`).join('<span class="rs-sep">·</span>')}</p>`).join('\n')}
+</div></details>
 <div class="rs-faq"><span class="rs-eye">GYIK</span>
 <h2>Gyakori kérdések a bérlésről</h2>
 ${faq.map(([q, aa]) => `<details><summary>${escAttr(q)}</summary><p>${escAttr(aa)}</p></details>`).join('\n')}
