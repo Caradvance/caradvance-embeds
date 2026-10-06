@@ -156,15 +156,24 @@ function rentalSeo() {
     if (t.length > 60) t = `${c.name} bérlés – tartós bérlet`;
     h = h.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escAttr(t).replace(/&quot;/g, '"')}</title>`)
       .replace(/(<meta[^>]+(?:property="og:title"|name="twitter:title")[^>]+content=")[^"]*(")/gi, `$1${escAttr(t)}$2`);
-    if (!/"@type":"Product"/.test(h)) {
-      const prod = { '@context': 'https://schema.org', '@type': 'Product', name: `${c.name} bérlés`, description: c.desc, brand: { '@type': 'Brand', name: c.brand }, url: c.url,
-        ...(c.img ? { image: c.img } : {}),
-        offers: { '@type': 'Offer', url: c.url, priceCurrency: 'HUF', price: c.ft, availability: 'https://schema.org/InStock', businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
-          priceSpecification: { '@type': 'UnitPriceSpecification', price: c.ft, priceCurrency: 'HUF', unitCode: 'MON', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MON' } },
-          seller: { '@id': SITE + '/#dealer' } } };
-      h = addLd(h, prod);
-      h = addLd(h, crumbs([['Főoldal', '/'], ['Bérelhető autóink', '/autoink/'], [`${c.name} bérlés`, `/berelheto-auto/${c.slug}/`]]));
-    }
+    const offer = { '@type': 'Offer', url: c.url, priceCurrency: 'HUF', price: c.ft, availability: 'https://schema.org/InStock', businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: c.ft, priceCurrency: 'HUF', unitCode: 'MON', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MON' } },
+      seller: { '@id': SITE + '/#dealer' } };
+    let hasCar = false, hasCrumb = false;
+    h = h.replace(/(<script[^>]*type="application\/ld\+json"[^>]*>)([\s\S]*?)(<\/script>)/gi, (m, a1, body, c1) => {
+      let j; try { j = JSON.parse(body); } catch { return m; }
+      if (j['@type'] === 'Product' && j.name === `${c.name} bérlés`) return '';            // korábbi saját Product → a Car kapja az ajánlatot
+      if (j['@type'] === 'Car' || j['@type'] === 'Vehicle') { hasCar = true; j.url = c.url; j.offers = offer; if (!j.image && c.img) j.image = c.img; return a1 + JSON.stringify(j) + c1; }
+      if (j['@type'] === 'BreadcrumbList') {
+        if (hasCrumb) return '';                                                              // dupla morzsamenü ki
+        hasCrumb = true;
+        j.itemListElement = [['Főoldal', '/'], ['Bérelhető autóink', '/autoink/'], [`${c.name} bérlés`, `/berelheto-auto/${c.slug}/`]].map(([n, u], i) => ({ '@type': 'ListItem', position: i + 1, name: n, item: SITE + u }));
+        return a1 + JSON.stringify(j) + c1;
+      }
+      return m;
+    });
+    if (!hasCar) h = addLd(h, { '@context': 'https://schema.org', '@type': 'Product', name: `${c.name} bérlés`, description: c.desc, brand: { '@type': 'Brand', name: c.brand }, url: c.url, ...(c.img ? { image: c.img } : {}), offers: offer });
+    if (!hasCrumb) h = addLd(h, crumbs([['Főoldal', '/'], ['Bérelhető autóink', '/autoink/'], [`${c.name} bérlés`, `/berelheto-auto/${c.slug}/`]]));
     // kereszt-link az új autós (rendelésre) oldalra, ha van ilyen modell
     const u = ujs.find((x) => match(x.slug) === c);
     if (u && !/data-ca-xlink/.test(h)) {
