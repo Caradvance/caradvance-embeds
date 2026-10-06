@@ -220,7 +220,8 @@ function rentalSeo() {
 .ca-rent-seo .rs-models .rs-row a{color:#141519!important;text-decoration:none;font-weight:600;white-space:nowrap}
 .ca-rent-seo .rs-models .rs-row a:hover{color:#E2001A!important}
 .ca-rent-seo .rs-models .rs-row small{color:#E2001A;font-weight:700;font-size:12.5px;margin-left:3px}
-.ca-rent-seo .rs-models .rs-row .rs-sep{color:#C5CCD8;margin:0 6px}
+.ca-rent-seo .rs-models .rs-row .rs-sep{color:#C5CCD8;margin:0 8px}
+.ca-rent-seo .rs-models .rs-row .rs-it{white-space:nowrap;display:inline-block}
 .ca-rent-seo .rs-faq{margin-top:44px}
 .ca-rent-seo .rs-faq h2{margin-bottom:20px}
 .ca-rent-seo .rs-more{color:#5A6B82;font-size:15px;margin:18px 0 0}
@@ -234,7 +235,7 @@ function rentalSeo() {
 <h2>Autóbérlés és tartós bérlet</h2>
 <p class="rs-lead">Tartós bérlet Németországból: ${leadBrands.join(', ')} és más márkák, ${ftFmt(min('ft'))} Ft/hó-tól, átlátható futáskerettel és kaucióval.</p>
 <details class="rs-models"><summary>Összes bérelhető modell (${cars.length})</summary><div>
-${Object.entries(byBrand).map(([b, cs]) => `<p class="rs-row"><b>${escAttr(b)}:</b>${cs.map((c) => `<a href="/berelheto-auto/${c.slug}/" title="${escAttr(c.name)} bérlés">${escAttr(short(c))}</a><small>${ftFmt(c.ft)} Ft</small>`).join('<span class="rs-sep">·</span>')}</p>`).join('\n')}
+${Object.entries(byBrand).map(([b, cs]) => `<p class="rs-row"><b>${escAttr(b)}:</b>${cs.map((c) => `<span class="rs-it"><a href="/berelheto-auto/${c.slug}/" title="${escAttr(c.name)} bérlés">${escAttr(short(c))}</a><small>${ftFmt(c.ft).replace(/ /g, '\u00a0')}\u00a0Ft</small></span>`).join('<span class="rs-sep">·</span>')}</p>`).join('\n')}
 </div></details>
 <div class="rs-faq"><span class="rs-eye">GYIK</span>
 <h2>Gyakori kérdések a bérlésről</h2>
