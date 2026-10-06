@@ -49,7 +49,7 @@ const DEALER = {
   priceRange: '€€€',
   address: { '@type': 'PostalAddress', streetAddress: 'Ibolya utca 18.', postalCode: '2083', addressLocality: 'Solymár', addressRegion: 'Pest', addressCountry: 'HU' },
   openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '17:00' }],
-  sameAs: ['https://www.facebook.com/share/19BfQsJxSk/', 'https://www.instagram.com/caradvance_hungary', 'https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw', 'https://www.hasznaltauto.hu/partner/bh_group_zrt-20676'],
+  sameAs: ['https://www.facebook.com/caradvancehungary/', 'https://www.instagram.com/caradvance_hungary/', 'https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw', 'https://www.hasznaltauto.hu/partner/bh_group_zrt-20676'],
   parentOrganization: { '@type': 'Organization', name: 'Caradvance GmbH', url: 'https://www.caradvance.de/', address: { '@type': 'PostalAddress', streetAddress: 'Bgm.-Graf-Ring 21', postalCode: '82538', addressLocality: 'Geretsried', addressCountry: 'DE' } },
 };
 function enrich(o) {
@@ -115,12 +115,79 @@ function pre() {
 
 /* ------------------------------------------------------------------ POST */
 function trimDesc(d) {
-  if (d.length <= 165) return d;
+  if (d.length <= 160) return d;
   const cut = d.slice(0, 160);
   const s = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '), cut.lastIndexOf('。'));
   if (s >= 90) return cut.slice(0, s + 1).trim();
   const w = cut.lastIndexOf(' ');
   return (w > 100 ? cut.slice(0, w) : cut).replace(/[,;:–—\-\s]+$/, '') + '…';
+}
+/* Ahrefs-audit javítások (2026-10-06) */
+// belső linkek, amelyek 404-re mutattak → létező oldal (minden nyelvi előtaggal) + 301
+const LINKFIX = {
+  '/auto/volkswagen-golf-gti-clubsport-s-abt-370ps-19-1of400/': '/auto/volkswagen-golf-gti-clubsport-s-007-von-400-abt-370ps/',
+  '/berelheto-auto/audi-q6-e-tron-berles/': '/berelheto-auto/audi-q6-sportback-berles/',
+};
+// külső linkek, amelyek átirányítanak → végleges cím
+const EXTFIX = [
+  [/https:\/\/www\.facebook\.com\/share\/19BfQsJxSk\/?/g, 'https://www.facebook.com/caradvancehungary/'],
+  [/https:\/\/www\.instagram\.com\/caradvance_hungary(?=["'?#\\])/g, 'https://www.instagram.com/caradvance_hungary/'],
+];
+// magyar oldalak kézzel rövidített címei (≤60 karakter)
+const HU_TITLES = {
+  '/': 'Prémium autók Németországból – bérlés, import | CarAdvance',
+  '/blog/': 'CarAdvance Magazin – autós útmutatók, lízing, import',
+  '/miert-mi/': 'Miért a CarAdvance? Autókereskedés német háttérrel',
+  '/referenciak/': 'Referenciák – vélemények, eladott és importált autóink',
+  '/beszerzesi-folyamat/': 'Autóbehozatal Németországból lépésről lépésre',
+  '/blog/eredetisegvizsgalat/': 'Eredetiségvizsgálat 2026 – ára, menete, érvényessége',
+  '/blog/hosszu-tavu-autoberles/': 'Hosszú távú autóbérlés – kinek éri meg, mennyibe kerül?',
+  '/blog/regisztracios-ado-2026/': 'Regisztrációs adó 2026 – számítás, táblázat, példák',
+  '/blog/bmw-x5-vasarlas-behozatal/': 'BMW X5 behozatal Németországból – árak, folyamat',
+  '/blog/bizomanyos-auto-ertekesites/': 'Bizományos autóértékesítés – add el gyorsan, jó áron',
+  '/blog/nemet-hasznaltauto-vasarlas/': 'Német használtautó vásárlás – kiválasztás, ellenőrzés',
+  '/blog/auto-lizing-maganszemelykent/': 'Autó lízing magánszemélyként 2026 – feltételek, kalkulátor',
+  '/blog/auto-behozatal-nemetorszagbol/': 'Autó behozatal Németországból – költségek és folyamat',
+  '/blog/autoberles-budapest-kulfoldre/': 'Autóbérlés Budapesten és külföldre – teljes útmutató',
+  '/blog/hasznalt-auto-lizing-feltetelei/': 'Használt autó lízing feltételei – mire figyelj?',
+  '/blog/elektromos-auto-lizing-tamogatas/': 'Elektromos autó lízing és támogatás 2026 – tudnivalók',
+  '/blog/mercedes-behozatal-nemetorszagbol/': 'Mercedes behozatal Németországból – E-osztály, Vito, Sprinter',
+  '/blog/ceges-auto-operativ-lizing-tartos-berlet/': 'Céges autó: operatív lízing vagy tartós bérlet?',
+};
+const HU_TAIL = [
+  [/ — tartós autóbérlet havidíjjal$/, ' — tartós bérlet'],
+  [/ — ár kérésre, rendelés Németországból$/, ' — rendelés Németországból'],
+  [/ bérlés — tartós bérlet (\S+ €\/hó-tól)$/, ' bérlés — $1'],
+];
+const TMAX = 60;
+function shortTitle(t, lang) {
+  if (t.length <= TMAX) return t;
+  let s = t.replace(/\s*[|—–-]\s*CarAdvance\s*$/, '');
+  if (lang === 'hu') for (const [re, to] of HU_TAIL) if (s.length > TMAX) s = s.replace(re, to);
+  if (s.length <= TMAX) return s;
+  // vágás az utolsó elválasztónál (— – | :), ha az eleje legalább 25 karakter
+  const seps = [' — ', ' – ', ' | ', ': '];
+  let best = -1;
+  for (const sp of seps) { let i = s.lastIndexOf(sp, TMAX); while (i > TMAX) i = s.lastIndexOf(sp, i - 1); if (i >= 25 && i > best) best = i; }
+  if (best > 0) return s.slice(0, best).trim();
+  // szóhatár
+  let w = s.slice(0, TMAX + 1).lastIndexOf(' ');
+  let out = (w > 30 ? s.slice(0, w) : s.slice(0, TMAX)).replace(/[\s,;:–—\-/|&(+]+$/, '');
+  out = out.replace(/\s+(és|a|az|with|and|the|for|mit|und|für|de|et|la|le|des|і|та|з|для)$/i, '');
+  return out;
+}
+const DSUF = {
+  hu: [' Kérj ajánlatot: +36 30 233 6060.', ' Prémium autók Németországból – CarAdvance.'],
+  en: [' Get a quote: +36 30 233 6060.', ' Premium cars from Germany – CarAdvance.'],
+  de: [' Angebot anfordern: +36 30 233 6060.', ' Premium-Autos aus Deutschland – CarAdvance.'],
+  fr: [' Demandez un devis : +36 30 233 6060.', ' Voitures premium d’Allemagne – CarAdvance.'],
+  uk: [' Отримайте пропозицію: +36 30 233 6060.', ' Преміум-авто з Німеччини – CarAdvance.'],
+};
+function padDesc(d, lang) {
+  const suf = DSUF[lang]; if (!suf || d.length >= 110) return d;
+  let out = d.trim(); if (!/[.!?…]$/.test(out)) out += '.';
+  for (const x of suf) { if (out.length >= 110) break; if (out.length + x.length <= 160 && !out.includes(x.trim())) out += x; }
+  return out;
 }
 function altFor(tagStart, html, idx, pageH1) {
   // a képet tartalmazó kártya/link címe
@@ -157,20 +224,30 @@ function post() {
       // title
       const tm = h.match(/<title>([\s\S]*?)<\/title>/i);
       let title = tm ? decode(tm[1]).replace(/\s+/g, ' ').trim() : '';
-      if (title.length > 65 && / \| CarAdvance$/.test(title)) {
-        const nt = title.replace(/ \| CarAdvance$/, '');
+      const lang = (p.match(/^\/(en|de|fr|uk|zh|sk|cs|pl)\//) || [, 'hu'])[1];
+      let nt = (lang === 'hu' && HU_TITLES[p]) || shortTitle(title, lang);
+      if (title && nt !== title) {
+        const oldT = title;
         h = h.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escAttr(nt).replace(/&quot;/g, '"')}</title>`);
-        h = h.replace(/(<meta[^>]+(?:property="og:title"|name="twitter:title")[^>]+content=")([^"]*)(")/gi, (m, a, v, c) => (/ \| CarAdvance$/.test(decode(v)) && decode(v).length > 65 ? a + escAttr(decode(v).replace(/ \| CarAdvance$/, '')) + c : m));
+        h = h.replace(/(<meta[^>]+(?:property="og:title"|name="twitter:title")[^>]+content=")([^"]*)(")/gi, (m, a, v, c) => (decode(v).replace(/\s+/g, ' ').trim() === oldT ? a + escAttr(nt) + c : m));
         title = nt; st.title++;
       }
       // description
       const dm = h.match(/<meta[^>]+name="description"[^>]+content="([^"]*)"/i);
       let desc = dm ? decode(dm[1]) : '';
-      if (desc.length > 165) {
-        const nd = trimDesc(desc);
+      let nd0 = desc.length > 160 ? trimDesc(desc) : padDesc(desc, lang);
+      if (desc && nd0 !== desc) {
+        const nd = nd0;
         h = h.replace(/(<meta[^>]+(?:name="description"|property="og:description"|name="twitter:description")[^>]+content=")([^"]*)(")/gi, (m, a, v, c) => (decode(v) === desc ? a + escAttr(nd) + c : m));
         desc = nd; st.desc++;
       }
+      // hibás belső linkek + átirányító külső linkek
+      for (const [from, to] of Object.entries(LINKFIX)) {
+        const f0 = from.replace(/\/$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp('href="(https://www\\.caradvance\\.hu)?(/(?:en|de|fr|uk|zh|sk|cs|pl))?' + f0 + '/?(?=["#?])', 'g');
+        h = h.replace(re, (m, host, lp) => { st.link = (st.link || 0) + 1; return 'href="' + (host || '') + (lp || '') + to.replace(/\/$/, '') + '/'; });
+      }
+      for (const [re, to] of EXTFIX) h = h.replace(re, () => { st.ext = (st.ext || 0) + 1; return to; });
       // Open Graph / Twitter
       if (/<head[\s>]/i.test(h) && !/http-equiv=["']?refresh/i.test(h)) {
         const canon = (h.match(/<link rel="canonical" href="([^"]+)"/i) || [])[1] || SITE + p;
@@ -217,6 +294,7 @@ function post() {
     if (h !== before) fs.writeFileSync(f, h);
   }
   // _redirects
+  for (const [from, to] of Object.entries(LINKFIX)) for (const lp of ['', '/en', '/de', '/fr', '/uk', '/zh', '/sk', '/cs']) redirects.push([lp + from, lp + to]);
   try {
     const rf = path.join(DIST, '_redirects'); let r = fs.existsSync(rf) ? fs.readFileSync(rf, 'utf8') : '';
     const have = new Set(r.split('\n').map((l) => l.trim().split(/\s+/)[0]).filter(Boolean));
