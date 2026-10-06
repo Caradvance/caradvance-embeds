@@ -151,7 +151,7 @@ const HU_TITLES = {
   '/blog/autoberles-budapest-kulfoldre/': 'Autóbérlés Budapesten és külföldre – teljes útmutató',
   '/blog/hasznalt-auto-lizing-feltetelei/': 'Használt autó lízing feltételei – mire figyelj?',
   '/blog/elektromos-auto-lizing-tamogatas/': 'Elektromos autó lízing és támogatás 2026 – tudnivalók',
-  '/blog/mercedes-behozatal-nemetorszagbol/': 'Mercedes behozatal Németországból – E-osztály, Vito, Sprinter',
+  '/blog/mercedes-behozatal-nemetorszagbol/': 'Mercedes behozatal Németországból – E-osztály, Sprinter',
   '/blog/ceges-auto-operativ-lizing-tartos-berlet/': 'Céges autó: operatív lízing vagy tartós bérlet?',
 };
 const HU_TAIL = [
