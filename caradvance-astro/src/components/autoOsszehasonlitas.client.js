@@ -38,6 +38,16 @@ function sil(c,v){return v==='side'?silSide(c):silEnd(c,v==='rear')}
 // Autóképek a PHOTOS-ból: {src, mm:[szélesség, magasság] mm-ben}; a kép alja az autó árnyéka (SH mm a talaj alatt).
 const SH={side:125,front:155,rear:225};
 function photo(c,v){const p=PHOTOS[c.slug];return p&&p[v]?p[v]:null}
+// Müncheni (M) rendszámtábla elölről / hátulról — a kép üres táblahelyére illesztve (pf / pr: [x, y, szél., mag.] a kép arányában)
+function plateNo(slug){let h=0;for(const ch of slug)h=(h*31+ch.charCodeAt(0))>>>0;return 1000+h%9000}
+function stars(cx,cy,r){let s='';for(let i=0;i<12;i++){const a=i*Math.PI/6;s+=`<circle cx="${(cx+r*Math.sin(a)).toFixed(1)}" cy="${(cy-r*Math.cos(a)).toFixed(1)}" r="1.6" fill="#FFCC00"/>`}return s}
+function plateSvg(c,v,b,ar){const n=plateNo(c.slug),rear=v==='rear';
+ const seal=(x,y)=>(rear?`<circle cx="${x}" cy="${y-16}" r="11" fill="#2E86C1" stroke="#555" stroke-width="1"/>`:'')+`<circle cx="${x}" cy="${y+(rear?14:0)}" r="${rear?11:13}" fill="#C9302C" stroke="#555" stroke-width="1"/>`;
+ const st=`position:absolute;left:${b[0]*100}%;top:${b[1]*100}%;width:${b[2]*100}%;height:${b[3]*100}%`;
+ if(ar<2.6)return `<svg class="plate" style="${st}" viewBox="0 0 340 200" preserveAspectRatio="none" aria-hidden="true"><rect x="2" y="2" width="336" height="196" rx="12" fill="#fff" stroke="#111" stroke-width="5"/><rect x="5" y="5" width="44" height="190" rx="7" fill="#003399"/>${stars(27,60,14)}<text x="27" y="170" font-size="30" font-weight="700" fill="#fff" text-anchor="middle" font-family="Arial,Helvetica,sans-serif">D</text><text x="72" y="92" font-size="78" font-weight="700" fill="#111" font-family="'Arial Narrow','Roboto Condensed',Arial,sans-serif" textLength="60" lengthAdjust="spacingAndGlyphs">M</text>${seal(165,62)}<text x="200" y="92" font-size="78" font-weight="700" fill="#111" font-family="'Arial Narrow','Roboto Condensed',Arial,sans-serif" textLength="115" lengthAdjust="spacingAndGlyphs">CA</text><text x="72" y="182" font-size="80" font-weight="700" fill="#111" font-family="'Arial Narrow','Roboto Condensed',Arial,sans-serif" textLength="245" lengthAdjust="spacingAndGlyphs">${n}</text></svg>`;
+ return `<svg class="plate" style="${st}" viewBox="0 0 520 110" preserveAspectRatio="none" aria-hidden="true"><rect x="2" y="2" width="516" height="106" rx="9" fill="#fff" stroke="#111" stroke-width="5"/><rect x="5" y="5" width="40" height="100" rx="6" fill="#003399"/>${stars(25,38,13)}<text x="25" y="95" font-size="28" font-weight="700" fill="#fff" text-anchor="middle" font-family="Arial,Helvetica,sans-serif">D</text><text x="60" y="88" font-size="80" font-weight="700" fill="#111" font-family="'Arial Narrow','Roboto Condensed',Arial,sans-serif" textLength="52" lengthAdjust="spacingAndGlyphs">M</text>${seal(140,55)}<text x="168" y="88" font-size="80" font-weight="700" fill="#111" font-family="'Arial Narrow','Roboto Condensed',Arial,sans-serif" textLength="335" lengthAdjust="spacingAndGlyphs">CA ${n}</text></svg>`}
+function plateFor(c,v,im){const p=PHOTOS[c.slug];if(!p||v==='side')return '';const b=v==='front'?p.pf:p.pr;if(!b)return '';const ar=(b[2]*im.mm[0])/(b[3]*im.mm[1]);return plateSvg(c,v,b,ar)}
+
 const $=s=>document.querySelector(s);const by=s=>CARS.find(c=>c.slug===s);
 const fmtM=mm=>(mm/1000).toFixed(3).replace('.',',')+' m';const ft=n=>n?n.toLocaleString('hu-HU').replace(/,/g,' ')+' Ft/hó':'Ár kérésre';
 const cm=d=>(Math.abs(d)/10).toLocaleString('hu-HU',{maximumFractionDigits:1})+' cm';
@@ -85,7 +95,7 @@ function render(){const a=by($('#s1').value),b=by($('#s2').value);
   const x=side?pos[cl]:cx[cl]-w/2;geo[cl]={x,w};
   const alt=`${c.name} ${side?'oldalnézet':view==='front'?'elölnézet':'hátulnézet'}`;
   const ghost=side&&cl==='c2';
-  html+=`<div class="ccar ${ghost?'ghost':'solid'}" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${im?`<img src="${im.src}" alt="${alt}" decoding="async">`:sil(c,view)}</div>`;
+  html+=`<div class="ccar ${ghost?'ghost':'solid'}" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${im?`<img src="${im.src}" alt="${alt}" decoding="async">${plateFor(c,view,im)}`:sil(c,view)}</div>`;
   // sziluettnél a hátsó (2.) autó körvonala az 1. autó fölött is látszik — így hasonló méretű autóknál sem tűnik el
   if(ghost&&!im)html+=`<div class="ccar outl" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${sil(c,view)}</div>`;
  });

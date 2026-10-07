@@ -23,7 +23,7 @@ const PHOTOS: Record<string, any> = {};
 for (const c of CARS) {
   const m: any = (PHOTO_META as any)[c.slug];
   if (!m) continue;
-  const o: any = { fa: m.fa, ra: m.ra };
+  const o: any = { fa: m.fa, ra: m.ra, pf: m.pf, pr: m.pr };
   for (const v of ['side', 'front', 'rear']) if (m[v]) o[v] = { src: `/osszehasonlito/${m.img}-${v}.webp`, mm: m[v] };
   PHOTOS[c.slug] = o;
 }
@@ -61,7 +61,7 @@ const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price"
 <div class="align" id="align"></div>
 <div class="legend" id="legend"></div>
 <p class="cnote" id="note">A képek valós arányban, azonos léptékben jelennek meg.</p>
-<p class="cnote">Autóképek: <a href="https://www.carsized.com/" target="_blank" rel="noopener nofollow">carsized.com</a> · a képek referenciaautókat mutatnak, a bérelhető autó színe és felszereltsége eltérhet.</p>
+<p class="cnote">Autóképek: <a href="https://www.carsized.com/" target="_blank" rel="noopener nofollow">carsized.com</a> · a képek referenciaautókat mutatnak, a bérelhető autó színe és felszereltsége eltérhet. A rendszámok illusztrációk.</p>
 <table id="tbl"></table>
 <div class="grid2" id="cards"></div>
 <section class="calc" id="calc"><span class="ceye">Kalkulátor</span><h2>Mennyibe kerül valójában havonta?</h2>
@@ -101,6 +101,8 @@ const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price"
 .cmp-lead{margin:0;color:#dfe3ea;font-size:17px;line-height:1.6;max-width:70ch}
 .cmp .cfaq{margin-top:50px}
 .cmp .ccar.outl{z-index:3;pointer-events:none}
+.cmp .ccar .plate{display:block;pointer-events:none}
+.cmp .ccar.ghost .plate{opacity:.5;filter:grayscale(1)}
 .cmp .ccar.outl svg *{fill:none!important;stroke:#1F4FA8!important;stroke-width:1.8px!important;stroke-dasharray:7 5;vector-effect:non-scaling-stroke}
 .cmp .ccar.outl svg rect,.cmp .ccar.outl svg .rh,.cmp .ccar.outl svg .wn{display:none}
 .cmp{--red:#E2001A;--navy:#0B2A4A;--ink:#0B0B0D;--mut:#5A6B82;--line:#E6EAF1;--bg:#F7F8FA}
