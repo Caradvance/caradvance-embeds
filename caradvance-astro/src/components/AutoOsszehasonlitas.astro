@@ -2,11 +2,10 @@
 /* Autó-összehasonlító: két bérelhető autó valós arányban (oldal/elöl/hátul), méretek, csomagtartó,
    család, havi költség, garázs. Az autóképek saját fotók (public/osszehasonlito/<slug>/side|front|rear.webp);
    amíg nincs fotó, gyári méretekből rajzolt, méretarányos sziluett jelenik meg. */
-import fs from 'node:fs';
-import path from 'node:path';
 import { COMPARE_CARS } from '../data/compareCars';
 import { listRentals, getRental, rentSlug, rentHref } from '../data/rental';
 import JS_CODE from './autoOsszehasonlitas.client.js?raw';
+import PHOTO_META from '../data/comparePhotos.json';
 
 const rentals = new Map<string, { price: number; href: string; name: string }>();
 for (const x of listRentals()) {
@@ -17,11 +16,16 @@ for (const x of listRentals()) {
 }
 const CARS = COMPARE_CARS.filter((c) => rentals.has(c.slug)).map((c) => ({ ...c, ...rentals.get(c.slug)!, name: c.name }));
 
-// Saját fotók felderítése build-időben
-const PHOTOS: Record<string, Record<string, string>> = {};
-const base = [path.resolve(process.cwd(), 'public/osszehasonlito'), path.resolve(process.cwd(), 'caradvance-astro/public/osszehasonlito')].find((p) => fs.existsSync(p));
-if (base) for (const c of CARS) for (const v of ['side', 'front', 'rear']) for (const ext of ['webp', 'png', 'jpg']) {
-  if (fs.existsSync(path.join(base, c.slug, v + '.' + ext))) { (PHOTOS[c.slug] ||= {})[v] = `/osszehasonlito/${c.slug}/${v}.${ext}`; break; }
+// Autóképek: public/osszehasonlito/<kép>-<side|front|rear>.webp, közös léptékben (0,24 px/mm).
+// A comparePhotos.json tartalmazza a képek valós méretét mm-ben (mm) és az oldalnézeti tengelyek helyét (fa/ra),
+// így a két autó pontosan azonos léptékben és helyesen igazítva jelenik meg.
+const PHOTOS: Record<string, any> = {};
+for (const c of CARS) {
+  const m: any = (PHOTO_META as any)[c.slug];
+  if (!m) continue;
+  const o: any = { fa: m.fa, ra: m.ra };
+  for (const v of ['side', 'front', 'rear']) if (m[v]) o[v] = { src: `/osszehasonlito/${m.img}-${v}.webp`, mm: m[v] };
+  PHOTOS[c.slug] = o;
 }
 const FAQ = [{"q": "Hogyan működik az autó-összehasonlító?", "a": "Válassz ki két bérelhető autót: oldalról, elölről és hátulról valós arányban, azonos léptékben látod őket, a méretekkel és a különbségekkel együtt. Alatta összevetheted a csomagtartót, az üléseket, az ISOFIX-pontokat, a havi költséget és azt, hogy befér-e az autó a garázsodba."}, {"q": "Mennyire pontosak a méretek?", "a": "A méretek a gyártók által közölt adatok (hossz, szélesség, magasság, tengelytáv). A konkrét felszereltség – például tetősín vagy nagyobb kerekek – néhány centiméterrel módosíthatja őket; ha a centi számít, kérdezd munkatársainkat."}, {"q": "Befér az autó a mélygarázsba?", "a": "A „Befér a garázsba?” részben add meg a behajtási magasságot és a parkolóhely méretét – az eszköz megmutatja, hány centi marad fölötte, oldalanként és hosszában. A budapesti mélygarázsok jellemzően 1,90–2,10 m magasak."}, {"q": "Melyik autóban fér el három gyerekülés?", "a": "A „Családi autók” szűrőben a „3 gyerekülés egymás mellett” és a „7+ ülés” gombbal azonnal látod azokat a bérelhető modelleket, amelyekben három gyerek is kényelmesen utazik."}];
 const ld = {
@@ -57,6 +61,7 @@ const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price"
 <div class="align" id="align"></div>
 <div class="legend" id="legend"></div>
 <p class="cnote" id="note">A képek valós arányban, azonos léptékben jelennek meg.</p>
+<p class="cnote">Autóképek: <a href="https://www.carsized.com/" target="_blank" rel="noopener nofollow">carsized.com</a> · a képek referenciaautókat mutatnak, a bérelhető autó színe és felszereltsége eltérhet.</p>
 <table id="tbl"></table>
 <div class="grid2" id="cards"></div>
 <section class="calc" id="calc"><span class="ceye">Kalkulátor</span><h2>Mennyibe kerül valójában havonta?</h2>

@@ -35,11 +35,9 @@ function silEnd(c,rear){const Wm=c.Wm,W=c.W,H=c.H,cx=Wm/2,bw=W/2,B=BP[c.body]||B
 function sil(c,v){return v==='side'?silSide(c):silEnd(c,v==='rear')}
 
 
-// Saját fotók: public/osszehasonlito/<slug>/{side,front,rear}.(webp|png|jpg) — szorosan az autóra vágva, átlátszó háttérrel.
-// Oldalnézetben a kép szélessége = az autó hossza, elöl/hátul a kép magassága = az autó magassága.
-const PH={};
-function photo(c,v){const u=PHOTOS[c.slug]&&PHOTOS[c.slug][v];if(!u)return null;const p=PH[u];if(p&&p.w)return p;
- if(!p){const im=new Image();PH[u]={src:u};im.onload=()=>{PH[u]={src:u,w:im.naturalWidth,h:im.naturalHeight};render()};im.src=u}return null}
+// Autóképek a PHOTOS-ból: {src, mm:[szélesség, magasság] mm-ben}; a kép alja az autó árnyéka (SH mm a talaj alatt).
+const SH={side:125,front:155,rear:225};
+function photo(c,v){const p=PHOTOS[c.slug];return p&&p[v]?p[v]:null}
 const $=s=>document.querySelector(s);const by=s=>CARS.find(c=>c.slug===s);
 const fmtM=mm=>(mm/1000).toFixed(3).replace('.',',')+' m';const ft=n=>n?n.toLocaleString('hu-HU').replace(/,/g,' ')+' Ft/hó':'Ár kérésre';
 const cm=d=>(Math.abs(d)/10).toLocaleString('hu-HU',{maximumFractionDigits:1})+' cm';
@@ -76,18 +74,18 @@ function render(){const a=by($('#s1').value),b=by($('#s2').value);
  const floor=H-bandsH;
  const rs=$('#stage .croom');rs.style.height=(floor*425/365)+'px';rs.style.bottom='auto';
  let html='';
- const ax=c=>{const fa=(c.L-c.WB)*0.46;return {fa,ra:fa+c.WB}};const anc=c=>{const {fa,ra}=ax(c);return ({f:0,r:c.L,c:c.L/2,fa,ra,ab:(fa+ra)/2})[align]};
+ const ax=c=>{const p=PHOTOS[c.slug];if(p&&p.side&&p.fa)return {fa:p.fa,ra:p.ra};const fa=(c.L-c.WB)*0.46;return {fa,ra:fa+c.WB}};const anc=c=>{const {fa,ra}=ax(c);return ({f:0,r:c.L,c:c.L/2,fa,ra,ab:(fa+ra)/2})[align]};
  const pos={};
  if(side){const la0=-anc(a)*k,lb0=-anc(b)*k,mn=Math.min(la0,lb0),mx=Math.max(la0+a.L*k,lb0+b.L*k),off=W/2-(mn+mx)/2;pos.c1=la0+off;pos.c2=lb0+off;pos.x=off}
  const cx={c1:W*0.285,c2:W*0.715};
  const geo={};
  // hátsó (2.) autó előbb – oldalnézetben halvány „szellem” a háttérben, az 1. autó teljesen előtte
  [[b,'c2'],[a,'c1']].forEach(([c,cl])=>{const im=photo(c,view);let w,h,y;
-  if(im){if(side){w=c.L*k;h=w*im.h/im.w}else{h=c.H*k;w=h*im.w/im.h}y=floor-h}else{w=(side?c.L:c.Wm)*k;h=c.H*k;y=floor-h}
+  if(im){w=im.mm[0]*k;h=im.mm[1]*k;y=floor-(im.mm[1]-SH[view])*k}else{w=(side?c.L:c.Wm)*k;h=c.H*k;y=floor-h}
   const x=side?pos[cl]:cx[cl]-w/2;geo[cl]={x,w};
   const alt=`${c.name} ${side?'oldalnézet':view==='front'?'elölnézet':'hátulnézet'}`;
   const ghost=side&&cl==='c2';
-  html+=`<div class="ccar ${ghost?'ghost':'solid'}" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${im?`<img src="${im.src}" alt="${alt}" loading="lazy">`:sil(c,view)}</div>`;
+  html+=`<div class="ccar ${ghost?'ghost':'solid'}" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${im?`<img src="${im.src}" alt="${alt}" decoding="async">`:sil(c,view)}</div>`;
   // sziluettnél a hátsó (2.) autó körvonala az 1. autó fölött is látszik — így hasonló méretű autóknál sem tűnik el
   if(ghost&&!im)html+=`<div class="ccar outl" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${sil(c,view)}</div>`;
  });
