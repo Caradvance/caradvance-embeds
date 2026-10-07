@@ -1,0 +1,1022 @@
+{
+"audi-a3-sportback": {
+"side": [
+4358,
+1575
+],
+"front": [
+1983,
+1621
+],
+"rear": [
+2000,
+1683
+],
+"img": "audi-a3-2024-5-door-hatchback",
+"fa": 804,
+"ra": 3625
+},
+"audi-a5-avant": {
+"side": [
+4817,
+1579
+],
+"front": [
+2083,
+1621
+],
+"rear": [
+2083,
+1683
+],
+"img": "audi-a5-2024-estate",
+"fa": 795,
+"ra": 3894
+},
+"audi-a6-avant": {
+"side": [
+4962,
+1588
+],
+"front": [
+2079,
+1629
+],
+"rear": [
+2067,
+1696
+],
+"img": "audi-a6-2025-estate",
+"fa": 825,
+"ra": 3963
+},
+"audi-a6-avant-e-tron": {
+"side": [
+4912,
+1625
+],
+"front": [
+2133,
+1642
+],
+"rear": [
+2108,
+1733
+],
+"img": "audi-a6-e-tron-2024-estate",
+"fa": 771,
+"ra": 3950
+},
+"audi-a6-sportback-e-tron": {
+"side": [
+4912,
+1608
+],
+"front": [
+2133,
+1642
+],
+"rear": [
+2108,
+1708
+],
+"img": "audi-a6-e-tron-2024-liftback",
+"fa": 799,
+"ra": 3951
+},
+"audi-q3-sportback": {
+"side": [
+4504,
+1683
+],
+"front": [
+2054,
+1733
+],
+"rear": [
+2088,
+1796
+],
+"img": "audi-q3-2025-coupe-suv",
+"fa": 833,
+"ra": 3685
+},
+"audi-q4-e-tron": {
+"side": [
+4583,
+1746
+],
+"front": [
+2079,
+1775
+],
+"rear": [
+2071,
+1871
+],
+"img": "audi-q4-e-tron-2021-suv",
+"fa": 748,
+"ra": 3709
+},
+"audi-q4-sportback-e-tron": {
+"side": [
+4575,
+1712
+],
+"front": [
+2079,
+1771
+],
+"rear": [
+2071,
+1842
+],
+"img": "audi-q4-e-tron-2021-coupe-suv",
+"fa": 761,
+"ra": 3719
+},
+"audi-q5-sportback": {
+"side": [
+4683,
+1758
+],
+"front": [
+2100,
+1800
+],
+"rear": [
+2117,
+1879
+],
+"img": "audi-q5-2024-coupe-suv",
+"fa": 820,
+"ra": 3826
+},
+"audi-q6-sportback": {
+"side": [
+4762,
+1754
+],
+"front": [
+2183,
+1783
+],
+"rear": [
+2200,
+1838
+],
+"img": "audi-q6-e-tron-2024-coupe-suv",
+"fa": 794,
+"ra": 3909
+},
+"audi-s5-avant": {
+"side": [
+4817,
+1579
+],
+"front": [
+2083,
+1621
+],
+"rear": [
+2083,
+1683
+],
+"img": "audi-a5-2024-estate",
+"fa": 795,
+"ra": 3894
+},
+"audi-s5-limuzin": {
+"side": [
+4804,
+1567
+],
+"front": [
+2083,
+1625
+],
+"rear": [
+2075,
+1654
+],
+"img": "audi-a5-2024-liftback",
+"fa": 781,
+"ra": 3899
+},
+"audi-sq5-sportback": {
+"side": [
+4683,
+1758
+],
+"front": [
+2100,
+1800
+],
+"rear": [
+2117,
+1879
+],
+"img": "audi-q5-2024-coupe-suv",
+"fa": 820,
+"ra": 3826
+},
+"bmw-1-es": {
+"side": [
+4375,
+1567
+],
+"front": [
+2008,
+1625
+],
+"rear": [
+2058,
+1692
+],
+"img": "bmw-1-2024-5-door-hatchback",
+"fa": 794,
+"ra": 3648
+},
+"bmw-2-es-active-tourer": {
+"side": [
+4383,
+1712
+],
+"front": [
+2033,
+1733
+],
+"rear": [
+2046,
+1821
+],
+"img": "bmw-2-2022-5-door-minivan",
+"fa": 748,
+"ra": 3628
+},
+"bmw-3-as-limuzin": {
+"side": [
+4742,
+1550
+],
+"front": [
+2067,
+1612
+],
+"rear": [
+2033,
+1638
+],
+"img": "bmw-3-2022-sedan",
+"fa": 713,
+"ra": 3782
+},
+"bmw-4-es-cabrio": {
+"side": [
+4729,
+1525
+],
+"front": [
+2042,
+1571
+],
+"rear": [
+2021,
+1600
+],
+"img": "bmw-4-2024-cabriolet",
+"fa": 698,
+"ra": 3773
+},
+"bmw-4-es-coupe": {
+"side": [
+4746,
+1517
+],
+"front": [
+2046,
+1567
+],
+"rear": [
+2038,
+1604
+],
+"img": "bmw-4-2024-coupe",
+"fa": 711,
+"ra": 3773
+},
+"bmw-4-es-gran-coupe": {
+"side": [
+4758,
+1562
+],
+"front": [
+2083,
+1621
+],
+"rear": [
+2058,
+1654
+],
+"img": "bmw-4-2020-liftback",
+"fa": 731,
+"ra": 3787
+},
+"bmw-5-os-limuzin": {
+"side": [
+5096,
+1633
+],
+"front": [
+2129,
+1658
+],
+"rear": [
+2088,
+1742
+],
+"img": "bmw-5-2023-sedan",
+"fa": 817,
+"ra": 4028
+},
+"bmw-5-os-touring": {
+"side": [
+5083,
+1629
+],
+"front": [
+2121,
+1658
+],
+"rear": [
+2079,
+1750
+],
+"img": "bmw-5-2023-estate",
+"fa": 812,
+"ra": 4015
+},
+"bmw-x1": {
+"side": [
+4508,
+1775
+],
+"front": [
+2062,
+1792
+],
+"rear": [
+2050,
+1842
+],
+"img": "bmw-x1-2022-suv",
+"fa": 761,
+"ra": 3664
+},
+"bmw-x2": {
+"side": [
+4596,
+1712
+],
+"front": [
+2046,
+1746
+],
+"rear": [
+2038,
+1771
+],
+"img": "bmw-x2-2024-suv",
+"fa": 805,
+"ra": 3698
+},
+"bmw-x3": {
+"side": [
+4758,
+1796
+],
+"front": [
+2125,
+1800
+],
+"rear": [
+2129,
+1883
+],
+"img": "bmw-x3-2024-suv",
+"fa": 758,
+"ra": 3825
+},
+"bmw-x5": {
+"side": [
+4929,
+1908
+],
+"front": [
+2225,
+1896
+],
+"rear": [
+2246,
+2021
+],
+"img": "bmw-x5-2023-suv",
+"fa": 761,
+"ra": 3971
+},
+"bmw-x6": {
+"side": [
+4938,
+1817
+],
+"front": [
+2212,
+1842
+],
+"rear": [
+2221,
+1892
+],
+"img": "bmw-x6-2023-5-door-coupe-suv",
+"fa": 773,
+"ra": 3971
+},
+"cupra-raval": {
+"side": [
+4096,
+1662
+],
+"front": [
+2021,
+1696
+],
+"rear": [
+2038,
+1817
+],
+"img": "cupra-raval-2026-5-door-hatchback",
+"fa": 679,
+"ra": 3459
+},
+"cupra-tavascan": {
+"side": [
+4596,
+1712
+],
+"front": [
+2096,
+1758
+],
+"rear": [
+2054,
+1821
+],
+"img": "cupra-tavascan-2023-suv",
+"fa": 753,
+"ra": 3721
+},
+"hyundai-ioniq-5-n": {
+"side": [
+4625,
+1729
+],
+"front": [
+2142,
+1758
+],
+"rear": [
+2179,
+1862
+],
+"img": "hyundai-ioniq-5-2021-suv",
+"fa": 718,
+"ra": 3955
+},
+"hyundai-ioniq-6-n": {
+"side": [
+5008,
+1621
+],
+"front": [
+2171,
+1679
+],
+"rear": [
+2158,
+1700
+],
+"img": "hyundai-ioniq-6-2025-sedan-N",
+"fa": 812,
+"ra": 4023
+},
+"hyundai-santa-fe": {
+"side": [
+4846,
+1917
+],
+"front": [
+2133,
+1904
+],
+"rear": [
+2100,
+2038
+],
+"img": "hyundai-santa-fe-2023-suv",
+"fa": 812,
+"ra": 3841
+},
+"hyundai-staria": {
+"side": [
+5225,
+2183
+],
+"front": [
+2225,
+2050
+],
+"rear": [
+2208,
+2458
+],
+"img": "hyundai-staria-2021-van",
+"fa": 763,
+"ra": 4286
+},
+"hyundai-tucson": {
+"side": [
+4475,
+1771
+],
+"front": [
+2096,
+1779
+],
+"rear": [
+2104,
+1892
+],
+"img": "hyundai-tucson-2024-suv",
+"fa": 794,
+"ra": 3653
+},
+"kia-ev2": {
+"side": [
+4038,
+1729
+],
+"front": [
+2008,
+1750
+],
+"rear": [
+2096,
+1871
+],
+"img": "kia-ev2-2026-5-door-hatchback",
+"fa": 705,
+"ra": 3446
+},
+"kia-ev4": {
+"side": [
+4508,
+1646
+],
+"front": [
+2104,
+1679
+],
+"rear": [
+2125,
+1758
+],
+"img": "kia-ev4-2025-5-door-hatchback",
+"fa": 755,
+"ra": 3768
+},
+"mercedes-benz-c-osztaly": {
+"side": [
+4771,
+1550
+],
+"front": [
+2092,
+1629
+],
+"rear": [
+2008,
+1646
+],
+"img": "mercedes-benz-c-2021-sedan",
+"fa": 683,
+"ra": 3752
+},
+"mercedes-benz-cla": {
+"side": [
+4708,
+1592
+],
+"front": [
+2017,
+1629
+],
+"rear": [
+2033,
+1671
+],
+"img": "mercedes-benz-cla-2025-sedan-electric",
+"fa": 782,
+"ra": 3766
+},
+"mercedes-benz-e-osztaly-limuzin": {
+"side": [
+4958,
+1583
+],
+"front": [
+2121,
+1654
+],
+"rear": [
+2058,
+1671
+],
+"img": "mercedes-benz-e-2023-sedan",
+"fa": 719,
+"ra": 3919
+},
+"mercedes-benz-gla": {
+"side": [
+4421,
+1738
+],
+"front": [
+2029,
+1738
+],
+"rear": [
+2117,
+1825
+],
+"img": "mercedes-benz-gla-2020-suv",
+"fa": 784,
+"ra": 3732
+},
+"mercedes-benz-glb": {
+"side": [
+4646,
+1829
+],
+"front": [
+2038,
+1804
+],
+"rear": [
+2096,
+1925
+],
+"img": "mercedes-benz-glb-2023-suv",
+"fa": 792,
+"ra": 3825
+},
+"mercedes-benz-glc": {
+"side": [
+4700,
+1783
+],
+"front": [
+2154,
+1779
+],
+"rear": [
+2158,
+1854
+],
+"img": "mercedes-benz-glc-2022-suv",
+"fa": 713,
+"ra": 3823
+},
+"mercedes-benz-glc-coupe": {
+"side": [
+4758,
+1729
+],
+"front": [
+2154,
+1762
+],
+"rear": [
+2125,
+1792
+],
+"img": "mercedes-benz-glc-2022-5-door-coupe-suv",
+"fa": 719,
+"ra": 3812
+},
+"mercedes-benz-gle": {
+"side": [
+4883,
+1929
+],
+"front": [
+2217,
+1908
+],
+"rear": [
+2271,
+1992
+],
+"img": "mercedes-benz-gle-2023-suv",
+"fa": 774,
+"ra": 3976
+},
+"mini-cooper": {
+"side": [
+4071,
+1833
+],
+"front": [
+1921,
+1846
+],
+"rear": [
+1988,
+2033
+],
+"img": "mini-cooper-2021-5-door-hatchback-s",
+"fa": 696,
+"ra": 3443
+},
+"mini-cooper-cabrio": {
+"side": [
+3904,
+1550
+],
+"front": [
+1929,
+1608
+],
+"rear": [
+2012,
+1683
+],
+"img": "mini-cooper-2021-cabriolet-s",
+"fa": 693,
+"ra": 3367
+},
+"mini-countryman": {
+"side": [
+4454,
+1796
+],
+"front": [
+2050,
+1821
+],
+"rear": [
+2079,
+1858
+],
+"img": "mini-countryman-2023-suv",
+"fa": 794,
+"ra": 3685
+},
+"seat-leon-sportstourer": {
+"side": [
+4671,
+1567
+],
+"front": [
+1975,
+1621
+],
+"rear": [
+1896,
+1671
+],
+"img": "seat-leon-2020-estate",
+"fa": 795,
+"ra": 3680
+},
+"volkswagen-golf": {
+"side": [
+4312,
+1579
+],
+"front": [
+1979,
+1625
+],
+"rear": [
+1979,
+1700
+],
+"img": "volkswagen-golf-2024-5-door-hatchback",
+"fa": 779,
+"ra": 3596
+},
+"volkswagen-id-7-tourer": {
+"side": [
+4979,
+1675
+],
+"front": [
+2075,
+1712
+],
+"rear": [
+2033,
+1792
+],
+"img": "volkswagen-id7-2023-estate",
+"fa": 791,
+"ra": 3971
+},
+"volkswagen-passat-variant": {
+"side": [
+4925,
+1617
+],
+"front": [
+2038,
+1650
+],
+"rear": [
+1992,
+1742
+],
+"img": "volkswagen-passat-2023-estate",
+"fa": 849,
+"ra": 3903
+},
+"volkswagen-polo": {
+"side": [
+4092,
+1704
+],
+"front": [
+1954,
+1712
+],
+"rear": [
+1962,
+1871
+],
+"img": "volkswagen-polo-2021-5-door-hatchback",
+"fa": 734,
+"ra": 3479
+},
+"volkswagen-t-cross": {
+"side": [
+4125,
+1817
+],
+"front": [
+1967,
+1829
+],
+"rear": [
+2008,
+2029
+],
+"img": "volkswagen-t-cross-2024-suv",
+"fa": 729,
+"ra": 3471
+},
+"volkswagen-t-roc": {
+"side": [
+4388,
+1692
+],
+"front": [
+2021,
+1725
+],
+"rear": [
+2038,
+1829
+],
+"img": "volkswagen-t-roc-2025-suv",
+"fa": 800,
+"ra": 3604
+},
+"volkswagen-t-roc-cabrio": {
+"side": [
+4292,
+1662
+],
+"front": [
+2012,
+1712
+],
+"rear": [
+2021,
+1758
+],
+"img": "volkswagen-t-roc-2020-cabriolet-suv",
+"fa": 735,
+"ra": 3567
+},
+"volkswagen-taigo": {
+"side": [
+4242,
+1758
+],
+"front": [
+1950,
+1771
+],
+"rear": [
+1950,
+1917
+],
+"img": "volkswagen-taigo-2020-suv",
+"fa": 732,
+"ra": 3500
+},
+"volkswagen-tayron": {
+"side": [
+4788,
+1783
+],
+"front": [
+2038,
+1808
+],
+"rear": [
+2029,
+1933
+],
+"img": "volkswagen-tayron-2024-suv",
+"fa": 812,
+"ra": 3805
+},
+"volkswagen-tiguan": {
+"side": [
+4546,
+1788
+],
+"front": [
+2067,
+1808
+],
+"rear": [
+2096,
+1942
+],
+"img": "volkswagen-tiguan-2024-suv",
+"fa": 804,
+"ra": 3677
+},
+"volkswagen-touareg": {
+"side": [
+4892,
+1833
+],
+"front": [
+2171,
+1821
+],
+"rear": [
+2212,
+1950
+],
+"img": "volkswagen-touareg-2023-suv",
+"fa": 843,
+"ra": 3951
+},
+"volkswagen-touran": {
+"side": [
+4562,
+1792
+],
+"front": [
+2021,
+1833
+],
+"rear": [
+2021,
+1946
+],
+"img": "volkswagen-touran-2015-minivan",
+"fa": 771,
+"ra": 3776
+},
+"volvo-xc40": {
+"side": [
+4396,
+1779
+],
+"front": [
+2067,
+1788
+],
+"rear": [
+2146,
+1921
+],
+"img": "volvo-xc40-2017-suv",
+"fa": 748,
+"ra": 3659
+}
+}
