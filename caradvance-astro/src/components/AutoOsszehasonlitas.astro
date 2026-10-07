@@ -1,0 +1,286 @@
+---
+/* Autó-összehasonlító: két bérelhető autó valós arányban (oldal/elöl/hátul), méretek, csomagtartó,
+   család, havi költség, garázs. Az autóképek saját fotók (public/osszehasonlito/<slug>/side|front|rear.webp);
+   amíg nincs fotó, gyári méretekből rajzolt, méretarányos sziluett jelenik meg. */
+import fs from 'node:fs';
+import path from 'node:path';
+import { COMPARE_CARS } from '../data/compareCars';
+import { listRentals, getRental, rentSlug, rentHref } from '../data/rental';
+import JS_CODE from './autoOsszehasonlitas.client.js?raw';
+
+const rentals = new Map<string, { price: number; href: string; name: string }>();
+for (const x of listRentals()) {
+  const s = rentSlug(x.brand, x.model);
+  if (rentals.has(s)) continue;
+  const r = getRental(x.brand, x.model);
+  if (r && r.huf) rentals.set(s, { price: r.huf, href: rentHref(x.brand, x.model) + '/', name: r.name });
+}
+const CARS = COMPARE_CARS.filter((c) => rentals.has(c.slug)).map((c) => ({ ...c, ...rentals.get(c.slug)!, name: c.name }));
+
+// Saját fotók felderítése build-időben
+const PHOTOS: Record<string, Record<string, string>> = {};
+const base = [path.resolve(process.cwd(), 'public/osszehasonlito'), path.resolve(process.cwd(), 'caradvance-astro/public/osszehasonlito')].find((p) => fs.existsSync(p));
+if (base) for (const c of CARS) for (const v of ['side', 'front', 'rear']) for (const ext of ['webp', 'png', 'jpg']) {
+  if (fs.existsSync(path.join(base, c.slug, v + '.' + ext))) { (PHOTOS[c.slug] ||= {})[v] = `/osszehasonlito/${c.slug}/${v}.${ext}`; break; }
+}
+const FAQ = [{"q": "Hogyan működik az autó-összehasonlító?", "a": "Válassz ki két bérelhető autót: oldalról, elölről és hátulról valós arányban, azonos léptékben látod őket, a méretekkel és a különbségekkel együtt. Alatta összevetheted a csomagtartót, az üléseket, az ISOFIX-pontokat, a havi költséget és azt, hogy befér-e az autó a garázsodba."}, {"q": "Mennyire pontosak a méretek?", "a": "A méretek a gyártók által közölt adatok (hossz, szélesség, magasság, tengelytáv). A konkrét felszereltség – például tetősín vagy nagyobb kerekek – néhány centiméterrel módosíthatja őket; ha a centi számít, kérdezd munkatársainkat."}, {"q": "Befér az autó a mélygarázsba?", "a": "A „Befér a garázsba?” részben add meg a behajtási magasságot és a parkolóhely méretét – az eszköz megmutatja, hány centi marad fölötte, oldalanként és hosszában. A budapesti mélygarázsok jellemzően 1,90–2,10 m magasak."}, {"q": "Melyik autóban fér el három gyerekülés?", "a": "A „Családi autók” szűrőben a „3 gyerekülés egymás mellett” és a „7+ ülés” gombbal azonnal látod azokat a bérelhető modelleket, amelyekben három gyerek is kényelmesen utazik."}];
+const ld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebPage', name: 'Autó összehasonlítás – méret, csomagtartó, család', url: 'https://www.caradvance.hu/auto-osszehasonlitas/', inLanguage: 'hu-HU' },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Főoldal', item: 'https://www.caradvance.hu/' },
+      { '@type': 'ListItem', position: 2, name: 'Autó összehasonlítás', item: 'https://www.caradvance.hu/auto-osszehasonlitas/' } ] },
+    { '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+  ],
+};
+// Az ár kulcsa idézőjel nélkül (price:…), így a seo-noprice.mjs az ár nélküli (külföldi) változatban price:0-ra cseréli.
+const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price":/g, 'price:') + ';const PHOTOS=' + JSON.stringify(PHOTOS) + ';\n' + JS_CODE + '\n})();';
+---
+<div class="cmp">
+<header class="cmp-hero"><div class="cmp-hero-in">
+<div class="cmp-kicker">Autó összehasonlítás</div>
+<h1>Melyik autó a nagyobb? Méret, csomagtartó, család</h1>
+<p class="cmp-lead">Válassz ki két bérelhető autót, és nézd meg őket valós arányban: hossz, szélesség, magasság, csomagtartó, ülések, ISOFIX – és hogy hány gyerekülés fér el hátul.</p>
+</div></header>
+
+<div class="cwrap">
+<div class="cpick">
+ <div class="pk"><label><span class="cnum n1">1</span>Első autó</label><select id="s1"></select></div>
+ <button class="cbtn" id="swap" title="Csere">⇄ Csere</button>
+ <div class="pk"><label><span class="cnum n2">2</span>Második autó</label><select id="s2"></select></div>
+</div>
+<div class="cviews"><button class="cbtn" data-v="front">Elölről</button><button class="cbtn on" data-v="side">Oldalról</button><button class="cbtn" data-v="rear">Hátulról</button><span class="vsep"></span><button class="cbtn" id="swap2">⇄ Csere</button></div>
+<div class="cstage" id="stage">
+<svg class="croom" viewBox="0 0 1000 425" preserveAspectRatio="none"><g stroke="#DADDE2" stroke-width="1.2" fill="none"><path d="M0 40 L120 95 L880 95 L1000 40"/><path d="M0 410 L120 365 L880 365 L1000 410"/><path d="M120 95 V365 M880 95 V365 M500 95 V365"/><path d="M120 230 H880"/></g></svg>
+<div id="cars"></div></div>
+<div class="align" id="align"></div>
+<div class="legend" id="legend"></div>
+<p class="cnote" id="note">A képek valós arányban, azonos léptékben jelennek meg.</p>
+<table id="tbl"></table>
+<div class="grid2" id="cards"></div>
+<section class="calc" id="calc"><span class="ceye">Kalkulátor</span><h2>Mennyibe kerül valójában havonta?</h2>
+<div class="steps">
+ <div class="step"><span class="sn">1</span><div class="sb"><label>Havi futás: <b id="kmv">1 500 km</b></label><input type="range" id="km" min="300" max="5000" step="100" value="1500"></div></div>
+ <div class="step"><span class="sn">2</span><div class="sb"><label>Elektromos autót hol töltenél?</label><div class="seg" id="chg"><button data-p="40">Otthon</button><button class="on" data-p="115">Vegyesen</button><button data-p="190">Töltőállomáson</button></div></div></div>
+</div>
+<div class="fuel" id="fuel"><span>⛽ Benzin <b id="fb">605 Ft/l</b> · Dízel <b id="fd">681 Ft/l</b> · Áram <b id="fe">115 Ft/kWh</b></span><span class="fsrc" id="fsrc">NAV hivatalos üzemanyagár, 2026. október – havonta automatikusan frissül</span><button class="lnk" id="fedit" type="button">Saját árral számolok</button>
+<span class="fed" id="fed" hidden><label>Benzin <input type="number" id="pb" value="605"> Ft/l</label><label>Dízel <input type="number" id="pd" value="681"> Ft/l</label></span></div>
+<div class="ctw"><table class="ct" id="ct"></table></div>
+<p class="verdict" id="v-cost"></p>
+<p class="src">A bérleti díj tartalmazza a biztosítást, a szervizt, a gépjárműadót és a gumikat; az üzemanyagot / áramot a bérlő fizeti. Fogyasztás: a jelölt motorváltozat gyári (WLTP) értéke +15%, ami közelebb áll a valós fogyasztáshoz.</p>
+</section>
+<section class="calc" id="garage"><span class="ceye">Méretek a gyakorlatban</span><h2>Befér a garázsba?</h2>
+<div class="steps">
+ <div class="step"><span class="sn">1</span><div class="sb"><label>Garázs / beálló magassága</label><div class="unit"><input type="number" id="gh" value="2.00" step="0.01" min="1.5" max="3"> m</div></div></div>
+ <div class="step"><span class="sn">2</span><div class="sb"><label>Parkolóhely szélessége</label><div class="unit"><input type="number" id="gw" value="2.50" step="0.05" min="1.8" max="4"> m</div></div></div>
+ <div class="step"><span class="sn">3</span><div class="sb"><label>Parkolóhely hossza</label><div class="unit"><input type="number" id="gl" value="5.00" step="0.05" min="3.5" max="7"> m</div></div></div>
+</div>
+<div class="ctw"><table class="ct" id="gt"></table></div>
+<p class="src">Magasság: gyári adat tetőcsomagtartó nélkül. Szélesség: kihajtott tükrökkel. Kényelmes kiszálláshoz oldalanként legalább ~35 cm kell. A budapesti mélygarázsok jellemző behajtási magassága 1,90–2,10 m – mindig nézd meg a kihelyezett táblát.</p>
+</section>
+<section class="fam"><span class="ceye">Családi autók</span><h2>Melyik autó jó a családodnak?</h2>
+<p class="clead">Szűrj a családod méretére – kattints egy autóra, és bekerül az összehasonlításba.</p>
+<div class="filters" id="flt"><button class="cbtn on" data-f="all">Mind</button><button class="cbtn" data-f="2">2 gyerek</button><button class="cbtn" data-f="3">3 gyerekülés egymás mellett</button><button class="cbtn" data-f="7">7+ ülés</button><button class="cbtn" data-f="big">Nagy csomagtartó (600 l+)</button><button class="cbtn" data-f="ev">Elektromos</button></div>
+<div class="fl" id="fl"></div></section>
+<section class="cfaq"><span class="ceye">GYIK</span><h2>Gyakori kérdések az összehasonlításról</h2><details><summary>Hogyan működik az autó-összehasonlító?</summary><p>Válassz ki két bérelhető autót: oldalról, elölről és hátulról valós arányban, azonos léptékben látod őket, a méretekkel és a különbségekkel együtt. Alatta összevetheted a csomagtartót, az üléseket, az ISOFIX-pontokat, a havi költséget és azt, hogy befér-e az autó a garázsodba.</p></details><details><summary>Mennyire pontosak a méretek?</summary><p>A méretek a gyártók által közölt adatok (hossz, szélesség, magasság, tengelytáv). A konkrét felszereltség – például tetősín vagy nagyobb kerekek – néhány centiméterrel módosíthatja őket; ha a centi számít, kérdezd munkatársainkat.</p></details><details><summary>Befér az autó a mélygarázsba?</summary><p>A „Befér a garázsba?” részben add meg a behajtási magasságot és a parkolóhely méretét – az eszköz megmutatja, hány centi marad fölötte, oldalanként és hosszában. A budapesti mélygarázsok jellemzően 1,90–2,10 m magasak.</p></details><details><summary>Melyik autóban fér el három gyerekülés?</summary><p>A „Családi autók” szűrőben a „3 gyerekülés egymás mellett” és a „7+ ülés” gombbal azonnal látod azokat a bérelhető modelleket, amelyekben három gyerek is kényelmesen utazik.</p></details></section>
+</div>
+</div>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+<script is:inline set:html={SCRIPT}></script>
+<style is:global>
+.cmp-hero{background:linear-gradient(135deg,#0B0B0D 0%,#1b1d24 100%);color:#fff;padding:calc(var(--navh,80px) + 48px) 24px 40px}
+.cmp-hero-in{max-width:1180px;margin:0 auto}
+.cmp-kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#E2001A;font-weight:800;margin-bottom:10px}
+.cmp .cmp-hero h1{font-size:clamp(30px,4.4vw,46px);line-height:1.1;margin:0 0 12px;font-weight:800;color:#fff}
+.cmp-lead{margin:0;color:#dfe3ea;font-size:17px;line-height:1.6;max-width:70ch}
+.cmp .cfaq{margin-top:50px}
+.cmp{--red:#E2001A;--navy:#0B2A4A;--ink:#0B0B0D;--mut:#5A6B82;--line:#E6EAF1;--bg:#F7F8FA}
+.cmp .cwrap{max-width:1180px;margin:0 auto;padding:36px 20px 70px}
+.cmp .ceye{color:var(--red);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.cmp h1{font-size:40px;font-weight:800;letter-spacing:-.02em;margin:8px 0 10px;line-height:1.1}
+.cmp h2{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:6px 0 16px}
+.cmp .clead{color:var(--mut);font-size:17px;line-height:1.55;max-width:760px;margin:0 0 26px}
+.cmp .cpick{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end;margin-bottom:18px}
+.cmp .pk label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.cmp .cnum{display:inline-flex;width:22px;height:22px;border-radius:6px;color:#fff;font-weight:800;font-size:12px;align-items:center;justify-content:center}
+.cmp .n1{background:var(--red)}
+.cmp .n2{background:var(--navy)}
+.cmp select{width:100%;font:inherit;font-size:16px;font-weight:700;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer}
+.cmp #s1{border-color:rgba(226,0,26,.45)}
+.cmp #s2{border-color:rgba(11,42,74,.45)}
+.cmp .cbtn{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;background:#EEF0F4;color:var(--ink)}
+.cmp .cbtn:hover{background:#E3E7EE}
+.cmp .cviews{display:flex;justify-content:center;gap:6px;margin:6px 0 14px;flex-wrap:wrap}
+.cmp .cviews .cbtn.on{background:var(--ink);color:#fff}
+.cmp .cstage{position:relative;width:100%;aspect-ratio:2.35/1;background:#F1F2F4;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.cmp .cstage svg.croom{position:absolute;inset:0;width:100%;height:100%}
+.cmp .ccar{position:absolute;left:0;transition:all .45s cubic-bezier(.2,.7,.2,1)}
+.cmp .ccar img,.cmp .ccar svg{display:block;width:100%;height:100%}
+.cmp .ccar.solid{z-index:2}
+.cmp .ccar.ghost{z-index:1}
+.cmp .ccar.ghost img{filter:grayscale(1) brightness(1.45) contrast(.85);opacity:.55}
+.cmp .ccar.ghost svg{opacity:.45}
+.cmp .hlab{position:absolute;z-index:4;display:flex;flex-direction:column;gap:4px;padding:2px 10px;transition:all .45s}
+.cmp .hlab.r{border-left:4px solid var(--red);align-items:flex-start}
+.cmp .hlab.b{border-right:4px solid var(--navy);align-items:flex-end}
+.cmp .hrow{display:flex;gap:6px;align-items:center;font-weight:700;font-size:15px;white-space:nowrap}
+.cmp .hlab .v{color:#fff;border-radius:5px;padding:2px 7px;font-weight:800}
+.cmp .hlab.r .v{background:var(--red)}
+.cmp .hlab.b .v{background:var(--navy)}
+.cmp .hlab.r .t{color:var(--red)}
+.cmp .hlab.b .t{color:var(--navy)}
+.cmp .d{background:#6B7280;color:#fff;border-radius:5px;padding:2px 7px;font-weight:800;font-size:13px}
+.cmp .band{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;border-top:4px solid;transition:all .45s;overflow:visible}
+.cmp .band.r{border-color:var(--red);background:rgba(226,0,26,.07)}
+.cmp .band.b{border-color:var(--navy);background:rgba(11,42,74,.07)}
+.cmp .bl{display:flex;gap:6px;align-items:center;font-weight:700;font-size:15px;white-space:nowrap}
+.cmp .band .v{color:#fff;border-radius:5px;padding:2px 7px;font-weight:800}
+.cmp .band.r .v{background:var(--red)}
+.cmp .band.b .v{background:var(--navy)}
+.cmp .band.r .t{color:var(--red)}
+.cmp .band.b .t{color:var(--navy)}
+.cmp .cstage.stack .croom{display:none}
+.cmp .lane{position:absolute;left:4%;right:4%;height:0;border-top:1.5px solid #D5D9E0;z-index:0}
+.cmp .lanetag{position:absolute;left:12px;z-index:4;display:flex;gap:6px;align-items:center;font-weight:800;font-size:14px}
+.cmp .vsep{width:1px;background:var(--line);margin:0 6px}
+.cmp .cviews .seg{width:auto}
+.cmp .cviews .seg button{padding:10px 14px;font-size:14px}
+.cmp .hl{position:absolute;height:0;border-top:2px solid;z-index:3;transition:all .45s}
+.cmp .hl.r{border-color:var(--red)}
+.cmp .hl.b{border-color:var(--navy)}
+.cmp .ctag{position:absolute;z-index:4;display:flex;gap:5px;align-items:center;font-weight:700;font-size:14px;white-space:nowrap;transition:all .45s}
+.cmp .ctag .v{color:#fff;border-radius:5px;padding:3px 7px;font-weight:800}
+.cmp .ctag.r{color:var(--red)}
+.cmp .ctag.r .v{background:var(--red)}
+.cmp .ctag.b{color:var(--navy)}
+.cmp .ctag.b .v{background:var(--navy)}
+.cmp .ctag .d{background:#6B7280;color:#fff;border-radius:5px;padding:3px 7px;font-weight:800;font-size:13px}
+.cmp .lenbar{position:absolute;height:0;border-top:2px solid;z-index:3;transition:all .45s}
+.cmp .lenbar:before,.cmp .lenbar:after{content:"";position:absolute;top:-7px;width:2px;height:12px;background:currentColor}
+.cmp .lenbar:before{left:0}
+.cmp .lenbar:after{right:0}
+.cmp .lenbar.r{color:var(--red);border-color:var(--red)}
+.cmp .lenbar.b{color:var(--navy);border-color:var(--navy)}
+.cmp .legend{display:flex;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+.cmp .legend .ctag{position:static}
+.cmp .cstage.stack.sv{aspect-ratio:1.7/1}
+.cmp .align{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;background:#F1F2F4;border:1px solid var(--line);border-top:0;border-radius:0 0 16px 16px;margin-top:-14px;padding:20px 10px 8px;position:relative;z-index:0}
+.cmp .align button{background:none;border:0;padding:4px 6px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;color:#8A919B;font:inherit;font-size:11px;font-weight:700}
+.cmp .align button:hover{background:#E6E8EC;color:#3A3F47}
+.cmp .align button.on{color:var(--ink)}
+.cmp .align button svg{width:74px;height:46px;display:block}
+.cmp .align.off{opacity:.35;pointer-events:none}
+.cmp .anc{position:absolute;top:6%;bottom:6%;width:0;border-left:1.5px dashed rgba(11,11,13,.28);z-index:3;transition:all .45s}
+.cmp .cstage{z-index:1}
+.cmp .cnote{font-size:12px;color:var(--mut);margin:8px 2px 0}
+.cmp .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}
+.cmp .ccard{border:1px solid var(--line);border-radius:14px;padding:20px 20px 18px;background:#fff}
+.cmp .ccard h3{margin:0 0 4px;font-size:20px;font-weight:800;display:flex;gap:10px;align-items:center}
+.cmp .ccard .pr{color:var(--mut);font-size:14px;margin-bottom:14px}
+.cmp .cbadges{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 14px}
+.cmp .bd{font-size:13px;font-weight:700;border-radius:999px;padding:6px 11px;background:#EEF7EF;color:#1D6B33}
+.cmp .bd.no{background:#F4F5F7;color:#8A94A6;text-decoration:line-through}
+.cmp .bd.i{background:#EEF3FB;color:#1F4E8C}
+.cmp .ccta{display:inline-flex;gap:8px;align-items:center;background:var(--red);color:#fff;text-decoration:none;font-weight:800;padding:12px 18px;border-radius:10px;font-size:15px}
+.cmp .ccard.k2 .ccta{background:var(--navy)}
+.cmp table{width:100%;border-collapse:separate;border-spacing:0;margin-top:34px;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:15px}
+.cmp th,.cmp td{padding:12px 14px;border-bottom:1px solid #EEF0F4;text-align:left}
+.cmp th{background:var(--bg);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.cmp td.v{font-weight:700;white-space:nowrap}
+.cmp td.win{color:#1D6B33}
+.cmp td.v .w{display:inline-block;margin-left:6px;font-size:11px;background:#EEF7EF;color:#1D6B33;border-radius:5px;padding:2px 6px;vertical-align:1px}
+.cmp tr:last-child td{border-bottom:0}
+.cmp .trunk{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 2px}
+.cmp .suit{width:18px;height:24px;border-radius:4px;border:2px solid currentColor;position:relative}
+.cmp .suit:before{content:"";position:absolute;top:-6px;left:4px;width:6px;height:4px;border:2px solid currentColor;border-bottom:0;border-radius:3px 3px 0 0}
+.cmp .k1 .trunk{color:var(--red)}
+.cmp .k2 .trunk{color:var(--navy)}
+.cmp .csmall{font-size:12px;color:var(--mut)}
+.cmp .fam{margin-top:44px}
+.cmp .fam .clead{margin-bottom:16px}
+.cmp .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.cmp .filters .cbtn.on{background:var(--red);color:#fff}
+.cmp .fl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.cmp .fi{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg);cursor:pointer}
+.cmp .fi:hover{border-color:#cfd6e2}
+.cmp .fi b{display:block;font-size:15px}
+.cmp .fi span{font-size:13px;color:var(--mut)}
+.cmp .calc{margin-top:46px}
+.cmp .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}
+.cmp .tabs .cbtn.on{background:var(--ink);color:#fff}
+.cmp .pane{display:none;border:1px solid var(--line);border-radius:14px;padding:20px;background:#fff}
+.cmp .pane.on{display:block}
+.cmp .ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 16px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid #EEF0F4}
+.cmp .ctrl label{display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.cmp .ctrl input[type=number],.cmp .ctrl select{width:100%;font:inherit;font-size:15px;font-weight:700;padding:9px 10px;border:1.5px solid var(--line);border-radius:10px}
+.cmp .ctrl input[type=range]{width:100%;accent-color:var(--red)}
+.cmp .ctrl .chk{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;color:var(--ink);text-transform:none;letter-spacing:0;cursor:pointer;margin:6px 0 0}
+.cmp .res{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cmp .rc{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--bg)}
+.cmp .rc h4{margin:0 0 10px;font-size:16px;display:flex;gap:8px;align-items:center}
+.cmp .rc .ln{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:5px 0;border-bottom:1px dashed #E3E7EE}
+.cmp .rc .ln span:first-child{color:var(--mut)}
+.cmp .rc .tot{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;font-weight:800}
+.cmp .rc .tot b{font-size:24px}
+.cmp .rc.k1 .tot b{color:var(--red)}
+.cmp .rc.k2 .tot b{color:var(--navy)}
+.cmp .bar{height:10px;border-radius:6px;background:#E6E9EF;margin-top:10px;overflow:hidden}
+.cmp .bar i{display:block;height:100%;border-radius:6px}
+.cmp .k1 .bar i{background:var(--red)}
+.cmp .k2 .bar i{background:var(--navy)}
+.cmp .verdict{margin:14px 0 0;font-size:15px;font-weight:700}
+.cmp .src{font-size:12px;color:var(--mut);margin-top:12px;line-height:1.5}
+.cmp .fit{display:inline-block;font-size:12px;font-weight:800;border-radius:6px;padding:2px 8px;margin-left:6px}
+.cmp .fit.ok{background:#EEF7EF;color:#1D6B33}
+.cmp .fit.mid{background:#FFF4D6;color:#7A5600}
+.cmp .fit.no{background:#FDECEE;color:#B0001A}
+.cmp .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:6px 0 14px}
+.cmp .step{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.cmp .sn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.cmp .sb{flex:1;min-width:0}
+.cmp .sb label{display:block;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.cmp .sb label b{color:var(--red)}
+.cmp .sb input[type=range]{width:100%;accent-color:var(--red)}
+.cmp .seg{display:flex;background:#EEF0F4;border-radius:10px;padding:3px;gap:3px}
+.cmp .seg button{flex:1;border:0;background:none;font:inherit;font-size:13px;font-weight:700;padding:8px 6px;border-radius:8px;cursor:pointer;color:#4A5568}
+.cmp .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cmp .unit{display:flex;align-items:center;gap:6px;font-weight:700}
+.cmp .unit input{width:100%;font:inherit;font-size:16px;font-weight:700;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px}
+.cmp .fuel{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+.cmp .fsrc{color:var(--mut);font-size:12.5px}
+.cmp .lnk{background:none;border:0;color:var(--red);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+.cmp .fed{display:flex;gap:10px;flex-wrap:wrap}
+.cmp .fed[hidden]{display:none}
+.cmp .fed input{width:76px;font:inherit;font-weight:700;padding:4px 6px;border:1.5px solid var(--line);border-radius:8px}
+.cmp .ctw{overflow-x:auto}
+.cmp table.ct{margin-top:0}
+.cmp .ct td.v{text-align:right}
+.cmp .ct th.c{text-align:right}
+.cmp .ct .sub{display:block;font-size:12px;color:var(--mut);font-weight:500;margin-top:2px}
+.cmp .ct tr.tot td{background:#FAFBFC;font-size:17px}
+.cmp .ct tr.tot td.v{font-size:22px;font-weight:800}
+.cmp .ct tr.tot td.v.k1{color:var(--red)}
+.cmp .ct tr.tot td.v.k2{color:var(--navy)}
+.cmp .ct .best{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;background:#EEF7EF;color:#1D6B33;border-radius:5px;padding:2px 6px;vertical-align:3px}
+.cmp .tip{position:relative;display:inline-flex;width:16px;height:16px;border-radius:50%;background:#C9CED6;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;cursor:help;margin-left:6px;vertical-align:1px}
+.cmp .tip .tt{display:none;position:absolute;bottom:150%;left:-10px;width:min(300px,78vw);background:#0B0B0D;color:#fff;font-size:12px;font-weight:500;line-height:1.5;padding:11px 13px;border-radius:10px;z-index:20;text-align:left;white-space:normal}
+.cmp .tip:hover .tt,.cmp .tip:focus .tt{display:block}
+@media(max-width:760px){.cmp .hrow,.cmp .bl{font-size:12px}
+.cmp .hlab .v,.cmp .band .v{padding:1px 5px}
+.cmp .d{font-size:11px;padding:1px 5px}
+.cmp .cstage.stack.sv{aspect-ratio:1/1.05}
+.cmp .vsep{display:none}
+.cmp .steps{grid-template-columns:1fr}
+.cmp .ct tr.tot td.v{font-size:18px}
+.cmp .res{grid-template-columns:1fr}
+.cmp .align button svg{width:52px;height:34px}
+.cmp .align button span{display:none}
+.cmp h1{font-size:30px}
+.cmp .cpick{grid-template-columns:1fr}
+.cmp .cstage{aspect-ratio:1.45/1}
+.cmp .grid2{grid-template-columns:1fr}
+.cmp .ctag{font-size:12px}
+.cmp table{font-size:13px}
+.cmp th,.cmp td{padding:9px 8px}}
+</style>
