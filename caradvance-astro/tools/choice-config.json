@@ -66,7 +66,8 @@
     "VW Tayron": "/berles/vw-tayron.webp",
     "VW Passat Variant": "/berles/vw-passat-variant.webp",
     "VW ID.7 Tourer": "/berles/vw-id-7-tourer.webp",
-    "VW Touareg": "/berles/vw-touareg.webp"
+    "VW Touareg": "/berles/vw-touareg.webp",
+    "Mercedes-Benz GLE Coupé": "/mb-gle-coupe.webp"
   },
   "colors": {
     "Frost Blue": "Frost kék",
@@ -81,6 +82,8 @@
     "Samtbraun metallic": "Bársonybarna metál",
     "Cape york gruen metallic": "Cape York zöld metál",
     "Wolf Grey Metallic / Schwarz Uni": "Wolf Grey metál / fekete uni",
-    "Performance Blue": "Performance kék"
+    "Performance Blue": "Performance kék",
+    "Uranograu": "Uránszürke",
+    "Atacama Desert Metallic": "Atacama Desert metál"
   }
 }
