@@ -19,12 +19,14 @@ const CARS = COMPARE_CARS.filter((c) => rentals.has(c.slug)).map((c) => ({ ...c,
 // Autóképek: public/osszehasonlito/<kép>-<side|front|rear>.webp, közös léptékben (0,24 px/mm).
 // A comparePhotos.json tartalmazza a képek valós méretét mm-ben (mm) és az oldalnézeti tengelyek helyét (fa/ra),
 // így a két autó pontosan azonos léptékben és helyesen igazítva jelenik meg.
+// Props (opcionális): photoMeta – másik képkészlet (pl. tesztoldal), note – figyelmeztető sáv a hero alatt.
+const { photoMeta = PHOTO_META, note = '' } = Astro.props as { photoMeta?: any; note?: string };
 const PHOTOS: Record<string, any> = {};
 for (const c of CARS) {
-  const m: any = (PHOTO_META as any)[c.slug];
+  const m: any = (photoMeta as any)[c.slug];
   if (!m) continue;
   const o: any = { fa: m.fa, ra: m.ra, pf: m.pf, pr: m.pr };
-  for (const v of ['side', 'front', 'rear']) if (m[v]) o[v] = { src: `/osszehasonlito/${m.img}-${v}.webp`, mm: m[v] };
+  for (const v of ['side', 'front', 'rear']) if (m[v]) o[v] = { src: `/osszehasonlito/${m.img}-${v}.webp`, mm: m[v], ...(m.sh && m.sh[v] != null ? { sh: m.sh[v] } : {}) };
   PHOTOS[c.slug] = o;
 }
 const FAQ = [{"q": "Hogyan működik az autó-összehasonlító?", "a": "Válassz ki két bérelhető autót: oldalról, elölről és hátulról valós arányban, azonos léptékben látod őket, a méretekkel és a különbségekkel együtt. Alatta összevetheted a csomagtartót, az üléseket, az ISOFIX-pontokat, a havi költséget és azt, hogy befér-e az autó a garázsodba."}, {"q": "Mennyire pontosak a méretek?", "a": "A méretek a gyártók által közölt adatok (hossz, szélesség, magasság, tengelytáv). A konkrét felszereltség – például tetősín vagy nagyobb kerekek – néhány centiméterrel módosíthatja őket; ha a centi számít, kérdezd munkatársainkat."}, {"q": "Befér az autó a mélygarázsba?", "a": "A „Befér a garázsba?” részben add meg a behajtási magasságot és a parkolóhely méretét – az eszköz megmutatja, hány centi marad fölötte, oldalanként és hosszában. A budapesti mélygarázsok jellemzően 1,90–2,10 m magasak."}, {"q": "Melyik autóban fér el három gyerekülés?", "a": "A „Családi autók” szűrőben a „3 gyerekülés egymás mellett” és a „7+ ülés” gombbal azonnal látod azokat a bérelhető modelleket, amelyekben három gyerek is kényelmesen utazik."}];
@@ -47,6 +49,7 @@ const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price"
 <h1>Melyik autó a nagyobb? Méret, csomagtartó, család</h1>
 <p class="cmp-lead">Válassz ki két bérelhető autót, és nézd meg őket valós arányban: hossz, szélesség, magasság, csomagtartó, ülések, ISOFIX – és hogy hány gyerekülés fér el hátul.</p>
 </div></header>
+{note && <div class="cmp-note" set:html={note}></div>}
 
 <div class="cwrap">
 <div class="cpick">
@@ -95,6 +98,7 @@ const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price"
 <style is:global>
 .cmp-hero{background:linear-gradient(135deg,#0B0B0D 0%,#1b1d24 100%);color:#fff;padding:calc(var(--navh,80px) + 48px) 24px 40px}
 .cmp-hero-in{max-width:1180px;margin:0 auto}
+.cmp .cmp-note{max-width:1180px;margin:16px auto 0;padding:12px 16px;background:#FFF6D6;border:1px solid #F0D27A;border-radius:10px;font-size:14px;line-height:1.5;color:#5A4500}
 .cmp-kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#E2001A;font-weight:800;margin-bottom:10px}
 .cmp .cmp-hero h1{font-size:clamp(30px,4.4vw,46px);line-height:1.1;margin:0 0 12px;font-weight:800;color:#fff}
 .cmp-lead{margin:0;color:#dfe3ea;font-size:17px;line-height:1.6;max-width:70ch}

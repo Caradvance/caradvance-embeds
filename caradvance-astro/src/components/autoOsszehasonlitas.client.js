@@ -91,7 +91,7 @@ function render(){const a=by($('#s1').value),b=by($('#s2').value);
  const geo={};
  // hátsó (2.) autó előbb – oldalnézetben halvány „szellem” a háttérben, az 1. autó teljesen előtte
  [[b,'c2'],[a,'c1']].forEach(([c,cl])=>{const im=photo(c,view);let w,h,y;
-  if(im){w=im.mm[0]*k;h=im.mm[1]*k;y=floor-(im.mm[1]-SH[view])*k}else{w=(side?c.L:c.Wm)*k;h=c.H*k;y=floor-h}
+  if(im){w=im.mm[0]*k;h=im.mm[1]*k;y=floor-(im.mm[1]-(im.sh!=null?im.sh:SH[view]))*k}else{w=(side?c.L:c.Wm)*k;h=c.H*k;y=floor-h}
   const x=side?pos[cl]:cx[cl]-w/2;geo[cl]={x,w};
   const alt=`${c.name} ${side?'oldalnézet':view==='front'?'elölnézet':'hátulnézet'}`;
   const ghost=side&&cl==='c2';
