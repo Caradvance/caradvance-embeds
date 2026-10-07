@@ -19,14 +19,14 @@ function silSide(c){const L=c.L,H=c.H,B=BP[c.body]||BP.sedan,gc=B.gc,R=Math.max(
  const hw=R*1.1,s=2*R+45-gc,r=(hw*hw+s*s)/(2*s),big=s>hw?1:0,yb=H-gc;
  let d=smoothPath(P)+` L${(ra+hw).toFixed(0)},${yb} A${r.toFixed(0)},${r.toFixed(0)} 0 ${big} 0 ${(ra-hw).toFixed(0)},${yb} L${(fa+hw).toFixed(0)},${yb} A${r.toFixed(0)},${r.toFixed(0)} 0 ${big} 0 ${(fa-hw).toFixed(0)},${yb} Z`;
  const poly=a=>'M'+a.map(([x,y])=>X(x).toFixed(0)+','+Y(y).toFixed(0)).join(' L')+' Z';
- const win=(B.w.length?`<path d="${poly(B.w)}" fill="${SC.win}" stroke="${SC.win}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`:'')+(B.ws?`<path d="${poly(B.ws)}" fill="${SC.win}" stroke="${SC.line}" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`:'');
- const wheel=x=>`<circle cx="${x.toFixed(0)}" cy="${(H-R).toFixed(0)}" r="${R.toFixed(0)}" fill="${SC.tire}"/><circle cx="${x.toFixed(0)}" cy="${(H-R).toFixed(0)}" r="${(R*.62).toFixed(0)}" fill="${SC.rim}"/><circle cx="${x.toFixed(0)}" cy="${(H-R).toFixed(0)}" r="${(R*.16).toFixed(0)}" fill="${SC.hub}"/>`;
+ const win=(B.w.length?`<path class="wn" d="${poly(B.w)}" fill="${SC.win}" stroke="${SC.win}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`:'')+(B.ws?`<path d="${poly(B.ws)}" fill="${SC.win}" stroke="${SC.line}" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`:'');
+ const wheel=x=>`<circle cx="${x.toFixed(0)}" cy="${(H-R).toFixed(0)}" r="${R.toFixed(0)}" fill="${SC.tire}"/><circle cx="${x.toFixed(0)}" cy="${(H-R).toFixed(0)}" r="${(R*.62).toFixed(0)}" fill="${SC.rim}" class="rh"/><circle cx="${x.toFixed(0)}" cy="${(H-R).toFixed(0)}" r="${(R*.16).toFixed(0)}" fill="${SC.hub}" class="rh"/>`;
  return `<svg viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="${SC.body}" stroke="${SC.line}" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>${win}${wheel(fa)}${wheel(ra)}</svg>`}
 function silEnd(c,rear){const Wm=c.Wm,W=c.W,H=c.H,cx=Wm/2,bw=W/2,B=BP[c.body]||BP.sedan,gc=B.gc,belt=(c.body==='suv'||c.body==='mpv'||c.body==='van'?.6:.56)*H;
  const topW=(c.body==='van'?.9:c.body==='cabrio'?.7:.68)*W,ty=H-H, y0=H-gc*.55;
  const body=`M${cx-bw},${y0} L${cx-bw},${H-belt+60} Q${cx-bw},${H-belt} ${cx-bw+90},${H-belt-20} L${cx+bw-90},${H-belt-20} Q${cx+bw},${H-belt} ${cx+bw},${H-belt+60} L${cx+bw},${y0} Z`;
  const gh=c.body==='cabrio'?`M${cx-bw*.86},${H-belt-10} L${cx-topW/2},${H*.04} L${cx+topW/2},${H*.04} L${cx+bw*.86},${H-belt-10} Z`:`M${cx-bw*.9},${H-belt-10} Q${cx-topW/2-30},${ty+40} ${cx-topW/2+60},${ty} L${cx+topW/2-60},${ty} Q${cx+topW/2+30},${ty+40} ${cx+bw*.9},${H-belt-10} Z`;
- const glass=c.body==='cabrio'?`<path d="M${cx-bw*.78},${H-belt-30} L${cx-topW/2+30},${H*.08} L${cx+topW/2-30},${H*.08} L${cx+bw*.78},${H-belt-30} Z" fill="${SC.win}" opacity=".7"/>`:`<path d="M${cx-bw*.78},${H-belt-40} L${cx-topW/2+40},${ty+H*.1} L${cx+topW/2-40},${ty+H*.1} L${cx+bw*.78},${H-belt-40} Z" fill="${SC.win}" stroke="${SC.win}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+ const glass=c.body==='cabrio'?`<path class="wn" d="M${cx-bw*.78},${H-belt-30} L${cx-topW/2+30},${H*.08} L${cx+topW/2-30},${H*.08} L${cx+bw*.78},${H-belt-30} Z" fill="${SC.win}" opacity=".7"/>`:`<path class="wn" d="M${cx-bw*.78},${H-belt-40} L${cx-topW/2+40},${ty+H*.1} L${cx+topW/2-40},${ty+H*.1} L${cx+bw*.78},${H-belt-40} Z" fill="${SC.win}" stroke="${SC.win}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
  const my=H-belt-60,mir=`<path d="M${cx-bw},${my} L${cx-Wm/2},${my-40} L${cx-Wm/2+20},${my+90} L${cx-bw},${my+110} Z M${cx+bw},${my} L${cx+Wm/2},${my-40} L${cx+Wm/2-20},${my+90} L${cx+bw},${my+110} Z" fill="${SC.body}" stroke="${SC.line}" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`;
  const tw=W*.13,tire=`<rect x="${cx-bw+40}" y="${H-gc-120}" width="${tw}" height="${gc+120}" rx="40" fill="${SC.tire}"/><rect x="${cx+bw-40-tw}" y="${H-gc-120}" width="${tw}" height="${gc+120}" rx="40" fill="${SC.tire}"/>`;
  const ly=H-belt*.78,lamp=rear?'#C55A63':'#F4F6F8',lamps=`<rect x="${cx-bw+70}" y="${ly}" width="${W*.2}" height="${H*.06}" rx="30" fill="${lamp}" stroke="${SC.line}" stroke-width="1.2" vector-effect="non-scaling-stroke"/><rect x="${cx+bw-70-W*.2}" y="${ly}" width="${W*.2}" height="${H*.06}" rx="30" fill="${lamp}" stroke="${SC.line}" stroke-width="1.2" vector-effect="non-scaling-stroke"/>`;
@@ -88,6 +88,8 @@ function render(){const a=by($('#s1').value),b=by($('#s2').value);
   const alt=`${c.name} ${side?'oldalnézet':view==='front'?'elölnézet':'hátulnézet'}`;
   const ghost=side&&cl==='c2';
   html+=`<div class="ccar ${ghost?'ghost':'solid'}" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${im?`<img src="${im.src}" alt="${alt}" loading="lazy">`:sil(c,view)}</div>`;
+  // sziluettnél a hátsó (2.) autó körvonala az 1. autó fölött is látszik — így hasonló méretű autóknál sem tűnik el
+  if(ghost&&!im)html+=`<div class="ccar outl" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${sil(c,view)}</div>`;
  });
  if(side)html+=`<div class="anc" style="left:${pos.x}px;bottom:${H-floor-6}px"></div>`;
  // magasság-vonalak és címkék (carsized-stílus: 1 balra, 2 jobbra; a különbség a magasabb autónál)
