@@ -41,7 +41,7 @@ try {
 // ugyfel-ajanlat nem valo. (A /berelheto/ atiranyit a /autoink/#berelheto-re,
 // ezert duplikatum lenne a sitemapban.)
 // /auto-osszehasonlitas/: amíg saját fotók és ellenőrzött adatok nincsenek, nem indexelhető és nincs a sitemapban.
-const PRIVATE_PATHS = ['/belso/', '/ajanlat/', '/berelheto/', '/auto-osszehasonlitas/'];
+const PRIVATE_PATHS = ['/belso/', '/ajanlat/', '/berelheto/', '/auto-osszehasonlitas/', '/auto-osszehasonlitas-teszt/'];
 
 const NOINDEX_DUP = '<meta name="robots" content="noindex,follow">';
 const NOINDEX_PRIVATE = '<meta name="robots" content="noindex,nofollow">';
