@@ -95,7 +95,7 @@ function render(){const a=by($('#s1').value),b=by($('#s2').value);
   const x=side?pos[cl]:cx[cl]-w/2;geo[cl]={x,w};
   const alt=`${c.name} ${side?'oldalnézet':view==='front'?'elölnézet':'hátulnézet'}`;
   const ghost=side&&cl==='c2';
-  html+=`<div class="ccar ${ghost?'ghost':'solid'}" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${im?`<img src="${im.src}" alt="${alt}" decoding="async">${plateFor(c,view,im)}`:sil(c,view)}</div>`;
+  html+=`<div class="ccar ${ghost?'ghost':'solid'}" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${im?`<img src="${im.src}" alt="${alt}" decoding="async">`:sil(c,view)}</div>`;
   // sziluettnél a hátsó (2.) autó körvonala az 1. autó fölött is látszik — így hasonló méretű autóknál sem tűnik el
   if(ghost&&!im)html+=`<div class="ccar outl" style="width:${w}px;height:${h}px;top:${y}px;left:${x}px">${sil(c,view)}</div>`;
  });
