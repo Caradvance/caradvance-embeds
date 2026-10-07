@@ -20,7 +20,7 @@ const CARS = COMPARE_CARS.filter((c) => rentals.has(c.slug)).map((c) => ({ ...c,
 // A comparePhotos.json tartalmazza a képek valós méretét mm-ben (mm) és az oldalnézeti tengelyek helyét (fa/ra),
 // így a két autó pontosan azonos léptékben és helyesen igazítva jelenik meg.
 // Props (opcionális): photoMeta – másik képkészlet (pl. tesztoldal), note – figyelmeztető sáv a hero alatt.
-const { photoMeta = PHOTO_META, note = '' } = Astro.props as { photoMeta?: any; note?: string };
+const { photoMeta = PHOTO_META, note = '', colorGhost = false } = Astro.props as { photoMeta?: any; note?: string; colorGhost?: boolean };
 const PHOTOS: Record<string, any> = {};
 for (const c of CARS) {
   const m: any = (photoMeta as any)[c.slug];
@@ -43,7 +43,7 @@ const ld = {
 // Az ár kulcsa idézőjel nélkül (price:…), így a seo-noprice.mjs az ár nélküli (külföldi) változatban price:0-ra cseréli.
 const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price":/g, 'price:') + ';const PHOTOS=' + JSON.stringify(PHOTOS) + ';\n' + JS_CODE + '\n})();';
 ---
-<div class="cmp">
+<div class={colorGhost ? "cmp cmp-color" : "cmp"}>
 <header class="cmp-hero"><div class="cmp-hero-in">
 <div class="cmp-kicker">Autó összehasonlítás</div>
 <h1>Melyik autó a nagyobb? Méret, csomagtartó, család</h1>
@@ -133,6 +133,7 @@ const SCRIPT = '(function(){const CARS=' + JSON.stringify(CARS).replace(/"price"
 .cmp .ccar.solid{z-index:2}
 .cmp .ccar.ghost{z-index:1}
 .cmp .ccar.ghost img{filter:grayscale(1) brightness(1.45) contrast(.85);opacity:.55}
+.cmp.cmp-color .ccar.ghost img{filter:saturate(1.15);opacity:.5}
 .cmp .ccar.ghost svg{opacity:.45}
 .cmp .hlab{position:absolute;z-index:4;display:flex;flex-direction:column;gap:4px;padding:2px 10px;transition:all .45s}
 .cmp .hlab.r{border-left:4px solid var(--red);align-items:flex-start}
