@@ -40,7 +40,8 @@ try {
 // elesites utan viszont a Google-nek sem a belso iranyitopult, sem az egyedi
 // ugyfel-ajanlat nem valo. (A /berelheto/ atiranyit a /autoink/#berelheto-re,
 // ezert duplikatum lenne a sitemapban.)
-const PRIVATE_PATHS = ['/belso/', '/ajanlat/', '/berelheto/'];
+// /auto-osszehasonlitas/: amíg saját fotók és ellenőrzött adatok nincsenek, nem indexelhető és nincs a sitemapban.
+const PRIVATE_PATHS = ['/belso/', '/ajanlat/', '/berelheto/', '/auto-osszehasonlitas/'];
 
 const NOINDEX_DUP = '<meta name="robots" content="noindex,follow">';
 const NOINDEX_PRIVATE = '<meta name="robots" content="noindex,nofollow">';
