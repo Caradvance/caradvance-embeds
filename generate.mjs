@@ -413,7 +413,7 @@ function ujBadge(c, abs) {
 function navHtml(rel) {
   const cat = rel + "autoink/";
   const items = [
-    ["Prémium autóbérlés", [["Bérelhető autóink", "/berelheto"], ["Új autó bérlése", "/uj-auto-berlese"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
+    ["Autóbérlés", [["Bérelhető autóink", "/berelheto"], ["Új autó bérlése", "/uj-auto-berlese"], ["Rövid távú bérlés", "#"], ["Hosszú távú bérlés", "#"], ["Flotta kezelés", "#"], ["Feltételek", "#"]]],
     ["Megvásárolható autóink", [["Autóink", cat], ["Egyedi autó rendelés", "/egyedi-auto-rendeles"], ["Finanszírozás – lízing", "#"], ["Előnyök", "#"]]],
     ["Bizományos értékesítés", [["Bizományos autóink", "/bizomanyos"], ["Eladom az autómat", "/eladom"], ["Jótékonyság", "/jotekonysag"], ["Értékesítési folyamat", "/ertekesitesi-folyamat"], ["Gyakori kérdések", "/gyakori-kerdesek"]]],
     ["Import", [["Autó rendelés", "/auto-rendeles"], ["Beszerzési folyamat", "/beszerzesi-folyamat"], ["Honosítás kalkulátor", "/honositas-kalkulator/"], ["Előnyök", "/elonyok"], ["Egyedül vagy velünk?", "/egyedul-vagy-velunk"], ["Referenciák", "#"]]],
@@ -448,7 +448,7 @@ function footerHtml(rel) {
     <p style="margin:12px 0 0;max-width:34ch;font-size:14px">Prémium autók Németországból — bérlés, megvásárolható autók, import és bizományos értékesítés.</p></div>
   <div><h4>Menü</h4>
     <a href="${rel}autoink/">Megvásárolható autóink</a>
-    <a href="${rel}#berles">Prémium autóbérlés</a>
+    <a href="${rel}#berles">Autóbérlés</a>
     <a href="${rel}#bizomany">Bizományos értékesítés</a>
     <a href="${rel}#import">Import</a></div>
   <div><h4>Kapcsolat</h4>
