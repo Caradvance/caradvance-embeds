@@ -22,7 +22,7 @@ export const flagCode: Record<Locale, string> = {
 // (or wire them to your Google Sheet) to translate the whole site.
 export const ui = {
   hu: {
-    'nav.rental': 'Prémium autóbérlés',
+    'nav.rental': 'Autóbérlés',
     'nav.buy': 'Megvásárolható autóink',
     'nav.consign': 'Bizományos értékesítés',
     'nav.import': 'Import',
@@ -53,7 +53,7 @@ export const ui = {
 
   // Fully translated example. Others fall back to hu until filled.
   en: {
-    'nav.rental': 'Premium car rental',
+    'nav.rental': 'Car rental',
     'nav.buy': 'Cars for sale',
     'nav.consign': 'Consignment sales',
     'nav.import': 'Import',
