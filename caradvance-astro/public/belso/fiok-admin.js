@@ -1,3 +1,57 @@
+/* /belso bejelentkezés: „Belépés e-mail kóddal” (jelszó nélkül) — /api/belso-kod/* */
+(function () {
+  'use strict';
+  var D = document;
+  var btn = D.getElementById('lg-btn'), emailEl = D.getElementById('lg-email'), pwEl = D.getElementById('lg-pw'), err = D.getElementById('lg-err');
+  if (!btn || !emailEl || !pwEl || D.getElementById('lg-codebox')) return;
+  var pwWrap = pwEl.parentElement, pwLabel = pwWrap.previousElementSibling;
+  var st = 'margin-top:10px;width:100%;padding:10px;border-radius:9px;border:1px solid #2a2c33;background:transparent;color:#cfd4de;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit';
+  var link = D.createElement('button'); link.type = 'button'; link.id = 'lg-codelink'; link.textContent = 'Belépés e-mail kóddal (jelszó nélkül)'; link.setAttribute('style', st);
+  var box = D.createElement('div'); box.id = 'lg-codebox'; box.style.display = 'none';
+  box.innerHTML = '<label style="display:block;font-size:11px;color:#8b93a7;margin:2px 0 5px">E-mailben kapott 6 jegyű kód</label>' +
+    '<input id="lg-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" style="width:100%;padding:11px;border-radius:9px;border:1px solid #2a2c33;background:#0f1013;color:#fff;outline:none;font-size:22px;letter-spacing:.4em;text-align:center">' +
+    '<button type="button" id="lg-codebtn" style="width:100%;margin-top:14px;padding:11px;border:0;border-radius:9px;background:#E2001A;color:#fff;font-weight:800;font-size:15px;cursor:pointer">Kód küldése</button>' +
+    '<button type="button" id="lg-back" style="' + st + '">← Vissza a jelszavas belépéshez</button>';
+  btn.insertAdjacentElement('afterend', link);
+  link.insertAdjacentElement('afterend', box);
+  var codeEl = box.querySelector('#lg-code'), cbtn = box.querySelector('#lg-codebtn'), sent = false;
+  codeEl.parentElement.querySelector('label').style.display = 'none'; codeEl.style.display = 'none';
+  function mode(code) {
+    box.style.display = code ? '' : 'none'; link.style.display = code ? 'none' : '';
+    btn.style.display = code ? 'none' : ''; pwWrap.style.display = code ? 'none' : ''; if (pwLabel) pwLabel.style.display = code ? 'none' : '';
+    err.textContent = '';
+  }
+  function post(path, b) {
+    return fetch('/api/belso-kod/' + path, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._ok = r.ok; return j; }); });
+  }
+  link.onclick = function () { mode(true); emailEl.focus(); };
+  box.querySelector('#lg-back').onclick = function () { mode(false); sent = false; codeEl.value = ''; codeEl.style.display = 'none'; codeEl.parentElement.querySelector('label').style.display = 'none'; cbtn.textContent = 'Kód küldése'; };
+  cbtn.onclick = function () {
+    var email = emailEl.value.trim();
+    if (!email) { err.textContent = 'Add meg a munkahelyi e-mail címed.'; return; }
+    cbtn.disabled = true;
+    if (!sent) {
+      cbtn.textContent = 'Küldés…';
+      post('kod', { email: email }).then(function (j) {
+        cbtn.disabled = false;
+        if (!j._ok) { cbtn.textContent = 'Kód küldése'; err.textContent = j.error || 'Hiba történt.'; return; }
+        sent = true; cbtn.textContent = 'Belépés';
+        codeEl.style.display = ''; codeEl.parentElement.querySelector('label').style.display = '';
+        err.style.color = '#9fe3b8'; err.textContent = 'Ha ez a cím szerepel a Felhasználók között, elküldtük a kódot.'; codeEl.focus();
+      });
+      return;
+    }
+    err.style.color = '';
+    post('belepes', { email: email, code: codeEl.value }).then(function (j) {
+      cbtn.disabled = false;
+      if (!j._ok) { err.textContent = j.error || 'Hibás kód.'; return; }
+      mode(false); window.CA_hideLogin && window.CA_hideLogin(); window.CA_boot && window.CA_boot();
+    });
+  };
+  codeEl.addEventListener('input', function () { codeEl.value = codeEl.value.replace(/\D/g, '').slice(0, 6); if (codeEl.value.length === 6) cbtn.click(); });
+})();
+
 /* CarAdvance /belso — Ügyfélfiókok: meglévő ügyfeleknek fiók létrehozása, meghívó, várható érkezés, fizetendő tételek.
    API: /api/fiok-admin/* (ugyanaz a munkatársi bejelentkezés, mint a /belso többi részén). */
 (function () {
