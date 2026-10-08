@@ -1,0 +1,33 @@
+/* CarAdvance — fiók ikon a menüben + "Mentés" gomb az autóoldalakon. A seo-fiok.mjs húzza be minden oldalba. */
+.ca-pbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;border:1px solid var(--line,#E3E8EF);background:#F4F7FB;color:var(--ink,#0F172A);border-radius:999px;text-decoration:none;transition:background .15s,color .15s,transform .15s,box-shadow .15s}
+.ca-pbtn:hover{background:var(--navy,#0B2A4A);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(11,42,74,.25);transform:translateY(-1px)}
+.ca-pbtn:focus-visible{outline:2px solid var(--red,#E2001A);outline-offset:2px}
+.ca-pbtn svg{display:block}
+.ca-pbtn .ca-pini{display:none}
+.ca-pbtn.in{background:var(--navy,#0B2A4A);color:#fff;border-color:transparent}
+.ca-pbtn.in svg{display:none}
+.ca-pbtn.in .ca-pini{display:block;font-weight:800;font-size:17px;line-height:1}
+.ca-pbtn.in::after{content:"";position:absolute;right:1px;bottom:1px;width:11px;height:11px;border-radius:50%;background:#16A34A;border:2px solid #fff}
+.ca-pbtn.in:hover{background:var(--red,#E2001A)}
+@media(max-width:1024px){.ca-pbtn{border-radius:12px}.ca-pbtn.in::after{right:-2px;bottom:-2px}}
+/* Kisebb laptopokon (1025–1439 px) tömörebb menü, hogy a kereső + fiók ikon + Kapcsolat + nyelv kiférjen */
+@media(min-width:1025px) and (max-width:1439px){.ca-nav .menu{gap:2px}.ca-nav .menu>li>button,.ca-nav .menu>li>a{padding-left:10px;padding-right:10px}.ca-nav .navright{gap:8px}.ca-nav .ca-sbtn,.ca-nav .ca-pbtn{width:40px;height:40px}}
+@media(min-width:1025px) and (max-width:1279px){.ca-nav{gap:8px}.ca-nav .menu>li>button,.ca-nav .menu>li>a{font-size:14px;padding-left:8px;padding-right:8px}.ca-nav .brand img{height:auto;width:122px}.ca-nav .kapcsolat{padding-left:14px;padding-right:14px}}
+@media(min-width:1025px) and (max-width:1199px){.ca-nav .kapcsolat{display:none}}
+@media(max-width:480px){.ca-nav .ca-sbtn,.ca-nav .ca-pbtn{width:40px;height:40px}}
+@media(max-width:374px){.ca-nav .navright{gap:6px}.ca-nav .ca-sbtn,.ca-nav .ca-pbtn{width:36px;height:36px}.ca-nav .brand img{width:124px;height:auto}}
+@media(max-width:339px){.ca-nav .brand img{width:100px}.ca-nav .navright{gap:4px}.ca-nav .ca-sbtn,.ca-nav .ca-pbtn{width:34px;height:34px}}
+
+.ca-fav{display:inline-flex;align-items:center;gap:7px;margin:12px 0 4px;padding:8px 15px 8px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.14);background:rgba(255,255,255,.94);color:#0F172A;font:inherit;font-size:14px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(9,17,31,.12);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:transform .15s,background .15s,color .15s}
+.ca-fav[hidden]{display:none}
+.ca-fav svg{color:#9AA3B2;transition:color .15s,transform .2s}
+.ca-fav:hover{transform:translateY(-1px)}
+.ca-fav:hover svg{color:#E2001A}
+.ca-fav.on{background:#fff;color:#E2001A;border-color:rgba(226,0,26,.35)}
+.ca-fav.on svg{color:#E2001A;transform:scale(1.08)}
+.ca-fav:focus-visible{outline:2px solid #E2001A;outline-offset:2px}
+.ca-favtip{position:relative;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;max-width:420px;margin:6px auto 4px;padding:12px 40px 12px 14px;background:#fff;color:#0F172A;border-radius:14px;box-shadow:0 14px 40px rgba(9,17,31,.22);text-align:left;font-size:14px;line-height:1.45}
+.ca-favtip p{margin:0;flex:1 1 220px;color:#334155}
+.ca-favgo{display:inline-flex;border-radius:999px;padding:8px 16px;background:#0B2A4A;color:#fff!important;font-weight:700;text-decoration:none}
+.ca-favgo:hover{background:#E2001A}
+.ca-favx{position:absolute;top:6px;right:8px;border:0;background:none;font-size:20px;line-height:1;color:#8A94A6;cursor:pointer;padding:4px}
