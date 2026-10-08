@@ -67,6 +67,44 @@ function kindOf(rel) {
 }
 
 // Bérautók kiegészítő adatai (ülések, csomagtartó, karosszéria) az összehasonlító oldal adataiból
+// Bérautók: ugyanaz a kártyafotó, mint az /autoink „Bérelhető” listában (seo-abo.mjs PHOTO + SUB).
+// Kulcs: /berelheto-auto/<slug>-berles/ — a slug ugyanúgy készül, mint src/data/rental.ts rentSlug().
+let PHOTOS = new Map();
+function cardPhotos() {
+  const map = new Map();
+  try {
+    const src = fs.readFileSync(path.resolve('seo-abo.mjs'), 'utf8');
+    const b64 = (src.match(/const SEC_B64 = "([^"]+)"/) || [])[1];
+    if (!b64) return map;
+    const sec = Buffer.from(b64, 'base64').toString('utf8');
+    const grab = (s, marker) => {
+      const i = s.indexOf(marker); if (i < 0) return null;
+      let k = i + marker.length, depth = 0, inStr = false, q = '', esc = false;
+      const j = k;
+      for (; k < s.length; k++) {
+        const ch = s[k];
+        if (inStr) { if (esc) esc = false; else if (ch === '\\') esc = true; else if (ch === q) inStr = false; continue; }
+        if (ch === '"' || ch === "'") { inStr = true; q = ch; continue; }
+        if (ch === '{' || ch === '[') depth++;
+        else if (ch === '}' || ch === ']') { depth--; if (depth === 0) { k++; break; } }
+      }
+      const txt = s.slice(j, k);
+      try { return JSON.parse(txt); } catch { try { return new Function('return (' + txt + ')')(); } catch { return null; } }
+    };
+    const PHOTO = grab(sec, 'var PHOTO=') || {};
+    const SUB = grab(sec, 'window.SUB=') || {};
+    const DIG = { '1': '1-es', '2': '2-es', '3': '3-as', '4': '4-es', '5': '5-ös', '6': '6-os', '7': '7-es', '8': '8-as' };
+    const huName = (b, m) => (b === 'VW' ? 'Volkswagen' : b) + ' ' + String(m).replace(/\b(\d)er\b/g, (_, d) => DIG[d] || d).replace(/\bLimousine\b/g, 'Limuzin').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, '$1-osztály');
+    const slugify = (s) => String(s).toLowerCase().replace(/[áà]/g, 'a').replace(/[éè]/g, 'e').replace(/í/g, 'i').replace(/[óöő]/g, 'o').replace(/[úüű]/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    for (const m of SUB.models || []) {
+      if (!m || !m.brand || !m.model) continue;
+      const ph = PHOTO[m.brand + ' ' + m.model];
+      if (ph) map.set('/berelheto-auto/' + slugify(huName(m.brand, m.model)) + '-berles/', String(ph));
+    }
+  } catch (e) { log('bérautó kártyafotók nem olvashatók:', e.message); }
+  return map;
+}
+
 function compareData() {
   const map = new Map();
   try {
@@ -129,6 +167,10 @@ function extract(file, rel, lang, cmp, eurRate) {
     if (mm) it.p = num(mm[1]);
     it.pu = 'ho';
     if (relNoLang.startsWith('uj-auto-berlese/')) it.sub = 'abo';
+    const u0 = url.replace(/^\/[a-z]{2}\//, '/');
+    const cp = PHOTOS.get(u0) || PHOTOS.get(u0.replace(/^\/uj-auto-berlese\/([^/]+)\/$/, '/berelheto-auto/$1-berles/'));
+    if (cp) img = cp;
+    it.cf = 1; // bérautó-kép: teljes autó látszik, nem vágjuk le
     const c = cmp.get(url.replace(/^\/[a-z]{2}\//, '/')) || null;
     if (c) {
       it.s = c.seats; if (c.seatsOpt > c.seats) it.so = c.seatsOpt;
@@ -238,6 +280,8 @@ function inject(files, ver) {
 try {
   if (!fs.existsSync(ROOT)) throw new Error('nincs dist/');
   const cmp = compareData();
+  PHOTOS = cardPhotos();
+  log('bérautó kártyafotók:', PHOTOS.size);
   const contact = contactInfo();
   const stamp = new Date().toISOString().slice(0, 16);
   let total = 0;
