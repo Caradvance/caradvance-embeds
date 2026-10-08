@@ -58,7 +58,8 @@ a{color:inherit}
 .m-sub{display:none;flex-direction:column;padding:0 12px 10px}.m-acc.open .m-sub{display:flex}
 .m-sub a{padding:9px 8px;text-decoration:none;color:var(--muted);font-weight:600;font-size:14.5px}.m-sub a:hover{color:var(--red)}
 .m-kapcsolat{display:block;text-align:center;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px;border-radius:999px;margin:12px 6px 6px}
-@media(max-width:1024px){.ca-nav .menu{display:none}.kapcsolat{display:none}.lang{display:none}.burger{display:flex}.ca-nav{gap:10px;padding:8px 12px}.navright{margin-left:auto}}
+@media(max-width:1024px){.ca-nav .menu{display:none}.kapcsolat{display:none}.burger{display:flex}.ca-nav{gap:10px;padding:8px 12px}.navright{margin-left:auto}}
+@media(max-width:480px){.navright{gap:8px}.langbtn{padding:4px 2px}.langbtn .lchev{display:none}.langmenu{right:-52px}}
 
 /* ── Hero (rounded + inset, same as caradvance.hu landing) ── */
 .hero{position:relative;overflow:hidden;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:540px;padding:20px 24px 72px;border-radius:32px;margin:8px 16px 16px;margin-top:calc(6px - var(--navh));background:linear-gradient(180deg,#17181C,#0B0B0D 62%,#060607)}
