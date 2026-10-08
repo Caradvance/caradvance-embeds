@@ -386,7 +386,7 @@
       var pr = priceTxt(o);
       var tag = o.k === 'berles' && o.sub === 'abo' ? '<span class="cs-tag">' + esc(L.k.abo) + '</span>' : '';
       return '<a class="cs-r' + (car ? ' cs-car' : '') + '" href="' + esc(I.url) + '" data-n="' + idx + '" role="option" id="cs-o' + idx + '">' +
-        '<span class="cs-img">' + img + '<i>' + (ICON[o.k] || ICON.oldal) + '</i></span>' +
+        '<span class="cs-img' + (o.cf ? ' cs-fit' : '') + '">' + img + '<i>' + (ICON[o.k] || ICON.oldal) + '</i></span>' +
         '<span class="cs-tx"><span class="cs-t">' + hl(name, P) + tag + '</span><span class="cs-m">' + hl(sub, P) + '</span></span>' +
         (pr ? '<span class="cs-p">' + esc(pr) + '</span>' : '') + '</a>';
     }

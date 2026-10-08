@@ -11,7 +11,7 @@
   var H1 = D.getElementById('acct-h1'), SUB = D.getElementById('acct-sub');
   var LOCALE = { hu: 'hu-HU', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', uk: 'uk-UA', zh: 'zh-CN', sk: 'sk-SK', cs: 'cs-CZ' }[LANG] || 'hu-HU';
   var LANG_NAMES = [['hu', 'Magyar'], ['en', 'English'], ['de', 'Deutsch'], ['fr', 'Français'], ['uk', 'Українська'], ['zh', '中文'], ['sk', 'Slovenčina'], ['cs', 'Čeština']];
-  var OFFICE_PHONE = '+36 30 233 6060';
+  var OFFICE_PHONE = '+36 30 233 6060';
   var S = { email: '', data: null, tab: 'ov', cool: 0, timer: null };
 
   function t(k, v) { var s = I[k] != null ? I[k] : k; if (v) for (var x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
@@ -214,7 +214,7 @@
     var name = c ? c.name : 'Tóth Károly', mail = (c && c.email) || 'info@caradvance.hu';
     var img = c ? '<span class="ac-pav">' + esc(name.charAt(0).toUpperCase()) + '</span>' : '<img src="/toth-karoly.webp" alt="" width="56" height="56" loading="lazy">';
     return '<div class="ac-card ac-contact"><h2>' + esc(t('contactT')) + '</h2><div class="ac-person">' + img + '<div><b>' + esc(name) + '</b>' + (c ? '' : '<small>' + esc(t('contactRole')) + '</small>') + '</div></div>' +
-      '<a class="ac-btn ac-btn-ghost ac-wide" href="tel:' + (c ? OFFICE_PHONE : '+36302146989').replace(/[^\d+]/g, '') + '">' + ICON.phone + ' ' + esc(c ? OFFICE_PHONE : '+36 30 214 6989') + '</a>' +
+      '<a class="ac-btn ac-btn-ghost ac-wide" href="tel:' + (c ? OFFICE_PHONE : '+36302146989').replace(/[^\d+]/g, '') + '">' + ICON.phone + ' ' + esc(c ? OFFICE_PHONE : '+36 30 214 6989') + '</a>' +
       '<a class="ac-btn ac-btn-ghost ac-wide" href="mailto:' + esc(mail) + '">' + esc(mail) + '</a></div>';
   }
   function paneOv() {
