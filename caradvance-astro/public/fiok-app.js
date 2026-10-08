@@ -1,4 +1,5 @@
-/* CarAdvance — ügyfélfiók oldal (/fiok/ és nyelvi változatai). Szövegek: fiok-i18n.js */
+/* CarAdvance — ügyfélfiók oldal (/fiok/ és nyelvi változatai). Csak meglévő, meghívott ügyfeleknek.
+   Szövegek: fiok-i18n.js */
 (function () {
   'use strict';
   var D = document, W = window;
@@ -10,7 +11,8 @@
   var H1 = D.getElementById('acct-h1'), SUB = D.getElementById('acct-sub');
   var LOCALE = { hu: 'hu-HU', en: 'en-GB', de: 'de-DE', fr: 'fr-FR', uk: 'uk-UA', zh: 'zh-CN', sk: 'sk-SK', cs: 'cs-CZ' }[LANG] || 'hu-HU';
   var LANG_NAMES = [['hu', 'Magyar'], ['en', 'English'], ['de', 'Deutsch'], ['fr', 'Français'], ['uk', 'Українська'], ['zh', '中文'], ['sk', 'Slovenčina'], ['cs', 'Čeština']];
-  var S = { email: '', data: null, tab: 'ov', cool: 0, timer: null, note: '' };
+  var OFFICE_PHONE = '+36 30 233 6060';
+  var S = { email: '', data: null, tab: 'ov', cool: 0, timer: null };
 
   function t(k, v) { var s = I[k] != null ? I[k] : k; if (v) for (var x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -21,21 +23,30 @@
     return fetch('/api/fiok/' + path, o).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._status = r.status; return j; }); });
   }
   function errText(j) { var k = 'err_' + (j && j.error); return I[k] ? I[k] : I.err_generic; }
+  function parseDay(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+  function today() { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function daysTo(s) { var d = parseDay(s); return d ? Math.round((d - today()) / 86400000) : null; }
+  function fmtDay(s) { var d = parseDay(s); if (!d) return ''; try { return d.toLocaleDateString(LOCALE, { year: 'numeric', month: 'long', day: 'numeric' }); } catch (e) { return s; } }
   function fmtDate(s) { if (!s) return ''; var d = new Date(String(s).replace(' ', 'T') + (/[zZ]|[+-]\d\d:?\d\d$/.test(s) ? '' : 'Z')); if (isNaN(d)) return ''; try { return d.toLocaleDateString(LOCALE, { year: 'numeric', month: 'short', day: 'numeric' }); } catch (e) { return d.toISOString().slice(0, 10); } }
+  function money(a, cur) {
+    cur = cur || 'HUF';
+    try { return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: cur, maximumFractionDigits: cur === 'HUF' ? 0 : 2, minimumFractionDigits: 0 }).format(a); }
+    catch (e) { return Math.round(a) + ' ' + cur; }
+  }
+  function sums(list) { var s = {}; list.forEach(function (x) { s[x.currency || 'HUF'] = (s[x.currency || 'HUF'] || 0) + Number(x.amount || 0); }); return Object.keys(s).map(function (c) { return money(s[c], c); }).join(' + ') || money(0, 'HUF'); }
   function hero(h, s) { if (H1) H1.textContent = h; if (SUB) SUB.textContent = s; }
   var ICON = {
     mail: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
     check: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    heart: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 20.3s-7.6-4.6-9.3-9.2C1.5 7.8 3.6 4.5 7 4.5c2 0 3.6 1.1 5 2.9 1.4-1.8 3-2.9 5-2.9 3.4 0 5.5 3.3 4.3 6.6-1.7 4.6-9.3 9.2-9.3 9.2z" fill="currentColor"/></svg>',
-    car: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 16h14M4.5 16l1.6-5.2A2.5 2.5 0 018.5 9h7a2.5 2.5 0 012.4 1.8L19.5 16v2.5a1 1 0 01-1 1h-1a1 1 0 01-1-1V18H7.5v.5a1 1 0 01-1 1h-1a1 1 0 01-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8" cy="14.5" r="1" fill="currentColor"/><circle cx="16" cy="14.5" r="1" fill="currentColor"/></svg>',
     key: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="8" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 12l8-8M16 7l2 2M14 9l2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
-    tag: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 12V4a1 1 0 011-1h8l9 9-9 9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.6" fill="currentColor"/></svg>',
-    search: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
-    gift: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3" y="8" width="18" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 13v7h14v-7M12 8v12M12 8S10.5 3.5 8 4.5 9 8 12 8zm0 0s1.5-4.5 4-3.5S15 8 12 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'
+    gift: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3" y="8" width="18" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 13v7h14v-7M12 8v12M12 8S10.5 3.5 8 4.5 9 8 12 8zm0 0s1.5-4.5 4-3.5S15 8 12 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+    cal: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    msg: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+    phone: '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M6.5 3.5l3 3-2 2.5a12 12 0 006 6l2.5-2 3 3-2 3.5C10 19 5 14 3 6.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'
   };
 
   /* ------------------ kijelentkezett nézet ------------------ */
-  function viewLogin(msg) {
+  function viewLogin(msg, isNoAcct) {
     hero(t('h1Out'), t('subOut'));
     var priv = t('privacy').replace('{a}', '<a href="' + esc(LINKS.privacy || '/adatkezeles/') + '">').replace('{/a}', '</a>');
     root.innerHTML =
@@ -45,7 +56,7 @@
         '<form class="ac-form" id="ac-f1" novalidate>' +
           '<label class="ac-l" for="ac-email">' + esc(t('emailL')) + '</label>' +
           '<input class="ac-in" id="ac-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" required placeholder="' + esc(t('emailPh')) + '" value="' + esc(S.email) + '">' +
-          '<div class="ac-err" id="ac-err1" role="alert">' + (msg ? esc(msg) : '') + '</div>' +
+          '<div class="ac-err' + (isNoAcct ? ' ac-warn' : '') + '" id="ac-err1" role="alert">' + (msg ? esc(msg) : '') + '</div>' +
           '<button class="ac-btn ac-btn-red ac-wide" type="submit">' + esc(t('send')) + '</button>' +
         '</form>' +
         '<p class="ac-muted">' + esc(t('noPass')) + '</p>' +
@@ -53,9 +64,8 @@
       '</div>' +
       '<div class="ac-card ac-ben"><h2>' + esc(t('benefitsT')) + '</h2><ul>' +
         ['b1', 'b2', 'b3', 'b4'].map(function (k) { return '<li><span>' + ICON.check + '</span>' + esc(t(k)) + '</li>'; }).join('') +
-      '</ul></div></div>';
-    var f = D.getElementById('ac-f1');
-    f.addEventListener('submit', function (e) { e.preventDefault(); sendCode(D.getElementById('ac-email').value); });
+      '</ul><p class="ac-invite">' + esc(t('inviteOnly')) + '</p></div></div>';
+    D.getElementById('ac-f1').addEventListener('submit', function (e) { e.preventDefault(); sendCode(D.getElementById('ac-email').value); });
     if (!msg) setTimeout(function () { var i = D.getElementById('ac-email'); if (i && W.innerWidth > 720) i.focus(); }, 60);
   }
   function sendCode(email) {
@@ -68,7 +78,7 @@
     if (rs) rs.disabled = true;
     api('kod', { email: email, lang: LANG }).then(function (j) {
       if (j.ok) { S.cool = 30; viewCode(); }
-      else if (D.getElementById('ac-f1')) { viewLogin(errText(j)); }
+      else if (D.getElementById('ac-f1')) { viewLogin(errText(j), j.error === 'no_account'); }
       else { var e2 = D.getElementById('ac-err2'); if (e2) e2.textContent = errText(j); if (rs) rs.disabled = false; }
     }).catch(function () { viewLogin(t('err_generic')); });
   }
@@ -91,8 +101,7 @@
     D.getElementById('ac-f2').addEventListener('submit', function (e) { e.preventDefault(); verifyCode(c.value.replace(/\D/g, '')); });
     D.getElementById('ac-other').onclick = function () { clearInterval(S.timer); viewLogin(); };
     D.getElementById('ac-resend').onclick = function () { sendCode(S.email); };
-    tick();
-    clearInterval(S.timer); S.timer = setInterval(tick, 1000);
+    tick(); clearInterval(S.timer); S.timer = setInterval(tick, 1000);
     setTimeout(function () { c.focus(); }, 60);
   }
   function tick() {
@@ -120,15 +129,9 @@
   function load() {
     root.innerHTML = '<div class="ac-loading">' + esc(t('loading')) + '</div>';
     return api('me').then(function (j) {
-      if (!j.ok) { ls('ca_acct_prof', null); ls('ca_favs', null); viewLogin(); return; }
+      if (!j.ok) { ls('ca_acct_prof', null); viewLogin(); return; }
       S.data = j;
       ls('ca_acct_prof', { name: j.user.name, email: j.user.email, phone: j.user.phone, company: j.user.company });
-      ls('ca_favs', (j.favs || []).map(function (f) { return f.url; }));
-      var pend = ls('ca_fav_pending');
-      if (pend && pend.url) {
-        ls('ca_fav_pending', null);
-        return api('kedvenc', pend).then(function (r) { if (r.ok) { S.tab = 'fav'; S.note = t('savedPending'); } return load(); });
-      }
       paintNav(j.user);
       viewApp();
     }).catch(function () { root.innerHTML = '<div class="ac-card ac-msg">' + esc(t('err_generic')) + '</div>'; });
@@ -145,30 +148,38 @@
     if (LANG === 'zh') return n;
     return p[0];
   }
+  function isClosed(x) { return x.stages.length ? x.idx === x.stages.length - 1 : /Lezárva|Átadva|Eladva/.test(x.stage); }
+  function invState(x) {
+    if (x.paid_at) return { cls: 'paid', txt: t('st_paid', { d: fmtDay(x.paid_at) }) };
+    var n = daysTo(x.due_date);
+    if (n === null) return { cls: 'due', txt: t('st_noDue') };
+    if (n < 0) return { cls: 'over', txt: t('st_overdue', { n: -n }) };
+    if (n === 0) return { cls: 'over', txt: t('st_dueToday') };
+    return { cls: n <= 7 ? 'soon' : 'due', txt: t('st_dueIn', { n: n }) };
+  }
   function viewApp() {
     var d = S.data, u = d.user;
     var fn = firstName(u);
     hero(fn ? t('h1In', { n: fn }) : t('h1Anon'), t('subIn'));
-    var openOffers = (d.offers || []).filter(function (o) { return !o.responded; }).length;
-    var tabs = [['ov', t('tabOv')], ['req', t('tabReq'), (d.deals || []).length + (d.requests || []).length], ['fav', t('tabFav'), (d.favs || []).length], ['prof', t('tabProf')]];
+    var open = (d.invoices || []).filter(function (x) { return !x.paid_at; });
+    var overdue = open.filter(function (x) { var n = daysTo(x.due_date); return n !== null && n < 0; });
+    var tabs = [['ov', t('tabOv')], ['inv', t('tabInv'), open.length, overdue.length], ['prof', t('tabProf')]];
     root.innerHTML =
       '<div class="ac-bar">' +
         '<div class="ac-who"><span class="ac-av">' + esc((u.name || u.email).charAt(0).toUpperCase()) + '</span><div><b>' + esc(u.name || u.email) + '</b><small>' + esc(u.name ? u.email : t('since', { d: fmtDate(u.created_at) })) + '</small></div></div>' +
-        '<nav class="ac-tabs" role="tablist">' + tabs.map(function (x) { return '<button type="button" role="tab" data-tab="' + x[0] + '" aria-selected="' + (S.tab === x[0]) + '"' + (S.tab === x[0] ? ' class="on"' : '') + '>' + esc(x[1]) + (x[2] ? '<i>' + x[2] + '</i>' : '') + (x[0] === 'req' && openOffers ? '<em></em>' : '') + '</button>'; }).join('') + '</nav>' +
+        '<nav class="ac-tabs" role="tablist">' + tabs.map(function (x) { return '<button type="button" role="tab" data-tab="' + x[0] + '" aria-selected="' + (S.tab === x[0]) + '"' + (S.tab === x[0] ? ' class="on"' : '') + '>' + esc(x[1]) + (x[2] ? '<i>' + x[2] + '</i>' : '') + (x[3] ? '<em></em>' : '') + '</button>'; }).join('') + '</nav>' +
         '<button type="button" class="ac-out" id="ac-out">' + esc(t('logout')) + '</button>' +
-      '</div>' +
-      (S.note ? '<div class="ac-note" role="status">' + ICON.check + ' ' + esc(S.note) + '</div>' : '') +
-      '<div id="ac-pane"></div>';
-    S.note = '';
+      '</div><div id="ac-pane"></div>';
     var tb = root.querySelectorAll('.ac-tabs button');
     for (var i = 0; i < tb.length; i++) tb[i].onclick = function () { S.tab = this.getAttribute('data-tab'); try { history.replaceState(null, '', '#' + S.tab); } catch (e) {} viewApp(); };
-    D.getElementById('ac-out').onclick = function () { api('kilepes', {}).then(function () { ls('ca_acct_prof', null); ls('ca_favs', null); location.href = location.pathname; }); };
+    D.getElementById('ac-out').onclick = function () { api('kilepes', {}).then(function () { ls('ca_acct_prof', null); location.href = location.pathname; }); };
     var pane = D.getElementById('ac-pane');
-    if (S.tab === 'req') pane.innerHTML = paneReq();
-    else if (S.tab === 'fav') pane.innerHTML = paneFav();
+    if (S.tab === 'inv') pane.innerHTML = paneInv();
     else if (S.tab === 'prof') { pane.innerHTML = paneProf(); bindProf(); }
     else pane.innerHTML = paneOv();
-    bindCommon();
+    root.querySelectorAll('.ac-steps').forEach(function (ol) { var c = ol.querySelector('.cur,.cur-end'); if (c && ol.scrollWidth > ol.clientWidth) ol.scrollLeft = c.offsetLeft - ol.clientWidth / 2 + c.clientWidth / 2; });
+    var g = root.querySelectorAll('[data-go]');
+    for (var k = 0; k < g.length; k++) g[k].onclick = function () { S.tab = this.getAttribute('data-go'); viewApp(); W.scrollTo({ top: root.getBoundingClientRect().top + W.scrollY - 90, behavior: 'smooth' }); };
   }
   function offersHtml() {
     var o = S.data.offers || []; if (!o.length) return '';
@@ -181,50 +192,64 @@
   function dealHtml(x) {
     var st = x.stages || [], idx = x.idx;
     var label = (I.stages && I.stages[x.stage]) || x.stage;
-    return '<div class="ac-deal">' +
-      '<div class="ac-dh"><span class="ac-pill">' + esc(t('line_' + x.line) !== 'line_' + x.line ? t('line_' + x.line) : x.line) + '</span><b>' + esc(x.car || '') + '</b><span class="ac-stage">' + esc(label) + '</span></div>' +
+    var lineLbl = I['line_' + x.line] || x.line;
+    var etaHtml = '';
+    if (x.eta && !isClosed(x)) {
+      var n = daysTo(x.eta);
+      etaHtml = '<div class="ac-eta">' + ICON.cal + '<span>' + esc(t('eta')) + ': <b>' + esc(fmtDay(x.eta)) + '</b>' + (n !== null && n >= 0 ? ' <em>(' + esc(n === 0 ? t('etaToday') : t('etaIn', { n: n })) + ')</em>' : '') + '</span></div>';
+    }
+    return '<div class="ac-deal' + (isClosed(x) ? ' closed' : '') + '">' +
+      '<div class="ac-dh"><span class="ac-pill">' + esc(lineLbl) + '</span><b>' + esc(x.car || '') + '</b><span class="ac-stage">' + esc(label) + '</span></div>' +
+      etaHtml +
       (st.length ? '<ol class="ac-steps" aria-label="' + esc(idx > -1 ? t('step', { i: idx + 1, n: st.length }) : '') + '">' + st.map(function (s, i) {
-        var cls = i < idx ? 'done' : (i === idx ? 'cur' : '');
-        return '<li class="' + cls + '"><span class="dot">' + (i < idx ? ICON.check : (i + 1)) + '</span><span class="lb">' + esc((I.stages && I.stages[s]) || s) + '</span></li>';
+        var cls = i < idx ? 'done' : (i === idx ? (i === st.length - 1 ? 'done cur-end' : 'cur') : '');
+        return '<li class="' + cls + '"><span class="dot">' + (i < idx || (i === idx && i === st.length - 1) ? ICON.check : (i + 1)) + '</span><span class="lb">' + esc((I.stages && I.stages[s]) || s) + '</span></li>';
       }).join('') + '</ol>' : '') +
+      (x.note ? '<div class="ac-note2">' + ICON.msg + '<div><small>' + esc(t('noteT')) + '</small><p>' + esc(x.note) + '</p></div></div>' : '') +
     '</div>';
   }
-  function reqHtml(r) {
-    var f = r.fields || {}, keys = Object.keys(f).filter(function (k) { return !/^(Típus|type|form|Nyelv|E-mail)$/.test(k); }).slice(0, 14);
-    return '<details class="ac-req"><summary><span class="ac-pill lt">' + esc(t('kind_' + r.kind) !== 'kind_' + r.kind ? t('kind_' + r.kind) : (r.kind || '')) + '</span><b>' + esc(r.car || '') + '</b><time>' + esc(fmtDate(r.created_at)) + '</time><span class="ac-more">' + esc(t('details')) + '</span></summary>' +
-      (keys.length ? '<dl>' + keys.map(function (k) { return '<dt>' + esc(k) + '</dt><dd>' + esc(f[k]) + '</dd>'; }).join('') + '</dl>' : '') + '</details>';
+  function contactHtml() {
+    var c = null;
+    (S.data.deals || []).some(function (x) { if (x.contact && x.contact.name) { c = x.contact; return true; } return false; });
+    var name = c ? c.name : 'Tóth Károly', mail = (c && c.email) || 'info@caradvance.hu';
+    var img = c ? '<span class="ac-pav">' + esc(name.charAt(0).toUpperCase()) + '</span>' : '<img src="/toth-karoly.webp" alt="" width="56" height="56" loading="lazy">';
+    return '<div class="ac-card ac-contact"><h2>' + esc(t('contactT')) + '</h2><div class="ac-person">' + img + '<div><b>' + esc(name) + '</b>' + (c ? '' : '<small>' + esc(t('contactRole')) + '</small>') + '</div></div>' +
+      '<a class="ac-btn ac-btn-ghost ac-wide" href="tel:' + (c ? OFFICE_PHONE : '+36302146989').replace(/[^\d+]/g, '') + '">' + ICON.phone + ' ' + esc(c ? OFFICE_PHONE : '+36 30 214 6989') + '</a>' +
+      '<a class="ac-btn ac-btn-ghost ac-wide" href="mailto:' + esc(mail) + '">' + esc(mail) + '</a></div>';
   }
   function paneOv() {
     var d = S.data;
-    var stats = [['req', t('stCases'), (d.deals || []).length], ['req', t('stOffers'), (d.offers || []).length], ['fav', t('stFavs'), (d.favs || []).length], ['req', t('stReqs'), (d.requests || []).length]];
-    var active = (d.deals || []).slice(0, 2);
-    var q = [['rent', 'q_rent', ICON.key], ['order', 'q_order', ICON.car], ['import', 'q_import', ICON.search], ['sell', 'q_sell', ICON.tag]];
+    var deals = d.deals || [];
+    var active = deals.filter(function (x) { return !isClosed(x); });
+    var closed = deals.filter(isClosed);
+    var etas = active.map(function (x) { return x.eta; }).filter(function (e) { var n = daysTo(e); return n !== null && n >= 0; }).sort();
+    var open = (d.invoices || []).filter(function (x) { return !x.paid_at; });
+    var overdue = open.filter(function (x) { var n = daysTo(x.due_date); return n !== null && n < 0; });
+    var stats = [
+      ['', t('stCases'), String(active.length), ''],
+      ['', t('stEta'), etas[0] ? fmtDay(etas[0]) : '—', ''],
+      ['inv', t('stOpen'), open.length ? sums(open) : '—', ''],
+      ['inv', t('stOverdue'), overdue.length ? sums(overdue) : '—', overdue.length ? 'bad' : '']
+    ];
     return offersHtml() +
-      '<div class="ac-stats">' + stats.map(function (s) { return '<button type="button" class="ac-stat" data-go="' + s[0] + '"><b>' + s[2] + '</b><span>' + esc(s[1]) + '</span></button>'; }).join('') + '</div>' +
+      '<div class="ac-stats">' + stats.map(function (s) { return '<' + (s[0] ? 'button type="button" data-go="' + s[0] + '"' : 'div') + ' class="ac-stat ' + s[3] + '"><b>' + esc(s[2]) + '</b><span>' + esc(s[1]) + '</span></' + (s[0] ? 'button' : 'div') + '>'; }).join('') + '</div>' +
       '<div class="ac-cols">' +
-        '<div class="ac-card"><h2>' + esc(t('casesT')) + '</h2>' + (active.length ? active.map(dealHtml).join('') : '<p class="ac-muted">' + esc(t('noCases')) + '</p>') +
-          ((d.requests || []).length && !active.length ? '<h3 class="ac-h3">' + esc(t('reqT')) + '</h3>' + d.requests.slice(0, 3).map(reqHtml).join('') : '') + '</div>' +
-        '<div class="ac-side">' +
-          '<div class="ac-card"><h2>' + esc(t('quickT')) + '</h2><div class="ac-quick">' + q.map(function (x) { return LINKS[x[0]] ? '<a href="' + esc(LINKS[x[0]]) + '"><span class="ac-ic sm">' + x[2] + '</span>' + esc(t(x[1])) + '</a>' : ''; }).join('') + '</div></div>' +
-          '<div class="ac-card ac-contact"><h2>' + esc(t('contactT')) + '</h2><div class="ac-person"><img src="/toth-karoly.webp" alt="" width="56" height="56" loading="lazy"><div><b>Tóth Károly</b><small>' + esc(t('contactRole')) + '</small></div></div>' +
-            '<a class="ac-btn ac-btn-ghost ac-wide" href="tel:+36302146989">+36 30 214 6989</a><a class="ac-btn ac-btn-ghost ac-wide" href="mailto:info@caradvance.hu">info@caradvance.hu</a></div>' +
-        '</div>' +
+        '<div class="ac-card"><h2>' + esc(t('casesT')) + '</h2>' + (deals.length ? active.concat(closed).map(dealHtml).join('') : '<p class="ac-muted">' + esc(t('noCases')) + '</p>') + '</div>' +
+        '<div class="ac-side">' + (open.length ? '<div class="ac-card"><h2>' + esc(t('invT')) + '</h2>' + open.slice(0, 3).map(invRow).join('') + '<button type="button" class="ac-link" data-go="inv">' + esc(t('tabInv')) + ' →</button></div>' : '') + contactHtml() + '</div>' +
       '</div>';
   }
-  function paneReq() {
-    var d = S.data;
-    var deals = d.deals || [], reqs = d.requests || [];
-    return offersHtml() +
-      '<div class="ac-card"><h2>' + esc(t('casesT')) + '</h2>' + (deals.length ? deals.map(dealHtml).join('') : '<p class="ac-muted">' + esc(t('noCases')) + '</p>') + '</div>' +
-      '<div class="ac-card"><h2>' + esc(t('reqT')) + '</h2>' + (reqs.length ? reqs.map(reqHtml).join('') : '<p class="ac-muted">' + esc(t('noReqs')) + '</p>') + '</div>';
+  function invRow(x) {
+    var s = invState(x);
+    return '<div class="ac-inv ' + s.cls + '"><div class="ac-inv-l"><b>' + esc(x.title || x.number || '—') + '</b><small>' + esc([x.number && x.title ? t('invNo') + ': ' + x.number : '', x.due_date ? t('invDue') + ': ' + fmtDay(x.due_date) : ''].filter(Boolean).join(' · ')) + '</small></div>' +
+      '<div class="ac-inv-r"><b>' + esc(money(Number(x.amount || 0), x.currency)) + '</b><span class="ac-chip ' + s.cls + '">' + esc(s.txt) + '</span></div></div>';
   }
-  function paneFav() {
-    var f = S.data.favs || [];
-    if (!f.length) return '<div class="ac-card ac-empty"><span class="ac-ic">' + ICON.heart + '</span><p>' + esc(t('noFavs')) + '</p>' + (LINKS.browse ? '<a class="ac-btn ac-btn-red" href="' + esc(LINKS.browse) + '">' + esc(t('browse')) + '</a>' : '') + '</div>';
-    return '<div class="ac-card"><h2>' + esc(t('favT')) + '</h2><div class="ac-favs">' + f.map(function (x) {
-      return '<div class="ac-fav"><a href="' + esc(x.url) + '"><span class="ac-fimg">' + (x.img ? '<img src="' + esc(x.img) + '" alt="" loading="lazy">' : ICON.car) + '</span><b>' + esc(x.title || x.url) + '</b>' + (x.price ? '<small>' + esc(x.price) + '</small>' : '') + '</a>' +
-        '<button type="button" class="ac-frm" data-rm="' + esc(x.url) + '" aria-label="' + esc(t('remove')) + '" title="' + esc(t('remove')) + '">×</button></div>';
-    }).join('') + '</div></div>';
+  function paneInv() {
+    var inv = S.data.invoices || [];
+    var open = inv.filter(function (x) { return !x.paid_at; }), paid = inv.filter(function (x) { return x.paid_at; });
+    return '<div class="ac-card"><div class="ac-invhead"><h2>' + esc(t('invT')) + '</h2>' + (open.length ? '<div class="ac-total"><small>' + esc(t('invTotal')) + '</small><b>' + esc(sums(open)) + '</b></div>' : '') + '</div>' +
+      (open.length ? open.map(invRow).join('') : '<p class="ac-muted">' + esc(t('noInv')) + '</p>') +
+      '<p class="ac-small">' + esc(t('invHelp')) + '</p></div>' +
+      (paid.length ? '<div class="ac-card"><h2>' + esc(t('invPaidT')) + '</h2>' + paid.map(invRow).join('') + '</div>' : '');
   }
   function paneProf() {
     var u = S.data.user;
@@ -235,15 +260,13 @@
         '<label class="ac-l" for="pf-c">' + esc(t('company')) + '</label><input class="ac-in" id="pf-c" name="company" autocomplete="organization" value="' + esc(u.company) + '">' +
         '<label class="ac-l" for="pf-e">' + esc(t('email')) + '</label><input class="ac-in" id="pf-e" value="' + esc(u.email) + '" disabled>' +
         '<label class="ac-l" for="pf-l">' + esc(t('langL')) + '</label><select class="ac-in" id="pf-l" name="lang">' + LANG_NAMES.map(function (l) { return '<option value="' + l[0] + '"' + (u.lang === l[0] ? ' selected' : '') + '>' + l[1] + '</option>'; }).join('') + '</select>' +
-        '<label class="ac-chk"><input type="checkbox" id="pf-m"' + (u.marketing ? ' checked' : '') + '><span>' + esc(t('mkt')) + '</span></label>' +
         '<div class="ac-row"><button class="ac-btn ac-btn-red" type="submit">' + esc(t('save')) + '</button><span class="ac-ok" id="pf-ok" role="status"></span></div>' +
-      '</form></div>' +
-      '<div class="ac-card ac-danger"><h2>' + esc(t('delT')) + '</h2><p class="ac-muted">' + esc(t('delSub')) + '</p><button type="button" class="ac-btn ac-btn-ghost" id="ac-del">' + esc(t('delBtn')) + '</button></div></div>';
+      '</form></div>' + contactHtml() + '</div>';
   }
   function bindProf() {
     D.getElementById('ac-pf').addEventListener('submit', function (e) {
       e.preventDefault();
-      var b = { name: D.getElementById('pf-n').value, phone: D.getElementById('pf-p').value, company: D.getElementById('pf-c').value, lang: D.getElementById('pf-l').value, marketing: D.getElementById('pf-m').checked };
+      var b = { name: D.getElementById('pf-n').value, phone: D.getElementById('pf-p').value, company: D.getElementById('pf-c').value, lang: D.getElementById('pf-l').value };
       var ok = D.getElementById('pf-ok'); ok.textContent = '…';
       api('profil', b).then(function (j) {
         if (!j.ok) { ok.textContent = errText(j); return; }
@@ -253,40 +276,16 @@
         ok.textContent = t('saved');
       });
     });
-    D.getElementById('ac-del').onclick = function () {
-      if (!W.confirm(t('delConfirm'))) return;
-      api('torles', { confirm: true }).then(function (j) {
-        if (!j.ok) return;
-        ls('ca_acct_prof', null); ls('ca_favs', null);
-        S.data = null; S.email = ''; viewLogin(); var e = D.getElementById('ac-err1'); if (e) { e.className = 'ac-ok'; e.textContent = t('deleted'); }
-        var bs = D.querySelectorAll('a.ca-pbtn'); for (var i = 0; i < bs.length; i++) bs[i].classList.remove('in');
-      });
-    };
-  }
-  function bindCommon() {
-    var g = root.querySelectorAll('[data-go]');
-    for (var i = 0; i < g.length; i++) g[i].onclick = function () { S.tab = this.getAttribute('data-go'); viewApp(); W.scrollTo({ top: root.getBoundingClientRect().top + W.scrollY - 90, behavior: 'smooth' }); };
-    var r = root.querySelectorAll('[data-rm]');
-    for (var j = 0; j < r.length; j++) r[j].onclick = function () {
-      var url = this.getAttribute('data-rm');
-      api('kedvenc', { url: url, remove: true }).then(function (x) {
-        if (!x.ok) return;
-        S.data.favs = S.data.favs.filter(function (f) { return f.url !== url; });
-        ls('ca_favs', S.data.favs.map(function (f) { return f.url; }));
-        viewApp();
-      });
-    };
   }
 
   /* ------------------ indulás ------------------ */
-  var h = (location.hash || '').slice(1); if (/^(ov|req|fav|prof)$/.test(h)) S.tab = h;
-  var qs = new URLSearchParams(location.search);
-  var tok = qs.get('t');
+  var h = (location.hash || '').slice(1); if (/^(ov|inv|prof)$/.test(h)) S.tab = h;
+  var tok = new URLSearchParams(location.search).get('t');
   if (tok) {
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
     hero(t('h1Anon'), t('linkLogin'));
     root.innerHTML = '<div class="ac-loading">' + esc(t('linkLogin')) + '</div>';
-    api('belepes', { t: tok }).then(function (j) { if (j.ok) load(); else viewLogin(errText(j)); }).catch(function () { viewLogin(t('err_generic')); });
+    api('belepes', { t: tok }).then(function (j) { if (j.ok) load(); else viewLogin(errText(j), j.error === 'no_account'); }).catch(function () { viewLogin(t('err_generic')); });
   } else if (/(?:^|; )ca_cust_n=/.test(D.cookie)) {
     load();
   } else {
