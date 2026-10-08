@@ -82,3 +82,8 @@ html.cs-lock{overflow:hidden}
   .cs-ql,.cs-ans{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){.cs-pn,.cs-bd{transition:none}}
+
+/* Mobil fejléc: a nyelvválasztó (zászló) a kereső és a menü gomb között is látszik.
+   (A global.css-ben is így van; ez a szabály a nem Astro-ból készült oldalakra is érvényes.) */
+@media(max-width:1024px){.ca-nav .navright .lang{display:block}}
+@media(max-width:480px){.ca-nav .navright{gap:8px}.ca-nav .langbtn{padding:4px 2px}.ca-nav .langbtn .lchev{display:none}.ca-nav .langmenu{right:-52px}}
