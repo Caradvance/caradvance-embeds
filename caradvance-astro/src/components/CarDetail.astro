@@ -147,7 +147,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <div class="cd-intro-grid">
         <div class="cd-info">
           <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}<span class="cd-chip cd-chip-year">{model.yearChip}</span></div>
-          {isRent ? (<Fragment><div class="cd-price"><span class="cd-net">nettó</span><span class="cd-huf cd-rent-live" data-eur={rentEur}>{rentHuf}</span><span class="cd-eur">/hó · {rentEur} €/hó -tól</span></div>
+          {isRent ? (<Fragment><div class="ca-pbox ca-pbox--lg" data-bteur={rentEur} data-fx={FX}><div class="ca-ptop"><span class="ca-seg" role="group" aria-label="Ár megjelenítése"><button type="button" data-bt="c" class="on" aria-pressed="true">Cég</button><button type="button" data-bt="p" aria-pressed="false">Magán</button></span><span class="ca-pt">nettó + áfa</span></div><div class="ca-prow"><b class="ca-pv">{rentHuf}</b><span class="ca-pm">/hó -tól</span></div><div class="ca-pe">{rentEur} €/hó · nettó</div></div><link rel="stylesheet" href="/ca-bt.css?v=1" /><script is:inline src="/ca-bt.js?v=1" defer></script>
           <p class="cd-note">Havi bérleti díj {rentKm ? nf(rentKm) + ' km/hó futáskerettel' : 'egyedi futáskerettel'}{rentMonths ? ', ' + rentMonths + ' hónapos futamidőre' : ''}; egyszeri, visszatérítendő kaució: <span class="cd-dep-live" data-eur={kaucioEur}>{kaucioHuf}</span> ({nf(kaucioEur)} €)-tól. A kaució a bérlés végén — káresemény nélkül — visszajár. <a href="/berlesi-feltetelek/#kaucio">Mi történik a kaucióval? →</a></p></Fragment>) : (<Fragment>{poa ? (<Fragment><div class="cd-price"><span class="cd-huf">Ár kérésre</span></div>
           <p class="cd-note">Ez a modell egyedi ajánlat alapján rendelhető — a pontos árat a kiválasztott motor és felszereltség alapján adjuk meg.</p></Fragment>) : (<Fragment><div class="cd-price"><span class="cd-net">nettó</span><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} -tól</span></div>
           <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p></Fragment>)}</Fragment>)}
@@ -538,7 +538,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   <script is:inline>
   (function(){try{
     fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function(r){return r.json();}).then(function(d){
-      if(d&&d.rates&&d.rates.HUF){var fx=Math.round(d.rates.HUF);
+      if(d&&d.rates&&d.rates.HUF){var fx=Math.round(d.rates.HUF);window.__caFX=fx;if(window.caBTApply)window.caBTApply();
         var f=document.getElementById('cdFx'); if(f) f.textContent=fx;
         [].forEach.call(document.querySelectorAll('.cd-huf-live'),function(h){var n=Number(h.getAttribute('data-net')||0); if(n) h.textContent=new Intl.NumberFormat('hu-HU').format(Math.round(n*fx))+' Ft';});
         // a szövegben (áttekintés, GYIK, útmutató) is ugyanaz az élő árfolyamos összeg legyen, mint a fejlécben

@@ -2,7 +2,7 @@
 // Új autó bérlése — same look as Egyedi autó rendelés (egl-mhero hero + egl-card cards), rental data.
 // Data source: "új autó bérlés" sheet (44 models). Do not add models not in this list.
 // Cars grouped by model family (fam) with section headers, like Egyedi.
-import { MODELS, BRANDS, g, gh, bodyOf } from '../data/rentalModels.js';
+import { MODELS, BRANDS, g, gh, bodyOf, HUF } from '../data/rentalModels.js';
 
 const brandCount = (id) => MODELS.filter((x) => x.b === id).length;
 const families = (bid) => { const seen = []; MODELS.filter((x) => x.b === bid).forEach((x) => { if (seen.indexOf(x.fam) < 0) seen.push(x.fam); }); return seen; };
@@ -128,12 +128,11 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
                   </div>
                   <div class="egl-name">{car.m}</div>
                   <div class="egl-specs">{specLine(car)}</div>
-                  <div class="egl-price">
-                    <span class="egl-net">nettó</span>
-                    <b>{gh(car.p2)} Ft</b>
-                    <span class="eur">/ hó</span>
-                    <span class="tol">{g(car.p2)} €-tól</span>
-                    <span class="egl-info" tabindex="0">i<span class="egl-tip">A havi díj 2000 km/hó futáskerettel értendő. 3000 km/hó esetén {g(car.p3)} € / hó ({gh(car.p3)} Ft). Egyszeri, visszatérítendő kaució: {g(car.k)} € ({gh(car.k)} Ft). Az árak tájékoztató jellegűek, élő árfolyammal (1 € = 368 Ft). <a href="/berlesi-feltetelek/#kaucio" style="color:#8fc7ff;text-decoration:underline">Mi történik a kaucióval? →</a></span></span>
+                  <div class="ca-pbox" data-bteur={car.p2} data-fx={HUF} data-r="100">
+                    <div class="ca-ptop"><span class="ca-seg" role="group" aria-label="Ár megjelenítése"><button type="button" data-bt="c" class="on" aria-pressed="true">Cég</button><button type="button" data-bt="p" aria-pressed="false">Magán</button></span><span class="ca-pt">nettó + áfa</span></div>
+                    <div class="ca-prow"><b class="ca-pv">{gh(car.p2)} Ft</b><span class="ca-pm">/hó -tól</span>
+                    <span class="egl-info" tabindex="0">i<span class="egl-tip">A havi díj 2000 km/hó futáskerettel értendő. 3000 km/hó esetén {g(car.p3)} € / hó ({gh(car.p3)} Ft). Egyszeri, visszatérítendő kaució: {g(car.k)} € ({gh(car.k)} Ft). Az árak tájékoztató jellegűek, élő árfolyammal (1 € = 368 Ft). <a href="/berlesi-feltetelek/#kaucio" style="color:#8fc7ff;text-decoration:underline">Mi történik a kaucióval? →</a></span></span></div>
+                    <div class="ca-pe">{g(car.p2)} €/hó · nettó</div>
                   </div>
                 </div>
                 <div class="egl-actions">
@@ -148,6 +147,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
     </div>
   ))}
 </section>
+<link rel="stylesheet" href="/ca-bt.css?v=1" /><script is:inline src="/ca-bt.js?v=1" defer></script>
 
 <style is:global>
 .uab{--red:#E2001A;--red-dark:#b80016;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--navy:#0F1B2D;max-width:1160px;margin:0 auto;padding:0 20px 26px}
