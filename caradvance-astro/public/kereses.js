@@ -350,7 +350,7 @@
     function fmt(n) { try { return Math.round(n).toLocaleString('hu-HU').replace(/ /g, ' '); } catch (e) { return String(Math.round(n)); } }
     function priceTxt(o) {
       if (NP || !o.p) return '';
-      if (o.k === 'berles') return fmt(o.p) + ' ' + L.ho;
+      if (o.k === 'berles') return L.netto + ' ' + fmt(o.p) + ' ' + L.ho;
       if (o.k === 'rendeles') return o.ep ? L.netto + ' ' + fmt(o.ep) + ' €' + L.tol : L.netto + ' ' + (o.p / 1e6).toFixed(1).replace('.', ',') + ' M Ft' + L.tol;
       return fmt(o.p) + ' Ft';
     }
