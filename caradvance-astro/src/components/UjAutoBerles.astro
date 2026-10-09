@@ -129,6 +129,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
                   <div class="egl-name">{car.m}</div>
                   <div class="egl-specs">{specLine(car)}</div>
                   <div class="egl-price">
+                    <span class="egl-net">nettó</span>
                     <b>{gh(car.p2)} Ft</b>
                     <span class="eur">/ hó</span>
                     <span class="tol">{g(car.p2)} €-tól</span>
@@ -208,6 +209,7 @@ const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 .uab .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px}
 .uab .egl-price{display:flex;align-items:baseline;gap:7px;margin-bottom:14px;flex-wrap:wrap;position:relative}
 .uab .egl-price b{font-size:23px;font-weight:800;color:var(--ink)}
+.uab .egl-price .egl-net{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);align-self:center;margin-right:-3px}
 .uab .egl-price .eur{font-size:14px;font-weight:700;color:var(--muted)}
 .uab .egl-price .tol{font-size:13px;color:var(--muted);font-weight:600}
 .uab .egl-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:italic;cursor:help;margin-left:2px;flex:0 0 auto}

@@ -63,7 +63,7 @@ const cmpRows = [
   ['Váltó / hajtás', ...model.variants.map((v) => v.drive)],
   ['Kinek ajánljuk', ...model.variants.map((v) => v.rec)],
 ];
-if (isRent) cmpRows.push(['Havidíj -tól', ...model.variants.map((v) => (v as any).rentTxt || '—')]);
+if (isRent) cmpRows.push(['Nettó havidíj -tól', ...model.variants.map((v) => (v as any).rentTxt || '—')]);
 
 // galéria + belső-tér sajtófotók (ld. src/data/interiorGallery.ts)
 const gal = withInterior(Astro.url.pathname, model.gallery || [], model.name);
@@ -147,9 +147,9 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <div class="cd-intro-grid">
         <div class="cd-info">
           <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}<span class="cd-chip cd-chip-year">{model.yearChip}</span></div>
-          {isRent ? (<Fragment><div class="cd-price"><span class="cd-huf cd-rent-live" data-eur={rentEur}>{rentHuf}</span><span class="cd-eur">/hó · {rentEur} €/hó -tól</span></div>
+          {isRent ? (<Fragment><div class="cd-price"><span class="cd-net">nettó</span><span class="cd-huf cd-rent-live" data-eur={rentEur}>{rentHuf}</span><span class="cd-eur">/hó · {rentEur} €/hó -tól</span></div>
           <p class="cd-note">Havi bérleti díj {rentKm ? nf(rentKm) + ' km/hó futáskerettel' : 'egyedi futáskerettel'}{rentMonths ? ', ' + rentMonths + ' hónapos futamidőre' : ''}; egyszeri, visszatérítendő kaució: <span class="cd-dep-live" data-eur={kaucioEur}>{kaucioHuf}</span> ({nf(kaucioEur)} €)-tól. A kaució a bérlés végén — káresemény nélkül — visszajár. <a href="/berlesi-feltetelek/#kaucio">Mi történik a kaucióval? →</a></p></Fragment>) : (<Fragment>{poa ? (<Fragment><div class="cd-price"><span class="cd-huf">Ár kérésre</span></div>
-          <p class="cd-note">Ez a modell egyedi ajánlat alapján rendelhető — a pontos árat a kiválasztott motor és felszereltség alapján adjuk meg.</p></Fragment>) : (<Fragment><div class="cd-price"><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} nettó -tól</span></div>
+          <p class="cd-note">Ez a modell egyedi ajánlat alapján rendelhető — a pontos árat a kiválasztott motor és felszereltség alapján adjuk meg.</p></Fragment>) : (<Fragment><div class="cd-price"><span class="cd-net">nettó</span><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} -tól</span></div>
           <p class="cd-note">Tájékoztató német nettó listaár, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="cdFx">{FX}</span>&nbsp;Ft). A végleges ár a felszereltségtől és kedvezménytől függ.</p></Fragment>)}</Fragment>)}
           <div class="cd-cta2">{isRent ? (<Fragment><a class="cd-btn cd-btn-red sub-rent" href={kapcsRent} {...rentBtn}>Ajánlatot kérek</a><a class="cd-btn cd-btn-dark" href={berlesBack}>Vissza a bérléshez</a></Fragment>) : (<Fragment><a class="cd-btn cd-btn-red" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Autót rendelek</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></Fragment>)}</div>
           <div class="cd-trust">
@@ -178,8 +178,8 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         <a href="#gyik">GYIK</a>
       </div>
       <div class="cd-nav-cta">
-        {isRent ? (<Fragment><span class="cd-nav-price"><span class="cd-rent-live" data-eur={rentEur}>{rentHuf}</span>/hó-tól</span>
-        <a class="cd-nav-btn sub-rent" href={kapcsRent} {...rentBtn}>Ajánlatot kérek</a></Fragment>) : (<Fragment><span class="cd-nav-price">{poa ? 'Ár kérésre' : (<Fragment><span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</Fragment>)}</span>
+        {isRent ? (<Fragment><span class="cd-nav-price"><span class="cd-net">nettó</span> <span class="cd-rent-live" data-eur={rentEur}>{rentHuf}</span>/hó-tól</span>
+        <a class="cd-nav-btn sub-rent" href={kapcsRent} {...rentBtn}>Ajánlatot kérek</a></Fragment>) : (<Fragment><span class="cd-nav-price">{poa ? 'Ár kérésre' : (<Fragment><span class="cd-net">nettó</span> <span class="cd-huf-live" data-net={model.netEur}>{huf}</span>-tól</Fragment>)}</span>
         <a class="cd-nav-btn" href={orderHref} data-egl-order data-name={model.name} data-img={model.mainImg} data-price={orderPrice} data-fuels={model.orderFuels}>Rendeld meg</a></Fragment>)}
       </div>
     </div>
@@ -263,7 +263,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
           {has('vmax') && (<div class="r"><span class="k">Végsebesség</span><span class="v" id="svVmax">{v0.vmax || '—'}</span></div>)}
           {has('cons') && (<div class="r"><span class="k">Fogyasztás (WLTP)</span><span class="v" id="svCons">{v0.cons || '—'}</span></div>)}
           {has('boot') && (<div class="r"><span class="k">Csomagtér</span><span class="v" id="svBoot">{v0.boot || '—'}</span></div>)}
-          {isRent ? (<div class="r"><span class="k">Havidíj -tól</span><span class="v" id="svRent">{v0.rentTxt || (rentEur + ' €/hó-tól')}</span></div>) : (<div class="r"><span class="k">Nettó ár -tól</span><span class="v">{poa ? 'Ár kérésre' : (<Fragment>{eur} · <span class="cd-huf-live" data-net={model.netEur}>{huf}</span></Fragment>)}</span></div>)}
+          {isRent ? (<div class="r"><span class="k">Nettó havidíj -tól</span><span class="v" id="svRent">{v0.rentTxt || (rentEur + ' €/hó-tól')}</span></div>) : (<div class="r"><span class="k">Nettó ár -tól</span><span class="v">{poa ? 'Ár kérésre' : (<Fragment>{eur} · <span class="cd-huf-live" data-net={model.netEur}>{huf}</span></Fragment>)}</span></div>)}
         </div>
       </div>
       <script type="application/json" id="cdVarData" set:html={JSON.stringify(varMap)}></script>
@@ -621,6 +621,8 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   .cd-chip{background:var(--soft);color:var(--navy);font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:100px;}
   .cd-chip-year{background:var(--red);color:#fff;}
   .cd-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .cd-net{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.75;margin-right:-6px;}
+  .cd-nav-price .cd-net{font-size:11px;margin-right:0;}
   .cd-huf{font-size:clamp(32px,4.4vw,46px);font-weight:800;color:var(--navy);letter-spacing:-.015em;}
   .cd-eur{font-size:16px;color:var(--muted);font-weight:600;}
   .cd-note{font-size:13px;color:#6f7b8b;margin:8px 0 22px;line-height:1.5;max-width:520px;}

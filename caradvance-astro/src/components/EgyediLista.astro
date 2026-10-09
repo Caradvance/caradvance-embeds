@@ -273,6 +273,7 @@ const _rebuild='rebuild-nudge-3';
   .egl-specs{font-size:14px;color:var(--muted);margin:0 0 14px;}
   .egl-price{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;flex-wrap:nowrap;white-space:nowrap;}
   .egl-price b{font-size:21px;font-weight:800;color:var(--ink);}
+  .egl-price .egl-net{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);align-self:center;margin-right:-4px;}
   .egl-price .eur{font-size:14px;font-weight:600;color:var(--muted);}
   .egl-price .egl-soon{font-size:22px;font-weight:800;color:var(--navy);}
   .egl-price .tol{font-size:13px;color:var(--muted);font-weight:600;}
@@ -550,7 +551,7 @@ const _rebuild='rebuild-nudge-3';
     } else if(!isMini && SOON.indexOf(slug(c))>-1){
       priceHtml = '<span class="egl-soon">Hamarosan</span>';
     } else {
-      priceHtml = '<b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
+      priceHtml = '<span class="egl-net">nettó</span><b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
     }
     var href = '/egyedi-auto-rendeles/'+slug(c);
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
@@ -763,7 +764,7 @@ const _rebuild='rebuild-nudge-3';
     setBuyer('Magánszemély');
     var im=document.getElementById('eglOrderImg'); if(im){ im.src=d.img||''; im.alt=d.name||''; }
     var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v||''; };
-    set('eglOrderTitle',d.name); set('eglOrderPrice',d.price);
+    set('eglOrderTitle',d.name); set('eglOrderPrice',(/\d/.test(d.price||'')&&(d.price||'').indexOf('Ft')>-1&&!/nettó/i.test(d.price||''))?('nettó '+d.price):d.price);
     var cc=document.getElementById('eglOrderCar'); if(cc) cc.value=d.name||'';
     // price "-tól" + info tooltip (only when a real price is shown)
     var info=document.getElementById('eglOrderInfo'), tip=document.getElementById('eglOrderTip'), tol=document.getElementById('eglOrderTol');
