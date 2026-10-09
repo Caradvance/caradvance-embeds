@@ -63,7 +63,7 @@ function cleanJson(v) {
   return typeof v === 'string' ? strip(v) : v;
 }
 
-const PRICE_ATTR = /^(eur|net|huf|price|k|p2|p3|dep|rent|kaucio|cross|save|gross|ft)$/;
+const PRICE_ATTR = /^(eur|net|huf|price|k|p2|p3|dep|rent|kaucio|cross|save|gross|ft|bteur)$/;
 function cleanAttrs(tag) {
   return tag.replace(/\s([a-zA-Z0-9:_-]+)="([^"]*)"/g, (m, name, val) => {
     const dn = name.startsWith('data-') ? name.slice(5) : '';
