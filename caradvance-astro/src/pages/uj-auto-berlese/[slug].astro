@@ -61,7 +61,7 @@ const faqJson = { '@context':'https://schema.org','@type':'FAQPage','mainEntity'
       <div class="cd-intro-grid">
         <div class="cd-info">
           <div class="cd-chips"><span class="cd-chip">{car.fam}</span><span class="cd-chip">{body}</span><span class="cd-chip">Bérelhető</span><span class="cd-chip cd-chip-year">Új autó · 2026</span></div>
-          <div class="cd-price"><span class="cd-huf" data-eur={car.p2}>{gh(car.p2)} Ft</span><span class="cd-eur">/ hó · {g(car.p2)} €-tól</span></div>
+          <div class="cd-price"><span class="cd-net">nettó</span><span class="cd-huf" data-eur={car.p2}>{gh(car.p2)} Ft</span><span class="cd-eur">/ hó · {g(car.p2)} €-tól</span></div>
           <p class="cd-note">Havi bérleti díj 2000 km/hó futáskerettel, tájékoztató jelleggel, élő árfolyammal (1&nbsp;€&nbsp;=&nbsp;<span id="rtFx">{HUF}</span>&nbsp;Ft). Egyszeri, visszatérítendő kaució: {g(car.k)}&nbsp;€ (<span data-eur={car.k}>{gh(car.k)} Ft</span>).</p>
           <div class="cd-cta2"><a class="cd-btn cd-btn-red" href={kapcs}>Bérlés igénylése</a><a class="cd-btn cd-btn-dark" href="/kapcsolat">Ajánlatot kérek</a></div>
           <div class="cd-trust">
@@ -88,7 +88,7 @@ const faqJson = { '@context':'https://schema.org','@type':'FAQPage','mainEntity'
         <a href="#gyik">GYIK</a>
       </div>
       <div class="cd-nav-cta">
-        <span class="cd-nav-price"><span data-eur={car.p2}>{gh(car.p2)} Ft</span>/hó-tól</span>
+        <span class="cd-nav-price"><span class="cd-net">nettó</span> <span data-eur={car.p2}>{gh(car.p2)} Ft</span>/hó-tól</span>
         <a class="cd-nav-btn" href={kapcs}>Bérlés igénylése</a>
       </div>
     </div>
@@ -123,8 +123,8 @@ const faqJson = { '@context':'https://schema.org','@type':'FAQPage','mainEntity'
       <span class="cd-eyebrow">Bérleti díjak</span>
       <h2 class="cd-h2">Havi díj és kaució</h2>
       <div class="cd-hl" style="grid-template-columns:repeat(3,1fr);">
-        <div class="cd-c"><div class="cd-i">1</div><h3>Havi díj · 2000 km/hó</h3><p><b data-eur={car.p2} style="font-size:22px;color:var(--navy);">{gh(car.p2)} Ft</b><br/>{g(car.p2)} € / hó</p></div>
-        <div class="cd-c"><div class="cd-i">2</div><h3>Havi díj · 3000 km/hó</h3><p><b data-eur={car.p3} style="font-size:22px;color:var(--navy);">{gh(car.p3)} Ft</b><br/>{g(car.p3)} € / hó</p></div>
+        <div class="cd-c"><div class="cd-i">1</div><h3>Nettó havi díj · 2000 km/hó</h3><p><b data-eur={car.p2} style="font-size:22px;color:var(--navy);">{gh(car.p2)} Ft</b><br/>{g(car.p2)} € / hó</p></div>
+        <div class="cd-c"><div class="cd-i">2</div><h3>Nettó havi díj · 3000 km/hó</h3><p><b data-eur={car.p3} style="font-size:22px;color:var(--navy);">{gh(car.p3)} Ft</b><br/>{g(car.p3)} € / hó</p></div>
         <div class="cd-c"><div class="cd-i">↩</div><h3>Egyszeri kaució</h3><p><b data-eur={car.k} style="font-size:22px;color:var(--navy);">{gh(car.k)} Ft</b><br/>{g(car.k)} € · visszatérítendő</p></div>
       </div>
       <p class="cd-specnote">Az árak nettó, tájékoztató jellegű árak, élő árfolyammal számolva. A kaució a bérlet végén — káresemény és rendkívüli kopás hiányában — visszajár. A km-kereten felüli futást előre egyeztetett km-díjjal számoljuk el.</p>
@@ -236,6 +236,8 @@ const faqJson = { '@context':'https://schema.org','@type':'FAQPage','mainEntity'
   .cd-chip{background:var(--soft);color:var(--navy);font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:100px;}
   .cd-chip-year{background:var(--red);color:#fff;}
   .cd-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .cd-net{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.75;margin-right:-6px;}
+  .cd-nav-price .cd-net{font-size:11px;margin-right:0;}
   .cd-huf{font-size:clamp(32px,4.4vw,46px);font-weight:800;color:var(--navy);letter-spacing:-.01em;}
   .cd-eur{font-size:16px;color:var(--muted);font-weight:600;}
   .cd-note{font-size:12.5px;color:#9aa7ba;margin:8px 0 22px;line-height:1.5;max-width:520px;}
