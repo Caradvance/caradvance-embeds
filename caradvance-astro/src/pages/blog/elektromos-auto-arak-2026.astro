@@ -1,0 +1,100 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'elektromos-auto-arak-2026';
+const title = 'Elektromos autó árak 2026 — új prémium villanyautók, bérlés és lízing havidíjjal';
+const lead = 'Mennyibe kerül ma egy új BMW, Audi vagy más prémium elektromos autó Németországból, mennyi a havidíja tartós bérletben, és mire figyelj, ha használt elektromos autót vennél? Valós árak és kiszámolt előnyök.';
+const description = 'Elektromos autó árak 2026: új prémium villanyautók nettó árai (BMW iX1, i4, iX3, i5, Audi Q6 e-tron, A6 e-tron), tartós bérlet 330 000 Ft/hó-tól, adó- és illetékmentesség, és ellenőrzőlista használt elektromos autó vásárlásához.';
+const faqs = [
+  ['Mennyibe kerül egy új prémium elektromos autó 2026-ban?', 'A német kínálatunkban a BMW iX1 nettó 41 513 €-tól (kb. 15,2 M Ft), a BMW i4 48 908 €-tól (17,9 M Ft), a BMW iX3 és az Audi Q6 e-tron kb. 53 300 €-tól (19,4–19,5 M Ft), a BMW i5 59 580 €-tól (21,7 M Ft) érhető el. Az árak nettó induló árak, élő árfolyammal.'],
+  ['Kell regisztrációs adót fizetni elektromos autó után?', 'Nem. A tisztán elektromos (5E) autók regisztrációs adó- és vagyonszerzésiilleték-mentesek, cégként pedig cégautóadót sem kell fizetni utánuk. Ez behozott autónál több százezer forint megtakarítás egy hasonló teljesítményű dízelhez képest.'],
+  ['Mennyi egy elektromos autó tartós bérlete?', 'Nálunk vadonatúj elektromos autó 330 000 Ft/hó-tól (Kia EV2) bérelhető, az Audi Q4 e-tron 440 000, az Audi A6 Avant e-tron 530 000 Ft/hó-tól — nettó havidíjjal, 4000 km/hó futáskerettel és 6 hónapos futamidővel.'],
+  ['Mire figyeljek használt elektromos autó vásárlásakor?', 'Az akkumulátor állapotára (SoH, lehetőleg mérési jegyzőkönyvvel), a gyári akkumulátor-garancia hátralévő idejére, a töltési képességekre (AC és DC teljesítmény), a hőszivattyúra és a szoftverfrissítésekre. Nézd meg a szervizelőzményeket és a baleseti múltat is.'],
+  ['Lízingelhető elektromos autó magánszemélyként?', 'Igen, új és használt elektromos autó is finanszírozható zárt- vagy nyíltvégű lízinggel. A lehetőségeket és a támogatásokat az elektromos autó lízing cikkünk és a lízing kalkulátor mutatja be.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Elektromos autó árak 2026 — új, bérlés, lízing | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["elektromos-auto-lizing-tamogatas","tartos-berlet-arak-2026","auto-honositas-2026"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>Az <strong>új prémium elektromos autók</strong> nettó induló ára a német kínálatban kb. <strong>15 millió forinttól</strong> (BMW iX1) indul, a középkategóriás SUV-ok (BMW iX3, Audi Q6 e-tron) 19–20 millió forint körül vannak. Ha nem vennél, <strong>tartós bérletben 330 000 Ft/hó-tól</strong> vezethetsz vadonatújat. A villanyautó Magyarországon <strong>regisztrációs adó-, illeték- és cégautóadó-mentes</strong>, ami behozott autónál különösen sokat számít.</p>
+    </div>
+
+    <p>Az <strong>elektromos autó árak</strong> 2026-ra sokat rendeződtek: a prémium márkák második-harmadik generációs villanyautói már hasonló áron kaphatók, mint a nagy teljesítményű benzines vagy dízel társaik — miközben az üzemeltetési és adózási előnyök megmaradtak. Megnézzük, mennyibe kerül ma egy új villanyautó, mennyi a havidíja, és mire figyelj, ha használtat vennél.</p>
+
+    <h2>Új elektromos autó árak — német nettó induló árak</h2>
+    <table>
+      <thead><tr><th>Modell</th><th>Teljesítmény</th><th>Nettó ár -tól</th><th>Kb. forintban</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-ix1/">BMW iX1</a></td><td>150 kW</td><td>41 513 €</td><td>15,2 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-ix2/">BMW iX2</a></td><td>150 kW</td><td>42 857 €</td><td>15,6 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-i4/">BMW i4</a></td><td>210 kW</td><td>48 908 €</td><td>17,9 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/a6sbetron-elektromos/">Audi A6 Sportback e-tron</a></td><td>210 kW</td><td>52 773 €</td><td>19,3 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/ix3-elektromos/">BMW iX3 (új generáció)</a></td><td>345 kW</td><td>53 277 €</td><td>19,4 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/q6etron-elektromos/">Audi Q6 e-tron</a></td><td>225 kW</td><td>53 361 €</td><td>19,5 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/a6avantetron-elektromos/">Audi A6 Avant e-tron</a></td><td>210 kW</td><td>54 160 €</td><td>19,8 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/q6sbetron-elektromos/">Audi Q6 Sportback e-tron</a></td><td>225 kW</td><td>55 378 €</td><td>20,2 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-i5/">BMW i5</a></td><td>250 kW</td><td>59 580 €</td><td>21,7 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-i5-touring/">BMW i5 Touring</a></td><td>250 kW</td><td>61 261 €</td><td>22,4 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-ix/">BMW iX</a></td><td>300 kW</td><td>70 168 €</td><td>25,6 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-i7/">BMW i7</a></td><td>335 kW</td><td>102 017 €</td><td>37,2 M Ft</td></tr>
+      </tbody>
+    </table>
+    <p>Nettó induló árak, 2026. október, élő árfolyammal (1 € ≈ 365 Ft). A végleges ár a felszereltségtől és a kedvezményektől függ. Magánszemélyként a Caradvance GmbH-n keresztül akár <strong>19% német áfával</strong> vásárolhatsz a hazai 27% helyett. Az összeállításhoz segít a <a href="/blog/bmw-mercedes-audi-konfigurator">BMW, Mercedes és Audi konfigurátor útmutató</a>.</p>
+
+    <h2>Miért olcsóbb fenntartani? Adók és illetékek</h2>
+    <table>
+      <thead><tr><th>Tétel</th><th>Elektromos (5E)</th><th>Hasonló dízel, 3 éves, 219 kW</th></tr></thead>
+      <tbody>
+        <tr><td>Regisztrációs adó (behozatalnál)</td><td><b>0 Ft</b></td><td>kb. 155 100 Ft</td></tr>
+        <tr><td>Vagyonszerzési illeték</td><td><b>0 Ft</b></td><td>kb. 208 050 Ft</td></tr>
+        <tr><td>Cégautóadó (cégnél)</td><td><b>0 Ft</b></td><td>havonta fizetendő</td></tr>
+        <tr><td>Zöld rendszám</td><td>igen — sok helyen parkolási kedvezmény</td><td>nem</td></tr>
+      </tbody>
+    </table>
+    <p>A teljes honosítási költséget tételesen a <a href="/blog/auto-honositas-2026">honosítás 2026</a> cikkben számoltuk ki; a saját autódra a <a href="/honositas-kalkulator/">honosítás kalkulátor</a> ad pontos összeget. Az üzemanyag- és töltési költséget modellenként az <a href="/auto-osszehasonlitas/">autó-összehasonlító kalkulátorban</a> vetheted össze.</p>
+
+    <h2>Elektromos autó tartós bérletben — havidíjak</h2>
+    <table>
+      <thead><tr><th>Modell</th><th>Nettó havidíj -tól</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/berelheto-auto/kia-ev2-berles/">Kia EV2</a></td><td>330 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/cupra-raval-berles/">CUPRA Raval</a></td><td>370 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/cupra-born-berles/">CUPRA Born</a></td><td>390 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/kia-ev4-berles/">Kia EV4</a></td><td>410 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/volkswagen-id-7-tourer-berles/">Volkswagen ID.7 Tourer</a></td><td>410 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-q4-e-tron-berles/">Audi Q4 e-tron</a></td><td>440 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/hyundai-ioniq-5-n-berles/">Hyundai IONIQ 5 N</a></td><td>460 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-q6-sportback-berles/">Audi Q6 Sportback e-tron</a></td><td>500 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-a6-avant-e-tron-berles/">Audi A6 Avant e-tron</a></td><td>530 000 Ft</td></tr>
+      </tbody>
+    </table>
+    <p>4000 km/hó futáskeret, 6 hónapos futamidő, szerviz, adó és gumi a díjban. Az összes modellt és a benzines, dízel alternatívákat a <a href="/blog/tartos-berlet-arak-2026">tartós bérlet árak 2026</a> cikkben és a <a href="/autoink/#berelheto">bérelhető autóink</a> között látod.</p>
+
+    <h2>Vásárlás, lízing vagy bérlet?</h2>
+    <ul>
+      <li><strong>Vásárlás</strong> — ha hosszú távra tartanád, és kihasználnád az adómentességet. Behozatalnál a honosítás itt a legolcsóbb.</li>
+      <li><strong>Lízing</strong> — ha a sajátod lenne, de nem egy összegben fizetnél. Részletek: <a href="/blog/elektromos-auto-lizing-tamogatas">elektromos autó lízing és támogatás</a>, számolás: <a href="/finanszirozas-lizing/">lízing kalkulátor</a>.</li>
+      <li><strong>Tartós bérlet</strong> — ha ki szeretnéd próbálni az elektromos autózást, vagy nem akarsz az akkumulátor hosszú távú értékvesztésével foglalkozni.</li>
+    </ul>
+
+    <h2>Használt elektromos autó — ellenőrzőlista</h2>
+    <p>A <strong>használt elektromos autó</strong> jó vétel lehet, mert az értékvesztés nagy részét az első tulajdonos viseli. Néhány dologra viszont jobban kell figyelni, mint egy benzinesnél:</p>
+    <ol>
+      <li><strong>Akkumulátor állapota (SoH)</strong> — kérj mérési jegyzőkönyvet vagy diagnosztikai kiolvasást; a hirdetésben szereplő hatótáv önmagában keveset mond.</li>
+      <li><strong>Akkumulátor-garancia</strong> — a prémium gyártók jellemzően 8 év / 160 000 km garanciát adnak az akkumulátorra; nézd meg, mennyi van hátra belőle.</li>
+      <li><strong>Töltési képességek</strong> — AC fedélzeti töltő (11 vagy 22 kW) és DC gyorstöltési teljesítmény; a régebbi modellek lényegesen lassabban töltenek.</li>
+      <li><strong>Hőszivattyú</strong> — télen akár jelentősen növelheti a hatótávot.</li>
+      <li><strong>Szoftver és szervizmúlt</strong> — friss szoftver, elvégzett visszahívások, dokumentált szervizek.</li>
+      <li><strong>Gumik és fékek</strong> — a nagy tömeg és nyomaték miatt az elektromos autó gyorsabban koptatja a gumit.</li>
+    </ol>
+    <p>Általános tippek a <a href="/blog/hasznalt-premium-auto-ellenorzo-lista">használt prémium autó ellenőrző listában</a>. Németországból behozott használt villanyautónál a teljes folyamatot az <a href="/auto-rendeles/">autó rendelés Németországból</a> oldalon írtuk le.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Az árak 2026. októberi, tájékoztató jellegű nettó árak és havidíjak. Az adó- és illetékszabályok a 2026-ban hatályos jogszabályokon alapulnak; a cikk nem minősül adótanácsadásnak.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>

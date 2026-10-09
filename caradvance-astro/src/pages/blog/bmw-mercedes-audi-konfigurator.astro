@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'bmw-mercedes-audi-konfigurator';
+const title = 'BMW, Mercedes és Audi konfigurátor — így rakd össze és rendeld meg német áron';
+const lead = 'A márkák online konfigurátorában pár perc alatt összeállítod az álomautódat. Megmutatjuk, mire figyelj a csomagoknál, melyik extra éri meg, és hogyan lesz a kész konfigurációból német áron, kulcsrakészen átvett autó.';
+const description = 'BMW konfigurátor, Mercedes konfigurátor, Audi konfigurátor magyarul: hogyan állítsd össze az új autót, mely csomagok és extrák érik meg, mennyi a német nettó ár, és hogyan rendeld meg Németországból akár 19% német áfával.';
+const faqs = [
+  ['Hol találom a BMW, Mercedes és Audi konfigurátort?', 'Mindhárom márka hivatalos weboldalán: magyarul a bmw.hu, a mercedes-benz.hu és az audi.hu oldalon, németül a bmw.de, a mercedes-benz.de és az audi.de oldalon. A német konfigurátorban gyakran több motor- és csomagváltozat érhető el, és ott látod a német listaárat is.'],
+  ['Meg lehet rendelni Németországból a konfigurátorban összeállított autót?', 'Igen. Elküldöd nekünk a konfiguráció mentett linkjét, kódját vagy PDF-jét, mi pedig ajánlatot adunk rá a németországi Caradvance GmbH-n keresztül — a szállítással, honosítással és magyar forgalomba helyezéssel együtt.'],
+  ['Mennyivel olcsóbb a német ár?', 'A német konfigurátor bruttó ára 19% német áfát tartalmaz. Magánszemélyként a Caradvance GmbH-n keresztül akár 19% német áfával vásárolhatsz a hazai 27% helyett — ez önmagában több százezer, drágább modelleknél milliós különbség is lehet.'],
+  ['Melyik extrák érik meg a viszonteladás szempontjából?', 'A sportos felszereltségi vonalak (BMW M Sport, Mercedes AMG Line, Audi S line), a semleges metálfényezés, a vezetéstámogató és a komfortcsomagok, elektromos autónál a hőszivattyú. A nagyon egyedi színek és a drága, de ritkán keresett extrák kevésbé térülnek meg.'],
+  ['Mennyi idő alatt érkezik meg a rendelt autó?', 'Raktáron lévő vagy már gyártásban lévő autónál néhány hét, gyári rendelésnél a modelltől és a gyártási sortól függően jellemzően néhány hónap. Az ajánlatban a várható átadási időt is megadjuk.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'BMW, Mercedes, Audi konfigurátor magyarul | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["audi-bmw-mercedes-osszehasonlitas","mercedes-behozatal-nemetorszagbol","auto-honositas-2026"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>BMW konfigurátor</strong>, a <strong>Mercedes konfigurátor</strong> és az <strong>Audi konfigurátor</strong> a márkák hivatalos oldalain ingyenesen használható. A legtöbbet a <strong>német</strong> változat mutatja: ott látod a teljes motor- és csomagkínálatot és a német listaárat. A kész konfigurációt elküldheted nekünk — mi Németországból, akár 19% német áfával, kulcsrakészen szerezzük be. A modellek nettó induló árait az <a href="/egyedi-auto-rendeles/">egyedi autó rendelés</a> oldalon látod.</p>
+    </div>
+
+    <p>Egy új prémium autó összeállítása ma már nem a szalonban kezdődik, hanem a kanapén. A konfigurátorban percek alatt kipróbálhatsz tíz színt, három felszereltségi vonalat és fél tucat felnit — de a sok opció között könnyű elveszni, és nem mindegy, mennyit fizetsz a végén. Ez az útmutató segít, hogy a konfigurációd <strong>okos</strong> is legyen, ne csak szép.</p>
+
+    <h2>Hol találod a konfigurátorokat?</h2>
+    <table>
+      <thead><tr><th>Márka</th><th>Magyar oldal</th><th>Német oldal</th><th>Nálunk</th></tr></thead>
+      <tbody>
+        <tr><td>BMW</td><td>bmw.hu</td><td>bmw.de</td><td><a href="/egyedi-auto-rendeles/?brand=bmw">BMW modellek és árak</a></td></tr>
+        <tr><td>Mercedes-Benz</td><td>mercedes-benz.hu</td><td>mercedes-benz.de</td><td><a href="/egyedi-auto-rendeles/?brand=mercedes">Mercedes modellek és árak</a></td></tr>
+        <tr><td>Audi</td><td>audi.hu</td><td>audi.de</td><td><a href="/egyedi-auto-rendeles/?brand=audi">Audi modellek és árak</a></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Tipp:</strong> ha a magyar konfigurátorban nem találsz egy motort vagy csomagot, nézd meg a német oldalon — a német piacon gyakran szélesebb a választék. A böngésző beépített fordítója jól boldogul a német menükkel.</p>
+
+    <h2>Így rakd össze lépésről lépésre</h2>
+    <ol>
+      <li><strong>Modell és karosszéria</strong> — limuzin, kombi (BMW Touring, Mercedes T-Modell, Audi Avant), SUV vagy kupé.</li>
+      <li><strong>Hajtáslánc</strong> — benzin, dízel, plug-in hibrid vagy tisztán elektromos. Az elektromos autó Magyarországon regisztrációs adó- és illetékmentes, cégként cégautóadó-mentes.</li>
+      <li><strong>Felszereltségi vonal</strong> — BMW-nél M Sport, Mercedesnél AMG Line, Audinál S line: ezek adják a sportosabb külsőt és sok alapfelszerelést.</li>
+      <li><strong>Szín és kárpit</strong> — a semleges metálszínek (fekete, szürke, fehér, sötétkék) a legkeresettebbek a használtpiacon.</li>
+      <li><strong>Csomagok</strong> — érdemesebb csomagban választani, mint egyenként: a vezetéstámogató, a komfort- és a parkolócsomag általában kedvezőbb, mint a tételek külön.</li>
+      <li><strong>Mentés</strong> — mentsd el a konfigurációt (link, kód vagy PDF), mert ez lesz a rendelés alapja.</li>
+    </ol>
+
+    <h2>Mely extrák érik meg — és melyek nem?</h2>
+    <table>
+      <thead><tr><th>Megéri</th><th>Átgondolandó</th></tr></thead>
+      <tbody>
+        <tr><td>Sportos felszereltségi vonal (M Sport / AMG Line / S line)</td><td>Nagyon egyedi, ritka fényezés</td></tr>
+        <tr><td>Vezetéstámogató csomag (adaptív tempomat, sávtartó)</td><td>Legnagyobb felnik — kényelmetlenebbek, drágább a gumi</td></tr>
+        <tr><td>Ülésfűtés, elektromos csomagtérajtó, tolatókamera</td><td>Drága prémium hifi, ha nem fontos neked</td></tr>
+        <tr><td>Elektromos autónál hőszivattyú, nagyobb AC-töltő</td><td>Előfizetéses funkciók hosszú távra</td></tr>
+        <tr><td>Vonóhorog (SUV, kombi), ha valaha kell</td><td>Utólag drágán vagy nem beépíthető extrák kihagyása</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Mennyibe kerül? Német nettó induló árak</h2>
+    <p>Néhány népszerű modell nettó induló ára a <a href="/egyedi-auto-rendeles/">német kínálatunkban</a> (2026. október, élő árfolyammal; a forintár a napi euróárfolyamtól függ):</p>
+    <table>
+      <thead><tr><th>Modell</th><th>Nettó ár-tól</th><th>Kb. forintban</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/egyedi-auto-rendeles/1erb-benzin/">BMW 1-es</a></td><td>28 782 €</td><td>10,5 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/mercedes-benz-c-osztaly/">Mercedes C-osztály</a></td><td>35 653 €</td><td>13,0 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/mercedes-benz-glc/">Mercedes GLC</a></td><td>45 392 €</td><td>16,6 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/q5-benzin/">Audi Q5</a></td><td>46 429 €</td><td>16,9 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/bmw-5-os/">BMW 5-ös</a></td><td>50 420 €</td><td>18,4 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/x3-benzin/">BMW X3</a></td><td>50 672 €</td><td>18,5 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/q6etron-elektromos/">Audi Q6 e-tron</a></td><td>53 361 €</td><td>19,5 M Ft</td></tr>
+        <tr><td><a href="/egyedi-auto-rendeles/ix3-elektromos/">BMW iX3</a></td><td>53 277 €</td><td>19,4 M Ft</td></tr>
+      </tbody>
+    </table>
+    <p>A konfigurátor bruttó német árában 19% áfa van. Magánszemélyként a geretsriedi (München melletti) <strong>Caradvance GmbH-n</strong> keresztül akár ezzel a <strong>19% német áfával</strong> vásárolhatsz a hazai 27% helyett; cégként nettó áron, áfa-visszaigénylési lehetőséggel. Behozott autónál a <a href="/blog/auto-honositas-2026">honosítás költségeivel</a> is számolni kell — ezt a <a href="/honositas-kalkulator/">honosítás kalkulátor</a> előre megmutatja.</p>
+
+    <h2>A konfigurációtól az átadásig</h2>
+    <ol>
+      <li>Elküldöd a mentett konfigurációt — az <a href="/egyedi-auto-rendeles/">egyedi rendelés</a> űrlapján PDF-et vagy képet is feltölthetsz.</li>
+      <li>Tételes ajánlatot adunk: vételár, szállítás, honosítás, várható átadási idő.</li>
+      <li>Megrendeljük az autót Németországban, vagy megkeressük a raktáron lévő, hasonló felszereltségű darabot.</li>
+      <li>Hazaszállítjuk, honosítjuk, és magyar forgalmival, rendszámmal adjuk át.</li>
+    </ol>
+    <p>Nem szeretnél vásárolni? Számos modell <a href="/uj-auto-berlese/">tartós bérletben</a> is elérhető, egyetlen nettó havidíjjal — vagy válassz <a href="/finanszirozas-lizing/">lízinget</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">A BMW, Mercedes-Benz és Audi a gyártók védjegyei; a CarAdvance független kereskedő. Az árak tájékoztató jellegű nettó induló árak, a végleges ár a felszereltségtől és a kedvezményektől függ.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>

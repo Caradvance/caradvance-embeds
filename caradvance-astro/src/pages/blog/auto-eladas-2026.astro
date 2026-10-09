@@ -1,0 +1,86 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'auto-eladas-2026';
+const title = 'Autó eladás 2026 — magánúton, beszámítással vagy bizományban? Papírok és teendők';
+const lead = 'Melyik eladási mód hozza a legtöbb pénzt a legkevesebb kockázattal? Összehasonlítjuk a három utat, összeszedjük a szükséges papírokat, a 15 napos bejelentési határidőt és az átírás költségét.';
+const description = 'Autó eladás 2026: magánúton, beszámítással vagy bizományban? Szükséges papírok, adásvételi szerződés, eladás bejelentése 15 napon belül, átírás költsége, biztosítás és a leggyakoribb csapdák.';
+const faqs = [
+  ['Milyen papírok kellenek az autó eladásához?', 'A forgalmi engedély, a törzskönyv (vagy hitel esetén a bank engedélye), a személyazonosító okmányok és egy írásbeli adásvételi szerződés. Érdemes átadni a szervizkönyvet, a pótkulcsot és a számlákat is — ezek emelik az eladási árat.'],
+  ['Meddig kell bejelenteni az autó eladását?', 'Az eladónak az adásvétel után 15 napon belül be kell jelentenie a tulajdonosváltozást — online (ügyfélkapuval) vagy a kormányablakban. A vevőnek szintén 15 napja van az átírásra. Amíg a bejelentés nem történik meg, a hatóság felé az eladó számít tulajdonosnak.'],
+  ['Mennyibe kerül az autó átírása a vevőnek?', 'A vagyonszerzési illeték (kW × életkor, 300–950 Ft/kW), az eredetiségvizsgálat (22 950–27 000 Ft) és az okmányok díja (12 000 Ft). Egy 110 kW-os, 8 évnél idősebb autónál ez összesen kb. 97 475 Ft. Pontos összeg: átírás kalkulátor.'],
+  ['Mi a bizományos autóeladás előnye?', 'A bizományos a hirdetést, a telefonokat, a megtekintéseket, az alkut és a papírmunkát is átveszi, miközben az autó a piaci árhoz közel kel el. Neked nem kell idegeneket fogadnod, és nem kell a fizetés biztonsága miatt aggódnod.'],
+  ['Mi történik a kötelező biztosítással eladás után?', 'A tulajdonosváltozással a régi kötelező biztosítás megszűnik; az adásvételi szerződéssel jelezd a biztosítódnak. A casco-t külön kell felmondani. A vevőnek saját KGFB-t kell kötnie.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Autó eladás 2026: papírok, bejelentés, átírás | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["bizomanyos-auto-ertekesites","hasznalt-premium-auto-ellenorzo-lista","eredetisegvizsgalat"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>Autót háromféleképpen adhatsz el: <strong>magánúton</strong> (legtöbb munka, piaci ár), <strong>beszámítással</strong> (leggyorsabb, de általában a piaci ár alatt) vagy <strong>bizományban</strong> (piaci árhoz közel, a munkát más végzi). Bármelyiket választod, az eladást <strong>15 napon belül be kell jelentened</strong>, a vevő pedig ugyanennyi idő alatt íratja át az autót. Ha nem akarsz ezzel foglalkozni, nézd meg a <a href="/bizomanyos/">bizományos értékesítésünket</a>.</p>
+    </div>
+
+    <p>Az autó eladás elsőre egyszerűnek tűnik: fotó, hirdetés, vevő, kész. A valóságban hetekig tartó telefonálás, megtekintések, alku és papírmunka lehet belőle — és egy rosszul megírt adásvételi szerződés évekkel később is gondot okozhat. Összeszedtük, mire figyelj 2026-ban.</p>
+
+    <h2>Három út — összehasonlítás</h2>
+    <table>
+      <thead><tr><th></th><th>Magánúton</th><th>Beszámítás</th><th>Bizomány</th></tr></thead>
+      <tbody>
+        <tr><td>Eladási ár</td><td>piaci ár</td><td>jellemzően a piaci ár alatt</td><td>piaci árhoz közel</td></tr>
+        <tr><td>Időigény tőled</td><td>sok (hirdetés, hívások, bemutatás)</td><td>minimális</td><td>minimális</td></tr>
+        <tr><td>Gyorsaság</td><td>napoktól hónapokig</td><td>azonnali</td><td>jellemzően néhány hét</td></tr>
+        <tr><td>Kockázat</td><td>fizetés, próbaút, csalók</td><td>alacsony</td><td>alacsony</td></tr>
+        <tr><td>Papírmunka</td><td>te intézed</td><td>a kereskedő</td><td>a bizományos</td></tr>
+      </tbody>
+    </table>
+
+    <h2>1. Magánúton — a teljes lista</h2>
+    <ul>
+      <li><strong>Árazás:</strong> nézd meg a hasonló évjáratú, felszereltségű és futásteljesítményű hirdetéseket. A túl magas ár hetekig ül, a túl alacsony pénzt hagy az asztalon.</li>
+      <li><strong>Előkészítés:</strong> alapos takarítás, apró hibák javítása, jó fényben készült fotók minden oldalról és az utastérről.</li>
+      <li><strong>Dokumentáció:</strong> szervizkönyv, számlák, pótkulcs, téli gumi — a vevők ezért fizetnek.</li>
+      <li><strong>Biztonság:</strong> próbaútra csak jogosítvány-ellenőrzés után és veled együtt; fizetés átutalással vagy bankban, a pénz beérkezése előtt ne add át a kulcsot és az okmányokat.</li>
+    </ul>
+
+    <h2>2. Beszámítás — gyors, de ára van</h2>
+    <p>Ha új vagy másik autót veszel egy kereskedésben, a régit beszámíthatod a vételárba. Gyors és kényelmes, viszont a kereskedő a felkészítés, a garancia és az eladás kockázatát beárazza — ezért a beszámítási ár jellemzően a piaci ár alatt marad.</p>
+
+    <h2>3. Bizomány — piaci ár, munka nélkül</h2>
+    <p>Bizományos értékesítésnél a kereskedő a te nevedben, a te autódat adja el. A CarAdvance-nél fotózunk, hirdetünk, fogadjuk a vevőket, intézzük az adásvételt és a bejelentést — neked csak az árban kell megállapodnod. Hogyan zajlik pontosan? <a href="/blog/bizomanyos-auto-ertekesites">Bizományos autóértékesítés — részletes útmutató</a>, vagy add meg az autód adatait az <a href="/eladom/">Eladom az autómat</a> oldalon.</p>
+
+    <h2>A szükséges papírok</h2>
+    <ol>
+      <li><strong>Forgalmi engedély</strong> és <strong>törzskönyv</strong> (hitelre vett autónál a bank hozzájárulása és a törzskönyv kiadása).</li>
+      <li><strong>Adásvételi szerződés</strong> — a felek adatai, az autó adatai (alvázszám, rendszám, km-óra állás), a vételár, a fizetés módja, az átadás időpontja, és hogy a vevő milyen állapotban, milyen ismert hibákkal veszi át. Célszerű legalább három példányban készíteni.</li>
+      <li><strong>Személyazonosító okmányok</strong> és lakcímkártya mindkét féltől.</li>
+    </ol>
+
+    <h2>Határidők és bejelentés</h2>
+    <ul>
+      <li><strong>Eladó:</strong> 15 napon belül bejelenti a tulajdonosváltozást (online vagy kormányablakban). Amíg ez nem történik meg, a hatóság felé ő számít tulajdonosnak — például bírságok és díjak tekintetében.</li>
+      <li><strong>Vevő:</strong> 15 napon belül átíratja az autót a saját nevére. Ehhez <a href="/blog/eredetisegvizsgalat">eredetiségvizsgálat</a> és saját KGFB-fedezet kell.</li>
+      <li><strong>Biztosítás:</strong> a régi kötelező biztosítás a tulajdonosváltozással megszűnik; az adásvételivel jelezd a biztosítódnak, a casco-t külön mondd fel.</li>
+    </ul>
+
+    <h2>Mennyibe kerül az átírás a vevőnek?</h2>
+    <p>A vevő oldalán három tétel merül fel: a <strong>vagyonszerzési illeték</strong> (a NAV kW × életkor táblája szerint 300–950 Ft/kW), az <strong>eredetiségvizsgálat</strong> (22 950–27 000 Ft) és az <strong>okmányok</strong> (forgalmi + törzskönyv 12 000 Ft). Példa: egy 110 kW-os, 8 évnél idősebb autónál 60 500 Ft illeték + 24 975 Ft eredetiségvizsgálat + 12 000 Ft = <b>97 475 Ft</b>. A tisztán elektromos autók illetékmentesek. Bármely autóra kiszámolhatod az <a href="/atiras-kalkulator/">átírás kalkulátorral</a>.</p>
+    <p>Ha a vevő ezt előre tudja, gyorsabban dönt — érdemes a hirdetésben is megemlíteni.</p>
+
+    <h2>Gyakori hibák autóeladáskor</h2>
+    <ul>
+      <li>Nincs írásos adásvételi, vagy kimarad belőle a km-óra állás és az ismert hibák listája.</li>
+      <li>A kulcs és az okmányok átadása a pénz beérkezése előtt.</li>
+      <li>Elmarad a 15 napos bejelentés — a későbbi bírságok az eladót keresik.</li>
+      <li>Túl magas induló ár, ami miatt az autó hetekig „beég” a hirdetési oldalakon.</li>
+    </ul>
+
+    <p>Prémium autót adnál el, és cserélnél újabbra? Nézd meg a <a href="/autoink/">megvásárolható autóinkat</a>, vagy rendelj újat Németországból az <a href="/egyedi-auto-rendeles/">egyedi autó rendeléssel</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">A cikk tájékoztató jellegű, a 2026-ban hatályos szabályok és díjak alapján; nem minősül jogi tanácsadásnak.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>

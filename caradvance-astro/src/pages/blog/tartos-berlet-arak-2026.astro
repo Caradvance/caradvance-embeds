@@ -1,0 +1,131 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'tartos-berlet-arak-2026';
+const title = 'Tartós autóbérlés árak 2026 — mennyi a havidíj BMW, Mercedes, Audi és MINI esetén?';
+const lead = 'Mennyibe kerül ma egy vadonatúj prémium autó tartós bérletben? Valós havidíjak 61 bérelhető modellünkből, kategóriánként — és hogy mit tartalmaz a díj, mennyi a kaució, és mikor éri meg jobban, mint a lízing.';
+const description = 'Tartós autóbérlés árak 2026: valós nettó havidíjak BMW, Mercedes, Audi, MINI, VW és elektromos modellekre 310 000 Ft/hó-tól, 4000 km/hó futáskerettel, 6 hónapos futamidővel. Mit tartalmaz a díj, mennyi a kaució?';
+const faqs = [
+  ['Mennyibe kerül egy prémium autó tartós bérlete 2026-ban?', 'A CarAdvance-nél a vadonatúj autók nettó havidíja 310 000 Ft/hó-tól indul (VW Polo), a prémium középkategória (BMW X1, Mercedes GLB, Audi Q3 Sportback) 410–420 000 Ft/hó, a nagy SUV-ok (BMW X5, Mercedes GLE) 660 000 Ft/hó-tól. A díjak 4000 km/hó futáskeretre és 6 hónapos futamidőre vonatkoznak.'],
+  ['Mit tartalmaz a havidíj?', 'A szervizt, az adót és a nyári-téli gumiszettet. Az üzemanyag vagy töltés a bérlőt terheli. A pontos feltételeket (pl. biztosítás, önrész) a bérlési feltételek és az egyedi ajánlat tartalmazza.'],
+  ['Mennyi a kaució?', 'Egyszeri, visszajáró kaució, modelltől függően 2500 €-tól 5000 €-ig. A bérlés végén, káresemény nélkül teljes egészében visszajár.'],
+  ['Mennyi a minimális futamidő?', 'A feltüntetett havidíjak 6 hónapos futamidőre vonatkoznak — ez jóval rövidebb kötöttség, mint az operatív lízing szokásos 3–4 éve.'],
+  ['Cégként is bérelhetek?', 'Igen. A havidíjak nettó árak; cégként a bérleti díj költségként elszámolható. Az áfa levonhatóságáról a könyvelőddel egyeztess.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Tartós autóbérlés árak 2026 — havidíjak | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["hosszu-tavu-autoberles","ceges-auto-operativ-lizing-tartos-berlet","autoberles-budapest-kulfoldre"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>tartós autóbérlés</strong> ára nálunk vadonatúj, 0 km-es autókra <strong>310 000 Ft/hó-tól</strong> indul (nettó), <strong>4000 km/hó</strong> futáskerettel és <strong>6 hónapos</strong> futamidővel. A prémium SUV-ok 410–440 ezer, az üzleti limuzinok és kombik 420–550 ezer, a nagy SUV-ok 660 ezer forintnál kezdődnek. A díjban benne van a szerviz, az adó és a gumi; a kaució 2500–5000 €, és visszajár. Minden modell aktuális díját a <a href="/autoink/#berelheto">bérelhető autóink</a> között látod.</p>
+    </div>
+
+    <p>A tartós bérlet egyre több magánszemélynek és cégnek jobb választás, mint a vásárlás: nincs önerő, nincs értékvesztési kockázat, és fél év után akár új modellre válthatsz. De mennyi is egy <strong>autó tartós bérlet</strong> havidíja valójában? Az alábbi árak nem becslések — a saját, jelenleg is bérelhető flottánk 2026. októberi díjai.</p>
+
+    <h2>Havidíjak kategóriánként (nettó, -tól)</h2>
+    <h3>Kisautók és kompaktok</h3>
+    <table>
+      <thead><tr><th>Modell</th><th>Havidíj -tól</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/berelheto-auto/volkswagen-polo-berles/">Volkswagen Polo</a></td><td>310 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/volkswagen-golf-berles/">Volkswagen Golf</a></td><td>350 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/mini-cooper-berles/">MINI Cooper</a></td><td>360 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/bmw-1-es-berles/">BMW 1-es</a></td><td>390 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-a3-sportback-berles/">Audi A3 Sportback (PHEV)</a></td><td>460 000 Ft</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Prémium SUV-ok</h3>
+    <table>
+      <thead><tr><th>Modell</th><th>Havidíj -tól</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/berelheto-auto/bmw-x1-berles/">BMW X1</a></td><td>410 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/mini-countryman-berles/">MINI Countryman</a></td><td>410 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/mercedes-benz-glb-berles/">Mercedes-Benz GLB</a></td><td>420 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-q3-sportback-berles/">Audi Q3 Sportback</a></td><td>420 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/bmw-x3-berles/">BMW X3</a></td><td>440 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/mercedes-benz-glc-berles/">Mercedes-Benz GLC</a></td><td>440 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-q5-sportback-berles/">Audi Q5 Sportback</a></td><td>460 000 Ft</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Üzleti limuzinok és kombik</h3>
+    <table>
+      <thead><tr><th>Modell</th><th>Havidíj -tól</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/berelheto-auto/bmw-3-as-limuzin-berles/">BMW 3-as limuzin</a></td><td>420 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/mercedes-benz-c-osztaly-berles/">Mercedes-Benz C-osztály</a></td><td>440 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/bmw-5-os-touring-berles/">BMW 5-ös Touring</a></td><td>480 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/bmw-5-os-limuzin-berles/">BMW 5-ös limuzin</a></td><td>500 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/mercedes-benz-e-osztaly-limuzin-berles/">Mercedes-Benz E-osztály</a></td><td>500 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-a6-avant-berles/">Audi A6 Avant</a></td><td>550 000 Ft</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Nagy SUV-ok</h3>
+    <table>
+      <thead><tr><th>Modell</th><th>Havidíj -tól</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/berelheto-auto/volkswagen-touareg-berles/">Volkswagen Touareg</a></td><td>510 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/bmw-x5-berles/">BMW X5</a></td><td>660 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/bmw-x6-berles/">BMW X6</a></td><td>660 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/mercedes-benz-gle-berles/">Mercedes-Benz GLE</a></td><td>660 000 Ft</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Elektromos autók</h3>
+    <table>
+      <thead><tr><th>Modell</th><th>Havidíj -tól</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/berelheto-auto/kia-ev2-berles/">Kia EV2</a></td><td>330 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/cupra-born-berles/">CUPRA Born</a></td><td>390 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/volkswagen-id-7-tourer-berles/">Volkswagen ID.7 Tourer</a></td><td>410 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-q4-e-tron-berles/">Audi Q4 e-tron</a></td><td>440 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-q6-sportback-berles/">Audi Q6 Sportback e-tron</a></td><td>500 000 Ft</td></tr>
+        <tr><td><a href="/berelheto-auto/audi-a6-avant-e-tron-berles/">Audi A6 Avant e-tron</a></td><td>530 000 Ft</td></tr>
+      </tbody>
+    </table>
+    <p>A díjak nettó havidíjak, 4000 km/hó futáskerettel és 6 hónapos futamidővel. A forintár a napi euróárfolyamtól függ; a pontos díj a változattól, a színtől és a csomagtól is. Új, még meg nem rendelt modellekhez lásd az <a href="/uj-auto-berlese/">új autó bérlése</a> oldalt.</p>
+
+    <h2>Mit tartalmaz a tartós bérlet díja?</h2>
+    <ul>
+      <li><strong>Vadonatúj, 0 km-es autó</strong> — nem használt flottaautó.</li>
+      <li><strong>Szerviz és karbantartás</strong>, az <strong>adó</strong>, valamint a <strong>nyári és téli gumiszett</strong>.</li>
+      <li><strong>4000 km/hó futáskeret</strong> — a legtöbb felhasználónak bőven elég, sokat utazóknak is.</li>
+      <li><strong>Egyszeri, visszajáró kaució</strong> 2500–5000 € között, modelltől függően.</li>
+    </ul>
+    <p>Az üzemanyag vagy a töltés a bérlőt terheli. A részletes feltételeket a <a href="/berlesi-feltetelek/">bérlési feltételek és kaució</a> oldalon, a folyamatot a <a href="/berlesi-folyamat/">bérlési folyamat</a> oldalon találod.</p>
+
+    <h2>Példa: 6 hónap BMW X3</h2>
+    <table>
+      <tbody>
+        <tr><td>Havidíj</td><td>440 000 Ft (nettó)</td></tr>
+        <tr><td>6 hónap összesen</td><td>2 640 000 Ft (nettó)</td></tr>
+        <tr><td>Kaució (visszajár)</td><td>modelltől függően 2500–5000 €</td></tr>
+        <tr><td>Szerviz, adó, gumi</td><td>a díjban</td></tr>
+        <tr><td>Értékvesztés, eladás gondja</td><td>nincs</td></tr>
+      </tbody>
+    </table>
+    <p>Ugyanezt az autót megvéve fél év alatt jellemzően több millió forintot veszítene az értékéből — ráadásul a vételárat egy összegben vagy lízingben kellene előteremteni.</p>
+
+    <h2>Tartós bérlet, operatív lízing vagy vásárlás?</h2>
+    <table>
+      <thead><tr><th></th><th>Tartós bérlet</th><th>Operatív lízing</th><th>Vásárlás</th></tr></thead>
+      <tbody>
+        <tr><td>Kötöttség</td><td>6 hónaptól</td><td>jellemzően 3–4 év</td><td>—</td></tr>
+        <tr><td>Önerő</td><td>nincs, csak visszajáró kaució</td><td>gyakran van</td><td>teljes vételár</td></tr>
+        <tr><td>Értékvesztés kockázata</td><td>nincs</td><td>nincs / részben</td><td>teljes</td></tr>
+        <tr><td>Szerviz, gumi</td><td>benne</td><td>konstrukciótól függ</td><td>külön költség</td></tr>
+        <tr><td>Kinek ideális?</td><td>rugalmasságot keresőknek</td><td>flottáknak, hosszú távra</td><td>aki sokáig tartja az autót</td></tr>
+      </tbody>
+    </table>
+    <p>Céges szempontból részletesen összevetettük a lehetőségeket a <a href="/blog/ceges-auto-operativ-lizing-tartos-berlet">céges autó: operatív lízing vagy tartós bérlet</a> cikkben; az általános előnyöket a <a href="/blog/hosszu-tavu-autoberles">hosszú távú autóbérlés</a> útmutató foglalja össze. Ha mégis a sajátod lenne, nézd meg a <a href="/finanszirozas-lizing/">lízing kalkulátort</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Az árak 2026. októberi, tájékoztató jellegű nettó havidíjak; az aktuális díjat és elérhetőséget a bérelhető autóink oldalán látod.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>

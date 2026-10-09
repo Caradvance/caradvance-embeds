@@ -1,0 +1,108 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'auto-honositas-2026';
+const title = 'Autó honosítás 2026 — menete, ára és kalkulátor lépésről lépésre';
+const lead = 'Mennyibe kerül egy külföldről behozott autó honosítása 2026-ban, milyen sorrendben kell intézni, és milyen papírok kellenek? Tételes költséglista, két kiszámolt példa és a teljes folyamat.';
+const description = 'Autó honosítás 2026: a honosítás menete lépésről lépésre, a költségek tételesen (regisztrációs adó, vagyonszerzési illeték, eredetiségvizsgálat, műszaki vizsga, okmányok, rendszám), kiszámolt példák és honosítás kalkulátor.';
+const faqs = [
+  ['Mennyibe kerül egy autó honosítása 2026-ban?', 'Az autótól függ: a két legnagyobb tétel a regisztrációs adó (teljesítmény, környezetvédelmi osztály és kor alapján) és a vagyonszerzési illeték (kW × életkor). Ehhez jön az eredetiségvizsgálat (22 950–27 000 Ft), a műszaki vizsga, a forgalmi és a törzskönyv (6 000 + 6 000 Ft) és a rendszám (11 475 Ft). Egy tisztán elektromos autónál a hatósági tételek 50 ezer forint körül maradnak, egy 3 éves, 219 kW-os dízel SUV-nál kb. 414 ezer forint (a műszaki vizsga díja nélkül).'],
+  ['Mi a honosítás menete?', 'Okmányok összegyűjtése → hazaszállítás → előzetes eredetiségvizsgálat → forgalomba helyezés előtti műszaki vizsga → regisztrációs adó megállapítása és megfizetése (NAV) → forgalomba helyezés a kormányablakban (illeték, forgalmi, törzskönyv, rendszám, kötelező biztosítás).'],
+  ['Mennyi ideig tart a honosítás?', 'Ha minden okmány rendben van, jellemzően 1–3 hét. A leghosszabb lépés általában a NAV regisztrációsadó-eljárása és a vizsgaidőpontok egyeztetése; hiányos okmányoknál ez elhúzódhat.'],
+  ['Kell regisztrációs adót fizetni elektromos autó honosításakor?', 'Nem. A tisztán elektromos (5E) autók regisztrációs adója és vagyonszerzési illetéke is 0 Ft — csak az eredetiségvizsgálat, a műszaki vizsga, az okmányok és a rendszám díját kell megfizetni.'],
+  ['Milyen okmányok kellenek a honosításhoz?', 'A külföldi forgalmi engedély (Németországban Zulassungsbescheinigung Teil I és Teil II), az adásvételi szerződés vagy számla, a személyazonosító okmányok, és ha van, a CoC megfelelőségi nyilatkozat. Az eredetiségvizsgálat és a műszaki vizsga eredménye a forgalomba helyezéshez kell.'],
+  ['Kiszámolhatom előre a honosítás költségét?', 'Igen — a CarAdvance honosítás kalkulátora a NAV 2026-os tábláival számolja a regisztrációs adót és az illetéket, és megmutatja a hatósági tételek végösszegét.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Autó honosítás 2026 — menete, ára, kalkulátor | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["regisztracios-ado-2026","eredetisegvizsgalat","auto-behozatal-nemetorszagbol"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>honosítás</strong> a külföldről behozott autó első magyarországi forgalomba helyezése. Hat lépésből áll, és két nagy költségtétele van: a <strong>regisztrációs adó</strong> és a <strong>vagyonszerzési illeték</strong>. A többi tétel (eredetiségvizsgálat, műszaki vizsga, okmányok, rendszám) együtt nagyjából 75–100 ezer forint. A saját autód pontos összegét a <a href="/honositas-kalkulator/">honosítás kalkulátor</a> egy perc alatt kiszámolja.</p>
+    </div>
+
+    <p>Aki Németországból vagy más EU-országból hoz autót, előbb-utóbb ugyanazokba a kérdésekbe ütközik: <em>milyen sorrendben kell intézni, mennyi az autó honosítás ára, és mi történik, ha valami hiányzik?</em> Ebben az útmutatóban végigmegyünk a teljes folyamaton, tételesen összeszedjük a 2026-os díjakat, és két valós példán ki is számoljuk a végösszeget.</p>
+
+    <h2>Mi a honosítás, és mikor kell?</h2>
+    <p>Honosításnak a köznyelv azt az eljárást hívja, amelynek végén a külföldön már forgalomba helyezett autó <strong>magyar forgalmi engedélyt, törzskönyvet és rendszámot</strong> kap. Akkor kell, ha a jármű még soha nem volt magyar forgalomban — vagyis jellemzően külföldről behozott használt autónál, de egy Németországból rendelt, ott már egyszer forgalomba helyezett új autónál is. Ha magyar rendszámos autót veszel, nincs honosítás: ott csak az <a href="/atiras-kalkulator/">átírás</a> költségével kell számolnod.</p>
+
+    <h2>A honosítás menete — 6 lépés</h2>
+    <ol>
+      <li><strong>Okmányok összegyűjtése.</strong> Külföldi forgalmi engedély (Németországban a <em>Zulassungsbescheinigung Teil I</em> és <em>Teil II</em>), adásvételi szerződés vagy számla, és ha van, a CoC megfelelőségi nyilatkozat. Hiányzó Teil II (a német „törzskönyv”) a leggyakoribb elakadás — vásárláskor mindig ellenőrizd.</li>
+      <li><strong>Hazaszállítás.</strong> Tréleren, vagy rövid lejáratú / kiviteli rendszámmal a saját tengelyén. Prémium autónál a tréleres szállítás a biztonságosabb.</li>
+      <li><strong>Előzetes eredetiségvizsgálat.</strong> Az autó azonosító adatait (alvázszám, motorszám, okmányok) ellenőrzik. Díja 2026-ban hengerűrtartalomtól függően 22 950–27 000 Ft — részletek az <a href="/blog/eredetisegvizsgalat">eredetiségvizsgálat útmutatóban</a>.</li>
+      <li><strong>Forgalomba helyezés előtti műszaki vizsga.</strong> A vizsgaállomáson a jármű műszaki állapotát és adatait rögzítik; itt kapod meg a regisztrációs adóhoz szükséges műszaki adatlapot.</li>
+      <li><strong>Regisztrációs adó a NAV-nál.</strong> A Regisztrációs Adó Adatlap benyújtása után a NAV határozatban állapítja meg az adót; ennek megfizetése a forgalomba helyezés feltétele. A számítás módját a <a href="/blog/regisztracios-ado-2026">regisztrációs adó 2026</a> cikkben részletesen leírtuk.</li>
+      <li><strong>Forgalomba helyezés a kormányablakban.</strong> Itt fizeted meg a vagyonszerzési illetéket és az okmányok díját, igazolod a kötelező gépjármű-felelősségbiztosítást (KGFB fedezetigazolás), és megkapod a rendszámot, a forgalmit, majd postán a törzskönyvet.</li>
+    </ol>
+
+    <h2>Honosítás ára 2026 — a tételek</h2>
+    <table>
+      <thead><tr><th>Tétel</th><th>2026-os díj</th><th>Mitől függ?</th></tr></thead>
+      <tbody>
+        <tr><td>Regisztrációs adó</td><td>0 Ft-tól több millióig</td><td>kW, környezetvédelmi osztály, kor</td></tr>
+        <tr><td>Vagyonszerzési illeték</td><td>300–950 Ft/kW</td><td>kW és életkor (NAV-tábla)</td></tr>
+        <tr><td>Eredetiségvizsgálat</td><td>22 950 / 24 975 / 27 000 Ft</td><td>hengerűrtartalom (elektromos: a legalacsonyabb sáv)</td></tr>
+        <tr><td>Műszaki vizsga</td><td>a hatósági díj 26 700 Ft-tól, + állomás díja</td><td>vizsgaállomás</td></tr>
+        <tr><td>Forgalmi engedély + törzskönyv</td><td>6 000 + 6 000 Ft</td><td>fix</td></tr>
+        <tr><td>Rendszám (1 pár)</td><td>11 475 Ft</td><td>fix (egyedi rendszám drágább)</td></tr>
+        <tr><td>Kötelező biztosítás (KGFB)</td><td>biztosítótól függ</td><td>életkor, lakhely, bonus-malus</td></tr>
+      </tbody>
+    </table>
+
+    <h3>A vagyonszerzési illeték táblája (Ft/kW)</h3>
+    <table>
+      <thead><tr><th>Teljesítmény</th><th>0–3 év</th><th>4–8 év</th><th>8 év felett</th></tr></thead>
+      <tbody>
+        <tr><td>0–40 kW</td><td>550</td><td>450</td><td>300</td></tr>
+        <tr><td>41–80 kW</td><td>750</td><td>550</td><td>450</td></tr>
+        <tr><td>81–120 kW</td><td>850</td><td>750</td><td>550</td></tr>
+        <tr><td>120 kW felett</td><td>950</td><td>850</td><td>750</td></tr>
+      </tbody>
+    </table>
+    <p>A tisztán elektromos (5E) és a nulla emissziós (5Z) autók <strong>illetékmentesek</strong>, és regisztrációs adót sem fizetnek.</p>
+
+    <h2>Két kiszámolt példa</h2>
+    <h3>1. BMW X5 xDrive30d, 2023, 219 kW, dízel</h3>
+    <table>
+      <tbody>
+        <tr><td>Regisztrációs adó (alapadó 282 000 Ft × 0,55)</td><td>155 100 Ft</td></tr>
+        <tr><td>Vagyonszerzési illeték (219 kW × 950 Ft, 0–3 év)</td><td>208 050 Ft</td></tr>
+        <tr><td>Eredetiségvizsgálat (2000 cm³ felett)</td><td>27 000 Ft</td></tr>
+        <tr><td>Forgalmi + törzskönyv</td><td>12 000 Ft</td></tr>
+        <tr><td>Rendszám</td><td>11 475 Ft</td></tr>
+        <tr><td><b>Összesen (műszaki vizsga és KGFB nélkül)</b></td><td><b>413 625 Ft</b></td></tr>
+      </tbody>
+    </table>
+    <h3>2. BMW iX3, 2024, tisztán elektromos</h3>
+    <table>
+      <tbody>
+        <tr><td>Regisztrációs adó</td><td>0 Ft</td></tr>
+        <tr><td>Vagyonszerzési illeték</td><td>0 Ft</td></tr>
+        <tr><td>Eredetiségvizsgálat (elektromos)</td><td>22 950 Ft</td></tr>
+        <tr><td>Forgalmi + törzskönyv</td><td>12 000 Ft</td></tr>
+        <tr><td>Rendszám</td><td>11 475 Ft</td></tr>
+        <tr><td><b>Összesen (műszaki vizsga és KGFB nélkül)</b></td><td><b>46 425 Ft</b></td></tr>
+      </tbody>
+    </table>
+    <p>A regisztrációs adó szorzója a hónapra pontos életkortól függ (a példák 2026. októberi eljárással számolnak), ezért a saját autódat mindig a <a href="/honositas-kalkulator/">honosítás kalkulátorral</a> ellenőrizd.</p>
+
+    <h2>A leggyakoribb hibák honosításkor</h2>
+    <ul>
+      <li><strong>Hiányzó vagy hibás okmány</strong> — Teil II nélkül nincs honosítás. Ellenőrizd, hogy az alvázszám mindenhol egyezik.</li>
+      <li><strong>Rossz környezetvédelmi besorolás</strong> — a regadó oszlopa ettől függ; egy rossz Euro-adat százezres különbséget jelenthet.</li>
+      <li><strong>Csak a vételárral számolni</strong> — egy erős, fiatal dízelnél az adó és az illeték együtt könnyen 300–400 ezer forint.</li>
+      <li><strong>Szállítás biztosítás nélkül</strong> — a magas értékű autót tréleren, teljes biztosítással érdemes hazahozni.</li>
+    </ul>
+
+    <h2>Egyedül vagy velünk?</h2>
+    <p>A honosítás egyedül is elintézhető, de több hivatal, több időpont és sok papír. A CarAdvance-nél a németországi vásárlástól a <strong>magyar forgalmiig és rendszámig</strong> mindent kulcsrakészen intézünk, a költségeket pedig előre, tételesen rögzítjük. Nézd meg az <a href="/auto-rendeles/">autó rendelés Németországból</a> szolgáltatásunkat, vagy ha új autót szeretnél, az <a href="/egyedi-auto-rendeles/">egyedi autó rendelést</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">A cikk tájékoztató jellegű, a 2026-ban hatályos díjak alapján. A regisztrációs adót a NAV, az illetéket és az okmánydíjakat a hatóság állapítja meg; a cikk nem minősül adótanácsadásnak.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
