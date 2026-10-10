@@ -38,6 +38,7 @@
     var L = T[LANG] || T.en;
     var PH = { fr: 'Rechercher une voiture, une marque…', uk: 'Пошук авто, марки…', zh: '搜索车型、品牌…', sk: 'Hľadať auto, značku…', cs: 'Hledat auto, značku…' };
     if (!T[LANG] && PH[LANG]) L = Object.assign({}, T.en, { ph: PH[LANG] });
+    var AIX = {"hu": ["Okos kereső", "Írd le a saját szavaiddal, mit keresel — érti az árat, a márkát, az üléseket és a hajtást.", ["Pl. „családi SUV 7 üléssel, 600 ezer Ft/hó alatt”", "Pl. „elektromos BMW bérlés”", "Pl. „Audi kombi automata, 15 millió alatt”", "Pl. „autóimport Németországból”", "Pl. „Mercedes GLC azonnal elérhető”"]], "en": ["Smart search", "Describe what you need in your own words — it understands price, brand, seats and drivetrain.", ["e.g. “family SUV with 7 seats”", "e.g. “electric BMW to rent”", "e.g. “Audi estate, automatic”", "e.g. “import a car from Germany”"]], "de": ["Intelligente Suche", "Beschreiben Sie in eigenen Worten, was Sie suchen — die Suche versteht Preis, Marke, Sitze und Antrieb.", ["z. B. „Familien-SUV mit 7 Sitzen“", "z. B. „Elektro-BMW mieten“", "z. B. „Audi Kombi Automatik“", "z. B. „Auto aus Deutschland importieren“"]], "fr": ["Recherche intelligente", "Décrivez ce que vous cherchez avec vos mots — la recherche comprend le prix, la marque, les places et la motorisation.", ["ex. « SUV familial 7 places »", "ex. « BMW électrique à louer »", "ex. « Audi break automatique »", "ex. « importer une voiture d’Allemagne »"]], "uk": ["Розумний пошук", "Опишіть своїми словами, що шукаєте — пошук розуміє ціну, марку, кількість місць і привід.", ["напр. «сімейний SUV на 7 місць»", "напр. «електричний BMW в оренду»", "напр. «Audi універсал, автомат»", "напр. «імпорт авто з Німеччини»"]], "zh": ["智能搜索", "用您自己的话描述需求——搜索可理解价格、品牌、座位数和驱动方式。", ["例如“7座家用SUV”", "例如“租电动宝马”", "例如“奥迪旅行车 自动挡”", "例如“从德国进口汽车”"]], "sk": ["Inteligentné vyhľadávanie", "Opíšte vlastnými slovami, čo hľadáte — vyhľadávanie rozumie cene, značke, počtu miest aj pohonu.", ["napr. „rodinné SUV so 7 miestami“", "napr. „elektrické BMW na prenájom“", "napr. „Audi kombi, automat“"]], "cs": ["Chytré vyhledávání", "Popište vlastními slovy, co hledáte — vyhledávání rozumí ceně, značce, počtu míst i pohonu.", ["např. „rodinné SUV se 7 místy“", "např. „elektrické BMW k pronájmu“", "např. „Audi kombi, automat“"]]}; var AI = AIX[LANG] || AIX.en; var rotT = 0, rotI = 0;
 
     // ---------- szövegkezelés ----------
     function norm(s) {
@@ -402,6 +403,7 @@
       root.className = 'cs-ov'; root.setAttribute('hidden', '');
       root.innerHTML = '<div class="cs-bd" data-close></div>' +
         '<div class="cs-pn" role="dialog" aria-modal="true" aria-label="' + esc(B0.getAttribute('aria-label') || 'Search') + '">' +
+        '<div class="cs-ai"><span class="cs-ai-b"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.9 5.6L19.5 9.5l-5.6 1.9L12 17l-1.9-5.6L4.5 9.5l5.6-1.9z" fill="currentColor"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z" fill="currentColor"/></svg>' + esc(AI[0]) + '</span><span class="cs-ai-s">' + esc(AI[1]) + '</span></div>' +
         '<div class="cs-in"><svg viewBox="0 0 24 24" class="cs-ico" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>' +
         '<input type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-autocomplete="list" aria-controls="cs-body" placeholder="' + esc(L.ph) + '">' +
         '<button class="cs-x" type="button" data-close aria-label="' + esc(L.esc) + '"><span>Esc</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>' +
@@ -519,6 +521,7 @@
       if (q) inp.value = q;
       run();
       setTimeout(function () { inp.focus(); inp.select(); }, 30);
+      clearInterval(rotT); rotI = 0; rotT = setInterval(function () { if (!opened) { clearInterval(rotT); return; } if (inp.value) return; var ex = AI[2] || []; if (!ex.length) return; inp.placeholder = ex[rotI % ex.length]; rotI++; }, 2600);
       load().catch(function () { /* hibaüzenet a run-ban */ });
     }
     function close() {

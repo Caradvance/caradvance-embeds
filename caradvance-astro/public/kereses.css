@@ -89,3 +89,21 @@ html.cs-lock{overflow:hidden}
    (A global.css-ben is így van; ez a szabály a nem Astro-ból készült oldalakra is érvényes.) */
 @media(max-width:1024px){.ca-nav .navright .lang{display:block}}
 @media(max-width:480px){.ca-nav .navright{gap:8px}.ca-nav .langbtn{padding:4px 2px}.ca-nav .langbtn .lchev{display:none}.ca-nav .langmenu{right:-52px}}
+
+/* 2026-10: hangsúlyosabb, „okos kereső” beviteli mező */
+.cs-ai{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:18px 22px 0}
+.cs-ai-b{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#E2001A,#FF6A3D);color:#fff;font-weight:800;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;padding:6px 12px 6px 10px;border-radius:999px;box-shadow:0 4px 14px rgba(226,0,26,.28)}
+.cs-ai-b svg{width:15px;height:15px}
+.cs-ai-s{font-size:13.5px;line-height:1.4;color:#4B5563;font-weight:600}
+.cs-in{margin:12px 18px 16px;padding:6px 10px 6px 18px;border:2px solid transparent;border-radius:18px;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#E2001A,#FF8A3D 50%,#7C5CFF) border-box;box-shadow:0 10px 30px rgba(226,0,26,.14);transition:box-shadow .15s}
+.cs-in:focus-within{box-shadow:0 0 0 5px rgba(226,0,26,.12),0 12px 32px rgba(226,0,26,.2)}
+.cs-in .cs-ico{color:#E2001A;width:26px;height:26px}
+.cs-in input{font-size:21px;font-weight:600;color:#0B0B0D;padding:14px 0}
+.cs-in input::placeholder{color:#6B7280;font-weight:500}
+@media(max-width:640px){
+  .cs-ai{padding:14px 14px 0;gap:8px}
+  .cs-ai-s{font-size:12px}
+  .cs-in{margin:10px 12px 12px;padding:4px 8px 4px 12px;border-radius:14px}
+  .cs-in input{font-size:17px;padding:11px 0}
+  .cs-in .cs-ico{width:22px;height:22px}
+}
