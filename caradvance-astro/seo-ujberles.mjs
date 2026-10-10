@@ -96,7 +96,8 @@ if (fs.existsSync(rp)) {
   const r = JSON.parse(fs.readFileSync(rp, 'utf8'));
   const want = ['/uj-auto-berlese', '/uj-auto-berlese/*', ...LANGS.flatMap((l) => ['/' + l + '/uj-auto-berlese', '/' + l + '/uj-auto-berlese/*'])];
   r.include = r.include.filter((x) => !/uj-auto-berlese/.test(x));
-  for (const w of want) if (!r.include.includes(w)) r.include.push(w);
+  const covered = (w) => r.include.some((x) => x === w || (x.endsWith('/*') && (w + '/').startsWith(x.slice(0, -1))));
+  for (const w of want) if (!covered(w)) r.include.push(w);
   if (r.include.length > 100) throw new Error('_routes.json: túl sok szabály (' + r.include.length + ')');
   fs.writeFileSync(rp, JSON.stringify(r, null, 2));
 }
