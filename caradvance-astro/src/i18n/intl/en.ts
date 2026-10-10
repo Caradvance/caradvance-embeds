@@ -147,7 +147,7 @@ const en: IntlContent = {
             'Choose from current <strong>BMW</strong> (1 Series to X7, M models), <strong>MINI</strong>, <strong>Mercedes-Benz</strong> (A-Class to S-Class, GLC, GLE) and <strong>Audi</strong> models. Some cars are available immediately; others are ordered new to your specification — in that case the rental starts on the day of handover, not on signing.',
             'After the minimum term you can keep the car, return it with 30 days’ notice, or switch to another model.',
           ],
-          links: [['Available cars (in Hungarian)', '/autoink/#berelheto'], ['New car rental by brand (in Hungarian)', '/uj-auto-berlese/']],
+          links: [['Available cars (in Hungarian)', '/autoink/#berelheto']],
         },
         {
           kicker: 'Why long-term', h2: 'Why expats choose long-term rental instead of buying',

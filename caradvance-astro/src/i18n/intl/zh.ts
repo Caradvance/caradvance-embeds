@@ -155,7 +155,7 @@ const zh: IntlContent = {
             '从行政轿车到豪华 SUV：可选择最新款<strong>宝马</strong>（1 系至 X7、M 系列）、<strong>奔驰</strong>（A 级至 S 级、GLC、GLE）、<strong>奥迪</strong>和 <strong>MINI</strong>。部分车辆可立即提车；其他车辆可按您的配置订购新车，此时租期从交车当天开始计算。',
             '最短租期结束后，您可以继续使用、提前 30 天通知还车，或更换其他车型。',
           ],
-          links: [['现有车辆（匈牙利语）', '/autoink/#berelheto'], ['按品牌租赁新车（匈牙利语）', '/uj-auto-berlese/']],
+          links: [['现有车辆（匈牙利语）', '/autoink/#berelheto']],
         },
         {
           kicker: '为什么长期租', h2: '为什么企业选择长期租车而不是购车',

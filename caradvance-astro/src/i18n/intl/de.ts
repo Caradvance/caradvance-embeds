@@ -147,7 +147,7 @@ const de: IntlContent = {
             'Wählen Sie aus aktuellen Modellen von <strong>BMW</strong> (1er bis X7, M-Modelle), <strong>MINI</strong>, <strong>Mercedes-Benz</strong> (A- bis S-Klasse, GLC, GLE) und <strong>Audi</strong>. Manche Autos sind sofort verfügbar, andere werden nach Ihren Wünschen neu bestellt — dann beginnt die Miete erst am Tag der Übergabe.',
             'Nach der Mindestlaufzeit können Sie das Auto behalten, mit 30 Tagen Frist zurückgeben oder auf ein anderes Modell wechseln.',
           ],
-          links: [['Verfügbare Autos (auf Ungarisch)', '/autoink/#berelheto'], ['Neuwagen-Miete nach Marke (auf Ungarisch)', '/uj-auto-berlese/']],
+          links: [['Verfügbare Autos (auf Ungarisch)', '/autoink/#berelheto']],
         },
         {
           kicker: 'Warum Langzeitmiete', h2: 'Warum Expats mieten statt kaufen',

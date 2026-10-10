@@ -147,7 +147,7 @@ const fr: IntlContent = {
             'Choisissez parmi les modèles actuels <strong>BMW</strong> (Série 1 à X7, modèles M), <strong>MINI</strong>, <strong>Mercedes-Benz</strong> (Classe A à Classe S, GLC, GLE) et <strong>Audi</strong>. Certaines voitures sont disponibles immédiatement ; d’autres sont commandées neuves selon vos souhaits — la location commence alors le jour de la remise.',
             'Après la durée minimale, vous pouvez garder la voiture, la restituer avec 30 jours de préavis ou passer à un autre modèle.',
           ],
-          links: [['Voitures disponibles (en hongrois)', '/autoink/#berelheto'], ['Location de voiture neuve par marque (en hongrois)', '/uj-auto-berlese/']],
+          links: [['Voitures disponibles (en hongrois)', '/autoink/#berelheto']],
         },
         {
           kicker: 'Pourquoi la longue durée', h2: 'Pourquoi les expatriés louent plutôt que d’acheter',
