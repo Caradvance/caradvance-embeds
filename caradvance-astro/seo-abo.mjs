@@ -133,7 +133,8 @@ for (const f of FILES) {
 }
 // Főoldal: az „Autót keresek” gomb a keresőt (kereső-konzol) nyitja meg, nem e-mailt
 try {
-  const walkH = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p2 = path.join(d, e.name); if (e.isDirectory()) { if (/^(_np|api|auto|blog|berelheto-auto|egyedi-auto-rendeles)$/.test(e.name)) continue; walkH(p2); } else if (e.name === 'index.html') { let hh = fs.readFileSync(p2, 'utf8'); const n0 = hh.length; hh = hh.replace(/<a class="btn btn-primary" href="mailto:[^"]*subject=Aut%C3%B3t%20keresek"/g, '<a class="btn btn-primary" href="/autot-keresek/" data-ca-search'); if (hh.length !== n0) { fs.writeFileSync(p2, hh); console.log('[abo] Autót keresek -> kereső: ' + p2); } } } };
+  const walkH = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p2 = path.join(d, e.name); if (e.isDirectory()) { if (/^(_np|api|auto|blog|berelheto-auto|egyedi-auto-rendeles)$/.test(e.name)) continue; walkH(p2); } else if (e.name === 'index.html') { let hh = fs.readFileSync(p2, 'utf8'); const n0 = hh.length; hh = hh.replace(/<a class="btn btn-primary" href="mailto:[^"]*subject=Aut%C3%B3t%20keresek"/g, '<a class="btn btn-primary" href="/autot-keresek/" data-ca-opensearch');
+          if (hh.length !== n0 && !hh.includes('id="ca-opensearch-js"')) hh = hh.replace(/<\/body>/i, '<script id="ca-opensearch-js">document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest("[data-ca-opensearch]");if(!a)return;var b=document.querySelector("button.ca-sbtn");if(b){e.preventDefault();b.click();}},true);</script></body>'); if (hh.length !== n0) { fs.writeFileSync(p2, hh); console.log('[abo] Autót keresek -> kereső: ' + p2); } } } };
   walkH('dist');
 } catch (e) { console.log('[abo] kereső-gomb hiba: ' + e.message); }
 console.log('[abo] kesz (' + done + ' fajl modositva)');
