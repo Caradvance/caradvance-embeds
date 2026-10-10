@@ -75,7 +75,7 @@ export function buildSaleModel(car: EgyediCar, f: SaleFacts) {
   const pTxt = pMin ? (pMin === pMax ? `${pMin} LE` : `${pMin}–${pMax} LE`) : '';
   const engList = f.engines.map((e) => e[0].replace(new RegExp('^' + b.name + '\\s*|^' + b.site + '\\s*'), '')).join(', ');
   const priceTxt = net ? `${huf} (${ef(net)} € nettó)-tól` : 'egyedi ajánlat alapján';
-  const rentHref = f.rent ? `/berelheto-auto/${f.rent}-berles` : `/uj-auto-berlese?brand=${b.key}`;
+  const rentHref = f.rent ? `/berelheto-auto/${f.rent}-berles` : '/autoink/#berelheto';
 
   // Keresési cím: a magyar kereső "ár / ára / új ára" kifejezéseket használ, forintban gondolkodik.
   const mft = net ? (net * FX / 1e6).toFixed(1).replace('.', ',') : '';
