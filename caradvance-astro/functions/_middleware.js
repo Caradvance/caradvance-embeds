@@ -26,6 +26,19 @@ export async function onRequest(context) {
   }
 }
 
+// Megszűnt "Új autó bérlése" (/uj-auto-berlese/): 301 a bérlési oldalakra (térkép: src/data/ujRedirects.json)
+const UJ_MAP = {"audi-a3":"audi-a3-sportback","audi-a6":"audi-a6-avant","audi-q5":"audi-q5-sportback","bmw-3-as-limuzin":"bmw-3-as-limuzin","bmw-4-es-coupe":"bmw-4-es-coupe","bmw-5-os-limuzin":"bmw-5-os-limuzin","bmw-5-os-touring":"bmw-5-os-touring","bmw-x1":"bmw-x1","bmw-x3":"bmw-x3","bmw-x5":"bmw-x5","bmw-x6":"bmw-x6","mercedes-amg-c-osztaly-limuzin":"mercedes-benz-c-osztaly","mercedes-amg-c-osztaly-t-modell":"mercedes-benz-c-osztaly","mercedes-c-osztaly-limuzin":"mercedes-benz-c-osztaly","mercedes-c-osztaly-t-modell":"mercedes-benz-c-osztaly","mercedes-amg-e-osztaly-limuzin":"mercedes-benz-e-osztaly-limuzin","mercedes-amg-e-osztaly-t-modell":"mercedes-benz-e-osztaly-limuzin","mercedes-e-osztaly-limuzin":"mercedes-benz-e-osztaly-limuzin","mercedes-e-osztaly-t-modell":"mercedes-benz-e-osztaly-limuzin","mercedes-gla":"mercedes-benz-gla","mercedes-glb":"mercedes-benz-glb","mercedes-glc":"mercedes-benz-glc","mercedes-glc-coupe":"mercedes-benz-glc-coupe","mercedes-gle":"mercedes-benz-gle","mercedes-gle-coupe":"mercedes-benz-gle-coupe","mini-cooper-3-ajtos":"mini-cooper","mini-cooper-5-ajtos":"mini-cooper","mini-john-cooper-works":"mini-cooper","mini-cooper-cabrio":"mini-cooper-cabrio","mini-countryman":"mini-countryman","audi-q7":"audi-q7","bmw-3-as-touring":"bmw-3-as-touring","bmw-m2-coupe":"bmw-m2-coupe","bmw-m3-limuzin":"bmw-m3-limuzin","bmw-m3-touring":"bmw-m3-touring","bmw-m4-coupe":"bmw-m4-coupe","bmw-m5-limuzin":"bmw-m5-limuzin","bmw-m5-touring":"bmw-m5-touring","mercedes-a-osztaly":"mercedes-a-osztaly","mercedes-amg-cle-coupe":"mercedes-amg-cle-coupe","mercedes-b-osztaly":"mercedes-b-osztaly","mercedes-cle-cabrio":"mercedes-cle-cabrio","mercedes-cle-coupe":"mercedes-cle-coupe","mercedes-s-osztaly":"mercedes-s-osztaly"};
+const UJ_LANDING = { en: '/en/car-rental-budapest/', de: '/de/auto-mieten-budapest/', fr: '/fr/location-voiture-budapest/', uk: '/uk/orenda-avto-budapesht/', zh: '/zh/budapest-car-rental/' };
+function ujRedirect(url) {
+  const m = url.pathname.match(/^(?:\/(en|de|fr|uk|zh|sk|cs))?\/uj-auto-berlese(?:\/([a-z0-9-]+))?\/?$/);
+  if (!m) return null;
+  const l = m[1] || '', pre = l ? '/' + l : '';
+  let to;
+  if (m[2] && UJ_MAP[m[2]]) to = pre + '/berelheto-auto/' + UJ_MAP[m[2]] + '-berles/';
+  else to = l ? (UJ_LANDING[l] || pre + '/autoink/') : '/autoink/#berelheto';
+  return new Response(null, { status: 301, headers: { Location: new URL(to, url.origin).toString(), 'Cache-Control': 'public, max-age=3600' } });
+}
+
 // Saját domainek: caradvance.sk → dist/sk/… , caradvance.cz → dist/cs/… (a build i18n-mirror.mjs lépése készíti)
 const DOMAINS = { 'caradvance.sk': 'sk', 'www.caradvance.sk': 'sk', 'caradvance.cz': 'cs', 'www.caradvance.cz': 'cs' };
 const HU_SITE = 'https://www.caradvance.hu';
@@ -35,6 +48,7 @@ async function serveDomain(context, url, l) {
   const p = url.pathname;
   if (!url.hostname.startsWith('www.')) { url.hostname = 'www.' + url.hostname; return Response.redirect(url.toString(), 301); }
   if (p.startsWith('/api/')) return next();
+  { const ur = ujRedirect(url); if (ur) return ur; }
   const pre = '/' + l + '/';
   if (p === '/' + l || p.startsWith(pre)) { url.pathname = p.slice(l.length + 1) || '/'; return Response.redirect(url.toString(), 301); }
   if (p === '/robots.txt' || p === '/sitemap.xml') return env.ASSETS.fetch(new Request(new URL('/' + l + p, url.origin).toString()));
@@ -66,6 +80,7 @@ async function handle(context) {
 
   const dl = DOMAINS[url.hostname];
   if (dl) return serveDomain(context, url, dl);
+  { const ur = ujRedirect(url); if (ur) return ur; }
 
   if (p.startsWith('/api/')) return next();
   if (p.startsWith('/_np/')) return withHeaders(await next(), { 'X-Robots-Tag': 'noindex, nofollow' });
