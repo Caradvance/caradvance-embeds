@@ -9,6 +9,8 @@ import CarDetail from '../../components/CarDetail.astro';
 import { listRentals, getRental, rentSlug } from '../../data/rental';
 import { buildRentalModel } from '../../data/rentalPage';
 import { CONTENT } from '../../data/rentalContent';
+import UjRentDetail from '../../components/UjRentDetail.astro';
+import UJ from '../../data/ujRedirects.json';
 
 export function getStaticPaths() {
   // Ezekhez külön .astro oldal tartozik (pl. bmw-x3-berles.astro) — itt kihagyjuk őket.
@@ -26,7 +28,7 @@ export function getStaticPaths() {
     'mercedes-amg-e-osztaly-t-modell': 'mercedes-benz-e-osztaly-limuzin', 'mercedes-s-osztaly': '', 'mercedes-cle-cabrio': '',
     'mercedes-cle-coupe': '', 'mercedes-amg-cle-coupe': '', 'mercedes-gla': 'mercedes-benz-gla', 'mercedes-glb': 'mercedes-benz-glb',
     'mercedes-glc': 'mercedes-benz-glc', 'mercedes-glc-coupe': 'mercedes-benz-glc-coupe', 'mercedes-gle': 'mercedes-benz-gle',
-    'mercedes-gle-coupe': 'mercedes-benz-gle', 'audi-a3': 'audi-a3-sportback', 'audi-a6': 'audi-a6-avant', 'audi-q5': 'audi-q5-sportback', 'audi-q7': '',
+    'mercedes-gle-coupe': 'mercedes-benz-gle-coupe', 'audi-a3': 'audi-a3-sportback', 'audi-a6': 'audi-a6-avant', 'audi-q5': 'audi-q5-sportback', 'audi-q7': '',
   };
   const list = listRentals().filter((x) => !OWN_PAGE.includes(x.key));
   const slugs = new Set<string>();
@@ -38,20 +40,24 @@ export function getStaticPaths() {
     paths.push({ params: { slug: s + '-berles' }, props: { brand: x.brand, model: x.model } });
   }
   const all = new Set([...slugs, ...listRentals().map((x) => rentSlug(x.brand, x.model))]);
+  // A megszűnt Új autó bérlése modellek közül azok, amelyekhez nincs Choice-bérlési oldal: saját bérlési oldalt kapnak.
+  const SELF = new Set<string>((UJ as any).self);
   for (const [old, to] of Object.entries(LEGACY)) {
     if (slugs.has(old)) continue;
+    if (SELF.has(old)) { paths.push({ params: { slug: old + '-berles' }, props: { uj: old } }); continue; }
     const target = to && all.has(to) ? '/berelheto-auto/' + to + '-berles' : '/autoink#berelheto';
     paths.push({ params: { slug: old + '-berles' }, props: { redirect: target } });
   }
   return paths;
 }
 
-const { brand, model, redirect } = Astro.props as any;
+const { brand, model, redirect, uj } = Astro.props as any;
 if (redirect) return Astro.redirect(redirect, 301);
-const r = getRental(brand, model);
-if (!r) return Astro.redirect('/autoink#berelheto', 302);
-const m: any = buildRentalModel(r, CONTENT[r.key] || {});
+const r = uj ? null : getRental(brand, model);
+if (!uj && !r) return Astro.redirect('/autoink#berelheto', 302);
+const m: any = r ? buildRentalModel(r, CONTENT[r.key] || {}) : null;
 ---
+{uj ? (<UjRentDetail slug={uj} />) : (
 <Base lang="hu" path={`/berelheto-auto/${m.slug}-berles`} title={m.title} description={m.description}>
   <CarDetail model={m} mode="berles" rent={r} />
-</Base>
+</Base>)}
