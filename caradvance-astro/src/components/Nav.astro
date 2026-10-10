@@ -12,7 +12,19 @@ const autoink = localizedPath(lang, '/autoink/');
 // Menu mirrors the real caradvance.hu landing-page header exactly.
 const huMenu = [
   { label: 'Autóbérlés', items: [
-    { t: 'Bérelhető autóink', href: '/berelheto' },
+    { t: 'Bérelhető autóink', href: '/autoink/#berelheto', sub: [
+      { t: 'BMW', href: '/autoink/?marka=bmw#berelheto', logo: '/bl-bmw-dark.webp' },
+      { t: 'Mercedes', href: '/autoink/?marka=mercedes#berelheto', logo: '/bl-mercedes-dark.webp' },
+      { t: 'Audi', href: '/autoink/?marka=audi#berelheto', logo: '/bl-audi-dark.webp' },
+      { t: 'MINI', href: '/autoink/?marka=mini#berelheto', logo: '/bl-mini-dark.webp' },
+      { t: 'Volkswagen', href: '/autoink/?marka=volkswagen#berelheto', logo: '/bl-vw-dark.webp' },
+      { t: 'CUPRA', href: '/autoink/?marka=cupra#berelheto', logo: '/bl-cupra-dark.webp' },
+      { t: 'SEAT', href: '/autoink/?marka=seat#berelheto', logo: '/bl-seat-dark.webp' },
+      { t: 'Hyundai', href: '/autoink/?marka=hyundai#berelheto', logo: '/bl-hyundai-dark.webp' },
+      { t: 'Kia', href: '/autoink/?marka=kia#berelheto', logo: '/bl-kia-dark.webp' },
+      { t: 'Volvo', href: '/autoink/?marka=volvo#berelheto', logo: '/bl-volvo-dark.webp' },
+      { t: 'MAN', href: '/autoink/?marka=man#berelheto', logo: '/bl-man-dark.webp' },
+    ] },
     { t: 'Bérlési folyamat', href: '/berlesi-folyamat' }, { t: 'Feltételek és kaució', href: '/berlesi-feltetelek/' }, { t: 'Előnyök', href: '/berles-elonyei' },
     { t: 'Gyakori kérdések', href: '/berles-gyakori-kerdesek' },
   ]},
@@ -120,10 +132,10 @@ const flagUrl = (loc: Locale) => `https://flagcdn.com/w80/${flagCode[loc]}.png`;
   .ca-navwrap .ddi-sub.open > .flyout{display:block;}
   .ca-navwrap .ddi-sub > .flyout .ddi{white-space:nowrap;}
   .ca-navwrap .ddi-brand{display:flex;align-items:center;gap:11px;}
-  .ca-navwrap .ddi-brand .brandlogo{width:22px;height:22px;object-fit:contain;flex:0 0 22px;}
+  .ca-navwrap .ddi-brand .brandlogo{width:30px;height:22px;object-fit:contain;flex:0 0 30px;}
   /* Mobile: brand items indented under the parent */
   .ca-navwrap .m-sub .m-subitem{display:flex;align-items:center;gap:10px;padding-left:30px;opacity:.85;font-size:.95em;}
-  .ca-navwrap .m-sub .m-subitem .brandlogo{width:20px;height:20px;object-fit:contain;flex:0 0 20px;}
+  .ca-navwrap .m-sub .m-subitem .brandlogo{width:28px;height:20px;object-fit:contain;flex:0 0 28px;}
 </style>
 
 <script>
