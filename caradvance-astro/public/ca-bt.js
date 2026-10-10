@@ -5,7 +5,7 @@ function fmt(n){return Math.round(n).toLocaleString('hu-HU');}
 function rnd(v,r){return Math.ceil(v/r)*r;}
 function one(b,m){var p=m==='p';b.classList.toggle('is-p',p);
   [].forEach.call(b.querySelectorAll('[data-bt]'),function(x){var on=x.getAttribute('data-bt')===m;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on?'true':'false');});
-  var t=b.querySelector('.ca-pt');if(t)t.textContent=p?'19% német áfával':'nettó + áfa';
+  var t=b.querySelector('.ca-pt');if(t)t.textContent=p?'19% német áfával':'nettó';
   var e=+b.getAttribute('data-bteur')||0;if(!e)return;
   var fx=window.__caFX||+b.getAttribute('data-fx')||364,r=+b.getAttribute('data-r')||10000,eu=p?e*1.19:e;
   var v=b.querySelector('.ca-pv');if(v)v.textContent=fmt(rnd(eu*fx,r))+' Ft';
