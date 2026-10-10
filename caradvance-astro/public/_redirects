@@ -6,9 +6,6 @@
 /cookie/ /adatkezeles/#cookie 301
 /altalanos-szerzodesi-feltetelek /aszf/ 301
 /altalanos-szerzodesi-feltetelek/ /aszf/ 301
-# sk / cs: előnézet a /sk/ /cs/ alatt, élesben caradvance.sk / .cz (functions/_middleware.js). pl: addig az angol oldalra.
-/pl /en/ 302
-/pl/* /en/ 302
 # Megszűnt Új autó bérlése (2026-10): 301 a bérlési oldalakra (a functions/_middleware.js is kezeli)
 /uj-auto-berlese /autoink/#berelheto 301
 /uj-auto-berlese/ /autoink/#berelheto 301
@@ -730,3 +727,6 @@
 /cs/uj-auto-berlese/mercedes-cle-coupe/ /cs/berelheto-auto/mercedes-cle-coupe-berles/ 301
 /cs/uj-auto-berlese/mercedes-s-osztaly /cs/berelheto-auto/mercedes-s-osztaly-berles/ 301
 /cs/uj-auto-berlese/mercedes-s-osztaly/ /cs/berelheto-auto/mercedes-s-osztaly-berles/ 301
+# sk / cs: előnézet a /sk/ /cs/ alatt, élesben caradvance.sk / .cz (functions/_middleware.js). pl: addig az angol oldalra.
+/pl /en/ 302
+/pl/* /en/ 302
