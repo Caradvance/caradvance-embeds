@@ -245,7 +245,6 @@ ${Object.entries(byBrand).map(([b, cs]) => `<div class="rs-brand"><h4>${escAttr(
 <div class="rs-faq"><span class="rs-eye">GYIK</span>
 <h2>Gyakori kérdések a bérlésről</h2>
 ${faq.map(([q, aa]) => `<details><summary>${escAttr(q)}</summary><p>${escAttr(aa)}</p></details>`).join('\n')}
-<p class="rs-more">Vadonatúj autót szeretnél rendelésre? Nézd meg <a href="/uj-auto-berlese/">új autó tartós bérlet ajánlatainkat</a>.</p>
 </div>
 </section>\n`;
     if (!/class="ca-rent-seo"/.test(a)) a = a.replace(/(<\/div>\s*)(<div class="autok-panel" id="panel-premium")/, block + '$1$2');

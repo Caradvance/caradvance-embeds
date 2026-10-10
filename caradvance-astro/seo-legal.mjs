@@ -20,7 +20,6 @@ const SKIP = [/^belso\//, /^ajanlat\//, /^api\//];
 const COLS = [
   ['Autóbérlés', [
     ['Bérelhető autóink', '/berelheto/'],
-    ['Új autó bérlése', '/uj-auto-berlese/'],
     ['A bérlés előnyei', '/berles-elonyei/'],
     ['Bérlési folyamat', '/berlesi-folyamat/'],
     ['Feltételek és kaució', '/berlesi-feltetelek/'],
