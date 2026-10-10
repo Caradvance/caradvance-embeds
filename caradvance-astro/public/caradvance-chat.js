@@ -764,8 +764,8 @@
 /* charity-width-match */
 (function(){try{var id='ca-cahw';if(document.getElementById(id))return;var s=document.createElement('style');s.id=id;s.textContent='.cah .wrap{max-width:1160px !important}';(document.head||document.documentElement).appendChild(s);}catch(e){}})();
 
-/* rental-brand-flyout-inject */
-(function(){
+/* rental-brand-flyout-inject (kikapcsolva: az Új autó bérlése menüpont megszűnt) */
+(function(){ return;
   function repoint(a){ var h=a.getAttribute('href')||''; if(h.indexOf('/egyedi-auto-rendeles')>=0) a.setAttribute('href', h.replace('/egyedi-auto-rendeles','/uj-auto-berlese')); }
   function relabel(a){ [].slice.call(a.childNodes).forEach(function(n){ if(n.nodeType===3 && /Egyedi aut\u00f3 rendel\u00e9s/i.test(n.textContent)) n.textContent=n.textContent.replace(/Egyedi aut\u00f3 rendel\u00e9s/i,'\u00daj aut\u00f3 b\u00e9rl\u00e9se'); }); }
   function isRental(a){ return /\u00daj aut\u00f3 b\u00e9rl\u00e9se/i.test(a.textContent) && !/brand=/.test(a.getAttribute('href')||''); }
