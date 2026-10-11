@@ -65,7 +65,7 @@ export const VARIANTS: TbVariant[] = [
     faqs: [
       ['Mennyibe kerül a tartós bérlet?', 'Nálunk a nettó havidíj {min} Ft/hó-tól indul; a prémium SUV-ok jellemzően 410–460 ezer, a nagy SUV-ok 660 ezer forintnál kezdődnek. A pontos díj a modelltől, a változattól, a futamidőtől és a futáskerettől függ — a lenti lista valós, naponta frissülő díjakat mutat.'],
       ['Mit tartalmaz a havidíj?', 'A szervizt és karbantartást, a gépjárműadót, a kötelező gépjármű-felelősségbiztosítást és a cascót, valamint a nyári és téli gumiszettet. Az üzemanyag vagy a töltés a bérlőt terheli.'],
-      ['Kell önerő a tartós bérlethez?', 'Nem. Csak egy egyszeri, visszajáró kauciót kérünk, modelltől függően {depmin}–{depmax} € között. Káresemény nélkül a bérlet végén teljes egészében visszajár.'],
+      ['Kell önerő a tartós bérlethez?', 'Nem. Csak egy egyszeri, visszajáró kauciót kérünk, modelltől függően 2 000–10 000 € között. Káresemény nélkül a bérlet végén teljes egészében visszajár.'],
       ['Mennyi a minimális futamidő?', 'A tartós bérlet legalább 6 hónapra szól — 6 hónaptól 12, 24 vagy akár 36 hónapig. Ez jóval rövidebb kötöttség, mint az operatív lízing szokásos 3–4 éve, és a futamidő végén hosszabbíthatsz vagy új modellre válthatsz.'],
       ['Magánszemélyként is bérelhetek tartósan?', 'Igen. Magánszemélyként a nettó havidíj a 19% német áfával növelt összeg — a bérelhető autók kártyáján a Cég / Magán kapcsolóval mindkettőt látod. Részletek: <a href="/tartos-berlet/#maganszemelyeknek">tartós bérlet magánszemélyeknek</a>.'],
       ['Cégként elszámolható a tartós bérlet díja?', 'A bérleti díj a vállalkozás költségei között elszámolható; az áfa és a cégautóadó kezeléséről egyeztess a könyvelőddel. Részletek: <a href="/tartos-berlet/#cegeknek">tartós bérlet cégeknek</a>.'],
@@ -104,7 +104,7 @@ export const VARIANTS: TbVariant[] = [
       ['Mennyibe kerül egy céges autó tartós bérletben?', 'A nettó havidíj {min} Ft/hó-tól indul; egy prémium középkategóriás SUV (BMW X1, Mercedes GLB, Audi Q3) 410–420 ezer, egy üzleti limuzin vagy kombi 420–550 ezer forint körül van havonta.'],
       ['Több autót is bérelhetünk?', 'Igen, egy autótól a kisebb flottáig. Több autónál egyedi ajánlatot adunk, és a modellek akár eltérhetnek kollégánként.'],
       ['Ki vezetheti az autót?', 'A szerződésben megnevezett sofőrök. A pontos feltételeket az ajánlatban rögzítjük.'],
-      ['Mennyi a kaució céges bérletnél?', 'Modelltől függően {depmin}–{depmax} € egyszeri, visszajáró kaució — önerő nincs.'],
+      ['Mennyi a kaució céges bérletnél?', 'Modelltől függően 2 000–10 000 € egyszeri, visszajáró kaució — önerő nincs.'],
     ],
     related: ['main', 'maganszemelyeknek', 'elektromos', 'bmw', 'mercedes'],
   },
