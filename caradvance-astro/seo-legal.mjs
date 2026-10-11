@@ -151,6 +151,13 @@ function footerFor(l) {
 const CONSENT_OLD = /Elfogadom az <a href="\/adatkezeles\/?"([^>]*)>adatkezelési tájékoztatót<\/a>\./g;
 const CONSENT_NEW = 'Elolvastam és elfogadom az <a href="/aszf/"$1>ÁSZF</a>-et és az <a href="/adatkezeles/"$1>adatkezelési tájékoztatót</a>.';
 
+const KMFIX = [
+  ['6 hónaptól, 4 000 km/hó kerettel — utána új modellre válthatsz.', '6 hónaptól, havi 2 000–4 000 km kerettel (autótól függően) — utána új modellre válthatsz.'],
+  ['<span class="rb-pill">4 000 km/hó</span>', '<span class="rb-pill">2 000–4 000 km/hó</span>'],
+  ['— 6 hónaptól, 2 000 vagy 3 000 km/hó kerettel.', '— 6 hónaptól, autótól függően havi 2 000–4 000 km kerettel.'],
+  ['alacsony kaucióval, 2 000 vagy 3 000 km havi kerettel.', 'alacsony kaucióval, autótól függően havi 2 000–4 000 km kerettel.'],
+];
+
 async function* walk(dir) {
   for (const e of await readdir(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name);
@@ -188,6 +195,9 @@ for await (const file of walk(ROOT)) {
   h = h.replace(CONSENT_OLD, CONSENT_NEW);
   // régi menük: a "Feltételek" pont eddig sehova (#) mutatott
   h = h.replace(/href="#"([^>]*)>Feltételek<\/a>/g, 'href="/berlesi-feltetelek/"$1>Feltételek és kaució</a>');
+
+  // 4. futáskeret: autótól függően havi 2 000–4 000 km (a seo-abo / seo-copy szövegeiben is) — csak HU, a fordítás utána jön
+  if (HL === 'hu') for (const [a, b] of KMFIX) h = h.split(a).join(b);
 
   if (h !== orig) { await writeFile(file, h); n++; }
 }

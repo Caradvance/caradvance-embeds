@@ -6,7 +6,7 @@
  * követhetők — itt a rentalPage.ts mondat-sablonjait tükrözzük minden nyelvre. A számok {n}
  * helyőrzőként, a típusnevek változatlanul kerülnek át.
  */
-const LIST = '\\{\\d+\\}(?:(?:, \\{\\d+\\})* vagy \\{\\d+\\})?';
+const LIST = '\\{\\d+\\}(?:(?:, \\{\\d+\\})* vagy \\{\\d+\\}|–\\{\\d+\\})?'; // „{1}–{2}” = tartomány (futáskeret 2 000–4 000)
 const KMT = `(?:(${LIST}) km\\/hó futáskerettel|egyedi futáskerettel)`;
 const MOT = `(?:(${LIST}) hónapos futamidővel|rugalmas futamidővel)`;
 const R = (s) => new RegExp('^' + s + '$');
@@ -171,6 +171,11 @@ export function makeRental(l, D, RT = {}) {
       return p.price(nm(m[1]), m[2], m[3], p.km(or(m[4])), p.mo(or(m[5])), m[6], m[7]);
     if ((m = k.match(R(`Az? (.+?) havi bérleti díja (\\{\\d+\\}) Ft \\((\\{\\d+\\}) €\\) -tól indul ${KMT} és ${MOT}\\.(?: Változatonként: (.+?)\\.)? Pontos, személyre szabott ajánlatért keress minket\\.`))))
       return p.faqPrice(nm(m[1]), m[2], m[3], p.km(or(m[4])), p.mo(or(m[5])), m[6] ? m[6].replace(/ €\/hó-tól/g, p.perMonth) : '');
+    // a seo-desc által rövidített leírás (a „Vadonatúj, … km-es …” rész nélkül)
+    if ((m = k.match(R(`(.+?) bérlés és tartós bérlet (\\{\\d+\\}) Ft\\/hó-tól(?:, (${LIST}) km\\/hó futáskerettel)?(?:, (${LIST}) hónapra)?, kaució (\\{\\d+\\}) €-tól\\.`)))) {
+      const t = p.desc(nm(m[1]), m[2], or(m[3]), or(m[4]), m[5], '§', '§', false); const i = t.indexOf('§');
+      const cut = Math.max(t.lastIndexOf('.', i), t.lastIndexOf('。', i)); if (cut > 0) return t.slice(0, cut + 1);
+    }
     if ((m = k.match(R(`(.+?) bérlés és tartós bérlet (\\{\\d+\\}) Ft\\/hó-tól(?:, (${LIST}) km\\/hó futáskerettel)?(?:, (${LIST}) hónapra)?, kaució (\\{\\d+\\}) €-tól\\. Vadonatúj, (\\{\\d+\\}) km-es (.+?)(, azonnal vagy hamarosan elérhető\\.|\\.)?`))))
       return p.desc(nm(m[1]), m[2], or(m[3]), or(m[4]), m[5], m[6], body(m[7]), !!(m[8] && m[8].startsWith(','))) + (m[8] === '.' ? '.' : '');
     if ((m = k.match(R(`A tartós bérlet futamideje (${LIST}) hónap\\. Utána meghosszabbíthatod, vagy új modellre válthatsz — akár félévente új autóval\\.`))))
