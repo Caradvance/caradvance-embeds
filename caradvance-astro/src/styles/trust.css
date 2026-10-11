@@ -1,0 +1,84 @@
+/* Rólunk → Átláthatóság + Minőségbiztosítás (2026-10) — közös stílus */
+.tq{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
+.tq .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.tq .tq-sec{padding:60px 0 8px;scroll-margin-top:96px}
+.tq .tq-sec .sec-title{color:var(--ink)}
+.tq .tq-sec .sec-intro{color:var(--muted)}
+.tq-crumb{display:flex;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:4px}
+.tq-crumb a{color:var(--muted);text-decoration:none}.tq-crumb a:hover{color:var(--red)}
+.tq .wrap.tq-toc{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:22px auto 0;padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(11,15,30,.07)}
+.tq-toc a{display:inline-flex;align-items:center;gap:6px;background:#fdeaec;border:1.5px solid #f5c2c8;border-radius:999px;padding:10px 16px;font-size:14.5px;font-weight:800;color:#b00015!important;text-decoration:none;transition:.15s}
+.tq-toc a:after{content:'↓';opacity:.7}
+.tq-toc a:hover{background:var(--red);border-color:var(--red);color:#fff!important}
+.tq-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:18px auto 6px;max-width:860px}
+.tq-chips span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;white-space:nowrap}
+.tq-chips b{font-weight:800}
+.tq-ico{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:12px;background:#FDECEE;color:var(--red);flex:0 0 46px}
+.tq-ico svg{width:24px;height:24px}
+/* cégkártyák */
+.tq-co{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
+.tq-co-card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 30px rgba(11,15,30,.05);padding:26px 28px}
+.tq-co-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.tq-co-head h3{font-size:20px;font-weight:800;margin:0;color:var(--ink)}
+.tq-co-role{display:inline-block;margin:6px 0 14px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--red);background:#fdeaec;border-radius:8px;padding:5px 10px}
+.tq-co dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 16px;margin:0;font-size:14.5px}
+.tq-co dt{color:var(--muted);font-weight:600}
+.tq-co dd{margin:0;color:var(--ink);font-weight:700}
+.tq-co-note{color:var(--muted);font-size:14.5px;line-height:1.6;margin:14px 0 0}
+/* ki mit csinál */
+.tq-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:14px;align-items:stretch;margin-top:28px}
+.tq-flow-c{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 22px}
+.tq-flow-c.hl{border-color:#f5c2c8;background:#fff8f9}
+.tq-flow-c h3{font-size:18px;font-weight:800;margin:12px 0 8px;color:var(--ink)}
+.tq-flow-c ul{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;line-height:1.6}
+.tq-flow-arrow{display:flex;align-items:center;justify-content:center;color:var(--red);font-size:28px;font-weight:800}
+.tq-callout{margin-top:18px;background:#0B0B0D;color:#fff;border-radius:18px;padding:18px 22px;font-size:15.5px;line-height:1.6}
+.tq-callout b{color:#fff}
+/* két oszlopos listák */
+.tq-two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+.tq-col{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px 26px}
+.tq-col h3{font-size:19px;font-weight:800;margin:0 0 14px;color:var(--ink)}
+.tq-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.tq-col li{position:relative;padding-left:30px;display:flex;flex-direction:column}
+.tq-col li b{color:var(--ink);font-size:15.5px}.tq-col li span{color:var(--muted);font-size:14px;line-height:1.5}
+.tq-yes li:before{content:"✓";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#e7f7ee;color:#16a34a;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.tq-no li:before{content:"–";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#f3f5f9;color:#5b6475;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.tq-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.tq-fact{background:#F6F7FA;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.tq-fact b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+.tq-fact span{font-size:14.5px;line-height:1.5;font-weight:600;color:var(--ink)}
+/* lépések / idővonal */
+.tq-steps{list-style:none;margin:28px auto 0;padding:0;max-width:900px;counter-reset:tq}
+.tq-steps li{counter-increment:tq;position:relative;padding:0 0 22px 64px}
+.tq-steps li:before{content:counter(tq);position:absolute;left:0;top:0;width:42px;height:42px;border-radius:12px;background:var(--red);color:#fff;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center}
+.tq-steps li:after{content:"";position:absolute;left:20px;top:46px;bottom:4px;width:2px;background:#f2d3d7}
+.tq-steps li:last-child:after{display:none}
+.tq-steps h3{font-size:18px;font-weight:800;margin:8px 0 6px;color:var(--ink)}
+.tq-steps p{margin:0;color:var(--muted);font-size:15px;line-height:1.6}
+/* ellenőrzőlista-rács */
+.tq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.tq-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 22px}
+.tq-card-h{display:flex;align-items:center;gap:12px}
+.tq-card-n{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;border-radius:10px;background:#0B0B0D;color:#fff;font-weight:800}
+.tq-card h3{font-size:17px;font-weight:800;margin:14px 0 6px;color:var(--ink)}
+.tq-card p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.6}
+/* dokumentumok */
+.tq-docs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}
+.tq-doc{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;text-decoration:none;color:var(--ink)!important;transition:.15s}
+.tq-doc:hover{border-color:var(--red);transform:translateY(-2px);box-shadow:0 10px 24px rgba(8,8,10,.08)}
+.tq-doc b{display:block;font-size:15.5px}.tq-doc span{display:block;color:var(--muted);font-size:13.5px;font-weight:500}
+/* GYIK */
+.tq .wrap.tq-faq{max-width:860px;display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.tq-faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.tq-faq summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.tq-faq summary::-webkit-details-marker{display:none}
+.tq-faq .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.tq-faq details[open] .pl{transform:rotate(45deg)}
+.tq-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+.tq-cta{background:#0B0B0D;color:#fff;border-radius:22px;padding:30px 36px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:40px 0 30px}
+.tq-cta h2{color:#fff!important;margin:0 0 6px;font-size:clamp(22px,3vw,28px);font-weight:800}.tq-cta p{color:#cfd6e2;margin:0}
+.tq-cta .tq-cta-b{display:flex;gap:10px;flex-wrap:wrap}
+.tq a.tq-lnk{color:var(--red);font-weight:700}
+.tq .btn.btn-primary{color:#fff!important}.tq .btn.btn-white{color:var(--ink)!important}
+@media(max-width:980px){.tq-flow{grid-template-columns:1fr}.tq-flow-arrow{transform:rotate(90deg);padding:2px 0}.tq-grid,.tq-docs{grid-template-columns:1fr 1fr}.tq-facts{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.tq-co,.tq-two{grid-template-columns:1fr}.tq-grid,.tq-docs{grid-template-columns:1fr}.tq-co dl{grid-template-columns:1fr;gap:2px 0}.tq-co dd{margin-bottom:8px}.tq .wrap.tq-toc{padding:12px;gap:8px}.tq-toc a{font-size:13.5px;padding:9px 13px}.tq-steps li{padding-left:56px}}
