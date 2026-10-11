@@ -11,16 +11,16 @@ const faqs = [
   ['Meddig érvényes az eredetiségvizsgálat?', 'A vizsgálat eredménye 60 napig és egy alkalommal használható fel a közlekedési igazgatási ügyintézéshez. Ha lejár, újra el kell végeztetni, és a díjat ismét meg kell fizetni.'],
   ['Ki fizeti az eredetiségvizsgálatot, az eladó vagy a vevő?', 'Erről a felek szabadon megállapodhatnak. A gyakorlatban többnyire a vevő intézi és fizeti, mert az átíráshoz neki van rá szüksége.'],
   ['Kell eredetiségvizsgálat a Németországból behozott autóra?', 'A külföldről behozott használt autó magyarországi forgalomba helyezése jellemzően eredetiségvizsgálattal indul, a honosítási műszaki vizsga, a regisztrációs adó és az okmányok mellett. A pontos eljárás a jármű és az okmányai alapján dől el.'],
-  ['Mikor nem kell eredetiségvizsgálat?', 'Örökléskor, bizonyos közeli hozzátartozók közötti tulajdonátruházáskor, valamint a megfelelő járműkísérő lappal rendelkező új járműnél főszabály szerint nincs rá szükség.'],
+  ['Mikor nem kell eredetiségvizsgálat?', 'Örökléskor, házastárstól, testvértől vagy egyenes ági rokontól (szülő, nagyszülő, gyermek, unoka) vásárolt autónál, valamint a megfelelő járműkísérő lappal rendelkező új járműnél főszabály szerint nincs rá szükség.'],
   ['Mi történik, ha eltérést találnak?', 'Az eltérés nem jelenti automatikusan, hogy a jármű lopott — lehet egyszerű adateltérés is. Ha viszont további hatósági tisztázás kell, az átírás vagy a forgalomba helyezés addig nem folytatható.'],
 ];
 const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
 ---
 <Base lang={lang} path={`/blog/${slug}`} title={`${title} | CarAdvance`} description={description}>
-  <BlogPost slug={slug} title={title} lead={lead} related={["regisztracios-ado-2026","auto-behozatal-nemetorszagbol"]}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["hasznalt-auto-vasarlas-menete","auto-adasveteli-szerzodes","regisztracios-ado-2026"]}>
     <div class="bp-tldr">
       <h3>Röviden</h3>
-      <p>Az <strong>eredetiségvizsgálat</strong> (köznyelvben eredetvizsga) során egy erre jogosult vizsgálóállomás ellenőrzi, hogy a jármű azonosítói — alvázszám, motorszám, adattábla — és okmányai valódiak-e és egyeznek-e egymással. <strong>Személyautónál 2026-ban 22 950–27 000 Ft</strong>, az eredmény <strong>60 napig, egyszer</strong> használható fel. Használt autó átírásához és a külföldről behozott autó forgalomba helyezéséhez jellemzően szükséges.</p>
+      <p>Az <strong>eredetiségvizsgálat</strong> (köznyelvben eredetvizsga) során egy erre jogosult vizsgálóállomás ellenőrzi, hogy a jármű azonosítói — alvázszám, adattábla — és okmányai valódiak-e és egyeznek-e egymással. <strong>Személyautónál 2026-ban 22 950–27 000 Ft</strong>, az eredmény <strong>60 napig, egyszer</strong> használható fel. Használt autó átírásához és a külföldről behozott autó forgalomba helyezéséhez jellemzően szükséges.</p>
     </div>
 
     <p>Ha használt autót veszel, vagy Németországból hozol autót, az eredetiségvizsgálat az egyik első kötelező lépés. Ebben az útmutatóban összeszedtük a <strong>2026-os díjakat</strong>, a vizsgálat menetét, a szükséges iratokat, és azt is, mire figyelj, ha behozott autót helyeznél forgalomba Magyarországon.</p>
@@ -50,7 +50,7 @@ const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEnti
       <li><strong>Külföldről behozott autó forgalomba helyezésekor</strong> — a honosítás jellemzően ezzel indul (lásd lent).</li>
       <li><strong>Ajándékozáskor</strong> — ha nem vonatkozik rá mentesség.</li>
     </ul>
-    <p><strong>Nem kell</strong> főszabály szerint öröklésnél, bizonyos közeli hozzátartozók közötti tulajdonátruházásnál, és a megfelelő járműkísérő lappal rendelkező új járműnél.</p>
+    <p><strong>Nem kell</strong> főszabály szerint öröklésnél, házastárstól, testvértől vagy egyenes ági rokontól vásárolt autónál, és a megfelelő járműkísérő lappal rendelkező új járműnél. Az átírás teljes menetét a <a href="/blog/hasznalt-auto-vasarlas-menete">használt autó vásárlás menete</a>, a szerződés kötelező tartalmát az <a href="/blog/auto-adasveteli-szerzodes">autó adásvételi szerződés</a> cikk mutatja.</p>
 
     <h2>Meddig érvényes?</h2>
     <p>Az eredetiségvizsgálat eredménye <strong>60 napig és egyetlen alkalommal</strong> használható fel. Ha az ügyintézés csúszik, és a 60 nap letelik, újra kell vizsgáztatni — ezért érdemes az időpontot az átírás vagy a forgalomba helyezés ütemezéséhez igazítani. Belföldi adásvételnél a tulajdonosváltást 15 napon belül kell bejelenteni, így a vizsgát nem érdemes az utolsó pillanatra hagyni.</p>
@@ -67,7 +67,7 @@ const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEnti
     <ol>
       <li><strong>Időpontfoglalás</strong> egy jogosult vizsgálóállomáson.</li>
       <li><strong>Okmányok ellenőrzése</strong> — a forgalmi, az adásvételi és a jármű adatai.</li>
-      <li><strong>Az azonosítók ellenőrzése</strong> — alvázszám, motorszám, adattáblák, és a gyári jelölések sértetlensége.</li>
+      <li><strong>Az azonosítók ellenőrzése</strong> — alvázszám, adattáblák és a gyári jelölések sértetlensége. <strong>2026. február 26-tól a motorszámot már nem vizsgálják</strong>, így egy motorcsere sem akadálya a sikeres vizsgának.</li>
       <li><strong>Fotódokumentáció</strong> és az eredmény rögzítése.</li>
       <li><strong>Hatósági bizonyítvány</strong> — ezzel mehetsz tovább a kormányablakba.</li>
     </ol>
