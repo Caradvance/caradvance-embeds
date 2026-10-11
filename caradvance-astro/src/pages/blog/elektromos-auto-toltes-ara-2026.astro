@@ -1,0 +1,119 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+import { allRentals, fmt } from '../../data/tartosBerlet';
+const lang = 'hu';
+const slug = 'elektromos-auto-toltes-ara-2026';
+const title = 'Elektromos autó töltés ára 2026 — otthon, nyilvános töltőn, wallbox (kalkulátorral)';
+const lead = 'Mennyibe kerül feltölteni egy elektromos autót 2026-ban otthon, a MOL Plugee, az E.ON Drive, az Ionity vagy a Tesla töltőin? Friss árak, wallbox-költségek és egy kalkulátor a havi töltési költségedhez.';
+const description = 'Elektromos autó töltés ára 2026: otthon kb. 36–70 Ft/kWh, nyilvános AC 149–199 Ft/kWh, DC gyorstöltés 249–302 Ft/kWh. MOL Plugee, E.ON Drive, Ionity, Tesla árak, wallbox ára és havi költség kalkulátor.';
+const evs = allRentals().filter((c) => c.fuels.some((x) => /elektromos/i.test(x))).slice(0, 8);
+const P = [
+  ['Otthon, rezsicsökkentett sávon belül (A1, kb.)', 36.3],
+  ['Otthon, átlagfogyasztás felett (A1/A2 piaci ár)', 70.1],
+  ['E.ON Drive AC/DC 11–50 kW, éjszaka', 149],
+  ['MOL Plugee AC, regisztrált', 159],
+  ['Tesla Supercharger, nappal, előfizetés nélkül (példa)', 194],
+  ['E.ON Drive gyors DC 51–150 kW, nappal', 249],
+  ['MOL Plugee DC ≤99 kW, regisztrált', 269],
+  ['Ionity, ad-hoc (helyszíntől függően)', 290],
+];
+const faqs = [
+  ['Mennyibe kerül egy elektromos autó feltöltése otthon?', 'A rezsicsökkentett sávon belül (évi 2523 kWh-ig mérőnként) a lakossági áram bruttó ára nagyjából 36 Ft/kWh, felette az MVM lakossági piaci ára 70,104 Ft/kWh (A1/A2, bruttó, rendszerhasználati díjjal). Egy 60 kWh-s akkumulátor 10–80%-os feltöltése (kb. 42 kWh) így otthon nagyjából 1 500–2 900 Ft.'],
+  ['Mennyibe kerül a gyorstöltés 2026-ban?', 'A nyilvános DC gyorstöltés 2026 őszén jellemzően 249–302 Ft/kWh: E.ON Drive 51–150 kW nappal 249 Ft, MOL Plugee DC regisztrált felhasználónak 269–289 Ft, Ionity ad-hoc 279–302 Ft. Éjszakai és előfizetéses tarifákkal ennél olcsóbb is lehet (pl. Tesla Supercharger völgyidőben 89–125 Ft/kWh egyes helyszíneken).'],
+  ['Van külön elektromosautó-tarifa a lakossági áramra?', 'Nincs kifejezetten elektromos autókra szóló lakossági tarifa. Az A2 kétzónás tarifa völgyidőszaka munkanapokon 22–06 óra (nyári időszámításkor 23–07). Az MVM Next 2026 szeptemberétől igényelhető dinamikus „D” árszabása legkorábban 2027. január 1-jétől él, és okos mérőt igényel.'],
+  ['Mennyibe kerül egy wallbox felszerelése?', 'Szakmai portálok 2026-os adatai szerint a teljes telepítés jellemzően 250 000 és 1 300 000 Ft között van: egy alap 7,4 kW-os töltő 180–220 ezer, egy okos 7,4–11 kW-os 250–350 ezer Ft, ehhez jön a kábelezés. Gyakran szükség van teljesítménybővítésre is az áramszolgáltatónál.'],
+  ['Mennyibe kerül 100 km elektromos autóval?', '18 kWh/100 km fogyasztással otthon, a kedvezményes sávban kb. 650 Ft, piaci áron kb. 1 260 Ft; nyilvános DC gyorstöltőn 249–302 Ft/kWh mellett kb. 4 500–5 400 Ft (töltési veszteség nélkül).'],
+  ['Kapok állami támogatást wallboxra?', '2026 közepén nem volt vissza nem térítendő állami támogatás otthoni töltőre. A vállalkozásoknak szóló elektromosautó-vásárlási program (RRF-10.10.1-24) 2026. április 15-én lezárult.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Elektromos autó töltés ára 2026 — otthon, gyorstöltő, wallbox | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["zold-rendszam-2026","elektromos-auto-arak-2026","elektromos-auto-lizing-tamogatas"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>Az <strong>elektromos autó töltése</strong> otthon a legolcsóbb: a rezsicsökkentett sávon belül nagyjából <strong>36 Ft/kWh</strong>, felette <strong>70 Ft/kWh</strong>. Nyilvános AC töltőn 149–199 Ft/kWh, <strong>DC gyorstöltőn 249–302 Ft/kWh</strong>. Egy átlagos villanyautóval 100 km otthon kb. <strong>650–1 260 Ft</strong>, gyorstöltőn kb. <strong>4 500–5 400 Ft</strong>. Lent kalkulátorral kiszámolhatod a saját havi költségedet.</p>
+    </div>
+
+    <h2>Töltési költség kalkulátor</h2>
+    <div class="et-calc">
+      <label>Havi futás (km)<input id="etkm" type="number" min="0" max="20000" value="1500" /></label>
+      <label>Fogyasztás (kWh/100 km)<input id="etc" type="number" min="10" max="35" step="0.5" value="18" /></label>
+      <label>Otthoni töltés aránya (%)<input id="eth" type="number" min="0" max="100" value="80" /></label>
+      <label>Otthoni áram<select id="ethp"><option value="36.3">Kedvezményes sáv (kb. 36 Ft/kWh)</option><option value="70.1" selected>Piaci ár (70,1 Ft/kWh)</option></select></label>
+      <label>Nyilvános töltés<select id="etpp"><option value="159">AC töltő (kb. 159 Ft/kWh)</option><option value="249">DC 51–150 kW (kb. 249 Ft/kWh)</option><option value="279" selected>DC gyors (kb. 279 Ft/kWh)</option><option value="300">HPC / ad-hoc (kb. 300 Ft/kWh)</option></select></label>
+      <label>Töltési veszteség (%)<input id="etl" type="number" min="0" max="25" value="10" /></label>
+      <div class="et-out"><div><span>Havi töltési költség</span><b id="etr1">—</b></div><div><span>Évente</span><b id="etr2">—</b></div><div><span>100 km-re</span><b id="etr3">—</b></div></div>
+    </div>
+    <script is:inline>(function(){var ids=['etkm','etc','eth','ethp','etpp','etl'];function g(i){return +document.getElementById(i).value||0;}function f(n){return Math.round(n).toLocaleString('hu-HU')+' Ft';}function r(){var km=g('etkm'),c=g('etc'),h=Math.min(100,g('eth'))/100,hp=g('ethp'),pp=g('etpp'),l=1+g('etl')/100;var kwh=km*c/100*l;var cost=kwh*(h*hp+(1-h)*pp);document.getElementById('etr1').textContent=f(cost);document.getElementById('etr2').textContent=f(cost*12);document.getElementById('etr3').textContent=km?f(cost/km*100):'—';}ids.forEach(function(i){var e=document.getElementById(i);e.addEventListener('input',r);e.addEventListener('change',r);});r();})();</script>
+    <p style="font-size:13px;color:#667">Tájékoztató számítás 2026. októberi árakkal. A nyilvános töltők árai helyszínenként, napszakonként és előfizetéstől függően eltérnek; a parkolási/blokkolási díjakat nem tartalmazza.</p>
+
+    <h2>Otthoni töltés ára 2026</h2>
+    <ul>
+      <li><strong>Rezsicsökkentett sáv:</strong> évi <strong>2523 kWh</strong> mérőnként (napi kb. 6,91 kWh), az elszámolási év augusztus 1-jétől július 31-ig tart. Ezen belül a bruttó ár nagyjából <strong>36 Ft/kWh</strong>.</li>
+      <li><strong>Átlagfogyasztás felett:</strong> az MVM lakossági piaci ára <strong>70,104 Ft/kWh</strong> (A1/A2, bruttó, rendszerhasználati díjjal, 27% áfával), a vezérelt „B” mérőn 60,935 Ft/kWh.</li>
+      <li><strong>Mennyit fogyaszt egy villanyautó?</strong> Évi 15 000 km és 18 kWh/100 km mellett kb. 2 700 kWh — ez egymagában meghaladja a teljes kedvezményes sávot, így a háztartás többi fogyasztásával együtt a töltés nagy része jellemzően piaci áron megy.</li>
+      <li><strong>Nincs külön EV-tarifa.</strong> Az A2 kétzónás tarifa völgyidőszaka munkanapokon 22–06 óra (nyári időszámításkor 23–07). A „H” tarifa hőszivattyúkra vonatkozik, nem autótöltésre.</li>
+      <li><strong>Új: dinamikus „D” árszabás.</strong> Az MVM Next 2026. szeptember 1-jétől fogadja az igényléseket, a tarifa <strong>legkorábban 2027. január 1-jétől</strong> él: 2523 kWh-ig a kedvezményes ár, felette a HUPX tőzsdei negyedórás ár + kereskedői díj. Távleolvasású okos mérő kell hozzá.</li>
+    </ul>
+
+    <h2>Nyilvános töltés árai 2026 (október)</h2>
+    <table>
+      <thead><tr><th>Szolgáltató</th><th>AC</th><th>DC</th><th>Megjegyzés</th></tr></thead>
+      <tbody>
+        <tr><td>MOL Plugee (regisztrált)</td><td>159 Ft/kWh</td><td>269 Ft (≤99 kW) / 289 Ft (≥100 kW)</td><td>MOL Move-val 10 Ft-tal olcsóbb; 30 perc után +0,5 Ft/perc</td></tr>
+        <tr><td>MOL Plugee (ad-hoc)</td><td>169 Ft/kWh</td><td>289 / 299 Ft/kWh</td><td>regisztráció nélkül</td></tr>
+        <tr><td>E.ON Drive</td><td>199 Ft (éjjel 149 Ft)</td><td>249 Ft 51–150 kW (éjjel 187), 299 Ft HPC (éjjel 224)</td><td>türelmi idő után blokkolási díj</td></tr>
+        <tr><td>Ionity</td><td>—</td><td>279–302 Ft ad-hoc, 265–287 Ft appal</td><td>2026. július 1-jétől helyszínenként eltérő; előfizetéssel 159–215 Ft</td></tr>
+        <tr><td>Tesla Supercharger (példa: Kiskunfélegyháza)</td><td>—</td><td>139 / 194 Ft nappal, 89 / 125 Ft völgyidőben</td><td>Tesla és előfizetők / előfizetés nélkül; helyszínenként eltér</td></tr>
+      </tbody>
+    </table>
+    <p>Az árakat a szolgáltatók saját oldalairól (molplugee.hu, edri.com) és a Villanyautósok.hu 2026. júliusi és októberi összefoglalóiból gyűjtöttük. A Mobiliti és a Shell Recharge 2026-os árai nem voltak egységesen ellenőrizhetők, mert töltőpontonként eltérnek.</p>
+
+    <h2>Mennyibe kerül 100 km? (18 kWh/100 km)</h2>
+    <table>
+      <thead><tr><th>Töltés helye</th><th>Ár</th><th>100 km költsége</th></tr></thead>
+      <tbody>{P.map(([n, p]) => (<tr><td>{n}</td><td>{String(p).replace('.', ',')} Ft/kWh</td><td>{fmt(Math.round((p as number) * 18 / 10) * 10)} Ft</td></tr>))}</tbody>
+    </table>
+    <p style="font-size:13px;color:#667">Töltési veszteség nélkül.</p>
+
+    <h2>Wallbox: ára, telepítése, teljesítménybővítés</h2>
+    <ul>
+      <li><strong>Töltő ára:</strong> alap 7,4 kW-os 180–220 ezer Ft, okos 7,4–11 kW-os 250–350 ezer Ft, prémium 11–22 kW-os terheléskezeléssel 400–600 ezer Ft.</li>
+      <li><strong>Telepítés:</strong> ha a töltő a mérőszekrény mellé kerül, minimális; 10 m kábelig kb. 80–120 ezer, 20 m-ig 140–180 ezer Ft. Teljes projekt: jellemzően <strong>250 000 – 1 300 000 Ft</strong>.</li>
+      <li><strong>Teljesítménybővítés:</strong> a háztartások jellemzően fázisonként 25 A-re vannak méretezve, egy wallboxhoz viszont gyakran 40 A-es biztosíték kell. A bővítést az elosztói engedélyesnél (E.ON, ELMŰ, MVM Démász) kell igényelni, díja a kért többletteljesítménytől függ.</li>
+      <li><strong>Engedély:</strong> családi háznál hatósági engedély nem kell, de a villanyszerelő megfelelőségi nyilatkozata kötelező. Társasháznál a közgyűlés hozzájárulása is szükséges lehet.</li>
+      <li><strong>Támogatás:</strong> 2026 közepén nem volt vissza nem térítendő állami támogatás otthoni töltőre.</li>
+    </ul>
+
+    <h2>Tipp: így töltesz olcsóbban</h2>
+    <ol>
+      <li>Tölts otthon, és ha van rá lehetőséged, a <strong>munkahelyen</strong>.</li>
+      <li>Használj <strong>regisztrált fiókot vagy appot</strong> az ad-hoc helyett — szolgáltatótól függően 10–30 Ft/kWh különbség.</li>
+      <li>Ha sokat utazol gyorstöltővel, nézd meg az <strong>előfizetéses csomagokat</strong> (Ionity, Tesla), és az <strong>éjszakai tarifákat</strong> (E.ON Drive).</li>
+      <li>Figyelj a <strong>blokkolási és percdíjakra</strong> — töltés végén állj el a töltőtől.</li>
+      <li>A 10–80% közötti töltés a leggyorsabb; 80% felett a töltési teljesítmény erősen csökken.</li>
+    </ol>
+
+    <h2>Elektromos autó tartós bérletben</h2>
+    <p>Elektromos autót kipróbálnál, de nem akarsz akkumulátor- és értékvesztési kockázatot? Az <a href="/tartos-berlet/elektromos-auto/">elektromos autó tartós bérlet</a> havidíja tartalmazza a szervizt, a biztosítást és a gumikat. Néhány bérelhető modell:</p>
+    <table>
+      <thead><tr><th>Modell</th><th>Havidíj (nettó) -tól</th></tr></thead>
+      <tbody>{evs.map((c) => (<tr><td><a href={`/berelheto-auto/${c.slug}-berles/`}>{c.name}</a></td><td>{fmt(c.huf)} Ft</td></tr>))}</tbody>
+    </table>
+    <p>Kapcsolódó: <a href="/blog/zold-rendszam-2026">zöld rendszám 2026</a>, <a href="/blog/elektromos-auto-arak-2026">elektromos autó árak 2026</a>, <a href="/blog/elektromos-auto-lizing-tamogatas">elektromos autó lízing és támogatás</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Források: MVM Next (lakossági árak, gyakori kérdések, dinamikus tarifa, 2026. 09. 02.), molplugee.hu/hu/araink, edri.com/hu-hu/tariffs (2026. 09. 28.), Villanyautósok.hu (Ionity: 2026. 07. 06.; Tesla: 2026. 10. 08.; MVM: 2026. 09. 03.), JóSzaki (wallbox, 2026. 07. 14.). Árak 2026. október 11-i állapot szerint, tájékoztató jelleggel.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
+<style>
+.et-calc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;background:#fff;border:1px solid #E6EAF1;border-radius:18px;padding:18px;margin:10px 0}
+.et-calc label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#5A6B82}
+.et-calc input,.et-calc select{height:44px;border:1px solid #dfe3ea;border-radius:12px;padding:0 12px;font:inherit;font-size:15px}
+.et-out{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.et-out div{background:#F6F7FA;border-radius:14px;padding:12px 14px}.et-out span{display:block;font-size:12.5px;color:#5A6B82}.et-out b{font-size:20px;font-weight:800;color:#141519}
+@media(max-width:760px){.et-calc{grid-template-columns:1fr}.et-out{grid-template-columns:1fr}}
+</style>

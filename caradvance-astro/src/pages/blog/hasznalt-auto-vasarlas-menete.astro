@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'hasznalt-auto-vasarlas-menete';
+const title = 'Használt autó vásárlás menete 2026 — 10 lépés a kiválasztástól az átírásig';
+const lead = 'Hogyan vegyél használt autót biztonságosan 2026-ban? Előélet-ellenőrzés, próbaút, szerződés, biztosítás, eredetiségvizsgálat és átírás határidőkkel és költségekkel — lépésről lépésre.';
+const description = 'Használt autó vásárlás menete 2026: előélet és km-ellenőrzés, átvizsgálás, adásvételi szerződés, KGFB, eredetiségvizsgálat, átírás 15 napon belül, illeték és okmánydíjak. Teljes ellenőrzőlista.';
+const STEPS = [
+  ['Költségkeret', 'Ne csak a vételárral számolj: illeték, eredetiségvizsgálat, okmánydíjak, KGFB, és az első szerviz is jön.'],
+  ['Kiválasztás', 'Szűkítsd a kört 2–3 modellre; nézd meg a tipikus hibáikat és a fenntartási költségüket.'],
+  ['Előélet-ellenőrzés', 'Kérd el a rendszámot és az alvázszámot; a hazai előélet és a km-állások a Jármű Szolgáltatási Platformon (JSZP) lekérdezhetők, külföldről hozott autónál kérj szervizmúltat.'],
+  ['Személyes megtekintés', 'Nappal, száraz időben nézd meg: karosszéria, rétegvastagság, gumik, belső tér kopása, hidegindítás.'],
+  ['Próbaút', 'Városban és nagyobb tempónál is; figyeld a váltót, a fékeket, a futóművet és a hibajelző lámpákat.'],
+  ['Független átvizsgálás', 'Márkaszervizben vagy független műhelyben, hibakód-kiolvasással — ez a legjobb pénzbe kerülő biztosíték.'],
+  ['Adásvételi szerződés', 'A 304/2009. Korm. rendelet szerinti kötelező adatokkal, km-állással és az átadás pontos idejével.'],
+  ['KGFB', 'Az átvétel pillanatától saját kötelező biztosítás kell — enélkül ne indulj el az autóval.'],
+  ['Eredetiségvizsgálat', 'Az átíráshoz kell (60 napig érvényes); közeli hozzátartozótól vásárolt vagy örökölt autónál nem.'],
+  ['Átírás 15 napon belül', 'Kormányablakban; itt fizeted az illetéket és az okmánydíjakat.'],
+];
+const faqs = [
+  ['Mennyi idő alatt kell átíratni a használt autót?', 'A vevőnek a szerződés aláírásától számított 15 napon belül kell kérnie az átírást a kormányablakban. Az eladónak szintén 15 napja van a tulajdonosváltozás bejelentésére.'],
+  ['Mi kell az átíráshoz?', 'Személyi igazolvány, útlevél vagy jogosítvány, lakcímkártya (vagy DÁP), az adásvételi szerződés, a forgalmi engedély és a törzskönyv, az eredetiségvizsgálat igazolása, valamint a KGFB ajánlat- vagy kötvényszáma. Illetékmentességhez rokoni kapcsolatot igazoló irat is kell.'],
+  ['Mennyibe kerül az átírás?', 'A vagyonszerzési illeték az autó korától és kW-jától függ (elektromos autónál és közeli hozzátartozótól vásárolt autónál nincs). Ehhez jön az új forgalmi engedély (6 000 Ft), a törzskönyv (6 000 Ft), a törzskönyv postázása (2 000 Ft) és az eredetiségvizsgálat. Az illetéket az átírás kalkulátorunkkal számolhatod ki.'],
+  ['Kell eredetiségvizsgálat, ha rokontól veszek autót?', 'Nem. Házastárstól, testvértől, egyenes ági rokontól vásárolt vagy örökölt autónál nem kell eredetiségvizsgálat, és a vagyonszerzési illeték alól is mentesség jár.'],
+  ['Ki fizeti a gépjárműadót a vásárlás évében?', 'Az eladó — ha határidőben bejelenti az eladást. A vevő a vásárlást követő év január 1-jétől adóköteles.'],
+  ['Hogyan ellenőrizhetem a km-óra állását?', 'A hazai műszaki vizsgák és hatósági eljárások során rögzített km-állások a Jármű Szolgáltatási Platformon lekérdezhetők. Külföldről hozott autónál a szervizkönyv, a digitális szerviztörténet és egy márkaszervizes lekérdezés segít.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+const howTo = { '@context': 'https://schema.org', '@type': 'HowTo', name: 'Használt autó vásárlás menete', step: STEPS.map(([n, t], i) => ({ '@type': 'HowToStep', position: i + 1, name: n, text: t })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Használt autó vásárlás menete 2026 — lépésről lépésre | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["auto-adasveteli-szerzodes","hasznalt-premium-auto-ellenorzo-lista","nemet-hasznaltauto-vasarlas"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>használt autó vásárlás menete</strong>: előélet-ellenőrzés → megtekintés és próbaút → független átvizsgálás → <a href="/blog/auto-adasveteli-szerzodes">adásvételi szerződés</a> → saját <strong>KGFB</strong> az átvételtől → <strong>eredetiségvizsgálat</strong> → <strong>átírás 15 napon belül</strong> a kormányablakban. Az átíráskor a vevő fizeti a vagyonszerzési illetéket és az okmánydíjakat.</p>
+    </div>
+
+    <h2>A használt autó vásárlás 10 lépése</h2>
+    <ol class="hv-steps">{STEPS.map(([n, t]) => (<li><strong>{n}.</strong> {t}</li>))}</ol>
+
+    <h2>Költségek a vételáron felül</h2>
+    <table>
+      <thead><tr><th>Tétel</th><th>Összeg</th></tr></thead>
+      <tbody>
+        <tr><td>Vagyonszerzési illeték</td><td>kor és kW szerint — <a href="/atiras-kalkulator/">átírás kalkulátor</a> (elektromos autónál 0 Ft)</td></tr>
+        <tr><td>Új forgalmi engedély</td><td>6 000 Ft</td></tr>
+        <tr><td>Törzskönyv</td><td>6 000 Ft</td></tr>
+        <tr><td>Törzskönyv postázása</td><td>2 000 Ft</td></tr>
+        <tr><td>Eredetiségvizsgálat</td><td>kategóriától függően — <a href="/blog/eredetisegvizsgalat">részletek</a></td></tr>
+        <tr><td>Független átvizsgálás</td><td>műhelyenként eltér — megéri</td></tr>
+        <tr><td>KGFB</td><td>biztosítótól, bonusz-malustól, lakóhelytől függ</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Az átíráshoz szükséges iratok</h2>
+    <ul>
+      <li>Személyi igazolvány, útlevél vagy jogosítvány, lakcímkártya (vagy DÁP alkalmazás)</li>
+      <li>Adásvételi szerződés</li>
+      <li>Forgalmi engedély és törzskönyv (ha valamelyik hiányzik, a szerződésben szerepeljen az oka)</li>
+      <li>Eredetiségvizsgálat igazolása (60 napnál nem régebbi)</li>
+      <li>KGFB ajánlat- vagy kötvényszám</li>
+      <li>Illetékmentességhez: rokoni kapcsolatot igazoló irat (pl. születési vagy házassági anyakönyvi kivonat)</li>
+    </ul>
+
+    <h2>A leggyakoribb csapdák</h2>
+    <ul>
+      <li><strong>Visszatekert km-óra</strong> — vesd össze a JSZP-adatokat, a szervizkönyvet és a kopásnyomokat.</li>
+      <li><strong>Eltitkolt baleset</strong> — rétegvastagság-mérő és független átvizsgálás.</li>
+      <li><strong>Hitel- vagy lízingterhelt autó</strong> — nézd meg a törzskönyvet; ha nincs meg, kérdezz rá.</li>
+      <li><strong>Előleg megtekintés nélkül</strong> — soha ne utalj előre ismeretlen eladónak.</li>
+      <li><strong>Elmaradt bejelentés</strong> — ragaszkodj hozzá, hogy az eladó 15 napon belül bejelentse az eladást.</li>
+    </ul>
+    <p>Prémium autónál részletes ellenőrzőlistát találsz a <a href="/blog/hasznalt-premium-auto-ellenorzo-lista">használt prémium autó ellenőrző lista</a> cikkben.</p>
+
+    <h2>Németországi használt autó: ellenőrzött előélet</h2>
+    <p>Németországban a dokumentált szervizmúlt és a kevésbé megviselt utak miatt gyakran jobb állapotú prémium használt autókat találni. Ha onnan vásárolnál, a <a href="/auto-rendeles/">németországi autórendeléssel</a> a kiválasztást, az átvizsgálást, a szállítást és a <a href="/blog/auto-honositas-2026">honosítást</a> is mi intézzük — részletek: <a href="/blog/nemet-hasznaltauto-vasarlas">német használtautó vásárlás</a>.</p>
+
+    <h2>Vagy egyáltalán nem veszel: tartós bérlet</h2>
+    <p>Ha nem akarsz használt autóval kockáztatni, a <a href="/tartos-berlet/">tartós bérlet</a> új autót ad fix havidíjért — a szerviz, a biztosítás, az adó és a gumik benne vannak, 6 hónaptól.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Források: dap.gov.hu „Autót veszek” életesemény (okmánydíjak, iratok, határidők), 304/2009. (XII. 22.) Korm. rendelet, 1991. évi LXXXII. törvény (Gjt.) 2. §. Tájékoztató jellegű összefoglaló.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(howTo)}></script>
+  </BlogPost>
+</Base>
+<style>
+.hv-steps li{margin:0 0 8px}
+</style>

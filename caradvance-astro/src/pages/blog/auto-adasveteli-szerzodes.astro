@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'auto-adasveteli-szerzodes';
+const title = 'Autó adásvételi szerződés 2026 — kötelező tartalom, ellenőrzőlista, bejelentés 15 napon belül';
+const lead = 'Mit kell kötelezően tartalmaznia egy használt autó adásvételi szerződésének, hány példányban és tanúkkal kell aláírni, és hogyan jelented be online vagy a kormányablakban az eladást? Jogszabály szerinti ellenőrzőlista.';
+const description = 'Autó adásvételi szerződés 2026: a 304/2009. Korm. rendelet szerinti kötelező adatok, km-állás, átadás időpontja, 4 példány 2 tanúval, digitális szerződés a DÁP appban, eladás bejelentése 15 napon belül, KGFB és gépjárműadó.';
+const MUST = [
+  ['Jogcím', 'adásvétel (vagy pl. ajándékozás, csere)'],
+  ['A jármű azonosítói', 'rendszám, alvázszám (VIN), gyártmány'],
+  ['Eladó és vevő adatai', 'név, születési hely és idő, anyja neve, állampolgárság, személyazonosító okmány típusa és száma, lakcím (cégnél cégadatok)'],
+  ['Okmányok', 'a forgalmi engedély és a törzskönyv sorszáma — vagy annak oka, ha valamelyik hiányzik'],
+  ['Birtokbaadás', 'az átadás időpontja és a kilométeróra állása az átadáskor'],
+  ['Tulajdonjog-változás', 'a tulajdonjog átszállásának időpontja'],
+  ['Nyilatkozatok', 'mindkét fél vállalja a határidőben történő bejelentést, és ismeri a késedelem jogkövetkezményeit; nyilatkozat a bizalmi vagyonkezelésről'],
+  ['Aláírás', 'mindkét fél aláírása'],
+];
+const faqs = [
+  ['Kell tanú az autó adásvételi szerződéshez?', 'A szerződésnek teljes bizonyító erejű magánokiratnak kell lennie. A gyakorlatban ezt két tanú aláírásával érik el: a kormányzati DÁP útmutató 4 példányt és 2 tanút javasol. A DÁP mobilalkalmazásban kötött digitális szerződésnél nincs szükség papírra és tanúkra.'],
+  ['Meddig kell bejelenteni az autó eladását?', 'Az eladónak a szerződéskötéstől számított 15 napon belül kell bejelentenie a tulajdonosváltozást. Ezt online a Webes Ügysegédben („Jármű tulajdonosváltás bejelentés”), a DÁP alkalmazásban vagy bármelyik kormányablakban teheti meg.'],
+  ['Van hivatalos adásvételi szerződés minta?', 'Kötelező hivatalos minta nincs. Nyomtatványboltban vásárolható űrlap, vagy a DÁP alkalmazásban digitálisan is megköthető a szerződés. A lényeg, hogy a 304/2009. Korm. rendelet szerinti kötelező adatok mind szerepeljenek benne.'],
+  ['Mi történik, ha az eladó nem jelenti be az eladást?', 'A nyilvántartásban továbbra is ő szerepel tulajdonosként, ezért a vevő által elkövetett szabálysértések bírságai hozzá kerülhetnek, és a gépjárműadó is őt terhelheti tovább.'],
+  ['Mi lesz a kötelező biztosítással eladáskor?', 'Az eladó KGFB-szerződése érdekmúlással megszűnik a tulajdonosváltáskor; a ki nem használt díjat a biztosító visszatéríti. A vevőnek az átvételtől saját kötelező biztosítást kell kötnie.'],
+  ['Ki fizeti a gépjárműadót az eladás évében?', 'Ha a bejelentés határidőben megtörténik, az eladó az adásvétel évére még adóköteles, a vevő a következő év január 1-jétől.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Autó adásvételi szerződés 2026 — kötelező tartalom, bejelentés | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["auto-eladas-2026","hasznalt-auto-vasarlas-menete","eredetisegvizsgalat"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>Az <strong>autó adásvételi szerződés</strong> kötelező tartalmát a <strong>304/2009. Korm. rendelet</strong> határozza meg: rendszám, alvázszám, a felek teljes személyes adatai, okmányszámok, <strong>átadás időpontja és km-állás</strong>, a tulajdonjog átszállásának ideje és a bejelentési nyilatkozatok. Papíron a gyakorlat <strong>4 példány, 2 tanú</strong>. Az eladó <strong>15 napon belül</strong> bejelenti az eladást, a vevő 15 napon belül átíratja az autót.</p>
+    </div>
+
+    <h2>Kötelező tartalom (304/2009. Korm. rendelet 3. §)</h2>
+    <table>
+      <thead><tr><th>Elem</th><th>Mit írj bele?</th></tr></thead>
+      <tbody>{MUST.map(([a, b]) => (<tr><td><strong>{a}</strong></td><td>{b}</td></tr>))}</tbody>
+    </table>
+
+    <h2>Amit érdemes még beleírni</h2>
+    <ul>
+      <li><strong>Vételár és fizetés módja</strong> (készpénz, utalás, a teljesítés időpontja).</li>
+      <li><strong>Átadás pontos ideje — óra és perc.</strong> Ebből dől el, ki volt az üzembentartó, ha aznap bírság vagy baleset történik.</li>
+      <li><strong>Az autó állapota:</strong> ismert hibák, sérülések, szervizmúlt; „megtekintett állapotban” kitétel.</li>
+      <li><strong>Átadott tartozékok:</strong> kulcsok száma, gumigarnitúra, szervizkönyv.</li>
+      <li><strong>Ki intézi és fizeti</strong> az eredetiségvizsgálatot és az átírást.</li>
+    </ul>
+
+    <h2>Forma: papíron vagy digitálisan</h2>
+    <ul>
+      <li><strong>Papíron:</strong> teljes bizonyító erejű magánokirat kell; a DÁP útmutató szerint <strong>4 példányban, 2 tanú előtt</strong> aláírva. Kötelező hivatalos minta nincs.</li>
+      <li><strong>Digitálisan, a DÁP mobilalkalmazásban:</strong> a szerződés és a bejelentés is elintézhető, ha a vevő nem közeli hozzátartozó, egyik fél sem egyéni vállalkozóként vagy kereskedőként jár el, nincs más tulajdonos vagy üzembentartó, és mindkét félnek van digitális aláírási jelszava.</li>
+    </ul>
+
+    <h2>Az eladó teendői</h2>
+    <ol>
+      <li><strong>Bejelentés 15 napon belül</strong> a szerződéskötéstől: online a Webes Ügysegédben („Jármű tulajdonosváltás bejelentés” — rendszám, alvázszám, eladás dátuma, a szerződés szkennelt példánya), a DÁP appban vagy kormányablakban. A hatóság 3 napon belül bejegyzi.</li>
+      <li><strong>Szóljon a biztosítójának</strong> — a KGFB érdekmúlással megszűnik, a ki nem használt díj visszajár.</li>
+      <li><strong>Gépjárműadó:</strong> határidőben tett bejelentés esetén az eladás évére még az eladó fizet, a következő évtől a vevő.</li>
+    </ol>
+    <p>Ha nem jelented be, a nyilvántartás szerint te maradsz a tulajdonos: a vevő bírságai hozzád kerülhetnek, és a gépjárműadó is téged terhelhet tovább.</p>
+
+    <h2>A vevő teendői</h2>
+    <ol>
+      <li><strong>Saját KGFB</strong> az átvétel pillanatától — biztosítás nélkül ne indulj el.</li>
+      <li><a href="/blog/eredetisegvizsgalat">Eredetiségvizsgálat</a> (60 napig érvényes) — közeli hozzátartozótól vásárolt vagy örökölt autónál nem kell.</li>
+      <li><strong>Átírás 15 napon belül</strong> a kormányablakban: személyi okmány, lakcímkártya (vagy DÁP), szerződés, forgalmi és törzskönyv, eredetiségvizsgálat, KGFB-igazolás.</li>
+      <li><strong>Vagyonszerzési illeték</strong> — a vevő fizeti, összege az autó korától és kW-jától függ; az elektromos autók mentesek. Számold ki az <a href="/atiras-kalkulator/">átírás kalkulátorral</a>.</li>
+    </ol>
+    <p>A teljes vásárlási folyamatot a <a href="/blog/hasznalt-auto-vasarlas-menete">használt autó vásárlás menete</a> cikkben lépésenként végigvesszük.</p>
+
+    <h2>Nem akarsz papírozni? Add el bizományban</h2>
+    <p>Ha prémium autót adsz el, a <a href="/bizomanyos/">bizományos értékesítéssel</a> a hirdetést, a vevőkeresést, a szerződést és az ügyintézést is mi végezzük. Részletek: <a href="/eladom/">Eladom az autómat</a> és <a href="/blog/auto-eladas-2026">autó eladás 2026</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Források: 304/2009. (XII. 22.) Korm. rendelet 2–4/A. § (njt.jog.gov.hu), dap.gov.hu „Autót adok el” és „Autót veszek” életesemények, Webes Ügysegéd, 2009. évi LXII. törvény (Gfbt.), 1991. évi LXXXII. törvény (Gjt.) 2. §. Tájékoztató jellegű összefoglaló, nem minősül jogi tanácsadásnak.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
