@@ -23,10 +23,7 @@ const toc = [
 ];
 
 const deposits = [
-  { amount: '3 000 €', cars: 'BMW 1-es, 2-es, X1, X2 · MINI Cooper (3- és 5-ajtós, Cabrio), Countryman, JCW · Mercedes A-osztály, B-osztály' },
-  { amount: '5 000 €', cars: 'BMW M2 Coupé, 3-as, 4-es, X3 · Mercedes A AMG, C-osztály, CLE, GLA, GLB, GLC, GLC Coupé' },
-  { amount: '7 500 €', cars: 'BMW M3, M4, 5-ös, X6, X7 · Mercedes C AMG, CLE AMG, E-osztály, GLA/GLB/GLC AMG, GLE, GLE Coupé' },
-  { amount: '10 000 €', cars: 'BMW M5, 7-es, X6 M · Mercedes E AMG, GLE AMG, GLE Coupé AMG, S-osztály' },
+  { amount: '2 000 – 10 000 €', cars: 'Modelltől függően. A pontos összeget minden autó kártyáján („Kaució”), az ajánlatban és a szerződésben is feltüntetjük.' },
 ];
 
 const faqs = [
@@ -49,7 +46,7 @@ const faqJson = {
   <script type="application/ld+json" set:html={JSON.stringify(faqJson)} />
   <LegalPage title="Tartós bérlet — feltételek és kaució" kicker="Tartós bérlet — 6 hónaptól" tabs={false} updLabel="Frissítve" lead="Minden, ami a bérleti szerződésben áll — érthetően. Különösen a kaucióról: mikor fizeted, mire szolgál, mit vonhatunk le belőle és mikor kapod vissza." toc={toc}>
     <div class="bf-sum">
-      <div><b>Kaució</b><span>3 000 – 10 000 €, modelltől függően</span></div>
+      <div><b>Kaució</b><span>2 000 – 10 000 €, modelltől függően</span></div>
       <div><b>Visszajár</b><span>30 napon belül a visszaadás és a nyitott ügyek lezárása után</span></div>
       <div><b>Minimum</b><span>6 hónap, utána 30 napos felmondás</span></div>
       <div><b>Díjban benne</b><span>szerviz, adó, casco, kgfb, nyári + téli gumi</span></div>
@@ -71,9 +68,9 @@ const faqJson = {
     <p><strong>Fontos:</strong> a kaució nem felső határ. A kárt, az önrészt, a biztosítás által nem fedezett kárt, a bírságokat és a túlfutást akkor is a bérlő fizeti, ha az összeg meghaladja a kauciót, vagy ha kaució nincs.</p>
 
     <h2 id="kaucio-osszeg">2. Mekkora a kaució?</h2>
-    <p>Az autó kategóriájától függ. A pontos összeget minden modell kártyáján, az ajánlatban és a szerződésben is feltüntetjük.</p>
+    <p>Modelltől függően <strong>2 000 € és 10 000 €</strong> között. A pontos összeget minden modell kártyáján, az ajánlatban és a szerződésben is feltüntetjük.</p>
     <div class="lg-tw"><table>
-      <thead><tr><th style="width:120px">Kaució</th><th>Modellek</th></tr></thead>
+      <thead><tr><th style="width:170px">Kaució</th><th>Pontos összeg</th></tr></thead>
       <tbody>{deposits.map((d) => <tr><td><strong>{d.amount}</strong></td><td>{d.cars}</td></tr>)}</tbody>
     </table></div>
 
