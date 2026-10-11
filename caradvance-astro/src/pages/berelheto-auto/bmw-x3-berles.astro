@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import CarDetail from '../../components/CarDetail.astro';
 import { carModels } from '../../data/carModels';
 import { getRental, fmtNum } from '../../data/rental';
+import { KM_FAQ } from '../../data/rentalPage';
 
 // A bérlési adatok (ár, futáskeret, futamidő, kaució, változatok, elérhetőség, színek)
 // a napi Choice-szinkronnal frissülő seo-abo.mjs-ből jönnek — ugyanaz, mint az /autoink kártya.
@@ -12,7 +13,7 @@ const r = getRental('BMW', 'X3');
 const eur = r ? r.eur : 1199;
 const huf = (r ? fmtNum(r.huf) : '440 000') + ' Ft';
 const km = r && r.km.length ? r.km[0] : 4000;
-const months = r && r.months.length ? r.months[0] : 6;
+const months = Math.max(6, r && r.months.length ? r.months[0] : 6); // tartós bérlet: legalább 6 hónap
 const dep = r ? r.dep : 3000;
 const depHuf = (r ? fmtNum(r.depHuf) : '1 092 000') + ' Ft';
 const trims = r && r.trims.length ? r.trims : [];
@@ -21,7 +22,7 @@ const count = r ? r.count : 0;
 const now = r ? r.now : 0;
 const later = r ? r.later : [];
 const colors = r ? r.colors : [];
-const kmNum = fmtNum(km);
+const kmNum = '2 000–4 000'; // futáskeret: autótól függően havi 2 000–4 000 km
 const fuelList = r && r.fuels.length ? r.fuels.join(' · ') : 'Benzin · Dízel · PHEV';
 const fuelHu = (f: string) => String(f).split(' / ').map((x) => ({ Benzin: 'benzin', 'Dízel': 'dízel', PHEV: 'plug-in hibrid', Hibrid: 'hibrid', Elektromos: 'elektromos' } as any)[x] || x.toLowerCase()).join(' / ');
 
@@ -79,7 +80,7 @@ const model: any = {
   related,
   faq: [
     { q: 'Mennyibe kerül a BMW X3 bérlése?', a: `A BMW X3 havi bérleti díja ${huf} (${eur} €) -tól indul ${kmNum} km/hó futáskerettel és ${months} hónapos futamidővel.${variants.length && (variants[0] as any).t ? ' Változatonként: ' + variants.map((v: any) => v.t.name + ' ' + v.t.eur + ' €/hó-tól').join(', ') + '.' : ''} Pontos, személyre szabott ajánlatért keress minket.` },
-    { q: 'Mekkora a futáskeret a BMW X3 tartós bérletnél?', a: `Havonta ${kmNum} km — a ${months} hónapos futamidő alatt összesen ${fmtNum(km * months)} km fér bele a havidíjba. Ez bőven elég a napi ingázáshoz és a hosszabb utakhoz is.` },
+    { q: 'Mekkora a futáskeret a BMW X3 tartós bérletnél?', a: KM_FAQ },
     { q: 'Mit tartalmaz a havi bérleti díj?', a: 'A havidíj a vadonatúj BMW X3 használatát tartalmazza a megadott futáskerettel; a szervizt, az adót és a nyári-téli gumiszettet mi álljuk. A pontos feltételeket az ajánlatban előre, írásban rögzítjük.' },
     { q: 'Mennyi a kaució és visszajár-e?', a: `A kaució egyszeri, visszatérítendő letét: ${fmtNum(dep)} €-tól${depMax > dep ? `, változattól függően legfeljebb ${fmtNum(depMax)} €` : ''}. A bérlet végén — káresemény és rendkívüli kopás nélkül — teljes egészében visszajár.` },
     { q: 'Mennyi a bérlési időtartam?', a: `A tartós bérlet futamideje ${months} hónap. Utána meghosszabbíthatod, vagy új modellre válthatsz — akár félévente új autóval.` },
