@@ -1,0 +1,151 @@
+---
+// /mercedes-konfigurator/, /audi-konfigurator/, /mini-konfigurator/ — márkánkénti konfigurátor-útmutató
+// + teljes német árlista az egyedi rendelés oldalakról (EGYEDI_CARS) + bérelhető modellek (allRentals)
+import '../styles/eladom.css';
+import { EGYEDI_CARS } from '../data/egyediCars';
+import { allRentals, fmt } from '../data/tartosBerlet';
+interface Props { brand: 'MB' | 'AUDI' | 'MINI' }
+const { brand } = Astro.props;
+const SITE = 'https://www.caradvance.hu';
+const FX = 364;
+const B = {
+  MB: {
+    name: 'Mercedes-Benz', short: 'Mercedes', path: '/mercedes-konfigurator/', key: 'mercedes', rk: 'mercedes',
+    video: '/mercedes-hero.mp4', poster: '', hu: 'mercedes-benz.hu', de: 'mercedes-benz.de',
+    lines: 'A legtöbb modellnél két külső stílus közül választhatsz: az elegánsabb alapkivitel vagy a sportos <strong>AMG Line</strong>. A felszereltséget a német konfigurátorban jellemzően <strong>csomagokba</strong> rendezve kínálják (az alapcsomagtól a prémium csomagokig) — ezek sok egyedi extránál kedvezőbbek.',
+    tips: ['AMG Line külső és belső — a legkeresettebb a használtpiacon', 'Vezetéstámogató csomag (távolságtartó tempomat, sávtartás)', 'Night csomag vagy fekete díszítések, ha sportos külsőt szeretnél', 'Elektromos modelleknél hőszivattyú és nagyobb AC töltőteljesítmény', 'Vonóhorog SUV-nál és kombinál (T-Modell), ha valaha kellhet'],
+    rel: [['/blog/mercedes-behozatal-nemetorszagbol', 'Mercedes behozatal Németországból'], ['/blog/audi-bmw-mercedes-osszehasonlitas', 'Audi, BMW vagy Mercedes?']],
+  },
+  AUDI: {
+    name: 'Audi', short: 'Audi', path: '/audi-konfigurator/', key: 'audi', rk: 'audi',
+    video: '/audi-hero.mp4', poster: '/audi-hero-poster.jpg', hu: 'audi.hu', de: 'audi.de',
+    lines: 'Az újabb Audi modelleknél az alapkivitel mellett jellemzően egy jobban felszerelt (<strong>advanced</strong>) és egy sportos (<strong>S line</strong>) felszereltségi vonal közül választhatsz; a <strong>quattro</strong> összkerékhajtás motortól függően elérhető. A német konfigurátor gyakran szélesebb motor- és csomagkínálatot mutat, mint a magyar.',
+    tips: ['S line külső (és belső) — sportos megjelenés, jó viszonteladási érték', 'Matrix LED fényszórók', 'Vezetéstámogató csomag (adaptív tempomat, sávtartás)', 'quattro, ha sokat jársz télen vagy vontatsz', 'e-tron modelleknél hőszivattyú és nagyobb AC töltő'],
+    rel: [['/blog/audi-bmw-mercedes-osszehasonlitas', 'Audi, BMW vagy Mercedes?'], ['/blog/auto-behozatal-nemetorszagbol', 'Autó behozatal Németországból']],
+  },
+  MINI: {
+    name: 'MINI', short: 'MINI', path: '/mini-konfigurator/', key: 'mini', rk: 'mini',
+    video: '/mini-JCW-family-video-wide.mp4', poster: '', hu: 'mini.hu', de: 'mini.de',
+    lines: 'Az új generációs MINI modelleket felszereltségi vonalakkal és csomagokkal állíthatod össze, a sportosabb megjelenésért a <strong>John Cooper Works</strong> stílus felel. Válassz karosszériát (3 ajtós, 5 ajtós, Cabrio, Countryman), hajtást (benzin vagy elektromos), majd színt, tetőszínt és felnit.',
+    tips: ['Kontrasztos tetőszín — a MINI karakterének része', 'Vezetéstámogató és parkolócsomag városi használatra', 'JCW stílus, ha sportos megjelenést szeretnél', 'Elektromos MINI-nél a töltési lehetőségek (AC teljesítmény)', 'Nagyobb felni helyett a komfort, ha sokat autózol rossz utakon'],
+    rel: [['/blog/bmw-mercedes-audi-konfigurator', 'BMW, Mercedes, Audi konfigurátor'], ['/blog/auto-behozatal-nemetorszagbol', 'Autó behozatal Németországból']],
+  },
+}[brand];
+const cars = EGYEDI_CARS.filter((c) => c.brand === brand).map((c) => {
+  const net = c.from ? Math.round(c.from / 1.19) : 0;
+  return { ...c, net, huf: net ? Math.round(net * FX / 10000) * 10000 : 0 };
+}).sort((a, b) => (a.net || 1e9) - (b.net || 1e9));
+const priced = cars.filter((c) => c.net);
+const minNet = priced.length ? priced[0].net : 0;
+const rentals = allRentals().filter((r) => r.brand.toLowerCase().startsWith(B.rk)).slice(0, 8);
+const ef = (n: number) => new Intl.NumberFormat('de-DE').format(n);
+const faqs: [string, string][] = [
+  [`Hol találom a ${B.short} konfigurátort magyarul?`, `A ${B.name} hivatalos magyar oldalán (${B.hu}) magyarul, a német oldalon (${B.de}) németül érhető el. A német konfigurátor a németországi árakat és gyakran szélesebb motor- és csomagválasztékot mutat — a böngésző fordítója jól boldogul vele.`],
+  [`Meg lehet rendelni Németországból a konfigurátorban összerakott ${B.short}-t?`, `Igen. Küldd el nekünk a mentett konfiguráció linkjét, kódját vagy PDF-jét, és ajánlatot adunk rá a németországi Caradvance GmbH-n keresztül — kulcsrakészen, magyar forgalomba helyezéssel.`],
+  [`Mennyibe kerül egy új ${B.short} Németországban?`, minNet ? `A jelenlegi listánkon a legolcsóbb ${B.short} modell nettó ${ef(minNet)} €-tól indul (kb. ${fmt(Math.round(minNet * FX / 10000) * 10000)} Ft). A pontos ár a motortól, a felszereltségtől és az aktuális kedvezményektől függ — lent a teljes modell-árlistát látod.` : 'A pontos ár a motortól, a felszereltségtől és az aktuális kedvezményektől függ — kérj ajánlatot.'],
+  ['Milyen áfával vásárolhatok magánszemélyként?', 'Magánszemélyként a Caradvance GmbH-n keresztül akár 19% német áfával vásárolhatsz a hazai 27% helyett. Cégként nettó áron rendelhetsz; az áfa levonhatóságáról egyeztess a könyvelőddel.'],
+  ['Mennyi idő alatt érkezik meg a rendelt autó?', 'Raktáron lévő vagy már gyártásban lévő autónál néhány hét, gyári rendelésnél a modelltől és a gyártási ütemtől függően jellemzően néhány hónap. A várható átadást az ajánlatban jelezzük.'],
+  [`Bérelhetek is ${B.short}-t?`, rentals.length ? `Igen, tartós bérletben is: jelenleg ${rentals.length} ${B.short} modell bérelhető fix nettó havidíjjal, már 6 hónaptól, szervizzel, biztosítással és gumival.` : 'Tartós bérletben több prémium márka modelljei is elérhetők — nézd meg a bérelhető autóinkat.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'Főoldal', item: SITE + '/' },
+  { '@type': 'ListItem', position: 2, name: 'Egyedi autó rendelés', item: SITE + '/egyedi-auto-rendeles/' },
+  { '@type': 'ListItem', position: 3, name: `${B.short} konfigurátor`, item: SITE + B.path }] };
+const listJson = { '@context': 'https://schema.org', '@type': 'ItemList', name: `${B.name} modellek és német árak`, itemListElement: cars.map((c, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/egyedi-auto-rendeles/${c.slug}/`, name: c.name })) };
+---
+<section class="ol">
+<section class="hero">
+<video autoplay muted loop playsinline preload="metadata" poster={B.poster || undefined}><source src={B.video} type="video/mp4" /></video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>{B.short} konfigurátor magyarul —<br /><span class="accent">rakd össze, mi német áron megrendeljük</span></h1>
+<p class="sub sub-wide">Így használd a {B.name} konfigurátort, ezekre figyelj a csomagoknál — és itt a teljes {B.short} modell-árlista{minNet ? ` nettó ${ef(minNet)} €-tól` : ''}. Új autó Németországból, kulcsrakészen.</p>
+<div class="cta-row"><a class="btn btn-primary" href="#arlista">{B.short} árlista</a><a class="btn btn-white" href="/kapcsolat">Konfigurációt küldök</a></div>
+</div>
+</section>
+
+<section class="section"><div class="wrap ol-text">
+<span class="eyebrow">{B.short} konfigurátor</span>
+<h2>Hol találod a {B.short} konfigurátort?</h2>
+<p>A <strong>{B.short} konfigurátor</strong> a márka hivatalos oldalain ingyenesen használható: magyarul a <strong>{B.hu}</strong>, németül a <strong>{B.de}</strong> oldalon. Ha Németországból rendelnél, a <strong>német konfigurátor</strong> a mérvadó: ott látod a német árakat, és gyakran szélesebb a motor- és csomagkínálat is.</p>
+<h2>Így rakd össze lépésről lépésre</h2>
+<ol>
+<li><strong>Modell és karosszéria</strong> — válaszd ki a modellt; lent a teljes {B.short} kínálatot látod német induló árakkal.</li>
+<li><strong>Hajtás</strong> — benzin, dízel, plug-in hibrid vagy elektromos. Az elektromos autó zöld rendszámot kap, és mentes a regisztrációs adó, a gépjárműadó, a cégautóadó és az illeték alól (<a href="/blog/zold-rendszam-2026">részletek</a>).</li>
+<li><strong>Felszereltségi vonal</strong> — <span set:html={B.lines} /></li>
+<li><strong>Szín, kárpit, felni</strong> — a semleges metálszínek a legkeresettebbek a használtpiacon.</li>
+<li><strong>Csomagok és extrák</strong> — csomagban általában olcsóbb, mint tételenként.</li>
+<li><strong>Mentés</strong> — mentsd el a konfigurációt (link, kód vagy PDF), és küldd el nekünk: erre adunk ajánlatot.</li>
+</ol>
+<h2>Mely extrák érik meg?</h2>
+<ul>{B.tips.map((t) => <li>{t}</li>)}</ul>
+</div></section>
+
+<section class="section" id="arlista" style="padding-top:0">
+<div class="wrap center"><span class="eyebrow">Árlista</span><h2 class="sec-title">{B.name} modellek és német induló árak</h2>
+<p class="sec-intro">Nettó német induló árak (19% áfa nélkül), forintban kb. {FX} Ft/€ árfolyammal. Kattints a modellre a motorokért, felszereltségért és a részletes árért.</p></div>
+<div class="wrap ol-text" style="max-width:1000px">
+<div class="ol-tw"><table class="ol-table">
+<thead><tr><th>Modell</th><th>Karosszéria</th><th>Hajtás</th><th>Nettó ár -tól</th><th>kb. Ft</th></tr></thead>
+<tbody>{cars.map((c) => (<tr><td><a href={`/egyedi-auto-rendeles/${c.slug}/`}>{c.name}</a></td><td>{c.body}</td><td>{(c.fuels.length ? c.fuels : [c.fuel]).join(' / ')}</td><td>{c.net ? ef(c.net) + ' €' : 'ár kérésre'}</td><td>{c.huf ? fmt(c.huf) + ' Ft' : '—'}</td></tr>))}</tbody>
+</table></div>
+<p class="ol-note">Tájékoztató induló árak; a végleges ár a konfigurációtól, az árfolyamtól és az aktuális gyári kedvezményektől függ. Magánszemélyként akár 19% német áfával vásárolhatsz.</p>
+</div>
+</section>
+
+{rentals.length > 0 && (
+<section class="section" style="padding-top:0">
+<div class="wrap center"><span class="eyebrow">Vásárlás helyett</span><h2 class="sec-title">{B.short} tartós bérletben</h2>
+<p class="sec-intro">Nem akarsz vásárolni? Új {B.short} fix nettó havidíjjal, szervizzel, adóval, biztosítással és gumival — már 6 hónaptól.</p></div>
+<div class="wrap ol-grid">{rentals.map((c) => (
+<a class="ol-card" href={`/berelheto-auto/${c.slug}-berles/`}><img src={c.photo} alt={`${c.name} tartós bérlet`} loading="lazy" width="480" height="300" />
+<div><b>{c.name}</b><span>{fmt(c.huf)} Ft/hó nettó-tól</span></div></a>))}
+</div>
+<div class="wrap center" style="margin-top:18px"><a class="btn btn-primary" href="/tartos-berlet/">Tartós bérlet →</a></div>
+</section>)}
+
+<section class="section" style="padding-top:8px">
+<div class="wrap center"><span class="eyebrow">GYIK</span><h2 class="sec-title">Gyakori kérdések a {B.short} konfigurátorról</h2></div>
+<div class="wrap ol-faq">{faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}</div>
+<div class="wrap ol-rl">
+<a href="/egyedi-auto-rendeles/">Egyedi autó rendelés →</a><a href="/blog/bmw-mercedes-audi-konfigurator">BMW, Mercedes, Audi konfigurátor →</a>
+{B.rel.map(([h, t]) => <a href={h}>{t} →</a>)}
+<a href="/finanszirozas-lizing/">Lízing kalkulátor →</a><a href="/honositas-kalkulator/">Honosítás kalkulátor →</a>
+</div>
+</section>
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(crumbJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(listJson)}></script>
+</section>
+
+<style>
+.ol{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
+.ol .wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.ol-text{max-width:900px}
+.ol-text p,.ol-text li{color:#3d4656;font-size:16px;line-height:1.7}
+.ol-text p{margin:0 0 14px}.ol-text ul,.ol-text ol{padding-left:20px}
+.ol-text h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:26px 0 12px}
+.ol-text a,.ol-faq a{color:var(--red);font-weight:600}
+.ol-tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
+.ol-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.ol-table th,.ol-table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.ol-table th{background:#F6F7FA;font-size:13px;color:var(--muted)}
+.ol-table td:first-child{font-weight:700;color:var(--ink)}
+.ol-note{font-size:13px;color:#667}
+.ol-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.ol-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit}
+.ol-card img{width:100%;aspect-ratio:16/10;object-fit:cover;background:#F4F6FA;display:block}
+.ol-card div{padding:12px 14px}.ol-card b{display:block;color:var(--ink)}.ol-card span{font-size:13px;color:var(--muted)}
+.ol-faq{max-width:860px;display:flex;flex-direction:column;gap:10px}
+.ol-faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.ol-faq summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.ol-faq summary::-webkit-details-marker{display:none}
+.ol-faq .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.ol-faq details[open] .pl{transform:rotate(45deg)}
+.ol-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+.ol-rl{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.ol-rl a{background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 16px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+.ol-rl a:hover{border-color:var(--red);color:var(--red)}
+@media(max-width:820px){.ol-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
