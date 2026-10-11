@@ -37,8 +37,38 @@ export type Post = {
 
 export const POSTS: Post[] = [
   {
+    slug: 'elektromos-auto-toltes-ara-2026',
+    cat: 'berles',
+    title: 'Elektromos autó töltés ára 2026 — otthon, nyilvános töltőn, wallbox (kalkulátorral)',
+    excerpt: 'Otthon kb. 36–70 Ft/kWh, gyorstöltőn 249–302 Ft/kWh. MOL Plugee, E.ON Drive, Ionity, Tesla árak, wallbox költségek és havi kalkulátor.',
+    dateISO: '2026-10-11',
+    readingMin: 7,
+    image: '/cover-elektromos-auto-toltes-ara-2026.webp',
+    keywords: 'elektromos autó töltés ára, elektromos autó töltés otthon, wallbox ár, gyorstöltés ár, mol plugee ár, elektromos autó töltés költsége',
+  },
+  {
+    slug: 'auto-adasveteli-szerzodes',
+    cat: 'bizomanyos',
+    title: 'Autó adásvételi szerződés 2026 — kötelező tartalom, ellenőrzőlista, bejelentés',
+    excerpt: 'A 304/2009. Korm. rendelet szerinti kötelező adatok, 4 példány 2 tanúval vagy digitálisan a DÁP appban, eladás bejelentése 15 napon belül.',
+    dateISO: '2026-10-11',
+    readingMin: 6,
+    image: '/cover-auto-adasveteli-szerzodes.webp',
+    keywords: 'autó adásvételi szerződés, használt autó adásvételi szerződés, adásvételi szerződés autó minta, autó eladás bejelentése, gépjármű adásvételi szerződés',
+  },
+  {
+    slug: 'hasznalt-auto-vasarlas-menete',
+    cat: 'import',
+    title: 'Használt autó vásárlás menete 2026 — 10 lépés a kiválasztástól az átírásig',
+    excerpt: 'Előélet-ellenőrzés, próbaút, szerződés, KGFB, eredetiségvizsgálat és átírás 15 napon belül — költségekkel és ellenőrzőlistával.',
+    dateISO: '2026-10-11',
+    readingMin: 7,
+    image: '/cover-hasznalt-auto-vasarlas-menete.webp',
+    keywords: 'használt autó vásárlás menete, autó vásárlás menete, használt autó vásárlás, átírás menete, autó átírás',
+  },
+  {
     slug: 'gepjarmuado-2026',
-    cat: 'hirek',
+    cat: 'import',
     title: 'Gépjárműadó 2026 — mennyi az adó, mikor kell fizetni? (kalkulátorral)',
     excerpt: '375 Ft/kW-tól 150 Ft/kW-ig, egy összegben április 15-ig. Kalkulátor, táblázat, mentességek, és ki fizet az autóvásárlás évében.',
     dateISO: '2026-10-11',
@@ -58,7 +88,7 @@ export const POSTS: Post[] = [
   },
   {
     slug: 'zold-rendszam-2026',
-    cat: 'hirek',
+    cat: 'import',
     title: 'Zöld rendszám 2026 — kinek jár, mit ér, mi változik novemberben és januárban?',
     excerpt: 'Csak elektromos autó kaphat zöld rendszámot, a plug-in hibridek rendszámcseréje november 30-ig, Budapesten 2027-től fizetős a parkolás.',
     dateISO: '2026-10-11',
@@ -78,7 +108,7 @@ export const POSTS: Post[] = [
   },
   {
     slug: 'muszaki-vizsga-2026',
-    cat: 'hirek',
+    cat: 'import',
     title: 'Műszaki vizsga 2026 — díja, gyakorisága, menete',
     excerpt: '26 700 Ft hatósági díj, 4 év új autónál, utána 2 évente — teljes költség, menete és ellenőrzőlista.',
     dateISO: '2026-10-11',
