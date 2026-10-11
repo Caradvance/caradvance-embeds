@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/Base.astro';
+import TartosBerlet from '../../components/TartosBerlet.astro';
+import { metaOf } from '../../data/tartosBerlet';
+const m = metaOf('main');
+---
+<Base lang="hu" path="/tartos-berlet" title={m.title} description={m.description}>
+  <TartosBerlet vkey="main" />
+</Base>

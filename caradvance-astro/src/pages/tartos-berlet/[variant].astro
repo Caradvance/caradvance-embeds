@@ -1,0 +1,14 @@
+---
+// /tartos-berlet/cegeknek, /maganszemelyeknek, /elektromos-auto, /bmw, /mercedes, /audi, /volkswagen, /mini
+import Base from '../../layouts/Base.astro';
+import TartosBerlet from '../../components/TartosBerlet.astro';
+import { VARIANTS, metaOf } from '../../data/tartosBerlet';
+export function getStaticPaths() {
+  return VARIANTS.filter((v) => v.key !== 'main').map((v) => ({ params: { variant: v.path.split('/').pop() }, props: { vkey: v.key, path: v.path } }));
+}
+const { vkey, path } = Astro.props as { vkey: string; path: string };
+const m = metaOf(vkey);
+---
+<Base lang="hu" path={path} title={m.title} description={m.description}>
+  <TartosBerlet vkey={vkey} />
+</Base>
