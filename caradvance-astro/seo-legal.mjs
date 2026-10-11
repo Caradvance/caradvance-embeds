@@ -153,7 +153,8 @@ const CONSENT_NEW = 'Elolvastam és elfogadom az <a href="/aszf/"$1>ÁSZF</a>-et
 
 const KMFIX = [
   ['6 hónaptól, 4 000 km/hó kerettel — utána új modellre válthatsz.', '6 hónaptól, havi 2 000–4 000 km kerettel (autótól függően) — utána új modellre válthatsz.'],
-  ['<span class="rb-pill">4 000 km/hó</span>', '<span class="rb-pill">2 000–4 000 km/hó</span>'],
+  ['<span class="rb-pill">4 000 km/hó</span>', '<span class="rb-pill">2–4 ezer km/hó</span>'],
+  ['<span class="rb-pill">2 000–4 000 km/hó</span>', '<span class="rb-pill">2–4 ezer km/hó</span>'],
   ['— 6 hónaptól, 2 000 vagy 3 000 km/hó kerettel.', '— 6 hónaptól, autótól függően havi 2 000–4 000 km kerettel.'],
   ['alacsony kaucióval, 2 000 vagy 3 000 km havi kerettel.', 'alacsony kaucióval, autótól függően havi 2 000–4 000 km kerettel.'],
 ];
@@ -198,6 +199,8 @@ for await (const file of walk(ROOT)) {
 
   // 4. futáskeret: autótól függően havi 2 000–4 000 km (a seo-abo / seo-copy szövegeiben is) — csak HU, a fordítás utána jön
   if (HL === 'hu') for (const [a, b] of KMFIX) h = h.split(a).join(b);
+  // az előny-kártyák jelvénye ne lógjon ki a kártyából (keskeny oszlop, mobil)
+  if (HL === 'hu' && h.includes('rb-pill') && !h.includes('id="rb-fit"')) h = h.replace(/<\/head>/i, '<style id="rb-fit">.rb-v{min-width:0;flex-wrap:wrap}.rb-pill{white-space:normal!important;max-width:100%;text-align:center;line-height:1.2}</style></head>');
 
   if (h !== orig) { await writeFile(file, h); n++; }
 }
