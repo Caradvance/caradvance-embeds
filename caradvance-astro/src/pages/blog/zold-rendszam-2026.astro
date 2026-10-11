@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+import { allRentals, fmt } from '../../data/tartosBerlet';
+const lang = 'hu';
+const slug = 'zold-rendszam-2026';
+const title = 'Zöld rendszám 2026 — kinek jár, mit ér, és mi változik november 30-án és januárban?';
+const lead = 'Csak tisztán elektromos autó kaphat zöld rendszámot, a plug-in hibridek rendszámát 2026. november 30-ig le kell cserélni, Budapesten pedig 2027-től megszűnik az ingyenes parkolás. Összefoglaljuk, mit jelent ez neked.';
+const description = 'Zöld rendszám 2026: csak 5E/5Z elektromos autóknak, plug-in hibrid rendszámcsere 2026. november 30-ig (17 475 Ft), adómentességek, budapesti ingyenes parkolás vége 2027. január 1. Minden, amit tudni kell.';
+const evs = allRentals().filter((c) => c.fuels.some((x) => /elektromos/i.test(x))).slice(0, 8);
+const faqs = [
+  ['Milyen autó kaphat zöld rendszámot 2026-ban?', '2024. szeptember 1. óta csak a tisztán elektromos (5E) és a zéró emissziós (5Z, pl. hidrogénes) autók. A plug-in hibridek (5P/5N) már nem kaphatnak zöld rendszámot.'],
+  ['Mi a teendő, ha plug-in hibridem zöld rendszámos?', 'A rendszámot 2026. november 30-ig le kell cserélni. Új rendszámszámmal 17 475 Ft, azonos számmal 16 605 Ft. Határidő után közúti ellenőrzésen a rendszámot és a forgalmi engedélyt elveszik, az autót kivonják a forgalomból. Visszamenőleges vagyonszerzési illetéket nem kell fizetni.'],
+  ['Ingyen parkolhatnak a zöld rendszámos autók Budapesten?', '2026. december 31-ig igen, de 2027. január 1-jétől a budapesti zöld rendszámos autók is fizetik a normál parkolási díjat. A Fővárosi Közgyűlés 2026 szeptemberében csak egy esetleges kedvezmény vizsgálatát rendelte el.'],
+  ['Milyen adókedvezmények járnak a zöld rendszámhoz?', 'Mentesség a gépjárműadó, a cégautóadó és a vagyonszerzési illeték alól, valamint 0 Ft regisztrációs adó.'],
+  ['Mi a helyzet a nehéz elektromos autókkal?', 'Budapesten 2028. január 1-jétől a 2000 kg saját tömeg feletti autókra dupla parkolási díj vonatkozik.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Zöld rendszám 2026 — feltételek, előnyök, határidők | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["elektromos-auto-arak-2026","elektromos-auto-lizing-tamogatas","gepjarmuado-2026"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>zöld rendszám</strong> 2026-ban csak <strong>tisztán elektromos (5E) és zéró emissziós (5Z)</strong> autóknak jár. A még zöld rendszámos <strong>plug-in hibridek rendszámát 2026. november 30-ig</strong> le kell cserélni. A zöld rendszámos autók mentesek a gépjárműadó, a cégautóadó és az illeték alól, a regisztrációs adójuk 0 Ft — de <strong>Budapesten 2027. január 1-jétől fizetniük kell a parkolásért</strong>.</p>
+    </div>
+
+    <h2>Ki kaphat zöld rendszámot?</h2>
+    <p>2024. szeptember 1. óta kizárólag a <strong>környezetkímélő gépkocsik</strong>: a tisztán elektromos (környezetvédelmi osztály: <strong>5E</strong>) és a zéró emissziós, például hidrogén üzemű (<strong>5Z</strong>) autók. A plug-in hibridek (5P, 5N) azóta nem kaphatnak zöld rendszámot, akkor sem, ha nagy elektromos hatótávjuk van.</p>
+
+    <h2>Plug-in hibridek: rendszámcsere 2026. november 30-ig</h2>
+    <p>A korábban zöld rendszámot kapott plug-in hibridek tulajdonosainak (a hatóság szerint még mintegy 32 ezer autó érintett) <strong>2026. november 30-ig</strong> le kell cserélniük a rendszámot fehérre.</p>
+    <table>
+      <tbody>
+        <tr><td>Határidő</td><td>2026. november 30.</td></tr>
+        <tr><td>Csere új rendszámszámmal</td><td>17 475 Ft</td></tr>
+        <tr><td>Csere azonos rendszámszámmal</td><td>16 605 Ft</td></tr>
+        <tr><td>Visszamenőleges illeték</td><td>nincs</td></tr>
+        <tr><td>Ha elmarad</td><td>közúti ellenőrzéskor a rendszámot és a forgalmit elveszik, az autót kivonják a forgalomból</td></tr>
+      </tbody>
+    </table>
+    <p>Fontos: a 2025 előtt forgalomba helyezett plug-in hibridek gépjárműadó- és cégautóadó-mentessége is <strong>2026. december 31-én megszűnik</strong> (részletek: <a href="/blog/gepjarmuado-2026">gépjárműadó 2026</a>, <a href="/blog/cegautoado-2026">cégautóadó 2026</a>).</p>
+
+    <h2>Milyen előnyökkel jár a zöld rendszám?</h2>
+    <ul>
+      <li><strong>Gépjárműadó:</strong> mentes.</li>
+      <li><strong>Cégautóadó:</strong> mentes — cégeknél ez havi több tízezer forint.</li>
+      <li><strong>Regisztrációs adó:</strong> 0 Ft (behozott elektromos autónál is) — számold ki a <a href="/honositas-kalkulator/">honosítás kalkulátorral</a>.</li>
+      <li><strong>Vagyonszerzési illeték (átírás):</strong> mentes — <a href="/atiras-kalkulator/">átírás kalkulátor</a>.</li>
+    </ul>
+
+    <h2>Parkolás: Budapesten 2027-től fizetős</h2>
+    <p>A zöld rendszámos autók budapesti ingyenes parkolása <strong>2027. január 1-jén megszűnik</strong>, ettől kezdve a normál parkolási díjat kell fizetni — erről a Fővárosi Közgyűlés még 2024-ben döntött. 2026 szeptemberében a Közgyűlés csak egy esetleges kedvezmény vizsgálatát rendelte el; a korábban megjelent „50%-os kedvezmény” hírt több szaklap is helyesbítette. 2028-tól a 2000 kg saját tömeg feletti autókra dupla díj vonatkozik.</p>
+
+    <h2>Elektromos autó kockázat nélkül: tartós bérlet</h2>
+    <p>Ha kipróbálnád az elektromos autót, de nem akarsz akkumulátor- és értékvesztési kockázatot vállalni, az <a href="/tartos-berlet/elektromos-auto/">elektromos autó tartós bérlet</a> a legegyszerűbb út. Néhány jelenleg bérelhető modell:</p>
+    <table>
+      <thead><tr><th>Modell</th><th>Havidíj (nettó) -tól</th></tr></thead>
+      <tbody>{evs.map((c) => (<tr><td><a href={`/berelheto-auto/${c.slug}-berles/`}>{c.name}</a></td><td>{fmt(c.huf)} Ft</td></tr>))}</tbody>
+    </table>
+    <p>Az elektromos autók áraival az <a href="/blog/elektromos-auto-arak-2026">elektromos autó árak 2026</a>, a finanszírozással az <a href="/blog/elektromos-auto-lizing-tamogatas">elektromos autó lízing és támogatás</a> cikk foglalkozik.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Források: Digitális Mobilitásért Felelős Kormánybiztos (dmu.gov.hu) — rendszámcsere és GYIK; NAV 95. információs füzet; a budapesti parkolásról a Totalcar (2026. 09. 28.) és a Villanyautósok.hu (2026. 09. 30.) helyesbített cikkei. Tájékoztató jellegű összefoglaló.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>

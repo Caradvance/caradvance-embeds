@@ -1,0 +1,93 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'gepjarmuado-2026';
+const title = 'Gépjárműadó 2026 — mennyi az adó, mikor kell fizetni? (kalkulátorral)';
+const lead = 'A 2026-os gépjárműadó tételek kW-onként, a befizetési határidő, a mentességek és egy kalkulátor, amivel pár másodperc alatt kiszámolod, mennyi adót fizetsz az autód után.';
+const description = 'Gépjárműadó 2026: 375 Ft/kW-tól 150 Ft/kW-ig az autó korától függően, egy összegben április 15-ig. Kalkulátor, táblázat, mentességek (elektromos, plug-in hibrid), új és használt autó vásárlásának éve.';
+const faqs = [
+  ['Mennyi a gépjárműadó 2026-ban?', 'Személyautónál a gyártási évben és az azt követő 3 naptári évben 375 Ft/kW, a 4–7. évben 325 Ft/kW, a 8–11. évben 250 Ft/kW, a 12–15. évben 205 Ft/kW, a 16. évtől 150 Ft/kW. Egy 110 kW-os, 2020-ban gyártott autó adója 2026-ban így 110 × 325 = 35 750 Ft.'],
+  ['Mikor kell befizetni a gépjárműadót 2026-ban?', '2024 óta egy összegben, április 15-ig. Magánszemélyek június 30-ig kérhetik, hogy legfeljebb 5 részletben, pótlékmentesen fizessenek. (Korábban március 15. és szeptember 15. volt a két határidő.)'],
+  ['Ki vetíti ki a gépjárműadót?', '2021 óta a NAV, nem az önkormányzat. A NAV határozatot küld a tulajdonosnak; az adót a 10032000-01079160 számlára kell utalni, forintra pontosan.'],
+  ['Kell gépjárműadót fizetni elektromos autó után?', 'A tisztán elektromos (5E) és a zéró emissziós (5Z) környezetkímélő autók mentesek. A 2025 előtt forgalomba helyezett plug-in hibridek (5P/5N) mentessége 2026. december 31-ig tart; a később forgalomba helyezett plug-in hibridek adókötelesek.'],
+  ['Mennyi adót fizetek az autó vásárlásának évében?', 'Új autónál a forgalomba helyezést követő hónap 1-jétől, időarányosan. Használt autónál a vevő az adásvételt követő év január 1-jétől adózik — az adásvétel évében még az eladó a kötelezett.'],
+  ['Hogyan számolom át a lóerőt kW-ra?', 'A gépjárműadó alapja a forgalmi engedélyben szereplő kW. Ha csak lóerő szerepel, oszd el 1,36-tal és kerekítsd.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Gépjárműadó 2026 — kalkulátor, táblázat, határidő | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["cegautoado-2026","regisztracios-ado-2026","zold-rendszam-2026"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>gépjárműadó 2026</strong>-ban személyautónál <strong>375 Ft/kW</strong> (új autó) és <strong>150 Ft/kW</strong> (16 évnél idősebb) között van. Egy összegben kell befizetni <strong>április 15-ig</strong>, a NAV határozata alapján. Az elektromos autók mentesek. Lent kalkulátorral számolhatsz.</p>
+    </div>
+
+    <h2>Gépjárműadó kalkulátor 2026</h2>
+    <div class="ga-calc">
+      <label>Teljesítmény<input id="gakw" type="number" min="1" max="1000" value="110" /><select id="gau"><option value="kw">kW</option><option value="le">LE (lóerő)</option></select></label>
+      <label>Gyártási év<input id="gay" type="number" min="1950" max="2026" value="2020" /></label>
+      <div class="ga-out"><span>Éves gépjárműadó 2026-ban</span><b id="gar">—</b><small id="gad"></small></div>
+    </div>
+    <script is:inline>(function(){var kw=document.getElementById('gakw'),u=document.getElementById('gau'),y=document.getElementById('gay');function rate(a){return a<=3?375:a<=7?325:a<=11?250:a<=15?205:150;}function r(){var k=+kw.value||0;if(u.value==='le')k=Math.round(k/1.36);var a=2026-(+y.value||2026);if(a<0)a=0;var t=rate(a),v=k*t;document.getElementById('gar').textContent=v.toLocaleString('hu-HU')+' Ft';document.getElementById('gad').textContent=k+' kW × '+t+' Ft/kW ('+(a<=3?'gyártási év + 3 év':a+'. év')+')';}[kw,u,y].forEach(function(x){x.addEventListener('input',r);x.addEventListener('change',r);});r();})();</script>
+    <p style="font-size:13px;color:#667">Tájékoztató számítás a 2026-os NAV adótételekkel, személygépkocsira. Elektromos (5E/5Z) autónál az adó 0 Ft.</p>
+
+    <h2>Gépjárműadó tételek 2026 (személyautó)</h2>
+    <table>
+      <thead><tr><th>Az autó kora</th><th>Adó / kW</th><th>Példa: 110 kW</th></tr></thead>
+      <tbody>
+        <tr><td>Gyártási év + az azt követő 3 naptári év</td><td>375 Ft</td><td>41 250 Ft</td></tr>
+        <tr><td>4–7. év</td><td>325 Ft</td><td>35 750 Ft</td></tr>
+        <tr><td>8–11. év</td><td>250 Ft</td><td>27 500 Ft</td></tr>
+        <tr><td>12–15. év</td><td>205 Ft</td><td>22 550 Ft</td></tr>
+        <tr><td>16. évtől</td><td>150 Ft</td><td>16 500 Ft</td></tr>
+      </tbody>
+    </table>
+    <p>Az adó alapja a forgalmi engedélyben szereplő <strong>kW</strong>. Az adótételeket a törvény alapján minden évben az előző év júliusi inflációval emelik, és a NAV a honlapján teszi közzé — ezért érdemes minden évben a friss tételekkel számolni.</p>
+
+    <h2>Mikor és hogyan kell befizetni?</h2>
+    <ul>
+      <li><strong>Határidő:</strong> egy összegben <strong>április 15.</strong> (2024 óta; korábban március 15. és szeptember 15.).</li>
+      <li><strong>Részletfizetés:</strong> magánszemélyek június 30-ig kérhetnek legfeljebb 5 pótlékmentes részletet.</li>
+      <li><strong>Ki szedi:</strong> a NAV (2021 óta), határozat alapján. Számla: 10032000-01079160, forintra pontosan.</li>
+      <li><strong>Év közbeni változás:</strong> ha az adó év közben keletkezik vagy változik, a határozat jogerőre emelkedésétől számított 15 napon belül kell fizetni.</li>
+    </ul>
+
+    <h2>Autóvásárlás éve: ki fizet és mennyit?</h2>
+    <ul>
+      <li><strong>Új autó:</strong> a forgalomba helyezést követő hónap 1-jétől, időarányosan. A NAV példája: egy 2026. október 22-én forgalomba helyezett 120 kW-os új autó 2026-ra 7 500 Ft adót fizet (teljes évre 45 000 Ft lenne).</li>
+      <li><strong>Használt autó tulajdonosváltással:</strong> a vevő az adásvételt követő év január 1-jétől adózik.</li>
+      <li><strong>Forgalomból kivont, majd újra forgalomba helyezett autó:</strong> az újbóli forgalomba helyezést követő hónaptól, időarányosan.</li>
+      <li><strong>Forgalomból kivonás:</strong> az adókötelezettség az adott hónap végén megszűnik; lopott autónál szünetel.</li>
+    </ul>
+    <p>Behozott autónál a gépjárműadó mellett a <a href="/honositas-kalkulator/">regisztrációs adóval</a> és az <a href="/atiras-kalkulator/">átírási illetékkel</a> is számolni kell — mindkettőhöz van kalkulátorunk.</p>
+
+    <h2>Kinek nem kell gépjárműadót fizetnie?</h2>
+    <ul>
+      <li><strong>Tisztán elektromos (5E) és zéró emissziós (5Z)</strong> autók — automatikusan, bejelentés nélkül. Részletek: <a href="/blog/zold-rendszam-2026">zöld rendszám 2026</a>.</li>
+      <li><strong>Plug-in hibridek (5P/5N):</strong> csak a 2025 előtt forgalomba helyezettek, és csak <strong>2026. december 31-ig</strong>. A később forgalomba helyezett plug-in hibridek adókötelesek.</li>
+      <li><strong>Mozgáskorlátozott személyek:</strong> egy autó után, 100 kW-ig, legfeljebb évi 13 000 Ft erejéig.</li>
+      <li>Költségvetési szervek, egyházak, egyes egyesületek, alapítványok és köztestületek.</li>
+    </ul>
+
+    <h2>Cégautó esetén</h2>
+    <p>Céges autónál a gépjárműadó mellett <a href="/blog/cegautoado-2026">cégautóadó</a> is fizetendő; a határidőben megfizetett gépjárműadó — ha a tulajdonos és az üzembentartó ugyanaz — levonható a cégautóadóból.</p>
+
+    <h2>Tipp: tartós bérletnél nincs adóügyintézés</h2>
+    <p>A <a href="/tartos-berlet/">tartós bérletben</a> kínált autóinknál a havidíj tartalmazza az adót, a biztosítást, a szervizt és a gumikat is — nincs NAV-határozat, nincs határidő, nincs külön számla. Új prémium autók havidíjjal, már 6 hónaptól: <a href="/tartos-berlet/">nézd meg az ajánlatokat</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Forrás: NAV 95. számú információs füzet (A belföldi gépjárművek adója, 2026. 10. 01.) és a NAV valorizált adómértékek oldala. Tájékoztató jellegű összefoglaló, nem minősül adótanácsadásnak.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
+<style>
+.ga-calc{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fff;border:1px solid #E6EAF1;border-radius:18px;padding:18px;margin:10px 0}
+.ga-calc label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#5A6B82}
+.ga-calc input,.ga-calc select{height:44px;border:1px solid #dfe3ea;border-radius:12px;padding:0 12px;font:inherit;font-size:16px}
+.ga-calc label:first-child{flex-direction:column}
+.ga-out{grid-column:1/-1;background:#F6F7FA;border-radius:14px;padding:14px 16px}
+.ga-out span{display:block;font-size:13px;color:#5A6B82}.ga-out b{font-size:28px;font-weight:800;color:#141519}.ga-out small{display:block;color:#5A6B82;margin-top:2px}
+@media(max-width:640px){.ga-calc{grid-template-columns:1fr}}
+</style>

@@ -1,0 +1,83 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'cegautoado-2026';
+const title = 'Cégautóadó 2026 — havi tételek, kalkulátor, ki fizeti és mikor?';
+const lead = 'A 2026-os cégautóadó havi összegei teljesítmény és környezetvédelmi osztály szerint, a plug-in hibridek változása, a bevallás és befizetés rendje — kalkulátorral.';
+const description = 'Cégautóadó 2026: havi 17 500 Ft-tól 101 000 Ft-ig kW és környezetvédelmi osztály szerint. Kalkulátor, táblázat, ki fizeti, mikor kell bevallani, elektromos és plug-in hibrid autók.';
+const T = [
+  ['0–50 kW', 38500, 20000, 17500],
+  ['51–90 kW', 51000, 25000, 20000],
+  ['91–120 kW', 76000, 51000, 25000],
+  ['120 kW felett', 101000, 76000, 51000],
+];
+const f = (n: number) => n.toLocaleString('hu-HU').replace(/ /g, ' ');
+const faqs = [
+  ['Mennyi a cégautóadó 2026-ban?', 'Havonta 17 500 Ft-tól 101 000 Ft-ig, a motor teljesítménye (kW) és a környezetvédelmi osztály szerint. Egy 0–4 osztályú, 120 kW feletti autó havi 101 000 Ft, egy 6–10 osztályú, 91–120 kW-os autó havi 51 000 Ft.'],
+  ['Kell cégautóadót fizetni elektromos autó után?', 'Nem. A tisztán elektromos (5E) és zéró emissziós (5Z) környezetkímélő autók mentesek. A plug-in hibridek (5P/5N) 2025. január 1-jétől adókötelesek; a 2025 előtt forgalomba helyezettek mentessége 2026. december 31-ig tart.'],
+  ['Mikor kell bevallani és befizetni a cégautóadót?', 'Negyedévente, a negyedévet követő hónap 20. napjáig.'],
+  ['Magánszemély autója után is kell cégautóadó?', 'Akkor, ha a cég költséget számol el az autóval kapcsolatban — az első elszámolt költség hónapját követő hónaptól. Kiküldetési rendelvénnyel (útnyilvántartással) elszámolt térítésnél nem keletkezik cégautóadó.'],
+  ['Levonható a gépjárműadó a cégautóadóból?', 'Igen, a határidőben megfizetett gépjárműadó levonható, ha a tulajdonos és az üzembentartó ugyanaz.'],
+  ['Hogyan változik a cégautóadó minden évben?', '2025 óta az adótételeket az előző év júliusi inflációval emelik (500, illetve 1000 Ft-ra kerekítve), és a NAV október 31-ig teszi közzé a következő évi tételeket. 2026-ra az emelés 4,3% volt.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Cégautóadó 2026 — táblázat és kalkulátor | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["gepjarmuado-2026","ceges-auto-operativ-lizing-tartos-berlet","zold-rendszam-2026"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>cégautóadó 2026</strong>-ban havonta <strong>17 500 Ft</strong> és <strong>101 000 Ft</strong> között van, a teljesítmény és a környezetvédelmi osztály szerint. Negyedévente kell bevallani és fizetni (a negyedévet követő hónap 20-ig). Az elektromos autók mentesek, a plug-in hibridek 2025-től — a régebbiek 2027-től — adókötelesek.</p>
+    </div>
+
+    <h2>Cégautóadó kalkulátor 2026</h2>
+    <div class="ca-calc">
+      <label>Teljesítmény (kW)<input id="cak" type="number" min="1" max="1000" value="110" /></label>
+      <label>Környezetvédelmi osztály<select id="cao"><option value="0">0–4</option><option value="1" selected>6–10</option><option value="2">5, 14–15</option><option value="3">5E / 5Z (környezetkímélő — mentes)</option></select></label>
+      <div class="ca-out"><div><span>Havonta</span><b id="car1">—</b></div><div><span>Negyedévente</span><b id="car2">—</b></div><div><span>Évente</span><b id="car3">—</b></div></div>
+    </div>
+    <script type="application/json" id="catab" set:html={JSON.stringify(T)}></script>
+    <script is:inline>(function(){var T=JSON.parse(document.getElementById('catab').textContent);var k=document.getElementById('cak'),o=document.getElementById('cao');function f(n){return Math.round(n).toLocaleString('hu-HU')+' Ft';}function r(){var kw=+k.value||0,c=+o.value,row=kw<=50?0:kw<=90?1:kw<=120?2:3,m=c===3?0:T[row][c+1];document.getElementById('car1').textContent=f(m);document.getElementById('car2').textContent=f(m*3);document.getElementById('car3').textContent=f(m*12);}k.addEventListener('input',r);o.addEventListener('change',r);r();})();</script>
+    <p style="font-size:13px;color:#667">A környezetvédelmi osztályt a forgalmi engedély V.9 rovata tartalmazza. Tájékoztató számítás a NAV által közzétett 2026-os tételekkel; a megfizetett gépjárműadó levonását nem tartalmazza.</p>
+
+    <h2>Cégautóadó táblázat 2026 (Ft/hó)</h2>
+    <table>
+      <thead><tr><th>Teljesítmény</th><th>Környezetvédelmi osztály 0–4</th><th>6–10</th><th>5, 14–15</th></tr></thead>
+      <tbody>{T.map(([k, a, b, c]) => (<tr><td>{k}</td><td>{f(a as number)} Ft</td><td>{f(b as number)} Ft</td><td>{f(c as number)} Ft</td></tr>))}</tbody>
+    </table>
+    <p>A tételek 2025 óta évente az előző év júliusi inflációjával nőnek; 2026-ra 4,3%-kal emelkedtek (2025-ben a 0–4 osztály legmagasabb sávja még havi 97 000 Ft volt).</p>
+
+    <h2>Ki fizeti a cégautóadót?</h2>
+    <ul>
+      <li>A cég nevén lévő, magyar rendszámú személyautó tulajdonosa — pénzügyi lízingnél a lízingbe vevő.</li>
+      <li>Magánszemély tulajdonában lévő autó után akkor, ha a cég költséget számol el vele kapcsolatban (az első ilyen költség hónapját követő hónaptól). Kiküldetési rendelvénnyel elszámolt térítésnél nem keletkezik.</li>
+      <li>Mentes többek között a kereskedői készlet, a megkülönböztető jelzéssel közlekedő autó és a környezetkímélő (5E/5Z) autó.</li>
+    </ul>
+
+    <h2>Elektromos és plug-in hibrid autók 2026-ban</h2>
+    <p>A tisztán elektromos (5E) és zéró emissziós (5Z) autók továbbra is <strong>mentesek</strong>. A <strong>plug-in hibridek (5P/5N) 2025. január 1-jétől adókötelesek</strong>; a 2025 előtt forgalomba helyezett plug-in hibridek átmeneti mentessége <strong>2026. december 31-én lejár</strong>. Ha céges autót választasz, ez 2027-től jelentős különbség lehet — részletek: <a href="/blog/zold-rendszam-2026">zöld rendszám 2026</a>, <a href="/blog/hibrid-auto">hibrid autó típusok és adózás</a>.</p>
+
+    <h2>Bevallás és befizetés</h2>
+    <ul>
+      <li><strong>Gyakoriság:</strong> negyedévente.</li>
+      <li><strong>Határidő:</strong> a negyedévet követő hónap 20. napja.</li>
+      <li><strong>Gépjárműadó beszámítása:</strong> a határidőben megfizetett gépjárműadó levonható, ha a tulajdonos és az üzembentartó azonos. A gépjárműadó tételeit a <a href="/blog/gepjarmuado-2026">gépjárműadó 2026</a> cikkben találod.</li>
+    </ul>
+
+    <h2>Céges autó tartós bérletben</h2>
+    <p>A <a href="/tartos-berlet/cegeknek/">tartós bérlet cégeknek</a> a céges autó tartására egy fix, nettó havidíjat kínál, amely tartalmazza a szervizt, a (német) gépjárműadót, a biztosítást és a gumikat. A bérelt, külföldi rendszámú autókkal kapcsolatos adóteendőket (cégautóadó, áfa) a könyvelőddel egyeztesd. Összevetés: <a href="/operativ-lizing/">operatív lízing vagy tartós bérlet</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Forrás: NAV — cégautóadó valorizált adómértékek (2025. 10. 27.) és „A cégautóadót érintő változások”. Tájékoztató jellegű összefoglaló, nem minősül adótanácsadásnak.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
+<style>
+.ca-calc{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fff;border:1px solid #E6EAF1;border-radius:18px;padding:18px;margin:10px 0}
+.ca-calc label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#5A6B82}
+.ca-calc input,.ca-calc select{height:44px;border:1px solid #dfe3ea;border-radius:12px;padding:0 12px;font:inherit;font-size:15px}
+.ca-out{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ca-out div{background:#F6F7FA;border-radius:14px;padding:12px 14px}.ca-out span{display:block;font-size:12.5px;color:#5A6B82}.ca-out b{font-size:20px;font-weight:800;color:#141519}
+@media(max-width:640px){.ca-calc{grid-template-columns:1fr}.ca-out{grid-template-columns:1fr}}
+</style>

@@ -1,0 +1,76 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'muszaki-vizsga-2026';
+const title = 'Műszaki vizsga 2026 — díja, gyakorisága, menete és mit nézzenek meg előtte';
+const lead = 'Mennyibe kerül a műszaki vizsga 2026-ban, milyen gyakran kell vizsgáztatni az autót, és mire figyelj, hogy elsőre átmenjen? Hatósági díj, állomási díj, határidők és egy ellenőrzőlista.';
+const description = 'Műszaki vizsga 2026: 26 700 Ft hatósági díj személyautónál (benne a környezetvédelmi vizsgálat), új autónál 4 év, utána 2 évente. Teljes költség, menete, mit ellenőriz a vizsgabiztos, és mit nézz meg előtte.';
+const faqs = [
+  ['Mennyibe kerül a műszaki vizsga 2026-ban?', 'Személyautónál a hatósági díj 26 700 Ft, amely a 9 600 Ft-os környezetvédelmi (zöldkártya) vizsgálatot is tartalmazza. Összkerékhajtásnál további 6 700 Ft. Ehhez jön a vizsgaállomás saját szolgáltatási díja, így a teljes költség jellemzően 30–40 ezer Ft.'],
+  ['Milyen gyakran kell műszaki vizsgára vinni az autót?', 'Új személyautónál az első műszaki érvényessége 4 év. Az első forgalomba helyezést követő 3 naptári éven belül forgalomba helyezett használt autónál 3 év, azt követően 2 évente. Taxinál évente.'],
+  ['Mikor érdemes vizsgára vinni?', 'Ha legfeljebb 30 nappal a lejárat előtt viszed, az új érvényesség a régi lejárati dátumtól számít, így nem veszítesz napokat.'],
+  ['Mi kell a műszaki vizsgához?', 'A forgalmi engedély, a törzskönyv vagy annak hiányában a tulajdonjogot igazoló irat, érvényes kötelező biztosítás, valamint az autó a kötelező tartozékokkal (elakadásjelző háromszög, elsősegélycsomag).'],
+  ['Kell műszaki vizsga külföldről behozott autónál?', 'Igen, a honosítás során a forgalomba helyezés előtti műszaki vizsgálat kötelező, a származás-ellenőrzés és az eredetiségvizsgálat mellett.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Műszaki vizsga 2026 — díja, gyakorisága, menete | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["eredetisegvizsgalat","auto-honositas-2026","hasznalt-premium-auto-ellenorzo-lista"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>műszaki vizsga</strong> hatósági díja 2026-ban személyautónál <strong>26 700 Ft</strong> (benne a környezetvédelmi vizsgálat), amihez az állomás saját díja jön — összesen jellemzően 30–40 ezer Ft. Új autónál az első vizsga <strong>4 év</strong> után esedékes, utána <strong>2 évente</strong>. Ha 30 napon belül viszed a lejárat előtt, nem veszítesz érvényességi időt.</p>
+    </div>
+
+    <h2>Műszaki vizsga díja 2026</h2>
+    <table>
+      <thead><tr><th>Tétel</th><th>Összeg</th></tr></thead>
+      <tbody>
+        <tr><td>Hatósági díj, személyautó (M1)</td><td>26 700 Ft</td></tr>
+        <tr><td>— ebből környezetvédelmi vizsgálat</td><td>9 600 Ft</td></tr>
+        <tr><td>Összkerékhajtás felár</td><td>+6 700 Ft</td></tr>
+        <tr><td>Vizsgaállomás szolgáltatási díja</td><td>szabadáras (állomásonként eltér)</td></tr>
+        <tr><td>Jellemző teljes költség</td><td>30–40 ezer Ft</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Milyen gyakran kell vizsgáztatni?</h2>
+    <ul>
+      <li><strong>Új személyautó:</strong> 4 év.</li>
+      <li><strong>Használt autó, ha az első forgalomba helyezéstől számított 3 naptári éven belül kerül forgalomba:</strong> 3 év.</li>
+      <li><strong>Utána:</strong> 2 évente.</li>
+      <li><strong>Taxi:</strong> évente.</li>
+      <li><strong>30 napos szabály:</strong> ha a lejárat előtt legfeljebb 30 nappal vizsgázol, az új érvényesség a régi lejárati dátumtól indul.</li>
+    </ul>
+
+    <h2>Mit ellenőriz a vizsgabiztos?</h2>
+    <ul>
+      <li>Fékek (fékerő, kiegyenlítettség, kézifék), futómű, kormányzás, lengéscsillapítók.</li>
+      <li>Világítás, irányjelzők, fényszóró-beállítás, ablaktörlők, szélvédő épsége.</li>
+      <li>Gumiabroncsok állapota és profilmélysége, karosszéria és alváz korróziója.</li>
+      <li>Kipufogórendszer, olaj- és folyadékszivárgás, környezetvédelmi mérés (OBD / füstölés).</li>
+      <li>Az alvázszám és az adattábla egyezése, kötelező tartozékok.</li>
+    </ul>
+
+    <h2>Ellenőrzőlista a vizsga előtt</h2>
+    <ol>
+      <li>Minden lámpa és irányjelző működik? Égőcsere előre.</li>
+      <li>A gumik profilja megvan, nincs rajtuk sérülés?</li>
+      <li>Nem világít hibajelző (motor-, ABS-, légzsák-lámpa) a műszerfalon?</li>
+      <li>A szélvédőn nincs a látómezőben repedés?</li>
+      <li>Megvan az elakadásjelző háromszög és az elsősegélycsomag (érvényes)?</li>
+      <li>Érvényes a kötelező biztosítás?</li>
+    </ol>
+
+    <h2>Behozott autó: műszaki vizsga a honosítás része</h2>
+    <p>Németországból hozott autónál a forgalomba helyezés előtti műszaki vizsgálat a honosítás kötelező lépése, a származás-ellenőrzés és az <a href="/blog/eredetisegvizsgalat">eredetiségvizsgálat</a> mellett. A teljes folyamatot az <a href="/blog/auto-honositas-2026">autó honosítás 2026</a> cikk, a költségeket a <a href="/honositas-kalkulator/">honosítás kalkulátor</a> mutatja.</p>
+
+    <h2>Vizsga, szerviz, gumi nélkül: tartós bérlet</h2>
+    <p>A <a href="/tartos-berlet/">tartós bérletben</a> kínált új autóinknál nincs műszaki vizsga, szervizidőpont-egyeztetés vagy gumicsere-gond: a havidíj tartalmazza a szervizt, a biztosítást, az adót és a nyári-téli gumit.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Források: 46/2024. ÉKM rendelet 1. melléklet (hatósági díj), 5/1990. KöHÉM rendelet 11. § (érvényesség). Tájékoztató jellegű összefoglaló.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>

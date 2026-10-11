@@ -1,0 +1,66 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+import { allRentals, fmt } from '../../data/tartosBerlet';
+const lang = 'hu';
+const slug = 'hibrid-auto';
+const title = 'Hibrid autó 2026 — mild, full vagy plug-in hibrid? Típusok, előnyök, adózás';
+const lead = 'Mi a különbség a mild hibrid, a full hibrid és a plug-in hibrid között, kinek melyik éri meg, és hogyan változott 2026-ra a plug-in hibridek adózása és rendszáma?';
+const description = 'Hibrid autó típusai érthetően: mild hibrid (MHEV), full hibrid (HEV), plug-in hibrid (PHEV). Előnyök, hátrányok, fogyasztás, adózás 2026 (zöld rendszám, gépjárműadó, cégautóadó), és melyiket válaszd.';
+const phev = allRentals().filter((c) => c.fuels.some((x) => /PHEV|hibrid/i.test(x))).slice(0, 10);
+const faqs = [
+  ['Mi a különbség a hibrid és a plug-in hibrid között?', 'A (full) hibrid autó akkumulátorát a motor és a fékezés tölti, konnektorról nem tölthető, tisztán elektromosan csak rövid távot tesz meg. A plug-in hibrid (PHEV) nagyobb akkumulátorral rendelkezik, konnektorról tölthető, és jellemzően több tíz kilométert tud tisztán elektromosan megtenni.'],
+  ['Megéri plug-in hibridet venni 2026-ban?', 'Akkor, ha rendszeresen tudod tölteni (otthon vagy a munkahelyen), és a napi utaid többségét elektromosan megteszed. Töltés nélkül a nagyobb tömeg miatt a fogyasztása kedvezőtlenebb lehet. Adózási szempontból 2025 óta a plug-in hibrid már nem kap zöld rendszámot, és új forgalomba helyezésnél gépjárműadó- és cégautóadó-köteles.'],
+  ['Kaphat zöld rendszámot a hibrid autó?', 'Nem. 2024. szeptember 1. óta csak a tisztán elektromos (5E) és a zéró emissziós (5Z) autók kapnak zöld rendszámot. A még zöld rendszámos plug-in hibridek rendszámát 2026. november 30-ig le kell cserélni.'],
+  ['Mennyi a hibrid autó regisztrációs adója?', 'A regisztrációs adó a teljesítménytől (kW) és a környezetvédelmi osztálytól függ; a hibrid autók a legkedvezőbb szorzós oszlopba tartoznak. 2026-ban az alapösszeg 47 000 Ft, a szorzó 0–80 kW-ig 1, 250 kW felett 9 — a pontos összeget a honosítás kalkulátorral számolhatod ki.'],
+  ['Mi a mild hibrid?', 'A mild hibrid (MHEV) egy kis, jellemzően 48 voltos elektromos rendszer, amely indításkor és gyorsításkor segíti a belső égésű motort, és fékezéskor energiát nyer vissza. Önállóan elektromosan nem hajtja az autót, de csökkenti a fogyasztást.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Hibrid autó 2026 — típusok, előnyök, adózás | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["zold-rendszam-2026","elektromos-auto-arak-2026","gepjarmuado-2026"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>hibrid autó</strong> egy belső égésű motort és egy elektromos hajtást kombinál. Három fő típusa a <strong>mild hibrid</strong> (rásegítés), a <strong>full hibrid</strong> (rövid távon tisztán elektromos) és a <strong>plug-in hibrid</strong> (konnektorról tölthető, több tíz km elektromos hatótáv). 2026-ban a plug-in hibrid már nem kap zöld rendszámot, és a régebbiek adómentessége is az év végén lejár.</p>
+    </div>
+
+    <h2>A hibrid autók típusai</h2>
+    <table>
+      <thead><tr><th></th><th>Mild hibrid (MHEV)</th><th>Full hibrid (HEV)</th><th>Plug-in hibrid (PHEV)</th><th>Elektromos (BEV)</th></tr></thead>
+      <tbody>
+        <tr><td>Tölthető konnektorról?</td><td>nem</td><td>nem</td><td>igen</td><td>igen</td></tr>
+        <tr><td>Tisztán elektromos haladás</td><td>nem</td><td>rövid távon, alacsony tempóval</td><td>jellemzően több tíz km</td><td>teljes hatótáv</td></tr>
+        <tr><td>Fogyasztáscsökkentés</td><td>kicsi</td><td>városban jelentős</td><td>töltéssel nagyon nagy</td><td>nincs üzemanyag</td></tr>
+        <tr><td>Zöld rendszám 2026</td><td>nem</td><td>nem</td><td>nem</td><td>igen</td></tr>
+        <tr><td>Kinek ideális?</td><td>aki nem akar változtatni a szokásain</td><td>sok városi autózás</td><td>aki naponta tölteni tud</td><td>aki otthon/munkahelyen tölt</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Előnyök és hátrányok</h2>
+    <ul>
+      <li><strong>Előnyök:</strong> alacsonyabb fogyasztás (főleg városban), csendesebb indulás, plug-in hibridnél rövid utakon akár üzemanyag nélküli közlekedés, nincs hatótáv-szorongás.</li>
+      <li><strong>Hátrányok:</strong> bonyolultabb technika, nagyobb tömeg; a plug-in hibrid töltés nélkül gyakran többet fogyaszt, mint az ígéret; drágább vételár.</li>
+    </ul>
+
+    <h2>Hibrid autó adózása 2026-ban</h2>
+    <ul>
+      <li><strong>Zöld rendszám:</strong> 2024. szeptember 1. óta egyetlen hibrid sem kaphat — a régi zöld rendszámos plug-in hibridek rendszámát <strong>2026. november 30-ig</strong> le kell cserélni. Részletek: <a href="/blog/zold-rendszam-2026">zöld rendszám 2026</a>.</li>
+      <li><strong>Gépjárműadó és cégautóadó:</strong> a 2025-től forgalomba helyezett plug-in hibridek adókötelesek, a korábbiak mentessége <strong>2026. december 31-én</strong> lejár. Tételek: <a href="/blog/gepjarmuado-2026">gépjárműadó 2026</a>, <a href="/blog/cegautoado-2026">cégautóadó 2026</a>.</li>
+      <li><strong>Regisztrációs adó:</strong> a hibrid autók a legkedvezőbb szorzós oszlopba tartoznak (2026-os alapösszeg: 47 000 Ft). Behozatalnál számolj a <a href="/honositas-kalkulator/">honosítás kalkulátorral</a>.</li>
+    </ul>
+
+    <h2>Melyiket válaszd?</h2>
+    <p>Ha naponta tudsz tölteni és a legtöbb utad rövid, a <strong>plug-in hibrid</strong> vagy egyenesen az <a href="/tartos-berlet/elektromos-auto/">elektromos autó</a> a legolcsóbb üzemeltetésű. Ha sokat autópályázol és nincs töltési lehetőséged, egy hatékony <strong>dízel vagy full hibrid</strong> lehet a jobb. Bizonytalan vagy? <a href="/tartos-berlet/">Tartós bérletben</a> 6 hónapra kipróbálhatod, mielőtt hosszú távon döntenél.</p>
+
+    <h2>Plug-in hibrid és hibrid autók tartós bérletben</h2>
+    <table>
+      <thead><tr><th>Modell</th><th>Hajtás</th><th>Havidíj (nettó) -tól</th></tr></thead>
+      <tbody>{phev.map((c) => (<tr><td><a href={`/berelheto-auto/${c.slug}-berles/`}>{c.name}</a></td><td>{c.fuels.join(' / ')}</td><td>{fmt(c.huf)} Ft</td></tr>))}</tbody>
+    </table>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Az adózási adatok forrása: NAV 95. információs füzet (2026), dmu.gov.hu, Rega. tv. és a NAV 2026-os regisztrációsadó-tételei. Tájékoztató jellegű összefoglaló.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
