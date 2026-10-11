@@ -5,9 +5,9 @@ const lang = 'hu';
 const slug = 'tartos-berlet-arak-2026';
 const title = 'Tartós autóbérlés árak 2026 — mennyi a havidíj BMW, Mercedes, Audi és MINI esetén?';
 const lead = 'Mennyibe kerül ma egy vadonatúj prémium autó tartós bérletben? Valós havidíjak 61 bérelhető modellünkből, kategóriánként — és hogy mit tartalmaz a díj, mennyi a kaució, és mikor éri meg jobban, mint a lízing.';
-const description = 'Tartós autóbérlés árak 2026: valós nettó havidíjak BMW, Mercedes, Audi, MINI, VW és elektromos modellekre 310 000 Ft/hó-tól, 4000 km/hó futáskerettel, 6 hónapos futamidővel. Mit tartalmaz a díj, mennyi a kaució?';
+const description = 'Tartós autóbérlés árak 2026: valós nettó havidíjak BMW, Mercedes, Audi, MINI, VW és elektromos modellekre 310 000 Ft/hó-tól, havi 2 000–4 000 km futáskerettel, 6 hónapos futamidővel. Mit tartalmaz a díj, mennyi a kaució?';
 const faqs = [
-  ['Mennyibe kerül egy prémium autó tartós bérlete 2026-ban?', 'A CarAdvance-nél a vadonatúj autók nettó havidíja 310 000 Ft/hó-tól indul (VW Polo), a prémium középkategória (BMW X1, Mercedes GLB, Audi Q3 Sportback) 410–420 000 Ft/hó, a nagy SUV-ok (BMW X5, Mercedes GLE) 660 000 Ft/hó-tól. A díjak 4000 km/hó futáskeretre és 6 hónapos futamidőre vonatkoznak.'],
+  ['Mennyibe kerül egy prémium autó tartós bérlete 2026-ban?', 'A CarAdvance-nél a vadonatúj autók nettó havidíja 310 000 Ft/hó-tól indul (VW Polo), a prémium középkategória (BMW X1, Mercedes GLB, Audi Q3 Sportback) 410–420 000 Ft/hó, a nagy SUV-ok (BMW X5, Mercedes GLE) 660 000 Ft/hó-tól. A díjak autótól függően havi 2 000–4 000 km futáskeretre és 6 hónapos futamidőre vonatkoznak.'],
   ['Mit tartalmaz a havidíj?', 'A szervizt, az adót és a nyári-téli gumiszettet. Az üzemanyag vagy töltés a bérlőt terheli. A pontos feltételeket (pl. biztosítás, önrész) a bérlési feltételek és az egyedi ajánlat tartalmazza.'],
   ['Mennyi a kaució?', 'Egyszeri, visszajáró kaució, modelltől függően 2500 €-tól 5000 €-ig. A bérlés végén, káresemény nélkül teljes egészében visszajár.'],
   ['Mennyi a minimális futamidő?', 'A feltüntetett havidíjak 6 hónapos futamidőre vonatkoznak — ez jóval rövidebb kötöttség, mint az operatív lízing szokásos 3–4 éve.'],
@@ -19,7 +19,7 @@ const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEnti
   <BlogPost slug={slug} title={title} lead={lead} related={["hosszu-tavu-autoberles","ceges-auto-operativ-lizing-tartos-berlet","autoberles-budapest-kulfoldre"]}>
     <div class="bp-tldr">
       <h3>Röviden</h3>
-      <p>A <strong>tartós autóbérlés</strong> ára nálunk vadonatúj, 0 km-es autókra <strong>310 000 Ft/hó-tól</strong> indul (nettó), <strong>4000 km/hó</strong> futáskerettel és <strong>6 hónapos</strong> futamidővel. A prémium SUV-ok 410–440 ezer, az üzleti limuzinok és kombik 420–550 ezer, a nagy SUV-ok 660 ezer forintnál kezdődnek. A díjban benne van a szerviz, az adó és a gumi; a kaució 2500–5000 €, és visszajár. Minden modell aktuális díját a <a href="/autoink/#berelheto">bérelhető autóink</a> között látod.</p>
+      <p>A <strong>tartós autóbérlés</strong> ára nálunk vadonatúj, 0 km-es autókra <strong>310 000 Ft/hó-tól</strong> indul (nettó), autótól függően <strong>havi 2 000–4 000 km</strong> futáskerettel és <strong>6 hónapos</strong> futamidővel. A prémium SUV-ok 410–440 ezer, az üzleti limuzinok és kombik 420–550 ezer, a nagy SUV-ok 660 ezer forintnál kezdődnek. A díjban benne van a szerviz, az adó és a gumi; a kaució 2500–5000 €, és visszajár. Minden modell aktuális díját a <a href="/autoink/#berelheto">bérelhető autóink</a> között látod.</p>
     </div>
 
     <p class="tb-hub"><strong>Friss árak minden modellre:</strong> a <a href="/tartos-berlet/">tartós bérlet</a> oldalon mind a bérelhető autót, valós napi havidíjjal és <a href="/tartos-berlet/#kalkulator">tartós bérlet kalkulátorral</a> találod — márkánként is: <a href="/autoink/?marka=bmw#berelheto">BMW</a>, <a href="/autoink/?marka=mercedes#berelheto">Mercedes</a>, <a href="/autoink/?marka=audi#berelheto">Audi</a>, <a href="/tartos-berlet/#elektromos">elektromos autók</a>.</p>
@@ -88,13 +88,13 @@ const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEnti
         <tr><td><a href="/berelheto-auto/audi-a6-avant-e-tron-berles/">Audi A6 Avant e-tron</a></td><td>530 000 Ft</td></tr>
       </tbody>
     </table>
-    <p>A díjak nettó havidíjak, 4000 km/hó futáskerettel és 6 hónapos futamidővel. A forintár a napi euróárfolyamtól függ; a pontos díj a változattól, a színtől és a csomagtól is.</p>
+    <p>A díjak nettó havidíjak, autótól függően havi 2 000–4 000 km futáskerettel és 6 hónapos futamidővel. A forintár a napi euróárfolyamtól függ; a pontos díj a változattól, a színtől és a csomagtól is.</p>
 
     <h2>Mit tartalmaz a tartós bérlet díja?</h2>
     <ul>
       <li><strong>Vadonatúj, 0 km-es autó</strong> — nem használt flottaautó.</li>
       <li><strong>Szerviz és karbantartás</strong>, az <strong>adó</strong>, valamint a <strong>nyári és téli gumiszett</strong>.</li>
-      <li><strong>4000 km/hó futáskeret</strong> — a legtöbb felhasználónak bőven elég, sokat utazóknak is.</li>
+      <li><strong>Havi 2 000–4 000 km futáskeret</strong> — autótól függően; a legtöbb felhasználónak bőven elég, és a keret a teljes bérleti időre összeadódik.</li>
       <li><strong>Egyszeri, visszajáró kaució</strong> 2500–5000 € között, modelltől függően.</li>
     </ul>
     <p>Az üzemanyag vagy a töltés a bérlőt terheli. A részletes feltételeket a <a href="/berlesi-feltetelek/">bérlési feltételek és kaució</a> oldalon, a folyamatot a <a href="/berlesi-folyamat/">bérlési folyamat</a> oldalon találod.</p>
