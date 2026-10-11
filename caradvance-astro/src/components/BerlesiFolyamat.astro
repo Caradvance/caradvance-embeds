@@ -5,10 +5,7 @@ const { lang } = Astro.props as { lang: Locale };
 
 // Kaució-kategóriák — a feltöltött árajánlat alapján.
 const deposits = [
-  { amount: '3 000 €', cars: 'BMW 1-es, 2-es, X1, X2 · MINI Cooper (3- és 5-ajtós, Cabrio), Countryman, JCW · Mercedes A-osztály, B-osztály' },
-  { amount: '5 000 €', cars: 'BMW M2 Coupé, 3-as (Limousine/Touring), 4-es (Coupé/Cabrio), X3 · Mercedes A-osztály AMG, C-osztály (Limousine/T-modell), CLE (Coupé/Cabrio), GLA, GLB, GLC, GLC Coupé' },
-  { amount: '7 500 €', cars: 'BMW M3 (Limousine/Touring), M4 (Coupé/Cabrio), 5-ös (Limousine/Touring), X6, X7 · Mercedes C-osztály AMG (Limousine/T-modell), CLE AMG (Coupé/Cabrio), E-osztály (Limousine/T-modell), GLA AMG, GLB AMG, GLC AMG, GLC Coupé AMG, GLE, GLE Coupé' },
-  { amount: '10 000 €', cars: 'BMW M5 (Limousine/Touring), 7-es, X6 M · Mercedes E-osztály AMG (Limousine/T-modell), GLE AMG, GLE Coupé AMG, S-osztály' },
+  { amount: '2 000 – 10 000 €', cars: 'Modelltől függően. A pontos összeget minden autó kártyáján („Kaució”), az ajánlatban és a szerződésben is feltüntetjük.' },
 ];
 
 const steps = [
@@ -17,7 +14,7 @@ const steps = [
   { t: 'Megküldjük az ajánlatot', html: 'Elküldjük a konkrét autóra szóló ajánlatot minden részlettel. A készlettől, az igényeidtől és attól függően, hogy teljesen új vagy újszerű autóról van szó, megadjuk a várható szállítási időt és a szerződés feltételeit.', btns: [{ label: 'Ajánlat – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Ajánlat – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Az ajánlat elfogadása és leinformálás', html: 'Ha elfogadod az ajánlatot, részletes adatokat kérünk tőled — magánszemélyként vagy cégként. Ezt követően egy gyors, előzetes ellenőrzést végzünk.<sup>5</sup>' },
   { t: 'Előszerződés aláírása', html: 'A besorolásodnak megfelelően megküldjük az előszerződést — magánszemélyként vagy cégként. Aláírod az előszerződést, és visszaküldöd nekünk.', btns: [{ label: 'Előszerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Előszerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
-  { t: 'Kaució befizetése', html: 'A kauciót a németországi Caradvance GmbH részére fizeted be, az autó kategóriájának megfelelő összegben.<sup>6</sup> Az alábbi táblázat mutatja, melyik autóhoz mekkora kaució tartozik — hogy mi történik vele a bérlés alatt és végén, azt a <a href="/berlesi-feltetelek/#kaucio">Feltételek és kaució</a> oldalon írjuk le részletesen:', table: true },
+  { t: 'Kaució befizetése', html: 'A kauciót a németországi Caradvance GmbH részére fizeted be, az autó kategóriájának megfelelő összegben.<sup>6</sup> A kaució modelltől függően 2 000 € és 10 000 € között van — hogy mi történik vele a bérlés alatt és végén, azt a <a href="/berlesi-feltetelek/#kaucio">Feltételek és kaució</a> oldalon írjuk le részletesen:', table: true },
   { t: 'Beszerzés és szállítás', html: 'Megvásároljuk a kiválasztott autót Németországban, és házhoz szállítjuk neked.<sup>7</sup>' },
   { t: 'Átvételi ellenőrzés', html: 'Amikor az autó megérkezik, alaposan átnézzük: fotókat készítünk a külsőről, a belső térről, valamint a kilométeróra- és üzemanyagszintről. Ekkor töltjük ki az átadási jegyzőkönyvet is.<sup>8</sup>', btns: [{ label: 'Átadási jegyzőkönyv →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
   { t: 'Végleges szerződés', html: 'Mindkét fél aláírja a végleges szerződést, amely tartalmazza az átadási jegyzőkönyvet is. A szerződés feltételeit előre, érthetően összefoglalva itt nézheted át: <a href="/berlesi-feltetelek/">Bérlési feltételek és kaució</a>.', btns: [{ label: 'Végleges szerződés – magánszemély →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }, { label: 'Végleges szerződés – cég →', href: 'https://www.caradvance.hu/berlesi-folyamat/#' }] },
@@ -27,7 +24,7 @@ const steps = [
 const faqs = [
   ['Mennyi a minimális bérlési idő?', 'A minimális bérlési idő minden esetben 6 hónap. A bérlet lejártakor egyszerűen visszaadod az autót, vagy választhatsz egy új modellt.'],
   ['Magánszemélyként és cégként is bérelhetek?', 'Igen. Már az elején eldöntheted, hogy magánszemélyként vagy cégként szeretnél bérelni — az ajánlatot, a leinformálást és az előszerződést ennek megfelelően állítjuk össze.'],
-  ['Mekkora kauciót kell fizetnem?', 'A kaució az autó kategóriájától függ: 3 000 €, 5 000 €, 7 500 € vagy 10 000 €. A pontos összeget a fenti táblázatban láthatod, és az ajánlatban is rögzítjük.'],
+  ['Mekkora kauciót kell fizetnem?', 'A kaució modelltől függően 2 000 € és 10 000 € között van. A pontos összeget minden autó kártyáján látod, és az ajánlatban is rögzítjük.'],
   ['Kinek fizetem a kauciót?', 'A kauciót a németországi Caradvance GmbH részére fizeted be, az előszerződés aláírása után.'],
   ['Hol találom a pontos bérlési feltételeket?', 'A bérleti szerződés minden fontos pontját — kaució, kilométerkeret, biztosítás és önrész, kár esetén teendők, gumik, bírságok, külföldi használat és visszaadás — érthetően összefoglaltuk a Bérlési feltételek és kaució oldalon (caradvance.hu/berlesi-feltetelek).'],
   ['Mi van benne a bérleti díjban?', 'A szervizköltséget és az adókat mi álljuk, sőt a nyári és téli gumiszettet is tőlünk kapod. Neked csak a vezetés marad.'],
