@@ -5,7 +5,7 @@ const { lang } = Astro.props as { lang: Locale };
 
 const cats = [
 { id: 'mind', t: 'Mind' },
-{ id: 'altalanos', t: 'A bérlésről' },
+{ id: 'altalanos', t: 'A tartós bérletről' },
 { id: 'feltetel', t: 'Feltételek & kaució' },
 { id: 'koltseg', t: 'Költségek' },
 { id: 'autok', t: 'Autók & választás' },
@@ -14,7 +14,7 @@ const cats = [
 ];
 
 const faqs = [
-{ c: 'altalanos', q: 'Mit jelent a prémium autóbérlés a CarAdvance-nél?', a: 'Új vagy alig használt, kifogástalan állapotú német prémium autót — Mercedes, BMW, Audi és társaik — bérelhetsz nálunk rugalmas feltételekkel. A szervizt, az adót és a nyári-téli gumit mi álljuk, a kaució pedig a piaci átlagnál kedvezőbb, így neked gyakorlatilag csak vezetned kell.' },
+{ c: 'altalanos', q: 'Mit jelent a tartós bérlet a CarAdvance-nél?', a: 'Új vagy alig használt, kifogástalan állapotú német prémium autót — Mercedes, BMW, Audi és társaik — bérelhetsz nálunk tartós bérletben, legalább 6 hónapra (napi vagy heti autókölcsönzéssel nem foglalkozunk). A szervizt, az adót és a nyári-téli gumit mi álljuk, a kaució pedig a piaci átlagnál kedvezőbb, így neked gyakorlatilag csak vezetned kell.' },
 { c: 'altalanos', q: 'Kinek éri meg bérelni vásárlás helyett?', a: 'Annak, aki mindig friss, prémium autót szeretne anélkül, hogy nagy összeget kötne le és viselné a tulajdonlás kockázatait. Cégeknek különösen előnyös: a bérleti díj elszámolható költség, a tőke pedig a vállalkozásban maradhat, ahol többet hoz.' },
 { c: 'altalanos', q: 'Mennyi időre lehet bérelni?', a: 'Rövid és hosszú távra egyaránt. Akár félévente új, általad választott autóra válthatsz — a pontos időtartamot és feltételeket mindig az igényeidhez igazítjuk.' },
 { c: 'feltetel', q: 'Mennyi a kaució?', a: 'A piaci átlagnál lényegesen kedvezőbb: nálunk nem kell az autó értékének akár 20%-át letenned, így sokkal kevesebb lekötött pénzzel veheted át a prémium autót. A pontos összeg a modelltől és a konstrukciótól függ, ezt előre, átláthatóan rögzítjük.' },
@@ -46,8 +46,8 @@ mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: {
 </video>
 <div class="scrim"></div>
 <div class="inner">
-<h1>Gyakori kérdések —<br /><span class="accent">a prémium autóbérlésről</span></h1>
-<p class="sub sub-wide" style="max-width:900px">Minden, amit a bérlésről tudni érdemes: kaució és feltételek, költségek, autóválasztás, céges bérlés és a folyamat. Keress rá a témára — és ha nem találod a választ, egy hívás vagy e-mail&nbsp;elég.</p>
+<h1>Gyakori kérdések —<br /><span class="accent">a tartós bérletről</span></h1>
+<p class="sub sub-wide" style="max-width:900px">Minden, amit a tartós bérletről (minimum 6 hónap) tudni érdemes: kaució és feltételek, költségek, autóválasztás, céges bérlés és a folyamat. Keress rá a témára — és ha nem találod a választ, egy hívás vagy e-mail&nbsp;elég.</p>
 <div class="cta-row">
 <a class="btn btn-primary" href="/berelheto">Bérelhető autóink</a>
 <a class="btn btn-white" href="#gyik">Kérdések böngészése</a>

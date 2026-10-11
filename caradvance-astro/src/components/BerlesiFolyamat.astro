@@ -38,14 +38,14 @@ const faqJson = {
 };
 const howToJson = {
   '@context': 'https://schema.org', '@type': 'HowTo',
-  name: 'Prémium autóbérlés — a bérlési folyamat',
+  name: 'Tartós bérlet — a bérlési folyamat',
   description: 'Hogyan bérelhetsz kulcsrakészen egy prémium német autót, lépésről lépésre.',
   step: steps.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.t, text: s.html.replace(/<sup>.*?<\/sup>/g, '').replace(/<[^>]+>/g, '') })),
 };
 const serviceJson = {
   '@context': 'https://schema.org', '@type': 'Service',
-  name: 'Prémium autóbérlés — Caradvance',
-  serviceType: 'Prémium német autók bérlése kedvező feltételekkel',
+  name: 'Tartós bérlet — Caradvance',
+  serviceType: 'Prémium német autók tartós bérlete (minimum 6 hónap)',
   areaServed: { '@type': 'Country', name: 'Magyarország' },
   url: 'https://www.caradvance.hu/berlesi-folyamat/',
   provider: { '@type': 'AutoDealer', name: 'Caradvance GmbH', telephone: '+36 30 214 6989', email: 'import@caradvance.de' },
@@ -58,11 +58,11 @@ const serviceJson = {
 </video>
 <div class="scrim"></div>
 <div class="inner">
-<h1>Hogyan működik a bérlés? —<br /><span class="accent">tíz lépés a saját prémium autódig</span></h1>
+<h1>Hogyan működik a tartós bérlet? —<br /><span class="accent">tíz lépés a saját prémium autódig</span></h1>
 <p class="sub sub-wide" style="max-width:900px">A kiválasztástól a kulcsrakész átadásig mindent mi intézünk — ajánlat, leinformálás, szerződés, beszerzés és szállítás. Te csak átveszed az autót, és a következő hat hónapra a tiéd.</p>
 <div class="cta-row">
 <a class="btn btn-primary" href="/berelheto">Bérelhető autóink</a>
-<a class="btn btn-white" href="/berles-elonyei">A bérlés előnyei</a>
+<a class="btn btn-white" href="/berles-elonyei">A tartós bérlet előnyei</a>
 <a class="btn btn-white" href="/berlesi-feltetelek/">Bérlési feltételek</a>
 </div>
 </div>
@@ -71,7 +71,7 @@ const serviceJson = {
 
 <section class="section" style="padding-top:56px">
 <div class="wrap center">
-<span class="eyebrow">Hogyan működik a bérlés?</span>
+<span class="eyebrow">Tartós bérlet — 6 hónaptól</span>
 <h2 class="sec-title">A bérlési folyamat, lépésről lépésre</h2>
 <p class="sec-intro">Az érdeklődésedet követően egy kollégánk felveszi veled a kapcsolatot, és onnantól kulcsrakészen mindent intézünk.</p>
 </div>
@@ -165,7 +165,7 @@ const serviceJson = {
 <section class="section" style="padding-top:8px">
 <div class="wrap center">
 <span class="eyebrow">GYIK</span>
-<h2 class="sec-title">Gyakori kérdések a bérlésről</h2>
+<h2 class="sec-title">Gyakori kérdések a tartós bérletről</h2>
 </div>
 <div class="wrap pf-faq">
 {faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}
