@@ -1,0 +1,240 @@
+---
+// Tartós bérlet céloldal — adatvezérelt (src/data/tartosBerlet.ts + src/data/rental.ts)
+import '../styles/eladom.css';
+import { allRentals, getVariant, fmt, VARIANT_LABEL, VARIANTS } from '../data/tartosBerlet';
+
+const { vkey } = Astro.props as { vkey: string };
+const v = getVariant(vkey);
+const cars = allRentals().filter(v.filter);
+const SITE = 'https://www.caradvance.hu';
+const url = SITE + v.path + '/';
+
+const min = cars.length ? cars[0].huf : 0;
+const max = cars.length ? Math.max(...cars.map((c) => c.huf)) : 0;
+const depMin = cars.length ? Math.min(...cars.map((c) => c.dep)) : 0;
+const depMax = cars.length ? Math.max(...cars.map((c) => c.dep)) : 0;
+const monthsMin = cars.length ? Math.min(...cars.map((c) => Math.min(...(c.months.length ? c.months : [6])))) : 6;
+const cheapest = cars.length ? cars[0].name : '';
+const fill = (s: string) => s
+  .replace(/\{min\}/g, fmt(min)).replace(/\{max\}/g, fmt(max)).replace(/\{n\}/g, String(cars.length))
+  .replace(/\{depmin\}/g, fmt(depMin)).replace(/\{depmax\}/g, fmt(depMax)).replace(/\{dep\}/g, fmt(depMin))
+  .replace(/\{cheapest\}/g, cheapest).replace(/\{minp\}/g, fmt(Math.ceil(min * 1.19 / 10000) * 10000));
+
+const href = (c: any) => `/berelheto-auto/${c.slug}-berles/`;
+const fuelHu = (f: string) => ({ Benzin: 'benzin', 'Dízel': 'dízel', PHEV: 'plug-in hibrid', Hibrid: 'hibrid', Elektromos: 'elektromos' } as any)[f] || f;
+
+// csoportosítás kategória szerint (a fő oldalon), márkaoldalon is
+const ORDER = ['Kisautó', 'Kompakt', 'Limuzin', 'Kombi', 'SUV / Terepjáró', 'Coupé', 'Kabrió', 'Egyterű'];
+const groups: { cat: string; list: any[] }[] = [];
+for (const c of cars) { let g = groups.find((x) => x.cat === c.cat); if (!g) { g = { cat: c.cat, list: [] }; groups.push(g); } g.list.push(c); }
+groups.sort((a, b) => (ORDER.indexOf(a.cat) + 99) % 99 - (ORDER.indexOf(b.cat) + 99) % 99);
+const CATHU: Record<string, string> = { 'SUV / Terepjáró': 'SUV-ok és terepjárók', Kisautó: 'Kisautók', Kompakt: 'Kompaktok', Limuzin: 'Limuzinok', Kombi: 'Kombik', 'Coupé': 'Coupék', 'Kabrió': 'Kabriók', 'Egyterű': 'Egyterűek' };
+
+const points = v.points || [
+  ['Nincs önerő', 'Csak egy visszajáró kauciót kérünk — a vételár töredékét. A tőkéd máshol dolgozhat.'],
+  ['Minden benne van', 'Szerviz, gépjárműadó, kötelező biztosítás és casco, nyári-téli gumiszett: egy fix havidíj.'],
+  [`Már ${monthsMin} hónaptól`, 'Nem 3–4 évre kötöd el magad, mint egy operatív lízingnél. Utána akár új modellre válthatsz.'],
+  ['Új, prémium autók', 'Új és szinte új modellek, német rendszámmal, havi kb. 4000 km futáskerettel.'],
+  ['Nincs értékvesztés', 'A bérlet végén visszaadod az autót — nem kell eladnod, nem téged terhel az árak esése.'],
+  ['Gyors ügyintézés', 'Online ajánlatkérés, magyar nyelvű kapcsolattartás, gyors átadás.'],
+];
+
+const faqs = v.faqs.map(([q, a]) => [fill(q), fill(a)]);
+const strip = (s: string) => s.replace(/<[^>]+>/g, '');
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: strip(q), acceptedAnswer: { '@type': 'Answer', text: strip(a) } })) };
+const crumbs = [{ n: 'Főoldal', u: SITE + '/' }, { n: 'Tartós bérlet', u: SITE + '/tartos-berlet/' }];
+if (v.key !== 'main') crumbs.push({ n: VARIANT_LABEL[v.key], u: url });
+const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.n, item: c.u })) };
+const serviceJson = {
+  '@context': 'https://schema.org', '@type': 'Service', name: strip(fill(v.h1a)), serviceType: 'Tartós autóbérlés', url,
+  areaServed: { '@type': 'Country', name: 'Magyarország' },
+  provider: { '@type': 'AutoRental', name: 'CarAdvance', url: SITE + '/', telephone: '+36 30 233 6060' },
+  hasOfferCatalog: { '@type': 'OfferCatalog', name: strip(fill(v.h1a)), itemListElement: cars.slice(0, 40).map((c) => ({
+    '@type': 'Offer', url: SITE + href(c), itemOffered: { '@type': 'Car', name: c.name, brand: { '@type': 'Brand', name: c.brand } },
+    priceSpecification: { '@type': 'UnitPriceSpecification', price: c.huf, priceCurrency: 'HUF', unitCode: 'MON', valueAddedTaxIncluded: false } })) },
+};
+const calc = cars.map((c) => ({ n: c.name, h: c.huf, d: c.depHuf, m: Math.min(...(c.months.length ? c.months : [6])) }));
+const related = v.related.map((k) => VARIANTS.find((x) => x.key === k)).filter(Boolean) as any[];
+const VID: Record<string, [string, string]> = {
+  bmw: ['/caradvance-hero-x5.mp4', '/caradvance-hero-x5-poster.jpg'],
+  audi: ['/audi-hero.mp4', '/audi-hero-poster.jpg'],
+  mercedes: ['/mercedes-hero.mp4', '/caradvance-hero-poster.jpg'],
+  cegeknek: ['/caradvance-hero-hd.mp4', '/caradvance-hero-poster-hd.jpg'],
+  maganszemelyeknek: ['/caradvance-hero.mp4', '/caradvance-hero-poster.jpg'],
+};
+const [video, poster] = VID[v.key] || ['/caradvance-hero-beszerzesi.mp4', '/caradvance-hero-beszerzesi-poster.jpg'];
+---
+<section class="tb">
+<section class="hero">
+<video autoplay muted loop playsinline preload="metadata" poster={poster}><source src={video} type="video/mp4" /></video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>{fill(v.h1a)} —<br /><span class="accent">{fill(v.h1b)}</span></h1>
+<p class="sub sub-wide">{fill(v.sub)}</p>
+<div class="cta-row">
+<a class="btn btn-primary" href="#autok">Autók és havidíjak</a>
+<a class="btn btn-white" href="#kalkulator">Költség kalkulátor</a>
+</div>
+</div>
+</section>
+
+<nav class="tb-crumb wrap" aria-label="Morzsamenü">{crumbs.map((c, i) => (i < crumbs.length - 1 ? <><a href={c.u.replace(SITE, '')}>{c.n}</a><span>›</span></> : <span aria-current="page">{c.n}</span>))}</nav>
+
+<section class="tb-stats wrap">
+<div><b>{cars.length}</b><span>bérelhető modell</span></div>
+<div><b>{fmt(min)} Ft</b><span>havidíj -tól (nettó)</span></div>
+<div><b>{fmt(depMin)} €</b><span>visszajáró kaució -tól</span></div>
+<div><b>{monthsMin} hónap</b><span>minimális futamidő</span></div>
+</section>
+
+<section class="section tb-intro"><div class="wrap tb-text">
+<span class="eyebrow">{v.eyebrow}</span>
+{v.intro.map((p) => <p set:html={fill(p)} />)}
+</div></section>
+
+<section class="section" id="autok" style="padding-top:8px">
+<div class="wrap center"><span class="eyebrow">Bérelhető autók</span><h2 class="sec-title">{fill(v.h1a)}: modellek és havidíjak</h2>
+<p class="sec-intro">Valós, naponta frissülő nettó havidíjak. Kattints egy modellre a változatokért, színekért és az ajánlatkérésért.</p></div>
+{groups.map((g) => (
+<div class="wrap tb-group">
+{groups.length > 1 && <h3 class="tb-gh">{CATHU[g.cat] || g.cat} <small>{g.list.length} modell</small></h3>}
+<div class="tb-grid">
+{g.list.map((c: any) => (
+<a class="tb-card" href={href(c)}>
+<div class="tb-img"><img src={c.photo} alt={`${c.name} tartós bérlet`} loading="lazy" width="480" height="300" /></div>
+<div class="tb-body">
+<div class="tb-name">{c.name}</div>
+<div class="tb-meta">{c.fuels.map(fuelHu).join(' · ')}{c.count > 0 && <> · <span class="tb-av">{c.count} db</span></>}</div>
+<div class="tb-price"><b>{fmt(c.huf)} Ft</b><span>/hó nettó-tól</span></div>
+<div class="tb-sub">Kaució {fmt(c.dep)} € · {Math.min(...(c.months.length ? c.months : [6]))} hónaptól · {fmt(c.km.length ? c.km[0] : 4000)} km/hó</div>
+<span class="tb-btn">Részletek és ajánlat →</span>
+</div>
+</a>
+))}
+</div>
+</div>
+))}
+</section>
+
+<section class="section" style="padding-top:8px">
+<div class="wrap center"><span class="eyebrow">Előnyök</span><h2 class="sec-title">Miért tartós bérlet?</h2></div>
+<div class="wrap tb-points">
+{points.map(([t, d], i) => (<div class="tb-pt"><span class="tb-n">{String(i + 1).padStart(2, '0')}</span><h3>{t}</h3><p>{d}</p></div>))}
+</div>
+</section>
+
+<section class="section" id="kalkulator" style="padding-top:8px">
+<div class="wrap center"><span class="eyebrow">Kalkulátor</span><h2 class="sec-title">Tartós bérlet kalkulátor</h2>
+<p class="sec-intro">Válassz modellt és futamidőt — megmutatjuk a teljes bérleti költséget cégként (nettó) és magánszemélyként (19% német áfával).</p></div>
+<div class="wrap tb-calc">
+<div class="tb-cf">
+<label>Modell<select id="tbm">{calc.map((c, i) => <option value={i}>{c.n} — {fmt(c.h)} Ft/hó</option>)}</select></label>
+<label>Futamidő<select id="tbt"><option value="6">6 hónap</option><option value="12" selected>12 hónap</option><option value="18">18 hónap</option><option value="24">24 hónap</option><option value="36">36 hónap</option></select></label>
+<label>Bérlő<select id="tbw"><option value="c">Cég (nettó)</option><option value="p">Magánszemély (19% áfával)</option></select></label>
+</div>
+<div class="tb-cr">
+<div><span>Havidíj</span><b id="tbr1">—</b></div>
+<div><span>Teljes bérleti díj</span><b id="tbr2">—</b></div>
+<div><span>Visszajáró kaució</span><b id="tbr3">—</b></div>
+<div><span>Napi költség</span><b id="tbr4">—</b></div>
+</div>
+<p class="tb-note">Tájékoztató számítás a jelenlegi nettó havidíjakból (euróárfolyam szerint, kerekítve). Hosszabb futamidőre egyedi, akár kedvezőbb ajánlatot adunk. A díjban benne van a szerviz, az adó, a biztosítás és a gumi; az üzemanyag/töltés nem.</p>
+<a class="btn btn-primary" href="/kapcsolat">Egyedi ajánlatot kérek</a>
+</div>
+<script type="application/json" id="tbdata" set:html={JSON.stringify(calc)}></script>
+<script is:inline>(function(){var d=JSON.parse(document.getElementById('tbdata').textContent||'[]');var m=document.getElementById('tbm'),t=document.getElementById('tbt'),w=document.getElementById('tbw');if(!m)return;function f(n){return Math.round(n).toLocaleString('hu-HU')+' Ft';}function r(){var c=d[+m.value];if(!c)return;var k=w.value==='p'?1.19:1,mo=Math.max(+t.value,c.m),h=Math.ceil(c.h*k/1000)*1000;document.getElementById('tbr1').textContent=f(h);document.getElementById('tbr2').textContent=f(h*mo)+' / '+mo+' hó';document.getElementById('tbr3').textContent=f(c.d);document.getElementById('tbr4').textContent=f(h*12/365);}[m,t,w].forEach(function(x){x.addEventListener('change',r);});r();})();</script>
+</section>
+
+<section class="section" style="padding-top:8px">
+<div class="wrap tb-text">
+<h2>Tartós bérlet árak — teljes árlista</h2>
+<div class="tb-tw"><table class="tb-table">
+<thead><tr><th>Modell</th><th>Kategória</th><th>Havidíj (nettó)</th><th>Magánszemélynek</th><th>Kaució</th><th>Futamidő</th></tr></thead>
+<tbody>{cars.map((c: any) => (<tr><td><a href={href(c)}>{c.name}</a></td><td>{c.cat}</td><td>{fmt(c.huf)} Ft</td><td>{fmt(Math.ceil(c.huf * 1.19 / 10000) * 10000)} Ft</td><td>{fmt(c.dep)} €</td><td>{Math.min(...(c.months.length ? c.months : [6]))} hó-tól</td></tr>))}</tbody>
+</table></div>
+<p class="tb-note">A havidíjak nettó, -tól árak, havi kb. 4000 km futáskerettel; a forintár a napi euróárfolyamtól, a pontos díj a változattól, színtől és csomagtól függ.</p>
+{(v.extra || []).map((x) => (<><h2>{x.h}</h2>{x.p.map((p) => <p set:html={p} />)}</>))}
+</div>
+</section>
+
+<section class="section" style="padding-top:8px">
+<div class="wrap center"><span class="eyebrow">GYIK</span><h2 class="sec-title">Gyakori kérdések</h2></div>
+<div class="wrap tb-faq">{faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p set:html={a} /></details>))}</div>
+</section>
+
+<section class="section" style="padding-top:8px">
+<div class="wrap tb-rel">
+<h2>Kapcsolódó oldalak</h2>
+<div class="tb-rl">
+{related.map((r) => <a href={r.path + '/'}>{VARIANT_LABEL[r.key]} →</a>)}
+<a href="/operativ-lizing/">Operatív lízing vagy tartós bérlet? →</a>
+<a href="/blog/tartos-berlet-arak-2026">Tartós autóbérlés árak 2026 →</a>
+<a href="/berlesi-feltetelek/">Bérlési feltételek és kaució →</a>
+<a href="/autoink/#berelheto">Összes bérelhető autó →</a>
+</div>
+<div class="tb-cta"><div><h2>Kérj ajánlatot még ma</h2><p>Mondd el, milyen autót és mennyi időre keresel — 24 órán belül ajánlatot küldünk.</p></div><a class="btn btn-white" href="/kapcsolat">Ajánlatot kérek →</a></div>
+</div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(crumbJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(serviceJson)}></script>
+</section>
+
+<style>
+.tb{--red:#E2001A;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}
+.tb .wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.tb-crumb{display:flex;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:4px}
+.tb-crumb a{color:var(--muted);text-decoration:none}.tb-crumb a:hover{color:var(--red)}
+.tb-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.tb-stats div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;text-align:center}
+.tb-stats b{display:block;font-size:clamp(20px,2.4vw,26px);font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.tb-stats span{font-size:13px;color:var(--muted)}
+.tb-text{max-width:860px}
+.tb-text p{color:#3d4656;font-size:16px;line-height:1.7;margin:0 0 14px}
+.tb-text h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:30px 0 14px}
+.tb-text a,.tb-faq a{color:var(--red);font-weight:600}
+.tb-group{margin-top:22px}
+.tb-gh{font-size:20px;font-weight:800;color:var(--ink);margin:0 0 12px}.tb-gh small{font-size:13px;color:var(--muted);font-weight:600;margin-left:6px}
+.tb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.tb-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
+.tb-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(8,8,10,.1)}
+.tb-img{aspect-ratio:16/10;background:#F4F6FA;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tb-img img{width:100%;height:100%;object-fit:cover}
+.tb-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.tb-name{font-weight:800;font-size:17px;color:var(--ink)}
+.tb-meta{font-size:13px;color:var(--muted)}.tb-av{color:#0a8a3a;font-weight:700}
+.tb-price{margin-top:6px}.tb-price b{font-size:21px;font-weight:800;color:var(--ink)}.tb-price span{font-size:13px;color:var(--muted);margin-left:4px}
+.tb-sub{font-size:12.5px;color:var(--muted)}
+.tb-btn{margin-top:auto;padding-top:10px;color:var(--red);font-weight:800;font-size:14px}
+.tb-points{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tb-pt{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
+.tb-n{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:var(--red);color:#fff;font-weight:800}
+.tb-pt h3{font-size:18px;font-weight:800;margin:12px 0 6px;color:var(--ink)}.tb-pt p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0}
+.tb-calc{max-width:860px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}
+.tb-cf{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+.tb-cf label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
+.tb-cf select{height:46px;border:1px solid #dfe3ea;border-radius:12px;padding:0 12px;font:inherit;font-size:15px;color:var(--ink);background:#fff}
+.tb-cr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.tb-cr div{background:#F6F7FA;border-radius:14px;padding:14px}.tb-cr span{display:block;font-size:12.5px;color:var(--muted)}.tb-cr b{font-size:18px;font-weight:800;color:var(--ink)}
+.tb-note{font-size:13px;color:#667;line-height:1.55}
+.tb-tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
+.tb-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.tb-table th,.tb-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.tb-table th{background:#F6F7FA;font-size:13px;color:var(--muted)}
+.tb-table a{color:var(--ink);font-weight:700;text-decoration:none}.tb-table a:hover{color:var(--red)}
+.tb-faq{max-width:860px;display:flex;flex-direction:column;gap:10px}
+.tb-faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 18px}
+.tb-faq summary{list-style:none;cursor:pointer;font-weight:800;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.tb-faq summary::-webkit-details-marker{display:none}
+.tb-faq .pl{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:#fdeaec;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.tb-faq details[open] .pl{transform:rotate(45deg)}
+.tb-faq p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+.tb-rel h2{font-size:24px;font-weight:800;color:var(--ink)}
+.tb-rl{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.tb-rl a{background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 16px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+.tb-rl a:hover{border-color:var(--red);color:var(--red)}
+.tb-cta{background:#0B0B0D;color:#fff;border-radius:22px;padding:30px 36px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.tb-cta h2{color:#fff;margin:0 0 6px}.tb-cta p{color:#cfd6e2;margin:0}
+@media(max-width:820px){.tb-stats{grid-template-columns:repeat(2,1fr)}.tb-points{grid-template-columns:1fr}.tb-cf{grid-template-columns:1fr}.tb-cr{grid-template-columns:repeat(2,1fr)}}
+</style>
