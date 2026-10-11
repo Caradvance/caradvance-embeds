@@ -245,9 +245,9 @@
   }
   function syncNavMenu(wrap, label, removeList, setHref, addList) {
     var nis = wrap.querySelectorAll(".navitem");
-    for (var i = 0; i < nis.length; i++) { var nl = nis[i].querySelector(".navlink"); if (nl && txt(nl).replace(/^Prémium autóbérlés/, 'Autóbérlés').indexOf(label) === 0) { applyMenu(nis[i].querySelector(".dropdown .dd-inner"), false, removeList, setHref, addList); break; } }
+    for (var i = 0; i < nis.length; i++) { var nl = nis[i].querySelector(".navlink"); if (nl && txt(nl).replace(/^(Prémium autóbérlés|Tartós bérlet)/, 'Autóbérlés').indexOf(label) === 0) { applyMenu(nis[i].querySelector(".dropdown .dd-inner"), false, removeList, setHref, addList); break; } }
     var accs = wrap.querySelectorAll(".mobilepanel .m-acc");
-    for (var k = 0; k < accs.length; k++) { var b = accs[k].querySelector(".m-accbtn"); if (b && txt(b).replace(/^Prémium autóbérlés/, 'Autóbérlés').indexOf(label) === 0) { applyMenu(accs[k].querySelector(".m-sub"), true, removeList, setHref, addList); break; } }
+    for (var k = 0; k < accs.length; k++) { var b = accs[k].querySelector(".m-accbtn"); if (b && txt(b).replace(/^(Prémium autóbérlés|Tartós bérlet)/, 'Autóbérlés').indexOf(label) === 0) { applyMenu(accs[k].querySelector(".m-sub"), true, removeList, setHref, addList); break; } }
   }
 
   function run() {
