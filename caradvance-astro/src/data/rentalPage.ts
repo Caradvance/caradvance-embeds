@@ -53,15 +53,20 @@ export const az = (s: string) => (/^[AEIOUÁÉÍÓÖŐÚÜŰ]/i.test(String(s).t
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const lc = (s: string) => String(s).split(' ').map((w) => (/^[A-ZÁÉÍÓÖŐÚÜŰ]{2,}$/.test(w) ? w : w.toLowerCase())).join(' ');
 
+export const KM_FAQ = 'Autótól függően havonta 2 000–4 000 km. A keret a teljes bérleti időre összeadódik, így a napi ingázáshoz és a hosszabb utakhoz is bőven elég; ha ennél többre van szükséged, előre egyeztetjük, és a szerződésben rögzítjük.';
+
 export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   const br = BRAND[r.brand] || { key: r.brand.toLowerCase(), logo: '/bl-' + r.brand.toLowerCase() + '.webp', invert: true };
   const name = r.name;
   const A = az(name);
   const huf = fmtNum(r.huf) + ' Ft';
   const eur = r.eur;
-  const km = r.km.length ? r.km[0] : 0;
-  const kmNum = km ? fmtNum(km) : '';
-  const months = r.months.length ? r.months[0] : 0;
+  // Futáskeret: minden autónál egységesen „havi 2 000–4 000 km, autótól függően” (2026-10, ügyfél kérése);
+  // futamidő: a tartós bérlet legalább 6 hónap — a 6-nál rövidebb adatot 6-ra emeljük.
+  const km = 2000;
+  const kmNum = '2 000–4 000';
+  const moArr = Array.from(new Set(r.months.map((x) => Math.max(6, x)))).sort((a, b) => a - b);
+  const months = moArr.length ? moArr[0] : 6;
   const dep = r.dep;
   const depMax = r.trims.length ? Math.max(...r.trims.map((t) => t.dep)) : dep;
   const body = c.body || BODY_FIX[r.key] || (r.cat || '').replace(' / Terepjáró', '') || 'Prémium autó';
@@ -70,8 +75,8 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   const laterTxt = r.later.map((l) => l.d.replace(/^\d{4}\.\s*/, '') + ': ' + l.c + ' db').join(', ');
   const trimShort = r.trims.map((t) => t.name).join(', ');
   const orJoin = (a: string[]) => (a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' vagy ' + a[a.length - 1]);
-  const kmList = orJoin(r.km.map((k) => fmtNum(k)));
-  const moList = orJoin(r.months.map((x) => String(x)));
+  const kmList = kmNum;
+  const moList = orJoin(moArr.length ? moArr.map((x) => String(x)) : ['6']);
   const kmTxt = km ? `${kmList} km/hó futáskerettel` : 'egyedi futáskerettel';
   const moTxt = months ? `${moList} hónapos futamidővel` : 'rugalmas futamidővel';
   const psTxt = r.psMin && r.psMax ? (r.psMin === r.psMax ? `${r.psMin} LE` : `${r.psMin}–${r.psMax} LE`) : '';
@@ -130,7 +135,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
 
   const faq = [
     { q: `Mennyibe kerül ${A} ${name} bérlése?`, a: `${cap(A)} ${name} havi bérleti díja ${huf} (${eur} €) -tól indul ${kmTxt} és ${moTxt}.${variants.length > 1 ? ' Változatonként: ' + variants.map((v) => v.label + ' ' + v.t.eur + ' €/hó-tól').join(', ') + '.' : ''} Pontos, személyre szabott ajánlatért keress minket.` },
-    ...(km && months ? [{ q: `Mekkora a futáskeret ${A} ${name} tartós bérletnél?`, a: r.km.length > 1 ? `Választhatsz: havonta ${kmList} km. A ${months} hónapos futamidő alatt így ${fmtNum(km * months)}–${fmtNum(r.km[r.km.length - 1] * months)} km fér bele a havidíjba — a napi ingázáshoz és a hosszabb utakhoz is bőven elég.` : `Havonta ${kmNum} km — a ${months} hónapos futamidő alatt összesen ${fmtNum(km * months)} km fér bele a havidíjba. Ez bőven elég a napi ingázáshoz és a hosszabb utakhoz is.` }] : []),
+    { q: `Mekkora a futáskeret ${A} ${name} tartós bérletnél?`, a: KM_FAQ },
     { q: 'Mit tartalmaz a havi bérleti díj?', a: `A havidíj a vadonatúj ${name} használatát tartalmazza a megadott futáskerettel; a szervizt, az adót és a nyári-téli gumiszettet mi álljuk. A pontos feltételeket az ajánlatban előre, írásban rögzítjük.` },
     { q: 'Mennyi a kaució és visszajár-e?', a: `A kaució egyszeri, visszatérítendő letét: ${fmtNum(dep)} €-tól${depMax > dep ? `, változattól függően legfeljebb ${fmtNum(depMax)} €` : ''}. A bérlet végén — káresemény és rendkívüli kopás nélkül — teljes egészében visszajár.` },
     { q: 'Mennyi a bérlési időtartam?', a: `A tartós bérlet futamideje ${months ? moList + ' hónap' : 'egyedileg egyeztetett'}. Utána meghosszabbíthatod, vagy új modellre válthatsz — akár félévente új autóval.` },
@@ -139,7 +144,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
     { q: `Magánszemélyként és cégként is bérelhető ${A} ${name}?`, a: `Igen, ${A} ${name} tartós bérlet magánszemélyeknek és cégeknek is elérhető. Cégként a bérleti díj a könyvelésben elszámolható költség.` },
   ];
 
-  const chips = c.chips || [body, ...(r.fuels.length ? [r.fuels.map(fuelCap).join(' · ')] : []), gear, ...(km ? [`${r.km.map((k) => fmtNum(k)).join(' / ')} km/hó`] : [])];
+  const chips = c.chips || [body, ...(r.fuels.length ? [r.fuels.map(fuelCap).join(' · ')] : []), gear, `${kmList} km/hó`];
 
   return {
     slug: r.slug, name, brand: r.brand === 'VW' ? 'Volkswagen' : r.brand, brandKey: br.key,

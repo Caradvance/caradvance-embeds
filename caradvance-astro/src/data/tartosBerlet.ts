@@ -49,7 +49,7 @@ export const VARIANTS: TbVariant[] = [
     filter: () => true,
     intro: [
       'A <strong>tartós bérlet</strong> (más néven <strong>tartós autóbérlés</strong> vagy hosszú távú autóbérlés) azt jelenti, hogy egy új autót hónapokra vagy évekre bérelsz, egy előre rögzített havidíjért. Nem kell megvenned, nem kell lízingszerződést kötnöd, és nem kell önerőt fizetned: a havidíj fedezi az autó használatát, a szervizt, az adót, a biztosítást és a gumikat.',
-      'Nálunk az <strong>autó tartós bérlet</strong> különösen rugalmas: a futamidő már 6 hónaptól indul, a futáskeret havi 4000 km körül van, és a bérlet végén egyszerűen visszaadod az autót. Az alábbi listában minden jelenleg bérelhető modellünk szerepel, valós, naponta frissülő havidíjakkal.',
+      'Nálunk az <strong>autó tartós bérlet</strong> különösen rugalmas: a futamidő már 6 hónaptól indul, a futáskeret autótól függően havi 2 000–4 000 km, és a bérlet végén egyszerűen visszaadod az autót. Az alábbi listában minden jelenleg bérelhető modellünk szerepel, valós, naponta frissülő havidíjakkal.',
     ],
     extra: [
       { h: 'Hogyan működik a tartós bérlet?', p: [
@@ -172,7 +172,7 @@ export const VARIANTS: TbVariant[] = [
       `Az alábbi lista a jelenleg bérelhető ${name} modelljeinket mutatja, naponta frissülő havidíjakkal. Minden modellnél megnézheted a változatokat, színeket, futáskeretet és az elérhetőséget, és pár perc alatt ajánlatot kérhetsz.`,
     ],
     faqs: [
-      [`Mennyibe kerül egy ${name} tartós bérlete?`, `A legkedvezőbb ${name} modell, a {cheapest} nettó havidíja {min} Ft/hó-tól indul; a legdrágább bérelhető ${name} modell {max} Ft/hó körül van. A díjak 6 hónapos futamidőre és havi kb. 4000 km futáskeretre vonatkoznak.`],
+      [`Mennyibe kerül egy ${name} tartós bérlete?`, `A legkedvezőbb ${name} modell, a {cheapest} nettó havidíja {min} Ft/hó-tól indul; a legdrágább bérelhető ${name} modell {max} Ft/hó körül van. A díjak 6 hónapos futamidőre és autótól függően havi 2 000–4 000 km futáskeretre vonatkoznak.`],
       [`Mit tartalmaz a ${name} havidíja?`, 'A szervizt, a gépjárműadót, a kötelező biztosítást és a cascót, valamint a nyári-téli gumiszettet. Az üzemanyag vagy a töltés a bérlőt terheli.'],
       ['Mennyi a kaució?', `A ${name} modelleknél {depmin}–{depmax} € egyszeri, visszajáró kaució — önerő nincs.`],
       ['Magánszemélyként is bérelhetek?', 'Igen. Magánszemélyként a nettó díj a 19% német áfával növelt összeg; cégként a nettó díj érvényes.'],
