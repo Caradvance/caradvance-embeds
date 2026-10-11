@@ -1,0 +1,208 @@
+---
+/**
+ * Rólunk → Átláthatóság — /atlathatosag/ (2026-10)
+ * Kivel szerződsz, ki mit csinál, miből áll a havidíj és a vételár, mi történik a kaucióval, mi a teendő kár esetén.
+ * Minden adat a meglévő jogi oldalakból (Impresszum, ÁSZF, Feltételek és kaució, Beszerzési folyamat) — ne térjen el tőlük.
+ */
+import '../styles/eladom.css';
+import '../styles/trust.css';
+const SITE = 'https://www.caradvance.hu';
+const ICON: Record<string, string> = {
+  building: '<path d="M4 21V5.5L12 3l8 2.5V21"/><path d="M9 21v-4h6v4M8 8.5h2M14 8.5h2M8 12.5h2M14 12.5h2M2.5 21h19"/>',
+  flag: '<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
+  user: '<circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c.8-4 3.8-6.3 7.5-6.3s6.7 2.3 7.5 6.3"/>',
+  doc: '<path d="M7 2.8h7l4 4v14.4H7z"/><path d="M14 2.8v4h4M9.5 12h6M9.5 15.5h6M9.5 9h2.5"/>',
+  shield: '<path d="M12 2.8l7.5 3v6.1c0 4.6-3.2 8.2-7.5 9.3-4.3-1.1-7.5-4.7-7.5-9.3V5.8z"/><path d="M8.6 12.2l2.4 2.4 4.6-4.6"/>',
+  lock: '<rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+  receipt: '<path d="M6 2.8h12v18.4l-3-2-3 2-3-2-3 2z"/><path d="M9 7.5h6M9 11h6M9 14.5h3.5"/>',
+  route: '<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.5"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+};
+const ico = (k: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+
+const INCL: [string, string][] = [
+  ['Az autó használata', 'Új, 0 km-es autó a teljes bérleti időre — az értékvesztés kockázata a miénk.'],
+  ['Casco és kötelező biztosítás', 'Mi kötjük és fizetjük; káresetnél csak az önrész a tiéd.'],
+  ['Szerviz és karbantartás', 'A gyártó előírásai szerint, a kijelölt szervizben.'],
+  ['Gépjárműadó', 'A német rendszámos autó adóját mi fizetjük.'],
+  ['Nyári és téli gumi', 'Mindkét szett, a szezonális cserével és a nem használt szett tárolásával.'],
+  ['Forgalomba helyezés, német rendszám', 'Az autó a Caradvance GmbH nevén fut, minden papír rendben.'],
+];
+const EXCL: [string, string][] = [
+  ['Üzemanyag vagy töltés', 'A tankolás, illetve elektromos autónál a töltés a bérlőé.'],
+  ['Matrica, parkolás, bírságok', 'A bérlés alatt keletkezett bírságokat a hatóság felé a bérlő adataival intézzük.'],
+  ['Túlfutott kilométer', 'A kereten felüli kilométereket a szerződés szerinti díjjal számoljuk el.'],
+  ['Önrész káresetnél', 'Töréskárnál 10%, lopásnál 20%, de legalább 1 000 € káreseményenként.'],
+];
+const BUY: string[] = [
+  'az autó vételára', 'regisztrációs adó', 'műszaki vizsga', 'eredetiségvizsgálat', 'vagyonszerzési illeték',
+  'forgalmi engedély, rendszám, törzskönyv', 'szállítás biztosítással', 'ügyintézési díj',
+];
+const DEPOSIT: [string, string][] = [
+  ['Szerződéskötés', 'Az autóra vonatkozó kaució összegét a szerződés rögzíti; minden autó kártyáján és ajánlatában előre látod. Hogy induláskor be kell-e fizetni, az is az ajánlatban szerepel.'],
+  ['A bérlés alatt', 'A kaució biztosíték, nem bérleti díj, és nem kamatozik. Ha belőle levonás történik (például egy káresemény önrésze), 8 napon belül kell kiegészíteni.'],
+  ['Visszaadás', 'Az autó állapotát közösen rögzítjük az átadás-átvételi jegyzőkönyvben. Vita esetén közösen felkért független szakértő dönt.'],
+  ['Elszámolás', 'Csak a szerződésben felsorolt tételeket vonhatjuk le — tételesen, számlával. A rendeltetésszerű kopást elfogadjuk.'],
+  ['Visszautalás', 'A fennmaradó összeget a visszaadás és a nyitott kár- vagy bírságügyek lezárása után legkésőbb 30 napon belül visszautaljuk.'],
+];
+const DAMAGE: [string, string][] = [
+  ['A helyszínen', 'Harmadik fél, személyi sérülés, lopás vagy rongálás esetén hívj rendőrt. Töltsd ki az európai baleseti bejelentőt, és fotózd le a helyszínt és a sérülést.'],
+  ['Szólj nekünk 24 órán belül', 'Hívj a +36 30 233 6060-as számon, vagy írj az info@caradvance.hu címre. Mi intézzük a biztosítóval a kárrendezést.'],
+  ['Javítás és csereautó', 'A javítás a kijelölt szervizben történik. Az első 10 munkanapra — ha a flottában elérhető — hasonló kategóriájú csereautót adunk.'],
+  ['Meghibásodás', 'Ha az autó nem neked felróható okból 2 munkanapnál tovább áll, csereautót adunk, vagy a kiesett napokra arányosan jóváírjuk a díjat.'],
+];
+const DOCS: [string, string, string, string][] = [
+  ['doc', 'Általános Szerződési Feltételek', 'Vásárlás, bérlés, rendelés', '/aszf/'],
+  ['lock', 'Feltételek és kaució', 'A tartós bérlet szerződése röviden', '/berlesi-feltetelek/'],
+  ['shield', 'Adatkezelési tájékoztató', 'GDPR és sütik', '/adatkezeles/'],
+  ['building', 'Impresszum', 'Teljes cégadatok', '/impresszum/'],
+  ['route', 'Bérlési folyamat', 'Lépésről lépésre', '/berlesi-folyamat/'],
+  ['receipt', 'Beszerzési folyamat', 'Autóbehozatal 12 lépésben', '/beszerzesi-folyamat/'],
+];
+const faqs: [string, string][] = [
+  ['Kivel kötöm a szerződést?', 'Minden adásvételi és bérleti szerződés a németországi Caradvance GmbH-val jön létre (Geretsried, Amtsgericht München HRB 151009). A számlát is ő állítja ki, és a kauciót is neki fizeted. A BH Group Zrt. a magyarországi képviselő: magyarul tartja veled a kapcsolatot és intézi a papírmunkát.'],
+  ['Miért német cég a szerződő fél?', 'Az autókat a Caradvance GmbH vásárolja és tartja nyilván Németországban — ezért német rendszámmal futnak a bérelt autók, és ezért vásárolhatsz magánszemélyként 19%-os német áfával.'],
+  ['Mitől függ a pontos havidíj?', 'A változattól, a színtől, a felszereltségi csomagtól, a futamidőtől és a futáskerettől. Az árakat euróban rögzítjük; a forintár tájékoztató, a napi árfolyammal számoljuk. A pontos díjat a konkrét autóra szóló ajánlat tartalmazza.'],
+  ['Vannak rejtett költségek?', 'Nincsenek. A tartós bérletnél a havidíjon felül csak az üzemanyag, a matrica, a parkolás és az esetleges bírság, túlfutás vagy önrész lehet a tiéd. Vásárlásnál tételes, előre rögzített árajánlatot adunk, forintban.'],
+  ['Mikor kapom vissza a kauciót?', 'A visszaadás és a nyitott kár- vagy bírságügyek lezárása után legkésőbb 30 napon belül, a szerződés szerinti, tételesen elszámolt levonások után.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'Főoldal', item: SITE + '/' },
+  { '@type': 'ListItem', position: 2, name: 'Átláthatóság', item: SITE + '/atlathatosag/' } ] };
+const orgJson = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Caradvance GmbH', url: SITE + '/', foundingDate: '2003', vatID: 'DE232664616',
+  address: { '@type': 'PostalAddress', streetAddress: 'Bgm-Graf-Ring 21', postalCode: '82538', addressLocality: 'Geretsried', addressCountry: 'DE' },
+  subOrganization: { '@type': 'Organization', name: 'BH Group Zrt.', alternateName: 'Caradvance Hungary', taxID: '32488447-2-09', telephone: '+36 30 233 6060', email: 'info@caradvance.hu',
+    address: { '@type': 'PostalAddress', streetAddress: 'Petőfi utca 23.', postalCode: '4143', addressLocality: 'Vekerd', addressCountry: 'HU' } } };
+---
+<section class="el tq">
+<section class="hero">
+<video autoplay muted loop playsinline preload="metadata" poster="/caradvance-hero-x5-poster.jpg"><source src="/caradvance-hero-x5.mp4" type="video/mp4" /></video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>Átláthatóság —<br /><span class="accent">tudd pontosan, kivel szerződsz.</span></h1>
+<p class="sub sub-wide">Cégadatok, felelősségi körök, a havidíj és a vételár összetétele, a kaució útja és a teendők kár esetén — egy helyen, apró betű nélkül.</p>
+<div class="tq-chips"><span><b>2003</b> óta működünk</span><span>Szerződő fél: <b>Caradvance GmbH</b></span><span>Kaució vissza: <b>30 napon belül</b></span><span><b>Tételes</b> árajánlat</span></div>
+<div class="cta-row">
+<a class="btn btn-primary" href="/berlesi-feltetelek/">Feltételek és kaució →</a>
+<a class="btn btn-white" href="/kapcsolat">Kérdésem van</a>
+</div>
+</div>
+</section>
+
+<nav class="tq-crumb wrap" aria-label="Morzsamenü"><a href="/">Főoldal</a><span>›</span><span>Rólunk</span><span>›</span><span aria-current="page">Átláthatóság</span></nav>
+<nav class="wrap tq-toc" aria-label="Tartalom">
+<a href="#kik-vagyunk">Kik vagyunk?</a><a href="#ki-mit-csinal">Ki mit csinál?</a><a href="#havidij">A havidíj</a><a href="#vetelar">A vételár</a><a href="#kaucio">A kaució</a><a href="#kar">Kár esetén</a><a href="#dokumentumok">Dokumentumok</a>
+</nav>
+
+<section class="tq-sec" id="kik-vagyunk">
+<div class="wrap center"><span class="eyebrow">Kik vagyunk?</span><h2 class="sec-title">Két cég, egy felelős szerződő fél</h2>
+<p class="sec-intro">A CarAdvance a németországi Caradvance GmbH márkája. Magyarországon a BH Group Zrt. képvisel minket. Ezek a cégadatok — bármikor ellenőrizheted őket a cégnyilvántartásban.</p></div>
+<div class="wrap tq-co">
+<div class="tq-co-card">
+<div class="tq-co-head"><span class="tq-ico" set:html={ico('flag')}></span><h3>Caradvance GmbH</h3></div>
+<span class="tq-co-role">Szerződő fél · eladó · bérbeadó</span>
+<dl>
+<dt>Székhely</dt><dd>Bgm-Graf-Ring 21, 82538 Geretsried, Németország</dd>
+<dt>Cégjegyzék</dt><dd>Amtsgericht München, HRB 151009</dd>
+<dt>Közösségi adószám</dt><dd>DE232664616</dd>
+<dt>Működik</dt><dd>2003 óta</dd>
+<dt>Ügyvezetők</dt><dd>Peter van den Berg, Dr. Alexander Röther</dd>
+<dt>Elérhetőség</dt><dd>+49 89 1894141-0 · info@caradvance.de</dd>
+</dl>
+<p class="tq-co-note">Ő vásárolja és tartja nyilván az autókat, vele jön létre minden adásvételi és bérleti szerződés, ő állítja ki a számlát, és neki fizeted a kauciót.</p>
+</div>
+<div class="tq-co-card">
+<div class="tq-co-head"><span class="tq-ico" set:html={ico('building')}></span><h3>BH Group Zrt. — Caradvance Hungary</h3></div>
+<span class="tq-co-role">Magyarországi képviselet</span>
+<dl>
+<dt>Székhely</dt><dd>4143 Vekerd, Petőfi utca 23.</dd>
+<dt>Iroda</dt><dd>2083 Solymár, Ibolya utca 18. — H–P 9:00–17:00</dd>
+<dt>Cégjegyzékszám</dt><dd>09-10-000660 (Debreceni Törvényszék Cégbírósága)</dd>
+<dt>Adószám</dt><dd>32488447-2-09</dd>
+<dt>Elérhetőség</dt><dd>+36 30 233 6060 · info@caradvance.hu</dd>
+</dl>
+<p class="tq-co-note">Üzemelteti ezt a weboldalt, magyarul tartja veled a kapcsolatot, intézi a papírmunkát, a szállítást és segít a forgalomba helyezésben. Eladóként vagy bérbeadóként nem szerepel.</p>
+</div>
+</div>
+</section>
+
+<section class="tq-sec" id="ki-mit-csinal">
+<div class="wrap center"><span class="eyebrow">Ki mit csinál?</span><h2 class="sec-title">Egy ügy, világos felelősségi körök</h2>
+<p class="sec-intro">Hogy mindig tudd, kihez fordulj: így oszlik meg a munka közted, a magyar képviselet és a német szerződő fél között.</p></div>
+<div class="wrap tq-flow">
+<div class="tq-flow-c"><span class="tq-ico" set:html={ico('user')}></span><h3>Te</h3><ul><li>kiválasztod az autót</li><li>elfogadod az ajánlatot és aláírod a szerződést</li><li>fizeted a díjat, illetve a kauciót</li><li>vezetsz — és szólsz, ha bármi történik</li></ul></div>
+<div class="tq-flow-arrow" aria-hidden="true">→</div>
+<div class="tq-flow-c"><span class="tq-ico" set:html={ico('building')}></span><h3>BH Group Zrt. (Magyarország)</h3><ul><li>ajánlat, tanácsadás magyarul</li><li>papírmunka, szerződés előkészítése</li><li>szállítás, forgalomba helyezés segítése</li><li>kapcsolattartás kár, szerviz és bírság ügyében</li></ul></div>
+<div class="tq-flow-arrow" aria-hidden="true">→</div>
+<div class="tq-flow-c hl"><span class="tq-ico" set:html={ico('flag')}></span><h3>Caradvance GmbH (Németország)</h3><ul><li>szerződő fél: eladó, illetve bérbeadó</li><li>számlázás, a kaució kezelése</li><li>az autó tulajdonosa a bérlet alatt</li><li>biztosítás (casco, kötelező)</li></ul></div>
+</div>
+<div class="wrap"><p class="tq-callout"><b>Röviden:</b> a szerződés, a számla és a kaució mindig a Caradvance GmbH-hoz kötődik — a BH Group Zrt. képviselőként segít, de eladóként vagy bérbeadóként nem szerepel.</p></div>
+</section>
+
+<section class="tq-sec" id="havidij">
+<div class="wrap center"><span class="eyebrow">Tartós bérlet</span><h2 class="sec-title">Így áll össze a havidíj</h2>
+<p class="sec-intro">Egy fix havidíj — benne minden, ami az autó fenntartásával jár. Ez van benne, és ez nincs.</p></div>
+<div class="wrap tq-two">
+<div class="tq-col tq-yes"><h3>A havidíjban benne van</h3><ul>{INCL.map(([b, s]) => (<li><b>{b}</b><span>{s}</span></li>))}</ul></div>
+<div class="tq-col tq-no"><h3>Nincs benne — a bérlőé</h3><ul>{EXCL.map(([b, s]) => (<li><b>{b}</b><span>{s}</span></li>))}</ul></div>
+</div>
+<div class="wrap tq-facts">
+<div class="tq-fact"><b>Cégeknek</b><span>Nettó havidíj — ezt látod az autók kártyáin „Cég” nézetben.</span></div>
+<div class="tq-fact"><b>Magánszemélyeknek</b><span>A havidíj 19%-os német áfával, a „Magán” nézetben.</span></div>
+<div class="tq-fact"><b>Euró alapú ár</b><span>A díj euróban rögzített; a forintár a napi árfolyammal számolt tájékoztató érték.</span></div>
+<div class="tq-fact"><b>Futamidő, km-keret</b><span>Legalább 6 hónap, autótól függően havi 2 000–4 000 km.</span></div>
+</div>
+<div class="wrap center" style="margin-top:20px"><a class="tq-lnk" href="/autoink/#berelheto">Minden autó havidíja és kauciója egy helyen →</a></div>
+</section>
+
+<section class="tq-sec" id="vetelar">
+<div class="wrap center"><span class="eyebrow">Vásárlás és behozatal</span><h2 class="sec-title">Tételes vételár, rejtett költség nélkül</h2>
+<p class="sec-intro">Ha Németországból hozunk be neked autót, előre rögzített, tételes árajánlatot kapsz forintban — a „kapun belüli” árral.</p></div>
+<div class="wrap tq-two">
+<div class="tq-col tq-yes"><h3>Az árajánlat tételei</h3><ul>{BUY.map((b) => (<li><b>{b}</b></li>))}</ul></div>
+<div class="tq-col"><h3>Így fizetsz</h3>
+<ol class="tq-steps" style="margin-top:6px">
+<li><h3>30% előleg</h3><p>A szerződés aláírása után. A szerződésmintát aláírás előtt megtekintheted.</p></li>
+<li><h3>Megtekintés</h3><p>Amikor az autó megérkezett, megnézheted és mindenben ellenőrizheted.</p></li>
+<li><h3>70% egyenleg</h3><p>Csak a megtekintés után — a végleges átadás ezt követi.</p></li>
+</ol>
+<p style="color:var(--muted);font-size:14.5px;margin:4px 0 0">Magánszemélyként a Caradvance GmbH-tól 19%-os német áfával vásárolhatsz. Minden autóra 1 év szavatosságot vállalunk.</p>
+</div>
+</div>
+<div class="wrap center" style="margin-top:20px"><a class="tq-lnk" href="/beszerzesi-folyamat/">A teljes beszerzési folyamat 12 lépésben →</a></div>
+</section>
+
+<section class="tq-sec" id="kaucio">
+<div class="wrap center"><span class="eyebrow">Kaució</span><h2 class="sec-title">Hová kerül a kaució, és mikor jár vissza?</h2>
+<p class="sec-intro">A kaució biztosíték, nem bérleti díj. A Caradvance GmbH-nak fizeted, nem kamatozik, és a bérlet végén elszámolás után visszajár.</p></div>
+<div class="wrap"><ol class="tq-steps">{DEPOSIT.map(([t, d]) => (<li><h3>{t}</h3><p>{d}</p></li>))}</ol></div>
+<div class="wrap center"><a class="tq-lnk" href="/berlesi-feltetelek/#kaucio">A kaució részletes szabályai →</a></div>
+</section>
+
+<section class="tq-sec" id="kar">
+<div class="wrap center"><span class="eyebrow">Kár esetén</span><h2 class="sec-title">Ha baj van: ki intézi, és mi a teendőd?</h2>
+<p class="sec-intro">A casco és a kötelező biztosítás a havidíj része — a kárrendezést mi intézzük a biztosítóval. Ennyi a dolgod.</p></div>
+<div class="wrap tq-grid">{DAMAGE.map(([t, d], i) => (<div class="tq-card"><div class="tq-card-h"><span class="tq-card-n">{i + 1}</span></div><h3>{t}</h3><p>{d}</p></div>))}
+<div class="tq-card"><div class="tq-card-h"><span class="tq-card-n">€</span></div><h3>Önrész</h3><p>Töréskárnál a kár 10%-a, lopásnál és rablásnál 20%-a, de legalább 1 000 € káreseményenként. Nem kell fizetni, ha egy azonosított harmadik fél biztosítója teljesen megtéríti a kárt.</p></div>
+<div class="tq-card"><div class="tq-card-h"><span class="tq-card-n">!</span></div><h3>Bírságok</h3><p>A bérlés alatti bírság a bérlőé. Az első bírság ügyintézése díjmentes, a másodiktól ügyenként 30 € ügyintézési díj jár.</p></div>
+</div>
+</section>
+
+<section class="tq-sec" id="dokumentumok">
+<div class="wrap center"><span class="eyebrow">Dokumentumok</span><h2 class="sec-title">Minden feltétel, előre olvasható</h2>
+<p class="sec-intro">Szerződéskötés előtt mindent elolvashatsz — és ha valami nem egyértelmű, kérdezz bátran.</p></div>
+<div class="wrap tq-docs">{DOCS.map(([i, t, s, h]) => (<a class="tq-doc" href={h}><span class="tq-ico" set:html={ico(i)}></span><span><b>{t}</b><span>{s}</span></span></a>))}</div>
+</section>
+
+<section class="tq-sec" id="gyik">
+<div class="wrap center"><span class="eyebrow">Gyakori kérdések</span><h2 class="sec-title">Kérdések az átláthatóságról</h2></div>
+<div class="wrap tq-faq">{faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}</div>
+</section>
+
+<div class="wrap"><div class="tq-cta"><div><h2>Kérdésed van a szerződésről?</h2><p>Hívj minket: +36 30 233 6060 · info@caradvance.hu — magyarul, érthetően elmagyarázzuk.</p></div><div class="tq-cta-b"><a class="btn btn-white" href="/minosegbiztositas/">Minőségbiztosítás →</a><a class="btn btn-primary" href="/kapcsolat">Kapcsolat</a></div></div></div>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(crumbJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(orgJson)}></script>
+</section>

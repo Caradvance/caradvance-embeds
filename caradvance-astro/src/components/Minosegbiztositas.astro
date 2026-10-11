@@ -1,0 +1,111 @@
+---
+/**
+ * Rólunk → Minőségbiztosítás — /minosegbiztositas/ (2026-10)
+ * Hogyan ellenőrizzük az eladó/importált autókat, és hogyan kezeljük a bérelt autókat átadástól visszaadásig.
+ * Tények a Beszerzési folyamat, Előnyök, Bérlési folyamat és Feltételek oldalakról — ne térjen el tőlük.
+ */
+import '../styles/eladom.css';
+import '../styles/trust.css';
+const SITE = 'https://www.caradvance.hu';
+const ICON: Record<string, string> = {
+  search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3.4-3.4"/>',
+  shield: '<path d="M12 2.8l7.5 3v6.1c0 4.6-3.2 8.2-7.5 9.3-4.3-1.1-7.5-4.7-7.5-9.3V5.8z"/><path d="M8.6 12.2l2.4 2.4 4.6-4.6"/>',
+  gauge: '<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/><circle cx="12" cy="17" r="1.4"/>',
+  doc: '<path d="M7 2.8h7l4 4v14.4H7z"/><path d="M14 2.8v4h4M9.5 12h6M9.5 15.5h6M9.5 9h2.5"/>',
+  camera: '<path d="M4 7.5h3.2l1.6-2.2h6.4l1.6 2.2H20v11.7H4z"/><circle cx="12" cy="13.2" r="3.4"/>',
+  wrench: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.4 2.4-2.1-.4-.4-2.1 2.6-2.2z"/>',
+  truck: '<path d="M2.5 6.5h11v9h-11zM13.5 9.5h4l3 3v3h-7z"/><circle cx="6.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/>',
+  key: '<circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l2.5 2.5M14.5 8.5l2 2"/>',
+};
+const ico = (k: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+
+const IMPORT: [string, string, string][] = [
+  ['search', 'Előélet leinformálása', 'Az eladótól bekérjük a szervizkönyvet és minden adatot, ami az autó múltjáról szól — tulajdonosok, javítások, sérülések.'],
+  ['doc', 'Kártörténet ellenőrzése', 'Megnézzük, volt-e eltitkolt törés vagy elhallgatott javítás. Tisztázatlan előéletű autót nem ajánlunk.'],
+  ['gauge', 'Valós futás igazolása', 'A kilométer-állást hivatalos szervizadatokkal és nemzetközi adatbázissal vetjük össze — nem egy szépített számot veszel meg.'],
+  ['wrench', 'Helyszíni szakértői bevizsgálás', 'Az autót Németországban, a helyszínen bevizsgáljuk, mielőtt döntenél.'],
+  ['shield', 'Ha nem felel meg, nem vesszük meg', 'Ha a bevizsgáláskor hibát találunk, inkább keresünk egy jobb darabot — ezt a kockázatot még a döntés előtt kizárjuk.'],
+  ['truck', 'Biztosított szállítás', 'Profi szállítópartnerrel, magas értékű biztosítással hozzuk haza az autót, egészen az ajtódig.'],
+  ['camera', 'Megtekintés átvétel előtt', 'Megérkezés után megnézheted és mindenben ellenőrizheted az autót — a vételár 70%-át csak ezután kell rendezni.'],
+  ['key', 'Vizsgák és 1 év szavatosság', 'Eredetiségvizsgálat, műszaki vizsga, honosítás — és minden autóra 1 év szavatosságot vállalunk.'],
+];
+const RENT: [string, string][] = [
+  ['Új autó, gyári garanciával', 'A tartós bérletben vadonatúj, 0 km-es autót kapsz — nem használt flottaautót.'],
+  ['Átvételi ellenőrzés és jegyzőkönyv', 'Átadáskor fotókat készítünk a külsőről és a belső térről, rögzítjük a kilométeróra-állást, az üzemanyagszintet, a kulcsokat és a tartozékokat. Az átadási jegyzőkönyv a szerződés része.'],
+  ['Szerviz a gyártó előírásai szerint', 'A kötelező szervizeket és a karbantartást a kijelölt szervizben végeztetjük el, a havidíj terhére. A szervizjelzéstől számított 14 napon belül kell bemutatni az autót a kijelölt szervizben — ez általában egy munkanap.'],
+  ['Szezonális gumicsere', 'A nyári és a téli szettet is mi adjuk, a nem használt szettet díjmentesen tároljuk, a törvényes minimumig kopott abroncsot saját költségünkön cseréljük.'],
+  ['Meghibásodás, csereautó', 'Ha az autó nem neked felróható okból 2 munkanapnál tovább áll, csereautót adunk, vagy a kiesett napokra arányosan jóváírjuk a díjat.'],
+  ['Közös visszaadási jegyzőkönyv', 'Visszaadáskor közösen rögzítjük az állapotot; a rendeltetésszerű kopást elfogadjuk. Vita esetén közösen felkért független szakértő dönt.'],
+];
+const PAPERS: [string, string][] = [
+  ['Tételes ajánlat', 'minden költséggel, előre rögzítve'],
+  ['Szerződésminta', 'aláírás előtt elolvasható'],
+  ['Átadás-átvételi jegyzőkönyv', 'fotókkal, km-állással, üzemanyagszinttel'],
+  ['Előélet dokumentumai', 'szervizkönyv, ellenőrzési eredmények'],
+  ['Számla', 'a Caradvance GmbH-tól, tételesen'],
+  ['Szavatosság', '1 év minden eladott autóra'],
+];
+const faqs: [string, string][] = [
+  ['Mit jelent, hogy a helyszínen bevizsgáljátok az autót?', 'Mielőtt döntenél, az autót Németországban, a helyszínen megnézzük és átvizsgáljuk, és összevetjük az eladó által megadott adatokkal (szervizkönyv, sérülések, kilométer). Ha nem felel meg, nem vásároljuk meg.'],
+  ['Hogyan ellenőrzitek a valós kilométert?', 'A futásteljesítményt hivatalos szervizadatokból követjük nyomon, és nemzetközi adatbázisban is visszaellenőrizzük. Minden általunk behozott autónál igazoljuk a tényleges kilométert.'],
+  ['Mi van, ha az átvétel után hibát találok?', 'Minden eladott autóra 1 év szavatosságot vállalunk. Hívj minket a +36 30 233 6060-as számon, és megbeszéljük a teendőket.'],
+  ['Mi alapján döntitek el, mit vonhattok le a kaucióból?', 'Csak a szerződésben felsorolt tételeket, az átadási és a visszaadási jegyzőkönyv összevetése alapján, tételesen, számlával. A rendeltetésszerű kopást elfogadjuk; vita esetén független szakértő dönt.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'Főoldal', item: SITE + '/' },
+  { '@type': 'ListItem', position: 2, name: 'Minőségbiztosítás', item: SITE + '/minosegbiztositas/' } ] };
+const howJson = { '@context': 'https://schema.org', '@type': 'HowTo', name: 'Így ellenőrizzük a Németországból behozott autókat',
+  step: IMPORT.map(([, t, d], i) => ({ '@type': 'HowToStep', position: i + 1, name: t, text: d })) };
+---
+<section class="el tq">
+<section class="hero">
+<video autoplay muted loop playsinline preload="metadata" poster="/caradvance-hero-x5-poster.jpg"><source src="/caradvance-hero-x5.mp4" type="video/mp4" /></video>
+<div class="scrim"></div>
+<div class="inner">
+<h1>Minőségbiztosítás —<br /><span class="accent">így ellenőrizzük az autókat.</span></h1>
+<p class="sub sub-wide">Leinformált előélet, igazolt kilométer, helyszíni bevizsgálás és fotós átadási jegyzőkönyv — minden autónál, akár veszed, akár bérled.</p>
+<div class="tq-chips"><span><b>1 év</b> szavatosság</span><span><b>5000+</b> eladott autó</span><span><b>Helyszíni</b> bevizsgálás</span><span><b>Fotós</b> jegyzőkönyv</span></div>
+<div class="cta-row">
+<a class="btn btn-primary" href="#behozott-autok">Az ellenőrzés lépései →</a>
+<a class="btn btn-white" href="/kapcsolat">Kapcsolat</a>
+</div>
+</div>
+</section>
+
+<nav class="tq-crumb wrap" aria-label="Morzsamenü"><a href="/">Főoldal</a><span>›</span><span>Rólunk</span><span>›</span><span aria-current="page">Minőségbiztosítás</span></nav>
+<nav class="wrap tq-toc" aria-label="Tartalom">
+<a href="#behozott-autok">Behozott és eladó autók</a><a href="#berelt-autok">Bérelt autók</a><a href="#irasban">Amit írásban kapsz</a><a href="#gyik">GYIK</a>
+</nav>
+
+<section class="tq-sec" id="behozott-autok">
+<div class="wrap center"><span class="eyebrow">Vásárlás és behozatal</span><h2 class="sec-title">8 ellenőrzési pont, mielőtt az autó a tiéd lesz</h2>
+<p class="sec-intro">A német piac nagyjából 14× nagyobb a hazainál — mi ebből csak azt hozzuk be, ami minden ponton megfelel.</p></div>
+<div class="wrap tq-grid">{IMPORT.map(([i, t, d], n) => (<div class="tq-card"><div class="tq-card-h"><span class="tq-card-n">{n + 1}</span><span class="tq-ico" set:html={ico(i)}></span></div><h3>{t}</h3><p>{d}</p></div>))}</div>
+<div class="wrap center" style="margin-top:20px"><a class="tq-lnk" href="/beszerzesi-folyamat/">A teljes beszerzési folyamat →</a> &nbsp;·&nbsp; <a class="tq-lnk" href="/elonyok/">Miért a német piac?</a></div>
+</section>
+
+<section class="tq-sec" id="berelt-autok">
+<div class="wrap center"><span class="eyebrow">Tartós bérlet</span><h2 class="sec-title">Bérelt autók: átadástól a visszaadásig</h2>
+<p class="sec-intro">A bérlet alatt végig a miénk a felelősség az autó karbantartásáért — és minden lépést dokumentálunk, hogy a végén ne legyen vita.</p></div>
+<div class="wrap"><ol class="tq-steps">{RENT.map(([t, d]) => (<li><h3>{t}</h3><p>{d}</p></li>))}</ol></div>
+<div class="wrap center"><a class="tq-lnk" href="/berlesi-folyamat/">A bérlési folyamat lépésről lépésre →</a></div>
+</section>
+
+<section class="tq-sec" id="irasban">
+<div class="wrap center"><span class="eyebrow">Dokumentálva</span><h2 class="sec-title">Amit írásban kapsz tőlünk</h2>
+<p class="sec-intro">Nem ígéretekre kell hagyatkoznod: minden fontos lépésről papír készül.</p></div>
+<div class="wrap tq-docs">{PAPERS.map(([t, s]) => (<div class="tq-doc"><span class="tq-ico" set:html={ico('doc')}></span><span><b>{t}</b><span>{s}</span></span></div>))}</div>
+</section>
+
+<section class="tq-sec" id="gyik">
+<div class="wrap center"><span class="eyebrow">Gyakori kérdések</span><h2 class="sec-title">Kérdések az ellenőrzésről</h2></div>
+<div class="wrap tq-faq">{faqs.map(([q, a]) => (<details><summary>{q}<span class="pl">+</span></summary><p>{a}</p></details>))}</div>
+</section>
+
+<div class="wrap"><div class="tq-cta"><div><h2>Ellenőrzött autót keresel?</h2><p>Nézd meg a bérelhető és megvásárolható autóinkat — vagy mondd el, mit keresel, és mi felkutatjuk.</p></div><div class="tq-cta-b"><a class="btn btn-white" href="/atlathatosag/">Átláthatóság →</a><a class="btn btn-primary" href="/autoink/">Autóink</a></div></div></div>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(crumbJson)}></script>
+<script type="application/ld+json" set:html={JSON.stringify(howJson)}></script>
+</section>
