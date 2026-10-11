@@ -48,19 +48,19 @@ for (const c of cars) {
 }
 brands.sort((a, b) => b.n - a.n);
 
-const INCL: [string, string][] = [
-  ['Casco és kötelező biztosítás', 'Teljes körű biztosítás a havidíjban; káresetnél csak az önrész a tiéd.'],
-  ['Szerviz és karbantartás', 'Minden kötelező szerviz és karbantartás a gyártó előírásai szerint.'],
-  ['Gépjárműadó', 'A német rendszámos autó adóját mi fizetjük.'],
-  ['Nyári és téli gumi', 'Mindkét gumiszett, a szezonális cserével együtt.'],
-  ['Német rendszám, forgalomba helyezés', 'Az autó a Caradvance GmbH (München) nevén fut, minden papír rendben.'],
-  ['Havi 2 000–4 000 km futáskeret', 'Autótól függően 2 000 és 4 000 km között; a keret a teljes bérleti időre összeadódik, ha több kell, előre megbeszéljük.'],
+const INCL: [string, string, string][] = [
+  ['Casco és kötelező biztosítás', 'Teljes körű biztosítás a havidíjban; káresetnél csak az önrész a tiéd.', '01-biztositas.svg'],
+  ['Szerviz és karbantartás', 'Minden kötelező szerviz és karbantartás a gyártó előírásai szerint.', '02-szerviz.svg'],
+  ['Gépjárműadó', 'A német rendszámos autó adóját mi fizetjük.', '03-gepjarmuado.svg'],
+  ['Nyári és téli gumi', 'Mindkét gumiszett, a szezonális cserével együtt.', '04-gumik.svg'],
+  ['Német rendszám, forgalomba helyezés', 'Az autó a Caradvance GmbH (München) nevén fut, minden papír rendben.', '05-rendszam.svg'],
+  ['Havi 2 000–4 000 km futáskeret', 'Autótól függően 2 000 és 4 000 km között; a keret a teljes bérleti időre összeadódik, ha több kell, előre megbeszéljük.', '06-futaskeret.svg'],
 ];
-const EXCL: [string, string][] = [
-  ['Üzemanyag vagy töltés', 'A tankolás, illetve elektromos autónál a töltés a bérlőé.'],
-  ['Útdíjak, parkolás, bírságok', 'Autópálya-matrica, parkolási díj és a bérlet alatti bírságok.'],
-  ['Túlfutott kilométer', 'A kereten felüli kilométereket visszaadáskor számoljuk el.'],
-  ['Önrész káresetnél', 'A biztosítás önrésze — a pontos összeget a szerződés rögzíti.'],
+const EXCL: [string, string, string][] = [
+  ['Üzemanyag vagy töltés', 'A tankolás, illetve elektromos autónál a töltés a bérlőé.', '07-uzemanyag.svg'],
+  ['Útdíjak, parkolás, bírságok', 'Autópálya-matrica, parkolási díj és a bérlet alatti bírságok.', '08-parkolas.svg'],
+  ['Túlfutott kilométer', 'A kereten felüli kilométereket visszaadáskor számoljuk el.', '09-tulfutas.svg'],
+  ['Önrész káresetnél', 'A biztosítás önrésze — a pontos összeget a szerződés rögzíti.', '10-onresz.svg'],
 ];
 const STEPS: [string, string][] = [
   ['Válassz autót', 'Nézd meg a <a href="/autoink/#berelheto">bérelhető autóinkat</a> — változat, szín, futáskeret, elérhetőség.'],
@@ -139,8 +139,8 @@ const RB_HTML = '<div class="rb-wrap"><div class="rb-grid">\n<div class="rb-card
 <section class="section tb-sec" id="havidij">
 <div class="wrap center"><span class="eyebrow">Havidíj</span><h2 class="sec-title">Mit tartalmaz a havidíj — és mit nem?</h2></div>
 <div class="wrap tb-two">
-<div class="tb-col tb-yes"><h3>Benne van</h3><ul>{INCL.map(([t, d]) => <li><b>{t}</b><span>{d}</span></li>)}</ul></div>
-<div class="tb-col tb-no"><h3>Nincs benne</h3><ul>{EXCL.map(([t, d]) => <li><b>{t}</b><span>{d}</span></li>)}</ul>
+<div class="tb-col tb-yes"><h3>Benne van</h3><ul>{INCL.map(([t, d, icon]) => <li><img class="tb-fee-icon" src={`/icons/tartos-berlet/${icon}`} alt="" aria-hidden="true" width="32" height="32" loading="lazy" /><b>{t}</b><span>{d}</span></li>)}</ul></div>
+<div class="tb-col tb-no"><h3>Nincs benne</h3><ul>{EXCL.map(([t, d, icon]) => <li><img class="tb-fee-icon" src={`/icons/tartos-berlet/${icon}`} alt="" aria-hidden="true" width="32" height="32" loading="lazy" /><b>{t}</b><span>{d}</span></li>)}</ul>
 <p class="tb-mini">Részletek: <a href="/berlesi-feltetelek/">Feltételek és kaució</a></p></div>
 </div>
 </section>
@@ -295,10 +295,9 @@ const RB_HTML = '<div class="rb-wrap"><div class="rb-grid">\n<div class="rb-card
 .tb-col{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px 26px}
 .tb-col h3{font-size:20px;font-weight:800;margin:0 0 12px;color:var(--ink)}
 .tb-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
-.tb-col li{display:flex;flex-direction:column;padding-left:30px;position:relative}
+.tb-col li{display:flex;flex-direction:column;padding-left:46px;min-height:36px;position:relative}
+.tb-col .tb-fee-icon{position:absolute;left:0;top:2px;width:32px;height:32px;object-fit:contain}
 .tb-col li b{color:var(--ink);font-size:15.5px}.tb-col li span{color:var(--muted);font-size:14px;line-height:1.5}
-.tb-yes li:before{content:"✓";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#e7f7ee;color:#16a34a;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
-.tb-no li:before{content:"–";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#f3f5f9;color:#5b6475;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
 .tb-mini{font-size:13.5px;color:var(--muted);margin:14px 0 0}
 .tb-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:26px}
 .tb-step{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px 18px}
