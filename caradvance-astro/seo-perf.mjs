@@ -74,6 +74,25 @@ function renameRental(p, h) {
   return o;
 }
 
+
+// ---- 2026-10: a tartós bérlet aloldalai megszűntek → 301 (statikus szabályok a _redirects ELEJÉRE)
+try {
+  const R = 'dist/_redirects';
+  const MAP = { cegeknek: '/tartos-berlet/#cegeknek', maganszemelyeknek: '/tartos-berlet/#maganszemelyeknek', 'elektromos-auto': '/tartos-berlet/#elektromos',
+    bmw: '/autoink/?marka=bmw#berelheto', mercedes: '/autoink/?marka=mercedes#berelheto', audi: '/autoink/?marka=audi#berelheto',
+    volkswagen: '/autoink/?marka=volkswagen#berelheto', mini: '/autoink/?marka=mini#berelheto' };
+  const lines = [];
+  for (const [k, to] of Object.entries(MAP)) {
+    for (const pre of ['', '/en', '/de', '/fr', '/uk', '/zh', '/sk', '/cs']) {
+      const dest = pre + to;
+      lines.push(`${pre}/tartos-berlet/${k}/ ${dest} 301`, `${pre}/tartos-berlet/${k} ${dest} 301`);
+    }
+  }
+  const old = fs.existsSync(R) ? fs.readFileSync(R, 'utf8') : '';
+  if (!old.includes('/tartos-berlet/cegeknek/ ')) fs.writeFileSync(R, lines.join('\n') + '\n' + old);
+  console.log('[perf] tartós bérlet aloldalak 301: ' + lines.length + ' szabály');
+} catch (e) { console.log('[perf] _redirects hiba: ' + e.message); }
+
 let files = 0, changed = 0, vids = 0, fonts = 0, css = 0;
 function walk(d) {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
