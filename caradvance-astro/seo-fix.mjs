@@ -207,7 +207,7 @@ function rentalSeo() {
     const faq = [
       ['Mennyibe kerül egy autó tartós bérlete?', `A havidíj modelltől függ: bérelhető autóink ${ftFmt(min('ft'))} Ft/hó-tól ${ftFmt(max('ft'))} Ft/hó-ig érhetők el. A pontos díjat minden modell oldalán megtalálod.`],
       ['Milyen hosszú a bérleti idő és mekkora a futáskeret?', 'A tartós bérlet legalább 6 hónapra szól, utána 30 napos felmondással hosszabbítható; a havi futáskeret autótól függően 2 000–4 000 km.'],
-      ['Mekkora kauciót kell fizetni?', `A kaució modelltől függően ${ftFmt(min('dep'))} €-tól indul; az összeget minden autó oldalán feltüntetjük.`],
+      ['Mekkora kauciót kell fizetni?', 'A kaució modelltől függően 2 000 € és 10 000 € között van; a pontos összeget minden autó oldalán feltüntetjük.'],
       ['Hogyan bérelhetek autót a CarAdvance-től?', 'Válaszd ki az autót, küldd el az ajánlatkérést az oldalon, vagy hívj minket: +36 30 233 6060. Munkatársunk egyeztet veled a részletekről és az átadásról.'],
     ];
     const RS_CSS = `.ca-rent-seo{padding:48px 0 24px;font-family:inherit;max-width:900px}
