@@ -102,11 +102,41 @@ function walk(d) {
   }
 }
 
+
+// ── Autókártyák: „⇄ Összehasonlítás” gomb (hover-re a fotón; érintőképernyőn mindig látszik) ──
+// A /berelheto-auto/<slug>-berles linkből a slug → /auto-osszehasonlitas/?a=<slug>&b=<hasonló méretű másik márka>.
+const CMP = (() => {
+  try {
+    const t = fs.readFileSync('src/data/compareCars.ts', 'utf8');
+    const cars = t.split('\n').filter((l) => /^\s*\{"slug"/.test(l)).map((l) => { try { const o = JSON.parse(l.trim().replace(/,$/, '')); return { s: o.slug, b: o.name.split(' ')[0], L: o.L, body: o.body, fuel: o.fuel }; } catch { return null; } }).filter(Boolean);
+    const pair = {};
+    const d = (x, c) => Math.abs(x.L - c.L) + (x.body === c.body ? 0 : 400) + (x.fuel === c.fuel ? 0 : 60);
+    for (const c of cars) {
+      const o = cars.filter((x) => x.b !== c.b).sort((x, y) => d(x, c) - d(y, c))[0];
+      if (o) pair[c.s] = o.s;
+    }
+    return pair;
+  } catch { return {}; }
+})();
+const CMP_LBL = { hu: 'Összehasonlítás', en: 'Compare', de: 'Vergleichen', fr: 'Comparer', uk: 'Порівняти', zh: '对比', sk: 'Porovnať', cs: 'Porovnat' };
+let cmpPages = 0;
+function addCompare(p, h) {
+  if (!Object.keys(CMP).length || h.includes('id="ca-cmp"')) return h;
+  const rel = path.relative(DIST, p).split(path.sep).join('/');
+  if (!/(^|\/)autoink\/index\.html$/.test(rel) && !/sub-det|sub-card/.test(h)) return h;
+  const lang = ((h.match(/<html[^>]*\slang="([a-z]{2})/i) || [])[1] || 'hu').toLowerCase();
+  const lbl = CMP_LBL[lang] || CMP_LBL.hu;
+  cmpPages++;
+  const js = `<style id="ca-cmp-css">.sub-media .ca-cmp{position:absolute;right:10px;bottom:10px;z-index:3;display:inline-flex;align-items:center;gap:6px;background:#fff;color:#0b0b0d;border:1px solid #e3e7ee;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 6px 18px rgba(11,15,30,.14);opacity:0;transform:translateY(4px);transition:opacity .18s,transform .18s,background .15s,color .15s}.sub-card:hover .ca-cmp,.ca-cmp:focus{opacity:1;transform:none}.sub-media .ca-cmp:hover{background:#E2001A;border-color:#E2001A;color:#fff}.ca-cmp b{font-size:15px;line-height:1}@media (hover:none){.sub-media .ca-cmp{opacity:1;transform:none;padding:6px 10px;font-size:12px}}</style><script id="ca-cmp">(function(){var P=${JSON.stringify(CMP)},L=${JSON.stringify(lbl)};var seg=(location.pathname.split('/')[1]||'');var pre=/^(en|de|fr|uk|zh|sk|cs)$/.test(seg)?'/'+seg:'';function dec(){var as=document.querySelectorAll('.sub-card a.sub-det');for(var i=0;i<as.length;i++){var a=as[i],c=a.closest('.sub-card');if(!c||c.__cmp)continue;c.__cmp=1;var m=(a.getAttribute('href')||'').match(/\\/berelheto-auto\\/([a-z0-9-]+?)-berles\\/?$/);if(!m||!P[m[1]])continue;var md=c.querySelector('.sub-media');if(!md)continue;var x=document.createElement('a');x.className='ca-cmp';x.href=pre+'/auto-osszehasonlitas/?a='+m[1]+'&b='+P[m[1]];x.innerHTML='<b>⇄</b>'+L;x.addEventListener('click',function(e){e.stopPropagation();});md.appendChild(x);}}var t;new MutationObserver(function(){clearTimeout(t);t=setTimeout(dec,120);}).observe(document.documentElement,{childList:true,subtree:true});if(document.readyState!=='loading')dec();else document.addEventListener('DOMContentLoaded',dec);})();</script>`;
+  return h.replace(/<\/body>/i, js + '</body>');
+}
+
 function fix(p) {
   let h = fs.readFileSync(p, 'utf8');
   const o = h;
   if (h.includes('id="ca-perf"')) return;
   h = renameRental(p, h);
+  h = addCompare(p, h);
 
   // 1) Google Fonts: nem blokkoló betöltés
   h = h.replace(/<link\s+href="(https:\/\/fonts\.googleapis\.com\/css2\?[^"]+)"\s+rel="stylesheet"\s*\/?>/g, (m, href) => {
@@ -154,6 +184,7 @@ function fix(p) {
 
 try {
   if (fs.existsSync(DIST)) walk(DIST);
+  console.log(`[perf] összehasonlítás gomb az autókártyákon: ${cmpPages} oldal, ${Object.keys(CMP).length} modell`);
   console.log(`[perf] ${files} oldal, módosítva ${changed} · font ${fonts} · css ${css} · videó ${vids}`);
 } catch (e) { console.log('[perf] hiba: ' + (e && e.message)); }
 process.exit(0);
