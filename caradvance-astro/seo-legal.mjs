@@ -18,7 +18,7 @@ const YEAR = new Date().getFullYear();
 const SKIP = [/^belso\//, /^ajanlat\//, /^api\//];
 
 const COLS = [
-  ['Autóbérlés', [
+  ['Tartós bérlet', [
     ['Bérelhető autóink', '/berelheto/'],
     ['A bérlés előnyei', '/berles-elonyei/'],
     ['Bérlési folyamat', '/berlesi-folyamat/'],

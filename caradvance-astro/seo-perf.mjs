@@ -46,6 +46,34 @@ try {
   }
 } catch (e) { console.log('[perf] tartós bérlet ablak hiba: ' + e.message); }
 
+
+// ---- „Autóbérlés” → „Tartós bérlet” (2026-10): nálunk nincs napi bérlés, minden bérlet min. 6 hónapos.
+// A főmenü felirata minden oldalon (a nem-Astro, kézi fejlécű oldalakon is), nyelvenként a szótár szerint,
+// és az /autoink „Bérelhető” hero szövege.
+const NAVREN = { '': ['Autóbérlés', 'Tartós bérlet'] };
+try {
+  for (const l of ['en', 'de', 'fr', 'uk', 'zh', 'sk', 'cs']) {
+    const d = JSON.parse(fs.readFileSync('src/i18n/dict/' + l + '.json', 'utf8'));
+    if (d['Autóbérlés'] && d['Tartós bérlet']) NAVREN[l] = [d['Autóbérlés'], d['Tartós bérlet']];
+  }
+} catch (e) {}
+function renameRental(p, h) {
+  const rel = p.split(path.sep).slice(1);
+  const lang = (rel[0] === '_np' ? rel[1] : rel[0]) || '';
+  const pair = NAVREN[lang] || NAVREN[''];
+  const [from, to] = pair;
+  let o = h;
+  for (const cls of ['navlink', 'm-accbtn']) for (const f of [from, 'Tartós bérlet']) o = o.split('class="' + cls + '" type="button">' + f + '<').join('class="' + cls + '" type="button">' + to + '<');
+  if (/[\\/]autoink[\\/]index\.html$/.test(p) && pair === NAVREN['']) {
+    o = o.split('<div class="hh">Bérelhető autóink</div>').join('<div class="hh">Tartós bérlet</div>')
+      .split('Bérautóink többsége 0 km-es, vadonatúj — mindig a legfrissebb modellek. Havidíjas előfizetéses bérlet (Auto-Abo) rövid futamidővel és rugalmas km-kerettel; a kaució a bérlés végén visszajár.')
+      .join('Új, 0 km-es prémium autók tartós bérletben — minimum 6 hónapra, fix havidíjjal. Casco, szerviz, adó és nyári-téli gumi a díjban; a kaució a bérlet végén visszajár.')
+      .replace(/>(\d+) bérelhető autó</g, '>$1 autó tartós bérletre<')
+      .split('"name":"Bérelhető autóink – prémium autóbérlés és tartós bérlet"').join('"name":"Tartós bérlet – bérelhető prémium autóink (6 hónaptól)"');
+  }
+  return o;
+}
+
 let files = 0, changed = 0, vids = 0, fonts = 0, css = 0;
 function walk(d) {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
@@ -59,6 +87,7 @@ function fix(p) {
   let h = fs.readFileSync(p, 'utf8');
   const o = h;
   if (h.includes('id="ca-perf"')) return;
+  h = renameRental(p, h);
 
   // 1) Google Fonts: nem blokkoló betöltés
   h = h.replace(/<link\s+href="(https:\/\/fonts\.googleapis\.com\/css2\?[^"]+)"\s+rel="stylesheet"\s*\/?>/g, (m, href) => {
