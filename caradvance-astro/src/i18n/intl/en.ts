@@ -132,7 +132,7 @@ const en: IntlContent = {
             head: ['', ''],
             rows: [
               ['Minimum term', '6 full months from handover — then it continues on the same terms with 30 days’ notice (to the end of a rental month).'],
-              ['Deposit', '3,000–10,000 € depending on the model; refunded within 30 days after return. Some rentals start without an upfront deposit.'],
+              ['Deposit', '2,000–10,000 € depending on the model; refunded within 30 days after return. Some rentals start without an upfront deposit.'],
               ['Mileage', 'Monthly allowance (e.g. 2,000 km per month), added up over the whole term.'],
               ['Insurance excess', '10% of the damage (theft: 20%), at least 1,000 € per claim.'],
               ['Payment', 'Fixed monthly fee in EUR or HUF, by bank transfer.'],
@@ -164,7 +164,7 @@ const en: IntlContent = {
         ['Can foreigners rent a car long term in Hungary?', 'Yes. Private individuals and companies living or working in Hungary can rent from us. You need a valid driving licence and identification; we explain the required documents in your offer.'],
         ['What is included in the monthly price?', 'Service and maintenance, wear parts, vehicle tax and official fees, third-party liability and comprehensive insurance, summer and winter tyres with storage, and assistance. Fuel, tolls, parking, fines and the insurance excess are not included.'],
         ['Which number plates does the rental car have?', 'German plates. The car is registered in Germany to Caradvance GmbH, the lessor — no Hungarian registration is needed, and you receive the German registration document and the insurance card with the car.'],
-        ['How much is the deposit?', 'Between 3,000 € and 10,000 € depending on the car category. It is a security, not a fee, and is refunded within 30 days after the car is returned and any open matters are closed. Some rentals start without an upfront deposit.'],
+        ['How much is the deposit?', 'Between 2,000 € and 10,000 € depending on the model. It is a security, not a fee, and is refunded within 30 days after the car is returned and any open matters are closed. Some rentals start without an upfront deposit.'],
         ['Can I end the contract early?', 'The minimum term is 6 full months. After that the contract continues on the same terms and can be ended with 30 days’ written notice to the end of a rental month — or you can switch to another car.'],
         ['Can I drive the car abroad?', 'Yes, within the permitted countries listed in the contract; assistance is valid in Hungary and in those countries.'],
       ],

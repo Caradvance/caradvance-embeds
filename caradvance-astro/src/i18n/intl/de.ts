@@ -132,7 +132,7 @@ const de: IntlContent = {
             head: ['', ''],
             rows: [
               ['Mindestlaufzeit', '6 volle Monate ab Übergabe — danach läuft der Vertrag zu gleichen Bedingungen weiter, kündbar mit 30 Tagen Frist zum Ende eines Mietmonats.'],
-              ['Kaution', '3.000–10.000 € je nach Modell; Rückzahlung innerhalb von 30 Tagen nach Rückgabe. Manche Mieten starten ohne Kaution vorab.'],
+              ['Kaution', '2.000–10.000 € je nach Modell; Rückzahlung innerhalb von 30 Tagen nach Rückgabe. Manche Mieten starten ohne Kaution vorab.'],
               ['Kilometer', 'Monatliches Kontingent (z. B. 2.000 km pro Monat), über die gesamte Laufzeit addiert.'],
               ['Selbstbeteiligung', '10 % des Schadens (Diebstahl: 20 %), mindestens 1.000 € je Schadenfall.'],
               ['Zahlung', 'Feste Monatsrate in EUR oder HUF, per Überweisung.'],
@@ -164,7 +164,7 @@ const de: IntlContent = {
         ['Können Ausländer in Ungarn ein Auto langfristig mieten?', 'Ja. Privatpersonen und Unternehmen, die in Ungarn leben oder arbeiten, können bei uns mieten. Sie benötigen einen gültigen Führerschein und einen Ausweis; die nötigen Unterlagen nennen wir Ihnen im Angebot.'],
         ['Was ist in der Monatsrate enthalten?', 'Service und Wartung, Verschleißteile, Kfz-Steuer und Gebühren, Haftpflicht und Vollkasko, Sommer- und Winterreifen mit Einlagerung sowie Assistance. Kraftstoff, Maut, Parken, Bußgelder und die Selbstbeteiligung sind nicht enthalten.'],
         ['Welches Kennzeichen hat der Mietwagen?', 'Ein deutsches. Das Auto ist in Deutschland auf den Vermieter, die Caradvance GmbH, zugelassen — eine ungarische Zulassung ist nicht nötig; Fahrzeugschein und Versicherungskarte erhalten Sie mit dem Auto.'],
-        ['Wie hoch ist die Kaution?', 'Zwischen 3.000 € und 10.000 € je nach Fahrzeugkategorie. Sie ist eine Sicherheit, keine Gebühr, und wird innerhalb von 30 Tagen nach Rückgabe und Abschluss offener Vorgänge erstattet. Manche Mieten starten ohne Kaution vorab.'],
+        ['Wie hoch ist die Kaution?', 'Zwischen 2.000 € und 10.000 € je nach Modell. Sie ist eine Sicherheit, keine Gebühr, und wird innerhalb von 30 Tagen nach Rückgabe und Abschluss offener Vorgänge erstattet. Manche Mieten starten ohne Kaution vorab.'],
         ['Kann ich vorzeitig kündigen?', 'Die Mindestlaufzeit beträgt 6 volle Monate. Danach läuft der Vertrag zu gleichen Bedingungen weiter und kann mit 30 Tagen Frist schriftlich zum Ende eines Mietmonats gekündigt werden — oder Sie wechseln auf ein anderes Auto.'],
         ['Darf ich mit dem Auto ins Ausland fahren?', 'Ja, in die im Vertrag genannten erlaubten Länder; die Assistance gilt in Ungarn und in diesen Ländern.'],
       ],

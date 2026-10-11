@@ -132,7 +132,7 @@ const fr: IntlContent = {
             head: ['', ''],
             rows: [
               ['Durée minimale', '6 mois complets à partir de la remise — ensuite reconduction aux mêmes conditions, résiliable avec un préavis de 30 jours (fin du mois de location).'],
-              ['Dépôt de garantie', '3 000–10 000 € selon le modèle ; remboursé sous 30 jours après la restitution. Certaines locations démarrent sans dépôt initial.'],
+              ['Dépôt de garantie', '2 000–10 000 € selon le modèle ; remboursé sous 30 jours après la restitution. Certaines locations démarrent sans dépôt initial.'],
               ['Kilométrage', 'Forfait mensuel (p. ex. 2 000 km par mois), cumulé sur toute la durée.'],
               ['Franchise', '10 % du dommage (vol : 20 %), au minimum 1 000 € par sinistre.'],
               ['Paiement', 'Loyer mensuel fixe en EUR ou en HUF, par virement.'],
@@ -164,7 +164,7 @@ const fr: IntlContent = {
         ['Un étranger peut-il louer une voiture longue durée en Hongrie ?', 'Oui. Les particuliers et les entreprises qui vivent ou travaillent en Hongrie peuvent louer chez nous. Il faut un permis de conduire valide et une pièce d’identité ; nous précisons les documents nécessaires dans l’offre.'],
         ['Que comprend le loyer mensuel ?', 'Entretien, pièces d’usure, taxe sur les véhicules et frais officiels, responsabilité civile et tous risques, pneus été/hiver avec stockage, et assistance. Carburant, péages, stationnement, amendes et franchise ne sont pas inclus.'],
         ['Quelles plaques porte la voiture de location ?', 'Des plaques allemandes. La voiture est immatriculée en Allemagne au nom du loueur, Caradvance GmbH — aucune immatriculation hongroise n’est nécessaire ; vous recevez le certificat d’immatriculation allemand et la carte d’assurance avec la voiture.'],
-        ['Quel est le montant du dépôt de garantie ?', 'Entre 3 000 € et 10 000 € selon la catégorie. C’est une garantie, pas un frais, remboursée sous 30 jours après la restitution et la clôture des dossiers en cours. Certaines locations démarrent sans dépôt initial.'],
+        ['Quel est le montant du dépôt de garantie ?', 'Entre 2 000 € et 10 000 € selon le modèle. C’est une garantie, pas un frais, remboursée sous 30 jours après la restitution et la clôture des dossiers en cours. Certaines locations démarrent sans dépôt initial.'],
         ['Puis-je résilier plus tôt ?', 'La durée minimale est de 6 mois complets. Ensuite, le contrat se poursuit aux mêmes conditions et peut être résilié par écrit avec 30 jours de préavis à la fin d’un mois de location — ou vous changez de voiture.'],
         ['Puis-je rouler à l’étranger ?', 'Oui, dans les pays autorisés indiqués au contrat ; l’assistance est valable en Hongrie et dans ces pays.'],
       ],
