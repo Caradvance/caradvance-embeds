@@ -37,6 +37,16 @@ export type Post = {
 
 export const POSTS: Post[] = [
   {
+    slug: 'zart-vegu-nyilt-vegu-lizing',
+    cat: 'finanszirozas',
+    title: 'Zártvégű vagy nyíltvégű lízing? Különbségek, előnyök, kinek melyik éri meg (2026)',
+    excerpt: 'Kié az autó a futamidő végén, mi a maradványérték, hogyan működik az áfa — és mikor jobb választás az operatív lízing vagy a tartós bérlet.',
+    dateISO: '2026-10-11',
+    readingMin: 6,
+    image: '/cover-auto-lizing-maganszemelykent.webp',
+    keywords: 'zárt végű lízing, zártvégű lízing, nyílt végű pénzügyi lízing, nyíltvégű lízing, operatív lízing, autó lízing',
+  },
+  {
     slug: 'auto-honositas-2026',
     cat: 'import',
     title: 'Autó honosítás 2026 — menete, ára és kalkulátor lépésről lépésre',
