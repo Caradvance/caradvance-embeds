@@ -18,3 +18,23 @@
 # Egyéb, nem hash-elt statikus fájlok a public mappából (biztonság kedvéért rövid TTL)
 /*.js
   Cache-Control: public, max-age=300, must-revalidate
+
+# Astro hash-elt assetek — a fájlnév változik minden módosításkor, így örökre cache-elhetők
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Képek, videók, betűk (nem hash-eltek, de ritkán változnak) — 7 nap
+/*.webp
+  Cache-Control: public, max-age=604800
+/*.jpg
+  Cache-Control: public, max-age=604800
+/*.jpeg
+  Cache-Control: public, max-age=604800
+/*.png
+  Cache-Control: public, max-age=604800
+/*.svg
+  Cache-Control: public, max-age=604800
+/*.mp4
+  Cache-Control: public, max-age=604800
+/*.woff2
+  Cache-Control: public, max-age=2592000
