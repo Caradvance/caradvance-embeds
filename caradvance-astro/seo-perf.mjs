@@ -22,6 +22,30 @@ for (const f of ['kereses.css', 'fiok.css']) {
 
 const LOADER = `<script id="ca-lazyvid">(function(){function go(v){if(v.__ld)return;v.__ld=1;var s=v.querySelectorAll('source[data-src]'),ch=0,own=0;for(var i=0;i<s.length;i++){if(s[i].getAttribute('src')){own=1;}else{s[i].setAttribute('src',s[i].getAttribute('data-src'));ch=1;}s[i].removeAttribute('data-src');}if(v.getAttribute('data-src')){if(!v.getAttribute('src')){v.setAttribute('src',v.getAttribute('data-src'));ch=1;}v.removeAttribute('data-src');}if(ch&&!own){try{v.load();}catch(e){}}try{var p=v.play();if(p&&p.catch)p.catch(function(){});}catch(e){}}function run(){var vs=[].slice.call(document.querySelectorAll('video.ca-lv'));if(!vs.length)return;if(!('IntersectionObserver' in window)){vs.forEach(go);return;}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);go(e.target);}});},{rootMargin:'300px 0px'});vs.forEach(function(v){io.observe(v);});}function start(){setTimeout(run,150);}if(document.readyState==='complete')start();else window.addEventListener('load',start);})();</script>`;
 
+
+// ---- Tartós bérlet oldalak: a kártyák „Ajánlatot kérek” gombja ugyanazt a bérlési ablakot nyitja,
+// mint az /autoink kártyái és a modell-oldalak (a konfiguráció a seo-abo.mjs STRIP blokkjából jön).
+try {
+  const src = fs.readFileSync('seo-abo.mjs', 'utf8');
+  const lit = (src.match(/const STRIP = ("(?:[^"\\]|\\.)*")/) || [])[1];
+  if (lit) {
+    const STRIP = JSON.parse(lit);
+    const MODAL = '<style>.ab-modal{--red:#E2001A;--navy:#0B0B0D;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1}</style>'
+      + STRIP.replace(/<div class="brand-strip"[\s\S]*?<\/div><script>/, '<script>');
+    const T = ['dist/tartos-berlet/index.html'];
+    if (fs.existsSync('dist/tartos-berlet')) for (const sub of fs.readdirSync('dist/tartos-berlet')) T.push('dist/tartos-berlet/' + sub + '/index.html');
+    let tn = 0;
+    for (const f of T) {
+      if (!fs.existsSync(f)) continue;
+      let h = fs.readFileSync(f, 'utf8');
+      if (h.indexOf('sub-rent') < 0 || h.indexOf('window.__ABCFG') > -1) continue;
+      const bi = h.lastIndexOf('</body>'); if (bi < 0) continue;
+      h = h.slice(0, bi) + MODAL + h.slice(bi); fs.writeFileSync(f, h); tn++;
+    }
+    console.log('[perf] tartós bérlet: bérlési ablak beszúrva ' + tn + ' oldalra');
+  }
+} catch (e) { console.log('[perf] tartós bérlet ablak hiba: ' + e.message); }
+
 let files = 0, changed = 0, vids = 0, fonts = 0, css = 0;
 function walk(d) {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
