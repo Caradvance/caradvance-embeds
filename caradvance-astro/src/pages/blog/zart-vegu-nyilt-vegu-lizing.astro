@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogPost from '../../components/BlogPost.astro';
+const lang = 'hu';
+const slug = 'zart-vegu-nyilt-vegu-lizing';
+const title = 'Zártvégű vagy nyíltvégű lízing? Különbségek, előnyök, kinek melyik éri meg (2026)';
+const lead = 'Zártvégű lízing, nyíltvégű pénzügyi lízing, operatív lízing — mi a különbség, mi történik a futamidő végén, hogyan működik az áfa, és mikor jobb választás a tartós bérlet?';
+const description = 'Zártvégű és nyíltvégű lízing 2026: mi a különbség, kié az autó a futamidő végén, mi a maradványérték, hogyan működik az áfa, és kinek melyik éri meg — magánszemélynek vagy cégnek.';
+const faqs = [
+  ['Mi az a zártvégű lízing?', 'A zártvégű pénzügyi lízingnél a futamidő végén, az összes díj megfizetése után az autó tulajdonjoga automatikusan rád száll. Nincs döntési helyzet és jellemzően nincs nagy záró részlet: a havi díj a teljes finanszírozott összegre szól. Magánszemélyek leggyakrabban ezt választják.'],
+  ['Mi az a nyíltvégű pénzügyi lízing?', 'A nyíltvégű lízingnél a futamidő végén te döntesz: megveszed az autót a maradványértéken, harmadik felet jelölsz ki vevőnek, vagy visszaadod. A maradványérték miatt a havi részlet alacsonyabb. Vállalkozásoknál a lízingdíjak tőkerészének áfája jogszabályi feltételekkel visszaigényelhető.'],
+  ['Melyik a jobb magánszemélynek?', 'Magánszemélyként jellemzően a zártvégű lízing az egyszerűbb, mert áfát nem tudsz visszaigényelni, és a futamidő végén automatikusan a tiéd lesz az autó. Ha nem akarsz tulajdont szerezni, a tartós bérlet rugalmasabb: nincs önerő, és a díjban benne van a szerviz, az adó és a biztosítás.'],
+  ['Melyik a jobb cégnek?', 'Cégeknél gyakran a nyíltvégű konstrukció előnyösebb az áfa-kezelés és az alacsonyabb havi részlet miatt. A pontos előnyt mindig a könyvelőddel számoltasd ki.'],
+  ['Mi a különbség a pénzügyi és az operatív lízing között?', 'Pénzügyi lízingnél (zárt- vagy nyíltvégű) az autó a végén a tiéd lehet. Operatív lízingnél soha nem lesz a tiéd: használati díjat fizetsz, a végén visszaadod. Részletek: operatív lízing oldalunkon.'],
+];
+const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base lang={lang} path={`/blog/${slug}`} title={'Zártvégű vagy nyíltvégű lízing? Különbségek 2026 | CarAdvance'} description={description}>
+  <BlogPost slug={slug} title={title} lead={lead} related={["auto-lizing-maganszemelykent","ceges-auto-operativ-lizing-tartos-berlet","tartos-berlet-arak-2026"]}>
+    <div class="bp-tldr">
+      <h3>Röviden</h3>
+      <p>A <strong>zártvégű lízing</strong> végén az autó automatikusan a tiéd lesz — ezt választja a legtöbb magánszemély. A <strong>nyíltvégű pénzügyi lízing</strong> végén te döntesz (megveszed maradványértéken, kijelölsz vevőt vagy visszaadod), a havi részlet alacsonyabb, és cégként az áfa feltételekkel visszaigényelhető. Ha nem akarsz tulajdont, az <a href="/operativ-lizing/">operatív lízing</a> vagy a rugalmasabb <a href="/tartos-berlet/">tartós bérlet</a> a jobb út.</p>
+    </div>
+
+    <p>Az autólízingnél az első és legfontosabb döntés a konstrukció típusa. A <strong>zártvégű</strong> és a <strong>nyíltvégű</strong> lízing ugyanarra a célra szolgál — részletekben jutsz autóhoz —, de a futamidő végén, a havi részletben és az áfa kezelésében jelentősen eltérnek. Mutatjuk a különbségeket érthetően.</p>
+
+    <h2>Mi a zártvégű lízing?</h2>
+    <p>A <strong>zártvégű pénzügyi lízingnél</strong> a lízingcég megveszi az általad kiválasztott autót, te pedig havi díjat fizetsz. A futamidő alatt a finanszírozó a tulajdonos, te az üzembentartó vagy. Az utolsó díj megfizetése után a tulajdonjog <strong>automatikusan rád száll</strong> — nincs döntési helyzet, és jellemzően nincs nagy záró részlet sem.</p>
+    <ul>
+      <li><strong>Kinek ajánlott:</strong> elsősorban magánszemélyeknek.</li>
+      <li><strong>Áfa:</strong> a díjba épül, nem igényelhető vissza.</li>
+      <li><strong>Előny:</strong> kiszámítható, a végén biztosan a tiéd az autó.</li>
+      <li><strong>Hátrány:</strong> a havi részlet magasabb, mert a teljes finanszírozott összegre szól.</li>
+    </ul>
+
+    <h2>Mi a nyíltvégű pénzügyi lízing?</h2>
+    <p>A <strong>nyíltvégű lízingnél</strong> a szerződés egy <strong>maradványértékkel</strong> számol: a havi részlet csak az autó értékének egy részét fedezi, ezért alacsonyabb. A futamidő végén három lehetőséged van: megveszed az autót a maradványértéken, harmadik felet jelölsz ki vevőnek, vagy visszaadod.</p>
+    <ul>
+      <li><strong>Kinek ajánlott:</strong> jellemzően vállalkozásoknak.</li>
+      <li><strong>Áfa:</strong> a beszerzési ár áfája nem része a lízingtőkének; cégként a lízingdíjak tőkerészének áfája jogszabályi feltételekkel visszaigényelhető.</li>
+      <li><strong>Előny:</strong> alacsonyabb havi részlet, rugalmas lezárás.</li>
+      <li><strong>Hátrány:</strong> a futamidő végén a maradványértéket rendezni kell, ha megtartod az autót.</li>
+    </ul>
+
+    <h2>Zártvégű vs. nyíltvégű lízing — összehasonlítás</h2>
+    <table>
+      <thead><tr><th>Szempont</th><th>Zártvégű lízing</th><th>Nyíltvégű lízing</th></tr></thead>
+      <tbody>
+        <tr><td>Tulajdonjog a végén</td><td>automatikusan a tiéd</td><td>te döntesz: megveszed, vevőt jelölsz, visszaadod</td></tr>
+        <tr><td>Havi részlet</td><td>magasabb</td><td>alacsonyabb (maradványérték miatt)</td></tr>
+        <tr><td>Áfa</td><td>a díjba épül</td><td>cégként feltételekkel visszaigényelhető</td></tr>
+        <tr><td>Maradványérték</td><td>nincs vagy a díjba épül</td><td>a futamidő végén rendezendő</td></tr>
+        <tr><td>Jellemző ügyfél</td><td>magánszemély</td><td>vállalkozás</td></tr>
+      </tbody>
+    </table>
+    <p>A saját havi részletedet a <a href="/finanszirozas-lizing/">lízing kalkulátorunkkal</a> számolhatod ki zártvégű és nyíltvégű konstrukcióra, forint vagy euró alapon.</p>
+
+    <h2>És az operatív lízing?</h2>
+    <p>Az <a href="/operativ-lizing/">operatív lízing</a> nem pénzügyi, hanem bérleti jellegű: az autó soha nem lesz a tiéd, a futamidő (jellemzően 2–5 év) végén visszaadod, és full service változatban a díj a szervizt, a gumit és a biztosítást is tartalmazza. Főleg cégeknek és flottáknak szól.</p>
+
+    <h2>Ha nem kell tulajdon: tartós bérlet</h2>
+    <p>Sokan valójában nem akarják az autót a sajátjuknak — csak új autóval szeretnének járni, kiszámítható költséggel. Erre a <a href="/tartos-berlet/">tartós bérlet</a> a legegyszerűbb megoldás: nincs önerő (csak visszajáró kaució), a futamidő már 6 hónaptól indul, és a havidíjban benne van a szerviz, a gépjárműadó, a biztosítás és a gumi. Cégeknek: <a href="/tartos-berlet/cegeknek/">tartós bérlet cégeknek</a>, magánszemélyeknek: <a href="/tartos-berlet/maganszemelyeknek/">tartós bérlet magánszemélyeknek</a>.</p>
+
+    <h2>Gyakori kérdések</h2>
+    {faqs.map(([q, a]) => (<details class="bp-faq"><summary>{q}</summary><p>{a}</p></details>))}
+    <p style="font-size:13px;color:#667">Tájékoztató jellegű összefoglaló; a konkrét feltételek finanszírozónként eltérnek. Adózási kérdésekben egyeztess a könyvelőddel.</p>
+    <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
+  </BlogPost>
+</Base>
