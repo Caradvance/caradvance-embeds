@@ -2,6 +2,7 @@
 // Tartós bérlet céloldal — adatvezérelt (src/data/tartosBerlet.ts + src/data/rental.ts)
 import '../styles/eladom.css';
 import { allRentals, getVariant, fmt, VARIANT_LABEL, VARIANTS } from '../data/tartosBerlet';
+import { CONTENT } from '../data/rentalContent';
 
 const { vkey } = Astro.props as { vkey: string };
 const v = getVariant(vkey);
@@ -13,12 +14,33 @@ const min = cars.length ? cars[0].huf : 0;
 const max = cars.length ? Math.max(...cars.map((c) => c.huf)) : 0;
 const depMin = cars.length ? Math.min(...cars.map((c) => c.dep)) : 0;
 const depMax = cars.length ? Math.max(...cars.map((c) => c.dep)) : 0;
-const monthsMin = cars.length ? Math.min(...cars.map((c) => Math.min(...(c.months.length ? c.months : [6])))) : 6;
+const TB_MIN = 6; // tartós bérlet: 6 hónapos vagy hosszabb futamidő
+const monthsMin = TB_MIN;
 const cheapest = cars.length ? cars[0].name : '';
 const fill = (s: string) => s
   .replace(/\{min\}/g, fmt(min)).replace(/\{max\}/g, fmt(max)).replace(/\{n\}/g, String(cars.length))
   .replace(/\{depmin\}/g, fmt(depMin)).replace(/\{depmax\}/g, fmt(depMax)).replace(/\{dep\}/g, fmt(depMin))
   .replace(/\{cheapest\}/g, cheapest).replace(/\{minp\}/g, fmt(Math.ceil(min * 1.19 / 10000) * 10000));
+
+
+// ---- kártyák: ugyanaz a dizájn, mint az /autoink bérelhető kártyáin ----
+const LK: Record<string, string> = { VW: 'vw', BMW: 'bmw', Audi: 'audi', 'Mercedes-Benz': 'mercedes', MINI: 'mini', Hyundai: 'hyundai', CUPRA: 'cupra', Kia: 'kia', MAN: 'man', Seat: 'seat', SEAT: 'seat', Volvo: 'volvo' };
+const FC: Record<string, string> = { Benzin: '#e8820c', 'Dízel': '#6b7280', PHEV: '#00997E', Hibrid: '#00997E', Elektromos: '#0D79FF', EV: '#0D79FF' };
+const FL: Record<string, string> = { PHEV: 'Hibrid' };
+const FO: Record<string, number> = { Benzin: 1, Hibrid: 2, PHEV: 2, Elektromos: 3, EV: 3, 'Dízel': 4 };
+const logoOf = (c: any) => (LK[c.brand] ? '/bl-' + LK[c.brand] + '.webp' : '');
+const galOf = (c: any) => {
+  const g = ((CONTENT as any)[c.key]?.gallery || []).map((x: any) => x.img).filter((u: string) => u && !u.startsWith('/berles/') && u !== c.photo);
+  return g.slice(0, 8);
+};
+const fuelsOf = (c: any) => (c.fuels || []).slice().sort((a: string, b: string) => (FO[a] || 9) - (FO[b] || 9));
+const specsOf = (c: any) => [c.cat].concat(c.gears || []).filter(Boolean).join(' · ');
+const availOf = (c: any) => (c.now > 0 ? { cls: 'now', t: c.now + ' elérhető' } : { cls: 'pre', t: (c.later && c.later[0] && c.later[0].d) || 'Hamarosan' });
+const tipOf = (c: any) => `A forintár a napi árfolyammal számolt (1 € ≈ ${fmt(c.rate)} Ft). A feltüntetett ár nettó havidíj: ${fmt(c.eur)} €/hó + áfa (cégeknek). Magánszemélyek 19% német áfát fizetnek felette. A „-tól” a legkedvezőbb felszereltségre vonatkozik. Tartós bérlet: legalább ${TB_MIN} hónap.`;
+const CARDS_CSS = '.tb-cards .sub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}\n@media(max-width:920px){.tb-cards .sub-grid{grid-template-columns:1fr 1fr}}\n@media(max-width:600px){.tb-cards .sub-grid{grid-template-columns:1fr}}\n.tb-cards .sub-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s}\n.tb-cards .sub-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(8,8,10,.12);border-color:#d6deea}\n.tb-cards .sub-media{position:relative;aspect-ratio:49/26;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}\n.tb-cards .sub-media .sub-photo{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;padding:14px 8% 0;box-sizing:border-box;transform:translateY(6%)}\n.tb-cards .sub-media .car{width:66%;height:auto}\n.tb-cards .sub-avail{position:absolute;top:10px;right:11px;font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:999px}\n.tb-cards .sub-avail.now{background:#1DA851;color:#fff}\n.tb-cards .sub-avail.pre{background:rgba(255,255,255,.92);color:var(--navy)}\n.tb-cards .sub-body{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}\n.tb-cards .sub-title{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;color:var(--ink)}\n.tb-cards .sub-btn{margin-top:auto;display:block;text-align:center;background:var(--navy);color:#fff;font-weight:700;font-size:13.5px;padding:11px;border-radius:999px;text-decoration:none;transition:background .15s}\n.tb-cards .sub-btn:hover{background:var(--red)}\n.tb-cards .sub-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:visible;display:flex;flex-direction:column}\n.tb-cards .sub-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.10);transform:translateY(-3px)}\n.tb-cards .sub-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:center;justify-content:center;padding:10px;border-radius:20px 20px 0 0;overflow:hidden}\n.tb-cards .sub-fuels{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}\n.tb-cards .sub-fuel{color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12)}\n.tb-cards .sub-avail{position:absolute;left:12px;top:12px;right:auto;bottom:auto;width:auto;max-width:none;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.18)}\n.tb-cards .sub-avail.now{background:#00997E;color:#fff}\n.tb-cards .sub-avail.pre{background:#6b7280;color:#fff}\n.tb-cards .sub-body{padding:16px 20px 14px}\n.tb-cards .sub-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}\n.tb-cards .sub-brand2{display:inline-flex;align-items:center}\n.tb-cards .sub-sbadge{height:22px;width:auto;margin-left:12px;display:block}\n.tb-cards .sub-mlogo2{height:auto;max-height:22px;width:auto;max-width:52px;object-fit:contain;filter:brightness(0)}\n.tb-cards .sub-year{font-size:13px;color:var(--muted);text-align:right}\n.tb-cards .sub-title{font-size:22px;font-weight:800;color:var(--navy);margin:0 0 6px;line-height:1.2}\n.tb-cards .sub-specs{font-size:14px;color:var(--muted);margin:0 0 4px}\n.tb-cards .sub-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#c9d2e0;color:#fff;font-size:11px;font-weight:700;font-style:normal;line-height:1;cursor:help;flex:0 0 auto}\n.tb-cards .sub-info .sub-tip{position:absolute;bottom:150%;right:0;width:min(290px,80vw);white-space:normal;background:var(--navy);color:#fff;font-size:12px;font-weight:500;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;text-align:left}\n.tb-cards .sub-info:hover .sub-tip,.tb-cards .sub-info:focus .sub-tip{opacity:1;visibility:visible}\n.tb-cards .sub-price .sub-info{position:static}\n.tb-cards .sub-price .sub-info .sub-tip{left:0;right:0;width:auto;bottom:calc(100% + 8px)}\n.tb-cards .sub-info .sub-tip::after{content:"";position:absolute;left:0;right:0;top:100%;height:14px}\n.tb-cards .sub-info:focus-within .sub-tip{opacity:1;visibility:visible}\n.tb-cards .sub-info .sub-tip{transition:opacity .15s .25s,visibility 0s .4s}\n.tb-cards .sub-info:hover .sub-tip,.tb-cards .sub-info:focus-within .sub-tip{transition:opacity .15s,visibility 0s}\n.tb-cards .sub-tip a{pointer-events:auto}\n.tb-cards .sub-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px}\n.tb-cards .sub-btn{display:block;width:100%;box-sizing:border-box;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;font-size:15px;padding:14px;border:0;border-radius:12px;text-decoration:none;font-family:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;transition:.15s}\n.tb-cards .sub-det{display:block;text-align:center;background:#eef2f8;color:var(--navy);font-weight:700;font-size:15px;padding:14px;border-radius:12px;text-decoration:none;transition:.15s}\n.tb-cards .sub-card:hover .sub-det,.tb-cards .sub-det:hover{background:var(--navy);color:#fff}\n.tb-cards .sub-card:hover .sub-btn,.tb-cards .sub-btn:hover{background:#e2001a;color:#fff}\n@media(hover:hover){.tb-cards .sub-fuels{opacity:0;transition:opacity .18s}.tb-cards .sub-card:hover .sub-fuels{opacity:1}}\n.tb-cards .sub-media .sub-gal{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}\n.tb-cards .sub-media .sub-gal::-webkit-scrollbar{display:none}\n.tb-cards .sub-media .sub-slide{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff}\n.tb-cards .sub-media .sub-slide .sub-gimg{width:100%;height:100%;object-fit:cover;display:block;background:#eef1f5}\n.tb-cards .sub-media .sub-gbtn{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.94);box-shadow:0 2px 10px rgba(0,0,0,.18);font-size:22px;line-height:32px;padding:0;color:#0b0b0d;cursor:pointer;opacity:0;transition:opacity .15s;z-index:5}\n.tb-cards .sub-media .sub-gprev{left:10px}\n.tb-cards .sub-media .sub-gnext{right:10px}\n.tb-cards .sub-card:hover .sub-gbtn{opacity:1}\n@media(hover:none){.tb-cards .sub-media .sub-gbtn{opacity:.92;width:30px;height:30px;line-height:28px;font-size:19px}}\n.tb-cards .sub-media:has(.sub-gdots) .sub-gal{bottom:22px}\n.tb-cards .sub-media:has(.sub-gdots) .sub-gbtn{top:calc(50% - 11px)}\n.tb-cards .sub-media .sub-gdots{position:absolute;left:0;right:0;bottom:7px;display:flex;justify-content:center;gap:5px;z-index:5;pointer-events:none}\n.tb-cards .sub-media .sub-gdots i{width:6px;height:6px;border-radius:3px;background:rgba(11,11,13,.28);transition:width .15s,background .15s}\n.tb-cards .sub-media .sub-gdots i.on{background:#e2001a;width:16px}\n.tb-cards .sub-media .sub-fuels,.tb-cards .sub-media .sub-avail{z-index:6}';
+const RB_CSS = '\n.tb .rb-wrap{margin:0 0 26px}\n.tb .rb-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}\n@media(max-width:1100px){.tb .rb-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}\n@media(max-width:560px){.tb .rb-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding:2px 2px 10px;scrollbar-width:none}.tb .rb-grid::-webkit-scrollbar{display:none}.tb .rb-card{flex:0 0 72%;scroll-snap-align:start}}\n.tb .rb-card{background:#fff;border:1px solid #eceff4;border-radius:22px;box-shadow:0 10px 30px rgba(11,15,30,.05);padding:22px 20px 18px;display:flex;flex-direction:column;align-items:center;text-align:center}\n.tb .rb-h{font-size:26px;line-height:1.1;font-weight:800;letter-spacing:-.02em;color:#0b0b0d;margin:0}\n.tb .rb-h em{font-style:normal;color:#e2001a}\n.tb .rb-p{font-size:14.5px;line-height:1.45;color:#5b6475;font-weight:600;margin:10px 0 0;min-height:42px}\n.tb .rb-v{margin-top:auto;padding-top:14px;border-top:1px solid #eceff4;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;min-height:58px;margin-top:14px}\n.tb .rb-v svg{width:38px;height:38px;flex:0 0 38px}\n.tb .rb-pill{white-space:nowrap;font-weight:800;font-size:17px;color:#0b0b0d;background:#f3f5f9;border:1px solid #e6eaf1;border-radius:12px;padding:7px 13px;letter-spacing:.02em}\n.tb .rb-odo{font-family:ui-monospace,Menlo,monospace;font-weight:800;font-size:17px;background:#0b0b0d;color:#fff;border-radius:8px;padding:6px 10px;letter-spacing:.18em}\n.tb .rb-plate{display:inline-flex;align-items:stretch;border:2px solid #0b0b0d;border-radius:7px;overflow:hidden;background:#fff;height:38px}\n.tb .rb-plate i{background:#1d4ed8;color:#fff;font-style:normal;font-weight:800;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:3px 6px 4px;line-height:1}\n.tb .rb-plate i:before{content:"★";color:#facc15;font-size:9px;margin-bottom:3px}\n.tb .rb-plate b{font-family:"Arial Narrow",Arial,sans-serif;font-weight:800;font-size:21px;letter-spacing:.06em;color:#0b0b0d;display:flex;align-items:center;padding:0 10px}\n/* asztali: cím – szöveg – ikon soronként egy vonalban (subgrid) */\n@supports (grid-template-rows:subgrid){@media(min-width:561px){.tb .rb-card{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;justify-items:center;align-items:start}.tb .rb-h{align-self:start}.tb .rb-p{min-height:0;align-self:start}.tb .rb-v{align-self:end;margin-top:16px}}}\n@supports not (grid-template-rows:subgrid){.tb .rb-card .rb-v{margin-top:auto}.tb .rb-p{margin-bottom:14px}.tb .rb-h{min-height:2.2em}}\n@media(max-width:560px){.tb .rb-card{padding:16px 12px 12px;border-radius:18px}.tb .rb-h{font-size:19px}.tb .rb-p{font-size:12.5px;min-height:0}.tb .rb-v{min-height:44px;gap:8px}.tb .rb-v svg{width:30px;height:30px;flex-basis:30px}.tb .rb-pill,.tb .rb-odo{font-size:14px}.tb .rb-plate{height:30px}.tb .rb-plate b{font-size:15px;padding:0 6px}}\n';
+const RB_HTML = '<div class="rb-wrap"><div class="rb-grid">\n<div class="rb-card"><p class="rb-h">0 km <em>új autó</em></p><p class="rb-p">Vadonatúj, gyári garanciás autó — nem használt flottaautó.</p><div class="rb-v"><span class="rb-odo">000000</span><span class="rb-pill">km</span></div></div>\n<div class="rb-card"><p class="rb-h">Alacsony <em>kaució</em></p><p class="rb-p">Egyszeri, 2 500 €-tól — a bérlés végén visszajár.</p><div class="rb-v"><span class="rb-pill">2 500 €-tól</span><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="m9 12 2 2 4-4"/></svg></div></div>\n<div class="rb-card"><p class="rb-h">Casco <em>biztosítás</em></p><p class="rb-p">A casco benne van a havidíjban — nyugodtan vezethetsz.</p><div class="rb-v"><svg viewBox="0 0 24 24" fill="none" stroke="#0b0b0d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.3 7.5 9.5 4.4-1.2 7.5-4.9 7.5-9.5V6L12 3z"/><path d="m8.8 12.2 2.3 2.3 4.4-4.6" stroke="#e2001a" stroke-width="2.2"/></svg><span class="rb-pill">a díjban</span></div></div>\n<div class="rb-card"><p class="rb-h">Nyári + téli <em>gumi</em></p><p class="rb-p">Mindkét gumiszett jár, a szezonális cserével együtt.</p><div class="rb-v"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M4 6.5l16 11M4 17.5l16-11M9.5 3.5 12 6l2.5-2.5M9.5 20.5 12 18l2.5 2.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="#0b0b0d" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3v4.5M12 16.5V21M3 12h4.5M16.5 12H21"/></svg></div></div>\n<div class="rb-card"><p class="rb-h">Német <em>rendszám</em></p><p class="rb-p">Az autó a Caradvance GmbH (München) nevén fut, német rendszámmal.</p><div class="rb-v"><span class="rb-plate"><i>D</i><b>M · CA 2026</b></span></div></div>\n<div class="rb-card"><p class="rb-h">Szerviz + <em>adó</em></p><p class="rb-p">Karbantartás, szerviz és gépjárműadó — mind a havidíjban.</p><div class="rb-v"><svg viewBox="0 0 24 24" fill="none" stroke="#0b0b0d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.4 2.4-2.1-.4-.4-2.1 2.6-2.2z"/></svg><span class="rb-pill">0 Ft extra</span></div></div>\n<div class="rb-card"><p class="rb-h">Rugalmas <em>futamidő</em></p><p class="rb-p">6 hónaptól, 4 000 km/hó kerettel — utána új modellre válthatsz.</p><div class="rb-v"><svg viewBox="0 0 24 24" fill="none" stroke="#0b0b0d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9 14.5 2 2 4-4" stroke="#e2001a" stroke-width="2.2"/></svg><span class="rb-pill">4 000 km/hó</span></div></div>\n<div class="rb-card"><p class="rb-h">Nincs <em>önerő</em></p><p class="rb-p">Nincs önerő, nincs értékvesztés, nincs eladási gond.</p><div class="rb-v"><span class="rb-pill">0 Ft önerő</span><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg></div></div>\n</div></div>'.split('2 500 €-tól').join(String(depMin).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €-tól');
+const GAL_JS = "(function(){if(window.__subGal)return;window.__subGal=1;\nfunction load(g,i){var s=g.children[i];if(!s)return;var im=s.querySelector('img[data-src]');if(im){im.src=im.getAttribute('data-src');im.removeAttribute('data-src');}}\nfunction idx(g){return Math.round(g.scrollLeft/Math.max(1,g.clientWidth));}\nfunction upd(g){if(g._ti&&Date.now()-g._ti<700)return;var i=idx(g);g._i=i;load(g,i);load(g,i+1);var d=g.parentNode.querySelectorAll('.sub-gdots i');for(var k=0;k<d.length;k++)d[k].className=k===i?'on':'';}\ndocument.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.sub-gbtn');if(!b)return;e.preventDefault();e.stopPropagation();var g=b.parentNode.querySelector('.sub-gal');if(!g)return;var n=g.children.length,cur=(g._i!=null&&Date.now()-(g._ti||0)<900)?g._i:idx(g),i=cur+(b.classList.contains('sub-gnext')?1:-1);if(i<0)i=n-1;if(i>=n)i=0;g._i=i;g._ti=Date.now();load(g,i);load(g,i+1);var d=g.parentNode.querySelectorAll('.sub-gdots i');for(var k=0;k<d.length;k++)d[k].className=k===i?'on':'';g.scrollTo({left:i*g.clientWidth,behavior:'smooth'});},true);\ndocument.addEventListener('scroll',function(e){var g=e.target;if(g&&g.classList&&g.classList.contains('sub-gal')){clearTimeout(g._t);g._t=setTimeout(function(){upd(g);},60);}},true);\ndocument.addEventListener('mouseover',function(e){var c=e.target.closest&&e.target.closest('.sub-card');if(c&&!c._gl){c._gl=1;var g=c.querySelector('.sub-gal');if(g)load(g,1);}},true);\ndocument.addEventListener('touchstart',function(e){var g=e.target.closest&&e.target.closest('.sub-gal');if(g){load(g,1);load(g,idx(g)+1);}},{capture:true,passive:true});})();";
 
 const href = (c: any) => `/berelheto-auto/${c.slug}-berles/`;
 const fuelHu = (f: string) => ({ Benzin: 'benzin', 'Dízel': 'dízel', PHEV: 'plug-in hibrid', Hibrid: 'hibrid', Elektromos: 'elektromos' } as any)[f] || f;
@@ -53,7 +75,7 @@ const serviceJson = {
     '@type': 'Offer', url: SITE + href(c), itemOffered: { '@type': 'Car', name: c.name, brand: { '@type': 'Brand', name: c.brand } },
     priceSpecification: { '@type': 'UnitPriceSpecification', price: c.huf, priceCurrency: 'HUF', unitCode: 'MON', valueAddedTaxIncluded: false } })) },
 };
-const calc = cars.map((c) => ({ n: c.name, h: c.huf, d: c.depHuf, m: Math.min(...(c.months.length ? c.months : [6])) }));
+const calc = cars.map((c) => ({ n: c.name, h: c.huf, d: c.depHuf, m: TB_MIN }));
 const related = v.related.map((k) => VARIANTS.find((x) => x.key === k)).filter(Boolean) as any[];
 const VID: Record<string, [string, string]> = {
   bmw: ['/caradvance-hero-x5.mp4', '/caradvance-hero-x5-poster.jpg'],
@@ -84,8 +106,10 @@ const [video, poster] = VID[v.key] || ['/caradvance-hero-beszerzesi.mp4', '/cara
 <div><b>{cars.length}</b><span>bérelhető modell</span></div>
 <div><b>{fmt(min)} Ft</b><span>havidíj -tól (nettó)</span></div>
 <div><b>{fmt(depMin)} €</b><span>visszajáró kaució -tól</span></div>
-<div><b>{monthsMin} hónap</b><span>minimális futamidő</span></div>
+<div><b>{TB_MIN} hónaptól</b><span>tartós bérlet futamidő</span></div>
 </section>
+
+<section class="tb-ben wrap"><Fragment set:html={RB_HTML} /></section>
 
 <section class="section tb-intro"><div class="wrap tb-text">
 <span class="eyebrow">{v.eyebrow}</span>
@@ -95,33 +119,47 @@ const [video, poster] = VID[v.key] || ['/caradvance-hero-beszerzesi.mp4', '/cara
 <section class="section" id="autok" style="padding-top:8px">
 <div class="wrap center"><span class="eyebrow">Bérelhető autók</span><h2 class="sec-title">{fill(v.h1a)}: modellek és havidíjak</h2>
 <p class="sec-intro">Valós, naponta frissülő nettó havidíjak. Kattints egy modellre a változatokért, színekért és az ajánlatkérésért.</p></div>
+<div class="tb-cards">
 {groups.map((g) => (
 <div class="wrap tb-group">
 {groups.length > 1 && <h3 class="tb-gh">{CATHU[g.cat] || g.cat} <small>{g.list.length} modell</small></h3>}
-<div class="tb-grid">
-{g.list.map((c: any) => (
-<a class="tb-card" href={href(c)}>
-<div class="tb-img"><img src={c.photo} alt={`${c.name} tartós bérlet`} loading="lazy" width="480" height="300" /></div>
-<div class="tb-body">
-<div class="tb-name">{c.name}</div>
-<div class="tb-meta">{c.fuels.map(fuelHu).join(' · ')}{c.count > 0 && <> · <span class="tb-av">{c.count} db</span></>}</div>
-<div class="tb-price"><b>{fmt(c.huf)} Ft</b><span>/hó nettó-tól</span></div>
-<div class="tb-sub">Kaució {fmt(c.dep)} € · {Math.min(...(c.months.length ? c.months : [6]))} hónaptól · {fmt(c.km.length ? c.km[0] : 4000)} km/hó</div>
-<span class="tb-btn">Részletek és ajánlat →</span>
+<div class="sub-grid">
+{g.list.map((c: any) => { const gl = galOf(c); const av = availOf(c); const fs = fuelsOf(c); const lg = logoOf(c); return (
+<div class="sub-card">
+<div class="sub-media">
+{gl.length ? (<Fragment>
+<div class="sub-gal"><div class="sub-slide sub-slide0"><img class="sub-photo" src={c.photo} alt={`${c.name} tartós bérlet`} loading="lazy" /></div>{gl.map((u: string, i: number) => (<div class="sub-slide"><img class="sub-gimg" data-src={u} alt={`${c.name} – fotó ${i + 2}`} /></div>))}</div>
+<button type="button" class="sub-gbtn sub-gprev" aria-label="Előző kép">‹</button><button type="button" class="sub-gbtn sub-gnext" aria-label="Következő kép">›</button>
+<div class="sub-gdots"><i class="on"></i>{gl.map(() => <i></i>)}</div>
+</Fragment>) : (<img class="sub-photo" src={c.photo} alt={`${c.name} tartós bérlet`} loading="lazy" />)}
+<div class="sub-fuels">{fs.map((f: string) => <span class="sub-fuel" style={`background:${FC[f] || '#4b5563'}`}>{FL[f] || f}</span>)}</div>
+<span class={`sub-avail ${av.cls}`}>{av.t}</span>
 </div>
-</a>
+<div class="sub-body">
+<div class="sub-meta"><span class="sub-brand2">{lg ? <img class="sub-mlogo2" src={lg} alt={c.brand} /> : <b>{c.brand}</b>}</span><span class="sub-year">0 km · 2026</span></div>
+<h3 class="sub-title">{c.name}</h3>
+<div class="sub-specs">{specsOf(c)}</div>
+<div class="ca-pbox" data-bteur={c.eur} data-fx={c.rate}><div class="ca-ptop"><span class="ca-seg" role="group" aria-label="Ár megjelenítése"><button type="button" data-bt="c" class="on" aria-pressed="true">Cég</button><button type="button" data-bt="p" aria-pressed="false">Magán</button></span><span class="ca-pt">nettó</span></div><div class="ca-prow"><b class="ca-pv">{fmt(c.huf)} Ft</b><span class="ca-pm">/hó -tól</span><span class="sub-info" tabindex="0">i<span class="sub-tip">{tipOf(c)}</span></span></div><div class="ca-pe">{fmt(c.eur)} €/hó · nettó</div><div class="sub-dep">Kaució: {fmt(c.depHuf)} Ft ({fmt(c.dep)} €)-tól · visszajár</div></div>
+<div class="sub-terms2">{TB_MIN} hónaptól · {fmt(c.km.length ? c.km[0] : 4000)} km/hó{c.count > 0 && <> · <b>{c.count} db</b> a flottában</>}</div>
+</div>
+<div class="sub-actions"><a class="sub-det" href={href(c)}>Részletek</a><a class="sub-btn sub-rent" href={'/kapcsolat?berles=' + encodeURIComponent(c.name)} data-name={c.key} data-photo={c.photo} data-logo={lg} data-price={`${fmt(c.huf)} Ft · ${fmt(c.eur)} €/hó-tól`} data-colors={(c.colorsHex || []).join('~')}>Ajánlatot kérek</a></div>
+</div>
+); })}
+</div>
+</div>
 ))}
 </div>
-</div>
-))}
 </section>
 
+
+
+{v.points && (
 <section class="section" style="padding-top:8px">
-<div class="wrap center"><span class="eyebrow">Előnyök</span><h2 class="sec-title">Miért tartós bérlet?</h2></div>
+<div class="wrap center"><span class="eyebrow">Előnyök</span><h2 class="sec-title">Miért tartós bérlet {VARIANT_LABEL[v.key].replace(/^Tartós bérlet\s*/i, '')}?</h2></div>
 <div class="wrap tb-points">
 {points.map(([t, d], i) => (<div class="tb-pt"><span class="tb-n">{String(i + 1).padStart(2, '0')}</span><h3>{t}</h3><p>{d}</p></div>))}
 </div>
-</section>
+</section>)}
 
 <section class="section" id="kalkulator" style="padding-top:8px">
 <div class="wrap center"><span class="eyebrow">Kalkulátor</span><h2 class="sec-title">Tartós bérlet kalkulátor</h2>
@@ -150,7 +188,7 @@ const [video, poster] = VID[v.key] || ['/caradvance-hero-beszerzesi.mp4', '/cara
 <h2>Tartós bérlet árak — teljes árlista</h2>
 <div class="tb-tw"><table class="tb-table">
 <thead><tr><th>Modell</th><th>Kategória</th><th>Havidíj (nettó)</th><th>Magánszemélynek</th><th>Kaució</th><th>Futamidő</th></tr></thead>
-<tbody>{cars.map((c: any) => (<tr><td><a href={href(c)}>{c.name}</a></td><td>{c.cat}</td><td>{fmt(c.huf)} Ft</td><td>{fmt(Math.ceil(c.huf * 1.19 / 10000) * 10000)} Ft</td><td>{fmt(c.dep)} €</td><td>{Math.min(...(c.months.length ? c.months : [6]))} hó-tól</td></tr>))}</tbody>
+<tbody>{cars.map((c: any) => (<tr><td><a href={href(c)}>{c.name}</a></td><td>{c.cat}</td><td>{fmt(c.huf)} Ft</td><td>{fmt(Math.ceil(c.huf * 1.19 / 10000) * 10000)} Ft</td><td>{fmt(c.dep)} €</td><td>{TB_MIN} hó-tól</td></tr>))}</tbody>
 </table></div>
 <p class="tb-note">A havidíjak nettó, -tól árak, havi kb. 4000 km futáskerettel; a forintár a napi euróárfolyamtól, a pontos díj a változattól, színtől és csomagtól függ.</p>
 {(v.extra || []).map((x) => (<><h2>{x.h}</h2>{x.p.map((p) => <p set:html={p} />)}</>))}
@@ -176,6 +214,8 @@ const [video, poster] = VID[v.key] || ['/caradvance-hero-beszerzesi.mp4', '/cara
 </div>
 </section>
 
+<link rel="stylesheet" href="/ca-bt.css?v=1" /><script is:inline src="/ca-bt.js?v=5" defer></script>
+<Fragment set:html={'<style>' + CARDS_CSS + RB_CSS + '</style><script>' + GAL_JS + '</script>'} />
 <script type="application/ld+json" set:html={JSON.stringify(faqJson)}></script>
 <script type="application/ld+json" set:html={JSON.stringify(crumbJson)}></script>
 <script type="application/ld+json" set:html={JSON.stringify(serviceJson)}></script>
@@ -194,7 +234,11 @@ const [video, poster] = VID[v.key] || ['/caradvance-hero-beszerzesi.mp4', '/cara
 .tb-text p{color:#3d4656;font-size:16px;line-height:1.7;margin:0 0 14px}
 .tb-text h2{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:30px 0 14px}
 .tb-text a,.tb-faq a{color:var(--red);font-weight:600}
-.tb-group{margin-top:22px}
+.tb-group{margin-top:26px}
+.tb-ben{margin-top:22px}
+.tb-cards{--navy:#0B0B0D;--ink:#141519;--muted:#5A6B82;--line:#E6EAF1;--red:#E2001A}
+.tb-cards .sub-dep{font-size:12px;color:#6b7280;font-weight:600;margin-top:8px;padding-top:7px;border-top:1px solid #e3e8f0}
+.tb-cards .sub-terms2{font-size:12.5px;color:var(--muted);font-weight:600;margin:8px 0 2px}.tb-cards .sub-terms2 b{color:#0a8a3a}
 .tb-gh{font-size:20px;font-weight:800;color:var(--ink);margin:0 0 12px}.tb-gh small{font-size:13px;color:var(--muted);font-weight:600;margin-left:6px}
 .tb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .tb-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
