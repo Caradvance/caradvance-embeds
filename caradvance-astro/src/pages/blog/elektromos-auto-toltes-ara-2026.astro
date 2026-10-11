@@ -96,7 +96,7 @@ const faqJson = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEnti
     </ol>
 
     <h2>Elektromos autó tartós bérletben</h2>
-    <p>Elektromos autót kipróbálnál, de nem akarsz akkumulátor- és értékvesztési kockázatot? Az <a href="/tartos-berlet/elektromos-auto/">elektromos autó tartós bérlet</a> havidíja tartalmazza a szervizt, a biztosítást és a gumikat. Néhány bérelhető modell:</p>
+    <p>Elektromos autót kipróbálnál, de nem akarsz akkumulátor- és értékvesztési kockázatot? Az <a href="/tartos-berlet/#elektromos">elektromos autó tartós bérlet</a> havidíja tartalmazza a szervizt, a biztosítást és a gumikat. Néhány bérelhető modell:</p>
     <table>
       <thead><tr><th>Modell</th><th>Havidíj (nettó) -tól</th></tr></thead>
       <tbody>{evs.map((c) => (<tr><td><a href={`/berelheto-auto/${c.slug}-berles/`}>{c.name}</a></td><td>{fmt(c.huf)} Ft</td></tr>))}</tbody>
