@@ -170,12 +170,34 @@ function addCompare(p, h) {
   return h.replace(/<\/body>/i, js + sortJs + '</body>');
 }
 
+
+// Megosztási kép (LinkedIn/Facebook): az alap X5-poszter helyett márkás og-kép nyelvenként (2026-10)
+const OG_OLD = 'https://www.caradvance.hu/caradvance-hero-x5-poster.jpg';
+const OG_ALT = { hu: 'CarAdvance – prémium autók Németországból: új autó rendelés, import, tartós bérlet', de: 'CarAdvance – Premium-Autos aus Deutschland: Neuwagen-Bestellung, Import, Langzeitmiete', en: 'CarAdvance – premium cars from Germany: new car orders, import, long-term rental' };
+function ogImg(p, h) {
+  if (!h.includes(OG_OLD)) return h;
+  const seg = path.relative(DIST, p).split(path.sep)[0];
+  const lang = seg === 'de' ? 'de' : /^(en|fr|uk|zh|sk|cs)$/.test(seg) ? 'en' : 'hu';
+  const img = 'https://www.caradvance.hu/og-caradvance' + (lang === 'hu' ? '' : '-' + lang) + '.jpg';
+  let hit = false;
+  h = h.replace(/<meta\s+(property="og:image(?::url|:secure_url)?"|name="twitter:image")\s+content="([^"]*)"\s*\/?>/g, (m, k, v) => {
+    if (v !== OG_OLD) return m; hit = true; return '<meta ' + k + ' content="' + img + '">';
+  });
+  if (hit && !/property="og:image:width"/.test(h)) {
+    h = h.replace(/<\/head>/i, '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="' + OG_ALT[lang] + '"></head>');
+  }
+  if (hit) ogn++;
+  return h;
+}
+let ogn = 0;
+
 function fix(p) {
   let h = fs.readFileSync(p, 'utf8');
   const o = h;
   if (h.includes('id="ca-perf"')) return;
   h = renameRental(p, h);
   h = addCompare(p, h);
+  h = ogImg(p, h);
 
   // 1) Google Fonts: nem blokkoló betöltés
   h = h.replace(/<link\s+href="(https:\/\/fonts\.googleapis\.com\/css2\?[^"]+)"\s+rel="stylesheet"\s*\/?>/g, (m, href) => {
@@ -224,6 +246,7 @@ function fix(p) {
 try {
   if (fs.existsSync(DIST)) walk(DIST);
   console.log(`[perf] összehasonlítás gomb az autókártyákon: ${cmpPages} oldal, ${Object.keys(CMP).length} modell`);
+  console.log(`[perf] megosztási kép (og:image) cserélve: ${ogn} oldal`);
   console.log(`[perf] ${files} oldal, módosítva ${changed} · font ${fonts} · css ${css} · videó ${vids}`);
 } catch (e) { console.log('[perf] hiba: ' + (e && e.message)); }
 process.exit(0);
