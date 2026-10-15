@@ -191,6 +191,31 @@ function ogImg(p, h) {
 }
 let ogn = 0;
 
+
+// Bérlési űrlap: kívánt kezdő dátum (naptár, min. +10 nap / elérhetőség hónapja) + Choice link az admin e-mailbe (2026-10)
+const AB_DATE_JS = `<script id="ca-abdate">(function(){
+var seg=(location.pathname.split('/')[1]||'');var LG=/^(en|fr|uk|zh|sk|cs)$/.test(seg)?'en':(seg==='de'?'de':'hu');
+var T={hu:{lbl:'7. Mikortól bérelnéd?',tip:'Az autót Németországból hozzuk: a megrendeléstől számítva legalább 10 nap kell, mire átveheted. Későbbi elérhetőségű autónál a legkorábbi dátum az elérhetőség hónapjának első napja.',note:'Legkorábbi átvétel: ',err:'Kérlek válaszd ki, mikortól szeretnéd bérelni az autót.',errMin:'A legkorábbi lehetséges kezdés: '},
+en:{lbl:'7. When would you like the rental to start?',tip:'We bring the car from Germany: it takes at least 10 days from your order until handover. For cars available later, the earliest date is the first day of that month.',note:'Earliest handover: ',err:'Please choose when you would like the rental to start.',errMin:'The earliest possible start is '},
+de:{lbl:'7. Ab wann möchten Sie mieten?',tip:'Wir bringen das Auto aus Deutschland: Ab Bestellung dauert es mindestens 10 Tage bis zur Übergabe. Bei später verfügbaren Autos ist der früheste Termin der erste Tag des jeweiligen Monats.',note:'Frühestmögliche Übergabe: ',err:'Bitte wählen Sie, ab wann Sie das Auto mieten möchten.',errMin:'Frühestmöglicher Beginn: '}}[LG];
+var HUM=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+var LEAD=10;
+function p2(n){return (n<10?'0':'')+n;}
+function iso(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());}
+function huD(s){var a=s.split('-');return a[0]+'. '+HUM[+a[1]-1]+' '+(+a[2])+'.';}
+function nice(s){if(LG==='hu')return huD(s);try{return new Date(s+'T12:00:00').toLocaleDateString(LG==='de'?'de-DE':'en-GB',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}}
+function minDate(m){var d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+LEAD);var av=m.querySelector('input[name="avail"]:checked');var v=av?av.value:'';var r=/(\\d{4})\\.\\s*([a-záéíóöőúüű]+)/i.exec(v||'');if(r){var mi=HUM.indexOf(r[2].toLowerCase());if(mi>-1){var f=new Date(+r[1],mi,1,12);if(f>d)d=f;}}return iso(d);}
+var MAP=null,MAPL=0;function loadMap(){if(MAP||MAPL)return;MAPL=1;fetch('/abo-links.json').then(function(r){return r.json();}).then(function(j){MAP=j.m||{};}).catch(function(){MAPL=0;});}
+function choiceLink(m){var f=m.querySelector('#abForm');if(!f)return '';var fd=new FormData(f);var car=(fd.get('car')||'').trim(),fu=fd.get('fuel')||'',co=fd.get('color')||'',tr=fd.get('ausstattung')||'';var M=MAP||{};var k=[[car,fu,co,tr],[car,'','',tr],[car,fu,co,''],[car,'','','']];for(var i=0;i<k.length;i++){var v=M[k[i].join('|')];if(v)return 'https://fleetshop.choice.de/offer-details/'+v;}return 'https://fleetshop.choice.de/abo';}
+function sync(m){var inp=m.querySelector('#abStart');if(!inp)return;var mn=minDate(m);inp.min=mn;if(!inp.value||inp.value<mn)inp.value=mn;var n=m.querySelector('#abStartNote');if(n)n.textContent=T.note+nice(mn);}
+function add(m){if(m.querySelector('#abDateBlock'))return;var anchor=m.querySelector('#abAusInfo')||m.querySelector('#abAus');if(!anchor)return;var b=document.createElement('div');b.className='ab-block';b.id='abDateBlock';b.innerHTML='<div class="ab-label">'+T.lbl+'<span class="ab-av-i" tabindex="0">i<span class="ab-av-tip">'+T.tip+'</span></span></div><input type="date" name="startdate" id="abStart" required style="width:100%;font-family:inherit;font-size:15px;color:var(--ink,#141519);background:#f7f9fc;border:1.5px solid var(--line,#E6EAF1);border-radius:10px;padding:11px 12px;outline:none;min-height:46px"><div id="abStartNote" style="margin-top:8px;font-size:12.5px;color:#0a6b3b;font-weight:600"></div>';anchor.parentNode.insertBefore(b,anchor.nextSibling);m.addEventListener('click',function(e){if(e.target.closest('.ab-opt'))setTimeout(function(){sync(m);},0);});var inp=b.querySelector('#abStart');inp.addEventListener('change',function(){var mn=inp.min;if(inp.value&&inp.value<mn)inp.value=mn;});sync(m);}
+function patchExtras(){var o=window.caLeadExtras;if(o&&o.__ab)return;var w=function(){var r={};try{if(o)r=o.apply(this,arguments)||{};}catch(e){}try{var m=document.getElementById('abRent');if(m&&m.getAttribute('aria-hidden')==='false'){var inp=m.querySelector('#abStart');if(inp&&inp.value)r['Kívánt átvétel']=huD(inp.value);r['Choice link']=choiceLink(m);}}catch(e){}return r;};w.__ab=1;window.caLeadExtras=w;}
+document.addEventListener('submit',function(e){var f=e.target;if(!f||f.id!=='abForm')return;var m=document.getElementById('abRent');var inp=m&&m.querySelector('#abStart');if(!inp)return;patchExtras();var mn=minDate(m);var bad=!inp.value?T.err:(inp.value<mn?T.errMin+nice(mn):'');if(bad){e.preventDefault();e.stopImmediatePropagation();var g=m.querySelector('#abMsg');if(g){g.className='ab-msg err';g.textContent=bad;}inp.focus();}},true);
+function tick(){var m=document.getElementById('abRent');if(m&&m.getAttribute('aria-hidden')==='false'){loadMap();add(m);patchExtras();if(!m.__abo){m.__abo=1;}var inp=m.querySelector('#abStart');if(inp&&(!inp.value||inp.value<minDate(m)))sync(m);}}
+try{new MutationObserver(function(){tick();}).observe(document.documentElement,{attributes:true,subtree:true,attributeFilter:['aria-hidden']});}catch(e){}
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.sub-rent,[data-abx]'))setTimeout(tick,50);},true);
+})();</script>`;
+let abd = 0;
 function fix(p) {
   let h = fs.readFileSync(p, 'utf8');
   const o = h;
@@ -198,6 +223,7 @@ function fix(p) {
   h = renameRental(p, h);
   h = addCompare(p, h);
   h = ogImg(p, h);
+  if (h.includes('window.__ABCFG') && !h.includes('id="ca-abdate"')) { h = h.replace(/<\/body>(?![\s\S]*<\/body>)/i, AB_DATE_JS + '</body>'); abd++; }
 
   // 1) Google Fonts: nem blokkoló betöltés
   h = h.replace(/<link\s+href="(https:\/\/fonts\.googleapis\.com\/css2\?[^"]+)"\s+rel="stylesheet"\s*\/?>/g, (m, href) => {
@@ -246,6 +272,7 @@ function fix(p) {
 try {
   if (fs.existsSync(DIST)) walk(DIST);
   console.log(`[perf] összehasonlítás gomb az autókártyákon: ${cmpPages} oldal, ${Object.keys(CMP).length} modell`);
+  console.log(`[perf] bérlési dátum + Choice link: ${abd} oldal`);
   console.log(`[perf] megosztási kép (og:image) cserélve: ${ogn} oldal`);
   console.log(`[perf] ${files} oldal, módosítva ${changed} · font ${fonts} · css ${css} · videó ${vids}`);
 } catch (e) { console.log('[perf] hiba: ' + (e && e.message)); }
