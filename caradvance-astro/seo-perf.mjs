@@ -309,4 +309,29 @@ try {
     }
   }
 } catch (e) { console.log('[perf] _routes hiba: ' + (e && e.message)); }
+
+// ---------- i18n runtime (rt-*.js): végtelen ciklus javítása a saját domaineken ----------
+// A link-javító lk() minden linkre setAttribute-ot hív, akkor is, ha az érték nem változik. A
+// MutationObserver ezt új változásnak látja → újra lk() → … a caradvance.sk / .cz gyökerén (ahol a
+// linkek nem /sk/-vel kezdődnek) az oldal lefagy: nem töltődnek be az autók, a menü nem működik.
+// Javítás: csak akkor írjuk át a href-et, ha tényleg más lesz.
+try {
+  let rtFixed = 0, rtFiles = 0;
+  const rtDirs = [path.join(DIST, 'i18n'), path.join(DIST, '_np', 'i18n')];
+  for (const d of rtDirs) {
+    if (!fs.existsSync(d)) continue;
+    for (const f of fs.readdirSync(d)) {
+      if (!/^rt-[a-z]+\.js$/.test(f)) continue;
+      const p = path.join(d, f);
+      let s = fs.readFileSync(p, 'utf8');
+      const o = s;
+      s = s.replace("e.setAttribute('href',t+(m[2]||''));}", "var nv=t+(m[2]||'');if(nv!==h)e.setAttribute('href',nv);}");
+      s = s.replace("e.setAttribute('href',(SL['/autoink/']||'/'+LG+'/autoink/')+'#berelheto');return;",
+        "var bv=(SL['/autoink/']||'/'+LG+'/autoink/')+'#berelheto';if(DOMSTRIP)bv=bv.replace(DOMSTRIP,'/');if(bv!==h)e.setAttribute('href',bv);return;");
+      rtFiles++;
+      if (s !== o) { fs.writeFileSync(p, s); rtFixed++; }
+    }
+  }
+  console.log(`[perf] i18n runtime link-ciklus javítva: ${rtFixed}/${rtFiles} fájl`);
+} catch (e) { console.log('[perf] rt hiba: ' + (e && e.message)); }
 process.exit(0);
