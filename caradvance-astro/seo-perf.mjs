@@ -296,6 +296,9 @@ try {
       for (const e of fs.readdirSync(d, { withFileTypes: true })) if (e.isDirectory()) inc.add('/' + e.name + '/*');
     }
     inc.add('/robots.txt'); inc.add('/sitemap.xml');
+    // A Cloudflare nem enged átfedő szabályt (pl. "/sk/x/*" és "/sk/*"): a tágabb alá eső szűkebbet töröljük.
+    const wild = [...inc].filter((w) => w.endsWith('/*'));
+    for (const r of [...inc]) if (wild.some((w) => w !== r && r.startsWith(w.slice(0, -1)))) inc.delete(r);
     const arr = [...inc];
     if (arr.length + (R.exclude || []).length <= 100) {
       R.include = arr;
