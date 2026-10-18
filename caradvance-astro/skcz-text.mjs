@@ -469,7 +469,7 @@ export function run(DIST = 'dist') {
     }
     // 2. HTML-oldalak
     const translate = makeTranslator(X, l);
-    let files = 0, changed = 0, errs = 0;
+    let files = 0, changed = 0, errs = 0, rtFirst = 0, dbg = '';
     (function walk(d) {
       for (const e of fs.readdirSync(d, { withFileTypes: true })) {
         const p = path.join(d, e.name);
@@ -479,10 +479,12 @@ export function run(DIST = 'dist') {
         try {
           const h = fs.readFileSync(p, 'utf8'); const n = translate(h);
           if (n !== h) { fs.writeFileSync(p, n); changed++; }
+          const ri = n.indexOf('/i18n/rt-' + l + '.js'), ci = n.indexOf('/ca-consent.js');
+          if (ri >= 0 && ci >= 0) { if (ri < ci) rtFirst++; else if (!dbg) dbg = p + ' rt@' + ri + ' consent@' + ci + ' ' + JSON.stringify(n.slice(Math.max(0, ci - 40), ci + 40)) + ' ' + JSON.stringify(n.slice(Math.max(0, ri - 40), ri + 70)); }
         } catch (x) { errs++; }
       }
     })(base);
-    out.push(`${l}: rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}`);
+    out.push(`${l}: rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a cookie-sáv előtt: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
   }
   return '[skcz-text] ' + (out.join(' | ') || 'nincs sk/cs');
 }
