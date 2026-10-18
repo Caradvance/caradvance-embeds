@@ -66,6 +66,9 @@ const XD = {
     meta: 'Prenájom a dlhodobý prenájom $1 od $2 €/mes.: limit $3 km/mes., od $4 mesiacov, kaucia od $5 €.',
     sold: 'Predané: $1. Hľadáte podobné auto? Pozrite si aktuálnu ponuku.', sale: 'Na predaj $1. Cena $2. Overený dovoz z Nemecka s preukázanou históriou od CarAdvance.',
     desc: '$1 – $2, $3. $4 k, $5, $6. Cena bez DPH so zárukou, dovoz CarAdvance.', min: '$1 min', minr: '$1 min čítania',
+    soldOn: 'Predané: $1', soldRef: 'Predané · $1 · podobné vám dovezieme.', view: { 'oldalnézet': 'pohľad zboku', 'elölnézet': 'pohľad spredu', 'hátulnézet': 'pohľad zozadu' },
+    nav: 'Orientačná cena paliva podľa maďarského úradu NAV, $1 $2 – aktualizuje sa automaticky každý mesiac',
+    cheaper: 'Pri mesačnom nájazde $1 km je <g0>$2</g0> mesačne <g1>lacnejšie o $3</g1>.', suit: '$1 kabínových kufrov (odhad)',
     gPop: '<g0>$1</g0> je obľúbenou voľbou v kategórii $2. V <g1>dlhodobom prenájme</g1> ho môžete jazdiť bez toho, aby ste doň viazali veľkú sumu: platíte jeden <g2>mesačný poplatok</g2>, servis, daň a pneumatiky vybavíme my. To je podstata <g3>dlhodobého prenájmu auta</g3>: predvídateľné náklady, nové auto a žiadne starosti s ďalším predajom.',
     gVar: 'Momentálne si môžete prenajať verziu <g0>$1</g0> ($2) od $3 €/mes.',
     gLease: 'Radšej lízing? Pozrite si možnosti <g0>lízingu $1</g0> a financovania v kalkulačke.',
@@ -92,6 +95,9 @@ const XD = {
     meta: 'Pronájem a dlouhodobý pronájem $1 od $2 €/měs.: limit $3 km/měs., od $4 měsíců, kauce od $5 €.',
     sold: 'Prodáno: $1. Hledáte podobný vůz? Podívejte se na aktuální nabídku.', sale: 'Na prodej $1. Cena $2. Prověřený dovoz z Německa s doloženou historií od CarAdvance.',
     desc: '$1 – $2, $3. $4 k, $5, $6. Cena bez DPH se zárukou, dovoz CarAdvance.', min: '$1 min', minr: '$1 min čtení',
+    soldOn: 'Prodáno: $1', soldRef: 'Prodáno · $1 · podobný vůz vám dovezeme.', view: { 'oldalnézet': 'pohled z boku', 'elölnézet': 'pohled zepředu', 'hátulnézet': 'pohled zezadu' },
+    nav: 'Orientační cena paliva podle maďarského úřadu NAV, $1 $2 – aktualizuje se automaticky každý měsíc',
+    cheaper: 'Při měsíčním nájezdu $1 km je <g0>$2</g0> měsíčně <g1>levnější o $3</g1>.', suit: '$1 kabinových kufrů (odhad)',
     gPop: '<g0>$1</g0> je oblíbenou volbou v kategorii $2. V <g1>dlouhodobém pronájmu</g1> s ním můžete jezdit, aniž byste do něj vázali velkou částku: platíte jediný <g2>měsíční poplatek</g2>, servis, daň a pneumatiky zařídíme my. To je podstata <g3>dlouhodobého pronájmu auta</g3>: předvídatelné náklady, nový vůz a žádné starosti s dalším prodejem.',
     gVar: 'Momentálně si můžete pronajmout verzi <g0>$1</g0> ($2) od $3 €/měs.',
     gLease: 'Raději leasing? Podívejte se na možnosti <g0>leasingu $1</g0> a financování v kalkulačce.',
@@ -136,6 +142,13 @@ var XRR=[
  [/^Igen, a (.+) tartós bérlet magánszemélyeknek és cégeknek is elérhető\. Cégként a bérleti díj a könyvelésben elszámolható költség\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.yes,[0,n]):null;}],
  [/^Hasonló bérelhető (.+) modellek$/,function(m){var n=XNN(m[1]);return n?XF(XD.sim,[0,n]):null;}],
  [/^Mekkora a futáskeret a (.+) tartós bérletnél\?$/,function(m){var n=XNN(m[1]);return n?XF(XD.km,[0,n]):null;}],
+ [/^Elkelt: (\d{4})\. (\d{1,2})\. (\d{1,2})\.$/,function(m){return XF(XD.soldOn,[0,(+m[3])+'. '+(+m[2])+'. '+m[1]]);}],
+ [/^Elkelt · (\d{4})\. (\d{1,2})\. (\d{1,2})\. · hasonlót behozunk neked\.$/,function(m){return XF(XD.soldRef,[0,(+m[3])+'. '+(+m[2])+'. '+m[1]]);}],
+ [/^NAV hivatalos üzemanyagár, (\d{4})\. (\S+) – havonta automatikusan frissül$/,function(m){return XF(XD.nav,[0,XD.mon[m[2]]||m[2],m[1]]);}],
+ [/^(.+) (oldalnézet|elölnézet|hátulnézet)$/,function(m){var n=XNN(m[1]);return n?n+' – '+XD.view[m[2]]:null;}],
+ [/^(≈ ?\d+) kabinbőrönd \(becslés\)$/,function(m){return XF(XD.suit,[0,m[1]]);}],
+ [/^(\d+(?:–\d+)?) ülés$/,function(m){return m[1]+(LG==='cs'?' míst':' miest');}],
+ [/^((?:BMW|Mercedes-Benz|Mercedes|Audi|MINI|Volkswagen|Cupra|Hyundai|Kia|Seat|Volvo|Land Rover) .*(?:\d-(?:as|es|os|ös)\b|osztály|Limuzin|ajtós).*)$/,function(m){var n=XNN(m[1]);return n&&n!==m[1]?n:null;}],
  [/^(.+) tartós bérlet$/,function(m){var n=XNN(m[1]);return n?XF(XD.lt,[0,n]):null;}],
  [/^(.+) bérlés$/,function(m){var n=XNN(m[1]);return n?XF(XD.rent,[0,n]):null;}],
  [new RegExp('^(\\d{4})\\. '+XMON+' (\\d{1,2})\\.$'),function(m){return m[3]+'. '+XMI[m[2]]+'. '+m[1];}],
@@ -149,7 +162,8 @@ var XGR=[
  [/^Inkább lízingelnéd\? Nézd meg a <g0>(.+?) lízing<\/g0> és finanszírozás lehetőségeit a kalkulátorral\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.gLease,[0,n]):null;}],
  [/^A (.+?) <g0>egyedi rendeléssel<\/g0> is a tiéd lehet Németországból — akár 19% német áfával, kulcsrakészen\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.gOrder,[0,n]):null;}],
  [/^<g0><g1>nettó<\/g1> <g2>(.+?) €<\/g2>-tól<\/g0> <g3>Rendeld meg<\/g3>$/,function(m){return XF(XD.gOrderPrice,[0,m[1]]);}],
- [/^<g0><g1>nettó<\/g1><g2>(.+?) €<\/g2>\/hó-tól<\/g0><g3>Bérlés igénylése<\/g3>$/,function(m){return XF(XD.gRentPrice,[0,m[1]]);}]
+ [/^<g0><g1>nettó<\/g1><g2>(.+?) €<\/g2>\/hó-tól<\/g0><g3>Bérlés igénylése<\/g3>$/,function(m){return XF(XD.gRentPrice,[0,m[1]]);}],
+ [/^Havi (.+?) km-rel a <g0>(.+?)<\/g0> havonta <g1>(.+?)-tal olcsóbb<\/g1>\.$/,function(m){var n=XNN(m[2]);return n?XF(XD.cheaper,[0,m[1],n,m[3]]):null;}]
 ];
 function XG(k){var kc=/Kč/.test(k);if(kc)k=k.replace(/Kč/g,'€');for(var i=0;i<XGR.length;i++){var m=k.match(XGR[i][0]);if(m){var r=XGR[i][1](m);if(r!=null)return kc?r.replace(/€/g,'Kč'):r;}}return null;}
 `;
@@ -167,7 +181,7 @@ function patchRt(src, l) {
   rep('function tr(s){', code + 'function tr(s){');
   rep("if(r==null&&k.indexOf(' · ')>0)", "if(r==null)r=XR(k);if(r==null&&k.indexOf(' · ')>0)");
   rep('if(t==null)return;e.__ig=1;', 'if(t==null)t=XG(u.k);if(t==null)return;e.__ig=1;');
-  rep('if(r==null||r===k)return null;var a=s.match', "if(r!=null)r=r.replace(/\\b(?:info|sales)@caradvance\\.hu\\b/g,'info@caradvance." + (l === 'cs' ? 'cz' : 'sk') + "');if(r==null||r===k)return null;var a=s.match");
+  if (s.includes('if(r==null||r===k)return null;var a=s.match')) rep('if(r==null||r===k)return null;var a=s.match', "if(r!=null)r=r.replace(/\\b(?:info|sales)@caradvance\\.hu\\b/g,'info@caradvance." + (l === 'cs' ? 'cz' : 'sk') + "');if(r==null||r===k)return null;var a=s.match");
   return s;
 }
 
@@ -314,7 +328,9 @@ function makeTranslator(X, l) {
     else { if (!PG[n]) return; if (typeof PG[n] === 'string') n = PG[n]; t = (SL[n] || ('/' + l + n)) + (m[2] || ''); }
     if (t !== h) setAttr(e, 'href', t);
   }
+  const LOGO = (v) => v.replace(/(^|\/)caradvance-logo(-white)?\.webp(?=$|[?#])/, (w, p, wh) => p + 'caradvance-logo' + (wh || '') + '-' + l + '.webp');
   function attrs(e) {
+    for (const a of ['src', 'srcset', 'href', 'content']) { const v = getAttr(e.open, a); if (v && /caradvance-logo(-white)?\.webp/.test(v)) { const n = v.split(',').map((x) => x.replace(/\S+/, (u) => LOGO(u))).join(','); if (n !== v) setAttr(e, a, n); } }
     for (const a of AT) { const v = getAttr(e.open, a); if (v) { const t = tr(v); if (t != null) setAttr(e, a, t); } }
     if (e.name === 'meta') {
       const nm = getAttr(e.open, 'name') || getAttr(e.open, 'property') || '';
@@ -331,7 +347,8 @@ function makeTranslator(X, l) {
       if (Array.isArray(x)) { x.forEach((v, i) => { if (typeof v === 'string') { const t = tr(v); if (t != null) { x[i] = t; ch = true; } } else w(v); }); return; }
       if (x && typeof x === 'object') for (const k of Object.keys(x)) {
         const v = x[k];
-        if (typeof v === 'string' && /@caradvance\.hu\b/.test(v)) { x[k] = mail(v); ch = true; }
+        if (typeof v === 'string' && /caradvance-logo(-white)?\.webp/.test(v)) { x[k] = LOGO(v); ch = true; }
+        else if (typeof v === 'string' && /@caradvance\.hu\b/.test(v)) { x[k] = mail(v); ch = true; }
         else if (typeof v === 'string' && /^(name|description|headline|text|alternateName|caption|articleSection|about|disambiguatingDescription)$/.test(k)) { const t = tr(v); if (t != null) { x[k] = t; ch = true; } }
         else if (v && typeof v === 'object') w(v);
       }
