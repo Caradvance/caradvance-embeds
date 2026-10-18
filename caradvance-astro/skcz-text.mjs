@@ -264,8 +264,9 @@ const SKIP = new Set(['script', 'style', 'textarea', 'code', 'pre', 'noscript'])
 const AT = ['placeholder', 'title', 'aria-label', 'alt'];
 const META = /^(description|og:title|og:description|og:image:alt|twitter:title|twitter:description|twitter:image:alt)$/i;
 
-function makeTranslator(X, l) {
+function makeTranslator(X, l, IMG = new Set()) {
   const { tr, G, PG, SL } = X;
+  let imgN = 0;
   const cur = (s) => (X.CUR ? X.CUR(s) : s);
   const MAIL = 'info@caradvance.' + (l === 'cs' ? 'cz' : 'sk');
   const mail = (s) => s.replace(/\b(?:info|sales)@caradvance\.hu\b/g, MAIL);
@@ -349,7 +350,19 @@ function makeTranslator(X, l) {
     if (t !== h) setAttr(e, 'href', t);
   }
   const LOGO = (v) => v.replace(/(^|\/)caradvance-logo(-white)?\.webp(?=$|[?#])/, (w, p, wh) => p + 'caradvance-logo' + (wh || '') + '-' + l + '.webp');
+  // Nyelvi képcsere: ha létezik public/i18n-img/<l>/<eredeti útvonal>, azt használjuk (pl. szlovák/cseh feliratos kép).
+  const IMGRE = /^((?:https?:)?\/\/(?:www\.)?caradvance\.(?:hu|sk|cz))?(\/[^?#\s"'()]+)([?#][^\s"'()]*)?$/i;
+  const IM = (u) => { if (!IMG.size) return u; const m = IMGRE.exec(u); if (!m) return u; let p = m[2]; try { p = decodeURI(p); } catch (x) { } if (!IMG.has(p)) return u; imgN++; return (m[1] || '') + '/i18n-img/' + l + m[2] + (m[3] || ''); };
+  const IMS = (v) => v.split(',').map((x) => x.replace(/\S+/, (u) => IM(u))).join(',');
+  const IMC = (v) => v.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g, (w, q, u) => { const n = IM(u.trim()); return n === u.trim() ? w : 'url(' + q + n + q + ')'; });
+  function imgs(e) {
+    if (!IMG.size) return;
+    for (const a of ['src', 'poster', 'data-src', 'href', 'content']) { const v = getAttr(e.open, a); if (v) { const n = IM(v.trim()); if (n !== v.trim()) setAttr(e, a, n); } }
+    for (const a of ['srcset', 'data-srcset', 'imagesrcset']) { const v = getAttr(e.open, a); if (v) { const n = IMS(v); if (n !== v) setAttr(e, a, n); } }
+    const st = getAttr(e.open, 'style'); if (st && st.includes('url(')) { const n = IMC(st); if (n !== st) setAttr(e, 'style', n); }
+  }
   function attrs(e) {
+    imgs(e);
     for (const a of ['src', 'srcset', 'href', 'content']) { const v = getAttr(e.open, a); if (v && /caradvance-logo(-white)?\.webp/.test(v)) { const n = v.split(',').map((x) => x.replace(/\S+/, (u) => LOGO(u))).join(','); if (n !== v) setAttr(e, a, n); } }
     for (const a of AT) { const v = getAttr(e.open, a); if (v) { const t = TA(v); if (t != null) setAttr(e, a, t); } }
     if (e.name === 'meta') {
@@ -367,7 +380,8 @@ function makeTranslator(X, l) {
       if (Array.isArray(x)) { x.forEach((v, i) => { if (typeof v === 'string') { const t = TA(v); if (t != null) { x[i] = t; ch = true; } } else w(v); }); return; }
       if (x && typeof x === 'object') for (const k of Object.keys(x)) {
         const v = x[k];
-        if (typeof v === 'string' && /caradvance-logo(-white)?\.webp/.test(v)) { x[k] = LOGO(v); ch = true; }
+        if (typeof v === 'string' && IMG.size && IM(v) !== v) { x[k] = IM(v); ch = true; }
+        else if (typeof v === 'string' && /caradvance-logo(-white)?\.webp/.test(v)) { x[k] = LOGO(v); ch = true; }
         else if (typeof v === 'string' && /@caradvance\.hu\b/.test(v)) { x[k] = mail(v); ch = true; }
         else if (typeof v === 'string' && /^(name|description|headline|text|alternateName|caption|articleSection|about|disambiguatingDescription|legalName|streetAddress|addressLocality|postalCode|taxID|vatID)$/.test(k)) { const t = TA(v); if (t != null) { x[k] = t; ch = true; } }
         else if (v && typeof v === 'object') w(v);
@@ -404,7 +418,9 @@ function makeTranslator(X, l) {
     h = h.slice(0, m.index) + h.slice(m.index + tag.length);
     return h.slice(0, ci) + tag.replace(/\n?$/, '\n') + h.slice(ci);
   }
-  return (html, rel) => { page = rel || ''; const r = parse(html); walk(r); return moveRt(ser(r)); };
+  const fn = (html, rel) => { page = rel || ''; const r = parse(html); walk(r); return moveRt(ser(r)); };
+  fn.imgCount = () => imgN;
+  return fn;
 }
 
 // ---------- 3. blog főoldal: kártyák a szlovák / cseh cikkekből ----------
@@ -484,7 +500,15 @@ export function run(DIST = 'dist') {
       if (n !== h) { fs.writeFileSync(bi, n); blog++; }
     }
     // 2. HTML-oldalak
-    const translate = makeTranslator(X, l);
+    const IMG = new Set();
+    (function li(d, rel) {
+      if (!fs.existsSync(d)) return;
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        if (e.isDirectory()) li(path.join(d, e.name), rel + '/' + e.name);
+        else if (/\.(webp|avif|jpe?g|png|gif|svg)$/i.test(e.name)) IMG.add(rel + '/' + e.name);
+      }
+    })(path.join(DIST, 'i18n-img', l), '');
+    const translate = makeTranslator(X, l, IMG);
     let files = 0, changed = 0, errs = 0, rtFirst = 0, dbg = '';
     (function walk(d) {
       for (const e of fs.readdirSync(d, { withFileTypes: true })) {
@@ -502,7 +526,7 @@ export function run(DIST = 'dist') {
     })(base);
     // Szlovákia: saját illetékkalkulátorok (a magyar honosítás / átírás helyett)
     let calc = 0; if (l === 'sk') { try { calc = calcSk(base, map); } catch (x) { calc = 'hiba: ' + x.message; } }
-    out.push(`${l}: kalkulátor ${calc}, rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a <head>-ben: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
+    out.push(`${l}: képek ${IMG.size}/${translate.imgCount()} csere, kalkulátor ${calc}, rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a <head>-ben: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
   }
   return '[skcz-text] ' + (out.join(' | ') || 'nincs sk/cs');
 }
