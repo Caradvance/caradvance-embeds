@@ -382,8 +382,12 @@ function makeTranslator(X, l) {
   // Mindkettő "defer" — a sorrend a dokumentum-sorrend; a window.CA_CFG inline a <head>-ben előttük van.
   function moveRt(h) {
     const rt = new RegExp('<script src="/i18n/rt-' + l + '\\.js[^"]*" defer></script>\\n?');
-    const m = rt.exec(h); const ci = h.indexOf('<script src="/ca-consent.js" defer></script>');
-    if (!m || ci < 0 || m.index < ci) return h;
+    const m = rt.exec(h); if (!m) return h;
+    // A cookie-sávot (ca-consent.js) a build legvégén az inject-tracking.mjs teszi a </head> elé — ezért a
+    // fordítót a </head> elé tesszük (ha a sáv már bent van, elé). Mindkettő defer: a sorrend a dokumentum-sorrend.
+    let ci = h.indexOf('<script src="/ca-consent.js" defer></script>');
+    if (ci < 0) ci = h.search(/<\/head>/i);
+    if (ci < 0 || m.index < ci) return h;
     const tag = m[0];
     h = h.slice(0, m.index) + h.slice(m.index + tag.length);
     return h.slice(0, ci) + tag.replace(/\n?$/, '\n') + h.slice(ci);
@@ -479,12 +483,12 @@ export function run(DIST = 'dist') {
         try {
           const h = fs.readFileSync(p, 'utf8'); const n = translate(h);
           if (n !== h) { fs.writeFileSync(p, n); changed++; }
-          const ri = n.indexOf('/i18n/rt-' + l + '.js'), ci = n.indexOf('/ca-consent.js');
-          if (ri >= 0 && ci >= 0) { if (ri < ci) rtFirst++; else if (!dbg) dbg = p + ' rt@' + ri + ' consent@' + ci + ' ' + JSON.stringify(n.slice(Math.max(0, ci - 40), ci + 40)) + ' ' + JSON.stringify(n.slice(Math.max(0, ri - 40), ri + 70)); }
+          const ri = n.indexOf('/i18n/rt-' + l + '.js'), hi = n.search(/<\/head>/i);
+          if (ri >= 0 && hi >= 0) { if (ri < hi) rtFirst++; else if (!dbg) dbg = p + ' rt@' + ri + ' head@' + hi; }
         } catch (x) { errs++; }
       }
     })(base);
-    out.push(`${l}: rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a cookie-sáv előtt: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
+    out.push(`${l}: rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a <head>-ben: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
   }
   return '[skcz-text] ' + (out.join(' | ') || 'nincs sk/cs');
 }
