@@ -8,9 +8,13 @@
  * szkriptet. Idempotens: a már megjelölt fájlokat kihagyja, tehát újrafuttatható.
  * Ha a ca-config.json hiányzik vagy hibás, a build NEM áll meg — figyelmeztet és
  * kihagyja a beillesztést, hogy egy elgépelés soha ne vigye le az oldalt.
+ *
+ * 2026-10: a két szkript URL-je verziót kap (?v=<tartalom-hash>), így módosítás után a
+ * böngészők azonnal az új változatot töltik be (a statikus fájlok 4 órán át gyorsítótárazódnak).
  */
 import { readFile, writeFile, readdir, stat } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 const START = '<!-- ca-tracking:start -->';
@@ -36,11 +40,19 @@ if (missing.length) {
     ' — a kód bekerül, de ezek a rendszerek nem mérnek, amíg ki nem töltöd.');
 }
 
+// verzió a fájl tartalmából (ha nem található, verzió nélkül marad)
+function ver(file) {
+  for (const d of [dirs[0] || 'dist', 'public']) {
+    try { return '?v=' + createHash('sha1').update(readFileSync(path.join(d, file))).digest('hex').slice(0, 10); } catch { /* következő */ }
+  }
+  return '';
+}
+
 const block = [
   START,
   '<script>window.CA_CFG=' + JSON.stringify(config) + ';</script>',
-  '<script src="/ca-consent.js" defer></script>',
-  '<script src="/ca-track.js" defer></script>',
+  '<script src="/ca-consent.js' + ver('ca-consent.js') + '" defer></script>',
+  '<script src="/ca-track.js' + ver('ca-track.js') + '" defer></script>',
   END
 ].join('\n');
 
