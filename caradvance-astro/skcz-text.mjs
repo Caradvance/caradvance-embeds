@@ -37,6 +37,11 @@ function extra(l) {
   const c = l === 'sk' ? 1 : 2; const m = {}; const g = {};
   for (const e of XM) { const [k, v] = tmplText(e[0], e[c]); m[k] = v; if (k !== e[0]) m[e[0]] = e[c]; }
   for (const e of XGL) { const [k, v] = tmplG(e[0], e[c]); g[k] = v; }
+  // Csehországban az árak koronában (Kč) jelennek meg: minden €-s kulcs Kč-s változata is kell
+  if (l === 'cs') {
+    const kc = (o) => { for (const k of Object.keys(o)) if (k.includes('€')) { const k2 = k.split('€').join('Kč'); if (!(k2 in o)) o[k2] = o[k].split('€').join('Kč'); } };
+    kc(m); kc(g);
+  }
   return { m, g };
 }
 
@@ -137,7 +142,7 @@ var XRR=[
  [/^(\d+) perc olvasás$/,function(m){return XF(XD.minr,[0,m[1]]);}],
  [/^(\d+) perc$/,function(m){return XF(XD.min,[0,m[1]]);}]
 ];
-function XR(k){for(var i=0;i<XRR.length;i++){var m=k.match(XRR[i][0]);if(m){var r=XRR[i][1](m);if(r!=null)return r;}}return null;}
+function XR(k){var kc=/Kč/.test(k);if(kc)k=k.replace(/Kč/g,'€');for(var i=0;i<XRR.length;i++){var m=k.match(XRR[i][0]);if(m){var r=XRR[i][1](m);if(r!=null)return kc?r.replace(/€/g,'Kč'):r;}}return null;}
 var XGR=[
  [/^A <g0>(.+?)<\/g0> (\S+) kategóriájában népszerű választás\. <g1>Tartós bérletben<\/g1> úgy vezetheted, hogy nem kötsz le benne nagy összeget: egyetlen <g2>havi díjat<\/g2> fizetsz, a szervizt, az adót és a gumikat mi intézzük\. Ez a <g3>hosszú távú autóbérlés<\/g3> lényege: kiszámítható költség, új autó, továbbeladási gond nélkül\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.gPop,[0,n,XD.body[m[2]]||m[2]]):null;}],
  [/^Jelenleg a\(z\) <g0>(.+?)<\/g0> kivitel bérelhető \(([^)]+)\), (.+?) €\/hó-tól\.$/,function(m){return XF(XD.gVar,[0,m[1],XD.fuelAdj[m[2]]||m[2],m[3]]);}],
@@ -146,7 +151,7 @@ var XGR=[
  [/^<g0><g1>nettó<\/g1> <g2>(.+?) €<\/g2>-tól<\/g0> <g3>Rendeld meg<\/g3>$/,function(m){return XF(XD.gOrderPrice,[0,m[1]]);}],
  [/^<g0><g1>nettó<\/g1><g2>(.+?) €<\/g2>\/hó-tól<\/g0><g3>Bérlés igénylése<\/g3>$/,function(m){return XF(XD.gRentPrice,[0,m[1]]);}]
 ];
-function XG(k){for(var i=0;i<XGR.length;i++){var m=k.match(XGR[i][0]);if(m){var r=XGR[i][1](m);if(r!=null)return r;}}return null;}
+function XG(k){var kc=/Kč/.test(k);if(kc)k=k.replace(/Kč/g,'€');for(var i=0;i<XGR.length;i++){var m=k.match(XGR[i][0]);if(m){var r=XGR[i][1](m);if(r!=null)return kc?r.replace(/€/g,'Kč'):r;}}return null;}
 `;
 
 /** rt-<l>.js kiegészítése: extra M/G elemek + XR/XG szabályok. Idempotens. */
