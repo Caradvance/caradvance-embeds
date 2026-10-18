@@ -51,6 +51,18 @@ function toLangSite(v) {
   return m ? LANG_SITE[m[1]] + (m[2] || '/') : v;
 }
 
+// Régi (magyar) cím → szlovák/cseh cím: a build (skcz-slugs.mjs) írja ki a dist/sk|cs/_slugs.json fájlba
+const SLUGS = {};
+async function slugMap(env, l, origin) {
+  if (SLUGS[l]) return SLUGS[l];
+  try {
+    const r = await env.ASSETS.fetch(new Request(new URL('/' + l + '/_slugs.json', origin).toString()));
+    SLUGS[l] = r.status === 200 ? await r.json() : {};
+  } catch (e) { SLUGS[l] = {}; }
+  return SLUGS[l];
+}
+function locOf(map, p) { const q = p.endsWith('/') ? p : p + '/'; return map[q] || null; }
+
 async function serveDomain(context, url, l) {
   const { request, env, next } = context;
   const p = url.pathname;
@@ -58,13 +70,21 @@ async function serveDomain(context, url, l) {
   if (p.startsWith('/api/')) return next();
   { const ur = ujRedirect(url); if (ur) return ur; }
   const pre = '/' + l + '/';
-  if (p === '/' + l || p.startsWith(pre)) { url.pathname = p.slice(l.length + 1) || '/'; return Response.redirect(url.toString(), 301); }
+  if (p === '/' + l || p.startsWith(pre)) {
+    const rest = p.slice(l.length + 1) || '/';
+    url.pathname = locOf(await slugMap(env, l, url.origin), rest) || rest;
+    return Response.redirect(url.toString(), 301);
+  }
   if (p === '/robots.txt' || p === '/sitemap.xml') return env.ASSETS.fetch(new Request(new URL('/' + l + p, url.origin).toString()));
   if (/\.[a-z0-9]{1,5}$/i.test(p)) return next();                  // közös fájlok: képek, js, css, videó
   if (!p.endsWith('/')) { url.pathname = p + '/'; return Response.redirect(url.toString(), 301); }
   if (request.method !== 'GET' && request.method !== 'HEAD') return next();
   const r = await env.ASSETS.fetch(new Request(new URL('/' + l + p, url.origin).toString(), { method: request.method }));
-  if (r.status !== 200) return Response.redirect(new URL('/', url.origin).toString(), 302);
+  if (r.status !== 200) {
+    const loc = locOf(await slugMap(env, l, url.origin), p);           // régi magyar cím → új cím
+    if (loc && loc !== p) { url.pathname = loc; return Response.redirect(url.toString(), 301); }
+    return Response.redirect(new URL('/', url.origin).toString(), 302);
+  }
   const isFileUrl = (v) => /\.[a-z0-9]{1,5}$/i.test(v.split(/[?#]/)[0]);
   class Fix {
     constructor(a) { this.a = a; }
@@ -97,7 +117,11 @@ async function handle(context) {
   if (dl) return serveDomain(context, url, dl);
   if (SKCZ_REDIRECT && /(^|\.)caradvance\.hu$/.test(url.hostname)) {
     const lm = /^\/(sk|cs)(\/.*)?$/.exec(p);
-    if (lm) return new Response(null, { status: 301, headers: { Location: LANG_SITE[lm[1]] + (lm[2] || '/') + url.search, 'Cache-Control': 'public, max-age=3600' } });
+    if (lm) {
+      const rest = lm[2] || '/';
+      const loc = /\.[a-z0-9]{1,5}$/i.test(rest) ? rest : (locOf(await slugMap(env, lm[1], url.origin), rest) || rest);
+      return new Response(null, { status: 301, headers: { Location: LANG_SITE[lm[1]] + loc + url.search, 'Cache-Control': 'public, max-age=3600' } });
+    }
   }
   { const ur = ujRedirect(url); if (ur) return ur; }
 
