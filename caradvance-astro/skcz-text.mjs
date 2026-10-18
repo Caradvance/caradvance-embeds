@@ -126,6 +126,8 @@ var XRR=[
  [/^A\(z\) (.+) (plug-in hibrid|benzin|dízel|diesel|elektromos|hibrid) üzemű ([^.]+)\. (\d+) LE, ([^,]+), ([^.]+)\. Nettó ár \(áfa nélkül\) garanciával, CarAdvance import\.$/,function(m){return XF(XD.desc,[0,m[1],XD.fuel[m[2]]||m[2],XD.body[m[3]]||m[3],m[4],XD.gear[m[5]]||m[5],XD.drive[m[6]]||m[6]]);}],
  [/^Elkelt: (.+)\. Hasonlót keresel\? Nézd meg az aktuális készletet\.$/,function(m){return XF(XD.sold,[0,XT(m[1])]);}],
  [/^Eladó (.+)\. Ára (.+?)\. Ellenőrzött előéletű német import a CarAdvance-től\.$/,function(m){return XF(XD.sale,[0,XT(m[1]),m[2]]);}],
+ [/^Elkelt: (\d{4})\. (\d{1,2})\. (\d{1,2})\.$/,function(m){return XF(XD.soldOn,[0,(+m[3])+'. '+(+m[2])+'. '+m[1]]);}],
+ [/^Elkelt: (.+)$/,function(m){return XF(XD.soldOn,[0,XT(m[1])]);}],
  [/^(.+) bérlés és tartós bérlet (.+?) €\/hó-tól: (.+?) km\/hó futáskeret, (\d+) hónap, kaució (.+?) €-tól\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.meta,[0,n,m[2],m[3],m[4],m[5]]):null;}],
  [/^(.+) bérlés — tartós bérlet (.+?) €\/hó-tól$/,function(m){var n=XNN(m[1]);return n?XF(XD.rentFrom,[0,n,m[2]]):null;}],
  [/^(.+) tartós bérlet — vadonatúj (\S+) havidíjjal$/,function(m){var n=XNN(m[1]);return n?XF(XD.ltNew,[0,n,XD.body[m[2]]||m[2]]):null;}],
