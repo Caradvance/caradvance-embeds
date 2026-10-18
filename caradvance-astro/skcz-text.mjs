@@ -184,6 +184,11 @@ function patchRt(src, l) {
   rep('function tr(s){', code + 'function tr(s){');
   rep("if(r==null&&k.indexOf(' · ')>0)", "if(r==null)r=XR(k);if(r==null&&k.indexOf(' · ')>0)");
   rep('if(t==null)return;e.__ig=1;', 'if(t==null)t=XG(u.k);if(t==null)return;e.__ig=1;');
+  // újrarajzolt elemek (pl. autó-összehasonlító) újrafordítása: az __ig jelző ne tiltsa le
+  if (s.includes('if(!GN||e.__ig||')) rep('if(!GN||e.__ig||', 'if(!GN||');
+  // biztonsági újrabejárás betöltés után (a betöltéskor kirajzolt, de kimaradt szövegekhez)
+  { const ob = ".observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:AT.concat(['href'])});";
+    if (s.includes(ob)) rep(ob, ob + 'setTimeout(function(){walk(document.body)},1200);setTimeout(function(){walk(document.body)},4000);'); }
   if (s.includes('if(r==null||r===k)return null;var a=s.match')) rep('if(r==null||r===k)return null;var a=s.match', "if(r!=null)r=r.replace(/\\b(?:info|sales)@caradvance\\.hu\\b/g,'info@caradvance." + (l === 'cs' ? 'cz' : 'sk') + "');if(r==null||r===k)return null;var a=s.match");
   return s;
 }
