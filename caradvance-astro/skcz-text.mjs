@@ -167,6 +167,7 @@ function patchRt(src, l) {
   rep('function tr(s){', code + 'function tr(s){');
   rep("if(r==null&&k.indexOf(' · ')>0)", "if(r==null)r=XR(k);if(r==null&&k.indexOf(' · ')>0)");
   rep('if(t==null)return;e.__ig=1;', 'if(t==null)t=XG(u.k);if(t==null)return;e.__ig=1;');
+  rep('if(r==null||r===k)return null;var a=s.match', "if(r!=null)r=r.replace(/\\b(?:info|sales)@caradvance\\.hu\\b/g,'info@caradvance." + (l === 'cs' ? 'cz' : 'sk') + "');if(r==null||r===k)return null;var a=s.match");
   return s;
 }
 
@@ -243,7 +244,22 @@ const META = /^(description|og:title|og:description|og:image:alt|twitter:title|t
 function makeTranslator(X, l) {
   const { tr, G, PG, SL } = X;
   const cur = (s) => (X.CUR ? X.CUR(s) : s);
-  const T = (s) => { const t = tr(s); const b = t != null ? t : s; const c = cur(b); return c !== s ? c : null; };
+  const MAIL = 'info@caradvance.' + (l === 'cs' ? 'cz' : 'sk');
+  const mail = (s) => s.replace(/\b(?:info|sales)@caradvance\.hu\b/g, MAIL);
+  const T = (s) => { const t = tr(s); const b = t != null ? t : s; const c = mail(cur(b)); return c !== s ? c : null; };
+  const SUBJ = l === 'cs'
+    ? [[/^Ajánlatkérés: /, 'Poptávka: '], [/^Hasonlót keresek: /, 'Hledám podobný vůz: '], [/^Auto eladas$/, 'Prodej vozu'], [/^Autó eladása – bizomány$/, 'Prodej vozu – komisní prodej'], [/^Ertekesitesi folyamat - kerdes$/, 'Proces prodeje – dotaz'], [/^Kerdes$/, 'Dotaz'], [/^Video$/, 'Video']]
+    : [[/^Ajánlatkérés: /, 'Žiadosť o ponuku: '], [/^Hasonlót keresek: /, 'Hľadám podobné auto: '], [/^Auto eladas$/, 'Predaj auta'], [/^Autó eladása – bizomány$/, 'Predaj auta – komisionálny predaj'], [/^Ertekesitesi folyamat - kerdes$/, 'Proces predaja – otázka'], [/^Kerdes$/, 'Otázka'], [/^Video$/, 'Video']];
+  function mailto(h) {
+    const m = /^mailto:([^?]*)(\?.*)?$/i.exec(h); if (!m) return h;
+    let q = m[2] || '';
+    q = q.replace(/([?&]subject=)([^&]*)/i, (w, k, v) => {
+      let d; try { d = decodeURIComponent(v.replace(/\+/g, ' ')); } catch (e) { return w; }
+      let t = tr(d); if (t == null) { t = d; for (const [re, r] of SUBJ) if (re.test(t)) { t = t.replace(re, r); break; } }
+      return k + encodeURIComponent(t);
+    });
+    return 'mailto:' + mail(m[1]) + q;
+  }
   function ukey(e) {
     const tags = []; let out = '', ok = true, hasEl = false, hasTx = false;
     (function w(ns) {
@@ -285,6 +301,7 @@ function makeTranslator(X, l) {
     return true;
   }
   function lk(e) {
+    if (e.name === 'a') { const h0 = getAttr(e.open, 'href'); if (h0 && /^mailto:/i.test(h0)) { const n0 = mailto(h0); if (n0 !== h0) setAttr(e, 'href', n0); return; } }
     if (e.name !== 'a' || getAttr(e.open, 'hreflang') != null) return;
     if (/langopt/.test(getAttr(e.open, 'class') || '')) return;
     const h = getAttr(e.open, 'href'); if (!h) return;
@@ -314,7 +331,8 @@ function makeTranslator(X, l) {
       if (Array.isArray(x)) { x.forEach((v, i) => { if (typeof v === 'string') { const t = tr(v); if (t != null) { x[i] = t; ch = true; } } else w(v); }); return; }
       if (x && typeof x === 'object') for (const k of Object.keys(x)) {
         const v = x[k];
-        if (typeof v === 'string' && /^(name|description|headline|text|alternateName|caption|articleSection|about|disambiguatingDescription)$/.test(k)) { const t = tr(v); if (t != null) { x[k] = t; ch = true; } }
+        if (typeof v === 'string' && /@caradvance\.hu\b/.test(v)) { x[k] = mail(v); ch = true; }
+        else if (typeof v === 'string' && /^(name|description|headline|text|alternateName|caption|articleSection|about|disambiguatingDescription)$/.test(k)) { const t = tr(v); if (t != null) { x[k] = t; ch = true; } }
         else if (v && typeof v === 'object') w(v);
       }
     })(o);
@@ -329,8 +347,9 @@ function makeTranslator(X, l) {
     }
     if (e.type === 'el') {
       if (e.name === 'script') { ld(e); return; }
+      if (e.name !== 'style') attrs(e);                       // textarea placeholder is
       if (SKIP.has(e.name)) return;
-      inl(e); lk(e); attrs(e);
+      inl(e); lk(e);
     }
     for (const c of e.children) walk(c);
   }

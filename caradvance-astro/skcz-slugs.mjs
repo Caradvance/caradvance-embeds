@@ -152,6 +152,8 @@ function buildMap(l, base) {
   const pages = listPages(base);
   for (const hu of pages) {
     if (hu === '/') { map[hu] = '/'; used.add('/'); continue; }
+    // /berelheto/ csak átirányító oldal (→ /autoink/#berelheto): nem másoljuk, az új autós oldalra mutat
+    if (hu === '/berelheto/') { map[hu] = '/' + TOP[l].autoink + '/'; continue; }
     const segs = hu.split('/').filter(Boolean);
     const top = TOP[l][segs[0]];
     let loc;
@@ -178,7 +180,8 @@ function moveTree(base, map) {
   // nem-oldal fájlok a gyökérben (robots.txt, sitemap.xml …)
   for (const e of fs.readdirSync(base, { withFileTypes: true })) if (e.isFile()) fs.copyFileSync(path.join(base, e.name), path.join(tmp, e.name));
   for (const [hu, loc] of Object.entries(map)) {
-    if (hu !== '/' && loc === '/blog/' && hu.startsWith('/blog/')) continue; // kizárt blogcikk
+    if (hu !== '/blog/' && loc === '/blog/' && hu.startsWith('/blog/')) continue; // kizárt blogcikk (a blog főoldala marad!)
+    if (hu === '/berelheto/') continue;                                         // csak átirányítás
     const src = path.join(base, hu);
     const dst = path.join(tmp, loc);
     fs.mkdirSync(dst, { recursive: true });
