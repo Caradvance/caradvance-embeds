@@ -276,4 +276,34 @@ try {
   console.log(`[perf] megosztási kép (og:image) cserélve: ${ogn} oldal`);
   console.log(`[perf] ${files} oldal, módosítva ${changed} · font ${fonts} · css ${css} · videó ${vids}`);
 } catch (e) { console.log('[perf] hiba: ' + (e && e.message)); }
+
+// ---------- caradvance.sk / caradvance.cz: a middleware minden szlovák/cseh oldalon fusson ----------
+// A _routes.json (seo-noprice.mjs) csak a magyar áras könyvtárakat tartalmazza. A saját domainen
+// (www.caradvance.sk/aszf/ stb.) e nélkül a magyar oldal menne ki. Ezért felvesszük a dist/sk és dist/cs
+// összes könyvtárát, a /sk/* és /cs/* útvonalat, valamint a robots.txt-t és a sitemap.xml-t.
+// A "/x" pontos szabály fölösleges, ha "/x/*" is van (a middleware perjel nélküli címen úgyis továbbad).
+try {
+  const RP = path.join(DIST, '_routes.json');
+  if (fs.existsSync(RP)) {
+    const R = JSON.parse(fs.readFileSync(RP, 'utf8'));
+    const before = (R.include || []).length;
+    const inc = new Set(R.include || []);
+    for (const x of [...inc]) if (!x.includes('*') && x !== '/' && inc.has(x + '/*')) inc.delete(x);
+    for (const l of ['sk', 'cs']) {
+      const d = path.join(DIST, l);
+      if (!fs.existsSync(d)) continue;
+      inc.add('/' + l + '/*');
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) if (e.isDirectory()) inc.add('/' + e.name + '/*');
+    }
+    inc.add('/robots.txt'); inc.add('/sitemap.xml');
+    const arr = [...inc];
+    if (arr.length + (R.exclude || []).length <= 100) {
+      R.include = arr;
+      fs.writeFileSync(RP, JSON.stringify(R, null, 2));
+      console.log(`[perf] _routes.json: ${before} → ${arr.length} szabály (sk/cs saját domain)`);
+    } else {
+      console.log(`[perf] _routes.json: túl sok szabály (${arr.length}) — változatlanul hagyva`);
+    }
+  }
+} catch (e) { console.log('[perf] _routes hiba: ' + (e && e.message)); }
 process.exit(0);
