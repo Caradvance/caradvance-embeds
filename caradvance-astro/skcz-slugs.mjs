@@ -14,6 +14,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { FORCE_EXCLUDE } from './skcz-text-data.mjs';
 
 const SITE = { sk: 'https://www.caradvance.sk', cs: 'https://www.caradvance.cz' };
 
@@ -158,7 +159,7 @@ function buildMap(l, base) {
     else if (segs.length === 1) loc = '/' + top + '/';
     else if (segs[0] === 'blog') {
       const h1 = readH1(path.join(base, hu, 'index.html'));
-      if (!h1 || HU_TEXT.test(h1)) { excluded.push(hu); map[hu] = '/blog/'; continue; }
+      if (!h1 || HU_TEXT.test(h1) || FORCE_EXCLUDE.includes(segs[1])) { excluded.push(hu); map[hu] = '/blog/'; continue; }
       const main = h1.split(/\s[—–|]\s|[?:]\s/)[0].trim();          // a cím fő része („Dovoz auta z Nemecka — …” → „Dovoz auta z Nemecka”)
       loc = '/blog/' + slugify(main.length >= 15 ? main : h1) + '/';
     } else if (segs[0] === 'auto') loc = hu;                        // autók adatlapja: márka/modell, nem magyar

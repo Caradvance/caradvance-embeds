@@ -279,6 +279,9 @@ try {
 
 // ---------- caradvance.sk / caradvance.cz: szlovák / cseh URL-ek (skcz-slugs.mjs) ----------
 try { const SK = await import('./skcz-slugs.mjs'); console.log(SK.run(DIST)); } catch (e) { console.log('[skcz] hiba: ' + (e && e.message)); }
+// caradvance.sk / .cz: maradék magyar szövegek fordítása a HTML-ben és a futásidejű fordítóban (skcz-text.mjs)
+// (a link-ciklus javítása lent fut, a kiegészített rt-*.js fájlokon is)
+try { const SKT = await import('./skcz-text.mjs'); console.log(SKT.run(DIST)); } catch (e) { console.log('[skcz-text] hiba: ' + (e && e.message)); }
 
 // ---------- caradvance.sk / caradvance.cz: a middleware minden szlovák/cseh oldalon fusson ----------
 // A _routes.json (seo-noprice.mjs) csak a magyar áras könyvtárakat tartalmazza. A saját domainen
