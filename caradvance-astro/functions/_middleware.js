@@ -79,6 +79,10 @@ async function serveDomain(context, url, l) {
   if (/\.[a-z0-9]{1,5}$/i.test(p)) return next();                  // közös fájlok: képek, js, css, videó
   if (!p.endsWith('/')) { url.pathname = p + '/'; return Response.redirect(url.toString(), 301); }
   if (request.method !== 'GET' && request.method !== 'HEAD') return next();
+  { // régi magyar cím (pl. /autoink/) → 301 az új szlovák / cseh címre, mielőtt bármit kiszolgálnánk
+    const loc0 = locOf(await slugMap(env, l, url.origin), p);
+    if (loc0 && loc0 !== p) { url.pathname = loc0; return Response.redirect(url.toString(), 301); }
+  }
   const r = await env.ASSETS.fetch(new Request(new URL('/' + l + p, url.origin).toString(), { method: request.method }));
   if (r.status !== 200) {
     const loc = locOf(await slugMap(env, l, url.origin), p);           // régi magyar cím → új cím
