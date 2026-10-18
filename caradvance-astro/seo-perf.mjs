@@ -277,6 +277,9 @@ try {
   console.log(`[perf] ${files} oldal, módosítva ${changed} · font ${fonts} · css ${css} · videó ${vids}`);
 } catch (e) { console.log('[perf] hiba: ' + (e && e.message)); }
 
+// ---------- caradvance.sk / caradvance.cz: szlovák / cseh URL-ek (skcz-slugs.mjs) ----------
+try { const SK = await import('./skcz-slugs.mjs'); console.log(SK.run(DIST)); } catch (e) { console.log('[skcz] hiba: ' + (e && e.message)); }
+
 // ---------- caradvance.sk / caradvance.cz: a middleware minden szlovák/cseh oldalon fusson ----------
 // A _routes.json (seo-noprice.mjs) csak a magyar áras könyvtárakat tartalmazza. A saját domainen
 // (www.caradvance.sk/aszf/ stb.) e nélkül a magyar oldal menne ki. Ezért felvesszük a dist/sk és dist/cs
@@ -296,6 +299,12 @@ try {
       for (const e of fs.readdirSync(d, { withFileTypes: true })) if (e.isDirectory()) inc.add('/' + e.name + '/*');
     }
     inc.add('/robots.txt'); inc.add('/sitemap.xml');
+    // régi magyar címek a saját domainen → a middleware 301-gyel átirányít (csak ha belefér a 100 szabályba)
+    const old = new Set();
+    for (const l of ['sk', 'cs']) {
+      try { for (const hu of Object.keys(JSON.parse(fs.readFileSync(path.join(DIST, l, '_slugs.json'), 'utf8')))) { const s = hu.split('/')[1]; if (s) old.add('/' + s + '/*'); } } catch (e) { /* nincs térkép */ }
+    }
+    for (const r of old) { if (inc.size + (R.exclude || []).length >= 100) break; inc.add(r); }
     // A Cloudflare nem enged átfedő szabályt (pl. "/sk/x/*" és "/sk/*"): a tágabb alá eső szűkebbet töröljük.
     const wild = [...inc].filter((w) => w.endsWith('/*'));
     for (const r of [...inc]) if (wild.some((w) => w !== r && r.startsWith(w.slice(0, -1)))) inc.delete(r);
