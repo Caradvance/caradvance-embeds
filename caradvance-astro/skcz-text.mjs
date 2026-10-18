@@ -12,7 +12,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
-import { M as XM, G as XGL } from './skcz-text-data.mjs';
+import { M as XM, G as XGL, LEGAL, LEGAL_HREF, LEGAL_PAGES } from './skcz-text-data.mjs';
+import { runSk as calcSk } from './skcz-calc.mjs';
 
 const NUM = /\d+(?:[.,\u00a0\u202f ]\d+)*/g;
 
@@ -268,7 +269,17 @@ function makeTranslator(X, l) {
   const cur = (s) => (X.CUR ? X.CUR(s) : s);
   const MAIL = 'info@caradvance.' + (l === 'cs' ? 'cz' : 'sk');
   const mail = (s) => s.replace(/\b(?:info|sales)@caradvance\.hu\b/g, MAIL);
-  const T = (s) => { const t = tr(s); const b = t != null ? t : s; const c = mail(cur(b)); return c !== s ? c : null; };
+  // jogi / céges adatok (BH Group Zrt. → Mr. Job SK s.r.o., helyi hatóságok) — lásd LEGAL a skcz-text-data.mjs-ben
+  const LR = LEGAL[l] || []; const DOM = 'www.caradvance.' + (l === 'cs' ? 'cz' : 'sk');
+  let page = '';
+  const legal = (s) => {
+    let o = s;
+    for (const [a, b] of LR) if (o.includes(a)) o = o.split(a).join(b);
+    if (LEGAL_PAGES.test(page) && o.includes('www.caradvance.hu')) o = o.split('www.caradvance.hu').join(DOM);
+    return o;
+  };
+  const T = (s) => { const t = tr(s); const b = t != null ? t : s; const c = legal(mail(cur(b))); return c !== s ? c : null; };
+  const TA = (v) => { const t = tr(v); const b = t != null ? t : v; const c = legal(b); return c !== v ? c : null; };
   const SUBJ = l === 'cs'
     ? [[/^Ajánlatkérés: /, 'Poptávka: '], [/^Hasonlót keresek: /, 'Hledám podobný vůz: '], [/^Auto eladas$/, 'Prodej vozu'], [/^Autó eladása – bizomány$/, 'Prodej vozu – komisní prodej'], [/^Ertekesitesi folyamat - kerdes$/, 'Proces prodeje – dotaz'], [/^Kerdes$/, 'Dotaz'], [/^Video$/, 'Video']]
     : [[/^Ajánlatkérés: /, 'Žiadosť o ponuku: '], [/^Hasonlót keresek: /, 'Hľadám podobné auto: '], [/^Auto eladas$/, 'Predaj auta'], [/^Autó eladása – bizomány$/, 'Predaj auta – komisionálny predaj'], [/^Ertekesitesi folyamat - kerdes$/, 'Proces predaja – otázka'], [/^Kerdes$/, 'Otázka'], [/^Video$/, 'Video']];
@@ -323,6 +334,7 @@ function makeTranslator(X, l) {
     return true;
   }
   function lk(e) {
+    if (e.name === 'a') { const h1 = getAttr(e.open, 'href'); if (h1) for (const [re, to] of (LEGAL_HREF[l] || [])) if (re.test(h1)) { setAttr(e, 'href', to); return; } }
     if (e.name === 'a') { const h0 = getAttr(e.open, 'href'); if (h0 && /^mailto:/i.test(h0)) { const n0 = mailto(h0); if (n0 !== h0) setAttr(e, 'href', n0); return; } }
     if (e.name !== 'a' || getAttr(e.open, 'hreflang') != null) return;
     if (/langopt/.test(getAttr(e.open, 'class') || '')) return;
@@ -339,10 +351,10 @@ function makeTranslator(X, l) {
   const LOGO = (v) => v.replace(/(^|\/)caradvance-logo(-white)?\.webp(?=$|[?#])/, (w, p, wh) => p + 'caradvance-logo' + (wh || '') + '-' + l + '.webp');
   function attrs(e) {
     for (const a of ['src', 'srcset', 'href', 'content']) { const v = getAttr(e.open, a); if (v && /caradvance-logo(-white)?\.webp/.test(v)) { const n = v.split(',').map((x) => x.replace(/\S+/, (u) => LOGO(u))).join(','); if (n !== v) setAttr(e, a, n); } }
-    for (const a of AT) { const v = getAttr(e.open, a); if (v) { const t = tr(v); if (t != null) setAttr(e, a, t); } }
+    for (const a of AT) { const v = getAttr(e.open, a); if (v) { const t = TA(v); if (t != null) setAttr(e, a, t); } }
     if (e.name === 'meta') {
       const nm = getAttr(e.open, 'name') || getAttr(e.open, 'property') || '';
-      if (META.test(nm)) { const v = getAttr(e.open, 'content'); if (v) { const t = tr(v); if (t != null) setAttr(e, 'content', t); } }
+      if (META.test(nm)) { const v = getAttr(e.open, 'content'); if (v) { const t = TA(v); if (t != null) setAttr(e, 'content', t); } }
     }
     if (e.name === 'input' && /^(submit|button)$/i.test(getAttr(e.open, 'type') || '')) { const v = getAttr(e.open, 'value'); if (v) { const t = tr(v); if (t != null) setAttr(e, 'value', t); } }
   }
@@ -352,12 +364,12 @@ function makeTranslator(X, l) {
     let o; try { o = JSON.parse(c.raw); } catch (x) { return; }
     let ch = false;
     (function w(x) {
-      if (Array.isArray(x)) { x.forEach((v, i) => { if (typeof v === 'string') { const t = tr(v); if (t != null) { x[i] = t; ch = true; } } else w(v); }); return; }
+      if (Array.isArray(x)) { x.forEach((v, i) => { if (typeof v === 'string') { const t = TA(v); if (t != null) { x[i] = t; ch = true; } } else w(v); }); return; }
       if (x && typeof x === 'object') for (const k of Object.keys(x)) {
         const v = x[k];
         if (typeof v === 'string' && /caradvance-logo(-white)?\.webp/.test(v)) { x[k] = LOGO(v); ch = true; }
         else if (typeof v === 'string' && /@caradvance\.hu\b/.test(v)) { x[k] = mail(v); ch = true; }
-        else if (typeof v === 'string' && /^(name|description|headline|text|alternateName|caption|articleSection|about|disambiguatingDescription)$/.test(k)) { const t = tr(v); if (t != null) { x[k] = t; ch = true; } }
+        else if (typeof v === 'string' && /^(name|description|headline|text|alternateName|caption|articleSection|about|disambiguatingDescription|legalName|streetAddress|addressLocality|postalCode|taxID|vatID)$/.test(k)) { const t = TA(v); if (t != null) { x[k] = t; ch = true; } }
         else if (v && typeof v === 'object') w(v);
       }
     })(o);
@@ -392,7 +404,7 @@ function makeTranslator(X, l) {
     h = h.slice(0, m.index) + h.slice(m.index + tag.length);
     return h.slice(0, ci) + tag.replace(/\n?$/, '\n') + h.slice(ci);
   }
-  return (html) => { const r = parse(html); walk(r); return moveRt(ser(r)); };
+  return (html, rel) => { page = rel || ''; const r = parse(html); walk(r); return moveRt(ser(r)); };
 }
 
 // ---------- 3. blog főoldal: kártyák a szlovák / cseh cikkekből ----------
@@ -481,14 +493,16 @@ export function run(DIST = 'dist') {
         if (!e.name.endsWith('.html')) continue;
         files++;
         try {
-          const h = fs.readFileSync(p, 'utf8'); const n = translate(h);
+          const h = fs.readFileSync(p, 'utf8'); const n = translate(h, '/' + path.relative(base, path.dirname(p)).split(path.sep).join('/').replace(/^\/?/, '').replace(/([^/])$/, '$1/'));
           if (n !== h) { fs.writeFileSync(p, n); changed++; }
           const ri = n.indexOf('/i18n/rt-' + l + '.js'), hi = n.search(/<\/head>/i);
           if (ri >= 0 && hi >= 0) { if (ri < hi) rtFirst++; else if (!dbg) dbg = p + ' rt@' + ri + ' head@' + hi; }
         } catch (x) { errs++; }
       }
     })(base);
-    out.push(`${l}: rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a <head>-ben: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
+    // Szlovákia: saját illetékkalkulátorok (a magyar honosítás / átírás helyett)
+    let calc = 0; if (l === 'sk') { try { calc = calcSk(base, map); } catch (x) { calc = 'hiba: ' + x.message; } }
+    out.push(`${l}: kalkulátor ${calc}, rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a <head>-ben: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
   }
   return '[skcz-text] ' + (out.join(' | ') || 'nincs sk/cs');
 }

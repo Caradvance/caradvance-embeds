@@ -528,3 +528,104 @@ export const G = [
 
 // Blogcikkek, amelyek csak a magyar jogról / támogatásról szólnak → nem kerülnek ki a .sk / .cz oldalra
 export const FORCE_EXCLUDE = ['eredetisegvizsgalat', 'elektromos-auto-lizing-tamogatas'];
+
+// ---------------------------------------------------------------------------------------------
+// Jogi / céges adatok a .sk és .cz oldalon: a magyar BH Group Zrt. helyett a szlovák képviselő,
+// Mr. Job SK s.r.o. (IČO 52 005 445, Cesta na Senec 2/A, 821 04 Bratislava, OR Mestského súdu
+// Bratislava III, oddiel Sro, vložka 141700/B, DIČ 2120860148, IČ DPH SK2120860148 — forrás: orsr.sk, finstat.sk),
+// valamint a helyi hatóságok (ÚOOÚ SR / ÚOOÚ ČR, SOI / ČOI). Sorrend számít: a hosszabb minták előbb.
+// [keresett szöveg, csere] — minden oldal minden szövegére (és meta / JSON-LD szövegre) lefut.
+// ---------------------------------------------------------------------------------------------
+const MJ = 'Mr. Job SK s.r.o.';
+const ADDR_SK = 'Cesta na Senec 2/A, 821 04 Bratislava – Ružinov';
+const ADDR_CS = 'Cesta na Senec 2/A, 821 04 Bratislava, Slovensko';
+export const LEGAL = {
+  sk: [
+    ['BH Group Zártkörűen Működő Részvénytársaság (BH Group Zrt.) — Caradvance Hungary', MJ],
+    ['Mr. JOB SK s.r.o. — Caradvance Hungary', MJ],
+    ['BH Group Zrt. (Caradvance Slovensko)', MJ],
+    ['BH Group Zrt. (Caradvance Hungary)', MJ],
+    ['Mr. JOB SK s.r.o. (Maďarsko)', MJ + ' (Slovensko)'],
+    ['BH Group Zrt. — 4143 Vekerd, Petőfi utca 23.', MJ + ' — ' + ADDR_SK],
+    ['4143 Vekerd, Petőfi utca 23.', ADDR_SK],
+    ['2083 Solymár, Ibolya utca 18.', 'Cesta na Senec 2/A, 821 04 Bratislava'],
+    ['09-10-000660 · 32488447-2-09', 'IČO 52 005 445 · IČ DPH SK2120860148'],
+    ['09-10-000660 (Debreceni Törvényszék Cégbírósága)', 'IČO 52 005 445 — Obchodný register Mestského súdu Bratislava III, oddiel Sro, vložka č. 141700/B'],
+    ['32488447-2-09', 'DIČ 2120860148 · IČ DPH SK2120860148'],
+    ['Mr. JOB SK s.r.o.', MJ],
+    ['BH Group Zrt.', MJ],
+    ['po maďarsky, anglicky, nemecky aj francúzsky', 'po slovensky, anglicky aj nemecky'],
+    ['po maďarsky, anglicky alebo nemecky', 'po slovensky, anglicky alebo nemecky'],
+    ['Kontakt po maďarsky, anglicky alebo nemecky', 'Kontakt po slovensky, anglicky alebo nemecky'],
+    ['z Nemecka do Maďarska', 'z Nemecka na Slovensko'],
+    ['maďarský zákon CXII z roku 2011 (Infotv.), zákon V z roku 2013 (Ptk.) a zákon C z roku 2000 (Számviteli tv.) — pokiaľ ide o spracúvanie údajov spoločnosťou',
+      'zákon č. 18/2018 Z. z. o ochrane osobných údajov, zákon č. 40/1964 Zb. Občiansky zákonník a zákon č. 431/2002 Z. z. o účtovníctve — pokiaľ ide o spracúvanie údajov spoločnosťou'],
+    ['5-ročná lehota od ukončenia veci (maďarský Ptk. § 6:22)', 'do uplynutia premlčacej lehoty (3 roky podľa § 101 Občianskeho zákonníka, 4 roky podľa § 397 Obchodného zákonníka)'],
+    ['maďarský zákon o účtovníctve § 169', 'zákon č. 431/2002 Z. z. o účtovníctve, § 35'],
+    ['Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH) — 1055 Budapest, Falk Miksa utca 9–11.; poštová adresa: 1363 Budapest, Pf. 9.; +421 915 410 555;',
+      'Úrad na ochranu osobných údajov Slovenskej republiky — Galvaniho 7/B, 821 04 Bratislava; +421 2 3231 3214;'],
+    ['ugyfelszolgalat@naih.hu', 'statny.dozor@pdp.gov.sk'],
+    ['www.naih.hu', 'www.dataprotection.gov.sk'],
+    ['(v Maďarsku: nariadenie vlády č. 45/2014. (II. 26.) Korm.)', '(na Slovensku: zákon č. 108/2024 Z. z. o ochrane spotrebiteľa)'],
+    ['rozhodcovskú komisiu pre spotrebiteľov (békéltető testület) príslušnú podľa vášho bydliska alebo podľa sídla Zástupcu — Hajdú-Bihar Vármegyei Békéltető Testület (4025 Debrecen, Petőfi tér 10.) — kontakty:',
+      'subjekt alternatívneho riešenia spotrebiteľských sporov — Slovenská obchodná inšpekcia, ústredný inšpektorát, Odbor pre medzinárodné vzťahy a alternatívne riešenie spotrebiteľských sporov, Bajkalská 21/A, P. O. BOX 29, 827 99 Bratislava 27; ars@soi.sk; +421 2 5827 2123 — ARS je bezplatné; podrobnosti:'],
+    ['bekeltetes.hu', 'soi.sk/alternativne-riesenie-spotrebitelskych-sporov'],
+    ['a používanie Webu sa vzťahuje maďarské právo.', 'a používanie Webu sa vzťahuje právo Slovenskej republiky.'],
+    ['Tento preklad má len informatívny charakter — právne záväzná je maďarská verzia.', 'Tento dokument je vyhotovený v slovenskom jazyku.'],
+    ['Caradvance Maďarsko', 'Caradvance Slovensko'],
+    ['V Maďarsku nás zastupuje', 'Na Slovensku nás zastupuje'],
+    ['Zastúpenie v Maďarsku', 'Zastúpenie na Slovensku'],
+    ['maďarským zastúpením', 'slovenským zastúpením'],
+    ['je zástupcom v Maďarsku', 'je zástupcom na Slovensku'],
+    ['; cena vo forintoch je orientačná, prepočítaná denným kurzom', ''],
+    ['; cena vo forintoch je orientačná a prepočítaná denným kurzom', ''],
+    ['cenovú ponuku vo forintoch', 'cenovú ponuku v eurách']
+  ],
+  cs: [
+    ['BH Group Zártkörűen Működő Részvénytársaság (BH Group Zrt.) — Caradvance Hungary', MJ],
+    ['Mr. JOB SK s.r.o. — Caradvance Hungary', MJ],
+    ['BH Group Zrt. (Caradvance Česko)', MJ],
+    ['BH Group Zrt. (Caradvance Hungary)', MJ],
+    ['Mr. JOB SK s.r.o. (Maďarsko)', MJ + ' (Slovensko)'],
+    ['BH Group Zrt. — 4143 Vekerd, Petőfi utca 23.', MJ + ' — ' + ADDR_CS],
+    ['4143 Vekerd, Petőfi utca 23.', ADDR_CS],
+    ['2083 Solymár, Ibolya utca 18.', ADDR_CS],
+    ['09-10-000660 · 32488447-2-09', 'IČO 52 005 445 · DIČ SK2120860148'],
+    ['09-10-000660 (Rejstříkový soud při Krajském soudu v Debrecínu)', 'IČO 52 005 445 — obchodní rejstřík Městského soudu Bratislava III, oddíl Sro, vložka č. 141700/B'],
+    ['09-10-000660 (Debreceni Törvényszék Cégbírósága)', 'IČO 52 005 445 — obchodní rejstřík Městského soudu Bratislava III, oddíl Sro, vložka č. 141700/B'],
+    ['32488447-2-09', 'DIČ SK2120860148'],
+    ['Mr. JOB SK s.r.o.', MJ],
+    ['BH Group Zrt.', MJ],
+    ['maďarsky, anglicky nebo německy', 'česky, slovensky, anglicky nebo německy'],
+    ['z Německa do Maďarska', 'z Německa do Česka'],
+    ['maďarský zákon č. CXII/2011 (Infotv.), zákon č. V/2013 (Ptk.) a zákon č. C/2000 (zákon o účetnictví) — pokud jde o zpracování údajů společností',
+      'slovenský zákon č. 18/2018 Z. z. o ochraně osobních údajů, zákon č. 40/1964 Zb. (občanský zákoník) a zákon č. 431/2002 Z. z. o účetnictví — pokud jde o zpracování údajů společností'],
+    ['5 let od uzavření případu (maďarský občanský zákoník, § 6:22)', 'do uplynutí promlčecí lhůty (3 roky podle § 101 slovenského občanského zákoníku, 4 roky podle § 397 slovenského obchodního zákoníku)'],
+    ['maďarský zákon o účetnictví, § 169', 'slovenský zákon č. 431/2002 Z. z. o účetnictví, § 35'],
+    ['Maďarský národní úřad pro ochranu údajů a svobodu informací (NAIH) — 1055 Budapest, Falk Miksa utca 9–11.; poštovní adresa: 1363 Budapest, Pf. 9.; +421 915 410 555;',
+      'Úřad pro ochranu osobních údajů — Pplk. Sochora 27, 170 00 Praha 7; +420 234 665 111;'],
+    ['ugyfelszolgalat@naih.hu', 'posta@uoou.gov.cz'],
+    ['www.naih.hu', 'uoou.gov.cz'],
+    ['(v Maďarsku: nařízení vlády č. 45/2014 (II. 26.))', '(v Česku: § 1829 zákona č. 89/2012 Sb., občanský zákoník)'],
+    ['smírčí orgán (Békéltető Testület) při župě Hajdú-Bihar, příslušný podle vašeho bydliště nebo sídla Zástupce (4025 Debrecen, Petőfi tér 10.) — kontakty:',
+      'subjekt mimosoudního řešení spotřebitelských sporů — Českou obchodní inspekci (ADR je bezplatné); podrobnosti a formulář:'],
+    ['bekeltetes.hu', 'coi.gov.cz/informace-o-adr'],
+    ['a používání Webu se vztahuje maďarské právo.', 'a používání Webu se vztahuje právo Slovenské republiky.'],
+    ['Tento překlad má pouze informativní charakter — právně závazná je maďarská verze.', 'Tento dokument je vyhotoven v českém jazyce.'],
+    ['Caradvance Maďarsko', 'Caradvance Česko'],
+    ['V Maďarsku nás zastupuje', 'V Česku a na Slovensku nás zastupuje'],
+    ['Zastoupení v Maďarsku', 'Zastoupení pro Česko a Slovensko'],
+    ['maďarským zastoupením', 'naším zastoupením'],
+    ['je zástupcem v Maďarsku', 'je zástupcem pro Česko a Slovensko']
+  ]
+};
+// Linkek (href) cseréje ugyanezekhez
+export const LEGAL_HREF = {
+  sk: [[/^mailto:ugyfelszolgalat@naih\.hu$/i, 'mailto:statny.dozor@pdp.gov.sk'], [/^https?:\/\/(www\.)?naih\.hu\/?$/i, 'https://dataprotection.gov.sk/sk/'], [/^https?:\/\/(www\.)?bekeltetes\.hu\/?$/i, 'https://www.soi.sk/alternativne-riesenie-spotrebitelskych-sporov']],
+  cs: [[/^mailto:ugyfelszolgalat@naih\.hu$/i, 'mailto:posta@uoou.gov.cz'], [/^https?:\/\/(www\.)?naih\.hu\/?$/i, 'https://uoou.gov.cz/'], [/^https?:\/\/(www\.)?bekeltetes\.hu\/?$/i, 'https://coi.gov.cz/informace-o-adr/']]
+};
+// Csak a jogi oldalakon: a webcím a saját domain
+export const LEGAL_PAGES = /^\/(obchodne-podmienky|ochrana-osobnych-udajov|impressum|obchodni-podminky|ochrana-osobnich-udaju)\//;
+
+// A Magyarországra vonatkozó szabályokat ismertető blogcikk (regisztrációs adó) — kivéve
+FORCE_EXCLUDE.push('regisztracios-ado-2026');
