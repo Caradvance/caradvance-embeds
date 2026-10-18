@@ -387,11 +387,12 @@ function fixBlogIndex(html, l, base, map) {
   const cards = [];
   html.replace(cardRe, (a, cls) => { cards.push({ a, cls }); return a; });
   if (!cards.length) return html;
-  const keep = [];
+  const keep = []; const VALS = new Set(Object.values(map));
   for (const c of cards) {
     const hu = (c.a.match(/href="([^"]+)"/) || [])[1] || '';
-    const q = hu.replace(/^https:\/\/(?:www\.)?caradvance\.hu/, '');
-    const loc = map[q];
+    let q = hu.replace(/^https:\/\/(?:www\.)?caradvance\.(?:hu|sk|cz)/, '').replace(new RegExp('^/' + l + '(?=/)'), '').replace(/[?#].*$/, '');
+    if (!q.endsWith('/')) q += '/';
+    const loc = map[q] != null ? map[q] : (VALS.has(q) ? q : null);
     c.ok = !!(loc && loc !== '/blog/');
     if (!c.ok) continue;
     const inf = info(loc);
@@ -408,13 +409,13 @@ function fixBlogIndex(html, l, base, map) {
     if (first) {
       const g = (re) => (first.out.match(re) || [])[1];
       const href = g(/href="([^"]+)"/), img = g(/class="bl-cardimg"[^>]*style="([^"]*)"/), cat = g(/class="bl-cat"[^>]*>([\s\S]*?)<\/span>/),
-        title = g(/class="bl-cardtitle"[^>]*>([\s\S]*?)<\/span>/), exc = g(/class="bl-cardexc"[^>]*>([\s\S]*?)<\/span>/), meta = g(/class="bl-meta"[^>]*>([\s\S]*?<\/span>)\s*<\/span>/);
+        title = g(/class="bl-cardtitle"[^>]*>([\s\S]*?)<\/span>/), exc = g(/class="bl-cardexc"[^>]*>([\s\S]*?)<\/span>/), meta = g(/class="bl-meta"[^>]*>(<time[\s\S]*?<\/time>\s*<span class="bl-dot"[^>]*>[^<]*<\/span>[^<]*)<\/span>/);
       let a = feat.a.replace(/href="[^"]+"/, 'href="' + href + '"');
       if (img) a = a.replace(/(class="bl-featimg"[^>]*style=")[^"]*(")/, (w, p, s) => p + img + s);
       if (cat) a = a.replace(/(class="bl-cat"[^>]*>)[\s\S]*?(<\/span>)/, (w, p, s) => p + cat + s);
       if (title) a = a.replace(/(class="bl-feattitle"[^>]*>)[\s\S]*?(<\/span>)/, (w, p, s) => p + title + s);
       if (exc) a = a.replace(/(class="bl-featexc"[^>]*>)[\s\S]*?(<\/span>)/, (w, p, s) => p + exc + s);
-      if (meta) a = a.replace(/(class="bl-meta"[^>]*>)[\s\S]*?<\/span>(\s*<\/span>)/, (w, p, s) => p + meta + s);
+      if (meta) a = a.replace(/(class="bl-meta"[^>]*>)<time[\s\S]*?<\/time>\s*<span class="bl-dot"[^>]*>[^<]*<\/span>[^<]*(<\/span>)/, (w, p, s) => p + meta + s);
       feat.out = a; feat.ok = true; promoted = first;
     }
   }

@@ -227,7 +227,8 @@ export function run(DIST = 'dist') {
       files++;
       const o = s;
       // kizárt (csak magyar) blogcikkek: kártya törlése, szövegközi link kibontása
-      for (const l of Object.keys(exclRe)) s = s.replace(exclRe[l], (a, inner) => (/class="[^"]*card/.test(a) ? '' : inner));
+      // (a blog főoldalát a skcz-text.mjs rendezi: kártyák, kiemelt cikk)
+      if (!/[\\/](sk|cs)[\\/]blog[\\/]index\.html$/.test(p)) for (const l of Object.keys(exclRe)) s = s.replace(exclRe[l], (a, inner) => (/class="[^"]*card/.test(a) ? '' : inner));
       s = s.replace(RE, conv);
       if (s !== o) { fs.writeFileSync(p, s); changed++; }
     }
