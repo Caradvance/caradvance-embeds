@@ -350,9 +350,9 @@ function makeTranslator(X, l, IMG = new Set()) {
     if (t !== h) setAttr(e, 'href', t);
   }
   const LOGO = (v) => v.replace(/(^|\/)caradvance-logo(-white)?\.webp(?=$|[?#])/, (w, p, wh) => p + 'caradvance-logo' + (wh || '') + '-' + l + '.webp');
-  // Nyelvi képcsere: ha létezik public/i18n-img/<l>/<eredeti útvonal>, azt használjuk (pl. szlovák/cseh feliratos kép).
+  // Nyelvi képcsere: ha létezik public/l10n/<l>/<eredeti útvonal> (ugyanaz a konvenció, mint az i18n-mirror.mjs-ben, itt srcset/style/og:image/JSON-LD is), azt használjuk (pl. szlovák/cseh feliratos kép).
   const IMGRE = /^((?:https?:)?\/\/(?:www\.)?caradvance\.(?:hu|sk|cz))?(\/[^?#\s"'()]+)([?#][^\s"'()]*)?$/i;
-  const IM = (u) => { if (!IMG.size) return u; const m = IMGRE.exec(u); if (!m) return u; let p = m[2]; try { p = decodeURI(p); } catch (x) { } if (!IMG.has(p)) return u; imgN++; return (m[1] || '') + '/i18n-img/' + l + m[2] + (m[3] || ''); };
+  const IM = (u) => { if (!IMG.size) return u; const m = IMGRE.exec(u); if (!m) return u; let p = m[2]; try { p = decodeURI(p); } catch (x) { } if (!IMG.has(p)) return u; imgN++; return (m[1] || '') + '/l10n/' + l + m[2] + (m[3] || ''); };
   const IMS = (v) => v.split(',').map((x) => x.replace(/\S+/, (u) => IM(u))).join(',');
   const IMC = (v) => v.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g, (w, q, u) => { const n = IM(u.trim()); return n === u.trim() ? w : 'url(' + q + n + q + ')'; });
   function imgs(e) {
@@ -507,7 +507,7 @@ export function run(DIST = 'dist') {
         if (e.isDirectory()) li(path.join(d, e.name), rel + '/' + e.name);
         else if (/\.(webp|avif|jpe?g|png|gif|svg)$/i.test(e.name)) IMG.add(rel + '/' + e.name);
       }
-    })(path.join(DIST, 'i18n-img', l), '');
+    })(path.join(DIST, 'l10n', l), '');
     const translate = makeTranslator(X, l, IMG);
     let files = 0, changed = 0, errs = 0, rtFirst = 0, dbg = '';
     (function walk(d) {
