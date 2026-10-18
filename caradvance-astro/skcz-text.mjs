@@ -378,7 +378,17 @@ function makeTranslator(X, l) {
     }
     for (const c of e.children) walk(c);
   }
-  return (html) => { const r = parse(html); walk(r); return ser(r); };
+  // A fordító (rt-xx.js) a cookie-sáv (ca-consent.js) ELŐTT fusson, különben a sáv egy pillanatra magyarul jelenik meg.
+  // Mindkettő "defer" — a sorrend a dokumentum-sorrend; a window.CA_CFG inline a <head>-ben előttük van.
+  function moveRt(h) {
+    const rt = new RegExp('<script src="/i18n/rt-' + l + '\\.js[^"]*" defer></script>\\n?');
+    const m = rt.exec(h); const ci = h.indexOf('<script src="/ca-consent.js" defer></script>');
+    if (!m || ci < 0 || m.index < ci) return h;
+    const tag = m[0];
+    h = h.slice(0, m.index) + h.slice(m.index + tag.length);
+    return h.slice(0, ci) + tag.replace(/\n?$/, '\n') + h.slice(ci);
+  }
+  return (html) => { const r = parse(html); walk(r); return moveRt(ser(r)); };
 }
 
 // ---------- 3. blog főoldal: kártyák a szlovák / cseh cikkekből ----------
