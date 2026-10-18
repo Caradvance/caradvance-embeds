@@ -44,7 +44,7 @@ const DOMAINS = { 'caradvance.sk': 'sk', 'www.caradvance.sk': 'sk', 'caradvance.
 const HU_SITE = 'https://www.caradvance.hu';
 const LANG_SITE = { sk: 'https://www.caradvance.sk', cs: 'https://www.caradvance.cz' };
 // true = a caradvance.hu/sk/… és /cs/… címek 301-gyel a saját domainre mennek (csak ha a domainek már élnek!)
-const SKCZ_REDIRECT = false;
+const SKCZ_REDIRECT = true;
 /** Abszolút caradvance.hu/sk|cs URL → saját domain (canonical, hreflang, og:url, linkek). */
 function toLangSite(v) {
   const m = /^https:\/\/(?:www\.)?caradvance\.hu\/(sk|cs)(\/.*)?$/.exec(v);
