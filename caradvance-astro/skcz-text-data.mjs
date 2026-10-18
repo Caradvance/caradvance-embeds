@@ -579,7 +579,8 @@ export const LEGAL = {
     ['je zástupcom v Maďarsku', 'je zástupcom na Slovensku'],
     ['; cena vo forintoch je orientačná, prepočítaná denným kurzom', ''],
     ['; cena vo forintoch je orientačná a prepočítaná denným kurzom', ''],
-    ['cenovú ponuku vo forintoch', 'cenovú ponuku v eurách']
+    ['cenovú ponuku vo forintoch', 'cenovú ponuku v eurách'],
+    ['vo forintoch', 'v eurách']
   ],
   cs: [
     ['BH Group Zártkörűen Működő Részvénytársaság (BH Group Zrt.) — Caradvance Hungary', MJ],
@@ -616,7 +617,10 @@ export const LEGAL = {
     ['V Maďarsku nás zastupuje', 'V Česku a na Slovensku nás zastupuje'],
     ['Zastoupení v Maďarsku', 'Zastoupení pro Česko a Slovensko'],
     ['maďarským zastoupením', 'naším zastoupením'],
-    ['je zástupcem v Maďarsku', 'je zástupcem pro Česko a Slovensko']
+    ['je zástupcem v Maďarsku', 'je zástupcem pro Česko a Slovensko'],
+    ['cenovou nabídku ve forintech', 'cenovou nabídku v eurech'],
+    ['cena ve forintech je orientační', 'cena v korunách je orientační'],
+    ['ve forintech', 'v korunách']
   ]
 };
 // Linkek (href) cseréje ugyanezekhez
