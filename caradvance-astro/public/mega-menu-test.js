@@ -40,10 +40,10 @@
   var BUY_BRANDS = [B('bmw', 'BMW'), B('mini', 'MINI'), B('mercedes', 'Mercedes'), B('audi', 'Audi')]
     .map(function (b) { b.href = '/egyedi-auto-rendeles/?brand=' + b.k; return b; });
   var P = [
-    { brands: RENT_BRANDS, bt: 'Bérelhető autóink', bhref: '/autoink/#berelheto', bcols: 3,
+    { brands: RENT_BRANDS, bt: 'Bérelhető autóink', bhref: '/autoink/#berelheto', bcols: 6, cars: 'rent', ct: 'Kiemelt bérelhető autók', call: 'Összes bérelhető autó', callHref: '/autoink/#berelheto',
       links: [['info', 'Mi a tartós bérlet?', '/tartos-berlet/', 'Minden benne van egy havi díjban'], ['compare', 'Autók összehasonlítása', '/auto-osszehasonlitas/', 'Akár 3 modell egymás mellett'], ['route', 'Bérlési folyamat', '/berlesi-folyamat/', 'Lépésről lépésre az átadásig'], ['shield', 'Feltételek és kaució', '/berlesi-feltetelek/', 'Önrész, km-keret, kaució'], ['star', 'Előnyök', '/berles-elonyei/', 'Miért éri meg bérelni?'], ['help', 'Gyakori kérdések', '/berles-gyakori-kerdesek/', 'Válaszok a gyakori kérdésekre']],
       f: { img: '/piros-bmw-x6-m-premium-autoberles.webp', t: 'Prémium autó, egy havi díjért', s: 'Szerviz, gumi, biztosítás és adó a díjban.', cta: 'Bérelhető autóink', href: '/autoink/#berelheto' } },
-    { brands: BUY_BRANDS, bt: 'Egyedi autó rendelés', bhref: '/egyedi-auto-rendeles/', bcols: 2,
+    { brands: BUY_BRANDS, bt: 'Egyedi autó rendelés', bhref: '/egyedi-auto-rendeles/', bcols: 4, cars: 'sale', ct: 'Kiemelt eladó autók', call: 'Összes eladó autó', callHref: '/autoink/',
       links: [['store', 'Autóink', '/autoink/', 'Ellenőrzött autók Németországból'], ['coin', 'Finanszírozás – lízing', '/finanszirozas-lizing/', 'Havi részlet kiszámolása'], ['briefcase', 'Operatív lízing', '/operativ-lizing/', 'Cégeknek, nettó áron'], ['star', 'Előnyök', '/vasarlas-elonyei/', 'Miért vásárolj tőlünk?'], ['help', 'Gyakori kérdések', '/vasarlas-gyakori-kerdesek/', 'Áfa, garancia, átadás']],
       f: { img: '/bmw-m3-touring-premium-auto-eladas.webp', t: 'Konfiguráld, mi beszerezzük', s: 'BMW, MINI, Mercedes és Audi – gyári konfigurátorral.', cta: 'Egyedi rendelés', href: '/egyedi-auto-rendeles/' } },
     { links: [['cash', 'Eladom az autómat', '/eladom/', 'Ingyenes értékbecslés'], ['garage', 'Bizományos autóink', '/bizomanyos/', 'Eladó autók ügyfeleinktől'], ['timeline', 'Értékesítési folyamat', '/ertekesitesi-folyamat/', 'Mi intézünk mindent'], ['heart', 'Jótékonyság', '/jotekonysag/', 'Minden eladás után adományozunk'], ['help', 'Gyakori kérdések', '/gyakori-kerdesek/', 'Díjak, határidők, papírok']],
@@ -79,27 +79,82 @@
     '.mm-card:hover .mm-btn{background:#B80015}' +
     '.mm-foot{display:flex;flex-wrap:wrap;gap:22px;padding:13px 30px;border-top:1px solid #E6EAF1;font-size:13px;color:#5A6B82}' +
     '.mm-foot span{display:inline-flex;align-items:center;gap:6px}.mm-foot a{color:inherit;text-decoration:none}.mm-foot a:hover{color:#E2001A}' +
+    '.mm-in.mm-split{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:0;padding:0}' +
+    '.mm-left{padding:26px 18px 18px 22px;border-right:1px solid #E6EAF1;background:#FAFBFC;border-radius:26px 0 0 0}' +
+    '.mm-right{padding:26px 28px 18px 26px;display:flex;flex-direction:column;gap:20px;min-width:0}' +
+    '.mm-rowhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}' +
+    '.mm-more{font-size:13px;font-weight:700;color:#E2001A;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.mm-more:hover{color:#B80015}' +
+    '.mm-cars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}' +
+    '.mm-car{display:block;text-decoration:none;color:#14151A;border:1px solid #E6EAF1;border-radius:18px;overflow:hidden;background:#fff;transition:box-shadow .15s,border-color .15s,transform .15s}' +
+    '.mm-car:hover,.mm-car:focus-visible{border-color:#E2001A;box-shadow:0 10px 26px rgba(15,23,42,.10);transform:translateY(-2px);outline:none}' +
+    '.mm-car .mm-ph{aspect-ratio:16/10;background:#F1F4F9 center/cover no-repeat}' +
+    '.mm-car .mm-cb{padding:10px 12px 12px}.mm-car b{display:block;font-size:14px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.mm-car .mm-sp{display:block;font-size:12px;color:#7A8496;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.mm-car .mm-pr{display:flex;align-items:baseline;gap:6px;margin-top:8px}.mm-car .mm-pr strong{font-size:16px;color:#E2001A}.mm-car .mm-pr em{font-style:normal;font-size:11.5px;color:#7A8496}' +
+    '.mm-sk{border-radius:18px;background:linear-gradient(90deg,#F1F4F9,#F7F9FC,#F1F4F9);background-size:200% 100%;animation:mmsk 1.2s linear infinite;aspect-ratio:16/14}' +
+    '@keyframes mmsk{to{background-position:-200% 0}}' +
+    '.mm-single{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:0;border-radius:20px;overflow:hidden;background:#0B0B0D;color:#fff;text-decoration:none;min-height:230px}' +
+    '.mm-single .mm-ph{background:#222 center/cover no-repeat}.mm-single .mm-ct{padding:22px 22px;display:flex;flex-direction:column;justify-content:center}' +
+    '.mm-single b{font-size:20px;line-height:1.25}.mm-single span{display:block;font-size:14px;color:#C9CFDA;margin:8px 0 16px}' +
+    '.mm-chips{display:flex;gap:10px;flex-wrap:wrap}.mm-chips .mm-chip{margin:0}' +
     '.mm-all{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A;text-decoration:none;margin:8px 0 0 12px}';
 
   function el(html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function panelHtml(p) {
-    var cols = [];
-    if (p.brands) {
-      cols.push('1.5fr');
+  function fmtEur(v) { return Math.round(Number(v) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €'; }
+  function shortName(m) { return String(m || '').replace(/["'*]/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 4).join(' '); }
+  var DATA = { rent: null, sale: null, loading: false };
+  function slug(m) { return (window.RENT && RENT.slugify) ? RENT.slugify(m) : String(m || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function pick(list, n) { // kiemelt elöl, modellenként egy, max n
+    var out = [], seen = {};
+    list.slice().sort(function (a, b) { return (b.kiemelt ? 1 : 0) - (a.kiemelt ? 1 : 0); }).forEach(function (c) {
+      var key = (c.rent && c.rent.cat) || shortName(c.modell).split(' ').slice(0, 2).join(' ');
+      if (out.length < n && !seen[key] && c.img) { seen[key] = 1; out.push(c); }
+    });
+    return out;
+  }
+  function loadData(cb) {
+    if (DATA.rent || DATA.loading) return;
+    DATA.loading = true;
+    function go() {
+      try {
+        RENT.loadCars(function (cars) { DATA.rent = pick(cars || [], 4); DATA.rentN = (cars || []).length; cb(); });
+        RENT.loadAll(function (all) { DATA.sale = pick((all || []).filter(function (c) { return Number(c.eur) > 0; }), 4); DATA.saleN = (all || []).length; cb(); });
+      } catch (e) { DATA.rent = []; DATA.sale = []; cb(); }
     }
-    cols.push(p.brands ? '1.25fr' : '1.6fr');
-    if (p.side) cols.push('0.9fr');
-    cols.push('1fr');
-    var h = '<div class="mm-in" style="grid-template-columns:' + cols.map(function (c) { return 'minmax(0,' + c + ')'; }).join(' ') + '">';
+    if (window.RENT && RENT.loadCars) go();
+    else { var sc = document.createElement('script'); sc.src = '/rent-data.js'; sc.onload = go; sc.onerror = function () { DATA.rent = []; DATA.sale = []; cb(); }; document.head.appendChild(sc); }
+  }
+  function carCard(c, kind) {
+    var np = !!window.CA_NP;
+    var price = kind === 'rent'
+      ? (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + fmtEur(c.rent && c.rent.price) + '/hó</strong><em>nettó · 2 000 km/hó</em>')
+      : (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + fmtEur(c.eur) + '</strong><em>bruttó</em>');
+    var img = String(c.img || ''); if (/\?$/.test(img)) img += 'rule=mo-640'; else if (img.indexOf('rule=') < 0 && img.indexOf('classistatic') >= 0) img += (img.indexOf('?') < 0 ? '?' : '&') + 'rule=mo-640';
+    var sp = [String(c.evjarat || '').split('/').pop(), c.teljesitmeny, c.uzemanyag].filter(Boolean).join(' · ');
+    return '<a class="mm-car" href="/auto/' + slug(c.modell) + '/"><div class="mm-ph" style="background-image:url(\'' + img.replace(/'/g, '%27') + '\')"></div><div class="mm-cb"><b>' + esc(shortName(c.modell)) + '</b><span class="mm-sp">' + esc(sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
+  }
+  function carsHtml(p) {
+    var list = DATA[p.cars];
+    var body = !list ? '<div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div>'
+      : list.length ? list.map(function (c) { return carCard(c, p.cars); }).join('') : '';
+    if (list && !list.length) return '';
+    var n = p.cars === 'rent' ? DATA.rentN : DATA.saleN;
+    return '<div><div class="mm-rowhead"><p class="mm-h">' + esc(p.ct) + '</p><a class="mm-more" href="' + p.callHref + '">' + esc(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a></div><div class="mm-cars">' + body + '</div></div>';
+  }
+  function panelHtml(p) {
+    var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">Menü</p>' +
+      p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + esc(l[1]) + '</b><span>' + esc(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
     if (p.brands) {
       h += '<div><p class="mm-h"><a href="' + p.bhref + '">' + esc(p.bt) + ' ›</a></p><div class="mm-brands" style="grid-template-columns:repeat(' + p.bcols + ',minmax(0,1fr))">' +
         p.brands.map(function (b) { return '<a class="mm-b" href="' + b.href + '"><img src="/bl-' + b.k + '-dark.webp" alt="" width="30" height="30">' + esc(b.n) + '</a>'; }).join('') + '</div></div>';
     }
-    h += '<div><p class="mm-h">Oldalak</p>' + p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + esc(l[1]) + '</b><span>' + esc(l[3]) + '</span></div></a>'; }).join('') + '</div>';
-    if (p.side) h += '<div><p class="mm-h">' + esc(p.side.t) + '</p>' + p.side.items.map(function (s) { return '<a class="mm-chip" href="' + s[2] + '">' + svg(s[0], 18) + esc(s[1]) + '</a>'; }).join('') + '</div>';
-    h += '<div><p class="mm-h">Kiemelt</p><a class="mm-card" href="' + p.f.href + '"><img src="' + p.f.img + '" alt=""><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div>';
-    h += '</div><div class="mm-foot"><span>' + svg('star', 16) + '5,0 Google értékelés</span><span>' + svg('phone', 16) + '<a href="tel:+36302336060">+36 30 233 6060</a></span><span>' + svg('clock', 16) + 'Válasz 1 órán belül, munkaidőben</span><span>' + svg('pin', 16) + 'Geretsried (DE) · Solymár (HU)</span></div>';
+    if (p.cars) h += '<div class="mm-carswrap">' + carsHtml(p) + '</div>';
+    else {
+      if (p.side) h += '<div><p class="mm-h">' + esc(p.side.t) + '</p><div class="mm-chips">' + p.side.items.map(function (s) { return '<a class="mm-chip" href="' + s[2] + '">' + svg(s[0], 18) + esc(s[1]) + '</a>'; }).join('') + '</div></div>';
+      h += '<div><p class="mm-h">Kiemelt</p><a class="mm-single" href="' + p.f.href + '"><div class="mm-ph" style="background-image:url(\'' + p.f.img + '\')"></div><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn" style="align-self:flex-start;margin:0">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div>';
+    }
+    h += '</div></div><div class="mm-foot"><span>' + svg('star', 16) + '5,0 Google értékelés</span><span>' + svg('phone', 16) + '<a href="tel:+36302336060">+36 30 233 6060</a></span><span>' + svg('clock', 16) + 'Válasz 1 órán belül, munkaidőben</span><span>' + svg('pin', 16) + 'Geretsried (DE) · Solymár (HU)</span></div>';
     return h;
   }
 
@@ -142,6 +197,9 @@
     window.addEventListener('resize', sync); sync();
     // a képek előtöltése az első rámutatáskor, hogy a panel azonnal teljes legyen
     wrap.querySelector('.menu').addEventListener('mouseenter', function () { P.forEach(function (p) { var im = new Image(); im.src = p.f.img; }); }, { once: true });
+    function refresh() { var w = panel.querySelector('.mm-carswrap'); if (w && cur >= 0 && P[cur].cars) w.innerHTML = carsHtml(P[cur]); }
+    wrap.querySelector('.menu').addEventListener('mouseenter', function () { loadData(refresh); });
+    wrap.querySelector('.menu').addEventListener('focusin', function () { loadData(refresh); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
