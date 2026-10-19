@@ -94,11 +94,11 @@
     var h = '<div class="mm-in" style="grid-template-columns:' + cols.map(function (c) { return 'minmax(0,' + c + ')'; }).join(' ') + '">';
     if (p.brands) {
       h += '<div><p class="mm-h"><a href="' + p.bhref + '">' + esc(p.bt) + ' ›</a></p><div class="mm-brands" style="grid-template-columns:repeat(' + p.bcols + ',minmax(0,1fr))">' +
-        p.brands.map(function (b) { return '<a class="mm-b" href="' + b.href + '"><img src="/bl-' + b.k + '-dark.webp" alt="" width="30" height="30" loading="lazy">' + esc(b.n) + '</a>'; }).join('') + '</div></div>';
+        p.brands.map(function (b) { return '<a class="mm-b" href="' + b.href + '"><img src="/bl-' + b.k + '-dark.webp" alt="" width="30" height="30">' + esc(b.n) + '</a>'; }).join('') + '</div></div>';
     }
     h += '<div><p class="mm-h">Oldalak</p>' + p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + esc(l[1]) + '</b><span>' + esc(l[3]) + '</span></div></a>'; }).join('') + '</div>';
     if (p.side) h += '<div><p class="mm-h">' + esc(p.side.t) + '</p>' + p.side.items.map(function (s) { return '<a class="mm-chip" href="' + s[2] + '">' + svg(s[0], 18) + esc(s[1]) + '</a>'; }).join('') + '</div>';
-    h += '<div><p class="mm-h">Kiemelt</p><a class="mm-card" href="' + p.f.href + '"><img src="' + p.f.img + '" alt="" loading="lazy"><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div>';
+    h += '<div><p class="mm-h">Kiemelt</p><a class="mm-card" href="' + p.f.href + '"><img src="' + p.f.img + '" alt=""><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div>';
     h += '</div><div class="mm-foot"><span>' + svg('star', 16) + '5,0 Google értékelés</span><span>' + svg('phone', 16) + '<a href="tel:+36302336060">+36 30 233 6060</a></span><span>' + svg('clock', 16) + 'Válasz 1 órán belül, munkaidőben</span><span>' + svg('pin', 16) + 'Geretsried (DE) · Solymár (HU)</span></div>';
     return h;
   }
