@@ -118,19 +118,21 @@
     DATA.loading = true;
     function go() {
       try {
-        RENT.loadCars(function (cars) { DATA.rent = pick(cars || [], 4); DATA.rentN = (cars || []).length; cb(); });
-        RENT.loadAll(function (all) { DATA.sale = pick((all || []).filter(function (c) { return Number(c.eur) > 0; }), 4); DATA.saleN = (all || []).length; cb(); });
+        RENT.loadCars(function (cars) { DATA.rent = pick(cars || [], 4); DATA.rentN = (cars || []).length; preload(DATA.rent); cb(); });
+        RENT.loadAll(function (all) { DATA.sale = pick((all || []).filter(function (c) { return Number(c.eur) > 0; }), 4); DATA.saleN = (all || []).length; preload(DATA.sale); cb(); });
       } catch (e) { DATA.rent = []; DATA.sale = []; cb(); }
     }
     if (window.RENT && RENT.loadCars) go();
     else { var sc = document.createElement('script'); sc.src = '/rent-data.js'; sc.onload = go; sc.onerror = function () { DATA.rent = []; DATA.sale = []; cb(); }; document.head.appendChild(sc); }
   }
+  function thumb(u) { var img = String(u || ''); if (img.indexOf('classistatic') >= 0) { if (/rule=mo-\d+/.test(img)) img = img.replace(/rule=mo-\d+/, 'rule=mo-640'); else img += (/\?$/.test(img) ? '' : (img.indexOf('?') < 0 ? '?' : '&')) + 'rule=mo-640'; } return img; }
+  function preload(list) { (list || []).forEach(function (c) { var im = new Image(); im.src = thumb(c.img); }); }
   function carCard(c, kind) {
     var np = !!window.CA_NP;
     var price = kind === 'rent'
       ? (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + fmtEur(c.rent && c.rent.price) + '/hó</strong><em>nettó · 2 000 km/hó</em>')
       : (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + fmtEur(c.eur) + '</strong><em>bruttó</em>');
-    var img = String(c.img || ''); if (/\?$/.test(img)) img += 'rule=mo-640'; else if (img.indexOf('rule=') < 0 && img.indexOf('classistatic') >= 0) img += (img.indexOf('?') < 0 ? '?' : '&') + 'rule=mo-640';
+    var img = thumb(c.img);
     var sp = [String(c.evjarat || '').split('/').pop(), c.teljesitmeny, c.uzemanyag].filter(Boolean).join(' · ');
     return '<a class="mm-car" href="/auto/' + slug(c.modell) + '/"><div class="mm-ph" style="background-image:url(\'' + img.replace(/'/g, '%27') + '\')"></div><div class="mm-cb"><b>' + esc(shortName(c.modell)) + '</b><span class="mm-sp">' + esc(sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
   }
