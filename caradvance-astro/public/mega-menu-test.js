@@ -55,8 +55,8 @@
       f: { img: '/caradvance-iroda.webp', t: 'Gyere be hozzánk', s: 'Solymár, Ibolya utca 18. – hétfőtől péntekig 9–17.', cta: 'Kapcsolat', href: '/kapcsolat/' } }
   ];
   var CSS = '' +
-    '.mm-on .ca-nav .menu .dropdown{display:none!important}' +
-    '.mm-on .ca-nav .menu .navitem.mm-act>.navlink{color:#E2001A}' +
+    '@media (min-width:1100px){.mm-on .ca-nav .menu .dropdown{display:none!important}.mm-on .ca-nav .menu .navitem.mm-act>.navlink{color:#E2001A}}' +
+    '@media (max-width:1099.98px){.mm-panel{display:none!important}}' +
     '.mm-panel{position:absolute;left:50%;top:calc(100% + 10px);transform:translate(-50%,6px);width:min(1320px,calc(100vw - 28px));background:#fff;border-radius:26px;box-shadow:0 22px 60px rgba(8,8,10,.22);opacity:0;visibility:hidden;transition:opacity .16s ease,transform .16s ease,visibility 0s .16s;z-index:1001;font-family:"Plus Jakarta Sans",system-ui,sans-serif;color:#14151A}' +
     '.mm-panel.open{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .16s ease,transform .16s ease}' +
     '.mm-in{display:grid;gap:28px;padding:28px 30px 20px}' +
@@ -111,7 +111,7 @@
     var panel = el('<div class="mm-panel" role="region" aria-label="Főmenü"></div>');
     wrap.appendChild(panel);
     var cur = -1, tOpen = 0, tClose = 0;
-    function desktop() { return window.innerWidth >= MIN_W; }
+    function desktop() { return window.matchMedia('(min-width:' + MIN_W + 'px)').matches; }
     function sync() { wrap.classList.toggle('mm-on', desktop()); if (!desktop()) close(); }
     function open(i) {
       clearTimeout(tClose);
@@ -137,6 +137,8 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel.classList.contains('open')) { var b = items[cur] && items[cur].querySelector('.navlink'); close(); if (b) b.focus(); } });
     document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
     panel.addEventListener('focusout', function (e) { if (!panel.contains(e.relatedTarget) && !wrap.querySelector('.menu').contains(e.relatedTarget)) close(); });
+    var mq = window.matchMedia('(min-width:' + MIN_W + 'px)');
+    if (mq.addEventListener) mq.addEventListener('change', sync); else if (mq.addListener) mq.addListener(sync);
     window.addEventListener('resize', sync); sync();
     // a képek előtöltése az első rámutatáskor, hogy a panel azonnal teljes legyen
     wrap.querySelector('.menu').addEventListener('mouseenter', function () { P.forEach(function (p) { var im = new Image(); im.src = p.f.img; }); }, { once: true });
