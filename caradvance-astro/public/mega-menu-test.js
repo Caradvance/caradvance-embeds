@@ -168,7 +168,7 @@
         yr: m.stock ? (String(m.yr || '').split('/').pop() + ' · készleten') : (m.stockOnly ? 'Azonnal elvihető' : '0 km · 2026'), sp: [m.cat].concat(m.gears || []).filter(Boolean).join(' · '),
         avail: m.now > 0 ? m.now + (m.stock ? ' azonnal elérhető' : ' elérhető') : ((m.later && m.later[0]) ? m.later[0].d : 'Hamarosan'), now: m.now > 0,
         fuels: (m.fuels || []).map(function (f) { return f === 'PHEV' ? 'Hibrid' : f; }),
-        ft: (Math.ceil(eff * R / 10000) * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft', eur: eff, isNew: true };
+        ft: ((m.eurFix ? Math.round(eff * R / 10000) : Math.ceil(eff * R / 10000)) * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft', eur: eff, isNew: true };
     });
   }
   function loadBiz(cb) {
