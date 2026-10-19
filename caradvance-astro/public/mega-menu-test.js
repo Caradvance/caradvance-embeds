@@ -102,6 +102,7 @@
     '.mm-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.mm-meta img{height:24px;width:46px;object-fit:contain;object-position:left center}.mm-meta span{font-size:12px;color:#7A8496}' +
     '.mm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.mm-av,.mm-fu{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:7px;padding:3px 8px;line-height:1.3}.mm-av{background:#64748b}.mm-av.now{background:#15803D}' +
     '.mm-car.mm-cta{background:#0B0B0D;color:#fff;border-color:#0B0B0D;display:flex;align-items:center}.mm-car.mm-cta b{white-space:normal;font-size:16px;margin-top:8px}.mm-car.mm-cta .mm-sp{color:#C9CFDA}.mm-ic2{color:#E2001A}.mm-car.mm-cta:hover{border-color:#E2001A}' +
+    '.mm-b img[src*="mercedes"]{transform:scale(1.45)}.mm-meta img[src*="mercedes"]{transform:scale(1.4);transform-origin:left center}' +
     '.mm-all{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A;text-decoration:none;margin:8px 0 0 12px}';
 
   function el(html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; }
