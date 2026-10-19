@@ -635,6 +635,8 @@ export const LEGAL = {
     ['několik milionů forintů', 'statisíce korun']
   ]
 };
+// Teljes szövegcsomópontra illeszkedő cserék (pl. táblázatcella, amelyben csak "27%" áll)
+export const LEGAL_EXACT = { sk: { '27%': '23%', '27 %': '23 %' }, cs: { '27%': '21%', '27 %': '21 %' } };
 // Linkek (href) cseréje ugyanezekhez
 export const LEGAL_HREF = {
   sk: [[/^mailto:ugyfelszolgalat@naih\.hu$/i, 'mailto:statny.dozor@pdp.gov.sk'], [/^https?:\/\/(www\.)?naih\.hu\/?$/i, 'https://dataprotection.gov.sk/sk/'], [/^https?:\/\/(www\.)?bekeltetes\.hu\/?$/i, 'https://www.soi.sk/alternativne-riesenie-spotrebitelskych-sporov']],

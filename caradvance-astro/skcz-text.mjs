@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
-import { M as XM, G as XGL, LEGAL, LEGAL_HREF, LEGAL_PAGES } from './skcz-text-data.mjs';
+import { M as XM, G as XGL, LEGAL, LEGAL_HREF, LEGAL_PAGES, LEGAL_EXACT } from './skcz-text-data.mjs';
 import { runSk as calcSk } from './skcz-calc.mjs';
 
 const NUM = /\d+(?:[.,\u00a0\u202f ]\d+)*/g;
@@ -273,7 +273,9 @@ function makeTranslator(X, l, IMG = new Set()) {
   // jogi / céges adatok (BH Group Zrt. → Mr. Job SK s.r.o., helyi hatóságok) — lásd LEGAL a skcz-text-data.mjs-ben
   const LR = LEGAL[l] || []; const DOM = 'www.caradvance.' + (l === 'cs' ? 'cz' : 'sk');
   let page = '';
+  const EXACT = LEGAL_EXACT[l] || {};
   const legal = (s) => {
+    const tt = s.trim(); if (EXACT[tt]) return s.replace(tt, EXACT[tt]);
     let o = s;
     for (const [a, b] of LR) if (o.includes(a)) o = o.split(a).join(b);
     if (LEGAL_PAGES.test(page) && o.includes('www.caradvance.hu')) o = o.split('www.caradvance.hu').join(DOM);
