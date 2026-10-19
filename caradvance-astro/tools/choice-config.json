@@ -68,7 +68,9 @@
     "VW ID.7 Tourer": "/berles/vw-id-7-tourer.webp",
     "VW Touareg": "/berles/vw-touareg.webp",
     "Mercedes-Benz GLE Coupé": "/mb-gle-coupe.webp",
-    "Land Rover Range Rover Velar": "/berles/range-rover-velar.webp"
+    "Land Rover Range Rover Velar": "/berles/range-rover-velar.webp",
+    "CUPRA Leon Sportstourer": "/berles/cupra-leon-sportstourer.webp",
+    "VW NFZ Crafter Kasten": "/berles/vw-crafter-kasten.webp"
   },
   "colors": {
     "Frost Blue": "Frost kék",
@@ -89,6 +91,8 @@
     "Aurora Blue Metallic": "Aurora kék metál",
     "Carpathian Grey": "Carpathian szürke",
     "Santorini Black": "Santorini fekete",
-    "Manhattan metallic": "Manhattan metál"
+    "Manhattan metallic": "Manhattan metál",
+    "Tavascan Blue Metallic": "Tavascan kék metál",
+    "Candy-Weiß": "Candy fehér"
   }
 }
