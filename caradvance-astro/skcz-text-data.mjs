@@ -580,7 +580,13 @@ export const LEGAL = {
     ['; cena vo forintoch je orientačná, prepočítaná denným kurzom', ''],
     ['; cena vo forintoch je orientačná a prepočítaná denným kurzom', ''],
     ['cenovú ponuku vo forintoch', 'cenovú ponuku v eurách'],
-    ['vo forintoch', 'v eurách']
+    ['vo forintoch', 'v eurách'],
+    // DPH: Szlovákia 23 % (2025. 1. 1-től), nem 27 %
+    ['27 % na Slovensku', '23 % na Slovensku'], ['slovenských 27 %', 'slovenských 23 %'], ['slovenskej DPH 27 %', 'slovenskej DPH 23 %'],
+    ['namiesto 27 %', 'namiesto 23 %'], ['(nemecká) — 27%', '(nemecká) — 23%'], ['(nemecká) — 27 %', '(nemecká) — 23 %'],
+    ['Rozdiel 8 percentuálnych bodov', 'Rozdiel 4 percentuálnych bodov'],
+    ['úsporu v hodnote stoviek tisíc €', 'úsporu v hodnote tisícok eur'], ['úspora v hodnote stoviek tisíc €', 'úspora v hodnote tisícok eur'],
+    ['niekoľko miliónov forintov', 'niekoľko tisíc eur']
   ],
   cs: [
     ['BH Group Zártkörűen Működő Részvénytársaság (BH Group Zrt.) — Caradvance Hungary', MJ],
@@ -620,7 +626,13 @@ export const LEGAL = {
     ['je zástupcem v Maďarsku', 'je zástupcem pro Česko a Slovensko'],
     ['cenovou nabídku ve forintech', 'cenovou nabídku v eurech'],
     ['cena ve forintech je orientační', 'cena v korunách je orientační'],
-    ['ve forintech', 'v korunách']
+    ['ve forintech', 'v korunách'],
+    // DPH: Česko 21 %, nem 27 %
+    ['místo české 27 %', 'místo české 21 %'], ['místo tuzemských 27 %', 'místo tuzemských 21 %'], ['27 % v Česku', '21 % v Česku'],
+    ['české sazbě DPH 27 %', 'české sazbě DPH 21 %'], ['místo 27 %', 'místo 21 %'], ['(německá) — 27%', '(německá) — 21%'], ['(německá) — 27 %', '(německá) — 21 %'],
+    ['Rozdíl 8 procentních bodů', 'Rozdíl 2 procentních bodů'],
+    ['úsporu v řádu statisíců korun', 'úsporu v řádu desítek tisíc korun'], ['úsporu v řádu stovek tisíc', 'úsporu v řádu desítek tisíc korun'], ['úsporu v řádu milionů', 'úsporu v řádu desítek tisíc korun'],
+    ['několik milionů forintů', 'statisíce korun']
   ]
 };
 // Linkek (href) cseréje ugyanezekhez
