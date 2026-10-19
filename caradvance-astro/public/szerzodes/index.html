@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Bérleti szerződés — CarAdvance</title>
+<link rel="icon" href="/favicon-32.png">
+<!-- ca-tracking:start --><!-- Ezen az oldalon szándékosan nincs követőkód (személyes adatok, okmányok). --><!-- ca-tracking:end -->
+<style>
+:root{--red:#E2001A;--red2:#B80015;--ink:#0F172A;--ink2:#334155;--mut:#5A6B82;--mut2:#7A8496;--line:#E6EAF1;--bg:#F4F5F7;--card:#fff;--ok:#16A34A;--ok2:#15803D;--okbg:#DCFCE7;--warn:#92400E;--warnbg:#FEF3C7;--errbg:#FDE8EB;--navy:#0B2A4A}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+a{color:var(--red)}
+.top{background:#0B0B0D;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.top img{height:34px;display:block}
+.top .num{color:#cbd2dc;font-size:13px}
+.hero{background:radial-gradient(900px 300px at 85% -40%,rgba(226,0,26,.45),transparent 60%),linear-gradient(180deg,#0B0B0D,#151821);color:#fff;padding:26px 20px 70px}
+.hero h1{margin:0 0 4px;font-size:26px;line-height:1.2;letter-spacing:-.01em}
+.hero p{margin:0;color:#c9cfda}
+.wrap{max-width:860px;margin:-48px auto 40px;padding:0 14px}
+.card{background:var(--card);border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(15,23,42,.06);margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:19px}
+.card h3{margin:18px 0 8px;font-size:15px}
+.muted{color:var(--mut)} .small{font-size:13px}
+.steps{display:flex;gap:6px;list-style:none;margin:0 0 16px;padding:0;overflow-x:auto}
+.steps li{flex:1;min-width:110px;background:#fff;border-radius:14px;padding:10px 12px;font-size:12.5px;color:var(--mut2);box-shadow:0 4px 14px rgba(15,23,42,.05);border-top:3px solid var(--line)}
+.steps li b{display:block;font-size:13.5px;color:var(--ink2)}
+.steps li.done{border-top-color:var(--ok)} .steps li.done b{color:var(--ok2)}
+.steps li.cur{border-top-color:var(--red)} .steps li.cur b{color:var(--red)}
+.test{background:#111;color:#ffb4bd;border-radius:12px;padding:8px 12px;font-size:13px;margin-bottom:12px;font-weight:600}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0 4px}
+.sum div{background:#F7F9FC;border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.sum span{display:block;font-size:12px;color:var(--mut)} .sum b{font-size:15px}
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+.seg label{flex:1;min-width:140px;border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:600;background:#fff}
+.seg input{margin-right:6px;accent-color:var(--red)}
+.seg label.on{border-color:var(--red);background:#fff5f6}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.grid .full{grid-column:1/-1}
+label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600}
+label.f i{color:var(--red);font-style:normal}
+.in{width:100%;margin-top:4px;padding:11px 12px;border:1.5px solid var(--line);border-radius:14px;background:#F7F9FC;font:inherit;color:var(--ink)}
+.in:focus{outline:none;border-color:var(--navy);background:#fff}
+.in.bad{border-color:var(--red);background:#fff5f6}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:8px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:1px;accent-color:var(--red);flex:none}
+.docs{display:grid;gap:10px}
+.doc{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+.doc.ok{border-style:solid;border-color:#bfe8cd;background:#f6fdf8}
+.doc.bad{border-color:var(--red);background:#fff5f6}
+.doc .ic{width:38px;height:38px;border-radius:10px;background:#F1F4F9;display:flex;align-items:center;justify-content:center;flex:none;font-size:18px;overflow:hidden}
+.doc.ok .ic{background:var(--okbg);color:var(--ok2)}
+.doc .ic img{width:100%;height:100%;object-fit:cover}
+.doc .tx{flex:1;min-width:0}
+.doc .tx b{display:block;font-size:14px}
+.doc .tx span{font-size:12.5px;color:var(--mut);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 22px;font:700 15px/1 inherit;font-family:inherit;cursor:pointer;text-decoration:none;background:#EEF2F7;color:var(--ink)}
+.btn.red{background:var(--red);color:#fff} .btn.red:hover{background:var(--red2)}
+.btn.sm{padding:8px 14px;font-size:13px}
+.btn.ghost{background:#fff;border:1.5px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.wide{width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.note{border-radius:14px;padding:12px 14px;margin:10px 0;font-size:14px}
+.note.warn{background:var(--warnbg);color:var(--warn)}
+.note.err{background:var(--errbg);color:#9f1239}
+.note.ok{background:var(--okbg);color:var(--ok2)}
+.note.info{background:#EEF4FF;color:#1e3a8a}
+.sec{border:1.5px solid var(--line);border-radius:16px;margin:10px 0;overflow:hidden;background:#fff}
+.sec>button{all:unset;box-sizing:border-box;display:flex;width:100%;align-items:center;gap:10px;padding:14px 16px;font-weight:800;font-size:15.5px;position:sticky;top:0;background:#fff;z-index:1;border-bottom:1px solid var(--line);margin-bottom:10px}
+.sec>button .st{margin-left:auto;font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;background:#F1F4F9;color:var(--mut)}
+.sec.acc{border-color:#bfe8cd} .sec.acc>button .st{background:var(--okbg);color:var(--ok2)}
+.sec .bd{padding:0 16px 14px;font-size:14.5px;color:var(--ink2)}
+.sec.open .bd{display:block}
+.sec .bd p{margin:0 0 10px} .sec .bd ul{margin:0 0 10px;padding-left:20px}
+.sec .acc-line{border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
+.pad{position:relative;border:1.5px solid var(--line);border-radius:16px;background:#fff;touch-action:none}
+.pad canvas{display:block;width:100%;height:190px;border-radius:16px;cursor:crosshair}
+.pad .ph{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;color:#b8c0cc;pointer-events:none;font-size:14px}
+.pad .ln{position:absolute;left:18px;right:18px;bottom:38px;border-bottom:1.5px solid #dfe5ee;pointer-events:none}
+.code{font:700 26px/1 "Courier New",monospace;letter-spacing:8px;text-align:center;max-width:220px}
+table.ch{width:100%;border-collapse:collapse;font-size:14px}
+table.ch td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.chip{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;background:#F1F4F9;color:var(--mut)}
+.chip.paid{background:var(--okbg);color:var(--ok2)} .chip.due{background:var(--warnbg);color:var(--warn)} .chip.bad{background:var(--errbg);color:#9f1239}
+.drv{border:1.5px solid var(--line);border-radius:16px;padding:14px;margin:12px 0;background:#FBFCFE}
+.spin{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp 1s linear infinite}
+.btn:not(.red) .spin{border-color:rgba(0,0,0,.15);border-top-color:var(--ink)}
+@keyframes sp{to{transform:rotate(360deg)}}
+.big{font-size:22px;font-weight:800}
+.foot{text-align:center;color:var(--mut2);font-size:12.5px;margin:20px 0 40px}
+@media (max-width:640px){.grid{grid-template-columns:1fr}.card{padding:18px;border-radius:18px}.hero h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="top"><a href="/"><img src="/caradvance-logo-white.webp" alt="CarAdvance" width="150" height="34"></a><span class="num" id="num"></span></div>
+<div class="hero"><h1 id="h1">Bérleti szerződés</h1><p id="sub">Betöltés…</p></div>
+<div class="wrap"><div id="app"><div class="card">Betöltés…</div></div>
+<p class="foot">Caradvance GmbH · Bgm-Graf-Ring 21 · D-82538 Geretsried · Magyarországi képviselet: BH Group Zrt.<br>Kérdés esetén: <a href="tel:+36302146989">+36 30 214 6989</a> · <a href="mailto:info@caradvance.hu">info@caradvance.hu</a> · <a href="/adatkezeles/" target="_blank">Adatkezelés</a></p></div>
+<script>
+(function(){
+'use strict';
+var Q=new URLSearchParams(location.search), T=Q.get('t')||'', API='/api/szerzodes/'+T, S=null, app=document.getElementById('app'), saveTimer=null, opened={}, sigPad=null, sigPad2=null, codeSent=false, localPrev={}, LANG='hu', CO=9;
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function money(v,c){var n=Number(v)||0,d=c==='HUF'?0:(Math.round(n*100)%100?2:0);var s=n.toFixed(d).replace('.',',').split(',');return s[0].replace(/\B(?=(\d{3})+(?!\d))/g,' ')+(s[1]?','+s[1]:'')+(c==='HUF'?' Ft':' €')}
+function hd(d){if(!d)return '—';var p=String(d).slice(0,10).split('-');return p[0]+'. '+p[1]+'. '+p[2]+'.'}
+function api(path,data,raw){var o={method:data||raw?'POST':'GET',credentials:'same-origin',headers:{}};if(raw){o.body=raw.body;o.headers=raw.headers}else if(data){o.headers['Content-Type']='application/json';o.body=JSON.stringify(data)}
+  return fetch(API+(path?'/'+path:''),o).then(function(r){return r.json().catch(function(){return {ok:false,error:'http_'+r.status}}).then(function(j){j._status=r.status;return j})})}
+var ERR={not_found:'A link érvénytelen vagy a szerződést visszavonták. Kérjük, keresd kollégánkat.',locked:'Ez a lépés most nem érhető el – frissítsd az oldalt.',too_many:'Túl sok próbálkozás, kérjük, várj egy kicsit.',too_big:'A fájl túl nagy (max. 1,4 MB). Fotónál próbáld újra, PDF-nél kisebb fájlt tölts fel.',bad_type:'Csak JPG, PNG, WEBP kép vagy PDF tölthető fel.',wrong_code:'Hibás kód (bérlő).',wrong_code2:'Hibás kód (bérlőtárs).',co_email:'A bérlőtársnak saját, a bérlőétől eltérő e-mail cím kell (oda küldjük az aláírási kódját).',bad_co_name:'Írd be a bérlőtárs teljes nevét.',bad_co_signature:'A bérlőtársnak is alá kell írnia a mezőben.',code_expired:'A kód lejárt – kérj újat.',bad_signature:'Kérjük, írd alá a szerződést a mezőben.',bad_name:'Írd be a teljes nevedet.',not_all_accepted:'Minden fejezetet el kell fogadni.',mail_not_configured:'Az e-mail küldés most nem elérhető. Kérjük, hívj minket.',stripe_not_configured:'A kártyás fizetés még nincs bekapcsolva. Kollégánk hamarosan keres.',server_error:'Váratlan hiba történt. Kérjük, próbáld újra.',incomplete:'Néhány adat vagy okmány még hiányzik (pirossal jelölve).'};
+function errMsg(j){return ERR[j.error]||('Hiba: '+(j.error||'ismeretlen'))}
+var FL={email:'E-mail cím',address_card_number:'Lakcímkártya száma',name:'Teljes név',birth_date:'Születési dátum',birth_place:'Születési hely',address:'Lakcím',phone:'Telefonszám',id_type:'Okmány',id_number:'Okmányszám',licence_number:'Jogosítvány száma',licence_since:'Jogosítvány megszerzésének éve',licence_expiry:'Jogosítvány érvényessége',ev_number:'EV nyilvántartási szám',tax_number:'Adószám',company_name:'Cégnév',reg_number:'Cégjegyzékszám',seat:'Székhely',signer_role:'Beosztás'};
+var ICON={id_front:'🪪',id_back:'🪪',passport:'🛂',licence_front:'🚗',licence_back:'🚗',address_front:'🏠',specimen:'✍️',poa:'📄',extract:'🏢'};
+
+function load(){return api('').then(function(j){if(!j.ok){fatal(errMsg(j));return}S=j;render()})}
+function fatal(m){document.getElementById('sub').textContent='';app.innerHTML='<div class="card"><h2>Nem elérhető</h2><p class="muted">'+esc(m)+'</p></div>'}
+
+function stepIdx(st){return {draft:0,sent:0,changes:0,review:1,approved:2,signed:3,active:4,closed:4}[st]||0}
+function stepsHtml(){var st=S.contract.status,i=stepIdx(st),L=[['1. lépés','Adatok, okmányok'],['2. lépés','Ellenőrzés'],['3. lépés','Elolvasás, aláírás'],['4. lépés',S.contract.terms.billing==='card'?'Kártyás fizetés':'Fizetés'],['Kész','Aktív bérlés']];
+  return '<ol class="steps">'+L.map(function(x,k){return '<li class="'+(k<i||(k===4&&i===4)?'done':k===i?'cur':'')+'"><b>'+x[1]+'</b>'+x[0]+'</li>'}).join('')+'</ol>'}
+function sumHtml(){var t=S.contract.terms,c=t.currency;return '<div class="sum"><div><span>Autó</span><b>'+esc(t.car||'—')+'</b></div><div><span>Havi díj</span><b>'+money(t.monthly,c)+'</b></div><div><span>Óvadék (kaució)</span><b>'+money(t.deposit,c)+(t.deposit_upfront?'':' *')+'</b></div><div><span>Km-keret</span><b>'+Number(t.km_month).toLocaleString('hu-HU')+' km/hó</b></div><div><span>Minimális időtartam</span><b>'+t.min_months+' hónap</b></div><div><span>Tervezett átadás</span><b>'+hd(t.handover_planned)+'</b></div></div>'+(t.deposit_upfront?'':'<p class="small muted">* Az óvadékot csak káresemény esetén, felhívásra kell megfizetni (5.5 pont).</p>')}
+
+function render(){
+  var c=S.contract;document.getElementById('num').textContent=c.number;
+  document.getElementById('h1').textContent=c.terms.car?('Bérleti szerződés – '+c.terms.car):'Bérleti szerződés';
+  document.getElementById('sub').textContent=c.status_hu;
+  var h=(c.test?'<div class="test">TESZT-SZERZŐDÉS – nem éles, valódi fizetés nem történik.</div>':'')+stepsHtml();
+  var st=c.status;
+  if(st==='draft')h+='<div class="card"><h2>A szerződés előkészítés alatt</h2><p class="muted">Kollégánk még dolgozik rajta. Amint elkészül, e-mailben értesítünk.</p></div>';
+  else if(st==='sent'||st==='changes')h+=viewDocs();
+  else if(st==='review')h+=viewReview();
+  else if(st==='approved')h+=viewSign();
+  else if(st==='signed')h+=viewPay();
+  else h+=viewActive();
+  app.innerHTML=h;bind();
+}
+
+/* ---------------- 1. adatok + okmányok ---------------- */
+function pobj(p){var cu=S.contract.cust;return p===CO?(cu.co||{}):p?((cu.drivers||[])[p-1]||{}):cu}
+function fld(k,p,o){o=o||{};var v=pobj(p)[k];var bad=S._miss&&S._miss.indexOf(p===CO?('co.'+k):p?('drivers.'+(p-1)+'.'+k):k)>=0;
+  var req=o.req!==false;var id='f_'+p+'_'+k;var inp;
+  if(o.sel)inp='<select class="in'+(bad?' bad':'')+'" id="'+id+'" data-k="'+k+'" data-p="'+p+'">'+o.sel.map(function(x){return '<option value="'+x[0]+'"'+(v===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select>';
+  else inp='<input class="in'+(bad?' bad':'')+'" id="'+id+'" data-k="'+k+'" data-p="'+p+'" type="'+(o.type||'text')+'" value="'+esc(v||'')+'"'+(o.ph?' placeholder="'+esc(o.ph)+'"':'')+(o.ac?' autocomplete="'+o.ac+'"':'')+(o.im?' inputmode="'+o.im+'"':'')+'>';
+  return '<label class="f'+(o.full?' full':'')+'">'+esc(o.label||FL[k])+(req?' <i>*</i>':'')+inp+'</label>'}
+function personFields(p,ctype){var cu=pobj(p);var full=(p===0||p===CO);var h='<div class="grid">';
+  h+=fld('name',p,{ac:p?'off':'name',label:ctype==='ceg'&&!p?'A képviselő teljes neve':'Teljes név (az okmány szerint)'})+fld('birth_date',p,{type:'date'});
+  if(full)h+=fld('birth_place',p,{req:false})+(p===CO?fld('email',CO,{type:'email',label:'A bérlőtárs saját e-mail címe (ide kapja az aláírási kódot)'}):'')+fld('phone',p,{type:'tel',ac:p?'off':'tel',req:p!==CO})+fld('address',p,{full:true,ac:p?'off':'street-address',ph:'Irányítószám, település, utca, házszám'});
+  h+=fld('id_type',p,{sel:[['id','Személyi igazolvány'],['passport','Útlevél']]})+fld('id_number',p)+(full&&ctype!=='ceg'?fld('address_card_number',p,{req:false,label:'Lakcímkártya száma (ha van)'}):'');
+  var drives=p||ctype!=='ceg'||S.contract.cust.signer_drives;
+  if(drives)h+=fld('licence_number',p)+fld('licence_since',p,{type:'number',im:'numeric',ph:'pl. 2012'})+(p&&p!==CO?'':fld('licence_expiry',p,{type:'date',req:false}));
+  h+='</div>';
+  var w=softWarn(cu,drives);if(w)h+='<div class="note warn small">'+w+'</div>';
+  return h}
+function softWarn(p,drives){if(!drives)return '';var out=[];var t=S.today;if(p.birth_date){var a=age(p.birth_date,t);if(a!=null&&a<25)out.push('A bérleti feltételek szerint a vezetőnek legalább 25 évesnek kell lennie – kollégánk egyedileg dönt.')}
+  if(p.licence_since&&Number(t.slice(0,4))-Number(p.licence_since)<3)out.push('A feltételek szerint legalább 3 éve kell jogosítvánnyal rendelkezni – kollégánk egyedileg dönt.');return out.join('<br>')}
+function age(b,t){var x=b.split('-').map(Number),y=t.split('-').map(Number);return y[0]-x[0]-((y[1]<x[1]||(y[1]===x[1]&&y[2]<x[2]))?1:0)}
+function docSlots(p){var kinds=(S.persons.filter(function(x){return x.person===p})[0]||{kinds:[]}).kinds.slice();
+  if(p===0&&S.contract.ctype!=='ceg')kinds.push('address_front');if(p===0&&S.contract.ctype==='ceg')kinds.push('extract');
+  return '<div class="docs">'+kinds.map(function(k){var f=S.files.filter(function(x){return x.kind===k&&x.person===p})[0];var miss=S._missd&&S._missd.some(function(m){return m.kind===k&&m.person===p});var lk=k+':'+p;
+    return '<div class="doc'+(f?' ok':miss?' bad':'')+'" data-slot="'+lk+'"><div class="ic">'+(f&&localPrev[lk]?'<img src="'+localPrev[lk]+'" alt="">':(f?'✓':(ICON[k]||'📄')))+'</div><div class="tx"><b>'+esc(S.kinds[k]||k)+'</b><span>'+(f?esc((f.name||'feltöltve')+' · '+Math.round(f.size/1024)+' KB'):'Fotózd le vagy válassz fájlt (JPG, PNG, PDF)')+'</span></div>'+
+      '<label class="btn sm'+(f?' ghost':' red')+'">'+(f?'Csere':'Feltöltés')+'<input type="file" accept="image/*,application/pdf" hidden data-up="'+lk+'"></label>'+(f&&k!=='x'?'<button class="btn sm ghost" data-del="'+f.id+'" title="Törlés">✕</button>':'')+'</div>'}).join('')+'</div>'}
+function viewDocs(){var c=S.contract,cu=c.cust,ct=c.ctype;var h='';
+  if(c.status==='changes'&&c.review_note)h+='<div class="card"><div class="note warn"><b>Kérjük, javítsd vagy pótold:</b><br>'+esc(c.review_note).replace(/\n/g,'<br>')+'</div></div>';
+  h+='<div class="card"><h2>1. Adataid és okmányaid</h2><p class="muted small">Az adatokat automatikusan mentjük, később is folytathatod. Az okmányfotókat a feltöltés előtt a telefonod tömöríti, és „Csak Caradvance bérléshez” vízjelet kapnak.</p>'+sumHtml()+
+   '<h3>Ki köti a szerződést?</h3><div class="seg">'+[['magan','Magánszemély'],['ev','Egyéni vállalkozó'],['ceg','Cég']].map(function(x){return '<label class="'+(ct===x[0]?'on':'')+'"><input type="radio" name="ctype" value="'+x[0]+'"'+(ct===x[0]?' checked':'')+'>'+x[1]+'</label>'}).join('')+'</div>';
+  if(ct==='ceg'){h+='<h3>Cégadatok</h3><div class="grid">'+fld('company_name',0,{full:true})+fld('reg_number',0,{ph:'pl. 01-09-123456'})+fld('tax_number',0,{ph:'pl. 12345678-2-42'})+fld('seat',0,{full:true})+'</div>'+
+    '<h3>Az aláíró képviselő</h3>'+personFields(0,ct)+'<div class="grid">'+fld('signer_role',0,{ph:'pl. ügyvezető'})+'</div>'+
+    '<label class="chk"><input type="checkbox" id="dir"'+(cu.signer_is_director!==false?' checked':'')+'> Önálló cégjegyzésre jogosult vagyok (pl. ügyvezető). Ha nem, meghatalmazást kell feltölteni.</label>'+
+    '<label class="chk"><input type="checkbox" id="drives"'+(cu.signer_drives?' checked':'')+'> Én is vezetni fogom az autót.</label>'}
+  else{if(ct==='ev')h+='<h3>Vállalkozás</h3><div class="grid">'+fld('ev_number',0)+fld('tax_number',0)+'</div>';h+='<h3>Személyes adatok</h3>'+personFields(0,ct)}
+  h+='<h3>'+(ct==='ceg'?'A képviselő okmányai':'Okmányok')+'</h3>'+docSlots(0);
+  if(ct!=='ceg'){h+='<h3>Bérlőtárs (házastárs)</h3><label class="chk"><input type="checkbox" id="hasco"'+(cu.co?' checked':'')+'> A házastársam bérlőtársként velem együtt köti és aláírja a szerződést (egyetemlegesen felelünk, és ő is vezetheti az autót).</label>';
+    if(cu.co)h+='<div class="drv">'+personFields(CO,ct)+'<h3>A bérlőtárs okmányai</h3>'+docSlots(CO)+'</div>'}
+  if(ct==='ceg')h+='<p class="small muted">Aláírási címpéldány vagy aláírás-minta: az ügyvédtől vagy a cégiratokból. A cégkivonatot a cégjegyzékszám alapján mi is lekérjük, ezért nem kötelező.</p>';
+  h+='<h3>'+(ct==='ceg'?'Az autót vezető személyek':'További vezetők')+'</h3><p class="small muted">'+(ct==='ceg'?'Add meg mindenkit, aki az autót vezetni fogja (ha te is vezetsz, azt fent jelöld).':'Csak a szerződésben megnevezett személyek vezethetik az autót. Legfeljebb 3 további vezető adható meg.')+'</p>';
+  (cu.drivers||[]).forEach(function(d,i){h+='<div class="drv"><div class="row" style="justify-content:space-between"><b>'+(i+1)+'. vezető</b><button class="btn sm ghost" data-rmdrv="'+i+'">Eltávolítás</button></div>'+personFields(i+1,ct)+'<h3>Okmányai</h3>'+docSlots(i+1)+'</div>'});
+  if((cu.drivers||[]).length<3)h+='<button class="btn ghost" id="adddrv">+ Vezető hozzáadása</button>';
+  h+='<div id="subnote"></div><div class="row" style="margin-top:18px"><button class="btn red wide" id="submit">Beküldés ellenőrzésre</button></div><p class="small muted" style="margin-top:8px">A beküldés után kollégánk ellenőrzi az adatokat (általában ugyanazon a munkanapon), és e-mailben küldi az aláírásra kész szerződést.</p></div>';
+  return h}
+function collect(){var cu=JSON.parse(JSON.stringify(S.contract.cust||{}));cu.drivers=cu.drivers||[];
+  app.querySelectorAll('[data-k]').forEach(function(el){var p=Number(el.getAttribute('data-p')),k=el.getAttribute('data-k');if(p===CO){cu.co=cu.co||{};cu.co[k]=el.value}else if(p){cu.drivers[p-1]=cu.drivers[p-1]||{};cu.drivers[p-1][k]=el.value}else cu[k]=el.value});
+  var hc=$('#hasco');if(hc){if(hc.checked)cu.co=cu.co||{id_type:'id'};else delete cu.co}
+  var d=$('#dir');if(d)cu.signer_is_director=d.checked;var dr=$('#drives');if(dr)cu.signer_drives=dr.checked;return cu}
+function save(structural){clearTimeout(saveTimer);var cu=collect();var ct=(app.querySelector('input[name=ctype]:checked')||{}).value||S.contract.ctype;S.contract.cust=cu;
+  var go=function(){return api('adatok',{ctype:ct,cust:cu}).then(function(j){if(j.ok){var keep={_miss:S._miss,_missd:S._missd};S=j;S._miss=keep._miss;S._missd=keep._missd;if(structural)render()}})};
+  if(structural)return go();saveTimer=setTimeout(go,700)}
+
+/* képtömörítés + vízjel a böngészőben */
+function prep(file){return new Promise(function(res,rej){
+  if(file.type==='application/pdf'){if(file.size>1400*1024)return rej({error:'too_big'});return res({blob:file,type:'application/pdf'})}
+  var url=URL.createObjectURL(file),img=new Image();
+  img.onload=function(){try{var max=1800,w=img.naturalWidth,h=img.naturalHeight,s=Math.min(1,max/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);
+    var cv=document.createElement('canvas');cv.width=w;cv.height=h;var x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);
+    var txt='Csak Caradvance bérléshez · '+new Date().toLocaleDateString('hu-HU');x.save();x.translate(w/2,h/2);x.rotate(-Math.atan2(h,w));x.font='bold '+Math.max(18,Math.round(w/26))+'px Arial';x.fillStyle='rgba(226,0,26,0.22)';x.textAlign='center';
+    var step=Math.max(60,Math.round(w/9));for(var yy=-h;yy<=h;yy+=step*2)x.fillText(txt,0,yy);x.restore();URL.revokeObjectURL(url);
+    var q=0.82;(function out(){cv.toBlob(function(b){if(!b)return rej({error:'bad_type'});if(b.size>1350*1024&&q>0.5){q-=0.12;return out()}res({blob:b,type:'image/jpeg',preview:cv.toDataURL('image/jpeg',0.3)})},'image/jpeg',q)})()}catch(e){rej({error:'bad_type'})}};
+  img.onerror=function(){URL.revokeObjectURL(url);if(file.size<=1400*1024&&/jpe?g|png|webp/i.test(file.type))return res({blob:file,type:file.type});rej({error:'bad_type'})};img.src=url})}
+function upload(lk,file){var sp=lk.split(':'),slot=app.querySelector('[data-slot="'+lk+'"]');if(slot)slot.querySelector('.tx span').textContent='Feltöltés…';
+  save(false);
+  prep(file).then(function(p){return api('fajl',null,{body:p.blob,headers:{'Content-Type':p.type,'X-Kind':sp[0],'X-Person':sp[1],'X-Name':encodeURIComponent(file.name||'fajl')}}).then(function(j){if(!j.ok)throw j;if(p.preview)localPrev[lk]=p.preview;S.files=j.files.filter(function(f){return f.kind!=='signature'});
+    if(S._missd)S._missd=S._missd.filter(function(m){return !(m.kind===sp[0]&&String(m.person)===sp[1])});render()})})
+  .catch(function(j){alert(errMsg(j||{}));render()})}
+function submit(){var b=$('#submit');b.disabled=true;b.innerHTML='<span class="spin"></span> Küldés…';clearTimeout(saveTimer);var cu=collect();var ct=(app.querySelector('input[name=ctype]:checked')||{}).value||S.contract.ctype;
+  api('adatok',{ctype:ct,cust:cu}).then(function(){return api('bekuldes',{})}).then(function(j){if(j.ok){S=j;render();window.scrollTo(0,0);return}
+    S._miss=j.missing_fields||[];S._missd=j.missing_docs||[];return api('').then(function(k){var m=S._miss,md=S._missd;S=k;S._miss=m;S._missd=md;render();var n=$('#subnote');if(n)n.innerHTML='<div class="note err">'+errMsg(j)+'</div>';var f=app.querySelector('.bad');if(f)f.scrollIntoView({behavior:'smooth',block:'center'})})})}
+
+/* ---------------- 2. ellenőrzés ---------------- */
+function viewReview(){return '<div class="card"><h2>Köszönjük, megkaptuk!</h2><div class="note info">Kollégánk ellenőrzi az adataidat és az okmányaidat – általában ugyanazon a munkanapon. Ha minden rendben, e-mailben küldjük az aláírásra kész szerződést.</div>'+sumHtml()+'<h3>Beküldött okmányok</h3><ul>'+S.files.map(function(f){return '<li>'+esc(S.kinds[f.kind]||f.kind)+(f.person===CO?' – bérlőtárs':f.person?' – '+f.person+'. vezető':'')+'</li>'}).join('')+'</ul></div>'}
+
+/* ---------------- 3. elolvasás + aláírás ---------------- */
+function L2(a){return a[LANG==='en'?1:0]}
+function body2html(g){return g.parts.map(function(pt){return (pt.h?'<h4 style="margin:12px 0 6px;color:#E2001A;font-size:14px">'+esc(L2(pt.h))+'</h4>':'')+pt.items.map(function(x){if(Array.isArray(x))return '<p>'+esc(L2(x))+'</p>';return (x.head?'<p><b>'+esc(L2(x.head))+'</b></p>':'')+'<ul>'+x.list.map(function(li){return '<li>'+esc(L2(li))+'</li>'}).join('')+'</ul>'}).join('')}).join('')}
+function viewSign(){var c=S.contract,acc=c.accepted||{},secs=S.sections,n=secs.filter(function(s){return acc[s.id]}).length,all=n===secs.length;
+  var h='<div class="card"><h2>3. A szerződés elolvasása és aláírása</h2><p class="muted small">Görgess végig a szerződésen: minden fejezet végén jelöld be az elfogadást, majd lent írd alá.</p>'+sumHtml()+
+   '<div class="row" style="margin:10px 0"><a class="btn sm ghost" href="'+API+'/pdf" target="_blank" rel="noopener">Teljes szerződés (PDF-tervezet)</a><button class="btn sm ghost" id="lang" type="button">'+(LANG==='hu'?'English version':'Magyar változat')+'</button><span class="small muted">Elfogadva: <b id="accn">'+n+'</b> / '+secs.length+'</span></div><p class="small muted">A szerződés magyar és angol nyelvű; eltérés esetén a magyar szöveg az irányadó. / The agreement is bilingual; the Hungarian text prevails.</p>';
+  secs.forEach(function(s){var a=!!acc[s.id],op=opened[s.id];h+='<div class="sec'+(a?' acc':'')+(op?' open':'')+'" data-sec="'+s.id+'"><button type="button" data-open="'+s.id+'">'+esc(L2(s.title))+'<span class="st">'+(a?'✓ '+(LANG==='en'?'Accepted':'Elfogadva'):(LANG==='en'?'To read':'Elolvasandó'))+'</span></button><div class="bd">'+body2html(s)+
+    '<div class="acc-line"><label class="chk"><input type="checkbox" data-acc="'+s.id+'"'+(a?' checked':'')+'> <span>'+esc(L2(s.accept))+'</span></label></div></div></div>'});
+  h+='</div><div class="card" id="signcard"><h2>Aláírás</h2>'+(all?'':'<div class="note warn small">Előbb fogadd el az összes fejezetet ('+n+'/'+secs.length+').</div>')+
+   '<label class="f">Teljes neved <i>*</i><input class="in" id="sname" autocomplete="name" value="'+esc(c.cust.name||c.name||'')+'"'+(all?'':' disabled')+'></label>'+
+   '<p class="small muted" style="margin:12px 0 6px">Írd alá ujjal vagy egérrel:</p><div class="pad"><canvas id="pad"></canvas><div class="ln"></div><div class="ph" id="padph">Ide írj alá</div></div><div class="row" style="margin:8px 0 14px"><button class="btn sm ghost" id="padclr" type="button">Törlés</button></div>'+
+   (c.has_co?'<h3 style="margin-top:22px">Bérlőtárs aláírása</h3><label class="f">A bérlőtárs teljes neve <i>*</i><input class="in" id="sname2" value="'+esc((c.cust.co||{}).name||'')+'"'+(all?'':' disabled')+'></label><p class="small muted" style="margin:12px 0 6px">A bérlőtárs aláírása:</p><div class="pad"><canvas id="pad2"></canvas><div class="ln"></div><div class="ph" id="padph2">Ide írjon alá a bérlőtárs</div></div><div class="row" style="margin:8px 0 14px"><button class="btn sm ghost" id="padclr2" type="button">Törlés</button></div>':'')+
+   '<p class="small muted">Biztonsági okból egyszeri kódot küldünk a(z) <b>'+esc(c.email)+'</b> címre'+(c.has_co?' és a bérlőtársnak a(z) <b>'+esc((c.cust.co||{}).email||'')+'</b> címre':'')+'.</p><div class="row"><button class="btn ghost" id="sendcode"'+(all?'':' disabled')+'>'+(codeSent?'Új kód kérése':'Kód küldése e-mailben')+'</button></div>'+
+   '<div id="codebox" style="'+(codeSent?'':'display:none')+';margin-top:12px" class="row"><label class="f">'+(c.has_co?'A bérlő kódja':'A kapott 6 jegyű kód')+'<input class="in code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>'+(c.has_co?'<label class="f">A bérlőtárs kódja<input class="in code" id="code2" inputmode="numeric" maxlength="6"></label>':'')+'</div>'+
+   '<div id="signnote"></div><button class="btn red wide" id="signbtn" style="margin-top:16px" disabled>Aláírom a szerződést</button><p class="small muted" style="margin-top:8px">Az „Aláírom” gombbal a szerződést elektronikusan, a saját kezű aláírásoddal megegyező módon írod alá. Az aláírt példányt PDF-ben elküldjük e-mailben.</p></div>';
+  return h}
+function initPad(id,ph,setter){var cv=$('#'+id);if(!cv)return;var r=window.devicePixelRatio||1,box=cv.getBoundingClientRect();cv.width=Math.round(box.width*r);cv.height=Math.round(box.height*r);var x=cv.getContext('2d');x.scale(r,r);x.lineWidth=2.4;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#0b1a3a';
+  var drawing=false,last=null,pts=0;setter({cv:cv,count:function(){return pts},clear:function(){x.clearRect(0,0,cv.width,cv.height);pts=0;$('#'+ph).style.display='';checkSign()}});
+  function pos(e){var b=cv.getBoundingClientRect();return {x:e.clientX-b.left,y:e.clientY-b.top}}
+  cv.addEventListener('pointerdown',function(e){if(cv.dataset.off)return;drawing=true;last=pos(e);cv.setPointerCapture(e.pointerId);$('#'+ph).style.display='none';e.preventDefault()});
+  cv.addEventListener('pointermove',function(e){if(!drawing)return;var p=pos(e);x.beginPath();x.moveTo(last.x,last.y);var mx=(last.x+p.x)/2,my=(last.y+p.y)/2;x.quadraticCurveTo(last.x,last.y,mx,my);x.lineTo(p.x,p.y);x.stroke();last=p;pts++;e.preventDefault()});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){cv.addEventListener(t,function(){if(drawing){drawing=false;checkSign()}})});
+  if(!(S.sections.every(function(s){return S.contract.accepted[s.id]})))cv.dataset.off='1'}
+function sigJpeg(pad){var src=pad.cv,w=900,h=Math.round(src.height/src.width*900),o=document.createElement('canvas');o.width=w;o.height=h;var x=o.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(src,0,0,w,h);return o.toDataURL('image/jpeg',0.85)}
+function checkSign(){var b=$('#signbtn');if(!b)return;var all=S.sections.every(function(s){return S.contract.accepted[s.id]});var ok=all&&sigPad&&sigPad.count()>12&&($('#sname').value.trim().length>=3)&&/^\d{6}$/.test(($('#code')||{}).value||'');if(S.contract.has_co)ok=ok&&sigPad2&&sigPad2.count()>12&&(($('#sname2')||{}).value||'').trim().length>=3&&/^\d{6}$/.test(($('#code2')||{}).value||'');b.disabled=!ok}
+function doSign(){var b=$('#signbtn');b.disabled=true;b.innerHTML='<span class="spin"></span> Aláírás…';
+  var d={name:$('#sname').value.trim(),sig:sigJpeg(sigPad),code:$('#code').value.trim()};if(S.contract.has_co){d.co_name=$('#sname2').value.trim();d.co_sig=sigJpeg(sigPad2);d.code2=$('#code2').value.trim()}
+  api('alairas',d).then(function(j){if(j.ok){S=j;codeSent=false;render();window.scrollTo(0,0);return}
+    $('#signnote').innerHTML='<div class="note err">'+errMsg(j)+(j.left!=null?' Még '+j.left+' próbálkozás.':'')+'</div>';b.innerHTML='Aláírom a szerződést';checkSign()})}
+
+/* ---------------- 4. fizetés ---------------- */
+function viewPay(){var c=S.contract,t=c.terms,card=t.billing==='card';var h='<div class="card"><h2>Aláírva – köszönjük!</h2><div class="note ok">A szerződést aláírtad'+(c.signed_at?' ('+esc(c.signed_at.slice(0,16))+')':'')+'. Az aláírt példányt e-mailben is elküldtük.</div><div class="row"><a class="btn sm ghost" href="'+API+'/pdf" target="_blank" rel="noopener">Aláírt szerződés (PDF)</a></div></div>';
+  if(Q.get('megszakitva'))h+='<div class="card"><div class="note warn">A fizetés megszakadt. Bármikor újrakezdheted.</div></div>';
+  h+='<div class="card"><h2>4. Első fizetés</h2>'+(card?'<p class="muted">Az első havi díjat'+(t.deposit_upfront?' és a kauciót':'')+' most kell kifizetni bankkártyával. A kártyádat a Stripe biztonságosan elmenti a havi díjak automatikus terheléséhez (a szerződés 9. pontja szerint).</p>':'<p class="muted">Az első fizetésről díjbekérőt küldünk e-mailben; átutalással kell rendezni.</p>')+
+   '<table class="ch"><tr><td>Első havi bérleti díj</td><td style="text-align:right"><b>'+money(t.monthly,t.currency)+'</b></td></tr>'+(t.deposit_upfront&&t.deposit>0?'<tr><td>Óvadék (a bérlet végén visszajár)</td><td style="text-align:right"><b>'+money(t.deposit,t.currency)+'</b></td></tr>':'')+'<tr><td><b>Összesen</b></td><td style="text-align:right" class="big">'+money(c.first_amount,t.currency)+'</td></tr></table>';
+  if(card){h+='<div id="paynote"></div>';if(S.can_simulate)h+='<button class="btn red wide" id="pay" style="margin-top:16px">TESZT: fizetés szimulálása</button><p class="small muted">A Stripe még nincs bekapcsolva; teszt-szerződésnél a fizetést szimuláljuk.</p>';
+    else h+='<button class="btn red wide" id="pay" style="margin-top:16px">Fizetés bankkártyával</button><p class="small muted" style="margin-top:8px">A fizetés a Stripe biztonságos oldalán történik (Visa, Mastercard, Apple Pay, Google Pay), 3D Secure azonosítással. A kártyaadataidat mi nem látjuk.</p>'}
+  return h+'</div>'}
+function pay(chargeId,btnEl){var b=btnEl||$('#pay');var old=b.innerHTML;b.disabled=true;b.innerHTML='<span class="spin"></span> Átirányítás…';
+  api('fizetes',chargeId?{charge_id:chargeId}:{}).then(function(j){if(j.url){location.href=j.url;return}if(j.ok){S=j;render();window.scrollTo(0,0);return}b.disabled=false;b.innerHTML=old;alert(errMsg(j))})}
+
+/* ---------------- kész / aktív ---------------- */
+function chip(ch){var m={paid:['paid','Fizetve'],scheduled:['','Ütemezve'],retry:['bad','Sikertelen – újrapróbáljuk'],failed:['bad','Sikertelen'],pending_checkout:['due','Fizetés folyamatban'],refunded:['','Visszatérítve']}[ch.status]||['',ch.status];
+  if(ch.status==='scheduled'&&ch.due_date<=S.today)m=['due','Esedékes'];return '<span class="chip '+m[0]+'">'+m[1]+'</span>'}
+function viewActive(){var c=S.contract,t=c.terms;var open=S.charges.filter(function(ch){return ch.status==='retry'||ch.status==='failed'||(ch.status==='pending_checkout'&&ch.kind!=='first')});
+  var h='<div class="card"><h2>'+(c.status==='closed'?'A bérlet lezárult':'Aktív bérlés')+'</h2>'+(Q.get('sid')&&c.status==='active'?'<div class="note ok">Sikeres fizetés – köszönjük!</div>':'')+(Q.get('megszakitva')?'<div class="note warn">A művelet megszakadt.</div>':'')+sumHtml()+
+   '<div class="row" style="margin-top:12px"><a class="btn sm ghost" href="'+API+'/pdf" target="_blank" rel="noopener">Aláírt szerződés (PDF)</a></div>'+
+   (c.handover_date?'<p class="small muted">Átadás napja: <b>'+hd(c.handover_date)+'</b>'+(c.end_date?' · Megszűnés: <b>'+hd(c.end_date)+'</b>':'')+'</p>':'<p class="small muted">Kollégánk egyeztet veled az átadás pontos időpontjáról. A havi terhelések az átadás napjától indulnak.</p>')+'</div>';
+  if(open.length)h+='<div class="card"><h2>Rendezetlen fizetés</h2>'+open.map(function(ch){return '<div class="note err"><b>'+esc(ch.title)+'</b> – '+money(ch.amount,ch.currency)+'<br><button class="btn red sm" style="margin-top:8px" data-paych="'+ch.id+'">Fizetés most</button></div>'}).join('')+'</div>';
+  if(t.billing==='card'&&c.status==='active')h+='<div class="card"><h2>Bankkártya</h2><p>'+(c.card_label?'Mentett kártya: <b>'+esc(c.card_label)+'</b>':'Nincs mentett kártya.')+'</p><p class="small muted">A havi díjat minden bérleti hónap első napján automatikusan terheljük; előtte 3 nappal e-mailben értesítünk.</p>'+(S.stripe!=='none'?'<button class="btn ghost" id="card">Kártya cseréje</button>':'')+'</div>';
+  h+='<div class="card"><h2>Fizetések</h2>'+(S.charges.length?'<table class="ch">'+S.charges.map(function(ch){return '<tr><td>'+esc(ch.title)+'<br><span class="small muted">'+hd(ch.paid_at||ch.due_date)+'</span></td><td style="text-align:right;white-space:nowrap"><b>'+money(ch.amount,ch.currency)+'</b><br>'+chip(ch)+'</td></tr>'}).join('')+'</table>':'<p class="muted">Még nincs tétel.</p>')+'</div>';
+  return h}
+
+/* ---------------- események ---------------- */
+function bind(){
+  app.querySelectorAll('input[name=ctype]').forEach(function(r){r.addEventListener('change',function(){save(true)})});
+  app.querySelectorAll('[data-k]').forEach(function(el){var structural=el.tagName==='SELECT'||el.type==='date'||el.getAttribute('data-k')==='licence_since';el.addEventListener(structural?'change':'input',function(){el.classList.remove('bad');save(structural)})});
+  ['dir','drives','hasco'].forEach(function(id){var e=$('#'+id);if(e)e.addEventListener('change',function(){save(true)})});
+  app.querySelectorAll('[data-up]').forEach(function(inp){inp.addEventListener('change',function(){if(inp.files&&inp.files[0])upload(inp.getAttribute('data-up'),inp.files[0])})});
+  app.querySelectorAll('[data-del]').forEach(function(b){b.addEventListener('click',function(){if(!confirm('Törlöd ezt a fájlt?'))return;api('fajl-torles',{id:Number(b.getAttribute('data-del'))}).then(function(j){if(j.ok){S.files=j.files.filter(function(f){return f.kind!=='signature'});render()}})})});
+  var ad=$('#adddrv');if(ad)ad.addEventListener('click',function(){var cu=collect();cu.drivers.push({id_type:'id'});S.contract.cust=cu;api('adatok',{ctype:S.contract.ctype,cust:cu}).then(function(j){if(j.ok){S=j;render()}})});
+  app.querySelectorAll('[data-rmdrv]').forEach(function(b){b.addEventListener('click',function(){if(!confirm('Eltávolítod ezt a vezetőt és a feltöltött okmányait?'))return;var cu=collect();cu.drivers.splice(Number(b.getAttribute('data-rmdrv')),1);api('adatok',{ctype:S.contract.ctype,cust:cu}).then(function(j){if(j.ok){S=j;render()}})})});
+  var sb=$('#submit');if(sb)sb.addEventListener('click',submit);
+  app.querySelectorAll('[data-open]').forEach(function(b){b.addEventListener('click',function(){var id=b.getAttribute('data-open');opened[id]=!opened[id];b.parentNode.classList.toggle('open',opened[id])})});
+  app.querySelectorAll('[data-acc]').forEach(function(cb){cb.addEventListener('change',function(){var id=cb.getAttribute('data-acc');cb.disabled=true;api('elfogad',{section:id,value:cb.checked}).then(function(j){cb.disabled=false;if(!j.ok){cb.checked=!cb.checked;alert(errMsg(j));return}S.contract.accepted=j.accepted;
+    if(cb.checked){opened[id]=false;var secs=S.sections.map(function(s){return s.id});var nx=secs[secs.indexOf(id)+1];if(nx&&!S.contract.accepted[nx])opened[nx]=true}
+    var y=window.scrollY;var nm=($('#sname')||{}).value;render();if(nm&&$('#sname'))$('#sname').value=nm;var el=app.querySelector('[data-sec="'+id+'"]');window.scrollTo(0,y);if(el&&cb.checked){var nxe=el.nextElementSibling;if(nxe&&nxe.classList.contains('sec'))nxe.scrollIntoView({behavior:'smooth',block:'start'});else{var sc=$('#signcard');if(sc)sc.scrollIntoView({behavior:'smooth'})}}})})});
+  if($('#pad'))initPad('pad','padph',function(o){sigPad=o});if($('#pad2'))initPad('pad2','padph2',function(o){sigPad2=o});
+  var pc=$('#padclr');if(pc)pc.addEventListener('click',function(){sigPad&&sigPad.clear()});var pc2=$('#padclr2');if(pc2)pc2.addEventListener('click',function(){sigPad2&&sigPad2.clear()});
+  var sn=$('#sname');if(sn)sn.addEventListener('input',checkSign);var sn2=$('#sname2');if(sn2)sn2.addEventListener('input',checkSign);
+  var lg=$('#lang');if(lg)lg.addEventListener('click',function(){LANG=LANG==='hu'?'en':'hu';var y=window.scrollY;render();window.scrollTo(0,y)});
+  var sc=$('#sendcode');if(sc)sc.addEventListener('click',function(){sc.disabled=true;sc.innerHTML='<span class="spin"></span> Küldés…';api('kod',{}).then(function(j){sc.disabled=false;if(!j.ok){sc.textContent='Kód küldése e-mailben';$('#signnote').innerHTML='<div class="note err">'+errMsg(j)+'</div>';return}codeSent=true;sc.textContent='Új kód kérése';$('#codebox').style.display='';$('#signnote').innerHTML='<div class="note ok small">Elküldtük a kódot a(z) '+esc(j.email)+(j.co_email?' és a(z) '+esc(j.co_email):'')+' címre (a spam mappát is nézd meg).</div>';$('#code').focus()})});
+  ['code','code2'].forEach(function(id){var cd=$('#'+id);if(cd)cd.addEventListener('input',function(){cd.value=cd.value.replace(/\D/g,'').slice(0,6);checkSign()})});
+  var sg=$('#signbtn');if(sg)sg.addEventListener('click',doSign);
+  var pb=$('#pay');if(pb)pb.addEventListener('click',function(){pay(null,pb)});
+  app.querySelectorAll('[data-paych]').forEach(function(b){b.addEventListener('click',function(){pay(Number(b.getAttribute('data-paych')),b)})});
+  var cb=$('#card');if(cb)cb.addEventListener('click',function(){cb.disabled=true;api('kartya',{}).then(function(j){if(j.url)location.href=j.url;else{cb.disabled=false;alert(errMsg(j))}})});
+}
+
+if(!/^[a-f0-9]{40,64}$/.test(T)){fatal('Hiányzó vagy hibás link. Kérjük, nyisd meg újra az e-mailben kapott linket.');return}
+var sid=Q.get('sid');
+if(sid){app.innerHTML='<div class="card"><h2>Fizetés ellenőrzése…</h2><p class="muted">Egy pillanat.</p></div>';api('ellenorzes',{sid:sid}).then(function(j){if(j.ok){S=j;render()}else load();history.replaceState(null,'',location.pathname+'?t='+T+(j.verify&&j.verify.ok?'&sid=ok':''))})}
+else load();
+})();
+</script>
+</body>
+</html>
