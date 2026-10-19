@@ -99,7 +99,7 @@ var CADV_SYNC = (function () {
     // current data
     var secLit = text.match(/const SEC_B64\s*=\s*"([^"]*)"/); if (!secLit) throw new Error('SEC_B64 not found');
     var sec = b64dec(secLit[1]);
-    var subM = sec.match(/window\.SUB\s*=\s*(\{[\s\S]*?\});\s*<\/script>/); if (!subM) throw new Error('SUB not found');
+    var subM = sec.match(/window\.SUB\s*=\s*(\{[\s\S]*?\});\s*(?:<\/script>|\(function)/); if (!subM) throw new Error('SUB not found');
     var subOld = JSON.parse(subM[1]);
     var stripL = jsStrLit(text, 'STRIP'), strip = stripL.value;
     var cfgPos = strip.indexOf('window.__ABCFG='); if (cfgPos < 0) throw new Error('__ABCFG not found');
