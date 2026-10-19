@@ -131,10 +131,20 @@
     var n = (b === 'VW' ? 'Volkswagen' : b) + ' ' + String(mo).replace(/\b(\d)er\b/g, function (_, d) { return D[d] || d; }).replace(/\bLimousine\b/g, 'Limuzin').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, '$1-osztály');
     return '/berelheto-auto/' + n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-berles';
   }
+  /* kiegyensúlyozott JSON-objektum kivágása egy szövegből (a sztringeken belüli zárójeleket kihagyva) */
+  function jsonAt(t, i) {
+    var d = 0, q = false, e = false;
+    for (var j = i; j < t.length; j++) {
+      var ch = t[j];
+      if (q) { if (e) e = false; else if (ch === '\\') e = true; else if (ch === '"') q = false; continue; }
+      if (ch === '"') q = true; else if (ch === '{' || ch === '[') d++; else if (ch === '}' || ch === ']') { d--; if (!d) return t.slice(i, j + 1); }
+    }
+    throw new Error('json');
+  }
   function scriptText(doc, re) { var ss = doc.querySelectorAll('script'); for (var i = 0; i < ss.length; i++) { if (re.test(ss[i].textContent)) return ss[i].textContent; } return ''; }
   function parseSub(doc, rate) {
     var st = scriptText(doc, /window\.SUB\s*=/), rt = scriptText(doc, /var PHOTO\s*=/);
-    var SUB = JSON.parse(st.slice(st.indexOf('{'), st.lastIndexOf('}') + 1));
+    var SUB = JSON.parse(jsonAt(st, st.indexOf('{', st.search(/window\.SUB\s*=/))));
     var pm = /var PHOTO\s*=\s*(\{[^;]*?\});/.exec(rt); var PHOTO = pm ? JSON.parse(pm[1]) : {};
     var R = rate || SUB.rate_fallback || 364;
     var models = (SUB.models || []).filter(function (m) { return m.net && PHOTO[m.brand + ' ' + m.model]; });
