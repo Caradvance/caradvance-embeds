@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Bérleti szerződések — CarAdvance belső</title>
+<link rel="icon" href="/favicon-32.png">
+<!-- ca-tracking:start --><!-- belső felület: nincs követés --><!-- ca-tracking:end -->
+<style>
+:root{--red:#E2001A;--navy:#22447d;--ink:#161922;--mut:#5A6B82;--line:#E6EAF1;--bg:#F4F5F7;--ok:#15803D;--okbg:#DCFCE7;--warn:#92400E;--warnbg:#FEF3C7;--errbg:#FDE8EB}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--navy)}
+header{background:#0B0B0D;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header img{height:30px}header .sp{flex:1}header a{color:#cbd2dc;text-decoration:none;font-size:13px}
+.badge{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;background:#EEF2F7;color:var(--mut)}
+.badge.ok{background:var(--okbg);color:var(--ok)}.badge.warn{background:var(--warnbg);color:var(--warn)}.badge.err{background:var(--errbg);color:#9f1239}.badge.red{background:var(--red);color:#fff}.badge.navy{background:#e7eef9;color:var(--navy)}
+main{max-width:1180px;margin:0 auto;padding:18px}
+.card{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 20px rgba(15,23,42,.05);margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:17px}.card h3{margin:16px 0 8px;font-size:14px}
+table{width:100%;border-collapse:collapse}td,th{padding:8px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--mut);font-weight:600}
+tr.click{cursor:pointer}tr.click:hover td{background:#F7F9FC}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:9px 16px;font:600 13.5px/1 inherit;font-family:inherit;cursor:pointer;background:#EEF2F7;color:var(--ink);text-decoration:none}
+.btn.red{background:var(--red);color:#fff}.btn.navy{background:var(--navy);color:#fff}.btn.ghost{background:#fff;border:1.5px solid var(--line)}.btn.sm{padding:6px 11px;font-size:12.5px}.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px}.grid .full{grid-column:1/-1}.grid .two{grid-column:span 2}
+label.f{display:block;font-size:12.5px;font-weight:600;color:#334155}
+.in{width:100%;margin-top:3px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:#F7F9FC;font:inherit}
+.in:focus{outline:none;border-color:var(--navy);background:#fff}
+textarea.in{min-height:70px}
+.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:4px 10px;font-size:13.5px}.kv span{color:var(--mut)}
+.note{border-radius:12px;padding:10px 12px;margin:8px 0;font-size:13.5px}.note.warn{background:var(--warnbg);color:var(--warn)}.note.err{background:var(--errbg);color:#9f1239}.note.ok{background:var(--okbg);color:var(--ok)}.note.info{background:#EEF4FF;color:#1e3a8a}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.file{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:var(--ink);position:relative}
+.file .th{height:100px;background:#F1F4F9 center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:26px}
+.file .wm{position:absolute;left:0;right:0;top:38px;text-align:center;color:rgba(226,0,26,.55);font-weight:800;font-size:10px;transform:rotate(-14deg);pointer-events:none}
+.file div.t{padding:6px 8px;font-size:12px}
+.ev{font-size:12.5px;max-height:320px;overflow:auto}.ev div{padding:5px 0;border-bottom:1px dashed var(--line)}.ev span{color:var(--mut);margin-right:6px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.muted{color:var(--mut)}.small{font-size:12.5px}
+.link{font-family:monospace;font-size:12px;background:#F1F4F9;border-radius:8px;padding:6px 8px;word-break:break-all}
+@media (max-width:900px){.cols{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><b>Bérleti szerződések</b><span class="sp"></span><span id="sys"></span><a href="/belso/">← Belső felület</a></header>
+<main id="app"><div class="card">Betöltés…</div></main>
+<script>
+(function(){
+'use strict';
+var A='/api/szerzodes-admin/',app=document.getElementById('app'),ME=null,CUR=null;
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function money(v,c){var n=Number(v)||0,d=c==='HUF'?0:(Math.round(n*100)%100?2:0);var s=n.toFixed(d).replace('.',',').split(',');return s[0].replace(/\B(?=(\d{3})+(?!\d))/g,' ')+(s[1]?','+s[1]:'')+(c==='HUF'?' Ft':' €')}
+function hd(d){if(!d)return '—';var p=String(d).slice(0,10).split('-');return p[0]+'. '+p[1]+'. '+p[2]+'.'}
+function hdt(s){if(!s)return '—';var d=new Date(String(s).replace(' ','T')+(/Z$/.test(s)?'':'Z'));return d.toLocaleString('hu-HU',{timeZone:'Europe/Budapest'})}
+function api(p,data){return fetch(A+p,{method:data?'POST':'GET',credentials:'same-origin',headers:data?{'Content-Type':'application/json'}:{},body:data?JSON.stringify(data):undefined}).then(function(r){return r.json().catch(function(){return {error:'HTTP '+r.status}}).then(function(j){j._s=r.status;return j})})}
+var SB={draft:'',sent:'navy',changes:'warn',review:'red',approved:'navy',signed:'warn',active:'ok',closed:'',cancelled:''};
+var KIND={id_front:'Szem. ig. eleje',id_back:'Szem. ig. hátulja',passport:'Útlevél',licence_front:'Jogosítvány eleje',licence_back:'Jogosítvány hátulja',address_front:'Lakcímkártya eleje',specimen:'Aláírási címpéldány',poa:'Meghatalmazás',extract:'Cégkivonat',signature:'Aláírás'};
+var FL={address_card_number:'Lakcímkártya száma',name:'Név',birth_date:'Születési dátum',birth_place:'Születési hely',address:'Lakcím',phone:'Telefon',id_type:'Okmány',id_number:'Okmányszám',licence_number:'Jogosítvány',licence_since:'Jogosítvány éve',licence_expiry:'Jogosítvány érvényes',ev_number:'EV szám',tax_number:'Adószám',company_name:'Cégnév',reg_number:'Cégjegyzékszám',seat:'Székhely',signer_role:'Beosztás',signer_is_director:'Önálló cégjegyző',signer_drives:'Ő is vezet'};
+
+function boot(){api('me').then(function(j){if(j._s===401){app.innerHTML='<div class="card"><h2>Bejelentkezés szükséges</h2><p>Lépj be a <a href="/belso/">belső felületen</a>, majd nyisd meg újra ezt az oldalt.</p></div>';return}
+  ME=j;var s=j.stripe==='live'?'<span class="badge ok">Stripe: ÉLES</span>':j.stripe==='test'?'<span class="badge warn">Stripe: teszt mód</span>':'<span class="badge err">Stripe: nincs beállítva</span>';
+  $('#sys').innerHTML=s+' '+(j.cron?'<span class="badge ok">Napi futás: be</span>':'<span class="badge warn">Napi futás: nincs kulcs</span>')+' '+(j.mail?'':'<span class="badge err">E-mail: nincs</span>');route()})}
+function route(){var h=location.hash.slice(1);if(h==='uj')viewNew();else if(/^\d+$/.test(h))viewOne(Number(h));else viewList()}
+window.addEventListener('hashchange',route);
+
+function viewList(){app.innerHTML='<div class="card">Betöltés…</div>';api('list').then(function(j){
+  var h='<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Szerződések</h2><div class="row"><button class="btn ghost sm" id="run">Esedékes terhelések futtatása</button><a class="btn red" href="#uj">+ Új szerződés</a></div></div><div id="runout"></div>';
+  if(!j.items||!j.items.length)h+='<p class="muted">Még nincs szerződés. Hozz létre egyet az „Új szerződés” gombbal.</p>';
+  else h+='<table><tr><th>Szám</th><th>Ügyfél</th><th>Autó</th><th>Havi díj</th><th>Állapot</th><th>Következő terhelés</th><th>Létrehozva</th></tr>'+j.items.map(function(x){return '<tr class="click" data-id="'+x.id+'"><td><b>'+esc(x.number)+'</b>'+(x.test?' <span class="badge warn">TESZT</span>':'')+'</td><td>'+esc(x.company||x.name||'')+'<br><span class="small muted">'+esc(x.email)+' · '+esc(x.ctype_hu)+'</span></td><td>'+esc(x.car)+'</td><td>'+money(x.monthly,x.currency)+'</td><td><span class="badge '+(SB[x.status]||'')+'">'+esc(x.status_hu)+'</span>'+(x.problems?' <span class="badge err">'+x.problems+' sikertelen</span>':'')+'</td><td>'+hd(x.next_due)+'</td><td class="small">'+hdt(x.created_at)+'</td></tr>'}).join('')+'</table>';
+  app.innerHTML=h+'</div>';
+  app.querySelectorAll('tr[data-id]').forEach(function(tr){tr.addEventListener('click',function(){location.hash=tr.getAttribute('data-id')})});
+  $('#run').addEventListener('click',function(){var b=this;b.disabled=true;api('futtatas',{}).then(function(r){b.disabled=false;$('#runout').innerHTML='<div class="note info small">'+(r.log&&r.log.length?r.log.map(esc).join('<br>'):'Nincs esedékes tétel ('+esc(r.date||'')+').')+'</div>'})})})}
+
+function termsForm(t,c){t=t||{};c=c||{};var cur=t.currency||'EUR';
+  return '<h3>Ügyfél</h3><div class="grid"><label class="f">Típus<select class="in" id="ctype">'+[['magan','Magánszemély'],['ev','Egyéni vállalkozó'],['ceg','Cég']].map(function(x){return '<option value="'+x[0]+'"'+(c.ctype===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></label>'+
+  '<label class="f">E-mail *<input class="in" id="email" type="email" value="'+esc(c.email||'')+'"></label><label class="f">Név<input class="in" id="name" value="'+esc(c.name||'')+'"></label><label class="f">Telefon<input class="in" id="phone" value="'+esc(c.phone||'')+'"></label><label class="f">Cégnév (cégnél)<input class="in" id="company" value="'+esc(c.company||'')+'"></label><label class="f">CRM ügy azonosító (nem kötelező)<input class="in" id="deal_id" value="'+esc(c.deal_id||'')+'"></label></div>'+
+  '<h3>Autó és feltételek</h3><div class="grid"><label class="f two">Autó (márka, modell, felszereltség) *<input class="in" id="t_car" value="'+esc(t.car||'')+'"></label><label class="f">Tervezett átadás<input class="in" type="date" id="t_handover_planned" value="'+esc(t.handover_planned||'')+'"></label>'+
+  '<label class="f two">Felszereltség<input class="in" id="t_spec" placeholder="pl. M Sport Pro · Laserlight · Night Vision" value="'+esc(t.spec||'')+'"></label><label class="f">Üzemanyag, teljesítmény<input class="in" id="t_fuel_power" placeholder="pl. Dízel (mild hybrid) · 298 LE" value="'+esc(t.fuel_power||'')+'"></label>'+
+  '<label class="f">Első forgalomba helyezés<input class="in" id="t_first_reg" placeholder="pl. 2025. 12." value="'+esc(t.first_reg||'')+'"></label><label class="f">Karosszéria, hajtás<input class="in" id="t_body" placeholder="pl. SUV coupé · xDrive" value="'+esc(t.body||'')+'"></label><label class="f">Tulajdonos<input class="in" id="t_owner" value="'+esc(t.owner||'Caradvance GmbH')+'"></label>'+
+  '<label class="f">Átadás helye<input class="in" id="t_handover_place" value="'+esc(t.handover_place||'')+'"></label><label class="f">Vállalt szállítási határidő<input class="in" type="date" id="t_delivery_deadline" value="'+esc(t.delivery_deadline||'')+'"></label>'+
+  '<label class="f">Rendszám<input class="in" id="t_plate" value="'+esc(t.plate||'')+'"></label><label class="f">Alvázszám<input class="in" id="t_vin" value="'+esc(t.vin||'')+'"></label><label class="f">Pénznem<select class="in" id="t_currency"><option'+(cur==='EUR'?' selected':'')+'>EUR</option><option'+(cur==='HUF'?' selected':'')+'>HUF</option></select></label>'+
+  '<label class="f">Havi díj *<input class="in" id="t_monthly" inputmode="decimal" value="'+esc(t.monthly||'')+'"></label><label class="f">ÁFA<select class="in" id="t_vat"><option value="gross"'+(t.vat!=='net'?' selected':'')+'>Bruttó (19% német ÁFA-val – magánszemély)</option><option value="net"'+(t.vat==='net'?' selected':'')+'>Nettó (cég, fordított adózás)</option></select></label><label class="f">Minimális időtartam (hónap)<input class="in" id="t_min_months" inputmode="numeric" value="'+esc(t.min_months||6)+'"></label>'+
+  '<label class="f">Óvadék (kaució)<input class="in" id="t_deposit" inputmode="decimal" value="'+esc(t.deposit||'')+'"></label><label class="f">Óvadék az átadáskor?<select class="in" id="t_deposit_upfront"><option value="1"'+(t.deposit_upfront!==false?' selected':'')+'>Igen, az első fizetéssel</option><option value="0"'+(t.deposit_upfront===false?' selected':'')+'>Nem – csak káresemény esetén, felhívásra (5.5)</option></select></label><label class="f">Fizetés módja<select class="in" id="t_billing"><option value="card"'+(t.billing!=='transfer'?' selected':'')+'>Bankkártya, automatikus terhelés</option><option value="transfer"'+(t.billing==='transfer'?' selected':'')+'>Átutalás (számla alapján)</option></select></label>'+
+  '<label class="f">Km-keret / hó<input class="in" id="t_km_month" inputmode="numeric" value="'+esc(t.km_month||2000)+'"></label><label class="f">Túllépés díja / km<input class="in" id="t_km_fee" inputmode="decimal" value="'+esc(t.km_fee!=null?t.km_fee:0.85)+'"></label><label class="f">Teszt-szerződés<select class="in" id="test"><option value="1"'+(c.test!==0?' selected':'')+'>Igen – TESZT (nem éles)</option><option value="0"'+(c.test===0?' selected':'')+'>Nem – éles</option></select></label>'+
+  '<label class="f full">Egyedi megállapodások (soronként egy pont; üresen hagyható)<textarea class="in" id="t_notes">'+esc(t.notes||'')+'</textarea></label></div>'}
+function readForm(){var g=function(id){var e=$('#'+id);return e?e.value:''};return {ctype:g('ctype'),email:g('email'),name:g('name'),phone:g('phone'),company:g('company'),deal_id:g('deal_id'),test:g('test')!=='0',
+  terms:{car:g('t_car'),spec:g('t_spec'),fuel_power:g('t_fuel_power'),first_reg:g('t_first_reg'),body:g('t_body'),owner:g('t_owner'),handover_place:g('t_handover_place'),delivery_deadline:g('t_delivery_deadline'),handover_planned:g('t_handover_planned'),plate:g('t_plate'),vin:g('t_vin'),currency:g('t_currency'),monthly:g('t_monthly'),vat:g('t_vat'),min_months:g('t_min_months'),deposit:g('t_deposit'),deposit_upfront:g('t_deposit_upfront')!=='0',billing:g('t_billing'),km_month:g('t_km_month'),km_fee:g('t_km_fee'),notes:g('t_notes')}}}
+function viewNew(){app.innerHTML='<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Új bérleti szerződés</h2><a href="#" class="btn ghost sm">← Vissza</a></div>'+termsForm({},{test:1})+'<div id="out"></div><div class="row" style="margin-top:14px"><button class="btn navy" id="save">Mentés piszkozatként</button><button class="btn red" id="send">Mentés és link küldése az ügyfélnek</button></div><p class="small muted">A link elküldése után az ügyfél feltölti az adatait és okmányait; erről e-mailt kapsz ('+esc(ME.notify)+').</p></div>';
+  function go(send){var d=readForm();d.send=send;api('uj',d).then(function(j){if(j.error){$('#out').innerHTML='<div class="note err">'+esc(j.error)+'</div>';return}location.hash=j.id})}
+  $('#save').addEventListener('click',function(){go(false)});$('#send').addEventListener('click',function(){go(true)})}
+
+function viewOne(id){app.innerHTML='<div class="card">Betöltés…</div>';api('c/'+id).then(function(j){if(j.error){app.innerHTML='<div class="card"><div class="note err">'+esc(j.error)+'</div><a href="#">← Vissza</a></div>';return}CUR=j;renderOne()})}
+function act(path,data,confirmMsg){if(confirmMsg&&!confirm(confirmMsg))return;return api('c/'+CUR.contract.id+'/'+path,data||{}).then(function(j){if(j.error){alert(j.error);if(j.detail){CUR=j.detail;renderOne()}return}CUR=j;renderOne()})}
+function renderOne(){var j=CUR,c=j.contract,t=c.terms,cu=c.cust||{},st=c.status;var editable=['draft','sent','changes','review','approved'].indexOf(st)>=0;
+  var h='<div class="row" style="margin-bottom:12px"><a href="#" class="btn ghost sm">← Szerződések</a><b style="font-size:18px">'+esc(c.number)+'</b><span class="badge '+(SB[st]||'')+'">'+esc(c.status_hu)+'</span>'+(c.test?'<span class="badge warn">TESZT</span>':'')+'</div>';
+  // teendő
+  var todo='';
+  if(st==='draft')todo='<div class="note info">Piszkozat. Ellenőrizd a feltételeket, majd küldd el a linket az ügyfélnek.</div><button class="btn red" data-a="kuldes">Link küldése az ügyfélnek</button>';
+  else if(st==='sent'||st==='changes')todo='<div class="note info">Az ügyfél adataira és okmányaira várunk.'+(c.opened_at?' Megnyitotta: '+hdt(c.opened_at)+'.':' Még nem nyitotta meg.')+'</div><button class="btn ghost" data-a="kuldes">Link újraküldése</button>';
+  else if(st==='review')todo='<div class="note warn"><b>Teendő:</b> ellenőrizd az adatokat és az okmányokat (lent), majd hagyd jóvá vagy kérj javítást.</div>'+(j.warnings.length?'<div class="note err">'+j.warnings.map(esc).join('<br>')+'</div>':'')+'<div class="row"><button class="btn red" data-a="jovahagy">Jóváhagyás – aláírható</button></div><label class="f" style="margin-top:10px">Javítási kérés az ügyfélnek<textarea class="in" id="fixnote" placeholder="pl. A jogosítvány hátoldala homályos, kérjük, fotózd le újra."></textarea></label><button class="btn ghost" id="fixbtn" style="margin-top:6px">Javítás kérése</button>';
+  else if(st==='approved')todo='<div class="note info">Jóváhagyva ('+esc(c.approved_by||'')+', '+hdt(c.approved_at)+'). Az ügyfél aláírására várunk. Elfogadott fejezetek: '+Object.keys(c.accepted||{}).length+' / '+j.section_titles.length+'.</div><div class="row"><button class="btn ghost" data-a="kuldes">Link újraküldése</button></div><label class="f" style="margin-top:10px">Mégis javítást kérek<textarea class="in" id="fixnote"></textarea></label><button class="btn ghost" id="fixbtn" style="margin-top:6px">Javítás kérése</button>';
+  else if(st==='signed')todo=t.billing==='card'?'<div class="note warn">Aláírva '+hdt(c.signed_at)+'. Az ügyfél első kártyás fizetésére várunk ('+money(c.first_amount,t.currency)+').</div>':'<div class="note warn"><b>Teendő:</b> küldd ki a díjbekérőt ('+money(c.first_amount,t.currency)+'), és a befizetés után rögzítsd.</div><button class="btn red" data-a="elso-fizetve" data-c="Biztosan megérkezett az első fizetés?">Első fizetés megérkezett</button>';
+  else if(st==='active')todo='<div class="note ok">Aktív. '+(c.handover_date?'Átadva: '+hd(c.handover_date)+'.':'<b>Teendő az átadáskor:</b> add meg az átadás napját – ettől indulnak a havi terhelések.')+'</div>';
+  h+='<div class="card"><h2>Teendő</h2>'+todo+'</div>';
+  h+='<div class="cols"><div>';
+  // ügyfél adatai
+  h+='<div class="card"><h2>Ügyfél ('+esc({magan:'magánszemély',ev:'egyéni vállalkozó',ceg:'cég'}[c.ctype])+')</h2><div class="kv">';
+  ['company_name','reg_number','tax_number','seat','ev_number','name','signer_role','signer_is_director','signer_drives','birth_date','birth_place','address','phone','id_type','id_number','address_card_number','licence_number','licence_since','licence_expiry'].forEach(function(k){var v=cu[k];if(v===undefined||v===''||v===null)return;if(c.ctype!=='ceg'&&(k==='signer_is_director'||k==='signer_drives'))return;if(typeof v==='boolean')v=v?'igen':'nem';if(k==='id_type')v=v==='passport'?'útlevél':'személyi igazolvány';if(/date|expiry/.test(k))v=hd(v);h+='<span>'+esc(FL[k]||k)+'</span><b>'+esc(v)+'</b>'});
+  h+='<span>E-mail</span><b>'+esc(c.email)+'</b></div>';
+  if(cu.co){var o=cu.co;h+='<h3>Bérlőtárs (házastárs)</h3><div class="kv"><span>Név</span><b>'+esc(o.name)+'</b><span>E-mail</span><b>'+esc(o.email)+'</b><span>Születés</span><b>'+esc(o.birth_place||'')+' '+hd(o.birth_date)+'</b><span>Lakcím</span><b>'+esc(o.address)+'</b><span>Okmány</span><b>'+(o.id_type==='passport'?'útlevél':'szem. ig.')+' '+esc(o.id_number)+'</b>'+(o.address_card_number?'<span>Lakcímkártya</span><b>'+esc(o.address_card_number)+'</b>':'')+'<span>Jogosítvány</span><b>'+esc(o.licence_number)+' ('+esc(o.licence_since)+' óta)</b></div>'+(c.co_sign_name?'<p class="small">Aláírta: <b>'+esc(c.co_sign_name)+'</b></p>':'')}
+  (cu.drivers||[]).forEach(function(d,i){h+='<h3>'+(i+1)+'. további vezető</h3><div class="kv"><span>Név</span><b>'+esc(d.name)+'</b><span>Születési dátum</span><b>'+hd(d.birth_date)+'</b><span>Okmány</span><b>'+(d.id_type==='passport'?'útlevél':'szem. ig.')+' '+esc(d.id_number)+'</b><span>Jogosítvány</span><b>'+esc(d.licence_number)+' ('+esc(d.licence_since)+' óta)</b></div>'});
+  if(j.missing_fields.length&&['sent','changes'].indexOf(st)>=0)h+='<div class="note warn small">Hiányzó adatok: '+j.missing_fields.map(function(k){return esc(FL[k]||k)}).join(', ')+'</div>';
+  h+='</div>';
+  // okmányok
+  h+='<div class="card"><h2>Okmányok</h2>'+(j.files.length?'<div class="files">'+j.files.map(function(f){var img=/^image\//.test(f.mime);return '<a class="file" href="'+A+'fajl/'+f.id+'" target="_blank" rel="noopener"><div class="th" style="'+(img?'background-image:url('+A+'fajl/'+f.id+')':'')+'">'+(img?'':'📄')+'</div>'+(f.kind!=='signature'?'<div class="wm">CSAK CARADVANCE BÉRLÉSHEZ</div>':'')+'<div class="t"><b>'+esc(KIND[f.kind]||f.kind)+'</b>'+(f.person===9?' · bérlőtárs':f.person?' · '+f.person+'. vezető':'')+'<br><span class="muted">'+Math.round(f.size/1024)+' KB · '+hdt(f.created_at)+'</span></div></a>'}).join('')+'</div>':'<p class="muted">Még nincs feltöltött okmány.</p>')+
+    (j.missing_docs.length&&['sent','changes','review'].indexOf(st)>=0?'<div class="note warn small">Hiányzik: '+j.missing_docs.map(function(m){return esc(KIND[m.kind]||m.kind)+(m.person===9?' (bérlőtárs)':m.person?' ('+m.person+'. vezető)':'')}).join(', ')+'</div>':'')+'<p class="small muted">Az okmánymásolatok a lezárás vagy visszavonás után 30 nappal automatikusan törlődnek.</p></div>';
+  // terhelések
+  if(['signed','active','closed'].indexOf(st)>=0){h+='<div class="card"><h2>Fizetések és terhelések</h2>'+(c.card_label?'<p class="small">Mentett kártya: <b>'+esc(c.card_label)+'</b></p>':'')+(j.charges.length?'<table><tr><th>Tétel</th><th>Esedékes</th><th>Összeg</th><th>Állapot</th><th></th></tr>'+j.charges.map(function(ch){var b={paid:'ok',scheduled:'',retry:'err',failed:'err',pending_checkout:'warn',cancelled:''}[ch.status]||'';var lbl={paid:'Fizetve',scheduled:'Ütemezve',retry:'Sikertelen – újrapróba: '+hd(ch.next_try),failed:'Sikertelen',pending_checkout:'Ügyfél fizet',cancelled:'Törölve'}[ch.status]||ch.status;
+      return '<tr><td>'+esc(ch.title)+(ch.last_error&&ch.status!=='paid'?'<br><span class="small" style="color:#9f1239">'+esc(ch.last_error)+'</span>':'')+(ch.note?'<br><span class="small muted">'+esc(ch.note)+'</span>':'')+'</td><td>'+hd(ch.due_date)+'</td><td><b>'+money(ch.amount,ch.currency)+'</b></td><td><span class="badge '+b+'">'+esc(lbl)+'</span>'+(ch.paid_at?'<br><span class="small muted">'+hdt(ch.paid_at)+'</span>':'')+'</td><td>'+(['scheduled','retry','failed','pending_checkout'].indexOf(ch.status)>=0?'<div class="row">'+(t.billing==='card'?'<button class="btn sm ghost" data-ch="most" data-id="'+ch.id+'">Terhelés most</button>':'')+'<button class="btn sm ghost" data-ch="fizetve" data-id="'+ch.id+'">Fizetve (kézi)</button><button class="btn sm ghost" data-ch="torol" data-id="'+ch.id+'">Törlés</button></div>':'')+'</td></tr>'}).join('')+'</table>':'<p class="muted">Még nincs tétel.</p>');
+    if(st==='active'||st==='closed')h+='<h3>További terhelés (km-túllépés, bírság, kár, díj)</h3><div class="grid"><label class="f two">Megnevezés<input class="in" id="x_title" placeholder="pl. Kilométer-túllépés 1 200 km × 0,85 €"></label><label class="f">Összeg ('+esc(t.currency)+')<input class="in" id="x_amount" inputmode="decimal"></label></div><div class="row" style="margin-top:8px"><button class="btn ghost" id="xbtn">Felvétel és értesítés</button><span class="small muted">Az ügyfél azonnal e-mailt kap; '+(t.billing==='card'?'a kártyáját 3 nap múlva terheljük.':'a számlát külön küldöd.')+'</span></div>';
+    h+='</div>'}
+  h+='</div><div>';
+  // feltételek
+  h+='<div class="card"><h2>Feltételek</h2>'+(editable?'<div id="tform">'+termsForm(t,c)+'</div><div class="row" style="margin-top:10px"><button class="btn navy" id="tsave">Mentés</button></div>'+(st==='approved'?'<p class="small muted">Ha a feltételek változnak, az ügyfél elfogadásai törlődnek, és újra el kell fogadnia.</p>':''):
+    '<div class="kv"><span>Autó</span><b>'+esc(t.car)+'</b><span>Rendszám / alváz</span><b>'+esc((t.plate||'—')+' / '+(t.vin||'—'))+'</b><span>Havi díj</span><b>'+money(t.monthly,t.currency)+' ('+(t.vat==='net'?'nettó':'bruttó')+')</b><span>Óvadék</span><b>'+money(t.deposit,t.currency)+(t.deposit_upfront?'':' (csak kár esetén)')+'</b><span>Min. időtartam</span><b>'+t.min_months+' hó</b><span>Km-keret</span><b>'+t.km_month+' km/hó · '+money(t.km_fee,t.currency)+'/km</b><span>Fizetés</span><b>'+(t.billing==='card'?'kártya, automatikus':'átutalás')+'</b><span>Tervezett átadás</span><b>'+hd(t.handover_planned)+'</b></div>'+(t.notes?'<p class="small"><b>Egyedi:</b> '+esc(t.notes)+'</p>':''))+
+    '<div class="row" style="margin-top:12px"><a class="btn sm ghost" href="'+A+'c/'+c.id+'/pdf" target="_blank" rel="noopener">'+(c.snapshot_hash?'Aláírt szerződés (PDF)':'Szerződés-tervezet (PDF)')+'</a></div>'+(c.snapshot_hash?'<p class="small muted">SHA-256: '+esc(c.snapshot_hash)+'</p>':'')+'</div>';
+  // bérlet kezelése
+  if(st==='signed'||st==='active'||st==='closed'){h+='<div class="card"><h2>Bérlet</h2><div class="grid"><label class="f">Átadás napja<input class="in" type="date" id="hdate" value="'+esc(c.handover_date||'')+'"></label><div style="align-self:end"><button class="btn ghost sm" id="hbtn">Mentés</button></div><div></div>'+
+    '<label class="f">Megszűnés napja<input class="in" type="date" id="edate" value="'+esc(c.end_date||'')+'"></label><div style="align-self:end"><button class="btn ghost sm" id="ebtn">Mentés</button></div></div><p class="small muted">A megszűnés napjától már nincs havi díj; az utolsó hónap díja időarányos.</p>';
+    if(st!=='signed')h+='<h3>Óvadék elszámolása</h3>'+(c.deposit_refunded_at?'<div class="note ok small">Visszafizetve: '+money(c.deposit_refund,t.currency)+' '+esc(c.deposit_refund_method||'')+' ('+hdt(c.deposit_refunded_at)+')</div>':'<div class="grid"><label class="f">Visszafizetendő összeg<input class="in" id="dep" inputmode="decimal" value="'+esc(t.deposit_upfront?t.deposit:0)+'"></label><label class="f">Módja<select class="in" id="depm"><option value="atutalas">Átutalással</option>'+(c.first_pi?'<option value="stripe">Kártyára (Stripe)</option>':'')+'</select></label><div style="align-self:end"><button class="btn ghost sm" id="depbtn">Rögzítés</button></div></div>');
+    if(st==='active')h+='<div class="row" style="margin-top:14px"><button class="btn ghost" data-a="lezaras" data-c="Lezárod a szerződést? A további havi terhelések törlődnek, az okmányok 30 nap múlva törlődnek.">Szerződés lezárása</button></div>';
+    h+='</div>'}
+  // link + napló
+  h+='<div class="card"><h2>Ügyfél-link</h2><div class="link">'+esc(c.link)+'</div><div class="row" style="margin-top:8px"><button class="btn sm ghost" id="copy">Másolás</button><a class="btn sm ghost" href="'+esc(c.link)+'" target="_blank" rel="noopener">Megnyitás</a>'+(['active','closed','cancelled'].indexOf(st)<0?'<button class="btn sm ghost" data-a="visszavonas" data-c="Visszavonod a szerződést? A link nem fog működni.">Visszavonás</button>':'')+'</div></div>';
+  h+='<div class="card"><h2>Napló</h2><div class="ev">'+(c.events||[]).slice().reverse().map(function(e){return '<div><span>'+hdt(e.t)+'</span>'+esc(e.e)+'</div>'}).join('')+'</div></div>';
+  h+='</div></div>';
+  app.innerHTML=h;
+  app.querySelectorAll('[data-a]').forEach(function(b){b.addEventListener('click',function(){act(b.getAttribute('data-a'),{},b.getAttribute('data-c'))})});
+  var fb=$('#fixbtn');if(fb)fb.addEventListener('click',function(){act('javitas',{note:$('#fixnote').value})});
+  var ts=$('#tsave');if(ts)ts.addEventListener('click',function(){var d=readForm();api('c/'+c.id,d).then(function(r){if(r.error){alert(r.error);return}CUR=r;renderOne()})});
+  var hb=$('#hbtn');if(hb)hb.addEventListener('click',function(){act('atadas',{date:$('#hdate').value})});
+  var eb=$('#ebtn');if(eb)eb.addEventListener('click',function(){act('vege',{date:$('#edate').value})});
+  var xb=$('#xbtn');if(xb)xb.addEventListener('click',function(){act('extra',{title:$('#x_title').value,amount:$('#x_amount').value},'Felveszed a tételt, és értesíted az ügyfelet?')});
+  var db=$('#depbtn');if(db)db.addEventListener('click',function(){act('kaucio',{amount:$('#dep').value,method:$('#depm').value},'Rögzíted a kaució visszafizetését? Az ügyfél e-mailt kap.')});
+  app.querySelectorAll('[data-ch]').forEach(function(b){b.addEventListener('click',function(){var a=b.getAttribute('data-ch');act('terheles',{charge_id:Number(b.getAttribute('data-id')),action:a},{most:'Most terheled a kártyát?',fizetve:'Fizetettnek jelölöd (pl. átutalás érkezett)?',torol:'Törlöd ezt a tételt?'}[a])})});
+  var cp=$('#copy');if(cp)cp.addEventListener('click',function(){navigator.clipboard&&navigator.clipboard.writeText(c.link);cp.textContent='Másolva ✓'});
+}
+boot();
+})();
+</script>
+</body>
+</html>
