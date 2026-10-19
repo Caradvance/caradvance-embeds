@@ -97,6 +97,9 @@
     '.mm-single .mm-ph{background:#222 center/cover no-repeat}.mm-single .mm-ct{padding:22px 22px;display:flex;flex-direction:column;justify-content:center}' +
     '.mm-single b{font-size:20px;line-height:1.25}.mm-single span{display:block;font-size:14px;color:#C9CFDA;margin:8px 0 16px}' +
     '.mm-chips{display:flex;gap:10px;flex-wrap:wrap}.mm-chips .mm-chip{margin:0}' +
+    '.mm-car.mm-new .mm-ph{aspect-ratio:16/9;background-size:contain;background-color:#fff;margin:10px 12px 0}' +
+    '.mm-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.mm-meta img{height:18px;width:auto;max-width:60px;object-fit:contain}.mm-meta span{font-size:12px;color:#7A8496}' +
+    '.mm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.mm-av,.mm-fu{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:7px;padding:3px 8px;line-height:1.3}.mm-av{background:#64748b}.mm-av.now{background:#15803D}' +
     '.mm-all{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A;text-decoration:none;margin:8px 0 0 12px}';
 
   function el(html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; }
@@ -121,22 +124,61 @@
       return { href: href, t: txt(a.querySelector('.title')), sp: sp, img: im ? im.getAttribute('src') : '', ft: /Ft/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
     });
   }
+  var LK = { 'VW': 'vw', 'BMW': 'bmw', 'Audi': 'audi', 'Mercedes-Benz': 'mercedes', 'MINI': 'mini', 'Hyundai': 'hyundai', 'CUPRA': 'cupra', 'Kia': 'kia', 'MAN': 'man', 'Seat': 'seat', 'Volvo': 'volvo' };
+  var FC = { 'Benzin': '#e8820c', 'Dízel': '#6b7280', 'PHEV': '#00997E', 'Hibrid': '#00997E', 'Elektromos': '#0D79FF', 'EV': '#0D79FF' };
+  function rhref(b, mo) {
+    var D = { '1': '1-es', '2': '2-es', '3': '3-as', '4': '4-es', '5': '5-ös', '6': '6-os', '7': '7-es', '8': '8-as' };
+    var n = (b === 'VW' ? 'Volkswagen' : b) + ' ' + String(mo).replace(/\b(\d)er\b/g, function (_, d) { return D[d] || d; }).replace(/\bLimousine\b/g, 'Limuzin').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, '$1-osztály');
+    return '/berelheto-auto/' + n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-berles';
+  }
+  function scriptText(doc, re) { var ss = doc.querySelectorAll('script'); for (var i = 0; i < ss.length; i++) { if (re.test(ss[i].textContent)) return ss[i].textContent; } return ''; }
+  function parseSub(doc, rate) {
+    var st = scriptText(doc, /window\.SUB\s*=/), rt = scriptText(doc, /var PHOTO\s*=/);
+    var SUB = JSON.parse(st.slice(st.indexOf('{'), st.lastIndexOf('}') + 1));
+    var pm = /var PHOTO\s*=\s*(\{[^;]*?\});/.exec(rt); var PHOTO = pm ? JSON.parse(pm[1]) : {};
+    var R = rate || SUB.rate_fallback || 364;
+    var models = (SUB.models || []).filter(function (m) { return m.net && PHOTO[m.brand + ' ' + m.model]; });
+    models.sort(function (a, b) { return (b.now || 0) - (a.now || 0) || (b.count || 0) - (a.count || 0); });
+    var out = [], seen = {};
+    models.forEach(function (m) { if (out.length < 4 && !seen[m.brand]) { seen[m.brand] = 1; out.push(m); } });
+    DATA.rentN = (SUB.models || []).reduce(function (s, m) { return s + (m.count || 0); }, 0);
+    return out.map(function (m) {
+      var eff = m.net + 650;
+      return { href: rhref(m.brand, m.model), t: m.brand === 'VW' ? 'Volkswagen ' + m.model : m.brand + ' ' + m.model, img: PHOTO[m.brand + ' ' + m.model], logo: LK[m.brand] ? '/bl-' + LK[m.brand] + '.webp' : '',
+        yr: m.stockOnly ? 'Azonnal elvihető' : '0 km · 2026', sp: [m.cat].concat(m.gears || []).filter(Boolean).join(' · '),
+        avail: m.now > 0 ? m.now + ' elérhető' : ((m.later && m.later[0]) ? m.later[0].d : 'Hamarosan'), now: m.now > 0,
+        fuels: (m.fuels || []).map(function (f) { return f === 'PHEV' ? 'Hibrid' : f; }),
+        ft: (Math.ceil(eff * R / 10000) * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft', eur: eff, isNew: true };
+    });
+  }
   function loadData(cb) {
     if (DATA.rent || DATA.loading) return;
     DATA.loading = true;
-    fetch('/autoink/', { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (html) {
+    var rateP = fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function (r) { return r.json(); }).then(function (j) { return j && j.rates && j.rates.HUF; }).catch(function () { return 0; });
+    Promise.all([fetch('/autoink/', { credentials: 'same-origin' }).then(function (r) { return r.text(); }), rateP]).then(function (res) {
+      var html = res[0], rate = res[1];
       var doc = new DOMParser().parseFromString(html, 'text/html');
-      DATA.rent = parseCards(doc, '#panel-berelheto a.card', 'rent');
+      try { DATA.rent = parseSub(doc, rate); } catch (e) { DATA.rent = parseCards(doc, '#panel-berelheto a.card', 'rent'); }
       DATA.sale = parseCards(doc, '#grid a.card', 'sale');
       [].slice.call(doc.querySelectorAll('.autok-tab')).forEach(function (b) {
         var m = /\((\d+)\)/.exec(b.textContent || ''); if (!m) return;
-        if (/Bérelhető/i.test(b.textContent)) DATA.rentN = +m[1]; else if (/Eladó/i.test(b.textContent)) DATA.saleN = +m[1];
+        if (/Bérelhető/i.test(b.textContent)) { if (!DATA.rentN) DATA.rentN = +m[1]; } else if (/Eladó/i.test(b.textContent)) DATA.saleN = +m[1];
       });
       DATA.rent.concat(DATA.sale).forEach(function (c) { if (c.img) { var i = new Image(); i.referrerPolicy = 'no-referrer'; i.src = thumb(c.img); } });
       cb();
     }).catch(function () { DATA.rent = []; DATA.sale = []; cb(); });
   }
+  function newCard(c) {
+    var np = !!window.CA_NP;
+    var fu = c.fuels.map(function (f) { return '<span class="mm-fu" style="background:' + (FC[f] || '#4b5563') + '">' + esc(f) + '</span>'; }).join('');
+    return '<a class="mm-car mm-new" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + c.img + '\')"></div><div class="mm-cb">' +
+      '<div class="mm-meta">' + (c.logo ? '<img src="' + c.logo + '" alt="" width="40" height="18">' : '') + '<span>' + esc(c.yr) + '</span></div>' +
+      '<b>' + esc(c.t) + '</b><span class="mm-sp">' + esc(c.sp) + '</span>' +
+      '<div class="mm-tags"><span class="mm-av' + (c.now ? ' now' : '') + '">' + esc(c.avail) + '</span>' + fu + '</div>' +
+      '<div class="mm-pr">' + (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + esc(c.ft) + '</strong><em>/hó-tól · nettó</em>') + '</div></div></a>';
+  }
   function carCard(c, kind) {
+    if (c.isNew) return newCard(c);
     var np = !!window.CA_NP || !c.ft;
     var price = np ? '<strong>Ajánlatot kérek</strong>'
       : kind === 'rent' ? '<strong>' + esc(c.ft) + '/hó</strong><em>' + esc(c.sub.replace(/\s*\/\s*/, '/')) + '</em>'
