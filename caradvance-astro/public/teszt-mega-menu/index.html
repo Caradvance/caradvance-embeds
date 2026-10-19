@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Teszt: mega menü — CarAdvance</title>
+<!-- ca-tracking:start --><!-- tesztoldal: nincs követés --><!-- ca-tracking:end -->
+<style>body{margin:0;font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif;background:#F4F5F7;color:#14151A}.ld{max-width:520px;margin:120px auto;text-align:center}</style>
+</head>
+<body>
+<div class="ld">Az előnézet betöltése…</div>
+<script>
+/* TESZT: a valódi oldalt (alapból a főoldalt) tölti be, és az új mega menüt teszi rá. Az éles menü nem változik.
+   Másik oldal: /teszt-mega-menu/?oldal=/autoink/ */
+(function () {
+  var q = new URLSearchParams(location.search).get('oldal') || '/';
+  if (!/^\/[A-Za-z0-9\-_/]*$/.test(q) || q.indexOf('//') >= 0 || q.indexOf('/teszt-mega-menu') === 0) q = '/';
+  fetch(q, { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (html) {
+    html = html.replace(/<!-- ca-tracking:start -->[\s\S]*?<!-- ca-tracking:end -->/g, '');
+    html = html.replace(/<head([^>]*)>/i, '<head$1><meta name="robots" content="noindex,nofollow">');
+    var bar = '<div style="position:fixed;left:14px;bottom:14px;z-index:2147483000;background:#0B0B0D;color:#fff;font:600 13px/1.3 Plus Jakarta Sans,system-ui,sans-serif;padding:10px 14px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)">TESZT – új mega menü (csak asztali nézet, min. 1100 px)</div>';
+    html = html.replace(/<\/body>/i, bar + '<script src="/mega-menu-test.js?v=1"><\/script></body>');
+    document.open(); document.write(html); document.close();
+  }).catch(function () { document.querySelector('.ld').textContent = 'Az előnézet nem töltődött be. Frissítsd az oldalt.'; });
+})();
+</script>
+</body>
+</html>
