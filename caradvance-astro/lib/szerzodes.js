@@ -458,7 +458,7 @@ export function contractPdf(snap, meta) {
     if (at) p.draw(at, x, top - 109, 'R', 7.8, '0.35 0.4 0.5');
   };
   let top = p.y;
-  block(ML, top, 'Bérbeadó / Lessor', 'Caradvance GmbH', 'képv. / repr.: BH Group Zrt. (magyarországi képviselő)', null, snap.approved_at ? 'Jóváhagyva / approved: ' + huDateTime(snap.approved_at) + (snap.approved_by ? ' (' + snap.approved_by + ')' : '') : '');
+  block(ML, top, 'Bérbeadó / Lessor', 'Caradvance GmbH', 'Bgm-Graf-Ring 21, 82538 Geretsried', null, snap.approved_at ? 'Jóváhagyva / approved: ' + huDateTime(snap.approved_at) + (snap.approved_by ? ' (' + snap.approved_by + ')' : '') : '');
   p.draw('Elektronikusan kiállítva / issued electronically', ML, top - 50, 'R', 7.8, '0.35 0.4 0.5');
   block(x2, top, 'Bérlő / Lessee', snap.signer ? snap.signer.name : lesseeName, snap.signer ? 'E-mail kóddal igazolva / verified by e-mail code' : '(aláírásra vár / awaiting signature)', meta.sig, snap.signer ? huDateTime(snap.signer.at) : '');
   p.y = top - 122;
