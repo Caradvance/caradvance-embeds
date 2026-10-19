@@ -104,43 +104,50 @@
   function fmtEur(v) { return Math.round(Number(v) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €'; }
   function shortName(m) { return String(m || '').replace(/["'*]/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 4).join(' '); }
   var DATA = { rent: null, sale: null, loading: false };
-  function slug(m) { return (window.RENT && RENT.slugify) ? RENT.slugify(m) : String(m || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  function pick(list, n) { // kiemelt elöl, modellenként egy, max n
-    var out = [], seen = {};
-    list.slice().sort(function (a, b) { return (b.kiemelt ? 1 : 0) - (a.kiemelt ? 1 : 0); }).forEach(function (c) {
-      var key = (c.rent && c.rent.cat) || shortName(c.modell).split(' ').slice(0, 2).join(' ');
-      if (out.length < n && !seen[key] && c.img) { seen[key] = 1; out.push(c); }
+  function thumb(u) { var img = String(u || ''); if (img.indexOf('classistatic') >= 0) { if (/rule=mo-\d+/.test(img)) img = img.replace(/rule=mo-\d+/, 'rule=mo-640'); else img += (/\?$/.test(img) ? '' : (img.indexOf('?') < 0 ? '?' : '&')) + 'rule=mo-640'; } return img; }
+  function txt(el) { return el ? el.textContent.replace(/ /g, ' ').replace(/\s+/g, ' ').trim() : ''; }
+  function km(s) { var n = String(s || '').replace(/\D/g, ''); return n ? n.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' km' : ''; }
+  /* Az /autoink/ oldalon látható autók (ugyanaz a sorrend, kép és forintár), az oldal HTML-jéből. */
+  function parseCards(doc, sel, kind) {
+    return [].slice.call(doc.querySelectorAll(sel)).slice(0, 4).map(function (a) {
+      var href = (a.getAttribute('href') || '').replace(/^(\.\.\/)+/, '/').replace(/^([^/])/, '/$1');
+      var im = a.querySelector('.media img');
+      var parts = txt(a.querySelector('.specs')).split('·').map(function (x) { return x.trim(); });
+      var year = txt(a.querySelector('.year')).split('/').pop();
+      var sp = [year, km(parts[0]), parts[parts.length - 1]].filter(Boolean).join(' · ');
+      var ft = '', sub = '';
+      if (kind === 'rent') { var rp = a.querySelector('.rentprices .rp b span'); ft = txt(rp).replace(/^≈\s*/, ''); sub = txt(a.querySelector('.rentprices .rp span')) || '2 000 km / hó'; }
+      else { ft = txt(a.querySelector('.pricerow .price')); }
+      return { href: href, t: txt(a.querySelector('.title')), sp: sp, img: im ? im.getAttribute('src') : '', ft: /Ft/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
     });
-    return out;
   }
   function loadData(cb) {
     if (DATA.rent || DATA.loading) return;
     DATA.loading = true;
-    function go() {
-      try {
-        RENT.loadCars(function (cars) { DATA.rent = pick(cars || [], 4); DATA.rentN = (cars || []).length; preload(DATA.rent); cb(); });
-        RENT.loadAll(function (all) { DATA.sale = pick((all || []).filter(function (c) { return Number(c.eur) > 0; }), 4); DATA.saleN = (all || []).length; preload(DATA.sale); cb(); });
-      } catch (e) { DATA.rent = []; DATA.sale = []; cb(); }
-    }
-    if (window.RENT && RENT.loadCars) go();
-    else { var sc = document.createElement('script'); sc.src = '/rent-data.js'; sc.onload = go; sc.onerror = function () { DATA.rent = []; DATA.sale = []; cb(); }; document.head.appendChild(sc); }
+    fetch('/autoink/', { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      DATA.rent = parseCards(doc, '#panel-berelheto a.card', 'rent');
+      DATA.sale = parseCards(doc, '#grid a.card', 'sale');
+      [].slice.call(doc.querySelectorAll('.autok-tab')).forEach(function (b) {
+        var m = /\((\d+)\)/.exec(b.textContent || ''); if (!m) return;
+        if (/Bérelhető/i.test(b.textContent)) DATA.rentN = +m[1]; else if (/Eladó/i.test(b.textContent)) DATA.saleN = +m[1];
+      });
+      DATA.rent.concat(DATA.sale).forEach(function (c) { if (c.img) { var i = new Image(); i.referrerPolicy = 'no-referrer'; i.src = thumb(c.img); } });
+      cb();
+    }).catch(function () { DATA.rent = []; DATA.sale = []; cb(); });
   }
-  function thumb(u) { var img = String(u || ''); if (img.indexOf('classistatic') >= 0) { if (/rule=mo-\d+/.test(img)) img = img.replace(/rule=mo-\d+/, 'rule=mo-640'); else img += (/\?$/.test(img) ? '' : (img.indexOf('?') < 0 ? '?' : '&')) + 'rule=mo-640'; } return img; }
-  function preload(list) { (list || []).forEach(function (c) { var im = new Image(); im.src = thumb(c.img); }); }
   function carCard(c, kind) {
-    var np = !!window.CA_NP;
-    var price = kind === 'rent'
-      ? (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + fmtEur(c.rent && c.rent.price) + '/hó</strong><em>nettó · 2 000 km/hó</em>')
-      : (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + fmtEur(c.eur) + '</strong><em>bruttó</em>');
-    var img = thumb(c.img);
-    var sp = [String(c.evjarat || '').split('/').pop(), c.teljesitmeny, c.uzemanyag].filter(Boolean).join(' · ');
-    return '<a class="mm-car" href="/auto/' + slug(c.modell) + '/"><div class="mm-ph" style="background-image:url(\'' + img.replace(/'/g, '%27') + '\')"></div><div class="mm-cb"><b>' + esc(shortName(c.modell)) + '</b><span class="mm-sp">' + esc(sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
+    var np = !!window.CA_NP || !c.ft;
+    var price = np ? '<strong>Ajánlatot kérek</strong>'
+      : kind === 'rent' ? '<strong>' + esc(c.ft) + '/hó</strong><em>' + esc(c.sub.replace(/\s*\/\s*/, '/')) + '</em>'
+      : '<strong>' + esc(c.ft) + '</strong>';
+    return '<a class="mm-car" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')"></div><div class="mm-cb"><b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
   }
   function carsHtml(p) {
     var list = DATA[p.cars];
-    var body = !list ? '<div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div>'
-      : list.length ? list.map(function (c) { return carCard(c, p.cars); }).join('') : '';
     if (list && !list.length) return '';
+    var body = !list ? '<div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div>'
+      : list.map(function (c) { return carCard(c, p.cars); }).join('');
     var n = p.cars === 'rent' ? DATA.rentN : DATA.saleN;
     return '<div><div class="mm-rowhead"><p class="mm-h">' + esc(p.ct) + '</p><a class="mm-more" href="' + p.callHref + '">' + esc(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a></div><div class="mm-cars">' + body + '</div></div>';
   }
