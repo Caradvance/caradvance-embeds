@@ -13,6 +13,7 @@
     help: '<circle cx="12" cy="12" r="9"/><path d="M12 17v.01M12 13.5a1.5 1.5 0 0 1 1-1.5a2.6 2.6 0 1 0-3-4"/>',
     store: '<path d="M3 21h18M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2-4h14l2 4M5 21v-10.15M19 21v-10.15"/>',
     sliders: '<path d="M4 6h8M16 6h4M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+    euro: '<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4a5 5 0 1 0 0 7.2"/><path d="M7 10.5h6.5M7 13.5h6.5"/>',
     coin: '<circle cx="12" cy="12" r="9"/><path d="M14.8 9a2 2 0 0 0-1.8-1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1-1.8-1M12 7v10"/>',
     briefcase: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7v-2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M12 12v.01M3 13a20 20 0 0 0 18 0"/>',
     cash: '<rect x="7" y="9" width="14" height="10" rx="2"/><circle cx="14" cy="14" r="2"/><path d="M17 9v-2a2 2 0 0 0-2-2h-10a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>',
@@ -112,10 +113,9 @@
     '.mm-single .mm-ph{background:#222 center/cover no-repeat}.mm-single .mm-ct{padding:22px 22px;display:flex;flex-direction:column;justify-content:center}' +
     '.mm-single b{font-size:20px;line-height:1.25}.mm-single span{display:block;font-size:14px;color:#C9CFDA;margin:8px 0 16px}' +
     '.mm-schip svg{width:22px;height:22px;flex-shrink:0;display:block}' +
-    '.mm-ngos-w{margin-bottom:18px}.mm-ngos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 8px}' +
-    '.mm-ng{display:flex;align-items:center;gap:12px;padding:7px 10px;border-radius:14px;text-decoration:none;color:#14151A;font-weight:700;font-size:13.5px;line-height:1.25}' +
-    '.mm-ng:hover{background:#F4F7FB}.mm-ng img{width:40px;height:30px;object-fit:contain;flex:none}' +
-    '.mm-ng-more{color:#E2001A;gap:6px}' +
+    '.mm-ngos-w{margin-bottom:18px}.mm-ngos{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}' +
+    '.mm-ng{display:flex;align-items:center;justify-content:center;height:56px;padding:6px 10px;border:1px solid #E6EAF1;border-radius:14px;background:#fff;transition:border-color .15s,box-shadow .15s}' +
+    '.mm-ng:hover{border-color:#E2001A;box-shadow:0 6px 16px rgba(15,23,42,.08)}.mm-ng img{max-width:100%;max-height:42px;width:auto;height:auto;object-fit:contain;display:block}' +
     '.mm-siderow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}' +
     '.mm-badge{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:16px;background:#FFF1F2;border:1px solid #FBD0D5;text-decoration:none;color:#0B0B0D;flex:none;transition:border-color .15s,box-shadow .15s}' +
     '.mm-badge:hover{border-color:#E2001A;box-shadow:0 8px 20px rgba(226,0,26,.12)}.mm-badge .mm-ic2{display:flex}' +
@@ -319,9 +319,8 @@
     var ng = '';
     if (p.cars === 'biz') {
       ng = '<div class="mm-ngos-w"><p class="mm-h"><a href="/jotekonysag/">Akiket támogatunk ›</a></p><div class="mm-ngos">' +
-        (DATA.ngos ? DATA.ngos.map(function (o) { return '<a class="mm-ng" href="/jotekonysag/"><img src="' + esc(o.logo) + '" alt="" width="40" height="30">' + esc(o.name) + '</a>'; }).join('') +
-          '<a class="mm-ng mm-ng-more" href="/jotekonysag/">Így működik ' + svg('arrow', 15) + '</a>'
-        : '<div class="mm-sk" style="aspect-ratio:auto;height:44px"></div><div class="mm-sk" style="aspect-ratio:auto;height:44px"></div><div class="mm-sk" style="aspect-ratio:auto;height:44px"></div><div class="mm-sk" style="aspect-ratio:auto;height:44px"></div>') + '</div></div>';
+        (DATA.ngos ? DATA.ngos.map(function (o) { return '<a class="mm-ng" href="/jotekonysag/" title="' + esc(o.name) + '"><img src="' + esc(o.logo) + '" alt="' + esc(o.name) + '" width="120" height="44"></a>'; }).join('')
+        : new Array(8).join('<div class="mm-sk" style="aspect-ratio:auto;height:56px"></div>')) + '</div></div>';
     }
     return ng + '<div><div class="mm-rowhead"><p class="mm-h">' + esc(p.ct) + '</p><a class="mm-more" href="' + p.callHref + '">' + esc(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a></div><div class="mm-cars">' + body + '</div></div>';
   }
@@ -335,7 +334,7 @@
     if (p.cars) h += '<div class="mm-carswrap">' + carsHtml(p) + '</div>';
     else {
       if (p.side) h += '<div class="mm-siderow"><div><p class="mm-h">' + esc(p.side.t) + '</p><div class="mm-chips">' + p.side.items.map(function (s) { return '<a class="mm-chip" href="' + s[2] + '">' + svg(s[0], 18) + esc(s[1]) + '</a>'; }).join('') + '</div></div>' +
-        (p.badge ? '<a class="mm-badge" href="' + p.badge.href + '"><span class="mm-ic2">' + svg('coin', 24) + '</span><span><strong>' + esc(p.badge.t) + '</strong><em>' + esc(p.badge.s) + '</em></span></a>' : '') + '</div>';
+        (p.badge ? '<a class="mm-badge" href="' + p.badge.href + '"><span class="mm-ic2">' + svg('euro', 24) + '</span><span><strong>' + esc(p.badge.t) + '</strong><em>' + esc(p.badge.s) + '</em></span></a>' : '') + '</div>';
       var mini = (p.minis || []).map(function (m) { return '<a class="mm-mini" href="' + m[4] + '"><span class="mm-ic2">' + (m[0].indexOf('soc:') === 0 ? SOC[m[0].slice(4)] : svg(m[0], 24)) + '</span><div><strong' + (m[1].length > 8 ? ' class="mm-long"' : '') + '>' + esc(m[1]) + '</strong><b>' + esc(m[2]) + '</b><span>' + esc(m[3]) + '</span></div><span class="mm-go">Tovább ' + svg('arrow', 14) + '</span></a>'; }).join('');
       if (p.soc) h += '<div><p class="mm-h">Kövess minket</p><div class="mm-chips">' + p.soc.map(function (x) { return '<a class="mm-chip mm-schip" href="' + x[3] + '" target="_blank" rel="noopener">' + SOC[x[0]] + esc(x[1]) + '</a>'; }).join('') + '</div></div>';
       h += '<div><p class="mm-h">Kiemelt</p><div class="' + (mini ? 'mm-frow' : '') + '">' + mini + '<a class="mm-single" href="' + p.f.href + '"><div class="mm-ph" style="background-image:url(\'' + p.f.img + '\')"></div><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn" style="align-self:flex-start;margin:0">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div></div>';
