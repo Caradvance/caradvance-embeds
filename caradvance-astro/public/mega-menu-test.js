@@ -1,8 +1,194 @@
-/* CarAdvance — mega menü (TESZT). Csak a /teszt-mega-menu/ oldal tölti be; az éles menüt nem érinti.
-   Asztali nézetben (>= 1100 px) a fő menüpontok alá teljes szélességű panelt nyit; mobilon a régi menü marad. */
+/* CarAdvance — asztali mega menü (élő). Minden oldalra a build utolsó lépése (inject-megamenu.mjs) teszi be.
+   Asztali nézetben (>= 1100 px) a fő menüpontok alá teljes szélességű panelt nyit; mobilon a régi menü marad.
+   Nyelv: a <html lang> alapján (hu, en, de, fr, uk, zh, sk, cs). A linkek magyar útvonalak — a nyelvi oldalakon
+   a rt-<nyelv>.js futásidejű fordító lokalizálja őket, a .sk/.cz domainen pedig az árakat is átváltja. */
 (function () {
   'use strict';
+  if (window.__caMM) return; window.__caMM = 1;
   var MIN_W = 1100;
+  /* ---- nyelv: a <html lang> alapján (hu, en, de, fr, uk, zh-Hans, sk, cs) ---- */
+  var LANGS = ['hu', 'en', 'de', 'fr', 'uk', 'zh', 'sk', 'cs'];
+  var LANG = (function () { var l = String(document.documentElement.getAttribute('lang') || 'hu').toLowerCase().split('-')[0]; return LANGS.indexOf(l) >= 0 ? l : 'hu'; })();
+  var LI = LANGS.indexOf(LANG);
+  /* fordítások: magyar kulcs -> [en, de, fr, uk, zh, sk, cs] */
+  var TR = {
+    'Bérelhető autóink': ['Cars available for rent', 'Verfügbare Mietwagen', 'Voitures disponibles à la location', 'Авто для оренди', '可租车辆', 'Autá na prenájom', 'Vozy k pronájmu'],
+    'Kiemelt bérelhető autók': ['Featured rental cars', 'Ausgewählte Mietwagen', 'Voitures de location à la une', 'Рекомендовані авто для оренди', '精选租赁车辆', 'Odporúčané autá na prenájom', 'Doporučené vozy k pronájmu'],
+    'Összes bérelhető autó': ['All rental cars', 'Alle Mietwagen', 'Toutes les voitures de location', 'Усі авто для оренди', '全部租赁车辆', 'Všetky autá na prenájom', 'Všechny vozy k pronájmu'],
+    'Mi a tartós bérlet?': ['What is long-term rental?', 'Was ist Langzeitmiete?', 'Qu’est-ce que la location longue durée ?', 'Що таке довгострокова оренда?', '什么是长期租赁？', 'Čo je dlhodobý prenájom?', 'Co je dlouhodobý pronájem?'],
+    'Minden benne van egy havi díjban': ['Everything in one monthly fee', 'Alles in einer Monatsrate', 'Tout compris dans un loyer mensuel', 'Усе в одному щомісячному платежі', '一笔月费，全部包含', 'Všetko v jednom mesačnom poplatku', 'Vše v jednom měsíčním poplatku'],
+    'Autók összehasonlítása': ['Compare cars', 'Autos vergleichen', 'Comparer les voitures', 'Порівняння авто', '车辆对比', 'Porovnanie áut', 'Porovnání vozů'],
+    'Akár 3 modell egymás mellett': ['Up to 3 models side by side', 'Bis zu 3 Modelle nebeneinander', 'Jusqu’à 3 modèles côte à côte', 'До 3 моделей поруч', '最多 3 款车型并排对比', 'Až 3 modely vedľa seba', 'Až 3 modely vedle sebe'],
+    'Bérlési folyamat': ['Rental process', 'Ablauf der Miete', 'Déroulement de la location', 'Процес оренди', '租赁流程', 'Proces prenájmu', 'Průběh pronájmu'],
+    'Lépésről lépésre az átadásig': ['Step by step to handover', 'Schritt für Schritt bis zur Übergabe', 'Étape par étape jusqu’à la remise', 'Крок за кроком до передачі', '一步步直到交车', 'Krok za krokom až po odovzdanie', 'Krok za krokem až k předání'],
+    'Feltételek és kaució': ['Terms and deposit', 'Bedingungen und Kaution', 'Conditions et caution', 'Умови та застава', '条款与押金', 'Podmienky a kaucia', 'Podmínky a kauce'],
+    'Önrész, km-keret, kaució': ['Excess, mileage limit, deposit', 'Selbstbeteiligung, km-Kontingent, Kaution', 'Franchise, kilométrage, caution', 'Франшиза, ліміт км, застава', '自付额、里程额度、押金', 'Spoluúčasť, limit km, kaucia', 'Spoluúčast, limit km, kauce'],
+    'Előnyök': ['Benefits', 'Vorteile', 'Avantages', 'Переваги', '优势', 'Výhody', 'Výhody'],
+    'Miért éri meg bérelni?': ['Why rent?', 'Warum mieten?', 'Pourquoi louer ?', 'Чому варто орендувати?', '为什么选择租赁？', 'Prečo sa oplatí prenajať?', 'Proč se vyplatí pronajmout?'],
+    'Gyakori kérdések': ['FAQ', 'Häufige Fragen', 'Questions fréquentes', 'Часті запитання', '常见问题', 'Časté otázky', 'Časté dotazy'],
+    'Válaszok a gyakori kérdésekre': ['Answers to common questions', 'Antworten auf häufige Fragen', 'Réponses aux questions fréquentes', 'Відповіді на часті запитання', '常见问题解答', 'Odpovede na časté otázky', 'Odpovědi na časté dotazy'],
+    'Egyedi autó rendelés': ['Custom car order', 'Individuelle Autobestellung', 'Voiture sur mesure', 'Індивідуальне замовлення авто', '定制订车', 'Auto na mieru', 'Vůz na míru'],
+    'Kiemelt eladó autók': ['Featured cars for sale', 'Ausgewählte Autos zum Verkauf', 'Voitures à vendre à la une', 'Рекомендовані авто на продаж', '精选在售车辆', 'Odporúčané autá na predaj', 'Doporučené vozy na prodej'],
+    'Összes eladó autó': ['All cars for sale', 'Alle Autos zum Verkauf', 'Toutes les voitures à vendre', 'Усі авто на продаж', '全部在售车辆', 'Všetky autá na predaj', 'Všechny vozy na prodej'],
+    'Autóink': ['Our cars', 'Unsere Autos', 'Nos voitures', 'Наші авто', '我们的车辆', 'Naše autá', 'Naše vozy'],
+    'Ellenőrzött autók Németországból': ['Inspected cars from Germany', 'Geprüfte Autos aus Deutschland', 'Voitures contrôlées d’Allemagne', 'Перевірені авто з Німеччини', '来自德国的检测车辆', 'Preverené autá z Nemecka', 'Prověřené vozy z Německa'],
+    'Finanszírozás – lízing': ['Financing – leasing', 'Finanzierung – Leasing', 'Financement – leasing', 'Фінансування – лізинг', '融资 – 租赁', 'Financovanie – lízing', 'Financování – leasing'],
+    'Havi részlet kiszámolása': ['Calculate the monthly instalment', 'Monatsrate berechnen', 'Calculer la mensualité', 'Розрахунок щомісячного платежу', '计算月供', 'Výpočet mesačnej splátky', 'Výpočet měsíční splátky'],
+    'Operatív lízing': ['Operating lease', 'Operating-Leasing', 'Leasing opérationnel', 'Оперативний лізинг', '经营租赁', 'Operatívny lízing', 'Operativní leasing'],
+    'Cégeknek, nettó áron': ['For companies, at net prices', 'Für Firmen, zu Nettopreisen', 'Pour les entreprises, prix HT', 'Для компаній, ціни без ПДВ', '面向企业，不含税价格', 'Pre firmy, za ceny bez DPH', 'Pro firmy, za ceny bez DPH'],
+    'Miért vásárolj tőlünk?': ['Why buy from us?', 'Warum bei uns kaufen?', 'Pourquoi acheter chez nous ?', 'Чому купувати в нас?', '为什么在我们这里购车？', 'Prečo kúpiť u nás?', 'Proč koupit u nás?'],
+    'Áfa, garancia, átadás': ['VAT, warranty, handover', 'MwSt., Garantie, Übergabe', 'TVA, garantie, remise', 'ПДВ, гарантія, передача', '增值税、保修、交车', 'DPH, záruka, odovzdanie', 'DPH, záruka, předání'],
+    'Bizományos autóink': ['Our consignment cars', 'Unsere Kommissionsautos', 'Nos voitures en dépôt-vente', 'Наші авто на комісії', '我们的寄售车辆', 'Naše autá v komisnom predaji', 'Naše vozy v komisním prodeji'],
+    'Összes bizományos autó': ['All consignment cars', 'Alle Kommissionsautos', 'Toutes les voitures en dépôt-vente', 'Усі авто на комісії', '全部寄售车辆', 'Všetky autá v komisnom predaji', 'Všechny vozy v komisním prodeji'],
+    'Eladom az autómat': ['Sell my car', 'Mein Auto verkaufen', 'Vendre ma voiture', 'Продати моє авто', '出售我的车', 'Predať moje auto', 'Prodat moje auto'],
+    'Ingyenes értékbecslés': ['Free valuation', 'Kostenlose Bewertung', 'Estimation gratuite', 'Безкоштовна оцінка', '免费估价', 'Bezplatné ocenenie', 'Bezplatné ocenění'],
+    'Eladó autók ügyfeleinktől': ['Cars for sale from our clients', 'Autos unserer Kunden', 'Voitures de nos clients', 'Авто наших клієнтів на продаж', '客户在售车辆', 'Autá na predaj od našich klientov', 'Vozy na prodej od našich klientů'],
+    'Értékesítési folyamat': ['Sales process', 'Verkaufsablauf', 'Processus de vente', 'Процес продажу', '销售流程', 'Proces predaja', 'Průběh prodeje'],
+    'Mi intézünk mindent': ['We handle everything', 'Wir erledigen alles', 'Nous nous occupons de tout', 'Ми все беремо на себе', '一切由我们办理', 'Všetko vybavíme my', 'Vše vyřídíme my'],
+    'Jótékonyság': ['Charity', 'Wohltätigkeit', 'Solidarité', 'Благодійність', '公益', 'Charita', 'Charita'],
+    'Minden eladás után adományozunk': ['We donate after every sale', 'Wir spenden nach jedem Verkauf', 'Un don après chaque vente', 'Пожертва після кожного продажу', '每成交一辆车都会捐款', 'Po každom predaji darujeme', 'Po každém prodeji darujeme'],
+    'Díjak, határidők, papírok': ['Fees, deadlines, paperwork', 'Gebühren, Fristen, Papiere', 'Frais, délais, documents', 'Комісії, терміни, документи', '费用、期限、文件', 'Poplatky, termíny, doklady', 'Poplatky, lhůty, doklady'],
+    'Akiket támogatunk': ['Who we support', 'Wen wir unterstützen', 'Ceux que nous soutenons', 'Кого ми підтримуємо', '我们支持的机构', 'Koho podporujeme', 'Koho podporujeme'],
+    'Add el nálunk az autód': ['Sell your car with us', 'Verkaufen Sie Ihr Auto bei uns', 'Vendez votre voiture avec nous', 'Продайте авто з нами', '通过我们出售您的车', 'Predajte auto s nami', 'Prodejte auto s námi'],
+    'Ingyenes értékbecslés, hirdetés, bemutatás és papírmunka – mi intézzük.': ['Free valuation, advertising, viewings and paperwork – we handle it all.', 'Kostenlose Bewertung, Inserat, Besichtigungen und Papierkram – wir erledigen alles.', 'Estimation gratuite, annonce, visites et formalités – nous nous occupons de tout.', 'Безкоштовна оцінка, реклама, покази та документи – усе робимо ми.', '免费估价、发布广告、带看及办理手续——全部由我们负责。', 'Bezplatné ocenenie, inzercia, obhliadky a papierovanie – všetko vybavíme.', 'Bezplatné ocenění, inzerce, prohlídky a papírování – vše vyřídíme.'],
+    'Értékbecslést kérek': ['Get a valuation', 'Bewertung anfragen', 'Demander une estimation', 'Замовити оцінку', '申请估价', 'Chcem ocenenie', 'Chci ocenění'],
+    'Támogatjuk': ['We support', 'Wir unterstützen', 'Nous soutenons', 'Підтримуємо', '我们支持', 'Podporujeme', 'Podporujeme'],
+    'Támogattuk': ['We supported', 'Unterstützt', 'Nous avons soutenu', 'Ми підтримали', '已支持', 'Podporili sme', 'Podpořili jsme'],
+    'Eladva': ['Sold', 'Verkauft', 'Vendu', 'Продано', '已售', 'Predané', 'Prodáno'],
+    'Elkelt': ['Sold', 'Verkauft', 'Vendu', 'Продано', '售出日期', 'Predané', 'Prodáno'],
+    'elkelt': ['sold', 'verkauft', 'vendu', 'продано', '已售出', 'predané', 'prodáno'],
+    'bruttó': ['incl. VAT', 'brutto', 'TTC', 'з ПДВ', '含税', 's DPH', 's DPH'],
+    'nettó': ['excl. VAT', 'netto', 'HT', 'без ПДВ', '不含税', 'bez DPH', 'bez DPH'],
+    'Ajánlatot kérek': ['Request a quote', 'Angebot anfordern', 'Demander un devis', 'Запросити пропозицію', '获取报价', 'Chcem ponuku', 'Chci nabídku'],
+    'készleten': ['in stock', 'auf Lager', 'en stock', 'в наявності', '现货', 'skladom', 'skladem'],
+    'Azonnal elvihető': ['Available immediately', 'Sofort verfügbar', 'Disponible immédiatement', 'Доступно одразу', '即刻可提', 'Ihneď k odberu', 'Ihned k odběru'],
+    'elérhető': ['available', 'verfügbar', 'disponibles', 'доступно', '辆可用', 'dostupné', 'k dispozici'],
+    'azonnal elérhető': ['available now', 'sofort verfügbar', 'disponibles tout de suite', 'доступно одразу', '辆现车', 'ihneď dostupné', 'ihned k dispozici'],
+    'Hamarosan': ['Coming soon', 'Demnächst', 'Bientôt', 'Незабаром', '即将上市', 'Čoskoro', 'Brzy'],
+    'Autó rendelés': ['Car order', 'Autobestellung', 'Commande de voiture', 'Замовлення авто', '订车', 'Objednávka auta', 'Objednávka vozu'],
+    'Megkeressük, ellenőrizzük, hazahozzuk': ['We find, inspect and deliver it', 'Wir finden, prüfen und liefern es', 'Nous trouvons, contrôlons et livrons', 'Знайдемо, перевіримо, доставимо', '我们寻车、检测并运回', 'Nájdeme, preveríme, privezieme', 'Najdeme, prověříme, dovezeme'],
+    'Beszerzési folyamat': ['Sourcing process', 'Beschaffungsablauf', 'Processus d’achat', 'Процес закупівлі', '采购流程', 'Proces obstarania', 'Průběh obstarání'],
+    'Az ajánlattól a forgalomba helyezésig': ['From offer to registration', 'Vom Angebot bis zur Zulassung', 'De l’offre à l’immatriculation', 'Від пропозиції до реєстрації', '从报价到上牌', 'Od ponuky po prihlásenie', 'Od nabídky po registraci'],
+    'Egyedül vagy velünk?': ['On your own or with us?', 'Allein oder mit uns?', 'Seul ou avec nous ?', 'Самостійно чи з нами?', '自己办还是交给我们？', 'Sami alebo s nami?', 'Sami, nebo s námi?'],
+    'Költségek és kockázatok összevetve': ['Costs and risks compared', 'Kosten und Risiken im Vergleich', 'Coûts et risques comparés', 'Порівняння витрат і ризиків', '成本与风险对比', 'Porovnanie nákladov a rizík', 'Srovnání nákladů a rizik'],
+    'Miért Németországból?': ['Why from Germany?', 'Warum aus Deutschland?', 'Pourquoi d’Allemagne ?', 'Чому з Німеччини?', '为什么选择德国车？', 'Prečo z Nemecka?', 'Proč z Německa?'],
+    'Referenciák': ['References', 'Referenzen', 'Références', 'Відгуки', '客户案例', 'Referencie', 'Reference'],
+    'Ügyfeleink autói': ['Our clients’ cars', 'Autos unserer Kunden', 'Voitures de nos clients', 'Авто наших клієнтів', '客户的车辆', 'Autá našich klientov', 'Vozy našich klientů'],
+    'Csak 30% előleg': ['Only 30% down payment', 'Nur 30 % Anzahlung', 'Seulement 30 % d’acompte', 'Лише 30% передоплати', '仅需 30% 定金', 'Len 30 % záloha', 'Jen 30% záloha'],
+    'A legkedvezőbb a piacon': ['The best deal on the market', 'Das günstigste am Markt', 'Le plus avantageux du marché', 'Найвигідніше на ринку', '市场最优条件', 'Najvýhodnejšie na trhu', 'Nejvýhodnější na trhu'],
+    'Kalkulátorok': ['Calculators', 'Rechner', 'Calculateurs', 'Калькулятори', '计算器', 'Kalkulačky', 'Kalkulačky'],
+    'Honosítás kalkulátor': ['Registration cost calculator', 'Zulassungskostenrechner', 'Calculateur d’immatriculation', 'Калькулятор реєстрації', '落户费用计算器', 'Kalkulačka poplatkov', 'Kalkulačka poplatků'],
+    'Átírás kalkulátor': ['Transfer fee calculator', 'Umschreibungsrechner', 'Calculateur de transfert', 'Калькулятор переоформлення', '过户费计算器', 'Kalkulačka prepisu', 'Kalkulačka přepisu'],
+    'Lízing kalkulátor': ['Leasing calculator', 'Leasingrechner', 'Calculateur de leasing', 'Лізинговий калькулятор', '租赁计算器', 'Lízingová kalkulačka', 'Leasingová kalkulačka'],
+    'Autó Németországból, kulcsrakészen': ['Cars from Germany, turnkey', 'Autos aus Deutschland, schlüsselfertig', 'Voitures d’Allemagne, clés en main', 'Авто з Німеччини під ключ', '德国车，交钥匙服务', 'Auto z Nemecka na kľúč', 'Vůz z Německa na klíč'],
+    'Szállítás, honosítás, forgalomba helyezés – mi intézzük.': ['Transport, registration and paperwork – we handle it.', 'Transport, Zulassung und Papiere – wir erledigen das.', 'Transport, homologation, immatriculation – nous nous en chargeons.', 'Доставка, оформлення, реєстрація – усе робимо ми.', '运输、落户、上牌——全部由我们办理。', 'Doprava, prihlásenie, evidencia – vybavíme to.', 'Doprava, registrace, přihlášení – vyřídíme to.'],
+    'Autót rendelek': ['Order a car', 'Auto bestellen', 'Commander une voiture', 'Замовити авто', '我要订车', 'Objednať auto', 'Objednat vůz'],
+    '23 év': ['23 years', '23 Jahre', '23 ans', '23 роки', '23 年', '23 rokov', '23 let'],
+    'tapasztalat': ['of experience', 'Erfahrung', 'd’expérience', 'досвіду', '行业经验', 'skúseností', 'zkušeností'],
+    '2003 óta Németországban': ['In Germany since 2003', 'Seit 2003 in Deutschland', 'En Allemagne depuis 2003', 'У Німеччині з 2003 року', '自 2003 年起扎根德国', 'V Nemecku od roku 2003', 'V Německu od roku 2003'],
+    'eladott prémium autó': ['premium cars sold', 'verkaufte Premiumautos', 'voitures premium vendues', 'проданих преміум-авто', '辆高端车已售出', 'predaných prémiových áut', 'prodaných prémiových vozů'],
+    'Nézd meg ügyfeleink autóit': ['See our clients’ cars', 'Autos unserer Kunden ansehen', 'Voir les voitures de nos clients', 'Подивіться авто наших клієнтів', '查看客户的车辆', 'Pozrite si autá našich klientov', 'Prohlédněte si vozy našich klientů'],
+    'Tovább': ['More', 'Mehr', 'En savoir plus', 'Детальніше', '了解更多', 'Viac', 'Více'],
+    'Miért mi?': ['Why us?', 'Warum wir?', 'Pourquoi nous ?', 'Чому ми?', '为什么选择我们？', 'Prečo my?', 'Proč my?'],
+    'Német háttér, magyar ügyintézés': ['German background, personal service', 'Deutscher Hintergrund, persönlicher Service', 'Racines allemandes, service personnalisé', 'Німецька база, особистий сервіс', '德国背景，贴心服务', 'Nemecké zázemie, osobný prístup', 'Německé zázemí, osobní přístup'],
+    'Átláthatóság': ['Transparency', 'Transparenz', 'Transparence', 'Прозорість', '透明', 'Transparentnosť', 'Transparentnost'],
+    'Tételes, előre rögzített árak': ['Itemised prices, fixed up front', 'Detaillierte, vorab festgelegte Preise', 'Prix détaillés, fixés à l’avance', 'Детальні, заздалегідь зафіксовані ціни', '明细清晰、事先确定的价格', 'Položkové, vopred stanovené ceny', 'Položkové, předem stanovené ceny'],
+    'Minőségbiztosítás': ['Quality assurance', 'Qualitätssicherung', 'Assurance qualité', 'Контроль якості', '质量保证', 'Zabezpečenie kvality', 'Zajištění kvality'],
+    'Ellenőrzött autók, garancia': ['Inspected cars, warranty', 'Geprüfte Autos, Garantie', 'Voitures contrôlées, garantie', 'Перевірені авто, гарантія', '检测车辆，提供保修', 'Preverené autá, záruka', 'Prověřené vozy, záruka'],
+    'Ügyfeleink történetei': ['Our clients’ stories', 'Geschichten unserer Kunden', 'Histoires de nos clients', 'Історії наших клієнтів', '客户故事', 'Príbehy našich klientov', 'Příběhy našich klientů'],
+    'Media': ['Media', 'Medien', 'Médias', 'Медіа', '媒体', 'Médiá', 'Média'],
+    'Megjelenések': ['Press coverage', 'Presse', 'Dans la presse', 'Публікації', '媒体报道', 'V médiách', 'V médiích'],
+    'Blog': ['Blog', 'Blog', 'Blog', 'Блог', '博客', 'Blog', 'Blog'],
+    'Útmutatók, adók, árak': ['Guides, taxes, prices', 'Ratgeber, Steuern, Preise', 'Guides, taxes, prix', 'Поради, податки, ціни', '指南、税费、价格', 'Návody, dane, ceny', 'Návody, daně, ceny'],
+    'Gyere be hozzánk': ['Visit us', 'Besuchen Sie uns', 'Rendez-nous visite', 'Завітайте до нас', '欢迎来访', 'Navštívte nás', 'Navštivte nás'],
+    'Solymár, Ibolya utca 18. – hétfőtől péntekig 9–17.': ['Solymár, Ibolya utca 18 – Monday to Friday 9:00–17:00', 'Solymár, Ibolya utca 18 – Montag bis Freitag 9–17 Uhr', 'Solymár, Ibolya utca 18 – du lundi au vendredi 9h–17h', 'Solymár, Ibolya utca 18 – пн–пт 9:00–17:00', 'Solymár, Ibolya utca 18 – 周一至周五 9:00–17:00', 'Solymár, Ibolya utca 18 – pondelok až piatok 9:00–17:00', 'Solymár, Ibolya utca 18 – pondělí až pátek 9:00–17:00'],
+    'Kapcsolat': ['Contact', 'Kontakt', 'Contact', 'Контакти', '联系我们', 'Kontakt', 'Kontakt'],
+    '5,0': ['5.0', '5,0', '5,0', '5,0', '5.0', '5,0', '5,0'],
+    'Google-értékelés': ['Google rating', 'Google-Bewertung', 'Note Google', 'Оцінка в Google', 'Google 评分', 'Hodnotenie Google', 'Hodnocení Google'],
+    'Elégedett ügyfeleink szerint': ['From our happy clients', 'Von unseren zufriedenen Kunden', 'Selon nos clients satisfaits', 'За відгуками задоволених клієнтів', '来自满意客户的评价', 'Podľa našich spokojných klientov', 'Podle našich spokojených klientů'],
+    'Bevizsgált autók': ['Inspected cars', 'Geprüfte Autos', 'Voitures contrôlées', 'Перевірені авто', '经检测车辆', 'Preverené autá', 'Prověřené vozy'],
+    'Dokumentált előélet, valós km': ['Documented history, genuine mileage', 'Dokumentierte Historie, echte km', 'Historique documenté, kilométrage réel', 'Задокументована історія, реальний пробіг', '记录完整，里程真实', 'Zdokumentovaná história, reálne km', 'Doložená historie, skutečné km'],
+    'Kövess minket': ['Follow us', 'Folgen Sie uns', 'Suivez-nous', 'Слідкуйте за нами', '关注我们', 'Sledujte nás', 'Sledujte nás'],
+    'Menü': ['Menu', 'Menü', 'Menu', 'Меню', '菜单', 'Menu', 'Menu'],
+    'Kiemelt': ['Featured', 'Highlights', 'À la une', 'Рекомендуємо', '精选', 'Odporúčame', 'Doporučujeme'],
+    '5,0 Google értékelés': ['5.0 Google rating', '5,0 Google-Bewertung', '5,0 sur Google', '5,0 в Google', 'Google 评分 5.0', 'Hodnotenie 5,0 na Google', 'Hodnocení 5,0 na Google'],
+    'Válasz 1 órán belül, munkaidőben': ['Reply within 1 hour during business hours', 'Antwort binnen 1 Stunde zu Geschäftszeiten', 'Réponse sous 1 heure aux heures ouvrées', 'Відповідь протягом 1 години в робочий час', '工作时间内 1 小时内回复', 'Odpoveď do 1 hodiny v pracovnom čase', 'Odpověď do 1 hodiny v pracovní době'],
+    'Főmenü': ['Main menu', 'Hauptmenü', 'Menu principal', 'Головне меню', '主菜单', 'Hlavné menu', 'Hlavní menu'],
+    /* autóadatok */
+    'Benzin': ['Petrol', 'Benzin', 'Essence', 'Бензин', '汽油', 'Benzín', 'Benzín'],
+    'Dízel': ['Diesel', 'Diesel', 'Diesel', 'Дизель', '柴油', 'Diesel', 'Diesel'],
+    'Hibrid': ['Hybrid', 'Hybrid', 'Hybride', 'Гібрид', '混合动力', 'Hybrid', 'Hybrid'],
+    'Elektromos': ['Electric', 'Elektro', 'Électrique', 'Електро', '纯电', 'Elektro', 'Elektro'],
+    'Automata': ['Automatic', 'Automatik', 'Automatique', 'Автомат', '自动挡', 'Automat', 'Automat'],
+    'Manuális': ['Manual', 'Schaltgetriebe', 'Manuelle', 'Механіка', '手动挡', 'Manuál', 'Manuál'],
+    'SUV / Terepjáró': ['SUV', 'SUV / Geländewagen', 'SUV / 4x4', 'SUV / позашляховик', 'SUV / 越野车', 'SUV / terénne', 'SUV / terénní'],
+    'Kisautó': ['Small car', 'Kleinwagen', 'Citadine', 'Малолітражка', '小型车', 'Malé auto', 'Malý vůz'],
+    'Limuzin': ['Sedan', 'Limousine', 'Berline', 'Седан', '轿车', 'Limuzína', 'Limuzína'],
+    'Kombi': ['Estate', 'Kombi', 'Break', 'Універсал', '旅行车', 'Kombi', 'Kombi'],
+    'Kabrió': ['Convertible', 'Cabrio', 'Cabriolet', 'Кабріолет', '敞篷车', 'Kabriolet', 'Kabriolet'],
+    'Egyterű': ['MPV', 'Van', 'Monospace', 'Мінівен', 'MPV', 'MPV', 'MPV'],
+    'Coupé': ['Coupé', 'Coupé', 'Coupé', 'Купе', '轿跑', 'Kupé', 'Kupé'],
+    'Kompakt': ['Compact', 'Kompakt', 'Compacte', 'Компакт', '紧凑型', 'Kompakt', 'Kompakt']
+  };
+  function t(s) { if (!LI) return s; var r = TR[s]; return (r && r[LI - 1]) || s; }
+  function tx(s) { return esc(t(s)); }
+  /* üzemanyag / váltó / kategória a forrásadatokból (magyar vagy német/angol alak) */
+  var FUEL = { 'Benzin': 'Benzin', 'Benzín': 'Benzin', 'Petrol': 'Benzin', 'Dízel': 'Dízel', 'Diesel': 'Dízel', 'PHEV': 'Hibrid', 'Hibrid': 'Hibrid', 'Hybrid': 'Hibrid', 'Elektromos': 'Elektromos', 'Elektro': 'Elektromos', 'EV': 'Elektromos' };
+  function tFuel(f) { return t(FUEL[f] || f); }
+  function tSpec(s) { return String(s || '').split(' · ').map(function (x) { x = x.trim(); return FUEL[x] ? tFuel(x) : t(x); }).join(' · '); }
+  var MONTHS_HU = ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
+  var MONTHS = {
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    de: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+    fr: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+    uk: ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'],
+    sk: ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'],
+    cs: ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec']
+  };
+  /* "2026. november" -> nyelv szerinti hónap + év */
+  function tMonth(s) {
+    var m = /^(\d{4})\.\s*([a-záéíóöőúüű]+)/i.exec(String(s || '')); if (!m || !LI) return s;
+    var i = MONTHS_HU.indexOf(m[2].toLowerCase()); if (i < 0) return s;
+    if (LANG === 'zh') return m[1] + '年' + (i + 1) + '月';
+    return MONTHS[LANG][i] + ' ' + m[1];
+  }
+  /* eladás dátuma (YYYY-MM-DD) a nyelv szokása szerint */
+  function tDate(y, mo, d) {
+    if (LANG === 'hu') return y + '. ' + mo + '. ' + d + '.';
+    if (LANG === 'zh') return y + '年' + (+mo) + '月' + (+d) + '日';
+    if (LANG === 'sk' || LANG === 'cs') return (+d) + '. ' + (+mo) + '. ' + y;
+    if (LANG === 'de' || LANG === 'uk') return d + '.' + mo + '.' + y;
+    return d + '/' + mo + '/' + y;
+  }
+  /* bérleti ár: "390 000 Ft /hó-tól · nettó" a nyelv szerint */
+  var PER = { en: ['from ', '/month'], de: ['ab ', '/Monat'], fr: ['dès ', '/mois'], uk: ['від ', '/міс.'], zh: ['', ' 起/月'], sk: ['od ', '/mes.'], cs: ['od ', '/měs.'] };
+  function rentPrice(ft) {
+    if (!LI) return '<strong>' + esc(ft) + '</strong><em>/hó-tól · nettó</em>';
+    var p = PER[LANG]; return '<strong>' + esc(p[0] + ft) + '</strong><em>' + esc(p[1].trim()) + ' · ' + tx('nettó') + '</em>';
+  }
+  /* modellnév a nyelv szerint (a forrás német: "3er Limousine", "A-Klasse") */
+  function dispName(b, mo) {
+    var B0 = b === 'VW' ? 'Volkswagen' : b, s = String(mo);
+    if (LANG === 'hu') {
+      var D = { '1': '1-es', '2': '2-es', '3': '3-as', '4': '4-es', '5': '5-ös', '6': '6-os', '7': '7-es', '8': '8-as' };
+      s = s.replace(/\b(\d)er\b/g, function (_, d) { return D[d] || d; }).replace(/\bLimousine\b/g, 'Limuzin').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, '$1-osztály');
+    } else if (LANG === 'de') {
+      s = s.replace(/\bCoupe\b/g, 'Coupé');
+    } else if (LANG === 'fr') {
+      s = s.replace(/\b(\d)er\b/g, 'Série $1').replace(/\bLimousine\b/g, 'Berline').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, 'Classe $1');
+    } else if (LANG === 'sk') {
+      s = s.replace(/\b(\d)er\b/g, 'rad $1').replace(/\bLimousine\b/g, 'Limuzína').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, 'Trieda $1');
+    } else if (LANG === 'cs') {
+      s = s.replace(/\b(\d)er\b/g, 'řada $1').replace(/\bLimousine\b/g, 'Limuzína').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, 'Třída $1');
+    } else {
+      s = s.replace(/\b(\d)er\b/g, '$1 Series').replace(/\bLimousine\b/g, 'Sedan').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, '$1-Class');
+    }
+    return B0 + ' ' + s;
+  }
+  /* .sk / .cz domain: ott a magyar útvonalak helyett a helyi útvonalakon vannak az adatoldalak */
+  var DOM = (/(^|\.)caradvance\.(sk|cz)$/.exec(location.hostname) || [])[2] || '';
+  var SRC = DOM === 'sk' ? { autoink: '/auta/', biz: '/komisny-predaj/' } : DOM === 'cz' ? { autoink: '/vozy/', biz: '/komisni-prodej/' } : { autoink: '/autoink/', biz: '/bizomanyos/' };
+  function phone() { var p = (window.CA_CFG && window.CA_CFG.PHONE) || '+36 30 233 6060'; return { txt: p, tel: 'tel:' + String(p).replace(/[^\d+]/g, '') }; }
   var ICON = {
     car: '<path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6M6 11h12"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>',
@@ -159,7 +345,7 @@
   /* Az /autoink/ oldalon látható autók (ugyanaz a sorrend, kép és forintár), az oldal HTML-jéből. */
   function parseCards(doc, sel, kind) {
     return [].slice.call(doc.querySelectorAll(sel)).slice(0, 4).map(function (a) {
-      var href = (a.getAttribute('href') || '').replace(/^(\.\.\/)+/, '/').replace(/^([^/])/, '/$1');
+      var href = (a.getAttribute('href') || ''); try { var u = new URL(href, location.origin + SRC.autoink); href = u.pathname + u.search + u.hash; } catch (e) { href = href.replace(/^(\.\.\/)+/, '/').replace(/^([^/])/, '/$1'); }
       var im = a.querySelector('.media img');
       var parts = txt(a.querySelector('.specs')).split('·').map(function (x) { return x.trim(); });
       var year = txt(a.querySelector('.year')).split('/').pop();
@@ -168,7 +354,7 @@
       if (kind === 'rent') { var rp = a.querySelector('.rentprices .rp b span'); ft = txt(rp).replace(/^≈\s*/, ''); sub = txt(a.querySelector('.rentprices .rp span')) || '2 000 km / hó'; }
       else { ft = txt(a.querySelector('.pricerow .price')); }
       var tt = txt(a.querySelector('.title'));
-      return { href: href, t: tt, sp: sp, yr: [txt(a.querySelector('.cond')), txt(a.querySelector('.year'))].filter(Boolean).join(' · '), brand: a.getAttribute('data-marka') || tt, img: im ? im.getAttribute('src') : '', ft: /Ft/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
+      return { href: href, t: tt, sp: sp, yr: [txt(a.querySelector('.cond')), txt(a.querySelector('.year'))].filter(Boolean).join(' · '), brand: a.getAttribute('data-marka') || tt, img: im ? im.getAttribute('src') : '', ft: /Ft|€|Kč/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
     });
   }
   var LK = { 'VW': 'vw', 'BMW': 'bmw', 'Audi': 'audi', 'Mercedes-Benz': 'mercedes', 'MINI': 'mini', 'Hyundai': 'hyundai', 'CUPRA': 'cupra', 'Kia': 'kia', 'MAN': 'man', 'Seat': 'seat', 'Volvo': 'volvo' };
@@ -203,10 +389,6 @@
     }
     throw new Error('json');
   }
-  function dispName(b, mo) {
-    var D = { '1': '1-es', '2': '2-es', '3': '3-as', '4': '4-es', '5': '5-ös', '6': '6-os', '7': '7-es', '8': '8-as' };
-    return (b === 'VW' ? 'Volkswagen' : b) + ' ' + String(mo).replace(/\b(\d)er\b/g, function (_, d) { return D[d] || d; }).replace(/\bLimousine\b/g, 'Limuzin').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, '$1-osztály');
-  }
   function scriptText(doc, re) { var ss = doc.querySelectorAll('script'); for (var i = 0; i < ss.length; i++) { if (re.test(ss[i].textContent)) return ss[i].textContent; } return ''; }
   function parseSub(doc, rate) {
     var st = scriptText(doc, /window\.SUB\s*=/), rt = scriptText(doc, /var PHOTO\s*=/);
@@ -227,7 +409,7 @@
       var eff = m.eurFix || (m.net + 650);
       return { href: m.href || rhref(m.brand, m.model), t: dispName(m.brand, m.model), img: PHOTO[m.brand + ' ' + m.model] || (m.stock && m.stock[0].i) || '', logo: LK[m.brand] ? '/bl-' + LK[m.brand] + '-dark.webp' : '',
         yr: m.stock ? (String(m.yr || '').split('/').pop() + ' · készleten') : (m.stockOnly ? 'Azonnal elvihető' : '0 km · 2026'), sp: [m.cat].concat(m.gears || []).filter(Boolean).join(' · '),
-        avail: m.now > 0 ? m.now + (m.stock ? ' azonnal elérhető' : ' elérhető') : ((m.later && m.later[0]) ? m.later[0].d : 'Hamarosan'), now: m.now > 0,
+        avail: m.now > 0 ? m.now + ' ' + t(m.stock ? 'azonnal elérhető' : 'elérhető') : ((m.later && m.later[0]) ? tMonth(m.later[0].d) : t('Hamarosan')), now: m.now > 0,
         fuels: (m.fuels || []).map(function (f) { return f === 'PHEV' ? 'Hibrid' : f; }),
         ft: ((m.eurFix ? Math.round(eff * R / 10000) : Math.ceil(eff * R / 10000)) * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft', eur: eff, isNew: true };
     });
@@ -236,7 +418,7 @@
     function go() {
       try {
         /* a /bizomanyos/ oldal a forrás: eladott autók (SOLD: eladó-oldali alapítvány + dátum) és a régi forintárak (HUFOV) */
-        var soldP = fetch('/bizomanyos/', { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) {
+        var soldP = fetch(SRC.biz, { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) {
           var m = /var SOLD\s*=\s*\{([\s\S]*?)\};/.exec(h), out = {}, ov = {};
           if (m) m[1].replace(/['"]([a-z0-9-]+)['"]\s*:\s*\{([^}]*)\}/g, function (_, k, body) {
             var g = function (n) { var x = new RegExp(n + "\\s*:\\s*['\"]([^'\"]*)['\"]").exec(body); return x ? x[1] : ''; };
@@ -260,7 +442,7 @@
             var pr = P[(so && so.seller) || c.seller] || null;
             var dm = so && /^(\d{4})-(\d{2})-(\d{2})/.exec(so.date || '');
             return { href: '/auto/' + slug + '/?biz=1', t: c.modell, sp: sp, img: c.img,
-              ngo: pr ? { n: pr.name, logo: pr.logo } : null, sold: so ? (dm ? dm[1] + '. ' + dm[2] + '. ' + dm[3] + '.' : 'eladva') : '',
+              ngo: pr ? { n: pr.name, logo: pr.logo } : null, sold: so ? (dm ? tDate(dm[1], dm[2], dm[3]) : t('Eladva')) : '',
               ft: huf ? (BIZ.fmtFt ? BIZ.fmtFt(huf) : Math.round(huf).toLocaleString('hu-HU')) + (BIZ.fmtFt && /Ft/.test(BIZ.fmtFt(1)) ? '' : ' Ft') : '' };
           });
           DATA.bizN = active.length;
@@ -276,14 +458,14 @@
     if (DATA.rent || DATA.loading) return;
     DATA.loading = true;
     var rateP = fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function (r) { return r.json(); }).then(function (j) { return j && j.rates && j.rates.HUF; }).catch(function () { return 0; });
-    Promise.all([fetch('/autoink/', { credentials: 'same-origin' }).then(function (r) { return r.text(); }), rateP]).then(function (res) {
+    Promise.all([fetch(SRC.autoink, { credentials: 'same-origin' }).then(function (r) { return r.text(); }), rateP]).then(function (res) {
       var html = res[0], rate = res[1];
       var doc = new DOMParser().parseFromString(html, 'text/html');
       try { DATA.rent = parseSub(doc, rate); } catch (e) { DATA.rent = parseCards(doc, '#panel-berelheto a.card', 'rent'); }
       DATA.sale = parseCards(doc, '#grid a.card', 'sale');
       [].slice.call(doc.querySelectorAll('.autok-tab')).forEach(function (b) {
         var m = /\((\d+)\)/.exec(b.textContent || ''); if (!m) return;
-        if (/Bérelhető/i.test(b.textContent)) { if (!DATA.rentN) DATA.rentN = +m[1]; } else if (/Eladó/i.test(b.textContent)) DATA.saleN = +m[1];
+        if (/Bérelhető|prenájom|pronájm/i.test(b.textContent)) { if (!DATA.rentN) DATA.rentN = +m[1]; } else if (/Eladó autók|na predaj|na prodej/i.test(b.textContent)) DATA.saleN = +m[1];
       });
       loadBiz(cb);
       DATA.rent.concat(DATA.sale).forEach(function (c) { if (c.img) { var i = new Image(); i.referrerPolicy = 'no-referrer'; i.src = thumb(c.img); } });
@@ -292,54 +474,54 @@
   }
   function newCard(c) {
     var np = !!window.CA_NP;
-    var fu = c.fuels.map(function (f) { return '<span class="mm-fu" style="background:' + (FC[f] || '#4b5563') + '">' + esc(f) + '</span>'; }).join('');
+    var fu = c.fuels.map(function (f) { return '<span class="mm-fu" style="background:' + (FC[f] || '#4b5563') + '">' + esc(tFuel(f)) + '</span>'; }).join('');
     return '<a class="mm-car mm-new" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + c.img + '\')"></div><div class="mm-cb">' +
-      '<div class="mm-meta">' + (c.logo ? '<img src="' + c.logo + '" alt="" width="40" height="18">' : '') + '<span>' + esc(c.yr) + '</span></div>' +
-      '<b>' + esc(c.t) + '</b><span class="mm-sp">' + esc(c.sp) + '</span>' +
+      '<div class="mm-meta">' + (c.logo ? '<img src="' + c.logo + '" alt="" width="40" height="18">' : '') + '<span>' + esc(tSpec(c.yr)) + '</span></div>' +
+      '<b>' + esc(c.t) + '</b><span class="mm-sp">' + esc(tSpec(c.sp)) + '</span>' +
       '<div class="mm-tags"><span class="mm-av' + (c.now ? ' now' : '') + '">' + esc(c.avail) + '</span>' + fu + '</div>' +
-      '<div class="mm-pr">' + (np ? '<strong>Ajánlatot kérek</strong>' : '<strong>' + esc(c.ft) + '</strong><em>/hó-tól · nettó</em>') + '</div></div></a>';
+      '<div class="mm-pr">' + (np ? '<strong>' + tx('Ajánlatot kérek') + '</strong>' : rentPrice(c.ft)) + '</div></div></a>';
   }
   function carCard(c, kind) {
     if (c.isNew) return newCard(c);
     var np = !!window.CA_NP || !c.ft;
-    var price = np ? '<strong>Ajánlatot kérek</strong>'
+    var price = np ? '<strong>' + tx('Ajánlatot kérek') + '</strong>'
       : kind === 'rent' ? '<strong>' + esc(c.ft) + '/hó</strong><em>' + esc(c.sub.replace(/\s*\/\s*/, '/')) + '</em>'
-      : '<strong>' + esc(c.ft) + '</strong>' + (kind === 'sale' ? '<em>nettó</em>' : kind === 'biz' ? '<em>' + (c.sold ? 'elkelt' : 'bruttó') + '</em>' : '');
-    var stamp = c.sold ? '<span class="mm-stamp">Eladva</span><span class="mm-when">Elkelt: ' + esc(c.sold) + '</span>' : '';
-    var ngo = c.ngo ? '<div class="mm-ngo">' + (c.ngo.logo ? '<img src="' + esc(c.ngo.logo) + '" alt="" width="26" height="26" loading="lazy">' : '') + '<span><em>' + (c.sold ? 'Támogattuk' : 'Támogatjuk') + '</em>' + esc(c.ngo.n) + '</span></div>' : '';
-    return '<a class="mm-car' + (c.sold ? ' mm-sold' : '') + '" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')">' + stamp + '</div><div class="mm-cb"><b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div>' + ngo + '</div></a>';
+      : '<strong>' + esc(c.ft) + '</strong>' + (kind === 'sale' ? '<em>' + tx('nettó') + '</em>' : kind === 'biz' ? '<em>' + tx(c.sold ? 'elkelt' : 'bruttó') + '</em>' : '');
+    var stamp = c.sold ? '<span class="mm-stamp">' + tx('Eladva') + '</span><span class="mm-when">' + tx('Elkelt') + ': ' + esc(c.sold) + '</span>' : '';
+    var ngo = c.ngo ? '<div class="mm-ngo">' + (c.ngo.logo ? '<img src="' + esc(c.ngo.logo) + '" alt="" width="26" height="26" loading="lazy">' : '') + '<span><em>' + tx(c.sold ? 'Támogattuk' : 'Támogatjuk') + '</em>' + esc(c.ngo.n) + '</span></div>' : '';
+    return '<a class="mm-car' + (c.sold ? ' mm-sold' : '') + '" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')">' + stamp + '</div><div class="mm-cb"><b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(tSpec(c.sp)) + '</span><div class="mm-pr">' + price + '</div>' + ngo + '</div></a>';
   }
   function carsHtml(p) {
     var list = DATA[p.cars];
     if (list && !list.length) return '';
     var body = !list ? '<div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div>'
       : list.map(function (c) { return carCard(c, p.cars); }).join('') +
-        (p.cars === 'biz' && list.length < 4 ? '<a class="mm-car mm-cta" href="/eladom/"><div class="mm-cb"><span class="mm-ic2">' + svg('cash', 28) + '</span><b>Add el nálunk az autód</b><span class="mm-sp" style="white-space:normal">Ingyenes értékbecslés, hirdetés, bemutatás és papírmunka – mi intézzük.</span><span class="mm-btn" style="margin-top:12px">Értékbecslést kérek ' + svg('arrow', 15) + '</span></div></a>' : '');
+        (p.cars === 'biz' && list.length < 4 ? '<a class="mm-car mm-cta" href="/eladom/"><div class="mm-cb"><span class="mm-ic2">' + svg('cash', 28) + '</span><b>' + tx('Add el nálunk az autód') + '</b><span class="mm-sp" style="white-space:normal">' + tx('Ingyenes értékbecslés, hirdetés, bemutatás és papírmunka – mi intézzük.') + '</span><span class="mm-btn" style="margin-top:12px">' + tx('Értékbecslést kérek') + ' ' + svg('arrow', 15) + '</span></div></a>' : '');
     var n = p.cars === 'rent' ? DATA.rentN : p.cars === 'biz' ? DATA.bizN : DATA.saleN;
     var ng = '';
     if (p.cars === 'biz') {
-      ng = '<div class="mm-ngos-w"><p class="mm-h"><a href="/jotekonysag/">Akiket támogatunk ›</a></p><div class="mm-ngos">' +
+      ng = '<div class="mm-ngos-w"><p class="mm-h"><a href="/jotekonysag/">' + tx('Akiket támogatunk') + ' ›</a></p><div class="mm-ngos">' +
         (DATA.ngos ? DATA.ngos.map(function (o) { return '<a class="mm-ng" href="/jotekonysag/" title="' + esc(o.name) + '"><img src="' + esc(o.logo) + '" alt="' + esc(o.name) + '" width="120" height="44"></a>'; }).join('')
         : new Array(8).join('<div class="mm-sk" style="aspect-ratio:auto;height:56px"></div>')) + '</div></div>';
     }
-    return ng + '<div><div class="mm-rowhead"><p class="mm-h">' + esc(p.ct) + '</p><a class="mm-more" href="' + p.callHref + '">' + esc(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a></div><div class="mm-cars">' + body + '</div></div>';
+    return ng + '<div><div class="mm-rowhead"><p class="mm-h">' + tx(p.ct) + '</p><a class="mm-more" href="' + p.callHref + '">' + tx(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a></div><div class="mm-cars">' + body + '</div></div>';
   }
   function panelHtml(p) {
-    var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">Menü</p>' +
-      p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + esc(l[1]) + '</b><span>' + esc(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
+    var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">' + tx('Menü') + '</p>' +
+      p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
     if (p.brands) {
-      h += '<div><p class="mm-h"><a href="' + p.bhref + '">' + esc(p.bt) + ' ›</a></p><div class="mm-brands" style="grid-template-columns:repeat(' + p.bcols + ',minmax(0,1fr))">' +
+      h += '<div><p class="mm-h"><a href="' + p.bhref + '">' + tx(p.bt) + ' ›</a></p><div class="mm-brands" style="grid-template-columns:repeat(' + p.bcols + ',minmax(0,1fr))">' +
         p.brands.map(function (b) { return '<a class="mm-b" href="' + b.href + '"><img src="/bl-' + b.k + '-dark.webp" alt="" width="46" height="30">' + esc(b.n) + '</a>'; }).join('') + '</div></div>';
     }
     if (p.cars) h += '<div class="mm-carswrap">' + carsHtml(p) + '</div>';
     else {
-      if (p.side) h += '<div class="mm-siderow"><div><p class="mm-h">' + esc(p.side.t) + '</p><div class="mm-chips">' + p.side.items.map(function (s) { return '<a class="mm-chip" href="' + s[2] + '">' + svg(s[0], 18) + esc(s[1]) + '</a>'; }).join('') + '</div></div>' +
-        (p.badge ? '<a class="mm-badge" href="' + p.badge.href + '"><span class="mm-ic2">' + svg('euro', 24) + '</span><span><strong>' + esc(p.badge.t) + '</strong><em>' + esc(p.badge.s) + '</em></span></a>' : '') + '</div>';
-      var mini = (p.minis || []).map(function (m) { return '<a class="mm-mini" href="' + m[4] + '"><span class="mm-ic2">' + (m[0].indexOf('soc:') === 0 ? SOC[m[0].slice(4)] : svg(m[0], 24)) + '</span><div><strong' + (m[1].length > 8 ? ' class="mm-long"' : '') + '>' + esc(m[1]) + '</strong><b>' + esc(m[2]) + '</b><span>' + esc(m[3]) + '</span></div><span class="mm-go">Tovább ' + svg('arrow', 14) + '</span></a>'; }).join('');
-      if (p.soc) h += '<div><p class="mm-h">Kövess minket</p><div class="mm-chips">' + p.soc.map(function (x) { return '<a class="mm-chip mm-schip" href="' + x[3] + '" target="_blank" rel="noopener">' + SOC[x[0]] + esc(x[1]) + '</a>'; }).join('') + '</div></div>';
-      h += '<div><p class="mm-h">Kiemelt</p><div class="' + (mini ? 'mm-frow' : '') + '">' + mini + '<a class="mm-single" href="' + p.f.href + '"><div class="mm-ph" style="background-image:url(\'' + p.f.img + '\')"></div><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn" style="align-self:flex-start;margin:0">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div></div>';
+      if (p.side) h += '<div class="mm-siderow"><div><p class="mm-h">' + tx(p.side.t) + '</p><div class="mm-chips">' + p.side.items.map(function (s) { return '<a class="mm-chip" href="' + s[2] + '">' + svg(s[0], 18) + tx(s[1]) + '</a>'; }).join('') + '</div></div>' +
+        (p.badge ? '<a class="mm-badge" href="' + p.badge.href + '"><span class="mm-ic2">' + svg('euro', 24) + '</span><span><strong>' + tx(p.badge.t) + '</strong><em>' + tx(p.badge.s) + '</em></span></a>' : '') + '</div>';
+      var mini = (p.minis || []).map(function (m) { return '<a class="mm-mini" href="' + m[4] + '"><span class="mm-ic2">' + (m[0].indexOf('soc:') === 0 ? SOC[m[0].slice(4)] : svg(m[0], 24)) + '</span><div><strong' + (t(m[1]).length > 8 ? ' class="mm-long"' : '') + '>' + tx(m[1]) + '</strong><b>' + tx(m[2]) + '</b><span>' + tx(m[3]) + '</span></div><span class="mm-go">' + tx('Tovább') + ' ' + svg('arrow', 14) + '</span></a>'; }).join('');
+      if (p.soc) h += '<div><p class="mm-h">' + tx('Kövess minket') + '</p><div class="mm-chips">' + p.soc.map(function (x) { return '<a class="mm-chip mm-schip" href="' + x[3] + '" target="_blank" rel="noopener">' + SOC[x[0]] + esc(x[1]) + '</a>'; }).join('') + '</div></div>';
+      h += '<div><p class="mm-h">' + tx('Kiemelt') + '</p><div class="' + (mini ? 'mm-frow' : '') + '">' + mini + '<a class="mm-single" href="' + p.f.href + '"><div class="mm-ph" style="background-image:url(\'' + p.f.img + '\')"></div><div class="mm-ct"><b>' + tx(p.f.t) + '</b><span>' + tx(p.f.s) + '</span><span class="mm-btn" style="align-self:flex-start;margin:0">' + tx(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div></div>';
     }
-    h += '</div></div><div class="mm-foot"><span>' + svg('star', 16) + '5,0 Google értékelés</span><span>' + svg('phone', 16) + '<a href="tel:+36302336060">+36 30 233 6060</a></span><span>' + svg('clock', 16) + 'Válasz 1 órán belül, munkaidőben</span><span>' + svg('pin', 16) + 'Geretsried (DE) · Solymár (HU)</span></div>';
+    h += '</div></div><div class="mm-foot"><span>' + svg('star', 16) + tx('5,0 Google értékelés') + '</span><span>' + svg('phone', 16) + '<a href="' + esc(phone().tel) + '">' + esc(phone().txt) + '</a></span><span>' + svg('clock', 16) + tx('Válasz 1 órán belül, munkaidőben') + '</span><span>' + svg('pin', 16) + 'Geretsried (DE) · Solymár (HU)</span></div>';
     return h;
   }
 
@@ -348,7 +530,7 @@
     var items = wrap ? [].slice.call(wrap.querySelectorAll('.ca-nav .menu > .navitem')) : [];
     if (!wrap || items.length < 5) return;
     var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
-    var panel = el('<div class="mm-panel" role="region" aria-label="Főmenü"></div>');
+    var panel = el('<div class="mm-panel" role="region" aria-label="' + tx('Főmenü') + '"></div>');
     wrap.appendChild(panel);
     var cur = -1, tOpen = 0, tClose = 0;
     function desktop() { return window.matchMedia('(min-width:' + MIN_W + 'px)').matches; }
