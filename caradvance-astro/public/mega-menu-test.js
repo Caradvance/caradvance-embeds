@@ -462,7 +462,7 @@
   function loadData(cb) {
     if (DATA.rent || DATA.loading) return;
     DATA.loading = true;
-    var rateP = fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF').then(function (r) { return r.json(); }).then(function (j) { return j && j.rates && j.rates.HUF; }).catch(function () { return 0; });
+    var rateP = fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) { return j && j.rates && j.rates.HUF; }).catch(function () { return 0; });
     Promise.all([fetch(SRC.autoink, { credentials: 'same-origin' }).then(function (r) { return r.text(); }), rateP]).then(function (res) {
       var html = res[0], rate = res[1];
       var doc = new DOMParser().parseFromString(html, 'text/html');
