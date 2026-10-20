@@ -404,7 +404,7 @@
       var brand = g(o, 'brand') || 'BMW', key = g(o, 'key'), fuel = g(o, 'fuel'), from = +((/from:(\d+)/.exec(o) || [])[1] || 0);
       var net = Math.round(from / 1.19);
       return { isNewCar: true, t: nm, img: g(o, 'img') || ('/bmw/' + key + '.webp?v=6'), logo: LOGO[brand] || '',
-        href: '/egyedi-auto-rendeles/' + (g(o, 'slug') || (key + '-' + (FS[fuel] || 'benzin'))),
+        href: '/egyedi-auto-rendeles/' + (g(o, 'slug') || (key + '-' + (FS[fuel] || 'benzin'))) + '/',
         sp: [g(o, 'body'), 'Automata', fuel].filter(Boolean).join(' · '),
         ft: Math.round(net * R).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft' };
     }).filter(Boolean);
