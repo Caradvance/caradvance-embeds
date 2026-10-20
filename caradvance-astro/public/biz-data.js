@@ -61,7 +61,8 @@ window.BIZ = (function () {
 
   // load cars: try the sheet tab, else fallback; then run cb(cars)
   var EXTRA = [
-    { modell:'Ford Focus 1.5 EcoBlue ST-Line (Automata)', marka:'Ford', karosszeria:'Kombi', km:'65 390 km', teljesitmeny:'120 LE', valto:'Automata', uzemanyag:'Dízel', evjarat:'03/2023', hajtas:'Első kerék', eur:18684, huf:6799000, seller:'heimpal', img:'https://img.hasznaltautocdn.com/2048x1536/23486159/30823120.jpg' }
+    { modell:'Jaguar F-Type S 3.0 V6 S/C (Automata)', marka:'Jaguar', karosszeria:'Cabrio', km:'76 000 km', teljesitmeny:'380 LE', valto:'Automata', uzemanyag:'Benzin', evjarat:'03/2017', hajtas:'Hátsó kerék', eur:46537, huf:16899000, seller:'sos', img:'https://img.hasznaltautocdn.com/2048x1536/23612406/32360221.jpg' },
+    { modell:'Ford Focus 1.5 EcoBlue ST-Line (Automata)', marka:'Ford', karosszeria:'Kombi', km:'65 390 km', teljesitmeny:'120 LE', valto:'Automata', uzemanyag:'Dízel', evjarat:'03/2023', hajtas:'Első kerék', eur:16495, huf:5990000, seller:'heimpal', img:'https://img.hasznaltautocdn.com/2048x1536/23486159/30823120.jpg' }
   ];
   function withExtra(list){ var out=(list||[]).slice(); for(var i=0;i<EXTRA.length;i++){ var e=EXTRA[i], sl=slugify(e.modell); if(!out.some(function(c){return slugify(c.modell)===sl;})) out.push(e); } return out; }
   function loadCars(cb){
