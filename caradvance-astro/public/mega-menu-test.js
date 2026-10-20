@@ -103,6 +103,7 @@
     '.mm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.mm-av,.mm-fu{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:7px;padding:3px 8px;line-height:1.3}.mm-av{background:#64748b}.mm-av.now{background:#15803D}' +
     '.mm-car.mm-cta{background:#0B0B0D;color:#fff;border-color:#0B0B0D;display:flex;align-items:center}.mm-car.mm-cta b{white-space:normal;font-size:16px;margin-top:8px}.mm-car.mm-cta .mm-sp{color:#C9CFDA}.mm-ic2{color:#E2001A}.mm-car.mm-cta:hover{border-color:#E2001A}' +
     '.mm-b img[src*="mercedes"]{transform:scale(1.45)}.mm-meta img[src*="mercedes"]{transform:scale(1.4);transform-origin:left center}' +
+    '.mm-meta .mm-bt{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0B0B0D;line-height:24px;height:24px;white-space:nowrap}' +
     '.mm-all{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A;text-decoration:none;margin:8px 0 0 12px}';
 
   function el(html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; }
@@ -124,10 +125,26 @@
       var ft = '', sub = '';
       if (kind === 'rent') { var rp = a.querySelector('.rentprices .rp b span'); ft = txt(rp).replace(/^≈\s*/, ''); sub = txt(a.querySelector('.rentprices .rp span')) || '2 000 km / hó'; }
       else { ft = txt(a.querySelector('.pricerow .price')); }
-      return { href: href, t: txt(a.querySelector('.title')), sp: sp, img: im ? im.getAttribute('src') : '', ft: /Ft/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
+      var tt = txt(a.querySelector('.title'));
+      return { href: href, t: tt, sp: [km(parts[0]), parts[parts.length - 1]].filter(Boolean).join(' · '), yr: [txt(a.querySelector('.cond')), txt(a.querySelector('.year'))].filter(Boolean).join(' · '), brand: a.getAttribute('data-marka') || tt, img: im ? im.getAttribute('src') : '', ft: /Ft/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
     });
   }
   var LK = { 'VW': 'vw', 'BMW': 'bmw', 'Audi': 'audi', 'Mercedes-Benz': 'mercedes', 'MINI': 'mini', 'Hyundai': 'hyundai', 'CUPRA': 'cupra', 'Kia': 'kia', 'MAN': 'man', 'Seat': 'seat', 'Volvo': 'volvo' };
+  /* márka -> kis logó (ugyanaz, mint a bérelhető kártyákon); ha nincs logófájl, a márka neve jelenik meg */
+  var BRAND_RE = [[/^(vw|volkswagen)\b/i, 'Volkswagen', '/bl-vw.webp'], [/^bmw\b/i, 'BMW', '/bl-bmw.webp'], [/^audi\b/i, 'Audi', '/bl-audi.webp'], [/^mercedes/i, 'Mercedes-Benz', '/bl-mercedes.webp'],
+    [/^mini\b/i, 'MINI', '/bl-mini.webp'], [/^cupra\b/i, 'CUPRA', '/bl-cupra.webp'], [/^seat\b/i, 'SEAT', '/bl-seat.webp'], [/^hyundai\b/i, 'Hyundai', '/bl-hyundai.webp'], [/^kia\b/i, 'Kia', '/bl-kia.webp'],
+    [/^volvo\b/i, 'Volvo', '/bl-volvo.webp'], [/^man\b/i, 'MAN', '/bl-man.webp'], [/^porsche\b/i, 'Porsche', '/brand-porsche.png'], [/^ford\b/i, 'Ford', ''], [/^jaguar\b/i, 'Jaguar', ''],
+    [/^land\s*rover|^range\s*rover/i, 'Land Rover', ''], [/^ferrari\b/i, 'Ferrari', ''], [/^skoda|^škoda/i, 'Škoda', ''], [/^toyota\b/i, 'Toyota', ''], [/^tesla\b/i, 'Tesla', '']];
+  function brandOf(s) {
+    s = String(s || '').trim();
+    for (var i = 0; i < BRAND_RE.length; i++) if (BRAND_RE[i][0].test(s)) return { n: BRAND_RE[i][1], logo: BRAND_RE[i][2] };
+    return { n: s.split(' ')[0], logo: '' };
+  }
+  function metaHtml(brand, right) {
+    var b = brandOf(brand);
+    var l = b.logo ? '<img src="' + b.logo + '" alt="' + esc(b.n) + '" width="46" height="24">' : (b.n ? '<i class="mm-bt">' + esc(b.n) + '</i>' : '');
+    return '<div class="mm-meta">' + l + '<span>' + esc(right || '') + '</span></div>';
+  }
   var FC = { 'Benzin': '#e8820c', 'Dízel': '#6b7280', 'PHEV': '#00997E', 'Hibrid': '#00997E', 'Elektromos': '#0D79FF', 'EV': '#0D79FF' };
   function rhref(b, mo) {
     var D = { '1': '1-es', '2': '2-es', '3': '3-as', '4': '4-es', '5': '5-ös', '6': '6-os', '7': '7-es', '8': '8-as' };
@@ -186,15 +203,15 @@
           DATA.biz = cars.slice(0, 4).map(function (c) {
             var huf = Number(c.huf) || (BIZ.ftOf ? BIZ.ftOf(c.eur) : 0);
             var slug = BIZ.slugify ? BIZ.slugify(c.modell) : '';
-            var sp = [String(c.evjarat || '').split('/').pop(), c.km, c.uzemanyag].filter(Boolean).join(' · ');
-            return { href: '/auto/' + slug + '/?biz=1', t: c.modell, sp: sp, img: c.img, ft: huf ? (BIZ.fmtFt ? BIZ.fmtFt(huf) : Math.round(huf).toLocaleString('hu-HU')) + (BIZ.fmtFt && /Ft/.test(BIZ.fmtFt(1)) ? '' : '\u00a0Ft') : '' };
+            var sp = [c.km, c.uzemanyag].filter(Boolean).join(' · ');
+            return { href: '/auto/' + slug + '/?biz=1', t: c.modell, sp: sp, yr: ['Használt', c.evjarat].filter(Boolean).join(' · '), brand: c.marka || c.modell, img: c.img, ft: huf ? (BIZ.fmtFt ? BIZ.fmtFt(huf) : Math.round(huf).toLocaleString('hu-HU')) + (BIZ.fmtFt && /Ft/.test(BIZ.fmtFt(1)) ? '' : '\u00a0Ft') : '' };
           });
           DATA.bizN = cars.length; cb();
         }); });
       } catch (e) { DATA.biz = []; cb(); }
     }
     if (window.BIZ && BIZ.loadCars) go();
-    else { var sc = document.createElement('script'); sc.src = '/biz-data.js'; sc.onload = go; sc.onerror = function () { DATA.biz = []; cb(); }; document.head.appendChild(sc); }
+    else { var sc = document.createElement('script'); sc.src = '/biz-data.js?v=1020'; sc.onload = go; sc.onerror = function () { DATA.biz = []; cb(); }; document.head.appendChild(sc); }
   }
   function loadData(cb) {
     if (DATA.rent || DATA.loading) return;
@@ -228,8 +245,8 @@
     var np = !!window.CA_NP || !c.ft;
     var price = np ? '<strong>Ajánlatot kérek</strong>'
       : kind === 'rent' ? '<strong>' + esc(c.ft) + '/hó</strong><em>' + esc(c.sub.replace(/\s*\/\s*/, '/')) + '</em>'
-      : '<strong>' + esc(c.ft) + '</strong>' + (kind === 'sale' ? '<em>nettó</em>' : '');
-    return '<a class="mm-car" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')"></div><div class="mm-cb"><b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
+      : '<strong>' + esc(c.ft) + '</strong>' + (kind === 'sale' ? '<em>nettó</em>' : kind === 'biz' ? '<em>bruttó</em>' : '');
+    return '<a class="mm-car" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')"></div><div class="mm-cb">' + metaHtml(c.brand || c.t, c.yr) + '<b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
   }
   function carsHtml(p) {
     var list = DATA[p.cars];
