@@ -131,9 +131,9 @@
   }
   var LK = { 'VW': 'vw', 'BMW': 'bmw', 'Audi': 'audi', 'Mercedes-Benz': 'mercedes', 'MINI': 'mini', 'Hyundai': 'hyundai', 'CUPRA': 'cupra', 'Kia': 'kia', 'MAN': 'man', 'Seat': 'seat', 'Volvo': 'volvo' };
   /* márka -> kis logó (ugyanaz, mint a bérelhető kártyákon); ha nincs logófájl, a márka neve jelenik meg */
-  var BRAND_RE = [[/^(vw|volkswagen)\b/i, 'Volkswagen', '/bl-vw.webp'], [/^bmw\b/i, 'BMW', '/bl-bmw.webp'], [/^audi\b/i, 'Audi', '/bl-audi.webp'], [/^mercedes/i, 'Mercedes-Benz', '/bl-mercedes.webp'],
-    [/^mini\b/i, 'MINI', '/bl-mini.webp'], [/^cupra\b/i, 'CUPRA', '/bl-cupra.webp'], [/^seat\b/i, 'SEAT', '/bl-seat.webp'], [/^hyundai\b/i, 'Hyundai', '/bl-hyundai.webp'], [/^kia\b/i, 'Kia', '/bl-kia.webp'],
-    [/^volvo\b/i, 'Volvo', '/bl-volvo.webp'], [/^man\b/i, 'MAN', '/bl-man.webp'], [/^porsche\b/i, 'Porsche', '/brand-porsche.png'], [/^ford\b/i, 'Ford', ''], [/^jaguar\b/i, 'Jaguar', ''],
+  var BRAND_RE = [[/^(vw|volkswagen)\b/i, 'Volkswagen', '/bl-vw-dark.webp'], [/^bmw\b/i, 'BMW', '/bl-bmw-dark.webp'], [/^audi\b/i, 'Audi', '/bl-audi-dark.webp'], [/^mercedes/i, 'Mercedes-Benz', '/bl-mercedes-dark.webp'],
+    [/^mini\b/i, 'MINI', '/bl-mini-dark.webp'], [/^cupra\b/i, 'CUPRA', '/bl-cupra-dark.webp'], [/^seat\b/i, 'SEAT', '/bl-seat-dark.webp'], [/^hyundai\b/i, 'Hyundai', '/bl-hyundai-dark.webp'], [/^kia\b/i, 'Kia', '/bl-kia-dark.webp'],
+    [/^volvo\b/i, 'Volvo', '/bl-volvo-dark.webp'], [/^man\b/i, 'MAN', '/bl-man-dark.webp'], [/^porsche\b/i, 'Porsche', '/brand-porsche.png'], [/^ford\b/i, 'Ford', ''], [/^jaguar\b/i, 'Jaguar', ''],
     [/^land\s*rover|^range\s*rover/i, 'Land Rover', ''], [/^ferrari\b/i, 'Ferrari', ''], [/^skoda|^škoda/i, 'Škoda', ''], [/^toyota\b/i, 'Toyota', ''], [/^tesla\b/i, 'Tesla', '']];
   function brandOf(s) {
     s = String(s || '').trim();
@@ -183,7 +183,7 @@
     DATA.rentN = (SUB.models || []).reduce(function (s, m) { return s + (m.count || 0); }, 0);
     return out.map(function (m) {
       var eff = m.eurFix || (m.net + 650);
-      return { href: m.href || rhref(m.brand, m.model), t: dispName(m.brand, m.model), img: PHOTO[m.brand + ' ' + m.model] || (m.stock && m.stock[0].i) || '', logo: LK[m.brand] ? '/bl-' + LK[m.brand] + '.webp' : '',
+      return { href: m.href || rhref(m.brand, m.model), t: dispName(m.brand, m.model), img: PHOTO[m.brand + ' ' + m.model] || (m.stock && m.stock[0].i) || '', logo: LK[m.brand] ? '/bl-' + LK[m.brand] + '-dark.webp' : '',
         yr: m.stock ? (String(m.yr || '').split('/').pop() + ' · készleten') : (m.stockOnly ? 'Azonnal elvihető' : '0 km · 2026'), sp: [m.cat].concat(m.gears || []).filter(Boolean).join(' · '),
         avail: m.now > 0 ? m.now + (m.stock ? ' azonnal elérhető' : ' elérhető') : ((m.later && m.later[0]) ? m.later[0].d : 'Hamarosan'), now: m.now > 0,
         fuels: (m.fuels || []).map(function (f) { return f === 'PHEV' ? 'Hibrid' : f; }),
