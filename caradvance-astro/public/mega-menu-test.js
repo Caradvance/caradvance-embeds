@@ -103,6 +103,14 @@
     '.mm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.mm-av,.mm-fu{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:7px;padding:3px 8px;line-height:1.3}.mm-av{background:#64748b}.mm-av.now{background:#15803D}' +
     '.mm-car.mm-cta{background:#0B0B0D;color:#fff;border-color:#0B0B0D;display:flex;align-items:center}.mm-car.mm-cta b{white-space:normal;font-size:16px;margin-top:8px}.mm-car.mm-cta .mm-sp{color:#C9CFDA}.mm-ic2{color:#E2001A}.mm-car.mm-cta:hover{border-color:#E2001A}' +
     '.mm-b img[src*="mercedes"]{transform:scale(1.45)}.mm-meta img[src*="mercedes"]{transform:scale(1.4);transform-origin:left center}' +
+    '.mm-car .mm-ph{position:relative}' +
+    '.mm-stamp{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) rotate(-8deg);background:#E2001A;color:#fff;font-weight:800;font-size:15px;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:10px;border:2px solid #fff;box-shadow:0 6px 18px rgba(0,0,0,.25)}' +
+    '.mm-when{position:absolute;left:10px;bottom:10px;background:rgba(11,11,13,.85);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px}' +
+    '.mm-sold .mm-pr strong{color:#0B0B0D}' +
+    '.mm-ngo{display:flex;align-items:center;gap:8px;margin-top:10px;padding:7px 9px;border-radius:11px;background:#F4F7FB;border:1px solid #E6EAF1}' +
+    '.mm-ngo img{width:26px;height:26px;object-fit:contain;border-radius:6px;background:#fff;flex-shrink:0}' +
+    '.mm-ngo span{font-size:11.5px;font-weight:700;line-height:1.25;color:#0B0B0D;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}' +
+    '.mm-ngo em{display:block;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a94a6}' +
     '.mm-meta .mm-bt{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0B0B0D;line-height:24px;height:24px;white-space:nowrap}' +
     '.mm-all{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A;text-decoration:none;margin:8px 0 0 12px}';
 
@@ -195,20 +203,34 @@
   function loadBiz(cb) {
     function go() {
       try {
+        /* a /bizomanyos/ oldal a forrás: eladott autók (SOLD: eladó-oldali alapítvány + dátum) és a régi forintárak (HUFOV) */
         var soldP = fetch('/bizomanyos/', { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) {
-          var m = /var SOLD\s*=\s*\{([\s\S]*?)\};/.exec(h); var out = {};
-          if (m) m[1].replace(/['"]([a-z0-9-]+)['"]\s*:\s*\{/g, function (_, k) { out[k] = 1; return _; });
-          return out;
-        }).catch(function () { return {}; });
-        BIZ.loadCars(function (all) { soldP.then(function (SOLD) {
-          var cars = (all || []).filter(function (c) { return !SOLD[BIZ.slugify ? BIZ.slugify(c.modell) : '']; });
-          DATA.biz = cars.slice(0, 4).map(function (c) {
-            var huf = Number(c.huf) || (BIZ.ftOf ? BIZ.ftOf(c.eur) : 0);
-            var slug = BIZ.slugify ? BIZ.slugify(c.modell) : '';
-            var sp = [String(c.evjarat || '').split('/').pop(), c.km, c.uzemanyag].filter(Boolean).join(' · ');
-            return { href: '/auto/' + slug + '/?biz=1', t: c.modell, sp: sp, yr: ['Használt', c.evjarat].filter(Boolean).join(' · '), brand: c.marka || c.modell, img: c.img, ft: huf ? (BIZ.fmtFt ? BIZ.fmtFt(huf) : Math.round(huf).toLocaleString('hu-HU')) + (BIZ.fmtFt && /Ft/.test(BIZ.fmtFt(1)) ? '' : '\u00a0Ft') : '' };
+          var m = /var SOLD\s*=\s*\{([\s\S]*?)\};/.exec(h), out = {}, ov = {};
+          if (m) m[1].replace(/['"]([a-z0-9-]+)['"]\s*:\s*\{([^}]*)\}/g, function (_, k, body) {
+            var g = function (n) { var x = new RegExp(n + "\\s*:\\s*['\"]([^'\"]*)['\"]").exec(body); return x ? x[1] : ''; };
+            out[k] = { seller: g('seller'), date: g('date') }; return _;
           });
-          DATA.bizN = cars.length;
+          var hv = /var HUFOV\s*=\s*\{([^}]*)\}/.exec(h);
+          if (hv) hv[1].replace(/['"]([a-z0-9-]+)['"]\s*:\s*(\d+)/g, function (_, k, v) { ov[k] = +v; return _; });
+          return { sold: out, ov: ov };
+        }).catch(function () { return { sold: {}, ov: {} }; });
+        BIZ.loadCars(function (all) { soldP.then(function (S) {
+          var SOLD = S.sold, slugOf = function (c) { return BIZ.slugify ? BIZ.slugify(c.modell) : ''; };
+          var active = (all || []).filter(function (c) { return !SOLD[slugOf(c)]; });
+          var sold = (all || []).filter(function (c) { return SOLD[slugOf(c)]; })
+            .sort(function (a, b) { return (SOLD[slugOf(b)].date || '').localeCompare(SOLD[slugOf(a)].date || ''); });
+          var P = BIZ.PROJECTS || {};
+          DATA.biz = active.concat(sold).slice(0, 4).map(function (c) {
+            var slug = slugOf(c), so = SOLD[slug];
+            var huf = Number(c.huf) || S.ov[slug] || (BIZ.ftOf ? BIZ.ftOf(c.eur) : 0);
+            var sp = [String(c.evjarat || '').split('/').pop(), c.km, c.uzemanyag].filter(Boolean).join(' · ');
+            var pr = P[(so && so.seller) || c.seller] || null;
+            var dm = so && /^(\d{4})-(\d{2})-(\d{2})/.exec(so.date || '');
+            return { href: '/auto/' + slug + '/?biz=1', t: c.modell, sp: sp, img: c.img,
+              ngo: pr ? { n: pr.name, logo: pr.logo } : null, sold: so ? (dm ? dm[1] + '. ' + dm[2] + '. ' + dm[3] + '.' : 'eladva') : '',
+              ft: huf ? (BIZ.fmtFt ? BIZ.fmtFt(huf) : Math.round(huf).toLocaleString('hu-HU')) + (BIZ.fmtFt && /Ft/.test(BIZ.fmtFt(1)) ? '' : ' Ft') : '' };
+          });
+          DATA.bizN = active.length;
           DATA.biz.forEach(function (c) { if (c.img) { var i = new Image(); i.referrerPolicy = 'no-referrer'; i.src = thumb(c.img); } });
           cb();
         }); });
@@ -249,8 +271,10 @@
     var np = !!window.CA_NP || !c.ft;
     var price = np ? '<strong>Ajánlatot kérek</strong>'
       : kind === 'rent' ? '<strong>' + esc(c.ft) + '/hó</strong><em>' + esc(c.sub.replace(/\s*\/\s*/, '/')) + '</em>'
-      : '<strong>' + esc(c.ft) + '</strong>' + (kind === 'sale' ? '<em>nettó</em>' : kind === 'biz' ? '<em>bruttó</em>' : '');
-    return '<a class="mm-car" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')"></div><div class="mm-cb"><b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
+      : '<strong>' + esc(c.ft) + '</strong>' + (kind === 'sale' ? '<em>nettó</em>' : kind === 'biz' ? '<em>' + (c.sold ? 'elkelt' : 'bruttó') + '</em>' : '');
+    var stamp = c.sold ? '<span class="mm-stamp">Eladva</span><span class="mm-when">Elkelt: ' + esc(c.sold) + '</span>' : '';
+    var ngo = c.ngo ? '<div class="mm-ngo">' + (c.ngo.logo ? '<img src="' + esc(c.ngo.logo) + '" alt="" width="26" height="26" loading="lazy">' : '') + '<span><em>' + (c.sold ? 'Támogattuk' : 'Támogatjuk') + '</em>' + esc(c.ngo.n) + '</span></div>' : '';
+    return '<a class="mm-car' + (c.sold ? ' mm-sold' : '') + '" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')">' + stamp + '</div><div class="mm-cb"><b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div>' + ngo + '</div></a>';
   }
   function carsHtml(p) {
     var list = DATA[p.cars];
