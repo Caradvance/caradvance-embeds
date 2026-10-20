@@ -207,7 +207,7 @@
   };
   /* Új autók fül: a konfigurátor (/egyedi-auto-rendeles/) adataiból, ugyanazzal az árral és képpel */
   var PICK_NEW = ['BMW X5', 'Mercedes-Benz GLC Coupé', 'Audi Q5', 'MINI Countryman'];
-  var SALE_TAB = 'used';
+  var SALE_TAB = 'new';
   function phone() { var p = (window.CA_CFG && window.CA_CFG.PHONE) || '+36 30 233 6060'; return { txt: p, tel: 'tel:' + String(p).replace(/[^\d+]/g, '') }; }
   var ICON = {
     car: '<path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6M6 11h12"/>',
@@ -340,7 +340,8 @@
     '.mm-mini b{display:block;font-size:14px;margin-top:4px}.mm-mini div span{display:block;font-size:12.5px;color:#7A8496;margin-top:4px;line-height:1.35}' +
     '.mm-mini .mm-go{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A}' +
     '.mm-chips{display:flex;gap:10px;flex-wrap:wrap}.mm-chips .mm-chip{margin:0}' +
-    '.mm-car.mm-new .mm-ph{aspect-ratio:16/9;background-size:contain;background-color:#fff;margin:10px 12px 0}' +
+    '.mm-car.mm-new .mm-ph{aspect-ratio:16/9;background-size:contain;background-color:#fff;margin:10px 12px 0;background-origin:content-box;padding:6% 4% 2%;box-sizing:border-box}' +
+    '.mm-panes{display:grid}.mm-panes>.mm-pane{grid-area:1/1}.mm-pane.off{visibility:hidden;pointer-events:none}.mm-mores{justify-items:end}' +
     '.mm-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.mm-meta img{height:24px;width:46px;object-fit:contain;object-position:left center}.mm-meta span{font-size:12px;color:#7A8496}' +
     '.mm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.mm-av,.mm-fu{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:7px;padding:3px 8px;line-height:1.3}.mm-av{background:#64748b}.mm-av.now{background:#15803D}' +
     '.mm-car.mm-cta{background:#0B0B0D;color:#fff;border-color:#0B0B0D;display:flex;align-items:center}.mm-car.mm-cta b{white-space:normal;font-size:16px;margin-top:8px}.mm-car.mm-cta .mm-sp{color:#C9CFDA}.mm-ic2{color:#E2001A}.mm-car.mm-cta:hover{border-color:#E2001A}' +
@@ -389,6 +390,33 @@
     if (kind !== 'sale') return list;
     var good = list.filter(function (c) { return c.mapped; });
     return good.concat(list.filter(function (c) { return !c.mapped; })).slice(0, 4);
+  }
+  /* stúdiókép körbevágása az autó széléig (átlátszó vagy fehér háttér), hogy minden autó ugyanakkora legyen */
+  function trimImg(url) {
+    return new Promise(function (res) {
+      var done = false, fin = function (u) { if (!done) { done = true; res(u); } };
+      setTimeout(function () { fin(url); }, 4000);
+      var im = new Image();
+      im.onload = function () {
+        try {
+          var w = im.naturalWidth, h = im.naturalHeight, cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+          var cx = cv.getContext('2d'); cx.drawImage(im, 0, 0);
+          var d = cx.getImageData(0, 0, w, h).data, alpha = d[3] < 250, br = d[0], bg = d[1], bb = d[2];
+          var x0 = w, y0 = h, x1 = -1, y1 = -1;
+          for (var y = 0; y < h; y += 2) for (var x = 0; x < w; x += 2) {
+            var i = (y * w + x) * 4;
+            var ink = alpha ? d[i + 3] > 24 : (Math.abs(d[i] - br) + Math.abs(d[i + 1] - bg) + Math.abs(d[i + 2] - bb) > 36);
+            if (ink) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+          }
+          if (x1 < 0 || (x1 - x0) < w * 0.3) return fin(url);
+          var cw = x1 - x0 + 2, ch = y1 - y0 + 2, out = document.createElement('canvas'); out.width = cw; out.height = ch;
+          out.getContext('2d').drawImage(cv, x0, y0, cw, ch, 0, 0, cw, ch);
+          fin(out.toDataURL('image/webp', 0.9));
+        } catch (e) { fin(url); }
+      };
+      im.onerror = function () { fin(url); };
+      im.src = url;
+    });
   }
   /* a konfigurátor oldal beágyazott adataiból: {key, name, body, fuel, img, from (bruttó €), slug, hide} */
   function parseNew(html, rate) {
@@ -521,9 +549,8 @@
       });
       loadBiz(cb);
       fetch(SRC.nw, { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) {
-        DATA.nw = parseNew(h, rate);
-        DATA.nw.forEach(function (c) { var i = new Image(); i.src = c.img; });
-        cb();
+        var nw = parseNew(h, rate);
+        Promise.all(nw.map(function (c) { return trimImg(c.img).then(function (u) { c.img = u; }); })).then(function () { DATA.nw = nw; cb(); });
       }).catch(function () { DATA.nw = []; cb(); });
       DATA.rent.concat(DATA.sale).forEach(function (c) { if (c.img) { var i = new Image(); i.referrerPolicy = 'no-referrer'; i.src = thumb(c.img); } });
       cb();
@@ -560,12 +587,14 @@
       '<b>' + esc(c.t) + '</b><span class="mm-sp">' + esc(tSpec(c.sp)) + '</span><div class="mm-pr">' + pr + '</div></div></a>';
   }
   function carsHtml(p) {
-    var isNw = p.cars === 'sale' && SALE_TAB === 'new';
-    var list = isNw ? DATA.nw : DATA[p.cars];
-    if (list && !list.length && !isNw && p.cars !== 'sale') return '';
-    var body = !list ? '<div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div>'
-      : list.map(function (c) { return c.isNewCar ? newCarCard(c) : carCard(c, p.cars); }).join('') +
-        (p.cars === 'biz' && list.length < 4 ? '<a class="mm-car mm-cta" href="/eladom/"><div class="mm-cb"><span class="mm-ic2">' + svg('cash', 28) + '</span><b>' + tx('Add el nálunk az autód') + '</b><span class="mm-sp" style="white-space:normal">' + tx('Ingyenes értékbecslés, hirdetés, bemutatás és papírmunka – mi intézzük.') + '</span><span class="mm-btn" style="margin-top:12px">' + tx('Értékbecslést kérek') + ' ' + svg('arrow', 15) + '</span></div></a>' : '');
+    var sale = p.cars === 'sale', isNw = sale && SALE_TAB === 'new';
+    var SK = '<div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div><div class="mm-sk"></div>';
+    function cards(list, kind) {
+      return !list ? SK : list.map(function (c) { return c.isNewCar ? newCarCard(c) : carCard(c, kind); }).join('') +
+        (kind === 'biz' && list.length < 4 ? '<a class="mm-car mm-cta" href="/eladom/"><div class="mm-cb"><span class="mm-ic2">' + svg('cash', 28) + '</span><b>' + tx('Add el nálunk az autód') + '</b><span class="mm-sp" style="white-space:normal">' + tx('Ingyenes értékbecslés, hirdetés, bemutatás és papírmunka – mi intézzük.') + '</span><span class="mm-btn" style="margin-top:12px">' + tx('Értékbecslést kérek') + ' ' + svg('arrow', 15) + '</span></div></a>' : '');
+    }
+    var list = DATA[p.cars];
+    if (!sale && list && !list.length) return '';
     var n = p.cars === 'rent' ? DATA.rentN : p.cars === 'biz' ? DATA.bizN : DATA.saleN;
     var ng = '';
     if (p.cars === 'biz') {
@@ -573,13 +602,17 @@
         (DATA.ngos ? DATA.ngos.map(function (o) { return '<a class="mm-ng" href="/jotekonysag/" title="' + esc(o.name) + '"><img src="' + esc(o.logo) + '" alt="' + esc(o.name) + '" width="120" height="44"></a>'; }).join('')
         : new Array(8).join('<div class="mm-sk" style="aspect-ratio:auto;height:56px"></div>')) + '</div></div>';
     }
-    var tabs = '', more = '<a class="mm-more" href="' + p.callHref + '">' + tx(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a>';
-    if (p.cars === 'sale') {
-      tabs = '<span class="mm-tabs" role="tablist"><button type="button" role="tab" class="mm-tab' + (isNw ? '' : ' on') + '" data-tab="used" aria-selected="' + !isNw + '">' + tx('Használt autók') + '</button><button type="button" role="tab" class="mm-tab' + (isNw ? ' on' : '') + '" data-tab="new" aria-selected="' + isNw + '">' + tx('Új autók') + '</button></span>';
-      if (isNw) more = '<a class="mm-more" href="/egyedi-auto-rendeles/">' + tx('Összes új autó') + ' ' + svg('arrow', 15) + '</a>';
-    }
-    return ng + '<div><div class="mm-rowhead"><div class="mm-rh-l"><p class="mm-h">' + tx(p.ct) + '</p>' + tabs + '</div>' + more + '</div><div class="mm-cars">' + body + '</div></div>';
+    var more = '<a class="mm-more" href="' + p.callHref + '">' + tx(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a>';
+    if (!sale) return ng + '<div><div class="mm-rowhead"><div class="mm-rh-l"><p class="mm-h">' + tx(p.ct) + '</p></div>' + more + '</div><div class="mm-cars">' + cards(list, p.cars) + '</div></div>';
+    /* eladó autók: Új / Használt fül — mindkét lista a helyén van (egymásra rakva), így váltáskor nem ugrik a panel mérete */
+    var tab = function (k, label) { var on = (k === 'new') === isNw; return '<button type="button" role="tab" class="mm-tab' + (on ? ' on' : '') + '" data-tab="' + k + '" aria-selected="' + on + '">' + tx(label) + '</button>'; };
+    var tabs = '<span class="mm-tabs" role="tablist">' + tab('new', 'Új autók') + tab('used', 'Használt autók') + '</span>';
+    var moreNew = '<a class="mm-more" href="/egyedi-auto-rendeles/">' + tx('Összes új autó') + ' ' + svg('arrow', 15) + '</a>';
+    return '<div><div class="mm-rowhead"><div class="mm-rh-l"><p class="mm-h">' + tx(p.ct) + '</p>' + tabs + '</div>' +
+      '<span class="mm-panes mm-mores"><span class="mm-pane' + (isNw ? '' : ' off') + '" data-pane="new">' + moreNew + '</span><span class="mm-pane' + (isNw ? ' off' : '') + '" data-pane="used">' + more + '</span></span></div>' +
+      '<div class="mm-panes"><div class="mm-cars mm-pane' + (isNw ? '' : ' off') + '" data-pane="new">' + cards(DATA.nw, 'new') + '</div><div class="mm-cars mm-pane' + (isNw ? ' off' : '') + '" data-pane="used">' + cards(list, 'sale') + '</div></div></div>';
   }
+
   function panelHtml(p) {
     var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">' + tx('Menü') + '</p>' +
       p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
@@ -629,7 +662,12 @@
       btn.addEventListener('keydown', function (e) { if (!desktop()) return; if (e.key === 'ArrowDown') { e.preventDefault(); open(i); var a = panel.querySelector('a'); if (a) a.focus(); } });
     });
     panel.addEventListener('mouseenter', function () { clearTimeout(tClose); });
-    panel.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.mm-tab'); if (!b) return; e.preventDefault(); e.stopPropagation(); SALE_TAB = b.getAttribute('data-tab'); refresh(); var nb = panel.querySelector('.mm-tab[data-tab="' + SALE_TAB + '"]'); if (nb) nb.focus(); });
+    panel.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('.mm-tab'); if (!b) return;
+      e.preventDefault(); e.stopPropagation(); SALE_TAB = b.getAttribute('data-tab');
+      [].forEach.call(panel.querySelectorAll('.mm-tab'), function (x) { var on = x.getAttribute('data-tab') === SALE_TAB; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+      [].forEach.call(panel.querySelectorAll('.mm-pane'), function (x) { x.classList.toggle('off', x.getAttribute('data-pane') !== SALE_TAB); });
+    });
     panel.addEventListener('mouseleave', closeSoon);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel.classList.contains('open')) { var b = items[cur] && items[cur].querySelector('.navlink'); close(); if (b) b.focus(); } });
     document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
