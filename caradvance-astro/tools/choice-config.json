@@ -70,7 +70,8 @@
     "Mercedes-Benz GLE Coupé": "/mb-gle-coupe.webp",
     "Land Rover Range Rover Velar": "/berles/range-rover-velar.webp",
     "CUPRA Leon Sportstourer": "/berles/cupra-leon-sportstourer.webp",
-    "VW NFZ Crafter Kasten": "/berles/vw-crafter-kasten.webp"
+    "VW NFZ Crafter Kasten": "/berles/vw-crafter-kasten.webp",
+    "VW NFZ T7 Multivan": "/berles/vw-multivan.webp"
   },
   "colors": {
     "Frost Blue": "Frost kék",
@@ -93,6 +94,7 @@
     "Santorini Black": "Santorini fekete",
     "Manhattan metallic": "Manhattan metál",
     "Tavascan Blue Metallic": "Tavascan kék metál",
-    "Candy-Weiß": "Candy fehér"
+    "Candy-Weiß": "Candy fehér",
+    "Oxidgrau metallic": "Oxidszürke metál"
   }
 }
