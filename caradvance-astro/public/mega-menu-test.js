@@ -397,7 +397,7 @@
   /* stúdiókép körbevágása az autó széléig (átlátszó vagy fehér háttér), hogy minden autó ugyanakkora legyen */
   function trimImg(url) {
     return new Promise(function (res) {
-      var done = false, fin = function (u) { if (!done) { done = true; res(u); } };
+      var done = false, fin = function (u, r) { if (!done) { done = true; res({ u: u, r: r || 0 }); } };
       setTimeout(function () { fin(url); }, 4000);
       var im = new Image();
       im.onload = function () {
@@ -414,7 +414,7 @@
           if (x1 < 0 || (x1 - x0) < w * 0.3) return fin(url);
           var cw = x1 - x0 + 2, ch = y1 - y0 + 2, out = document.createElement('canvas'); out.width = cw; out.height = ch;
           out.getContext('2d').drawImage(cv, x0, y0, cw, ch, 0, 0, cw, ch);
-          fin(out.toDataURL('image/webp', 0.9));
+          fin(out.toDataURL('image/webp', 0.9), cw / ch);
         } catch (e) { fin(url); }
       };
       im.onerror = function () { fin(url); };
@@ -553,7 +553,7 @@
       loadBiz(cb);
       fetch(SRC.nw, { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) {
         var nw = parseNew(h, rate);
-        Promise.all(nw.map(function (c) { return trimImg(c.img).then(function (u) { c.img = u; }); })).then(function () { DATA.nw = nw; cb(); });
+        Promise.all(nw.map(function (c) { return trimImg(c.img).then(function (o) { c.img = o.u; c.r = o.r; }); })).then(function () { DATA.nw = nw; cb(); });
       }).catch(function () { DATA.nw = []; cb(); });
       DATA.rent.concat(DATA.sale).forEach(function (c) { if (c.img) { var i = new Image(); i.referrerPolicy = 'no-referrer'; i.src = thumb(c.img); } });
       cb();
@@ -585,7 +585,10 @@
       : !LI ? '<strong>' + esc(c.ft) + '</strong><em>-tól · nettó</em>'
       : LANG === 'zh' ? '<strong>' + esc(c.ft) + ' 起</strong><em>' + tx('nettó') + '</em>'
       : '<strong>' + esc(PER[LANG][0] + c.ft) + '</strong><em>' + tx('nettó') + '</em>';
-    return '<a class="mm-car mm-new" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + c.img + '\')"></div><div class="mm-cb">' +
+    /* azonos látható méret: a szélesség a kép oldalarányából (alacsony limuzin szélesebb, magas SUV keskenyebb), közös "talajvonalon" */
+    var sz = '';
+    if (c.r > 0) { var K = 16 / 9, W = Math.sqrt(0.3068 * c.r); W = Math.min(W, 0.92, 0.9 * c.r / K); sz = 'background-size:' + (W * 100).toFixed(1) + '% auto;background-position:50% 78%;padding:0;'; }
+    return '<a class="mm-car mm-new" href="' + esc(c.href) + '"><div class="mm-ph" style="' + sz + 'background-image:url(\'' + c.img + '\')"></div><div class="mm-cb">' +
       '<div class="mm-meta">' + (c.logo ? '<img src="' + c.logo + '" alt="" width="40" height="18">' : '') + '<span>2026 · ' + tx('Németország') + '</span></div>' +
       '<b>' + tx(c.t) + '</b><span class="mm-sp">' + esc(tSpec(c.sp)) + '</span><div class="mm-pr">' + pr + '</div></div></a>';
   }
