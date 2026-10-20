@@ -51,9 +51,11 @@
       f: { img: '/toyota-rav4-hybrid-hasznaltauto-eladas.webp', t: 'Mennyit ér az autód?', s: 'Hirdetjük, bemutatjuk, eladjuk – te csak átveszed a pénzt.', cta: 'Értékbecslést kérek', href: '/eladom/' } },
     { links: [['truck', 'Autó rendelés', '/auto-rendeles/', 'Megkeressük, ellenőrizzük, hazahozzuk'], ['list', 'Beszerzési folyamat', '/beszerzesi-folyamat/', 'Az ajánlattól a forgalomba helyezésig'], ['scale', 'Egyedül vagy velünk?', '/egyedul-vagy-velunk/', 'Költségek és kockázatok összevetve'], ['star', 'Előnyök', '/elonyok/', 'Miért Németországból?'], ['users', 'Referenciák', '/referenciak/', 'Ügyfeleink autói']],
       side: { t: 'Kalkulátorok', items: [['calc', 'Honosítás kalkulátor', '/honositas-kalkulator/'], ['calc', 'Átírás kalkulátor', '/atiras-kalkulator/'], ['calc', 'Lízing kalkulátor', '/finanszirozas-lizing/']] },
-      f: { img: '/autoszallitas-autoimport-nemetorszagbol.webp', t: 'Autó Németországból, kulcsrakészen', s: 'Szállítás, honosítás, forgalomba helyezés – mi intézzük.', cta: 'Autót rendelek', href: '/auto-rendeles/' } },
+      f: { img: '/autoszallitas-autoimport-nemetorszagbol.webp', t: 'Autó Németországból, kulcsrakészen', s: 'Szállítás, honosítás, forgalomba helyezés – mi intézzük.', cta: 'Autót rendelek', href: '/auto-rendeles/' },
+      minis: [['clock', '23 év', 'tapasztalat', '2003 óta Németországban', '/miert-mi/'], ['truck', '5000+', 'eladott prémium autó', 'Nézd meg ügyfeleink autóit', '/referenciak/']] },
     { links: [['users', 'Miért mi?', '/miert-mi/', 'Német háttér, magyar ügyintézés'], ['eye', 'Átláthatóság', '/atlathatosag/', 'Tételes, előre rögzített árak'], ['cert', 'Minőségbiztosítás', '/minosegbiztositas/', 'Ellenőrzött autók, garancia'], ['star', 'Referenciák', '/referenciak/', 'Ügyfeleink történetei'], ['media', 'Media', '/media/', 'Megjelenések'], ['news', 'Blog', '/blog/', 'Útmutatók, adók, árak']],
-      f: { img: '/caradvance-iroda.webp', t: 'Gyere be hozzánk', s: 'Solymár, Ibolya utca 18. – hétfőtől péntekig 9–17.', cta: 'Kapcsolat', href: '/kapcsolat/' } }
+      f: { img: '/caradvance-iroda.webp', t: 'Gyere be hozzánk', s: 'Solymár, Ibolya utca 18. – hétfőtől péntekig 9–17.', cta: 'Kapcsolat', href: '/kapcsolat/' },
+      minis: [['star', '5,0', 'Google-értékelés', 'Elégedett ügyfeleink szerint', '/referenciak/'], ['cert', '1 év', 'szavatosság', 'Minden eladott autónkra', '/minosegbiztositas/']] }
   ];
   var CSS = '' +
     '@media (min-width:1100px){.mm-on .ca-nav .menu .dropdown{display:none!important}.mm-on .ca-nav .menu .navitem.mm-act>.navlink{color:#E2001A}}' +
@@ -97,6 +99,13 @@
     '.mm-single{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:0;border-radius:20px;overflow:hidden;background:#0B0B0D;color:#fff;text-decoration:none;min-height:230px}' +
     '.mm-single .mm-ph{background:#222 center/cover no-repeat}.mm-single .mm-ct{padding:22px 22px;display:flex;flex-direction:column;justify-content:center}' +
     '.mm-single b{font-size:20px;line-height:1.25}.mm-single span{display:block;font-size:14px;color:#C9CFDA;margin:8px 0 16px}' +
+    '.mm-frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,2.3fr);gap:14px;align-items:stretch}' +
+    '.mm-frow .mm-single{min-height:200px}.mm-frow .mm-single b{font-size:18px}.mm-frow .mm-single .mm-ct{padding:18px 20px}' +
+    '.mm-mini{display:flex;flex-direction:column;justify-content:space-between;gap:10px;border:1px solid #E6EAF1;background:#F7F9FC;border-radius:20px;padding:18px;text-decoration:none;color:#14151A;transition:border-color .15s,box-shadow .15s,transform .15s}' +
+    '.mm-mini:hover{border-color:#E2001A;box-shadow:0 10px 26px rgba(15,23,42,.10);transform:translateY(-2px)}' +
+    '.mm-mini strong{display:block;font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B0B0D}' +
+    '.mm-mini b{display:block;font-size:14px;margin-top:4px}.mm-mini div span{display:block;font-size:12.5px;color:#7A8496;margin-top:4px;line-height:1.35}' +
+    '.mm-mini .mm-go{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A}' +
     '.mm-chips{display:flex;gap:10px;flex-wrap:wrap}.mm-chips .mm-chip{margin:0}' +
     '.mm-car.mm-new .mm-ph{aspect-ratio:16/9;background-size:contain;background-color:#fff;margin:10px 12px 0}' +
     '.mm-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.mm-meta img{height:24px;width:46px;object-fit:contain;object-position:left center}.mm-meta span{font-size:12px;color:#7A8496}' +
@@ -295,7 +304,8 @@
     if (p.cars) h += '<div class="mm-carswrap">' + carsHtml(p) + '</div>';
     else {
       if (p.side) h += '<div><p class="mm-h">' + esc(p.side.t) + '</p><div class="mm-chips">' + p.side.items.map(function (s) { return '<a class="mm-chip" href="' + s[2] + '">' + svg(s[0], 18) + esc(s[1]) + '</a>'; }).join('') + '</div></div>';
-      h += '<div><p class="mm-h">Kiemelt</p><a class="mm-single" href="' + p.f.href + '"><div class="mm-ph" style="background-image:url(\'' + p.f.img + '\')"></div><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn" style="align-self:flex-start;margin:0">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div>';
+      var mini = (p.minis || []).map(function (m) { return '<a class="mm-mini" href="' + m[4] + '"><span class="mm-ic2">' + svg(m[0], 24) + '</span><div><strong>' + esc(m[1]) + '</strong><b>' + esc(m[2]) + '</b><span>' + esc(m[3]) + '</span></div><span class="mm-go">Tovább ' + svg('arrow', 14) + '</span></a>'; }).join('');
+      h += '<div><p class="mm-h">Kiemelt</p><div class="' + (mini ? 'mm-frow' : '') + '">' + mini + '<a class="mm-single" href="' + p.f.href + '"><div class="mm-ph" style="background-image:url(\'' + p.f.img + '\')"></div><div class="mm-ct"><b>' + esc(p.f.t) + '</b><span>' + esc(p.f.s) + '</span><span class="mm-btn" style="align-self:flex-start;margin:0">' + esc(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div></div>';
     }
     h += '</div></div><div class="mm-foot"><span>' + svg('star', 16) + '5,0 Google értékelés</span><span>' + svg('phone', 16) + '<a href="tel:+36302336060">+36 30 233 6060</a></span><span>' + svg('clock', 16) + 'Válasz 1 órán belül, munkaidőben</span><span>' + svg('pin', 16) + 'Geretsried (DE) · Solymár (HU)</span></div>';
     return h;
