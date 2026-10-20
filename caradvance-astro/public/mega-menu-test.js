@@ -111,7 +111,9 @@
   function fmtEur(v) { return Math.round(Number(v) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €'; }
   function shortName(m) { return String(m || '').replace(/["'*]/g, ' ').replace(/\s+/g, ' ').trim().split(' ').slice(0, 4).join(' '); }
   var DATA = { rent: null, sale: null, loading: false };
-  function thumb(u) { var img = String(u || ''); if (img.indexOf('classistatic') >= 0) { if (/rule=mo-\d+/.test(img)) img = img.replace(/rule=mo-\d+/, 'rule=mo-640'); else img += (/\?$/.test(img) ? '' : (img.indexOf('?') < 0 ? '?' : '&')) + 'rule=mo-640'; } return img; }
+  function thumb(u) { var img = String(u || '');
+    /* hasznaltauto.hu: a 2048 px-es képet a böngésző ~230 px-re kicsinyítve recésen (pixelesen) rajzolja -> a 640x480-as változat éles és kisebb */
+    if (img.indexOf('hasznaltautocdn.com/') >= 0) img = img.replace(/\/\d+x\d+\//, '/640x480/'); if (img.indexOf('classistatic') >= 0) { if (/rule=mo-\d+/.test(img)) img = img.replace(/rule=mo-\d+/, 'rule=mo-640'); else img += (/\?$/.test(img) ? '' : (img.indexOf('?') < 0 ? '?' : '&')) + 'rule=mo-640'; } return img; }
   function txt(el) { return el ? el.textContent.replace(/ /g, ' ').replace(/\s+/g, ' ').trim() : ''; }
   function km(s) { var n = String(s || '').replace(/\D/g, ''); return n ? n.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' km' : ''; }
   /* Az /autoink/ oldalon látható autók (ugyanaz a sorrend, kép és forintár), az oldal HTML-jéből. */
@@ -206,7 +208,9 @@
             var sp = [String(c.evjarat || '').split('/').pop(), c.km, c.uzemanyag].filter(Boolean).join(' · ');
             return { href: '/auto/' + slug + '/?biz=1', t: c.modell, sp: sp, yr: ['Használt', c.evjarat].filter(Boolean).join(' · '), brand: c.marka || c.modell, img: c.img, ft: huf ? (BIZ.fmtFt ? BIZ.fmtFt(huf) : Math.round(huf).toLocaleString('hu-HU')) + (BIZ.fmtFt && /Ft/.test(BIZ.fmtFt(1)) ? '' : '\u00a0Ft') : '' };
           });
-          DATA.bizN = cars.length; cb();
+          DATA.bizN = cars.length;
+          DATA.biz.forEach(function (c) { if (c.img) { var i = new Image(); i.referrerPolicy = 'no-referrer'; i.src = thumb(c.img); } });
+          cb();
         }); });
       } catch (e) { DATA.biz = []; cb(); }
     }
