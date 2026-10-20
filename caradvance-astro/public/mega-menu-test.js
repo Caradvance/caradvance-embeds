@@ -135,6 +135,8 @@
     'Használt autók': ['Used cars', 'Gebrauchtwagen', 'Voitures d’occasion', 'Вживані авто', '二手车', 'Jazdené autá', 'Ojeté vozy'],
     'Új autók': ['New cars', 'Neuwagen', 'Voitures neuves', 'Нові авто', '新车', 'Nové autá', 'Nové vozy'],
     'Összes új autó': ['All new cars', 'Alle Neuwagen', 'Toutes les voitures neuves', 'Усі нові авто', '全部新车', 'Všetky nové autá', 'Všechny nové vozy'],
+    'BMW 3-as': ['BMW 3 Series', 'BMW 3er', 'BMW Série 3', 'BMW 3 Series', 'BMW 3系', 'BMW rad 3', 'BMW řada 3'],
+    'Mercedes-Benz S-osztály': ['Mercedes-Benz S-Class', 'Mercedes-Benz S-Klasse', 'Mercedes-Benz Classe S', 'Mercedes-Benz S-Class', '梅赛德斯-奔驰 S级', 'Mercedes-Benz Trieda S', 'Mercedes-Benz Třída S'],
     'Németország': ['Germany', 'Deutschland', 'Allemagne', 'Німеччина', '德国', 'Nemecko', 'Německo']
   };
   function t(s) { if (!LI) return s; var r = TR[s]; return (r && r[LI - 1]) || s; }
@@ -206,7 +208,7 @@
     'bmw-x7-m50d-m-sport-pro-22-b-w': 'https://img.classistatic.de/api/v1/mo-prod/images/50/50a7d2b2-354d-4a25-9739-65dbe3e64ccb?rule=mo-1600'
   };
   /* Új autók fül: a konfigurátor (/egyedi-auto-rendeles/) adataiból, ugyanazzal az árral és képpel */
-  var PICK_NEW = ['BMW X5', 'Mercedes-Benz GLC Coupé', 'Audi Q5', 'MINI Countryman'];
+  var PICK_NEW = ['MINI Cooper', 'BMW 3-as', 'Audi Q8', 'Mercedes-Benz S-osztály']; /* olcsótól a drágáig — ár szerint rendezve jelenik meg */
   var SALE_TAB = 'new';
   function phone() { var p = (window.CA_CFG && window.CA_CFG.PHONE) || '+36 30 233 6060'; return { txt: p, tel: 'tel:' + String(p).replace(/[^\d+]/g, '') }; }
   var ICON = {
@@ -435,8 +437,8 @@
       return { isNewCar: true, t: nm, img: g(o, 'img') || ('/bmw/' + key + '.webp?v=6'), logo: LOGO[brand] || '',
         href: '/egyedi-auto-rendeles/' + (g(o, 'slug') || (key + '-' + (FS[fuel] || 'benzin'))) + '/',
         sp: [g(o, 'body'), 'Automata', fuel].filter(Boolean).join(' · '),
-        ft: Math.round(net * R).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft' };
-    }).filter(Boolean);
+        huf: Math.round(net * R), ft: Math.round(net * R).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft' };
+    }).filter(Boolean).sort(function (a, b) { return a.huf - b.huf; });
   }
   var LK = { 'VW': 'vw', 'BMW': 'bmw', 'Audi': 'audi', 'Mercedes-Benz': 'mercedes', 'MINI': 'mini', 'Hyundai': 'hyundai', 'CUPRA': 'cupra', 'Kia': 'kia', 'MAN': 'man', 'Seat': 'seat', 'Volvo': 'volvo' };
   /* márka -> kis logó (ugyanaz, mint a bérelhető kártyákon); ha nincs logófájl, a márka neve jelenik meg */
@@ -585,7 +587,7 @@
       : '<strong>' + esc(PER[LANG][0] + c.ft) + '</strong><em>' + tx('nettó') + '</em>';
     return '<a class="mm-car mm-new" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + c.img + '\')"></div><div class="mm-cb">' +
       '<div class="mm-meta">' + (c.logo ? '<img src="' + c.logo + '" alt="" width="40" height="18">' : '') + '<span>2026 · ' + tx('Németország') + '</span></div>' +
-      '<b>' + esc(c.t) + '</b><span class="mm-sp">' + esc(tSpec(c.sp)) + '</span><div class="mm-pr">' + pr + '</div></div></a>';
+      '<b>' + tx(c.t) + '</b><span class="mm-sp">' + esc(tSpec(c.sp)) + '</span><div class="mm-pr">' + pr + '</div></div></a>';
   }
   function carsHtml(p) {
     var sale = p.cars === 'sale', isNw = sale && SALE_TAB === 'new';
