@@ -629,7 +629,7 @@
       btn.addEventListener('keydown', function (e) { if (!desktop()) return; if (e.key === 'ArrowDown') { e.preventDefault(); open(i); var a = panel.querySelector('a'); if (a) a.focus(); } });
     });
     panel.addEventListener('mouseenter', function () { clearTimeout(tClose); });
-    panel.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.mm-tab'); if (!b) return; e.preventDefault(); SALE_TAB = b.getAttribute('data-tab'); refresh(); var nb = panel.querySelector('.mm-tab[data-tab="' + SALE_TAB + '"]'); if (nb) nb.focus(); });
+    panel.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.mm-tab'); if (!b) return; e.preventDefault(); e.stopPropagation(); SALE_TAB = b.getAttribute('data-tab'); refresh(); var nb = panel.querySelector('.mm-tab[data-tab="' + SALE_TAB + '"]'); if (nb) nb.focus(); });
     panel.addEventListener('mouseleave', closeSoon);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel.classList.contains('open')) { var b = items[cur] && items[cur].querySelector('.navlink'); close(); if (b) b.focus(); } });
     document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
