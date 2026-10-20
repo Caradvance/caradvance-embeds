@@ -126,7 +126,7 @@
       if (kind === 'rent') { var rp = a.querySelector('.rentprices .rp b span'); ft = txt(rp).replace(/^≈\s*/, ''); sub = txt(a.querySelector('.rentprices .rp span')) || '2 000 km / hó'; }
       else { ft = txt(a.querySelector('.pricerow .price')); }
       var tt = txt(a.querySelector('.title'));
-      return { href: href, t: tt, sp: [km(parts[0]), parts[parts.length - 1]].filter(Boolean).join(' · '), yr: [txt(a.querySelector('.cond')), txt(a.querySelector('.year'))].filter(Boolean).join(' · '), brand: a.getAttribute('data-marka') || tt, img: im ? im.getAttribute('src') : '', ft: /Ft/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
+      return { href: href, t: tt, sp: sp, yr: [txt(a.querySelector('.cond')), txt(a.querySelector('.year'))].filter(Boolean).join(' · '), brand: a.getAttribute('data-marka') || tt, img: im ? im.getAttribute('src') : '', ft: /Ft/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
     });
   }
   var LK = { 'VW': 'vw', 'BMW': 'bmw', 'Audi': 'audi', 'Mercedes-Benz': 'mercedes', 'MINI': 'mini', 'Hyundai': 'hyundai', 'CUPRA': 'cupra', 'Kia': 'kia', 'MAN': 'man', 'Seat': 'seat', 'Volvo': 'volvo' };
@@ -203,7 +203,7 @@
           DATA.biz = cars.slice(0, 4).map(function (c) {
             var huf = Number(c.huf) || (BIZ.ftOf ? BIZ.ftOf(c.eur) : 0);
             var slug = BIZ.slugify ? BIZ.slugify(c.modell) : '';
-            var sp = [c.km, c.uzemanyag].filter(Boolean).join(' · ');
+            var sp = [String(c.evjarat || '').split('/').pop(), c.km, c.uzemanyag].filter(Boolean).join(' · ');
             return { href: '/auto/' + slug + '/?biz=1', t: c.modell, sp: sp, yr: ['Használt', c.evjarat].filter(Boolean).join(' · '), brand: c.marka || c.modell, img: c.img, ft: huf ? (BIZ.fmtFt ? BIZ.fmtFt(huf) : Math.round(huf).toLocaleString('hu-HU')) + (BIZ.fmtFt && /Ft/.test(BIZ.fmtFt(1)) ? '' : '\u00a0Ft') : '' };
           });
           DATA.bizN = cars.length; cb();
@@ -246,7 +246,7 @@
     var price = np ? '<strong>Ajánlatot kérek</strong>'
       : kind === 'rent' ? '<strong>' + esc(c.ft) + '/hó</strong><em>' + esc(c.sub.replace(/\s*\/\s*/, '/')) + '</em>'
       : '<strong>' + esc(c.ft) + '</strong>' + (kind === 'sale' ? '<em>nettó</em>' : kind === 'biz' ? '<em>bruttó</em>' : '');
-    return '<a class="mm-car" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')"></div><div class="mm-cb">' + metaHtml(c.brand || c.t, c.yr) + '<b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
+    return '<a class="mm-car" href="' + esc(c.href) + '"><div class="mm-ph" style="background-image:url(\'' + thumb(c.img).replace(/'/g, '%27') + '\')"></div><div class="mm-cb"><b>' + esc(shortName(c.t)) + '</b><span class="mm-sp">' + esc(c.sp) + '</span><div class="mm-pr">' + price + '</div></div></a>';
   }
   function carsHtml(p) {
     var list = DATA[p.cars];
