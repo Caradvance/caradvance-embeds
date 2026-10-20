@@ -109,7 +109,7 @@
     '.mm-sold .mm-pr strong{color:#0B0B0D}' +
     '.mm-ngo{display:flex;align-items:center;gap:8px;margin-top:10px;padding:7px 9px;border-radius:11px;background:#F4F7FB;border:1px solid #E6EAF1}' +
     '.mm-ngo img{width:26px;height:26px;object-fit:contain;border-radius:6px;background:#fff;flex-shrink:0}' +
-    '.mm-ngo span{font-size:11.5px;font-weight:700;line-height:1.25;color:#0B0B0D;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}' +
+    '.mm-ngo span{font-size:11.5px;font-weight:700;line-height:1.25;color:#0B0B0D;white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}' +
     '.mm-ngo em{display:block;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a94a6}' +
     '.mm-meta .mm-bt{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0B0B0D;line-height:24px;height:24px;white-space:nowrap}' +
     '.mm-all{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#E2001A;text-decoration:none;margin:8px 0 0 12px}';
