@@ -633,7 +633,7 @@
     panel.addEventListener('mouseleave', closeSoon);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel.classList.contains('open')) { var b = items[cur] && items[cur].querySelector('.navlink'); close(); if (b) b.focus(); } });
     document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
-    panel.addEventListener('focusout', function (e) { if (!panel.contains(e.relatedTarget) && !wrap.querySelector('.menu').contains(e.relatedTarget)) close(); });
+    panel.addEventListener('focusout', function (e) { if (e.relatedTarget && !panel.contains(e.relatedTarget) && !wrap.querySelector('.menu').contains(e.relatedTarget)) close(); });
     var mq = window.matchMedia('(min-width:' + MIN_W + 'px)');
     if (mq.addEventListener) mq.addEventListener('change', sync); else if (mq.addListener) mq.addListener(sync);
     window.addEventListener('resize', sync); sync();
