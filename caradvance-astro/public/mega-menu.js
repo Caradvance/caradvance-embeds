@@ -343,7 +343,7 @@
   function txt(el) { return el ? el.textContent.replace(/ /g, ' ').replace(/\s+/g, ' ').trim() : ''; }
   function km(s) { var n = String(s || '').replace(/\D/g, ''); return n ? n.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' km' : ''; }
   /* Az /autoink/ oldalon látható autók (ugyanaz a sorrend, kép és forintár), az oldal HTML-jéből. */
-  function parseCards(doc, sel, kind) {
+  function parseCards(doc, sel, kind, rate) {
     return [].slice.call(doc.querySelectorAll(sel)).slice(0, 4).map(function (a) {
       var href = (a.getAttribute('href') || ''); try { var u = new URL(href, location.origin + SRC.autoink); href = u.pathname + u.search + u.hash; } catch (e) { href = href.replace(/^(\.\.\/)+/, '/').replace(/^([^/])/, '/$1'); }
       var im = a.querySelector('.media img');
@@ -352,7 +352,12 @@
       var sp = [year, km(parts[0]), parts[parts.length - 1]].filter(Boolean).join(' · ');
       var ft = '', sub = '';
       if (kind === 'rent') { var rp = a.querySelector('.rentprices .rp b span'); ft = txt(rp).replace(/^≈\s*/, ''); sub = txt(a.querySelector('.rentprices .rp span')) || '2 000 km / hó'; }
-      else { ft = txt(a.querySelector('.pricerow .price')); }
+      else {
+        ft = txt(a.querySelector('.pricerow .price'));
+        /* ugyanúgy számolva, mint az /autoink/ oldal: a forintár az euróárból, az élő árfolyammal (Math.round), 10 000-re felfelé */
+        var pe = a.querySelector('.pricerow[data-eur]'), eu = pe ? +pe.getAttribute('data-eur') : 0;
+        if (eu > 0 && rate > 0) ft = (Math.ceil(eu * Math.round(rate) / 10000) * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Ft';
+      }
       var tt = txt(a.querySelector('.title'));
       return { href: href, t: tt, sp: sp, yr: [txt(a.querySelector('.cond')), txt(a.querySelector('.year'))].filter(Boolean).join(' · '), brand: a.getAttribute('data-marka') || tt, img: im ? im.getAttribute('src') : '', ft: /Ft|€|Kč/.test(ft) ? ft : '', sub: sub, feat: !!a.querySelector('.feat') };
     });
@@ -462,7 +467,7 @@
       var html = res[0], rate = res[1];
       var doc = new DOMParser().parseFromString(html, 'text/html');
       try { DATA.rent = parseSub(doc, rate); } catch (e) { DATA.rent = parseCards(doc, '#panel-berelheto a.card', 'rent'); }
-      DATA.sale = parseCards(doc, '#grid a.card', 'sale');
+      DATA.sale = parseCards(doc, '#grid a.card', 'sale', rate);
       [].slice.call(doc.querySelectorAll('.autok-tab')).forEach(function (b) {
         var m = /\((\d+)\)/.exec(b.textContent || ''); if (!m) return;
         if (/Bérelhető|prenájom|pronájm/i.test(b.textContent)) { if (!DATA.rentN) DATA.rentN = +m[1]; } else if (/Eladó autók|na predaj|na prodej/i.test(b.textContent)) DATA.saleN = +m[1];
