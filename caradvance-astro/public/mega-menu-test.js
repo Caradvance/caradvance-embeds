@@ -110,6 +110,10 @@
     '.mm-single .mm-ph{background:#222 center/cover no-repeat}.mm-single .mm-ct{padding:22px 22px;display:flex;flex-direction:column;justify-content:center}' +
     '.mm-single b{font-size:20px;line-height:1.25}.mm-single span{display:block;font-size:14px;color:#C9CFDA;margin:8px 0 16px}' +
     '.mm-schip svg{width:22px;height:22px;flex-shrink:0;display:block}' +
+    '.mm-ngos-w{margin-bottom:18px}.mm-ngos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 8px}' +
+    '.mm-ng{display:flex;align-items:center;gap:12px;padding:7px 10px;border-radius:14px;text-decoration:none;color:#14151A;font-weight:700;font-size:13.5px;line-height:1.25}' +
+    '.mm-ng:hover{background:#F4F7FB}.mm-ng img{width:40px;height:30px;object-fit:contain;flex:none}' +
+    '.mm-ng-more{color:#E2001A;gap:6px}' +
     '.mm-frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,2.3fr);gap:14px;align-items:stretch}' +
     '.mm-frow .mm-single{min-height:200px}.mm-frow .mm-single b{font-size:18px}.mm-frow .mm-single .mm-ct{padding:18px 20px}' +
     '.mm-mini{display:flex;flex-direction:column;justify-content:space-between;gap:10px;border:1px solid #E6EAF1;background:#F7F9FC;border-radius:20px;padding:18px;text-decoration:none;color:#14151A;transition:border-color .15s,box-shadow .15s,transform .15s}' +
@@ -240,6 +244,7 @@
           var sold = (all || []).filter(function (c) { return SOLD[slugOf(c)]; })
             .sort(function (a, b) { return (SOLD[slugOf(b)].date || '').localeCompare(SOLD[slugOf(a)].date || ''); });
           var P = BIZ.PROJECTS || {};
+          DATA.ngos = (BIZ.ORDER || Object.keys(P)).map(function (k) { return P[k]; }).filter(Boolean);
           DATA.biz = active.concat(sold).slice(0, 4).map(function (c) {
             var slug = slugOf(c), so = SOLD[slug];
             var huf = Number(c.huf) || S.ov[slug] || (BIZ.ftOf ? BIZ.ftOf(c.eur) : 0);
@@ -303,7 +308,14 @@
       : list.map(function (c) { return carCard(c, p.cars); }).join('') +
         (p.cars === 'biz' && list.length < 4 ? '<a class="mm-car mm-cta" href="/eladom/"><div class="mm-cb"><span class="mm-ic2">' + svg('cash', 28) + '</span><b>Add el nálunk az autód</b><span class="mm-sp" style="white-space:normal">Ingyenes értékbecslés, hirdetés, bemutatás és papírmunka – mi intézzük.</span><span class="mm-btn" style="margin-top:12px">Értékbecslést kérek ' + svg('arrow', 15) + '</span></div></a>' : '');
     var n = p.cars === 'rent' ? DATA.rentN : p.cars === 'biz' ? DATA.bizN : DATA.saleN;
-    return '<div><div class="mm-rowhead"><p class="mm-h">' + esc(p.ct) + '</p><a class="mm-more" href="' + p.callHref + '">' + esc(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a></div><div class="mm-cars">' + body + '</div></div>';
+    var ng = '';
+    if (p.cars === 'biz') {
+      ng = '<div class="mm-ngos-w"><p class="mm-h"><a href="/jotekonysag/">Akiket támogatunk ›</a></p><div class="mm-ngos">' +
+        (DATA.ngos ? DATA.ngos.map(function (o) { return '<a class="mm-ng" href="/jotekonysag/"><img src="' + esc(o.logo) + '" alt="" width="40" height="30">' + esc(o.name) + '</a>'; }).join('') +
+          '<a class="mm-ng mm-ng-more" href="/jotekonysag/">Így működik ' + svg('arrow', 15) + '</a>'
+        : '<div class="mm-sk" style="aspect-ratio:auto;height:44px"></div><div class="mm-sk" style="aspect-ratio:auto;height:44px"></div><div class="mm-sk" style="aspect-ratio:auto;height:44px"></div><div class="mm-sk" style="aspect-ratio:auto;height:44px"></div>') + '</div></div>';
+    }
+    return ng + '<div><div class="mm-rowhead"><p class="mm-h">' + esc(p.ct) + '</p><a class="mm-more" href="' + p.callHref + '">' + esc(p.call) + (n ? ' (' + n + ')' : '') + ' ' + svg('arrow', 15) + '</a></div><div class="mm-cars">' + body + '</div></div>';
   }
   function panelHtml(p) {
     var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">Menü</p>' +
