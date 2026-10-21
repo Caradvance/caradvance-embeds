@@ -618,8 +618,9 @@ const _rebuild='rebuild-nudge-3';
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
   // képlapozó a kártyán (görgetés + nyilak + pöttyök, mint a bérlési kártyákon)
   var GAL = window.CA_GAL || {};
-  function galHtml(c, img){
-    var first = '<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>', g = GAL[c.slug] || [];
+  function galHtml(c, img, href){
+    var hs = String(href || '').replace(/^.*\/egyedi-auto-rendeles\//, '').replace(/[\/?#].*$/, '');
+    var first = '<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>', g = GAL[c.slug] || GAL[hs] || [];
     if(!g.length) return first;
     var s = '<div class="egl-gal"><div class="egl-slide egl-slide0">'+first+'</div>';
     for(var i=0;i<g.length;i++) s += '<div class="egl-slide"><img class="egl-gimg" data-src="'+g[i]+'" alt="'+c.name+' – fotó '+(i+2)+'"/></div>';
@@ -681,7 +682,7 @@ const _rebuild='rebuild-nudge-3';
     }
     a.innerHTML =
       '<a class="egl-clink" href="'+href+'">'+
-        '<div class="egl-media">'+newBadge+(hasDisc ? '<span class="egl-disc'+(newBadge?' egl-disc2':'')+'">−'+dpct(c)+'%</span>' : '')+galHtml(c, img)+'</div>'+
+        '<div class="egl-media">'+newBadge+(hasDisc ? '<span class="egl-disc'+(newBadge?' egl-disc2':'')+'">−'+dpct(c)+'%</span>' : '')+galHtml(c, img, href)+'</div>'+
         '<div class="egl-body">'+
           '<div class="egl-meta"><span class="egl-brand">'+logoHtml+'</span><span class="egl-year">2026 · Németország</span></div>'+
           '<div class="egl-name">'+c.name+'</div>'+
