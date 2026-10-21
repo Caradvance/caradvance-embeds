@@ -372,7 +372,7 @@ const _rebuild='rebuild-nudge-3';
   .egl-was0{font-size:14px;font-weight:600;color:#8a94a6;text-decoration-thickness:1.5px;white-space:nowrap;}
   .egl-npill{background:#E4ECFA;color:#1e40af;font-size:13px;font-weight:800;padding:6px 18px;border-radius:999px;}
   .egl-pbox .egl-price,.egl-card-mini .egl-pbox .egl-price{margin:0;align-items:baseline;}
-  .egl-pbox .egl-price b{font-size:27px;letter-spacing:-.01em;}
+  .egl-pbox .egl-price b{font-size:27px;letter-spacing:-.01em;color:#E2001A;}
   .egl-pbox .egl-price .tol{font-size:15px;font-weight:700;}
   .egl-eur{font-size:14px;font-weight:700;color:var(--muted);margin-top:2px;}
   .egl-save{display:flex;align-items:center;gap:8px;border-top:1px solid #E6EAF1;margin-top:10px;padding-top:9px;font-size:13.5px;font-weight:600;color:var(--muted);}
@@ -386,7 +386,7 @@ const _rebuild='rebuild-nudge-3';
 <script is:inline>
 (function(){
   var FX = 361;
-  var HUF = function(eur){ return new Intl.NumberFormat('hu-HU').format(Math.round(eur*FX)) + ' Ft'; };
+  var HUF = function(eur){ return new Intl.NumberFormat('hu-HU').format(Math.round(eur*FX/10000)*10000) + ' Ft'; }; // kerek ár: 10 000 Ft-ra kerekítve
   var EUR = function(eur){ return new Intl.NumberFormat('de-DE').format(eur) + ' €'; };
   var net = function(g){ return Math.round(g/1.19); };
   // CarAdvance-kedvezmény (src/data/discounts.ts → window.CA_DISC): a kártyán a kedvezményes nettó ár, áthúzva a listaár, a képen "−X%" jelvény
@@ -561,7 +561,7 @@ const _rebuild='rebuild-nudge-3';
 
   var NEW=['bmw-ix5','bmw-i7','bmw-i3','bmw-7-es','ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel','m4-benzin'];
   function slug(c){ return c.slug || (c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel])); }
-  function specLine(c){ return c.body + ' · Automata · ' + c.fuel; }
+  function specLine(c){ return c.body; }
   function att(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
   function card(c){
@@ -609,7 +609,7 @@ const _rebuild='rebuild-nudge-3';
         '<div class="egl-ptop">'+(hasDisc ? '<s class="egl-was0">'+HUF(ln)+'</s>' : '<span></span>')+'<span class="egl-npill">nettó</span></div>'+
         '<div class="egl-price"><b>'+HUF(dn)+'</b><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span></div>'+
         '<div class="egl-eur">'+EUR(dn)+' · <span>nettó</span></div>'+
-        '<div class="egl-save"'+(hasDisc ? '' : ' style="visibility:hidden" aria-hidden="true"')+'><span>Megtakarítás</span><b>'+(hasDisc ? HUF(ln - dn) : '&nbsp;')+'</b>'+(hasDisc ? '<span class="egl-save-p">−'+dpct(c)+'%</span>' : '')+'</div>'+
+        '<div class="egl-save"'+(hasDisc ? '' : ' style="visibility:hidden" aria-hidden="true"')+'><span>Megtakarítás</span><b>'+(hasDisc ? new Intl.NumberFormat('hu-HU').format(Math.round(ln*FX/10000)*10000 - Math.round(dn*FX/10000)*10000) + ' Ft' : '&nbsp;')+'</b>'+(hasDisc ? '<span class="egl-save-p">−'+dpct(c)+'%</span>' : '')+'</div>'+
       '</div>';
     }
     a.innerHTML =
