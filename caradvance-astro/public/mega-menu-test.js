@@ -439,10 +439,10 @@
       var o = objs.filter(function (x) { return g(x, 'name') === nm && !/hide:true/.test(x); })[0]; if (!o) return null;
       var brand = g(o, 'brand') || 'BMW', key = g(o, 'key'), fuel = g(o, 'fuel'), from = +((/from:(\d+)/.exec(o) || [])[1] || 0);
       var list = Math.round(from / 1.19), d = DISC[nm] || 0, net = d ? Math.round(list * (1 - d / 100)) : list;
-      return { isNewCar: true, disc: d, was: d ? fmt(Math.round(list * R)) : '', t: nm, img: g(o, 'img') || ('/bmw/' + key + '.webp?v=6'), logo: LOGO[brand] || '',
+      return { isNewCar: true, disc: d, was: d ? fmt(Math.round(list * R / 10000) * 10000) : '', t: nm, img: g(o, 'img') || ('/bmw/' + key + '.webp?v=6'), logo: LOGO[brand] || '',
         href: '/egyedi-auto-rendeles/' + (g(o, 'slug') || (key + '-' + (FS[fuel] || 'benzin'))) + '/',
-        sp: [g(o, 'body'), 'Automata', fuel].filter(Boolean).join(' · '),
-        huf: Math.round(net * R), ft: fmt(Math.round(net * R)) };
+        sp: g(o, 'body'),
+        huf: Math.round(net * R), ft: fmt(Math.round(net * R / 10000) * 10000) }; /* kerek ár, mint a konfigurátor kártyáján */
     }).filter(Boolean).sort(function (a, b) { return a.huf - b.huf; });
   }
   var LK = { 'VW': 'vw', 'BMW': 'bmw', 'Audi': 'audi', 'Mercedes-Benz': 'mercedes', 'MINI': 'mini', 'Hyundai': 'hyundai', 'CUPRA': 'cupra', 'Kia': 'kia', 'MAN': 'man', 'Seat': 'seat', 'Volvo': 'volvo' };
