@@ -137,6 +137,7 @@
     'Összes új autó': ['All new cars', 'Alle Neuwagen', 'Toutes les voitures neuves', 'Усі нові авто', '全部新车', 'Všetky nové autá', 'Všechny nové vozy'],
     'BMW 3-as': ['BMW 3 Series', 'BMW 3er', 'BMW Série 3', 'BMW 3 Series', 'BMW 3系', 'BMW rad 3', 'BMW řada 3'],
     'Mercedes-Benz S-osztály': ['Mercedes-Benz S-Class', 'Mercedes-Benz S-Klasse', 'Mercedes-Benz Classe S', 'Mercedes-Benz S-Class', '梅赛德斯-奔驰 S级', 'Mercedes-Benz Trieda S', 'Mercedes-Benz Třída S'],
+    'Összes': ['All', 'Alle', 'Tous', 'Усі', '全部', 'Všetky', 'Všechny'],
     'Németország': ['Germany', 'Deutschland', 'Allemagne', 'Німеччина', '德国', 'Nemecko', 'Německo']
   };
   function t(s) { if (!LI) return s; var r = TR[s]; return (r && r[LI - 1]) || s; }
@@ -240,6 +241,7 @@
     phone: '<path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5-2.5l5 2v4a2 2 0 0 1-2 2a16 16 0 0 1-15-15a2 2 0 0 1 2-2"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
     pin: '<circle cx="12" cy="11" r="3"/><path d="M17.66 16.66l-4.24 4.24a2 2 0 0 1-2.83 0l-4.25-4.24a8 8 0 1 1 11.32 0z"/>',
+    grid: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
     arrow: '<path d="M5 12h14M13 18l6-6M13 6l6 6"/>'
   };
   function svg(n, s) { return '<svg class="mm-ic" width="' + (s || 20) + '" height="' + (s || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON[n] || '') + '</svg>'; }
@@ -252,7 +254,7 @@
     { brands: RENT_BRANDS, bt: 'Bérelhető autóink', bhref: '/autoink/#berelheto', bcols: 6, cars: 'rent', ct: 'Kiemelt bérelhető autók', call: 'Összes bérelhető autó', callHref: '/autoink/#berelheto',
       links: [['info', 'Mi a tartós bérlet?', '/tartos-berlet/', 'Minden benne van egy havi díjban'], ['compare', 'Autók összehasonlítása', '/auto-osszehasonlitas/', 'Akár 3 modell egymás mellett'], ['route', 'Bérlési folyamat', '/berlesi-folyamat/', 'Lépésről lépésre az átadásig'], ['shield', 'Feltételek és kaució', '/berlesi-feltetelek/', 'Önrész, km-keret, kaució'], ['star', 'Előnyök', '/berles-elonyei/', 'Miért éri meg bérelni?'], ['help', 'Gyakori kérdések', '/berles-gyakori-kerdesek/', 'Válaszok a gyakori kérdésekre']],
       f: { img: '/piros-bmw-x6-m-premium-autoberles.webp', t: 'Prémium autó, egy havi díjért', s: 'Szerviz, gumi, biztosítás és adó a díjban.', cta: 'Bérelhető autóink', href: '/autoink/#berelheto' } },
-    { brands: BUY_BRANDS, bt: 'Egyedi autó rendelés', bhref: '/egyedi-auto-rendeles/', bcols: 4, cars: 'sale', ct: 'Kiemelt eladó autók', call: 'Összes eladó autó', callHref: '/autoink/',
+    { brands: BUY_BRANDS, bt: 'Egyedi autó rendelés', bhref: '/egyedi-auto-rendeles/', bcols: 5, cars: 'sale', ct: 'Kiemelt eladó autók', call: 'Összes eladó autó', callHref: '/autoink/',
       links: [['store', 'Autóink', '/autoink/', 'Ellenőrzött autók Németországból'], ['coin', 'Finanszírozás – lízing', '/finanszirozas-lizing/', 'Havi részlet kiszámolása'], ['briefcase', 'Operatív lízing', '/operativ-lizing/', 'Cégeknek, nettó áron'], ['star', 'Előnyök', '/vasarlas-elonyei/', 'Miért vásárolj tőlünk?'], ['help', 'Gyakori kérdések', '/vasarlas-gyakori-kerdesek/', 'Áfa, garancia, átadás']],
       f: { img: '/bmw-m3-touring-premium-auto-eladas.webp', t: 'Konfiguráld, mi beszerezzük', s: 'BMW, MINI, Mercedes és Audi – gyári konfigurátorral.', cta: 'Egyedi rendelés', href: '/egyedi-auto-rendeles/' } },
     { cars: 'biz', ct: 'Bizományos autóink', call: 'Összes bizományos autó', callHref: '/bizomanyos/',
@@ -346,6 +348,7 @@
     '.mm-pane .mm-car:not(.mm-new){display:flex;flex-direction:column}.mm-pane .mm-car:not(.mm-new) .mm-cb{flex:1;display:flex;flex-direction:column;justify-content:center;padding-top:14px;padding-bottom:16px}' +
     '.mm-phw{position:relative}.mm-dsc{position:absolute;left:12px;top:10px;z-index:2;background:#E2001A;color:#fff;font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.02em;box-shadow:0 2px 8px rgba(0,0,0,.18)}' +
     '.mm-car .mm-was{display:block;font-size:12px;font-weight:600;color:#8a94a6;margin-top:6px;line-height:1.2}.mm-was s{text-decoration-thickness:1.5px}' +
+    '.mm-ballic{width:46px;height:30px;display:flex;align-items:center;justify-content:center;flex:none;color:#0B0B0D}.mm-ball:hover .mm-ballic{color:#E2001A}' +
     '.mm-panes{display:grid}.mm-panes>.mm-pane{grid-area:1/1}.mm-pane.off{visibility:hidden;pointer-events:none}.mm-mores{justify-items:end}' +
     '.mm-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.mm-meta img{height:24px;width:46px;object-fit:contain;object-position:left center}.mm-meta span{font-size:12px;color:#7A8496}' +
     '.mm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.mm-av,.mm-fu{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:7px;padding:3px 8px;line-height:1.3}.mm-av{background:#64748b}.mm-av.now{background:#15803D}' +
@@ -631,6 +634,8 @@
       p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
     if (p.brands) {
       h += '<div><p class="mm-h"><a href="' + p.bhref + '">' + tx(p.bt) + ' ›</a></p><div class="mm-brands" style="grid-template-columns:repeat(' + p.bcols + ',minmax(0,1fr))">' +
+        /* első csempe: "Összes" — az összes autó (bérlés: /autoink/#berelheto, vásárlás: /egyedi-auto-rendeles/) */
+        '<a class="mm-b mm-ball" href="' + p.bhref + '"><span class="mm-ballic">' + svg('grid', 22) + '</span>' + tx('Összes') + '</a>' +
         p.brands.map(function (b) { return '<a class="mm-b" href="' + b.href + '"><img src="/bl-' + b.k + '-dark.webp" alt="" width="46" height="30">' + esc(b.n) + '</a>'; }).join('') + '</div></div>';
     }
     if (p.cars) h += '<div class="mm-carswrap">' + carsHtml(p) + '</div>';
