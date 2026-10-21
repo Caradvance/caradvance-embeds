@@ -32,14 +32,14 @@ cs:{pill:'+19 % DPH',net:'netto',gross:'brutto',co:'Firma',priv:'Soukromě',vatI
 var L=T[LG];if(!L)return;var N='([\\d\\s.,\\u00a0\\u202f]+)';
 function f(t){return function(){var a=arguments;return t.replace(/\$(\d)/g,function(_,i){return String(a[+i]).trim();});};}
 var R=[
-[new RegExp('A forintár a napi árfolyammal számolt \\(1 € = '+N+' Ft\\)\\.','g'),f(L.fx)],
+[new RegExp('A forintár a napi árfolyammal számolt(?: \\(1\\s*€ = '+N+'\\s*(Ft|Kč)\\))?\\.','g'),function(m,n,u){return u==='Ft'?L.fx.replace('$1',String(n).trim()):'';}], /* .sk/.cz: az árfolyam-mondat (vagy a csonka/átváltott változata) kimarad — ott az árak már euróban/koronában vannak */
 [new RegExp('A feltüntetett ár nettó havidíj: '+N+' €\\/hó \\+ áfa \\(cégeknek\\)\\.','g'),f(L.netCo)],
 [new RegExp('A feltüntetett ár nettó havidíj: '+N+' €\\/hó\\.','g'),f(L.netM)],
 [/Magánszemélyként erre jön a 19% német áfa — a fenti összeg már ezzel számolt\./g,f(L.privIncl)],
 [/Magánszemélyként erre jön a 19% német áfa\./g,f(L.privAdd)],
 [/Cégként erre jön az áfa\./g,f(L.coVat)],
 [/A „-tól” a legkedvezőbb felszereltségre vonatkozik\./g,f(L.fromNote)],
-[new RegExp('A kaució \\('+N+' Ft \\/ '+N+' €-tól\\) a bérlés végén hiánytalanul visszajár, amennyiben nincs sérülés, közlekedési bírság vagy egyéb, a bérlőnek felróható levonás\\.','g'),f(L.dep)],
+[new RegExp('A kaució \\('+N+'\\s*(Ft|€|Kč) \\/ '+N+' €-tól\\) a bérlés végén hiánytalanul visszajár, amennyiben nincs sérülés, közlekedési bírság vagy egyéb, a bérlőnek felróható levonás\\.','g'),function(m,a,u,b){var s=L.dep;if(u!=='Ft')s=s.replace(/\$1\s*Ft\s*\/\s*/,'');return s.replace('$1',String(a).trim()).replace('$2',String(b).trim());}], /* .sk/.cz: a forintösszeg már átváltva érkezik */
 [/Így működik a bérlési folyamat →/g,f(L.how)],[/A képek illusztrációk\./g,f(L.illus)],
 [/\+19% német áfa\b/g,f('+'+L.vat19)],[/19% német áfával/g,f(L.vatIncl)],[/nettó ár/g,f(L.netPrice)],
 [/\+ áfa/g,f('+ '+L.vatW)],[/\/hó -tól/g,f(L.pmFrom)],[/\/hó(?![a-zA-Záéíóöőúüű])/g,f(L.pm)],
