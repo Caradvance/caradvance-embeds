@@ -436,10 +436,13 @@ const _rebuild='rebuild-nudge-3';
   var DISC = window.CA_DISC || {};
   // ár megjelenítése: 'p' = Magán (bruttó, 19% német áfa) — alapértelmezett; 'c' = Cég (nettó). Ugyanaz a kulcs, mint a bérlési kártyákon (ca_bt).
   var BT = (function(){ try { return localStorage.getItem('ca_bt') === 'c' ? 'c' : 'p'; } catch(e){ return 'p'; } })();
+  // .sk oldalon (euró) az árat közvetlenül euróban mutatjuk (nem a forintból visszaváltva), így nincs két eltérő €-összeg
+  var EURDOM = /(^|\.)caradvance\.sk$/i.test(location.hostname);
+  function EURS(e){ return new Intl.NumberFormat('hu-HU').format(Math.round(e)) + ' €'; }
   var EGLROOT = document.querySelector('section.egl') || document.documentElement; EGLROOT.setAttribute('data-bt', BT);
   var dpct = function(c){ return DISC[c.name] || 0; };
   var dnet = function(c){ var n = net(c.from), p = dpct(c); return p ? Math.round(n * (1 - p / 100)) : n; };
-  var SOON = ['bmw-ix5','bmw-i3','q9-benzin','ix5-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','7erb-dizel'];
+  var SOON = ['bmw-ix5','bmw-i3','q9-benzin','ix5-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','7erb-dizel','x5-dizel','x5-benzin']; // x5: az új BMW X5 (G65) hivatalos ára még nincs → Hamarosan
   var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
 
   var MINIS = [
@@ -670,12 +673,12 @@ const _rebuild='rebuild-nudge-3';
     } else {
       // Magán (B2C, 19% német áfával) / Cég (B2B, nettó): mindkét ár a kártyán van, a váltás csak CSS (section.egl[data-bt]) — nincs újrarajzolás, nem ugrik az oldal
       var dn = dnet(c), ln = net(c.from), r10 = function(e){ return Math.round(e*FX/10000)*10000; };
-      var info = '<span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak élő árfolyammal számolva (1&nbsp;€ = '+FX+'&nbsp;Ft). Cég: nettó ár, áfa nélkül. Magán: a nettó árra 19% német áfa jön. A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
-      var blk = function(mul, lbl, tag){ var dv = dn * mul, lv = ln * mul; return '<div class="egl-m'+tag+'">'+
-        '<div class="egl-wasl">'+(hasDisc ? '<s>'+HUF(lv)+'</s>' : '&nbsp;')+'</div>'+
-        '<div class="egl-price"><b>'+HUF(dv)+'</b><span class="tol">-tól</span>'+info+'</div>'+
-        '<div class="egl-eur">'+EUR(Math.round(dv))+' · <span>'+lbl+'</span></div>'+
-        '<div class="egl-save"'+(hasDisc ? '' : ' style="visibility:hidden" aria-hidden="true"')+'><span>Megtakarítás</span><b>'+(hasDisc ? new Intl.NumberFormat('hu-HU').format(r10(lv) - r10(dv)) + ' Ft' : '&nbsp;')+'</b>'+(hasDisc ? '<span class="egl-save-p">−'+dpct(c)+'%</span>' : '')+'</div></div>'; };
+      var info = '<span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak élő árfolyammal számolva'+(EURDOM ? '' : ' (1&nbsp;€ = '+FX+'&nbsp;Ft)')+'. Cég: nettó ár, áfa nélkül. Magán: a nettó árra 19% német áfa jön. A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
+      var blk = function(mul, lbl, tag){ var dv = dn * mul, lv = ln * mul, M = EURDOM ? EURS : HUF, sv = EURDOM ? EURS(Math.round(lv) - Math.round(dv)) : new Intl.NumberFormat('hu-HU').format(r10(lv) - r10(dv)) + ' Ft'; return '<div class="egl-m'+tag+'">'+
+        '<div class="egl-wasl">'+(hasDisc ? '<s>'+M(lv)+'</s>' : '&nbsp;')+'</div>'+
+        '<div class="egl-price"><b>'+M(dv)+'</b><span class="tol">-tól</span>'+info+'</div>'+
+        '<div class="egl-eur">'+(EURDOM ? '' : EUR(Math.round(dv))+' · ')+'<span>'+lbl+'</span></div>'+
+        '<div class="egl-save"'+(hasDisc ? '' : ' style="visibility:hidden" aria-hidden="true"')+'><span>Megtakarítás</span><b>'+(hasDisc ? sv : '&nbsp;')+'</b>'+(hasDisc ? '<span class="egl-save-p">−'+dpct(c)+'%</span>' : '')+'</div></div>'; };
       pboxHtml = '<div class="egl-pbox">'+
         '<div class="egl-ptop"><span class="egl-seg" role="group" aria-label="Ár megjelenítése"><span role="button" tabindex="0" data-bt="p">Magán</span><span role="button" tabindex="0" data-bt="c">Cég</span></span><span class="egl-npill"><span class="egl-mp">19% német áfával</span><span class="egl-mc">nettó</span></span></div>'+
         blk(1.19, 'bruttó', 'p') + blk(1, 'nettó', 'c') +
