@@ -378,8 +378,13 @@ const _rebuild='rebuild-nudge-3';
   .egl-save{display:flex;align-items:center;gap:8px;border-top:1px solid #E6EAF1;margin-top:10px;padding-top:9px;font-size:13.5px;font-weight:600;color:var(--muted);}
   .egl-save b{color:#15803D;font-weight:800;}
   .egl-save-p{margin-left:auto;background:#E7F8EE;color:#15803D;font-weight:800;font-size:12.5px;padding:3px 9px;border-radius:999px;}
-  .egl-actions{flex-direction:row;gap:8px;}
-  .egl-actions .egl-btn,.egl-actions .egl-order{flex:1;display:flex;align-items:center;justify-content:center;height:48px;padding:0 8px;}
+  .egl-actions{flex-direction:column;gap:8px;}
+  .egl-arow{display:flex;gap:8px;}
+  .egl-arow>*{flex:1 1 0;min-width:0;}
+  .egl-actions .egl-btn,.egl-actions .egl-order,.egl-cmp{display:flex;align-items:center;justify-content:center;height:48px;padding:0 8px;box-sizing:border-box;}
+  .egl-cmp{gap:6px;background:#eef2f8;color:var(--navy);font-weight:700;font-size:14.5px;border-radius:12px;text-decoration:none;white-space:nowrap;transition:.15s;}
+  .egl-cmp b{font-size:16px;line-height:1;font-weight:700;}
+  .egl-card:hover .egl-cmp,.egl-cmp:hover{background:var(--navy);color:#fff;}
 </style>
 
 <script is:inline set:html={'window.CA_DISC=' + JSON.stringify(DISCOUNTS) + ';'}></script>
@@ -562,6 +567,12 @@ const _rebuild='rebuild-nudge-3';
   var NEW=['bmw-ix5','bmw-i7','bmw-i3','bmw-7-es','ix5-elektromos','ix3-elektromos','i7-elektromos','i7m-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','x5-benzin','x3-benzin','7erb-benzin','x5-dizel','x3m-dizel','7erb-dizel','m4-benzin'];
   function slug(c){ return c.slug || (c.key+'-'+({'Benzin':'benzin','Dízel':'dizel','Hibrid':'hibrid','Elektromos':'elektromos'}[c.fuel])); }
   function specLine(c){ return c.body; }
+  // Összehasonlítás: az /auto-osszehasonlitas oldal modelljei (méret, csomagtartó) — ahol nincs pontos párja, az oldal üresen nyílik
+  var CMP = {'BMW 2-es Active Tourer':'bmw-2-es-active-tourer','BMW 3-as':'bmw-3-as-limuzin','BMW 4-es Coupé':'bmw-4-es-coupe','BMW 4-es Cabrio':'bmw-4-es-cabrio','BMW 4-es Gran Coupé':'bmw-4-es-gran-coupe','BMW 5-ös':'bmw-5-os-limuzin','BMW 5-ös Touring':'bmw-5-os-touring','BMW X1':'bmw-x1','BMW X2':'bmw-x2','BMW X3':'bmw-x3','BMW X6':'bmw-x6',
+    'MINI Cooper':'mini-cooper','MINI Cooper Cabrio':'mini-cooper-cabrio','MINI Countryman':'mini-countryman',
+    'Mercedes-Benz C-osztály':'mercedes-benz-c-osztaly','Mercedes-Benz E-osztály':'mercedes-benz-e-osztaly-limuzin','Mercedes-Benz GLA':'mercedes-benz-gla','Mercedes-Benz GLC':'mercedes-benz-glc','Mercedes-Benz GLC Coupé':'mercedes-benz-glc-coupe','Mercedes-Benz GLE':'mercedes-benz-gle',
+    'Audi A3 Sportback':'audi-a3-sportback','Audi A5 Avant':'audi-a5-avant','Audi A6 Avant':'audi-a6-avant','Audi A6 Avant e-tron':'audi-a6-avant-e-tron','Audi Q3 Sportback':'audi-q3-sportback','Audi Q5 Sportback':'audi-q5-sportback'};
+  function cmpHref(c){ var s = CMP[c.name]; return '/auto-osszehasonlitas/' + (s ? '?a=' + s : ''); }
   function att(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
   function card(c){
@@ -624,7 +635,7 @@ const _rebuild='rebuild-nudge-3';
         '</div>'+
       '</a>'+
       '<div class="egl-actions">'+
-        '<a class="egl-btn" href="'+href+'">Részletek</a>'+
+        '<div class="egl-arow"><a class="egl-btn" href="'+href+'">Részletek</a><a class="egl-cmp" href="'+cmpHref(c)+'"><b>⇄</b>Összehasonlítás</a></div>'+
         '<button class="egl-order" type="button" data-name="'+att(c.name)+'" data-img="'+att(img)+'" data-spec="'+att(specLine(c))+'" data-price="'+att(priceLine)+'" data-fuels="'+att(fuelList.join(','))+'">Autót rendelek</button>'+
       '</div>';
     return a;
