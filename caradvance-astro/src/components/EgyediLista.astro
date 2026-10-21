@@ -1,5 +1,22 @@
 ---
 import { DISCOUNTS } from '../data/discounts';
+import { EGYEDI_CARS } from '../data/egyediCars';
+import { SALE } from '../data/saleContent';
+import { buildSaleModel } from '../data/salePage';
+import { carModels } from '../data/carModels';
+import { withInterior } from '../data/interiorGallery';
+// Kártya-képlapozó (mint a bérlési kártyákon): ugyanazok a fotók, mint a modell Részletek-oldalának galériájában
+// (külső fotók elöl, max. 7 + a kártya fő képe). A fotók csak lapozáskor töltődnek be (data-src).
+const CA_GAL: Record<string, string[]> = {};
+for (const c of EGYEDI_CARS as any[]) {
+  try {
+    const m: any = c.own ? Object.values(carModels).find((x: any) => x && x.slug === c.slug) : (SALE[c.slug] ? buildSaleModel(c, SALE[c.slug]) : null);
+    if (!m) continue;
+    const g = withInterior('/egyedi-auto-rendeles/' + c.slug, m.gallery || [], m.name).map((x: any) => x && x.img).filter((u: any) => typeof u === 'string' && u && u !== c.img);
+    const u = [...new Set(g)].slice(0, 7);
+    if (u.length) CA_GAL[c.slug] = u as string[];
+  } catch (e) {}
+}
 const { lang = 'hu' } = Astro.props;
 const _rebuild='rebuild-nudge-3';
 ---
@@ -258,6 +275,19 @@ const _rebuild='rebuild-nudge-3';
   .egl-card:hover{box-shadow:0 14px 34px rgba(15,27,45,.10);transform:translateY(-3px);z-index:30;}
   .egl-media{position:relative;background:#fff;aspect-ratio:49/26;display:flex;align-items:flex-end;justify-content:center;padding:6px 4px 0;border-radius:20px 20px 0 0;overflow:hidden;}
   .egl-media img{max-width:78%;max-height:88%;width:auto;height:auto;object-fit:contain;margin:0 auto;display:block;}
+  .egl-media .egl-gal{position:absolute;left:0;right:0;top:0;bottom:22px;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;}
+  .egl-media .egl-gal::-webkit-scrollbar{display:none;}
+  .egl-slide{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;background:#fff;}
+  .egl-slide0{padding:6px 4px 0;box-sizing:border-box;}
+  .egl-media .egl-gimg{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;display:block;background:#EEF1F5;}
+  .egl-gbtn{position:absolute;top:calc(50% - 11px);transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.94);box-shadow:0 2px 10px rgba(0,0,0,.18);font-size:22px;line-height:32px;text-align:center;color:#0B0B0D;cursor:pointer;opacity:0;transition:opacity .15s;z-index:5;user-select:none;-webkit-user-select:none;}
+  .egl-gprev{left:10px;}
+  .egl-gnext{right:10px;}
+  .egl-clink:hover .egl-gbtn,.egl-gbtn:focus-visible{opacity:1;}
+  @media (hover:none){.egl-gbtn{opacity:.92;width:30px;height:30px;line-height:28px;font-size:19px;}}
+  .egl-gdots{position:absolute;left:0;right:0;bottom:7px;display:flex;justify-content:center;gap:5px;z-index:5;pointer-events:none;}
+  .egl-gdots i{width:6px;height:6px;border-radius:3px;background:rgba(11,11,13,.28);transition:width .15s,background .15s;}
+  .egl-gdots i.on{background:#E2001A;width:16px;}
   .egl-fuels{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
   .egl-fuel{color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.12);}
   @media (hover:hover){ .egl-fuels{opacity:0;transition:opacity .18s;} .egl-card:hover .egl-fuels{opacity:1;} }
@@ -395,7 +425,7 @@ const _rebuild='rebuild-nudge-3';
   .egl-card:hover .egl-cmp,.egl-cmp:hover{background:var(--navy);color:#fff;}
 </style>
 
-<script is:inline set:html={'window.CA_DISC=' + JSON.stringify(DISCOUNTS) + ';'}></script>
+<script is:inline set:html={'window.CA_DISC=' + JSON.stringify(DISCOUNTS) + ';window.CA_GAL=' + JSON.stringify(CA_GAL) + ';'}></script>
 <script is:inline>
 (function(){
   var FX = 361;
@@ -586,6 +616,16 @@ const _rebuild='rebuild-nudge-3';
   function cmpHref(c){ var s = CMP[c.name]; return '/auto-osszehasonlitas/' + (s ? '?a=' + s : ''); }
   function att(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
+  // képlapozó a kártyán (görgetés + nyilak + pöttyök, mint a bérlési kártyákon)
+  var GAL = window.CA_GAL || {};
+  function galHtml(c, img){
+    var first = '<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>', g = GAL[c.slug] || [];
+    if(!g.length) return first;
+    var s = '<div class="egl-gal"><div class="egl-slide egl-slide0">'+first+'</div>';
+    for(var i=0;i<g.length;i++) s += '<div class="egl-slide"><img class="egl-gimg" data-src="'+g[i]+'" alt="'+c.name+' – fotó '+(i+2)+'"/></div>';
+    return s + '</div><span class="egl-gbtn egl-gprev" role="button" aria-label="Előző kép">‹</span><span class="egl-gbtn egl-gnext" role="button" aria-label="Következő kép">›</span><span class="egl-gdots" aria-hidden="true"><i class="on"></i>'+new Array(g.length+1).join('<i></i>')+'</span>';
+  }
+  function galLoad(gal, i){ for(var j=i;j<=i+1;j++){ var s=gal.children[j], im=s && s.querySelector('img[data-src]'); if(im){ im.src=im.getAttribute('data-src'); im.removeAttribute('data-src'); } } }
   function card(c){
     var isMini = (c.brand==='MINI');
     var isMB = (c.brand==='MB');
@@ -641,7 +681,7 @@ const _rebuild='rebuild-nudge-3';
     }
     a.innerHTML =
       '<a class="egl-clink" href="'+href+'">'+
-        '<div class="egl-media">'+newBadge+(hasDisc ? '<span class="egl-disc'+(newBadge?' egl-disc2':'')+'">−'+dpct(c)+'%</span>' : '')+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+'</div>'+
+        '<div class="egl-media">'+newBadge+(hasDisc ? '<span class="egl-disc'+(newBadge?' egl-disc2':'')+'">−'+dpct(c)+'%</span>' : '')+galHtml(c, img)+'</div>'+
         '<div class="egl-body">'+
           '<div class="egl-meta"><span class="egl-brand">'+logoHtml+'</span><span class="egl-year">2026 · Németország</span></div>'+
           '<div class="egl-name">'+c.name+'</div>'+
@@ -659,6 +699,9 @@ const _rebuild='rebuild-nudge-3';
 
   var grid=document.getElementById('eglGrid');
   if(grid){
+    grid.addEventListener('click', function(e){ var gb = e.target.closest && e.target.closest('.egl-gbtn'); if(!gb) return; e.preventDefault(); e.stopPropagation(); var gal = gb.parentNode.querySelector('.egl-gal'); if(!gal) return; var n = gal.children.length, w = gal.clientWidth || 1, i = Math.round(gal.scrollLeft / w); i = gb.classList.contains('egl-gprev') ? (i - 1 + n) % n : (i + 1) % n; galLoad(gal, i); gal.scrollTo({ left: i * w, behavior: 'smooth' }); });
+    grid.addEventListener('scroll', function(e){ var gal = e.target; if(!gal.classList || !gal.classList.contains('egl-gal')) return; var i = Math.round(gal.scrollLeft / (gal.clientWidth || 1)); galLoad(gal, i); var d = gal.parentNode.querySelector('.egl-gdots'); if(d){ for(var k=0;k<d.children.length;k++) d.children[k].classList.toggle('on', k === i); } }, true);
+    grid.addEventListener('pointerover', function(e){ var m = e.target.closest && e.target.closest('.egl-media'); if(!m || m._gpl) return; m._gpl = 1; var gal = m.querySelector('.egl-gal'); if(gal) galLoad(gal, 1); });
     grid.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('.egl-seg [data-bt]'); if(!b) return; e.preventDefault(); e.stopPropagation(); var m = b.getAttribute('data-bt'); if(m === BT) return; BT = m; try{ localStorage.setItem('ca_bt', m); }catch(_){} EGLROOT.setAttribute('data-bt', m); });
     grid.addEventListener('keydown', function(e){ if((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('.egl-seg [data-bt]')){ e.preventDefault(); e.target.click(); } });
   }
