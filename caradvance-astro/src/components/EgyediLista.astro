@@ -438,7 +438,7 @@ const _rebuild='rebuild-nudge-3';
   var BT = (function(){ try { return localStorage.getItem('ca_bt') === 'c' ? 'c' : 'p'; } catch(e){ return 'p'; } })();
   // .sk oldalon (euró) az árat közvetlenül euróban mutatjuk (nem a forintból visszaváltva), így nincs két eltérő €-összeg
   var EURDOM = /(^|\.)caradvance\.sk$/i.test(location.hostname);
-  function EURS(e){ return new Intl.NumberFormat('hu-HU').format(Math.round(e)) + ' €'; }
+  function EURS(e){ return String(Math.round(e)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0€'; }
   var EGLROOT = document.querySelector('section.egl') || document.documentElement; EGLROOT.setAttribute('data-bt', BT);
   var dpct = function(c){ return DISC[c.name] || 0; };
   var dnet = function(c){ var n = net(c.from), p = dpct(c); return p ? Math.round(n * (1 - p / 100)) : n; };
@@ -627,7 +627,7 @@ const _rebuild='rebuild-nudge-3';
     var first = '<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>', g = GAL[c.slug] || GAL[hs] || [];
     if(!g.length) return first;
     var s = '<div class="egl-gal"><div class="egl-slide egl-slide0">'+first+'</div>';
-    for(var i=0;i<g.length;i++) s += '<div class="egl-slide"><img class="egl-gimg" data-src="'+g[i]+'" alt="'+c.name+' – '+GLT[2]+' '+(i+2)+'"/></div>';
+    for(var i=0;i<g.length;i++) s += '<div class="egl-slide"><img class="egl-gimg" data-src="'+g[i]+'" alt="'+c.name+'"/></div>';
     return s + '</div><span class="egl-gbtn egl-gprev" role="button" aria-label="'+GLT[0]+'">‹</span><span class="egl-gbtn egl-gnext" role="button" aria-label="'+GLT[1]+'">›</span><span class="egl-gdots" aria-hidden="true"><i class="on"></i>'+new Array(g.length+1).join('<i></i>')+'</span>';
   }
   function galLoad(gal, i){ for(var j=i;j<=i+1;j++){ var s=gal.children[j], im=s && s.querySelector('img[data-src]'); if(im){ im.src=im.getAttribute('data-src'); im.removeAttribute('data-src'); } } }
