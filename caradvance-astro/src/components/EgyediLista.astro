@@ -1,4 +1,5 @@
 ---
+import { DISCOUNTS } from '../data/discounts';
 const { lang = 'hu' } = Astro.props;
 const _rebuild='rebuild-nudge-3';
 ---
@@ -239,6 +240,12 @@ const _rebuild='rebuild-nudge-3';
   .egl-sel select:focus{outline:none;border-color:#c9d3e3;}
   .egl-count{display:none;}
   .egl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .egl-disc{position:absolute;left:14px;top:14px;background:var(--red,#E2001A);color:#fff;font-size:14px;font-weight:800;padding:5px 12px;border-radius:999px;letter-spacing:.02em;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  .egl-disc2{top:50px;}
+  .egl-was{display:flex;gap:10px;font-size:12.5px;font-weight:600;color:var(--muted);margin:2px 0 2px;white-space:nowrap;}
+  .egl-was s{text-decoration-thickness:1.5px;}
+  .egl-card-mini .egl-was{margin-top:auto;}
+  .egl-card-mini .egl-was + .egl-price{margin-top:0;}
   .egl-new{position:absolute;left:14px;top:14px;background:var(--red);color:#fff;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;letter-spacing:.05em;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.18);}
   .egl-section{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800;color:var(--ink);margin:26px 0 2px;letter-spacing:-.01em;}
   .egl-section:first-child{margin-top:0;}
@@ -352,12 +359,17 @@ const _rebuild='rebuild-nudge-3';
   .egl-fnote{font-size:12.5px;color:var(--muted);text-align:center;margin:0;line-height:1.4;}
 </style>
 
+<script is:inline set:html={'window.CA_DISC=' + JSON.stringify(DISCOUNTS) + ';'}></script>
 <script is:inline>
 (function(){
   var FX = 361;
   var HUF = function(eur){ return new Intl.NumberFormat('hu-HU').format(Math.round(eur*FX)) + ' Ft'; };
   var EUR = function(eur){ return new Intl.NumberFormat('de-DE').format(eur) + ' €'; };
   var net = function(g){ return Math.round(g/1.19); };
+  // CarAdvance-kedvezmény (src/data/discounts.ts → window.CA_DISC): a kártyán a kedvezményes nettó ár, áthúzva a listaár, a képen "−X%" jelvény
+  var DISC = window.CA_DISC || {};
+  var dpct = function(c){ return DISC[c.name] || 0; };
+  var dnet = function(c){ var n = net(c.from), p = dpct(c); return p ? Math.round(n * (1 - p / 100)) : n; };
   var SOON = ['bmw-ix5','bmw-i3','q9-benzin','ix5-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','7erb-dizel'];
   var FUELC={'Elektromos':'#0a84ff','Hibrid':'#00a389','Benzin':'#e8820c','Dízel':'#6b7280'};
 
@@ -551,26 +563,28 @@ const _rebuild='rebuild-nudge-3';
     } else if(!isMini && SOON.indexOf(slug(c))>-1){
       priceHtml = '<span class="egl-soon">Hamarosan</span>';
     } else {
-      priceHtml = '<span class="egl-net">nettó</span><b>'+HUF(net(c.from))+'</b><span class="eur">'+EUR(net(c.from))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
+      priceHtml = '<span class="egl-net">nettó</span><b>'+HUF(dnet(c))+'</b><span class="eur">'+EUR(dnet(c))+'</span><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
     }
+    var hasDisc = !!(c.from && dpct(c) && priceHtml.indexOf('egl-net') > -1);
+    var wasHtml = hasDisc ? '<div class="egl-was"><s>'+HUF(net(c.from))+'</s><s>'+EUR(net(c.from))+'</s></div>' : '<div class="egl-was" aria-hidden="true">&nbsp;</div>';
     var href = '/egyedi-auto-rendeles/'+slug(c);
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var fuelList = c.fuels || [c.fuel];
     var fuelBadges = fuelList.map(function(fu){ return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>'; }).join('');
     var priceLine = ((isMini||isMB||isAudi)&&!c.from) ? 'Ár kérésre'
       : ((!isMini && SOON.indexOf(slug(c))>-1) ? 'Hamarosan'
-      : (HUF(net(c.from))+' · '+EUR(net(c.from))));
+      : (HUF(dnet(c))+' · '+EUR(dnet(c))));
     var a=document.createElement('div');
     a.className='egl-card'+((isMini||isMB||isAudi)?' egl-card-mini':'');
     a.innerHTML =
       '<a class="egl-clink" href="'+href+'">'+
-        '<div class="egl-media">'+newBadge+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
+        '<div class="egl-media">'+newBadge+(hasDisc ? '<span class="egl-disc'+(newBadge?' egl-disc2':'')+'">−'+dpct(c)+'%</span>' : '')+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
           '<div class="egl-fuels">'+fuelBadges+'</div>'+'</div>'+
         '<div class="egl-body">'+
           '<div class="egl-meta"><span class="egl-brand">'+logoHtml+'</span><span class="egl-year">2026 · Németország</span></div>'+
           '<div class="egl-name">'+c.name+'</div>'+
           '<div class="egl-specs">'+specLine(c)+'</div>'+
-          '<div class="egl-price">'+priceHtml+'</div>'+
+          wasHtml+'<div class="egl-price">'+priceHtml+'</div>'+
         '</div>'+
       '</a>'+
       '<div class="egl-actions">'+
