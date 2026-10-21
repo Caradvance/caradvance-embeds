@@ -618,13 +618,14 @@ const _rebuild='rebuild-nudge-3';
   function isM(c){ return /(^|\s)(M\d\w*|M)(\s|$)/.test(c.name); }
   // képlapozó a kártyán (görgetés + nyilak + pöttyök, mint a bérlési kártyákon)
   var GAL = window.CA_GAL || {};
+  var GLT = ({hu:['Előző kép','Következő kép','fotó'],en:['Previous photo','Next photo','photo'],de:['Vorheriges Foto','Nächstes Foto','Foto'],fr:['Photo précédente','Photo suivante','photo'],uk:['Попереднє фото','Наступне фото','фото'],zh:['上一张照片','下一张照片','照片'],sk:['Predchádzajúca fotka','Ďalšia fotka','fotka'],cs:['Předchozí fotka','Další fotka','fotka']})[String(document.documentElement.lang || 'hu').slice(0,2).toLowerCase()] || ['Előző kép','Következő kép','fotó'];
   function galHtml(c, img, href){
     var hs = String(href || '').replace(/^.*\/egyedi-auto-rendeles\//, '').replace(/[\/?#].*$/, '');
     var first = '<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>', g = GAL[c.slug] || GAL[hs] || [];
     if(!g.length) return first;
     var s = '<div class="egl-gal"><div class="egl-slide egl-slide0">'+first+'</div>';
-    for(var i=0;i<g.length;i++) s += '<div class="egl-slide"><img class="egl-gimg" data-src="'+g[i]+'" alt="'+c.name+' – fotó '+(i+2)+'"/></div>';
-    return s + '</div><span class="egl-gbtn egl-gprev" role="button" aria-label="Előző kép">‹</span><span class="egl-gbtn egl-gnext" role="button" aria-label="Következő kép">›</span><span class="egl-gdots" aria-hidden="true"><i class="on"></i>'+new Array(g.length+1).join('<i></i>')+'</span>';
+    for(var i=0;i<g.length;i++) s += '<div class="egl-slide"><img class="egl-gimg" data-src="'+g[i]+'" alt="'+c.name+' – '+GLT[2]+' '+(i+2)+'"/></div>';
+    return s + '</div><span class="egl-gbtn egl-gprev" role="button" aria-label="'+GLT[0]+'">‹</span><span class="egl-gbtn egl-gnext" role="button" aria-label="'+GLT[1]+'">›</span><span class="egl-gdots" aria-hidden="true"><i class="on"></i>'+new Array(g.length+1).join('<i></i>')+'</span>';
   }
   function galLoad(gal, i){ for(var j=i;j<=i+1;j++){ var s=gal.children[j], im=s && s.querySelector('img[data-src]'); if(im){ im.src=im.getAttribute('data-src'); im.removeAttribute('data-src'); } } }
   function card(c){
