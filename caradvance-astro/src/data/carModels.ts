@@ -37,6 +37,7 @@ export interface CarModel {
   netEur: number;          // nettó EUR (induló ár) — a CarAdvance-kedvezménnyel csökkentve, ha van
   listEur?: number;        // német nettó listaár (csak ha van kedvezmény)
   disc?: number;           // CarAdvance-kedvezmény %-ban (discounts.ts)
+  soon?: boolean;        // hamarosan érkező modell — ár nélkül, "Hamarosan" felirattal
   orderKey: string;        // '1erb'  (a lista ?order= kulcsa)
   orderFuels: string;      // 'Benzin,Dízel'
   heroSub: string;
@@ -506,9 +507,10 @@ export const carModels: Record<string, CarModel> = {
     slug: 'x5-dizel',
     brand: 'BMW', brandKey: 'bmw', brandLogo: '/bmw-hero-logo.png',
     name: 'BMW X5', modelCode: 'G65',
-    title: 'Új BMW X5 (G65) ára 2026: nettó 29,3 M Ft-tól | CarAdvance',
-    description: 'Új BMW X5 (G65) rendelése Németországból nettó 80 462 €-tól (kb. 29,3 M Ft) — dízel, benzin és plug-in hibrid, xDrive. Kulcsrakész behozatal, akár 19% német áfával.',
-    netEur: 80462,
+    title: 'Új BMW X5 (G65) 2026: ár hamarosan, rendelés Németországból | CarAdvance',
+    description: 'Az új BMW X5 (G65) hamarosan rendelhető Németországból — dízel, benzin és plug-in hibrid, xDrive. Az árat a hivatalos árlista megjelenése után közöljük. Kulcsrakész behozatal, akár 19% német áfával.',
+    // hamarosan: a hivatalos német listaár még nincs meg → ár nélkül, "Hamarosan" (korábbi érték: nettó 80 462 €)
+    netEur: 0, soon: true,
     orderKey: 'x5', orderFuels: 'Benzin,Dízel,Plug-in hibrid',
     heroSub: 'Az új, G65 generációs X5 Németországból — xDrive összkerékhajtás, mild-hybrid és plug-in hibrid hajtás, Panoramic Vision, új autóként, egyedi konfigurációval.',
     heroVideo: '/caradvance-hero-x5.mp4',
@@ -565,7 +567,7 @@ export const carModels: Record<string, CarModel> = {
       { img: '/bmw/bmw-x5-studio-konzol.webp', alt: 'BMW X5 középkonzol, prémium kialakítás' },
     ],
     faq: [
-      { q: 'Mennyibe kerül egy új BMW X5 Németországból?', a: 'A BMW X5 nettó listaára a hajtáslánctól és a felszereltségtől függ, a feltüntetett ártól indul. Magánszemélyként akár 19% német áfával rendelheted a München melletti (geretsriedi) Caradvance GmbH-n keresztül — pontos árajánlatért keress minket.' },
+      { q: 'Mennyibe kerül egy új BMW X5 Németországból?', a: 'Az új BMW X5 hivatalos német listaára még nem jelent meg — amint elérhető, azonnal közöljük. Magánszemélyként akár 19% német áfával rendelheted a München melletti (geretsriedi) Caradvance GmbH-n keresztül — előzetes ajánlatért keress minket.' },
       { q: 'Milyen hajtásláncok érhetők el az új X5-höz?', a: 'Az új G65 X5 elérhető 40d dízel, xDrive40 benzin mild-hybrid, valamint 50e és M60e plug-in hibrid kivitelben. Mindegyik xDrive összkerékhajtással és 8 fokozatú automata váltóval érkezik. Segítünk kiválasztani a hozzád legjobban illő változatot.' },
       { q: 'Milyen erős és gyors az X5 xDrive40?', a: 'A benzines xDrive40 mild-hybrid 400 LE-t (294 kW) és 580 Nm nyomatékot ad le, xDrive összkerékhajtással, 0-ról 100 km/h-ra 5,3 másodperc alatt gyorsul, végsebessége 250 km/h.' },
       { q: 'Mekkora az X5 csomagtartója?', a: 'Az új BMW X5 csomagtartója kb. 620 liter, amely a hátsó ülések lehajtásával jelentősen bővíthető — ideális családi és hosszú távú használatra egyaránt.' },

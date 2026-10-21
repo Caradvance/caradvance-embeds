@@ -128,13 +128,13 @@ export function buildSaleModel(car: EgyediCar, f: SaleFacts) {
 
   const relSlugs = (f.rel || []).length ? f.rel! : EGYEDI_CARS.filter((c) => c.brand === car.brand && c.slug !== car.slug && c.body === car.body).slice(0, 4).map((c) => c.slug);
   const related = relSlugs.map((s) => EGYEDI_CARS.find((c) => c.slug === s)).filter(Boolean).slice(0, 4).map((c: any) => ({
-    name: c.name, href: saleHref(c.slug), img: c.img.split('?')[0], sub: c.from ? nf(Math.round(discountedNet(Math.round(c.from / 1.19), discountPct(c.name)) * FX)) + ' Ft-tól' : 'Ár kérésre',
+    name: c.name, href: saleHref(c.slug), img: c.img.split('?')[0], sub: c.soon ? 'Hamarosan' : c.from ? nf(Math.round(discountedNet(Math.round(c.from / 1.19), discountPct(c.name)) * FX)) + ' Ft-tól' : 'Ár kérésre',
   }));
 
   const kw = num(e0 && e0[2], /\((\d+)\s*kW/);
   return {
     slug: car.slug, rentHref: f.rent ? rentHref : '', brand: b.name, brandKey: b.key, brandLogo: b.logo, brandLogoInvert: !!b.invert,
-    name, modelCode: f.code || '', title, description, netEur: net, listEur: disc ? listNet : 0, disc,
+    name, modelCode: f.code || '', title, description, soon: !!f.soon, netEur: net, listEur: disc ? listNet : 0, disc,
     orderKey: car.key, orderFuels: txtFuels.join(','),
     heroSub: f.tagline, heroVideo: b.video, heroPoster: '', mainImg, mainAlt: `Új ${name} — egyedi rendelés Németországból`,
     mainContain: !f.press,

@@ -1,7 +1,7 @@
 // Az /egyedi-auto-rendeles lista autói (EgyediLista.astro kártyái, a rejtett kártyák nélkül).
 // FONTOS: ha a listában új modell jelenik meg, ide is fel kell venni (slug = a kártya linkje).
 // own: true → saját .astro oldala van (pl. 1erb-benzin.astro), a generikus [slug] oldal kihagyja.
-export interface EgyediCar { brand: 'BMW' | 'MINI' | 'MB' | 'AUDI'; key: string; name: string; body: string; fuel: string; fuels: string[]; from: number; img: string; slug: string; own: boolean; }
+export interface EgyediCar { brand: 'BMW' | 'MINI' | 'MB' | 'AUDI'; key: string; name: string; body: string; fuel: string; fuels: string[]; from: number; img: string; slug: string; own: boolean; soon?: boolean; }
 export const EGYEDI_CARS: EgyediCar[] = [
   {"brand": "MINI", "key": "coopers", "name": "MINI Cooper", "body": "Ferdehátú", "fuel": "Benzin", "fuels": ["Benzin"], "from": 26450, "img": "/cooper-s.webp?v=2", "slug": "mini-cooper", "own": false},
   {"brand": "MINI", "key": "cooper", "name": "MINI Cooper 5 ajtós", "body": "Ferdehátú", "fuel": "Benzin", "fuels": ["Benzin"], "from": 27450, "img": "/cooper.webp?v=2", "slug": "mini-cooper-5-ajtos", "own": false},
@@ -62,11 +62,11 @@ export const EGYEDI_CARS: EgyediCar[] = [
   {"brand": "AUDI", "key": "q7", "name": "Audi Q7", "body": "SUV", "fuel": "Benzin", "fuels": ["Benzin", "Hibrid", "Dízel"], "from": 87900, "img": "/audi/q7.webp", "slug": "q7-benzin", "own": false},
   {"brand": "AUDI", "key": "q8", "name": "Audi Q8", "body": "SUV Coupé", "fuel": "Benzin", "fuels": ["Benzin", "Hibrid", "Dízel"], "from": 90200, "img": "/audi/q8.webp", "slug": "q8-benzin", "own": false},
   {"brand": "AUDI", "key": "rsq8", "name": "Audi RS Q8 performance", "body": "SUV Coupé", "fuel": "Benzin", "fuels": ["Benzin"], "from": 160000, "img": "/audi/rsq8.webp", "slug": "rsq8-benzin", "own": false},
-  {"brand": "AUDI", "key": "q9", "name": "Audi Q9", "body": "SUV", "fuel": "Benzin", "fuels": ["Benzin", "Hibrid"], "from": 0, "img": "/audi/q9.webp", "slug": "q9-benzin", "own": false},
+  {"brand": "AUDI", "key": "q9", "name": "Audi Q9", "body": "SUV", "fuel": "Benzin", "fuels": ["Benzin", "Hibrid"], "from": 0, "img": "/audi/q9.webp", "slug": "q9-benzin", "soon": true, "own": false},
   {"brand": "AUDI", "key": "etrongt", "name": "Audi e-tron GT", "body": "Coupé", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 0, "img": "/audi/etrongt.webp", "slug": "etrongt-elektromos", "own": false},
   {"brand": "AUDI", "key": "rsetrongt", "name": "Audi RS e-tron GT", "body": "Coupé", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 0, "img": "/audi/rsetrongt.webp", "slug": "rsetrongt-elektromos", "own": false},
   {"brand": "BMW", "key": "ix", "name": "BMW iX", "body": "SUV", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 83500, "img": "/bmw/ix.webp?v=6", "slug": "bmw-ix", "own": false},
-  {"brand": "BMW", "key": "ix5", "name": "BMW iX5", "body": "SUV", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 100000, "img": "/bmw/ix5.webp?v=6", "slug": "bmw-ix5", "own": false},
+  {"brand": "BMW", "key": "ix5", "name": "BMW iX5", "body": "SUV", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 100000, "img": "/bmw/ix5.webp?v=6", "slug": "bmw-ix5", "soon": true, "own": false},
   {"brand": "BMW", "key": "ix3", "name": "BMW iX3", "body": "SUV", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 63400, "img": "/bmw/ix3.webp?v=6", "slug": "ix3-elektromos", "own": true},
   {"brand": "BMW", "key": "ix2", "name": "BMW iX2", "body": "SUV Coupé", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 51000, "img": "/bmw/ix2.webp?v=6", "slug": "bmw-ix2", "own": false},
   {"brand": "BMW", "key": "ix1", "name": "BMW iX1", "body": "SUV", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 49400, "img": "/bmw/ix1.webp?v=6", "slug": "bmw-ix1", "own": false},
@@ -74,7 +74,7 @@ export const EGYEDI_CARS: EgyediCar[] = [
   {"brand": "BMW", "key": "i5s", "name": "BMW i5", "body": "Limuzin", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 70900, "img": "/bmw/i5s.webp?v=6", "slug": "bmw-i5", "own": false},
   {"brand": "BMW", "key": "i5ts", "name": "BMW i5 Touring", "body": "Touring", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 72900, "img": "/bmw/i5ts.webp?v=6", "slug": "bmw-i5-touring", "own": false},
   {"brand": "BMW", "key": "i4s", "name": "BMW i4", "body": "Gran Coupé", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 58200, "img": "/bmw/i4s.webp?v=6", "slug": "bmw-i4", "own": false},
-  {"brand": "BMW", "key": "i3", "name": "BMW i3", "body": "Limuzin", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 47900, "img": "/bmw/i3.webp?v=6", "slug": "bmw-i3", "own": false},
+  {"brand": "BMW", "key": "i3", "name": "BMW i3", "body": "Limuzin", "fuel": "Elektromos", "fuels": ["Elektromos"], "from": 47900, "img": "/bmw/i3.webp?v=6", "slug": "bmw-i3", "soon": true, "own": false},
   {"brand": "BMW", "key": "xm", "name": "BMW XM", "body": "SUV", "fuel": "Hibrid", "fuels": ["Hibrid"], "from": 135500, "img": "/bmw/xm.webp?v=6", "slug": "xm-hibrid", "own": true},
   {"brand": "BMW", "key": "x7", "name": "BMW X7", "body": "SUV", "fuel": "Benzin", "fuels": ["Benzin", "Dízel"], "from": 106500, "img": "/bmw/x7.webp?v=6", "slug": "bmw-x7", "own": false},
   {"brand": "BMW", "key": "x3", "name": "BMW X3", "body": "SUV", "fuel": "Benzin", "fuels": ["Benzin", "Hibrid", "Dízel"], "from": 60300, "img": "/bmw/x3mw.webp?v=6", "slug": "x3-benzin", "own": true},
@@ -101,6 +101,6 @@ export const EGYEDI_CARS: EgyediCar[] = [
   {"brand": "BMW", "key": "1erb", "name": "BMW 1-es", "body": "Kompakt", "fuel": "Benzin", "fuels": ["Benzin", "Dízel"], "from": 34250, "img": "/bmw/1erb.webp?v=6", "slug": "1erb-benzin", "own": true},
   {"brand": "BMW", "key": "x6b", "name": "BMW X6", "body": "SUV Coupé", "fuel": "Dízel", "fuels": ["Benzin", "Dízel"], "from": 98100, "img": "/bmw/x6b.webp?v=6", "slug": "x6-dizel", "own": true},
   {"brand": "BMW", "key": "x6", "name": "BMW X6 M Competition", "body": "SUV Coupé", "fuel": "Benzin", "fuels": ["Benzin"], "from": 171900, "img": "/bmw/x6.webp?v=6", "slug": "bmw-x6-m-competition", "own": false},
-  {"brand": "BMW", "key": "x5", "name": "BMW X5", "body": "SUV", "fuel": "Dízel", "fuels": ["Benzin", "Hibrid", "Dízel"], "from": 95750, "img": "/bmw/x5.webp?v=6", "slug": "x5-dizel", "own": true},
+  {"brand": "BMW", "key": "x5", "name": "BMW X5", "body": "SUV", "fuel": "Dízel", "fuels": ["Benzin", "Hibrid", "Dízel"], "from": 95750, "img": "/bmw/x5.webp?v=6", "slug": "x5-dizel", "soon": true, "own": true},
 ];
 export const egyediBySlug = (s: string) => EGYEDI_CARS.find((c) => c.slug === s);
