@@ -357,6 +357,29 @@ const _rebuild='rebuild-nudge-3';
   .egl-fsubmit:hover{background:#c40017;}
   .egl-fsubmit:disabled{opacity:.6;cursor:default;}
   .egl-fnote{font-size:12.5px;color:var(--muted);text-align:center;margin:0;line-height:1.4;}
+  /* eladó autó kártya — a bérelhető kártya mintájára (árdoboz, címkék, gombok egy sorban) */
+  .egl-card{font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;}
+  .egl-clink{display:flex;flex-direction:column;flex:1;}
+  .egl-body{display:flex;flex-direction:column;flex:1;padding:16px 20px 14px;}
+  .egl-specs{margin:0 0 4px;}
+  .egl-tags{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0 14px;}
+  .egl-tag{background:#6b7280;color:#fff;font-size:13px;font-weight:800;padding:6px 12px;border-radius:10px;white-space:nowrap;}
+  .egl-tfuels{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .egl-tags .egl-fuel{font-size:13px;font-weight:800;padding:6px 12px;border-radius:10px;box-shadow:none;}
+  .egl-pbox{margin-top:auto;background:#F4F7FB;border:1px solid #E6EAF1;border-radius:16px;padding:12px 16px 12px;}
+  .egl-pbox-x{display:flex;align-items:center;min-height:96px;}
+  .egl-ptop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;min-height:30px;}
+  .egl-was0{font-size:14px;font-weight:600;color:#8a94a6;text-decoration-thickness:1.5px;white-space:nowrap;}
+  .egl-npill{background:#E4ECFA;color:#1e40af;font-size:13px;font-weight:800;padding:6px 18px;border-radius:999px;}
+  .egl-pbox .egl-price,.egl-card-mini .egl-pbox .egl-price{margin:0;align-items:baseline;}
+  .egl-pbox .egl-price b{font-size:27px;letter-spacing:-.01em;}
+  .egl-pbox .egl-price .tol{font-size:15px;font-weight:700;}
+  .egl-eur{font-size:14px;font-weight:700;color:var(--muted);margin-top:2px;}
+  .egl-save{display:flex;align-items:center;gap:8px;border-top:1px solid #E6EAF1;margin-top:10px;padding-top:9px;font-size:13.5px;font-weight:600;color:var(--muted);}
+  .egl-save b{color:#15803D;font-weight:800;}
+  .egl-save-p{margin-left:auto;background:#E7F8EE;color:#15803D;font-weight:800;font-size:12.5px;padding:3px 9px;border-radius:999px;}
+  .egl-actions{flex-direction:row;gap:8px;}
+  .egl-actions .egl-btn,.egl-actions .egl-order{flex:1;display:flex;align-items:center;justify-content:center;height:48px;padding:0 8px;}
 </style>
 
 <script is:inline set:html={'window.CA_DISC=' + JSON.stringify(DISCOUNTS) + ';'}></script>
@@ -576,15 +599,28 @@ const _rebuild='rebuild-nudge-3';
       : (HUF(dnet(c))+' · '+EUR(dnet(c))));
     var a=document.createElement('div');
     a.className='egl-card'+((isMini||isMB||isAudi)?' egl-card-mini':'');
+    /* árdoboz — a bérelhető autók kártyájának mintájára: áthúzott listaár + "nettó" címke, nagy kedvezményes ár, € sor, megtakarítás */
+    var pboxHtml;
+    if(priceHtml.indexOf('egl-net') < 0){
+      pboxHtml = '<div class="egl-pbox egl-pbox-x"><div class="egl-price">'+priceHtml+'</div></div>';
+    } else {
+      var dn = dnet(c), ln = net(c.from);
+      pboxHtml = '<div class="egl-pbox">'+
+        '<div class="egl-ptop">'+(hasDisc ? '<s class="egl-was0">'+HUF(ln)+'</s>' : '<span></span>')+'<span class="egl-npill">nettó</span></div>'+
+        '<div class="egl-price"><b>'+HUF(dn)+'</b><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak nettó árak, élő árfolyammal (1&nbsp;€ = '+FX+'&nbsp;Ft). A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span></div>'+
+        '<div class="egl-eur">'+EUR(dn)+' · <span>nettó</span></div>'+
+        '<div class="egl-save"'+(hasDisc ? '' : ' style="visibility:hidden" aria-hidden="true"')+'><span>Megtakarítás</span><b>'+(hasDisc ? HUF(ln - dn) : '&nbsp;')+'</b>'+(hasDisc ? '<span class="egl-save-p">−'+dpct(c)+'%</span>' : '')+'</div>'+
+      '</div>';
+    }
     a.innerHTML =
       '<a class="egl-clink" href="'+href+'">'+
-        '<div class="egl-media">'+newBadge+(hasDisc ? '<span class="egl-disc'+(newBadge?' egl-disc2':'')+'">−'+dpct(c)+'%</span>' : '')+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+
-          '<div class="egl-fuels">'+fuelBadges+'</div>'+'</div>'+
+        '<div class="egl-media">'+newBadge+(hasDisc ? '<span class="egl-disc'+(newBadge?' egl-disc2':'')+'">−'+dpct(c)+'%</span>' : '')+'<img src="'+img+'" alt="'+c.name+'" loading="lazy"/>'+'</div>'+
         '<div class="egl-body">'+
           '<div class="egl-meta"><span class="egl-brand">'+logoHtml+'</span><span class="egl-year">2026 · Németország</span></div>'+
           '<div class="egl-name">'+c.name+'</div>'+
           '<div class="egl-specs">'+specLine(c)+'</div>'+
-          wasHtml+'<div class="egl-price">'+priceHtml+'</div>'+
+          '<div class="egl-tags"><span class="egl-tag">Egyedi rendelés</span><span class="egl-tfuels">'+fuelBadges+'</span></div>'+
+          pboxHtml+
         '</div>'+
       '</a>'+
       '<div class="egl-actions">'+
