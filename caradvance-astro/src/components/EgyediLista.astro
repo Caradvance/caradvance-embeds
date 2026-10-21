@@ -372,11 +372,12 @@ const _rebuild='rebuild-nudge-3';
   .egl-was0{font-size:14px;font-weight:600;color:#8a94a6;text-decoration-thickness:1.5px;white-space:nowrap;}
   .egl-seg{display:inline-flex;gap:2px;background:#E6ECF4;border-radius:999px;padding:3px;}
   .egl-seg [data-bt]{font-size:13.5px;font-weight:700;color:#5A6B82;padding:6px 12px;border-radius:999px;cursor:pointer;user-select:none;line-height:1.2;}
-  .egl-seg [data-bt].on{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(15,27,45,.14);}
+  .egl[data-bt="p"] .egl-seg [data-bt="p"],.egl[data-bt="c"] .egl-seg [data-bt="c"]{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(15,27,45,.14);}
+  .egl[data-bt="p"] .egl-mc,.egl[data-bt="c"] .egl-mp{display:none!important;}
   .egl-seg [data-bt]:focus-visible{outline:2px solid #E2001A;outline-offset:1px;}
   .egl-wasl{font-size:13.5px;font-weight:600;color:#8a94a6;min-height:18px;margin:2px 0 0;}
   .egl-wasl s{text-decoration-thickness:1.5px;}
-  .egl-pbox.is-p .egl-npill{background:#FDECEC;color:#B4001A;padding:6px 10px;font-size:12px;white-space:nowrap;}
+  .egl[data-bt="p"] .egl-npill{background:#FDECEC;color:#B4001A;padding:6px 10px;font-size:12px;white-space:nowrap;}
   .egl-npill{background:#E4ECFA;color:#1e40af;font-size:13px;font-weight:800;padding:6px 18px;border-radius:999px;}
   .egl-pbox .egl-price,.egl-card-mini .egl-pbox .egl-price{margin:0;align-items:baseline;}
   .egl-pbox .egl-price b{font-size:27px;letter-spacing:-.01em;color:#E2001A;}
@@ -405,6 +406,7 @@ const _rebuild='rebuild-nudge-3';
   var DISC = window.CA_DISC || {};
   // ár megjelenítése: 'p' = Magán (bruttó, 19% német áfa) — alapértelmezett; 'c' = Cég (nettó). Ugyanaz a kulcs, mint a bérlési kártyákon (ca_bt).
   var BT = (function(){ try { return localStorage.getItem('ca_bt') === 'c' ? 'c' : 'p'; } catch(e){ return 'p'; } })();
+  var EGLROOT = document.querySelector('section.egl') || document.documentElement; EGLROOT.setAttribute('data-bt', BT);
   var dpct = function(c){ return DISC[c.name] || 0; };
   var dnet = function(c){ var n = net(c.from), p = dpct(c); return p ? Math.round(n * (1 - p / 100)) : n; };
   var SOON = ['bmw-ix5','bmw-i3','q9-benzin','ix5-elektromos','i3-elektromos','x5h-hibrid','x5m-hibrid','e750-hibrid','m760e-hibrid','7erb-dizel'];
@@ -624,15 +626,17 @@ const _rebuild='rebuild-nudge-3';
     if(priceHtml.indexOf('egl-net') < 0){
       pboxHtml = '<div class="egl-pbox egl-pbox-x"><div class="egl-price">'+priceHtml+'</div></div>';
     } else {
-      // Magán (B2C, 19% német áfával) / Cég (B2B, nettó) — mint a bérelhető autók kártyáján; a választás az egész oldalon érvényes
-      var dn = dnet(c), ln = net(c.from), isP = (BT === 'p'), mul = isP ? 1.19 : 1;
-      var dv = dn * mul, lv = ln * mul, r10 = function(e){ return Math.round(e*FX/10000)*10000; };
-      pboxHtml = '<div class="egl-pbox'+(isP ? ' is-p' : '')+'">'+
-        '<div class="egl-ptop"><span class="egl-seg" role="group" aria-label="Ár megjelenítése"><span role="button" tabindex="0" data-bt="p" class="'+(isP ? 'on' : '')+'" aria-pressed="'+isP+'">Magán</span><span role="button" tabindex="0" data-bt="c" class="'+(isP ? '' : 'on')+'" aria-pressed="'+(!isP)+'">Cég</span></span><span class="egl-npill">'+(isP ? '19% német áfával' : 'nettó')+'</span></div>'+
+      // Magán (B2C, 19% német áfával) / Cég (B2B, nettó): mindkét ár a kártyán van, a váltás csak CSS (section.egl[data-bt]) — nincs újrarajzolás, nem ugrik az oldal
+      var dn = dnet(c), ln = net(c.from), r10 = function(e){ return Math.round(e*FX/10000)*10000; };
+      var info = '<span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak élő árfolyammal számolva (1&nbsp;€ = '+FX+'&nbsp;Ft). Cég: nettó ár, áfa nélkül. Magán: a nettó árra 19% német áfa jön. A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span>';
+      var blk = function(mul, lbl, tag){ var dv = dn * mul, lv = ln * mul; return '<div class="egl-m'+tag+'">'+
         '<div class="egl-wasl">'+(hasDisc ? '<s>'+HUF(lv)+'</s>' : '&nbsp;')+'</div>'+
-        '<div class="egl-price"><b>'+HUF(dv)+'</b><span class="tol">-tól</span><span class="egl-info" tabindex="0">i<span class="egl-tip">Az árak élő árfolyammal számolva (1&nbsp;€ = '+FX+'&nbsp;Ft). Cég: nettó ár, áfa nélkül. Magán: a nettó árra 19% német áfa jön. A végleges ár a választott felszereltségtől és az adott kedvezménytől függ. A képek csak illusztrációk.</span></span></div>'+
-        '<div class="egl-eur">'+EUR(Math.round(dv))+' · <span>'+(isP ? 'bruttó' : 'nettó')+'</span></div>'+
-        '<div class="egl-save"'+(hasDisc ? '' : ' style="visibility:hidden" aria-hidden="true"')+'><span>Megtakarítás</span><b>'+(hasDisc ? new Intl.NumberFormat('hu-HU').format(r10(lv) - r10(dv)) + ' Ft' : '&nbsp;')+'</b>'+(hasDisc ? '<span class="egl-save-p">−'+dpct(c)+'%</span>' : '')+'</div>'+
+        '<div class="egl-price"><b>'+HUF(dv)+'</b><span class="tol">-tól</span>'+info+'</div>'+
+        '<div class="egl-eur">'+EUR(Math.round(dv))+' · <span>'+lbl+'</span></div>'+
+        '<div class="egl-save"'+(hasDisc ? '' : ' style="visibility:hidden" aria-hidden="true"')+'><span>Megtakarítás</span><b>'+(hasDisc ? new Intl.NumberFormat('hu-HU').format(r10(lv) - r10(dv)) + ' Ft' : '&nbsp;')+'</b>'+(hasDisc ? '<span class="egl-save-p">−'+dpct(c)+'%</span>' : '')+'</div></div>'; };
+      pboxHtml = '<div class="egl-pbox">'+
+        '<div class="egl-ptop"><span class="egl-seg" role="group" aria-label="Ár megjelenítése"><span role="button" tabindex="0" data-bt="p">Magán</span><span role="button" tabindex="0" data-bt="c">Cég</span></span><span class="egl-npill"><span class="egl-mp">19% német áfával</span><span class="egl-mc">nettó</span></span></div>'+
+        blk(1.19, 'bruttó', 'p') + blk(1, 'nettó', 'c') +
       '</div>';
     }
     a.innerHTML =
@@ -655,7 +659,7 @@ const _rebuild='rebuild-nudge-3';
 
   var grid=document.getElementById('eglGrid');
   if(grid){
-    grid.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('.egl-seg [data-bt]'); if(!b) return; e.preventDefault(); e.stopPropagation(); var m = b.getAttribute('data-bt'); if(m === BT) return; BT = m; try{ localStorage.setItem('ca_bt', m); }catch(_){} render(); });
+    grid.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('.egl-seg [data-bt]'); if(!b) return; e.preventDefault(); e.stopPropagation(); var m = b.getAttribute('data-bt'); if(m === BT) return; BT = m; try{ localStorage.setItem('ca_bt', m); }catch(_){} EGLROOT.setAttribute('data-bt', m); });
     grid.addEventListener('keydown', function(e){ if((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('.egl-seg [data-bt]')){ e.preventDefault(); e.target.click(); } });
   }
   var q=document.getElementById('eglQ'), fb=document.getElementById('eglBody'), ff=document.getElementById('eglFuel'), fbr=document.getElementById('eglBrand'), fcls=document.getElementById('eglClass');
