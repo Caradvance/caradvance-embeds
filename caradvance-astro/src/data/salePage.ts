@@ -7,6 +7,7 @@
 import type { EgyediCar } from './egyediCars';
 import { EGYEDI_CARS } from './egyediCars';
 import { CONTENT as RENT_CONTENT } from './rentalContent';
+import { discountPct, discountedNet } from './discounts';
 
 export type Eng = [string, string, string, string, string, string, string, string?]; // label, fuel, power, torque, drive, accel, vmax, cons
 export interface SaleFacts {
@@ -57,7 +58,10 @@ export function buildSaleModel(car: EgyediCar, f: SaleFacts) {
   const b = BRAND[car.brand];
   const name = car.name;
   const A = az(name);
-  const net = car.from && !f.soon ? Math.round(car.from / 1.19) : 0;
+  // CarAdvance-kedvezmény (discounts.ts): az ár mindenhol a kedvezményes nettó ár; listEur = német nettó listaár
+  const listNet = car.from && !f.soon ? Math.round(car.from / 1.19) : 0;
+  const disc = listNet ? discountPct(name) : 0;
+  const net = discountedNet(listNet, disc);
   const huf = net ? nf(Math.round(net * FX)) + ' Ft' : '';
   const vatSave = net ? Math.round((net * 0.08 * FX) / 10000) * 10000 : 0;
   const P = (k: string) => (f.press ? `/berles-press/${f.press}-${k}.webp` : '');
@@ -124,13 +128,13 @@ export function buildSaleModel(car: EgyediCar, f: SaleFacts) {
 
   const relSlugs = (f.rel || []).length ? f.rel! : EGYEDI_CARS.filter((c) => c.brand === car.brand && c.slug !== car.slug && c.body === car.body).slice(0, 4).map((c) => c.slug);
   const related = relSlugs.map((s) => EGYEDI_CARS.find((c) => c.slug === s)).filter(Boolean).slice(0, 4).map((c: any) => ({
-    name: c.name, href: saleHref(c.slug), img: c.img.split('?')[0], sub: c.from ? nf(Math.round((Math.round(c.from / 1.19)) * FX)) + ' Ft-tól' : 'Ár kérésre',
+    name: c.name, href: saleHref(c.slug), img: c.img.split('?')[0], sub: c.from ? nf(Math.round(discountedNet(Math.round(c.from / 1.19), discountPct(c.name)) * FX)) + ' Ft-tól' : 'Ár kérésre',
   }));
 
   const kw = num(e0 && e0[2], /\((\d+)\s*kW/);
   return {
     slug: car.slug, rentHref: f.rent ? rentHref : '', brand: b.name, brandKey: b.key, brandLogo: b.logo, brandLogoInvert: !!b.invert,
-    name, modelCode: f.code || '', title, description, netEur: net,
+    name, modelCode: f.code || '', title, description, netEur: net, listEur: disc ? listNet : 0, disc,
     orderKey: car.key, orderFuels: txtFuels.join(','),
     heroSub: f.tagline, heroVideo: b.video, heroPoster: '', mainImg, mainAlt: `Új ${name} — egyedi rendelés Németországból`,
     mainContain: !f.press,

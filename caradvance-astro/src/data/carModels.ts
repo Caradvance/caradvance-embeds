@@ -34,7 +34,9 @@ export interface CarModel {
   modelCode?: string;      // 'F70'
   title: string;
   description: string;
-  netEur: number;          // nettó EUR (induló ár)
+  netEur: number;          // nettó EUR (induló ár) — a CarAdvance-kedvezménnyel csökkentve, ha van
+  listEur?: number;        // német nettó listaár (csak ha van kedvezmény)
+  disc?: number;           // CarAdvance-kedvezmény %-ban (discounts.ts)
   orderKey: string;        // '1erb'  (a lista ?order= kulcsa)
   orderFuels: string;      // 'Benzin,Dízel'
   heroSub: string;
@@ -927,3 +929,7 @@ export const carModels: Record<string, CarModel> = {
     },
   },
 };
+
+// CarAdvance-kedvezmény (discounts.ts): a kézzel írt modelloldalak ára, címe és leírása is a kedvezményes nettó árat mutatja
+import { applyDiscount } from './discounts';
+for (const m of Object.values(carModels)) applyDiscount(m);
