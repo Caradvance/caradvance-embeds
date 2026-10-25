@@ -253,6 +253,50 @@ function hreflang(dist) {
   return 'hreflang: ' + n;
 }
 
+/* ---------- 4. fázis: indítás — saját címek a canonical / hreflang / sitemap URL-ekben ----------
+ * Az i18n-mirror (domainsLive=true) a sk/cs domain-URL-eket még a magyar könyvtárnevekkel írja
+ * (https://www.caradvance.sk/berelheto-auto/bmw-x3-berles/), ezek 301-gyel továbbítanak. Itt minden
+ * HTML-ben (magyar, idegen nyelvű, sk, cs) és a sk/cs sitemapben a _slugs.json alapján a végleges
+ * címre cseréljük őket, a nem létező sk/cs oldalra mutató hreflang-ot töröljük, a sitemapből pedig
+ * kivesszük a nem létező, duplikált és noindex oldalakat. */
+function launch(dist) {
+  const M = {};
+  for (const l of ['sk', 'cs']) { try { M[l] = JSON.parse(fs.readFileSync(path.join(dist, l, '_slugs.json'), 'utf8')); } catch (e) { return 'launch: nincs _slugs'; } }
+  const HOST = { 'www.caradvance.sk': 'sk', 'www.caradvance.cz': 'cs' };
+  const exists = (l, p) => fs.existsSync(path.join(dist, l, p.replace(/^\//, ''), 'index.html'));
+  const fixUrl = (host, p) => { const l = HOST[host]; const loc = M[l][p] || M[l][p.endsWith('/') ? p : p + '/']; return 'https://' + host + (loc || p); };
+  const fix = (h) => h.replace(/https:\/\/(www\.caradvance\.(?:sk|cz))(\/[^"'\s<>#?\\]*)/g, (m, host, p) => fixUrl(host, p));
+  let files = 0, changed = 0, dropped = 0;
+  (function walk(d) {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) { if (e.name !== 'node_modules') walk(p); continue; }
+      if (!e.name.endsWith('.html')) continue;
+      files++;
+      const h0 = fs.readFileSync(p, 'utf8');
+      if (!/caradvance\.(?:sk|cz)/.test(h0)) continue;
+      let h = fix(h0);
+      h = h.replace(/[ \t]*<link rel="alternate" hreflang="(sk|cs)" href="https:\/\/www\.caradvance\.(?:sk|cz)(\/[^"]*)"\s*\/?>\s*\n?/g, (m, l, u) => (exists(l, u.split(/[?#]/)[0]) ? m : (dropped++, '')));
+      if (h !== h0) { fs.writeFileSync(p, h); changed++; }
+    }
+  })(dist);
+  const sm = {};
+  for (const l of ['sk', 'cs']) {
+    const f = path.join(dist, l, 'sitemap.xml'); if (!fs.existsSync(f)) continue;
+    const seen = new Set(); let kept = 0;
+    const body = fs.readFileSync(f, 'utf8').replace(/\s*<url><loc>https:\/\/(www\.caradvance\.(?:sk|cz))(\/[^<]*)<\/loc>(<lastmod>[^<]*<\/lastmod>)?<\/url>/g, (m, host, u, lm) => {
+      const url = fixUrl(host, u); const loc = url.replace(/^https:\/\/[^/]+/, '');
+      if (seen.has(loc) || !exists(l, loc)) return '';
+      const page = fs.readFileSync(path.join(dist, l, loc.replace(/^\//, ''), 'index.html'), 'utf8');
+      if (/<meta\s+name=["']robots["'][^>]*noindex/i.test(page)) return '';
+      seen.add(loc); kept++;
+      return '\n  <url><loc>' + url + '</loc>' + (lm || '') + '</url>';
+    });
+    fs.writeFileSync(f, body); sm[l] = kept;
+  }
+  return 'launch: ' + changed + '/' + files + ' HTML, hreflang törölve ' + dropped + ', sitemap ' + Object.entries(sm).map(([l, n]) => l + ' ' + n).join(' ');
+}
+
 /* ---------- 404-oldal (C12) ---------- */
 import { P3 } from './skcz-p3-data.mjs';
 function notFound(dist) {
@@ -345,6 +389,8 @@ export function run(dist = DIST) {
   }
   // hreflang (C17): a sk/cs oldalakon önhivatkozó sk + a párja cs-ben (a magyar oldalak a 4. fázisban, indításkor kapják meg)
   try { out.push(hreflang(dist)); } catch (e) { out.push('hreflang hiba: ' + e.message); }
+  // 4. fázis (indítás): végleges sk/cs címek a canonical / hreflang / sitemap URL-ekben
+  try { out.push(launch(dist)); } catch (e) { out.push('launch hiba: ' + e.message); }
   // 404 (C12): a gyökér 404.html minden domainen ugyanaz — sk/cs változat külön fájlban, a .sk/.cz domainen ez töltődik be
   try { out.push(notFound(dist)); } catch (e) { out.push('404 hiba: ' + e.message); }
   return '[skcz-local] ' + out.join(' | ');

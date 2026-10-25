@@ -89,7 +89,14 @@ export const P3 = {
       [r('(?:info|sales|media)@caradvance\\.hu|import@caradvance\\.de'), 'info@caradvance.sk'],
       ['Készpénz / önerőből', 'Hotovosť / vlastné zdroje'], ['Finanszírozás (hitel)', 'Financovanie (úver)'], ['Finanszírozással', 'S financovaním'], ['Egy összegben', 'Jednorazovo'],
       [r('\\+36 30 233 6060'), '+421 915 410 555'], [r('36302336060'), '421915410555'],
-      [r('<a href="https://(?:magyarefk|kormanyhivatal)\\.hu"([^>]*)>(www\\.)?([a-z0-9.-]+\\.sk)</a>'), '<a href="https://www.$3"$1>$3</a>']
+      [r('<a href="https://(?:magyarefk|kormanyhivatal)\\.hu"([^>]*)>(www\\.)?([a-z0-9.-]+\\.sk)</a>'), '<a href="https://www.$3"$1>$3</a>'],
+      /* 4. fázis: online szerződéskötés, bármely ország lakosa bérelhet */
+      ['<p>Zmluvy sa spravidla uzatvárajú osobne, v kancelárii alebo pri odovzdaní auta; v takom prípade právo na odstúpenie od zmlúv uzavretých na diaľku neexistuje.</p>', '<p>Zmluvy uzatvárame spravidla online — podpisujú sa elektronicky, návšteva kancelárie nie je potrebná. Takto uzavretá zmluva je zmluvou uzavretou na diaľku.</p>'],
+      ['Predbežnú zmluvu podpíšete a pošlete nám ju späť.', 'Predbežnú zmluvu podpíšete online — elektronicky, bez tlače a bez návštevy kancelárie.'],
+      ['Obe strany podpíšu konečnú zmluvu, ktorej súčasťou', 'Obe strany podpíšu online konečnú zmluvu, ktorej súčasťou'],
+      ['<li>Podpis zmluvy je zároveň ', '<li>Prenajať si auto môžete s bydliskom alebo sídlom na Slovensku, v Česku, v Nemecku aj v inej krajine. Zmluvu podpisujete <strong>online</strong> — elektronicky, bez návštevy kancelárie.</li> <li>Podpis zmluvy je zároveň '],
+      [r('(?:www\\.)?caradvance\\.hu/berlesi-feltetelek/?'), 'caradvance.sk/prenajom/podmienky-a-kaucia/'],
+      [r('(\\d{4})\\. (januára|februára|marca|apríla|mája|júna|júla|augusta|septembra|októbra|novembra|decembra) (\\d{1,2})\\.'), '$3. $2 $1']
     ],
     IMPORT: { img: '/sk-team/pavel-horemuz.webp', name: 'Pavel Horemuž', role: 'Dovoz áut z Nemecka', alt: 'Pavel Horemuž — dovoz áut z Nemecka, CarAdvance', flags: [['sk', 'slovenčina'], ['cz', 'čeština']], bio: 'Pavel vás osobne sprevádza celým dovozom — od výberu auta až po odovzdanie kľúčov. Komunikuje s vami po slovensky a so spoločnosťou Caradvance GmbH dohodne všetky podrobnosti.', email: 'info@caradvance.sk' },
     CONTACT: {
@@ -148,7 +155,14 @@ export const P3 = {
       [r('(?:info|sales|media)@caradvance\\.hu|import@caradvance\\.de'), 'info@caradvance.cz'],
       ['Készpénz / önerőből', 'Hotovost / vlastní zdroje'], ['Finanszírozás (hitel)', 'Financování (úvěr)'], ['Finanszírozással', 'S financováním'], ['Egy összegben', 'Jednorázově'],
       [r('\\+36 30 233 6060'), '+421 915 410 555'], [r('36302336060'), '421915410555'],
-      [r('<a href="https://(?:magyarefk|kormanyhivatal)\\.hu"([^>]*)>(www\\.)?([a-z0-9.-]+\\.cz)</a>'), '<a href="https://www.$3"$1>$3</a>']
+      [r('<a href="https://(?:magyarefk|kormanyhivatal)\\.hu"([^>]*)>(www\\.)?([a-z0-9.-]+\\.cz)</a>'), '<a href="https://www.$3"$1>$3</a>'],
+      /* 4. fázis: online szerződéskötés, bármely ország lakosa bérelhet */
+      ['<p>Smlouvy se zpravidla uzavírají osobně, v kanceláři nebo při předání vozu; v takovém případě právo na odstoupení platné pro smlouvy uzavírané na dálku neexistuje.</p>', '<p>Smlouvy uzavíráme zpravidla online — podepisují se elektronicky, návštěva kanceláře není nutná. Takto uzavřená smlouva je smlouvou uzavřenou na dálku.</p>'],
+      ['Předběžnou smlouvu podepíšete a pošlete nám ji zpět.', 'Předběžnou smlouvu podepíšete online — elektronicky, bez tisku a bez návštěvy kanceláře.'],
+      ['Obě strany podepíší závěrečnou smlouvu, jejíž součástí', 'Obě strany podepíší online závěrečnou smlouvu, jejíž součástí'],
+      ['<li>Podpis smlouvy je zároveň ', '<li>Pronajmout si vůz můžete s bydlištěm nebo sídlem v Česku, na Slovensku, v Německu i v jiné zemi. Smlouvu podepisujete <strong>online</strong> — elektronicky, bez návštěvy kanceláře.</li> <li>Podpis smlouvy je zároveň '],
+      [r('(?:www\\.)?caradvance\\.hu/berlesi-feltetelek/?'), 'caradvance.cz/pronajem/podminky-a-kauce/'],
+      [r('(\\d{4})\\. (ledna|února|března|dubna|května|června|července|srpna|září|října|listopadu|prosince) (\\d{1,2})\\.'), '$3. $2 $1']
     ],
     IMPORT: { img: '/sk-team/pavel-horemuz.webp', name: 'Pavel Horemuž', role: 'Dovoz vozů z Německa', alt: 'Pavel Horemuž — dovoz vozů z Německa, CarAdvance', flags: [['sk', 'slovenština'], ['cz', 'čeština']], bio: 'Pavel vás osobně provede celým dovozem — od výběru vozu až po předání klíčů. Komunikuje s vámi česky i slovensky a se společností Caradvance GmbH domluví všechny podrobnosti.', email: 'info@caradvance.cz' },
     CONTACT: {

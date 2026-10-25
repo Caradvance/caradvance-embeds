@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { M as XM, G as XGL, LEGAL, LEGAL_HREF, LEGAL_PAGES, LEGAL_EXACT } from './skcz-text-data.mjs';
-import { runSk as calcSk } from './skcz-calc.mjs';
+import { runSk as calcSk, runCs as calcCs } from './skcz-calc.mjs';
 
 const NUM = /\d+(?:[.,\u00a0\u202f ]\d+)*/g;
 
@@ -526,8 +526,8 @@ export function run(DIST = 'dist') {
         } catch (x) { errs++; }
       }
     })(base);
-    // Szlovákia: saját illetékkalkulátorok (a magyar honosítás / átírás helyett)
-    let calc = 0; if (l === 'sk') { try { calc = calcSk(base, map); } catch (x) { calc = 'hiba: ' + x.message; } }
+    // Szlovákia és Csehország: saját illetékkalkulátorok (a magyar honosítás / átírás helyett)
+    let calc = 0; try { calc = l === 'sk' ? calcSk(base, map) : l === 'cs' ? calcCs(base, map) : 0; } catch (x) { calc = 'hiba: ' + x.message; }
     out.push(`${l}: képek ${IMG.size}/${translate.imgCount()} csere, kalkulátor ${calc}, rt ${rtn} fájl, HTML ${changed}/${files} módosítva${errs ? ', hiba: ' + errs : ''}, blog-főoldal: ${blog}, fordító a <head>-ben: ${rtFirst}${dbg ? ' — ' + dbg : ''}`);
   }
   return '[skcz-text] ' + (out.join(' | ') || 'nincs sk/cs');

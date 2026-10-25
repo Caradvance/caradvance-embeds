@@ -290,3 +290,264 @@ export function runSk(base, map) {
 
 // tesztekhez
 export { mainHtml, CALC_JS, PKW };
+
+/* ======================================================================================
+ * caradvance.cz — cseh illetékkalkulátorok (a magyar honosítás- és átírás-kalkulátor helyett).
+ *
+ * Csehországban két állami tétel van:
+ *  1) správní poplatek — zákon č. 634/2004 Sb., sazebník, položka 26 (zápis vozidla / změny vlastníka do registru):
+ *     motorové vozidlo s nejméně čtyřmi koly 800 Kč, motocykl nad 50 cm³ 500 Kč, do 50 cm³ 300 Kč,
+ *     přípojné vozidlo do 750 kg 500 Kč, nad 750 kg 700 Kč; nem kell fizetni, ha egyidejűleg EL rendszámot adnak ki.
+ *  2) emisní poplatek — zákon č. 542/2020 Sb. (§ 113 an.), csak M1 és N1: EURO 0 10 000 Kč, EURO 1 5 000 Kč,
+ *     EURO 2 3 000 Kč, EURO 3 és újabb 0 Kč; egy járműre csak egyszer (ha korábban már megfizették, nem kell).
+ * (Forrás: olomouc.eu életszituáció-leírás, 2025. 7. 1-től; zakonyprolidi.cz.)
+ * ====================================================================================== */
+const CZ_SRC_634 = 'https://www.zakonyprolidi.cz/cs/2004-634';
+const CZ_SRC_542 = 'https://www.zakonyprolidi.cz/cs/2020-542';
+const CZ_TYPES = [
+  ['m1', 'Osobní automobil (M1)', 800, true],
+  ['n1', 'Lehký užitkový vůz (N1, do 3,5 t)', 800, true],
+  ['moto', 'Motocykl nad 50 cm³', 500, false],
+  ['moto50', 'Motocykl do 50 cm³ včetně', 300, false],
+  ['trl', 'Přípojné vozidlo do 750 kg včetně', 500, false],
+  ['trh', 'Přípojné vozidlo nad 750 kg', 700, false]
+];
+const CZ_EMIS = [['Euro 3 a novější', 0], ['Euro 2', 3000], ['Euro 1', 5000], ['Euro 0 nebo bez emisní normy', 10000]];
+
+const CZ_FAQ = (kind) => [
+  [kind === 'prepis' ? 'Kolik stojí přepis auta v roce 2026?' : 'Kolik stojí registrace dovezeného auta v roce 2026?',
+    kind === 'prepis'
+      ? 'Správní poplatek za zápis změny vlastníka osobního auta je 800 Kč (motocykl 300 nebo 500 Kč, přívěs 500 nebo 700 Kč). U aut s emisní normou Euro 2 a starší se k tomu připočítává emisní poplatek 3 000 až 10 000 Kč — pokud už za vozidlo nebyl zaplacen dříve. Auta s normou Euro 3 a novější emisní poplatek neplatí.'
+      : 'Správní poplatek za zápis osobního auta do registru silničních vozidel je 800 Kč. Pokud se současně přiděluje registrační značka EL (elektromobil, vodík, plug-in hybrid do 50 g CO₂/km), poplatek se neplatí. U dovezeného auta s normou Euro 2 a starší se platí ještě emisní poplatek 3 000 až 10 000 Kč; Euro 3 a novější je bez emisního poplatku.'],
+  ['Co je emisní poplatek (dříve „ekologická daň“)?',
+    'Emisní poplatek podle zákona č. 542/2020 Sb. se platí u osobních aut (M1) a lehkých užitkových vozů (N1) při první registraci v ČR, při změně vlastníka nebo provozovatele. Výše: Euro 2 — 3 000 Kč, Euro 1 — 5 000 Kč, Euro 0 nebo bez normy — 10 000 Kč. Za jedno vozidlo se platí jen jednou: pokud už byl zaplacen (nebo dřívější ekopoplatek podle zákona o odpadech), znovu se neplatí. Osvobození upravuje § 115 zákona.'],
+  ['Platí se poplatek za elektromobil?',
+    'Pokud se elektromobilu (nebo vozu na vodík či plug-in hybridu do 50 g CO₂/km) při registraci současně přidělí registrační značka EL, správní poplatek se neplatí. Při přepisu vozidla, které už značku EL má, se platí běžných 800 Kč. Emisní poplatek se elektromobilů netýká.'],
+  ['Kde najdu emisní normu vozidla?',
+    'V osvědčení o registraci (technickém průkazu), v COC listu nebo v datech výrobce. Pokud normu neznáte, kalkulačka ji odhadne podle data první registrace — rozhodující je však údaj v dokladech vozidla.'],
+  ['Co dalšího je potřeba zaplatit?',
+    'Evidenční kontrolu ve stanici technické kontroly (cena podle ceníku stanice), u dovezeného vozu případně technickou prohlídku, povinné ručení (pojištění odpovědnosti) a při převozu vozidla případně převozní značky. Tyto položky kalkulačka nezahrnuje.'],
+  ['Platí se při dovozu ojetého auta z Německa česká DPH?',
+    'U ojetého auta koupeného od obchodníka z EU ve zvláštním režimu (zdanění přirážky) česká DPH zpravidla nevzniká. Auto mladší než šest měsíců nebo s nájezdem do 6 000 km se však považuje za nový dopravní prostředek a DPH se z něj platí v ČR.']
+];
+
+function czCalcHtml(kind, links) {
+  const isP = kind === 'prepis';
+  const yearOpts = [];
+  const nowY = new Date().getFullYear();
+  for (let y = nowY; y >= 1960; y--) yearOpts.push(`<option value="${y}"${y === nowY - 3 ? ' selected' : ''}>${y}</option>`);
+  return `
+<div class="lk" id="kalkulator">
+<div class="lk-head">
+<span class="lk-eyebrow">Kalkulačka 2026</span>
+<h2 class="lk-title">${isP ? 'Kalkulačka poplatků za přepis vozidla' : 'Kalkulačka poplatků za registraci dovezeného auta'}</h2>
+<p class="lk-lead">${isP ? 'Vyberte druh vozidla, pohon a emisní normu — okamžitě uvidíte správní a emisní poplatek, který nový vlastník zaplatí na registru vozidel při přepisu.' : 'Vyberte druh vozidla, pohon a emisní normu — okamžitě uvidíte správní a emisní poplatek za zápis auta dovezeného ze zahraničí do českého registru vozidel.'}</p>
+</div>
+<div class="lk-grid">
+<div class="lk-inputs">
+<div class="lk-field">
+<label for="czc-type"><span class="lk-lbl">Druh vozidla</span></label>
+<select id="czc-type" class="lk-in lk-sel">${CZ_TYPES.map(([v, t], i) => `<option value="${v}"${i === 0 ? ' selected' : ''}>${t}</option>`).join('')}</select>
+<span class="lk-hint">Kategorie vozidla je v osvědčení o registraci (kolonka J) nebo v COC listu.</span>
+</div>
+<div class="lk-field" id="czc-fuelf">
+<label for="czc-fuel"><span class="lk-lbl">Pohon</span></label>
+<select id="czc-fuel" class="lk-in lk-sel">
+<option value="ice" selected>Benzín, nafta, LPG, CNG nebo hybrid bez nabíjení</option>
+<option value="phev">Plug-in hybrid</option>
+<option value="ev">Elektromobil nebo vodík</option>
+</select>
+</div>
+<div class="lk-field" id="czc-elf" style="display:none">
+<label class="lk-check" style="display:flex;gap:.6em;align-items:flex-start;cursor:pointer"><input type="checkbox" id="czc-el" checked style="margin-top:.25em"> <span><span class="lk-lbl">${isP ? 'Současně žádám o přidělení značky EL' : 'Žádám o registrační značku EL'}</span><br><span class="lk-hint">Značku EL dostanou vozidla M1 a N1 s emisemi do 50 g CO₂/km. Při jejím přidělení se správní poplatek neplatí.${isP ? ' Pokud už vůz značku EL má, poplatek se platí.' : ''}</span></span></label>
+</div>
+<div class="lk-field" id="czc-normf">
+<label for="czc-norm"><span class="lk-lbl">Emisní norma Euro</span></label>
+<select id="czc-norm" class="lk-in lk-sel">
+<option value="0" selected>Euro 3 a novější</option>
+<option value="3000">Euro 2</option>
+<option value="5000">Euro 1</option>
+<option value="10000">Euro 0 nebo bez emisní normy</option>
+<option value="date">Nevím — odhadnout podle data první registrace</option>
+</select>
+<span class="lk-hint">Emisní normu najdete v osvědčení o registraci nebo v COC listu.</span>
+</div>
+<div class="lk-field" id="czc-yf" style="display:none">
+<label for="czc-y"><span class="lk-lbl">Rok první registrace</span></label>
+<select id="czc-y" class="lk-in lk-sel">${yearOpts.join('')}</select>
+</div>
+${isP ? `<div class="lk-field" id="czc-paidf">
+<label class="lk-check" style="display:flex;gap:.6em;align-items:flex-start;cursor:pointer"><input type="checkbox" id="czc-paid" style="margin-top:.25em"> <span><span class="lk-lbl">Emisní poplatek už byl za vozidlo v ČR zaplacen</span><br><span class="lk-hint">Za jedno vozidlo se platí jen jednou (platí i dřívější ekopoplatek podle zákona o odpadech). Údaj zjistíte na registru vozidel.</span></span></label>
+</div>` : ''}
+</div>
+<div class="lk-result">
+<div class="lk-monthly">
+<span class="lk-mlabel">${isP ? 'Poplatky za přepis celkem' : 'Poplatky za registraci celkem'}</span>
+<div class="lk-mval"><span class="lk-mnum" id="czc-total">—</span></div>
+</div>
+<div class="lk-rows">
+<div class="lk-row"><span>Druh vozidla</span><b id="czc-o-type">—</b></div>
+<div class="lk-row"><span>Správní poplatek (položka 26)</span><b id="czc-o-adm">—</b></div>
+<div class="lk-row"><span>Emisní norma</span><b id="czc-o-norm">—</b></div>
+<div class="lk-row"><span>Emisní poplatek</span><b id="czc-o-emis">—</b></div>
+<div class="lk-row lk-total"><span>Celkem státu</span><b id="czc-o-fee">—</b></div>
+</div>
+<a class="lk-cta" href="${links.kontakt}">${isP ? 'Přepis vyřídíme za vás →' : 'Registraci vyřídíme za vás →'}</a>
+<p class="lk-disc"><b>Kalkulačka má informativní charakter.</b> Výši poplatků vždy určí registr vozidel. Nezahrnuje evidenční kontrolu a technickou prohlídku, povinné ručení ani převozní značky. Zdroj: <a href="${CZ_SRC_634}" target="_blank" rel="noopener">zákon č. 634/2004 Sb., položka 26</a> a <a href="${CZ_SRC_542}" target="_blank" rel="noopener">zákon č. 542/2020 Sb.</a></p>
+</div>
+</div>
+</div>`;
+}
+
+const CZ_CALC_JS = (isP) => `<script id="czc-js">(function(){
+var T=${JSON.stringify(Object.fromEntries(CZ_TYPES.map(([v, t, f, e]) => [v, [t, f, e]])))},P=${isP ? 1 : 0};
+function $(i){return document.getElementById(i)}
+function fmt(x){return String(Math.round(x)).replace(/\\B(?=(\\d{3})+(?!\\d))/g,'\\u00a0')+'\\u00a0Kč'}
+function byYear(y){if(y<=1992)return[10000,'Euro 0 (odhad: první registrace do 1992)'];if(y<=1996)return[5000,'Euro 1 (odhad: 1993–1996)'];if(y<=2000)return[3000,'Euro 2 (odhad: 1997–2000)'];return[0,'Euro 3 a novější (odhad: od 2001)']}
+function calc(){
+ var t=$('czc-type').value,ty=T[t],m=ty[2],fuel=$('czc-fuel').value,ns=$('czc-norm').value;
+ $('czc-fuelf').style.display=m?'':'none';
+ var elOk=m&&(fuel==='ev'||fuel==='phev');
+ $('czc-elf').style.display=elOk?'':'none';
+ var ice=!(m&&fuel==='ev');
+ $('czc-normf').style.display=(m&&ice)?'':'none';
+ $('czc-yf').style.display=(m&&ice&&ns==='date')?'':'none';
+ var adm=ty[1];if(elOk&&$('czc-el').checked)adm=0;
+ var emis=0,nl='—';
+ if(m&&ice){var r;if(ns==='date')r=byYear(+$('czc-y').value);else r=[+ns,$('czc-norm').options[$('czc-norm').selectedIndex].text];emis=r[0];nl=r[1]}
+ else if(m){nl='elektromobil — netýká se'}
+ else{nl='netýká se (jen M1 a N1)'}
+ var paid=P&&$('czc-paid')&&$('czc-paid').checked;
+ if(P&&$('czc-paidf'))$('czc-paidf').style.display=(m&&ice)?'':'none';
+ if(paid&&emis)emis=0,nl+=' — již zaplaceno';
+ $('czc-o-type').textContent=ty[0];
+ $('czc-o-adm').textContent=adm?fmt(adm):(elOk?'0\\u00a0Kč (značka EL)':'0\\u00a0Kč');
+ $('czc-o-norm').textContent=nl;
+ $('czc-o-emis').textContent=fmt(emis);
+ $('czc-o-fee').textContent=fmt(adm+emis);$('czc-total').textContent=fmt(adm+emis);
+}
+['czc-type','czc-fuel','czc-norm','czc-y','czc-el','czc-paid'].forEach(function(i){var e=$(i);if(!e)return;e.addEventListener('input',calc);e.addEventListener('change',calc)});
+calc();
+})();</script>`;
+
+function czMainHtml(kind, hero, links) {
+  const isP = kind === 'prepis';
+  const faq = CZ_FAQ(kind);
+  const h1 = isP ? 'Poplatek za přepis auta 2026 —<br><span class="accent">kalkulačka správního a emisního poplatku</span>'
+    : 'Poplatek za registraci auta 2026 —<br><span class="accent">dovoz z Německa, kalkulačka</span>';
+  const sub = isP
+    ? 'Při přepisu se v Česku platí správní poplatek za zápis nového vlastníka do registru vozidel a u starších aut i emisní poplatek. Spočítejte si je — a přepis nám klidně svěřte celý.'
+    : 'Při první registraci auta dovezeného ze zahraničí se v Česku platí správní poplatek a u aut s normou Euro 2 a starší i emisní poplatek. Spočítejte si je podle aktuálních předpisů — dovoz i registraci vyřídíme na klíč.';
+  const heroHtml = hero
+    .replace(/<h1>[\s\S]*?<\/h1>/, `<h1>${h1}</h1>`)
+    .replace(/(<p class="sub[^"]*">)[\s\S]*?(<\/p>)/, `$1${sub}$2`)
+    .replace(/(<a class="btn btn-primary" href=")[^"]*(">)[\s\S]*?(<\/a>)/, `$1#kalkulator$2Spočítat poplatek$3`)
+    .replace(/(<a class="btn btn-white" href=")[^"]*(">)[\s\S]*?(<\/a>)/, `$1${links.kontakt}$2Chci pomoc$3`);
+  const other = isP ? links.dovozCalc : links.prepisCalc;
+  const steps = isP
+    ? [['Evidenční kontrola', 'Provádí ji stanice technické kontroly; protokol se nepředkládá, úřad si ho dohledá v systému. Platí i platná technická prohlídka s evidenční kontrolou.'],
+      ['Povinné ručení', 'Nový vlastník sjedná pojištění odpovědnosti ještě před zápisem do registru.'],
+      ['Zápis na registru vozidel', 'Prodávající a kupující (nebo zmocněnec) požádají o zápis změny vlastníka na kterémkoli obecním úřadě obce s rozšířenou působností; zaplatí se poplatky podle kalkulačky.'],
+      ['Nové osvědčení o registraci', 'Úřad vydá nové osvědčení o registraci vozidla; registrační značky zůstávají.']]
+    : [['Evidenční kontrola', 'Ověření identifikátorů vozidla (VIN, štítky) a dokladů ve stanici technické kontroly.'],
+      ['Technická prohlídka', 'Pokud ji registr vyžaduje — zejména u vozidla bez platné prohlídky ze země původu.'],
+      ['Povinné ručení', 'Pojištění odpovědnosti sjednáte před registrací — bez něj vozidlo do registru nezapíšou.'],
+      ['Registrace na registru vozidel', 'Zaplatí se poplatky podle kalkulačky, vydá se osvědčení o registraci a registrační značky.']];
+  return `<main>
+${heroHtml}
+<div id="ca-kalk">
+${czCalcHtml(kind, links)}
+
+<section class="sec">
+<h2>Správní poplatek za zápis do registru (položka 26)</h2>
+<p class="lede">Sazebník zákona č. 634/2004 Sb. o správních poplatcích — platí pro zápis vozidla do registru i pro zápis změny vlastníka nebo provozovatele.</p>
+<div class="scroll"><table><thead><tr><th>Vozidlo</th><th class="n">Poplatek</th></tr></thead><tbody>
+<tr><td>Motorové vozidlo s nejméně čtyřmi koly (osobní auto, užitkový vůz)</td><td class="n">800 Kč</td></tr>
+<tr><td>Motocykl nad 50 cm³</td><td class="n">500 Kč</td></tr>
+<tr><td>Motocykl do 50 cm³ včetně</td><td class="n">300 Kč</td></tr>
+<tr><td>Přípojné vozidlo nad 750 kg</td><td class="n">700 Kč</td></tr>
+<tr><td>Přípojné vozidlo do 750 kg včetně</td><td class="n">500 Kč</td></tr>
+<tr><td>Současně přidělovaná registrační značka EL</td><td class="n">0 Kč</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="sec">
+<h2>Emisní poplatek (M1 a N1)</h2>
+<p class="lede">Zákon č. 542/2020 Sb. o výrobcích s ukončenou životností — platí se jen jednou za život vozidla v ČR.</p>
+<div class="scroll"><table><thead><tr><th>Emisní norma</th><th class="n">Poplatek</th></tr></thead><tbody>${CZ_EMIS.map(([a, b]) => `<tr><td>${a}</td><td class="n">${b ? b.toLocaleString('cs-CZ').replace(/\s/g, '&nbsp;') + ' Kč' : '0 Kč'}</td></tr>`).join('')}</tbody></table></div>
+</section>
+
+<section class="ca-proc">
+<span class="ca-eyebrow">${isP ? 'Průběh přepisu' : 'Průběh registrace'}</span>
+<h2 class="ca-sectitle">${isP ? 'Čtyři kroky k přepisu auta' : 'Čtyři kroky k registraci dovezeného auta'}</h2>
+<div class="ca-steps">
+${steps.map(([t, p], i) => `<div class="ca-step"><div class="ca-sn">${i + 1}</div><h3>${t}</h3><p>${p}</p></div>`).join('\n')}
+</div>
+</section>
+
+<section class="sec">
+<h2>Časté otázky</h2>
+<div class="faq">
+${faq.map(([q, a]) => `<details><summary>${esc(q)}</summary>\n<p>${esc(a)}</p></details>`).join('\n')}
+</div>
+</section>
+
+<section class="sec">
+<div class="cta">
+<div class="t">${isP ? 'Přepis vyřídíme za vás' : 'Dovoz a registrace na klíč'}</div>
+<p>${isP ? 'Evidenční kontrolu, doklady i návštěvu registru vozidel zařídíme za vás.' : 'Auto najdeme, prověříme, dovezeme z Německa a předáme s českým osvědčením o registraci na vaše jméno.'}</p>
+<p>${isP ? 'Dovážíte auto ze zahraničí? Podívejte se na' : 'Přepisujete auto už registrované v ČR? Podívejte se na'} <a href="${other}" style="color:#fff;text-decoration:underline">${isP ? 'kalkulačku poplatků za registraci' : 'kalkulačku poplatků za přepis'}</a>.</p>
+<p><b>+421 915 410 555</b> · info@caradvance.cz</p>
+</div>
+<p class="foot">Kalkulačka má informativní charakter. Zdroj: zákon č. 634/2004 Sb. o správních poplatcích, položka 26; zákon č. 542/2020 Sb., emisní poplatek (stav 2026).</p>
+</section>
+</div>
+${CZ_CALC_JS(isP)}
+</main>`;
+}
+
+function czLd(kind, url) {
+  const isP = kind === 'prepis';
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'WebApplication', name: isP ? 'Kalkulačka poplatků za přepis vozidla' : 'Kalkulačka poplatků za registraci vozidla', url, applicationCategory: 'FinanceApplication', operatingSystem: 'Any', inLanguage: 'cs', offers: { '@type': 'Offer', price: '0', priceCurrency: 'CZK' } },
+      { '@type': 'FAQPage', mainEntity: CZ_FAQ(kind).map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }
+    ]
+  }).replace(/<\//g, '<\\/');
+}
+
+function czPatch(file, kind, links, url) {
+  if (!fs.existsSync(file)) return false;
+  let h = fs.readFileSync(file, 'utf8');
+  const ms = h.indexOf('<main'), me = h.indexOf('</main>');
+  if (ms < 0 || me < 0) return false;
+  const main = h.slice(ms, me + 7);
+  const hero = (main.match(/<section class="hero">[\s\S]*?<\/section>/) || [''])[0];
+  h = h.slice(0, ms) + czMainHtml(kind, hero, links) + h.slice(me + 7);
+  const isP = kind === 'prepis';
+  const title = isP ? 'Poplatek za přepis auta 2026 — kalkulačka | CarAdvance' : 'Poplatek za registraci auta 2026 — kalkulačka pro dovoz | CarAdvance';
+  const desc = isP
+    ? 'Kolik stojí přepis auta v roce 2026? Kalkulačka správního poplatku (800 Kč, položka 26 zákona 634/2004 Sb.) a emisního poplatku podle normy Euro (zákon 542/2020 Sb.).'
+    : 'Kolik stojí registrace auta dovezeného z Německa v roce 2026? Kalkulačka správního poplatku, značky EL a emisního poplatku podle normy Euro (zákon 634/2004 Sb., 542/2020 Sb.).';
+  h = h.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`);
+  h = h.replace(/(<meta\s+(?:name|property)="(?:description|og:description|twitter:description)"\s+content=")[^"]*(")/g, (w, a, b) => a + esc(desc) + b);
+  h = h.replace(/(<meta\s+(?:name|property)="(?:og:title|twitter:title)"\s+content=")[^"]*(")/g, (w, a, b) => a + esc(title) + b);
+  h = h.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, `<script type="application/ld+json">${czLd(kind, url)}</script>`);
+  fs.writeFileSync(file, h);
+  return true;
+}
+
+/** dist/cs — a két kalkulátor-oldal cseréje. map: régi magyar cím → új cseh cím (_slugs.json). */
+export function runCs(base, map) {
+  const loc = (hu, def) => map[hu] || def;
+  const links = {
+    kontakt: '/cs' + loc('/kapcsolat/', '/kontakt/'),
+    dovozCalc: '/cs' + loc('/honositas-kalkulator/', '/dovoz/kalkulacka-poplatku/'),
+    prepisCalc: '/cs' + loc('/atiras-kalkulator/', '/dovoz/kalkulacka-prepisu/')
+  };
+  let n = 0;
+  if (czPatch(path.join(base, loc('/honositas-kalkulator/', '/dovoz/kalkulacka-poplatku/'), 'index.html'), 'dovoz', links, 'https://www.caradvance.cz' + loc('/honositas-kalkulator/', '/dovoz/kalkulacka-poplatku/'))) n++;
+  if (czPatch(path.join(base, loc('/atiras-kalkulator/', '/dovoz/kalkulacka-prepisu/'), 'index.html'), 'prepis', links, 'https://www.caradvance.cz' + loc('/atiras-kalkulator/', '/dovoz/kalkulacka-prepisu/'))) n++;
+  return n;
+}
