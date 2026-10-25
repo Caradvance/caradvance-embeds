@@ -258,3 +258,14 @@ export const CONTENT: Record<string, RentalContent> = {
   ...MERCEDES,
   ...OTHERS,
 };
+
+// A Choice időnként átnevezi a modelleket (pl. 'Hyundai Tucson' → 'Hyundai TUCSON', új e-HYBRID kulcs).
+// Így a meglévő tartalom (szöveg + sajtófotó-galéria) az új kulccsal is megjelenik — a kártyán is lapozhatók a fotók.
+const ALIAS: Record<string, string> = {
+  'Hyundai TUCSON': 'Hyundai Tucson',
+  'Hyundai STARIA': 'Hyundai Staria',
+  'Seat Leon Sportstourer e-HYBRID': 'Seat Leon Sportstourer',
+  'Audi A5 Avant e-hybrid': 'Audi A5 Avant',
+  'Mercedes-Benz C-Klasse Limousine': 'Mercedes-Benz C-Klasse',
+};
+for (const [a, b] of Object.entries(ALIAS)) if (!CONTENT[a] && CONTENT[b]) CONTENT[a] = CONTENT[b];
