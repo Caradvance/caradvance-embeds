@@ -223,6 +223,36 @@ function cleanHtml(h, l, C, rel) {
   return [h, st];
 }
 
+/* ---------- hreflang sk/cs (C17) ---------- */
+function hreflang(dist) {
+  const M = {}; const INV = {};
+  for (const l of ['sk', 'cs']) {
+    try { M[l] = JSON.parse(fs.readFileSync(path.join(dist, l, '_slugs.json'), 'utf8')); } catch (e) { return 'hreflang: nincs _slugs'; }
+    INV[l] = {}; for (const [hu, loc] of Object.entries(M[l])) if (!(loc in INV[l]) && loc !== '/' || hu === '/') INV[l][loc] = hu;
+  }
+  const HL = { sk: 'sk', cs: 'cs' }; let n = 0;
+  for (const l of ['sk', 'cs']) {
+    const o = l === 'sk' ? 'cs' : 'sk';
+    (function walk(d, rel) {
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        if (e.isDirectory()) { walk(path.join(d, e.name), rel + e.name + '/'); continue; }
+        if (e.name !== 'index.html') continue;
+        const loc = rel || '/'; const hu = INV[l][loc]; if (!hu) continue;
+        const p = path.join(d, e.name); let h = fs.readFileSync(p, 'utf8');
+        if (/hreflang="sk"/.test(h) && /<link rel="alternate" hreflang="sk"/.test(h)) continue;
+        const oloc = M[o][hu];
+        let add = '<link rel="alternate" hreflang="' + HL[l] + '" href="' + SITE[l] + loc + '">';
+        if (oloc && fs.existsSync(path.join(dist, o, oloc, 'index.html'))) add += '<link rel="alternate" hreflang="' + HL[o] + '" href="' + SITE[o] + oloc + '">';
+        const i = h.lastIndexOf('<link rel="alternate" hreflang=');
+        if (i >= 0) { const j = h.indexOf('>', i) + 1; h = h.slice(0, j) + add + h.slice(j); }
+        else h = h.replace('</head>', add + '</head>');
+        fs.writeFileSync(p, h); n++;
+      }
+    })(path.join(dist, l), '/');
+  }
+  return 'hreflang: ' + n;
+}
+
 /* ---------- 404-oldal (C12) ---------- */
 import { P3 } from './skcz-p3-data.mjs';
 function notFound(dist) {
@@ -313,6 +343,8 @@ export function run(dist = DIST) {
       } catch (e) { out.push(f + ': hiba ' + e.message); }
     }
   }
+  // hreflang (C17): a sk/cs oldalakon önhivatkozó sk + a párja cs-ben (a magyar oldalak a 4. fázisban, indításkor kapják meg)
+  try { out.push(hreflang(dist)); } catch (e) { out.push('hreflang hiba: ' + e.message); }
   // 404 (C12): a gyökér 404.html minden domainen ugyanaz — sk/cs változat külön fájlban, a .sk/.cz domainen ez töltődik be
   try { out.push(notFound(dist)); } catch (e) { out.push('404 hiba: ' + e.message); }
   return '[skcz-local] ' + out.join(' | ');
