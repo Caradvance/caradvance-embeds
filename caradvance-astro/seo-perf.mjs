@@ -194,16 +194,18 @@ let ogn = 0;
 
 // Bérlési űrlap: kívánt kezdő dátum (naptár, min. +10 nap / elérhetőség hónapja) + Choice link az admin e-mailbe (2026-10)
 const AB_DATE_JS = `<script id="ca-abdate">(function(){
-var seg=(location.pathname.split('/')[1]||'');var LG=/^(en|fr|uk|zh|sk|cs)$/.test(seg)?'en':(seg==='de'?'de':'hu');
+var seg=(location.pathname.split('/')[1]||'');var HL=String(document.documentElement.lang||'').slice(0,2).toLowerCase();var LG=/^(sk|cs)$/.test(HL)?HL:(/^(en|fr|uk|zh|sk|cs)$/.test(seg)?'en':(seg==='de'?'de':'hu'));
 var T={hu:{lbl:'7. Mikortól bérelnéd?',tip:'Az autót Németországból hozzuk: a megrendeléstől számítva legalább 10 nap kell, mire átveheted. Későbbi elérhetőségű autónál a legkorábbi dátum az elérhetőség hónapjának első napja.',note:'Legkorábbi átvétel: ',err:'Kérlek válaszd ki, mikortól szeretnéd bérelni az autót.',errMin:'A legkorábbi lehetséges kezdés: '},
 en:{lbl:'7. When would you like the rental to start?',tip:'We bring the car from Germany: it takes at least 10 days from your order until handover. For cars available later, the earliest date is the first day of that month.',note:'Earliest handover: ',err:'Please choose when you would like the rental to start.',errMin:'The earliest possible start is '},
+sk:{lbl:'7. Od kedy si chcete auto prenajať?',tip:'Auto privezieme z Nemecka: od objednávky trvá najmenej 10 dní, kým si ho môžete prevziať. Pri aute s neskoršou dostupnosťou je najskorší dátum prvý deň mesiaca dostupnosti.',note:'Najskorší termín prevzatia: ',err:'Vyberte, prosím, od kedy si chcete auto prenajať.',errMin:'Najskorší možný začiatok: '},
+cs:{lbl:'7. Od kdy si chcete vůz pronajmout?',tip:'Vůz přivezeme z Německa: od objednávky trvá nejméně 10 dní, než si ho můžete převzít. U vozu s pozdější dostupností je nejbližší termín první den měsíce dostupnosti.',note:'Nejbližší termín převzetí: ',err:'Vyberte prosím, od kdy si chcete vůz pronajmout.',errMin:'Nejbližší možný začátek: '},
 de:{lbl:'7. Ab wann möchten Sie mieten?',tip:'Wir bringen das Auto aus Deutschland: Ab Bestellung dauert es mindestens 10 Tage bis zur Übergabe. Bei später verfügbaren Autos ist der früheste Termin der erste Tag des jeweiligen Monats.',note:'Frühestmögliche Übergabe: ',err:'Bitte wählen Sie, ab wann Sie das Auto mieten möchten.',errMin:'Frühestmöglicher Beginn: '}}[LG];
 var HUM=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
 var LEAD=10;
 function p2(n){return (n<10?'0':'')+n;}
 function iso(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());}
 function huD(s){var a=s.split('-');return a[0]+'. '+HUM[+a[1]-1]+' '+(+a[2])+'.';}
-function nice(s){if(LG==='hu')return huD(s);try{return new Date(s+'T12:00:00').toLocaleDateString(LG==='de'?'de-DE':'en-GB',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}}
+function nice(s){if(LG==='hu')return huD(s);if(LG==='sk'||LG==='cs'){var q=s.split('-');return (+q[2])+'. '+(+q[1])+'. '+q[0];}try{return new Date(s+'T12:00:00').toLocaleDateString(LG==='de'?'de-DE':'en-GB',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}}
 function minDate(m){var d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+LEAD);var av=m.querySelector('input[name="avail"]:checked');var v=av?av.value:'';var r=/(\\d{4})\\.\\s*([a-záéíóöőúüű]+)/i.exec(v||'');if(r){var mi=HUM.indexOf(r[2].toLowerCase());if(mi>-1){var f=new Date(+r[1],mi,1,12);if(f>d)d=f;}}return iso(d);}
 var MAP=null,MAPL=0;function loadMap(){if(MAP||MAPL)return;MAPL=1;fetch('/abo-links.json').then(function(r){return r.json();}).then(function(j){MAP=j.m||{};}).catch(function(){MAPL=0;});}
 function choiceLink(m){var f=m.querySelector('#abForm');if(!f)return '';var fd=new FormData(f);var car=(fd.get('car')||'').trim(),fu=fd.get('fuel')||'',co=fd.get('color')||'',tr=fd.get('ausstattung')||'';var M=MAP||{};var k=[[car,fu,co,tr],[car,'','',tr],[car,fu,co,''],[car,'','','']];for(var i=0;i<k.length;i++){var v=M[k[i].join('|')];if(v)return 'https://fleetshop.choice.de/offer-details/'+v;}return 'https://fleetshop.choice.de/abo';}

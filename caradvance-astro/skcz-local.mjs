@@ -24,7 +24,7 @@ const DIST = process.argv[2] || 'dist';
 
 const CFG = {
   sk: {
-    seg: ['komisny-predaj', 'blog/komisionalny-predaj-auta'],
+    seg: ['komisny-predaj', 'blog/komisionalny-predaj-auta', 'szerzodes', 'teszt-mega-menu'],
     hu: ['/bizomanyos/', '/bizomanyos-auto/', '/eladom/', '/jotekonysag/', '/ertekesitesi-folyamat/', '/gyakori-kerdesek/', '/blog/bizomanyos-auto-ertekesites/'],
     kw: /komision[áa]ln|komision[áa]rsk|komisn[ýyé]|charit/i,
     other: [['https://www.caradvance.hu/', 'CarAdvance Maďarsko', 'hu'], ['https://www.caradvance.cz/', 'CarAdvance Česko', 'cs']],
@@ -55,7 +55,7 @@ const CFG = {
     ]
   },
   cs: {
-    seg: ['komisni-prodej', 'blog/komisni-prodej-auta'],
+    seg: ['komisni-prodej', 'blog/komisni-prodej-auta', 'szerzodes', 'teszt-mega-menu'],
     hu: ['/bizomanyos/', '/bizomanyos-auto/', '/eladom/', '/jotekonysag/', '/ertekesitesi-folyamat/', '/gyakori-kerdesek/', '/blog/bizomanyos-auto-ertekesites/'],
     kw: /komisn[íiě]|komisionářsk|charit/i,
     other: [['https://www.caradvance.hu/', 'CarAdvance Maďarsko', 'hu'], ['https://www.caradvance.sk/', 'CarAdvance Slovensko', 'sk']],
@@ -223,6 +223,34 @@ function cleanHtml(h, l, C, rel) {
   return [h, st];
 }
 
+/* ---------- 404-oldal (C12) ---------- */
+import { P3 } from './skcz-p3-data.mjs';
+function notFound(dist) {
+  const root = path.join(dist, '404.html');
+  if (!fs.existsSync(root)) return '404: nincs';
+  let h = fs.readFileSync(root, 'utf8');
+  const made = [];
+  for (const l of ['sk', 'cs']) {
+    const N = P3[l].NF; const home = path.join(dist, l, 'index.html');
+    let t = h.replace(/<html lang="[^"]*">/, '<html lang="' + N.lang + '">').replace(/<title>[^<]*<\/title>/, '<title>' + N.title + '</title>')
+      .replace(/<link rel="canonical"[^>]*>/, '')
+      .replace(/<main class="box">[\s\S]*?<\/main>/, '<main class="box"> <img class="logo" src="/caradvance-logo-' + l + '.webp" onerror="this.src=\'/caradvance-logo.webp\'" alt="CarAdvance"> <div class="code">' + N.code + '</div> <h1>' + N.h1 + '</h1> <p>' + N.p + '</p> <div class="hint"><strong>' + N.hintB + '</strong><br>' + N.hint + '</div> <div class="btns"><a class="btn primary" href="' + N.b1[0] + '">' + N.b1[1] + '</a> <a class="btn soft" href="' + N.b2[0] + '">' + N.b2[1] + '</a></div> <div class="foot">' + N.foot + '</div> </main>');
+    // lábléc: a sk/cs főoldal lábléce (saját domainre mutató linkekkel)
+    if (fs.existsSync(home)) {
+      const hh = fs.readFileSync(home, 'utf8');
+      const f = /<footer class="cafoot"[\s\S]*?<\/footer>/.exec(hh);
+      if (f) t = t.replace(/<footer class="cafoot"[\s\S]*?<\/footer>/, f[0].replace(new RegExp('href="/' + l + '/', 'g'), 'href="/'));
+    }
+    fs.writeFileSync(path.join(dist, '404-' + l + '.html'), t);
+    made.push(l);
+  }
+  if (!/id="ca-404l"/.test(h)) {
+    h = h.replace(/<head>/, '<head><script id="ca-404l">(function(){var m=/(^|\\.)caradvance\\.(sk|cz)$/.exec(location.hostname);if(!m)return;var l=m[2]==="sk"?"sk":"cs";document.documentElement.style.visibility="hidden";fetch("/404-"+l+".html").then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(t){document.open();document.write(t);document.close();}).catch(function(){document.documentElement.style.visibility="";});})();</script>');
+    fs.writeFileSync(root, h);
+  }
+  return '404: ' + made.join(',');
+}
+
 /* ---------- futtatás ---------- */
 export function run(dist = DIST) {
   const out = [];
@@ -230,6 +258,9 @@ export function run(dist = DIST) {
   let BTV = '';
   try { BTV = crypto.createHash('sha1').update(fs.readFileSync(path.join(dist, 'ca-bt.js'))).digest('hex').slice(0, 10); } catch (e) {}
   globalThis.__BTV = BTV;
+  let CHV = '';
+  try { CHV = crypto.createHash('sha1').update(fs.readFileSync(path.join(dist, 'caradvance-chat.js'))).digest('hex').slice(0, 10); } catch (e) {}
+  globalThis.__CHV = CHV;
   for (const l of Object.keys(CFG)) {
     const C = CFG[l];
     for (const base of [path.join(dist, l), path.join(dist, '_np', l)]) {
@@ -262,6 +293,7 @@ export function run(dist = DIST) {
           let [n, st] = cleanHtml(s, l, C, rel);
           const [n2, st2] = legal(n, l, rel, CONTACT, SITE[l]);
           n = n2; for (const k in st2) st['legal.' + k] = st2[k];
+          if (globalThis.__CHV) n = n.replace(/\/caradvance-chat\.js(\?v=[0-9a-z]+)?"/g, '/caradvance-chat.js?v=' + globalThis.__CHV + '"');
           if (globalThis.__BTV) n = n.replace(/ca-bt\.js\?v=[0-9a-z]+/g, 'ca-bt.js?v=' + globalThis.__BTV);
           if (n !== s) { fs.writeFileSync(p, n); files++; for (const k in st) tot[k] = (tot[k] || 0) + st[k]; }
         }
@@ -281,6 +313,8 @@ export function run(dist = DIST) {
       } catch (e) { out.push(f + ': hiba ' + e.message); }
     }
   }
+  // 404 (C12): a gyökér 404.html minden domainen ugyanaz — sk/cs változat külön fájlban, a .sk/.cz domainen ez töltődik be
+  try { out.push(notFound(dist)); } catch (e) { out.push('404 hiba: ' + e.message); }
   return '[skcz-local] ' + out.join(' | ');
 }
 

@@ -12,6 +12,7 @@
  */
 import fs from 'node:fs';
 import { LEGAL } from './skcz-legal-data.mjs';
+import { P3 } from './skcz-p3-data.mjs';
 
 const VOID = /^(area|base|br|col|embed|hr|img|input|link|meta|source|track|wbr)$/i;
 function elEnd(s, i) {
@@ -192,9 +193,72 @@ function financePage(h, L, st) {
   return h;
 }
 
+/* ---------- 3. fázis: kapcsolat-oldal, import-kapcsolattartó, értékelések (C10, C14) ---------- */
+const FLAG = (codes) => codes.split(/ +/).filter(Boolean).map((c) => '<span class="kap-rflag" style="background-image:url(https://flagcdn.com/w40/' + c + '.png)"></span>').join('');
+const telOf = (p) => p.replace(/[^\d+]/g, '');
+function contactPage(h, Q, st) {
+  const C = Q.CONTACT; if (!C || h.indexOf('class="kap-hero"') < 0) return h;
+  const a = h.indexOf('<div class="kap-hero"'); const b = elEnd(h, a);
+  if (a < 0 || b < 0) return h;
+  h = h.slice(0, a) + h.slice(b);                                   // magyar megyetérkép + régiós kapcsolattartók ki
+  h = h.replace(/(<p class="kaphero-sub"[^>]*>)[\s\S]*?(<\/p>)/, '$1' + esc(C.sub) + '$2')
+    .replace(/(<img class="kaphero-bg" src=")[^"]*(")/, '$1/bmw-m3-touring-premium-auto-eladas.webp$2')
+    .replace(/(<div class="kap-sec-title"[^>]*>)[^<]*(<\/div>)/, '$1' + esc(C.teamTitle) + '$2')
+    .replace(/(<p class="kap-sec-sub"[^>]*>)[^<]*(<\/p>)/, '$1' + esc(C.teamSub) + '$2')
+    .replace(/<div class="kap-team-scroll" style="margin-top:6px"><div class="kap-team" id="kap-team2"><\/div><\/div>/, '');
+  const chip = (ic, t, href) => href ? '<a class="kap-chip' + (href.indexOf('wa.me') >= 0 ? ' kap-wa' : '') + '" href="' + href + '"' + (href.indexOf('wa.me') >= 0 ? ' target="_blank" rel="noopener"' : '') + '><span class="ic">' + ic + '</span>' + esc(t) + '</a>' : '<span class="kap-chip"><span class="ic">' + ic + '</span>' + esc(t) + '</span>';
+  const O = C.office;
+  const office = '<div class="kap-office-body" style="grid-column:1/-1"><div class="kap-office-name">' + esc(O.name) + '</div><div class="kap-office-role">' + esc(O.role) + '</div><p class="kap-office-bio">' + esc(O.bio) + '</p><div class="kap-office-chips">' +
+    chip('🕘', O.hours) + chip('📍', O.addr) + chip('✉', O.email, 'mailto:' + O.email) + chip('✆', '+421 915 410 555', 'tel:+421915410555') + chip('🟢', 'WhatsApp', 'https://wa.me/421915410555') + '</div></div>';
+  const team = C.team.map((t) => '<div class="kap-card"><div class="kap-photo"><img src="' + t.img + '" alt="' + esc(t.name) + '" loading="lazy"></div><div class="body"><div class="nm">' + esc(t.name) + '<span class="kap-flags">' + FLAG(t.flags) + '</span></div><div class="rl">' + esc(t.role) + '</div><div class="bio">' + esc(t.bio) + '</div><div class="cc">' +
+    chip('✆', t.phone, 'tel:' + telOf(t.phone)) + chip('🟢', 'WhatsApp', 'https://wa.me/' + telOf(t.phone).replace('+', '')) + chip('✉', O.email, 'mailto:' + O.email) + '</div></div></div>').join('');
+  h = h.replace(/<div class="kap-office" id="kap-office"><\/div>/, '<div class="kap-office" id="kap-office">' + office + '</div>');
+  h = h.replace(/<div class="kap-team" id="kap-team"><\/div>/, '<div class="kap-team" id="kap-team">' + team + '</div>');
+  // a régi (magyar csapatot, megyetérképet rajzoló) script ki
+  h = h.replace(/<script>\s*\(function\(\)\{\s*var COUNTIES = [\s\S]*?<\/script>/, '');
+  h = h.replace(/<script>\s*\(function\(\)\{\s*var AT='\\u0040'[\s\S]*?<\/script>/, '');
+  st.contact = 1;
+  return h;
+}
+function importCard(h, Q, st) {
+  const I = Q.IMPORT; if (!I) return h;
+  return h.replace(/<article class="team-card"[^>]*>[\s\S]*?<\/article>/g, (art) => {
+    if (art.indexOf('Tóth Károly') < 0) return art;
+    st.imp = 1;
+    return art
+      .replace(/(<div class="tc-photo"[^>]*><img src=")[^"]*(" alt=")[^"]*(")/, '$1' + I.img + '$2' + esc(I.alt) + '$3')
+      .replace(/(<span class="tc-role"[^>]*>)[^<]*(<\/span>)/, '$1' + esc(I.role) + '$2')
+      .replace(/(<h3 class="tc-name"[^>]*>)[^<]*(<\/h3>)/, '$1' + esc(I.name) + '$2')
+      .replace(/(<div class="tc-flags"[^>]*>)[\s\S]*?(<\/div>)/, (m, o, c) => o + I.flags.map(([f, t]) => '<span class="tc-flag" style="background-image:url(https://flagcdn.com/w80/' + f + '.png)" title="' + t + '"></span>').join('') + c)
+      .replace(/(<p class="tc-bio"[^>]*>)[\s\S]*?(<\/p>)/, '$1' + esc(I.bio) + '$2')
+      .replace(/(<a class="tc-chip" href="mailto:)[^"]*("[^>]*>[\s\S]*?<\/svg>)\s*[^<]*(<\/a>)/, '$1' + I.email + '$2 ' + I.email + '$3');
+  });
+}
+function reviewsLd(h, st) {
+  if (h.indexOf('"@type":"Review"') < 0) return h;
+  const SKT = {};
+  h.replace(/<span class="ref-rev-id"[^>]*><b[^>]*>([^<]+)<\/b>[\s\S]*?<p class="ref-rev-text"[^>]*>([\s\S]*?)<\/p>/g, (m, n, t) => { SKT[n.trim()] = plain(t); return m; });
+  return h.replace(/(<script type="application\/ld\+json">)([\s\S]*?)(<\/script>)/g, (all, a, js, b) => {
+    if (js.indexOf('"Review"') < 0) return all;
+    try {
+      const fix = (v) => {
+        if (Array.isArray(v)) return v.filter((x) => !(x && x['@type'] === 'Review' && !SKT[(x.author && x.author.name || '').trim()])).map(fix);
+        if (v && typeof v === 'object') {
+          if (v['@type'] === 'Review') { const n = (v.author && v.author.name || '').trim(); if (SKT[n]) v.reviewBody = SKT[n]; st.rev = (st.rev || 0) + 1; }
+          for (const k of Object.keys(v)) v[k] = fix(v[k]);
+        }
+        return v;
+      };
+      return a + JSON.stringify(fix(JSON.parse(js))).replace(/<\//g, '<\\/') + b;
+    } catch (e) { return all; }
+  });
+}
+
 export function legal(h, l, rel, contact, site) {
-  const L = LEGAL[l]; const st = {};
-  if (!L) return [h, st];
+  const L0 = LEGAL[l]; const st = {};
+  if (!L0) return [h, st];
+  const Q = P3[l] || { RULES: [], JS: [] };
+  const L = Object.assign({}, L0, { JS: L0.JS.concat(Q.JS), RULES: L0.RULES.concat(Q.RULES) });
   // 1) beágyazott scriptek / űrlapok (pontos egyezések)
   h = applyRules(h, L.JS, st, 'js');
   // 2) JSON-LD
@@ -211,6 +275,9 @@ export function legal(h, l, rel, contact, site) {
   h = cardPrices(h, L, l, st);
   h = dropPrivCol(h, st);
   if (L.FIN && L.FIN.re.test(rel)) h = financePage(h, L, st);
+  if (rel === 'kontakt/index.html') h = contactPage(h, Q, st);
+  h = importCard(h, Q, st);
+  h = reviewsLd(h, st);
   // 6) a GYIK-kereső rejtett szövege (data-text) a látható szövegből — ne maradjon benne magyar / régi szöveg (B12, C11)
   h = h.replace(/<([a-z]+)\b([^>]*?)\sdata-text="[^"]*"([^>]*)>/g, (tag, t, a1, a2, off) => {
     const end = elEnd(h, off); if (end < 0) return tag;
