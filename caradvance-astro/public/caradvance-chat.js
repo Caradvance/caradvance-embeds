@@ -69,6 +69,9 @@
 
   var API = "https://caradvance-chatbot.flat-fire-7e25.workers.dev/api/chat";
   var WA = "36302336060";                 // +36 30 233 6060
+  /* caradvance.sk / .cz: a szlovák / cseh kapcsolattartó (Mr. Job SK s.r.o.) WhatsAppja és szövege */
+  var CLG = String(document.documentElement.lang || "hu").slice(0, 2).toLowerCase();
+  if (CLG === "sk" || CLG === "cs") WA = "421915410555";
   var SESSION = null;                      // Phase 2: bejelentkezett ügyfél tokenje
   var LOGO = "/caradvance-logo.webp";      // tedd a public mappába
 
@@ -120,17 +123,19 @@
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
   var wrap = document.createElement("div"); wrap.className = "cac"; document.body.appendChild(wrap);
-  var waMsg = "Szia CarAdvance! A weboldali chatből írok, szeretnék egy munkatárssal beszélni.";
+  var waMsg = CLG === "sk" ? "Dobrý deň, píšem z chatu na webe caradvance.sk a rád by som hovoril s vaším kolegom."
+    : CLG === "cs" ? "Dobrý den, píšu z chatu na webu caradvance.cz a rád bych mluvil s vaším kolegou."
+    : "Szia CarAdvance! A weboldali chatből írok, szeretnék egy munkatárssal beszélni.";
   var waHref = "https://wa.me/" + WA + "?text=" + encodeURIComponent(waMsg);
   var carSvg = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
   var waSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.11 3.22 5.1 4.51.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35zM12 2a10 10 0 0 0-8.55 15.2L2 22l4.94-1.3A10 10 0 1 0 12 2z"/></svg>';
 
   wrap.innerHTML =
     '<button class="cac-launch" id="cacL" aria-label="Kérdése van? Segítek">' + carSvg + '<span class="cac-lt">Segítek</span></button>' +
-    '<section class="cac-w cl" id="cacW" role="dialog" aria-label="CarAdvance asszisztens">' +
+    '<section class="cac-w cl" id="cacW" role="dialog" aria-label="CarAdvance ' + (CLG === "sk" || CLG === "cs" ? "asistent" : "asszisztens") + '">' +
       '<header class="cac-hd"><div class="cac-br">' +
         '<img class="cac-lg" src="' + LOGO + '" alt="CarAdvance" onerror="this.outerHTML=\'<div class=&quot;cac-lgt&quot;>Car<span>Advance</span></div>\'">' +
-        '<p class="cac-st"><span class="cac-dot"></span> <b>AI asszisztens</b> · online</p>' +
+        '<p class="cac-st"><span class="cac-dot"></span> <b>' + (CLG === "sk" || CLG === "cs" ? "AI asistent" : "AI asszisztens") + '</b> · online</p>' +
       '</div><button class="cac-x" id="cacX" aria-label="Bezárás">✕</button></header>' +
       '<div class="cac-th" id="cacTh"><div class="cac-ms" id="cacMs"></div><div class="cac-ch" id="cacCh"></div>' +
         '<div class="cac-hf" id="cacHf"><div class="t"><b>Beszélnél egy munkatárssal?</b>Hétköznap 9–17h között WhatsAppon.</div>' +

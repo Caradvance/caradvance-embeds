@@ -311,7 +311,11 @@
     P.splice(2, 1);
     /* ott a lízingkalkulátor nincs (a finanszírozást a partner lízingcég ajánlja) */
     P.forEach(function (p) { if (p.side) p.side.items = p.side.items.filter(function (it) { return it[1] !== 'Lízing kalkulátor'; }); });
+    /* Rólunk panel: a szlovák / cseh kapcsolattartó (Mr. Job SK s.r.o., Pozsony) a solymári iroda helyett */
+    var _ab = P[P.length - 1];
+    if (_ab && _ab.f) _ab.f = { img: '/bmw-m3-touring-premium-auto-eladas.webp', t: LANG === 'sk' ? 'Kontaktujte nás' : 'Kontaktujte nás', s: LANG === 'sk' ? 'Mr. Job SK s.r.o. · Cesta na Senec 2/A, Bratislava – pondelok až piatok 9–17.' : 'Mr. Job SK s.r.o. · Cesta na Senec 2/A, Bratislava – pondělí až pátek 9–17.', cta: 'Kapcsolat', href: '/kapcsolat/' };
   }
+  var PIN = (LANG === 'sk' || LANG === 'cs') ? 'Geretsried (DE) · Bratislava (SK)' : 'Geretsried (DE) · Solymár (HU)';
   /* közösségi ikonok – ugyanazok, mint a weboldal láblécében */
   var SOC = {
     fb: '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="mmFb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18ACFE"/><stop offset="1" stop-color="#0163E0"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#mmFb)"/><path fill="#fff" d="M26.6 40V26.4h4.6l.7-5.4h-5.3v-3.4c0-1.6.4-2.6 2.7-2.6H32v-4.8c-.5-.1-2.2-.2-4.1-.2-4.1 0-6.9 2.5-6.9 7.1V21h-4.6v5.4H21V40h5.6z"/></svg>',
@@ -689,7 +693,7 @@
       if (p.soc) h += '<div><p class="mm-h">' + tx('Kövess minket') + '</p><div class="mm-chips">' + p.soc.map(function (x) { return '<a class="mm-chip mm-schip" href="' + x[3] + '" target="_blank" rel="noopener">' + SOC[x[0]] + esc(x[1]) + '</a>'; }).join('') + '</div></div>';
       h += '<div><p class="mm-h">' + tx('Kiemelt') + '</p><div class="' + (mini ? 'mm-frow' : '') + '">' + mini + '<a class="mm-single" href="' + p.f.href + '"><div class="mm-ph" style="background-image:url(\'' + p.f.img + '\')"></div><div class="mm-ct"><b>' + tx(p.f.t) + '</b><span>' + tx(p.f.s) + '</span><span class="mm-btn" style="align-self:flex-start;margin:0">' + tx(p.f.cta) + ' ' + svg('arrow', 16) + '</span></div></a></div></div>';
     }
-    h += '</div></div><div class="mm-foot"><span>' + svg('star', 16) + tx('5,0 Google értékelés') + '</span><span>' + svg('phone', 16) + '<a href="' + esc(phone().tel) + '">' + esc(phone().txt) + '</a></span><span>' + svg('clock', 16) + tx('Válasz 1 órán belül, munkaidőben') + '</span><span>' + svg('pin', 16) + 'Geretsried (DE) · Solymár (HU)</span></div>';
+    h += '</div></div><div class="mm-foot"><span>' + svg('star', 16) + tx('5,0 Google értékelés') + '</span><span>' + svg('phone', 16) + '<a href="' + esc(phone().tel) + '">' + esc(phone().txt) + '</a></span><span>' + svg('clock', 16) + tx('Válasz 1 órán belül, munkaidőben') + '</span><span>' + svg('pin', 16) + PIN + '</span></div>';
     return h;
   }
 
