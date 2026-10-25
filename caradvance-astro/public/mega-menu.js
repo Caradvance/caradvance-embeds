@@ -307,7 +307,11 @@
         ['tt', 'TikTok', 'Rövid videók, átadások', 'https://www.tiktok.com/search?q=caradvance'], ['yt', 'YouTube', 'Bemutatók és videók', 'https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw'], ['li', 'LinkedIn', 'Céges hírek, partnerek', 'https://www.linkedin.com/search/results/companies/?keywords=caradvance']] }
   ];
   /* caradvance.sk / .cz: nincs bizományos értékesítés — a menüpont a HTML-ből is kimarad (skcz-local.mjs) */
-  if (LANG === 'sk' || LANG === 'cs') P.splice(2, 1);
+  if (LANG === 'sk' || LANG === 'cs') {
+    P.splice(2, 1);
+    /* ott a lízingkalkulátor nincs (a finanszírozást a partner lízingcég ajánlja) */
+    P.forEach(function (p) { if (p.side) p.side.items = p.side.items.filter(function (it) { return it[1] !== 'Lízing kalkulátor'; }); });
+  }
   /* közösségi ikonok – ugyanazok, mint a weboldal láblécében */
   var SOC = {
     fb: '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="mmFb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18ACFE"/><stop offset="1" stop-color="#0163E0"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#mmFb)"/><path fill="#fff" d="M26.6 40V26.4h4.6l.7-5.4h-5.3v-3.4c0-1.6.4-2.6 2.7-2.6H32v-4.8c-.5-.1-2.2-.2-4.1-.2-4.1 0-6.9 2.5-6.9 7.1V21h-4.6v5.4H21V40h5.6z"/></svg>',
