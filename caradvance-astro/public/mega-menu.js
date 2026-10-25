@@ -99,7 +99,7 @@
     'Azonnal elvihető': ['Available immediately', 'Sofort verfügbar', 'Disponible immédiatement', 'Доступно одразу', '即刻可提', 'Ihneď k odberu', 'Ihned k odběru'],
     'elérhető': ['available', 'verfügbar', 'disponibles', 'доступно', '辆可用', 'dostupné', 'k dispozici'],
     'azonnal elérhető': ['available now', 'sofort verfügbar', 'disponibles tout de suite', 'доступно одразу', '辆现车', 'ihneď dostupné', 'ihned k dispozici'],
-    'Hamarosan': ['Coming soon', 'Demnächst', 'Bientôt', 'Незабаром', '即将上市', 'Čoskoro', 'Brzy'], 'Kiemelt': ['Featured', 'Empfohlen', 'Recommandé', 'Рекомендовано', '推荐', 'Odporúčané', 'Doporučeno'],
+    'Hamarosan': ['Coming soon', 'Demnächst', 'Bientôt', 'Незабаром', '即将上市', 'Čoskoro', 'Brzy'], 'Az összes bérelhető autó egy helyen': ['All rental cars in one place', 'Alle Mietwagen auf einen Blick', 'Toutes les voitures à louer en un coup d’œil', 'Усі авто для оренди в одному місці', '所有可租车辆一览', 'Všetky autá na prenájom na jednom mieste', 'Všechny vozy k pronájmu na jednom místě'], 'Kiemelt': ['Featured', 'Empfohlen', 'Recommandé', 'Рекомендовано', '推荐', 'Odporúčané', 'Doporučeno'],
     'Autó rendelés': ['Car order', 'Autobestellung', 'Commande de voiture', 'Замовлення авто', '订车', 'Objednávka auta', 'Objednávka vozu'],
     'Megkeressük, ellenőrizzük, hazahozzuk': ['We find, inspect and deliver it', 'Wir finden, prüfen und liefern es', 'Nous trouvons, contrôlons et livrons', 'Знайдемо, перевіримо, доставимо', '我们寻车、检测并运回', 'Nájdeme, preveríme, privezieme', 'Najdeme, prověříme, dovezeme'],
     'Beszerzési folyamat': ['Sourcing process', 'Beschaffungsablauf', 'Processus d’achat', 'Процес закупівлі', '采购流程', 'Proces obstarania', 'Průběh obstarání'],
@@ -287,7 +287,7 @@
     .map(function (b) { b.href = '/egyedi-auto-rendeles/?brand=' + b.k; return b; });
   var P = [
     { brands: RENT_BRANDS, bt: 'Bérelhető autóink', bhref: '/autoink/#berelheto', bcols: 6, cars: 'rent', ct: 'Kiemelt bérelhető autók', call: 'Összes bérelhető autó', callHref: '/autoink/#berelheto',
-      links: [['info', 'Mi a tartós bérlet?', '/tartos-berlet/', 'Minden benne van egy havi díjban'], ['compare', 'Autók összehasonlítása', '/auto-osszehasonlitas/', 'Akár 3 modell egymás mellett'], ['route', 'Bérlési folyamat', '/berlesi-folyamat/', 'Lépésről lépésre az átadásig'], ['shield', 'Feltételek és kaució', '/berlesi-feltetelek/', 'Önrész, km-keret, kaució'], ['star', 'Előnyök', '/berles-elonyei/', 'Miért éri meg bérelni?'], ['help', 'Gyakori kérdések', '/berles-gyakori-kerdesek/', 'Válaszok a gyakori kérdésekre']],
+      links: [['car', 'Bérelhető autóink', '/autoink/#berelheto', 'Az összes bérelhető autó egy helyen'], ['info', 'Mi a tartós bérlet?', '/tartos-berlet/', 'Minden benne van egy havi díjban'], ['compare', 'Autók összehasonlítása', '/auto-osszehasonlitas/', 'Akár 3 modell egymás mellett'], ['route', 'Bérlési folyamat', '/berlesi-folyamat/', 'Lépésről lépésre az átadásig'], ['shield', 'Feltételek és kaució', '/berlesi-feltetelek/', 'Önrész, km-keret, kaució'], ['star', 'Előnyök', '/berles-elonyei/', 'Miért éri meg bérelni?'], ['help', 'Gyakori kérdések', '/berles-gyakori-kerdesek/', 'Válaszok a gyakori kérdésekre']],
       f: { img: '/piros-bmw-x6-m-premium-autoberles.webp', t: 'Prémium autó, egy havi díjért', s: 'Szerviz, gumi, biztosítás és adó a díjban.', cta: 'Bérelhető autóink', href: '/autoink/#berelheto' } },
     { brands: BUY_BRANDS, bt: 'Egyedi autó rendelés', bhref: '/egyedi-auto-rendeles/', bcols: 5, cars: 'sale', ct: 'Kiemelt eladó autók', call: 'Összes eladó autó', callHref: '/autoink/',
       links: [['store', 'Autóink', '/autoink/', 'Ellenőrzött autók Németországból'], ['coin', 'Finanszírozás – lízing', '/finanszirozas-lizing/', 'Havi részlet kiszámolása'], ['briefcase', 'Operatív lízing', '/operativ-lizing/', 'Cégeknek, nettó áron'], ['star', 'Előnyök', '/vasarlas-elonyei/', 'Miért vásárolj tőlünk?'], ['help', 'Gyakori kérdések', '/vasarlas-gyakori-kerdesek/', 'Áfa, garancia, átadás']],
@@ -665,7 +665,7 @@
   }
 
   /* kiemelt (legfontosabb) menüpontok: piros keretes, halvány piros háttér + "Kiemelt" címke */
-  var FEAT = { '/auto-rendeles/': 1, '/eladom/': 1 };
+  var FEAT = { '/auto-rendeles/': 1, '/eladom/': 1, '/autoink/#berelheto': 1 };
   function panelHtml(p) {
     var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">' + tx('Menü') + '</p>' +
       p.links.map(function (l) { var f = FEAT[l[2]]; return '<a class="mm-l' + (f ? ' mm-lf' : '') + '" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) + (f ? '<i class="mm-lfb">' + tx('Kiemelt') + '</i>' : '') + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
