@@ -245,3 +245,11 @@ withPhotos('Kia EV4', 'kia-ev4', 'Kia EV4', true, [['g1', 'oldalnézet'], ['g2',
 withPhotos('Volvo XC40', 'volvo-xc40', 'Volvo XC40', true, [['g1', 'oldalnézet'], ['g2', 'oldalnézet, stúdió'], ['g3', 'elölnézet, keréktárcsa'], ['g4', 'nyitott ajtókkal'], ['g5', 'csomagtartó'], ['g6', 'elölnézet']]);
 withPhotos('Volvo V60', 'volvo-v60', 'Volvo V60', true, [['g1', 'oldalnézet'], ['g2', 'elölnézet'], ['g3', 'hűtőrács'], ['g4', 'Thor-kalapács LED fényszóró'], ['g5', 'csomagtartó'], ['g6', 'első ülések'], ['g7', 'panorámatető'], ['g8', 'keréktárcsa']]);
 withPhotos('Seat Leon Sportstourer', 'seat-leon-sportstourer', 'SEAT Leon Sportstourer', true, [['g1', 'felülnézet'], ['g2', 'hátulról'], ['g3', 'töltés közben'], ['g4', 'töltőcsatlakozó'], ['g5', 'utánfutóval'], ['g6', 'műszerfal'], ['g7', 'csomagtartó']]);
+
+// Sajtófotó-galéria a szöveges tartalom nélküli Choice-modellekhez (a szöveget a rentalPage az élő Choice-adatból állítja össze).
+// Források: cupraofficial.hu, vwh.hu (Volkswagen Haszonjárművek), man.eu — 2026-10-25
+OTHERS['CUPRA Leon Sportstourer e-HYBRID'] = OTHERS['CUPRA Leon Sportstourer e-HYBRID'] || {};
+OTHERS['VW Multivan'] = OTHERS['VW Multivan'] || {};
+withPhotos('CUPRA Leon Sportstourer e-HYBRID', 'cupra-leon-sportstourer', 'CUPRA Leon Sportstourer', true, [['design', 'elölnézet'], ['interior', 'belső tér, sportülések'], ['g1', 'hátulról, városi háttérrel'], ['g2', 'nyitott csomagtartó'], ['g3', 'kormány és kijelző'], ['g4', 'felülnézet'], ['g5', 'töltés közben']]);
+withPhotos('VW Multivan', 'vw-multivan', 'Volkswagen Multivan', true, [['design', 'havas hegyek előtt'], ['interior', 'vezetőtér'], ['g1', 'hátulról'], ['g2', 'tóparton, nyitott tolóajtóval'], ['g3', 'egyedi ülések'], ['g4', 'multifunkciós asztal'], ['g5', 'panoráma tetőablak']]);
+withPhotos('MAN TGE Kombi Basic', 'man-tge-kombi', 'MAN TGE Kombi', true, [['design', 'LED fényszóró'], ['interior', 'vezetőtér'], ['g1', 'nagy hátsó ajtók'], ['g2', 'színezett üvegek'], ['g3', 'infotainment'], ['g4', 'menet közben']]);
