@@ -744,6 +744,23 @@
 /sk/berelheto-auto/vw-nfz-multivan-berles/ /sk/berelheto-auto/volkswagen-multivan-berles/ 301
 /cs/berelheto-auto/vw-nfz-multivan-berles /cs/berelheto-auto/volkswagen-multivan-berles/ 301
 /cs/berelheto-auto/vw-nfz-multivan-berles/ /cs/berelheto-auto/volkswagen-multivan-berles/ 301
+# Audi A5 Avant e-hybrid → Audi A5 Avant (egy kártya, 2026-10-25)
+/berelheto-auto/audi-a5-avant-e-hybrid-berles /berelheto-auto/audi-a5-avant-berles/ 301
+/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /berelheto-auto/audi-a5-avant-berles/ 301
+/en/berelheto-auto/audi-a5-avant-e-hybrid-berles /en/berelheto-auto/audi-a5-avant-berles/ 301
+/en/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /en/berelheto-auto/audi-a5-avant-berles/ 301
+/de/berelheto-auto/audi-a5-avant-e-hybrid-berles /de/berelheto-auto/audi-a5-avant-berles/ 301
+/de/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /de/berelheto-auto/audi-a5-avant-berles/ 301
+/fr/berelheto-auto/audi-a5-avant-e-hybrid-berles /fr/berelheto-auto/audi-a5-avant-berles/ 301
+/fr/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /fr/berelheto-auto/audi-a5-avant-berles/ 301
+/uk/berelheto-auto/audi-a5-avant-e-hybrid-berles /uk/berelheto-auto/audi-a5-avant-berles/ 301
+/uk/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /uk/berelheto-auto/audi-a5-avant-berles/ 301
+/zh/berelheto-auto/audi-a5-avant-e-hybrid-berles /zh/berelheto-auto/audi-a5-avant-berles/ 301
+/zh/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /zh/berelheto-auto/audi-a5-avant-berles/ 301
+/sk/berelheto-auto/audi-a5-avant-e-hybrid-berles /sk/berelheto-auto/audi-a5-avant-berles/ 301
+/sk/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /sk/berelheto-auto/audi-a5-avant-berles/ 301
+/cs/berelheto-auto/audi-a5-avant-e-hybrid-berles /cs/berelheto-auto/audi-a5-avant-berles/ 301
+/cs/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /cs/berelheto-auto/audi-a5-avant-berles/ 301
 # sk / cs: előnézet a /sk/ /cs/ alatt, élesben caradvance.sk / .cz (functions/_middleware.js). pl: addig az angol oldalra.
 /pl /en/ 302
 /pl/* /en/ 302
