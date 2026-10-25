@@ -17,6 +17,8 @@ var CADV_SYNC = (function () {
   var BRAND = { 'Mini': 'MINI', 'Volkswagen': 'VW', 'Mercedes': 'Mercedes-Benz', 'Cupra': 'CUPRA', 'SEAT': 'Seat' };
   // model renames / merges decided with Marc (key = brand + ' ' + model)
   var RENAME = { 'MINI Cooper 3-Türer': 'MINI Cooper' };
+  // márka-áthelyezés: a Choice 'VW NFZ' (haszonjármű) címkéjű modellek közül ezek a Volkswagen személyautók közé kerülnek (Marc, 2026-10-25)
+  var MOVE = { 'VW NFZ Multivan': 'VW', 'VW NFZ T7 Multivan': 'VW' };
   var MERGE = { 'Audi Q5 Sportback e-hybrid': 'Audi Q5 Sportback', 'Audi A6 Avant e-hybrid': 'Audi A6 Avant' };
   function fixTrim(t) { return String(t || '').replace(/\s+/g, ' ').trim().replace(/qutattro/g, 'quattro'); }
 
@@ -73,6 +75,7 @@ var CADV_SYNC = (function () {
     var model = String(ro.CarModell || '').replace(/\s+/g, ' ').trim();
     var key = brand + ' ' + model, trim = fixTrim(ro.CarModellspec), merged = false;
     if (RENAME[key]) key = RENAME[key];
+    if (MOVE[key]) { var mvModel = key.slice(brand.length + 1).replace(/^T7\s+/, ''); brand = MOVE[key]; key = brand + ' ' + mvModel; }
     if (MERGE[key]) { key = MERGE[key]; merged = true; if (!/hybrid/i.test(trim)) trim = fixTrim('e-Hybrid ' + trim); }
     var colDe = String(ro.Color || it.Color || '').replace(/\s+/g, ' ').trim() || '—';
     var fuelRaw = String(it.KindOfFuel || ro.KindOfFuel || ''), gearRaw = String(it.KindOfGear || ro.KindOfGear || '');
