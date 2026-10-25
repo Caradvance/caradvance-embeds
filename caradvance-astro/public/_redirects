@@ -727,6 +727,23 @@
 /cs/uj-auto-berlese/mercedes-cle-coupe/ /cs/berelheto-auto/mercedes-cle-coupe-berles/ 301
 /cs/uj-auto-berlese/mercedes-s-osztaly /cs/berelheto-auto/mercedes-s-osztaly-berles/ 301
 /cs/uj-auto-berlese/mercedes-s-osztaly/ /cs/berelheto-auto/mercedes-s-osztaly-berles/ 301
+# VW Multivan: VW NFZ → Volkswagen csoport (2026-10-25)
+/berelheto-auto/vw-nfz-multivan-berles /berelheto-auto/volkswagen-multivan-berles/ 301
+/berelheto-auto/vw-nfz-multivan-berles/ /berelheto-auto/volkswagen-multivan-berles/ 301
+/en/berelheto-auto/vw-nfz-multivan-berles /en/berelheto-auto/volkswagen-multivan-berles/ 301
+/en/berelheto-auto/vw-nfz-multivan-berles/ /en/berelheto-auto/volkswagen-multivan-berles/ 301
+/de/berelheto-auto/vw-nfz-multivan-berles /de/berelheto-auto/volkswagen-multivan-berles/ 301
+/de/berelheto-auto/vw-nfz-multivan-berles/ /de/berelheto-auto/volkswagen-multivan-berles/ 301
+/fr/berelheto-auto/vw-nfz-multivan-berles /fr/berelheto-auto/volkswagen-multivan-berles/ 301
+/fr/berelheto-auto/vw-nfz-multivan-berles/ /fr/berelheto-auto/volkswagen-multivan-berles/ 301
+/uk/berelheto-auto/vw-nfz-multivan-berles /uk/berelheto-auto/volkswagen-multivan-berles/ 301
+/uk/berelheto-auto/vw-nfz-multivan-berles/ /uk/berelheto-auto/volkswagen-multivan-berles/ 301
+/zh/berelheto-auto/vw-nfz-multivan-berles /zh/berelheto-auto/volkswagen-multivan-berles/ 301
+/zh/berelheto-auto/vw-nfz-multivan-berles/ /zh/berelheto-auto/volkswagen-multivan-berles/ 301
+/sk/berelheto-auto/vw-nfz-multivan-berles /sk/berelheto-auto/volkswagen-multivan-berles/ 301
+/sk/berelheto-auto/vw-nfz-multivan-berles/ /sk/berelheto-auto/volkswagen-multivan-berles/ 301
+/cs/berelheto-auto/vw-nfz-multivan-berles /cs/berelheto-auto/volkswagen-multivan-berles/ 301
+/cs/berelheto-auto/vw-nfz-multivan-berles/ /cs/berelheto-auto/volkswagen-multivan-berles/ 301
 # sk / cs: előnézet a /sk/ /cs/ alatt, élesben caradvance.sk / .cz (functions/_middleware.js). pl: addig az angol oldalra.
 /pl /en/ 302
 /pl/* /en/ 302
