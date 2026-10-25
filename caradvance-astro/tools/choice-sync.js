@@ -19,7 +19,7 @@ var CADV_SYNC = (function () {
   var RENAME = { 'MINI Cooper 3-Türer': 'MINI Cooper' };
   // márka-áthelyezés: a Choice 'VW NFZ' (haszonjármű) címkéjű modellek közül ezek a Volkswagen személyautók közé kerülnek (Marc, 2026-10-25)
   var MOVE = { 'VW NFZ Multivan': 'VW', 'VW NFZ T7 Multivan': 'VW' };
-  var MERGE = { 'Audi Q5 Sportback e-hybrid': 'Audi Q5 Sportback', 'Audi A6 Avant e-hybrid': 'Audi A6 Avant' };
+  var MERGE = { 'Audi A5 Avant e-hybrid': 'Audi A5 Avant', 'Audi Q5 Sportback e-hybrid': 'Audi Q5 Sportback', 'Audi A6 Avant e-hybrid': 'Audi A6 Avant' };
   function fixTrim(t) { return String(t || '').replace(/\s+/g, ' ').trim().replace(/qutattro/g, 'quattro'); }
 
   var CM = {
