@@ -2,6 +2,41 @@
    Asztali nézetben (>= 1100 px) a fő menüpontok alá teljes szélességű panelt nyit; mobilon a régi menü marad.
    Nyelv: a <html lang> alapján (hu, en, de, fr, uk, zh, sk, cs). A linkek magyar útvonalak — a nyelvi oldalakon
    a rt-<nyelv>.js futásidejű fordító lokalizálja őket, a .sk/.cz domainen pedig az árakat is átváltja. */
+/* Frissítéskor (F5 / reload) és vissza-gombnál ugyanott marad az oldal, ahol a látogató járt.
+   A böngésző saját visszaállítása a JS-sel később betöltődő tartalom (kártyák, galériák, #horgony) miatt
+   gyakran rossz helyre ugrik — ezért itt mentjük a pozíciót (sessionStorage), és a tartalom betöltődése
+   után állítjuk vissza. Ha a látogató közben görget/kattint, azonnal leállunk. Minden oldalon fut (mobilon is). */
+(function () {
+  try {
+    if (window.__caScrollKeep) return; window.__caScrollKeep = 1;
+    var K = 'ca_scroll:' + location.pathname + location.search;
+    var nav = '';
+    try { var e = performance.getEntriesByType && performance.getEntriesByType('navigation')[0]; nav = e ? e.type : (performance.navigation && performance.navigation.type === 1 ? 'reload' : ''); } catch (_) {}
+    var save = function () { try { sessionStorage.setItem(K, String(Math.round(window.scrollY || window.pageYOffset || 0))); } catch (_) {} };
+    window.addEventListener('pagehide', save);
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') save(); });
+    if (nav !== 'reload' && nav !== 'back_forward') return;
+    var y = 0; try { y = parseInt(sessionStorage.getItem(K) || '0', 10) || 0; } catch (_) {}
+    if (y < 10) return;
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var stop = false, t0 = Date.now(), lastOk = 0;
+    var quit = function () { stop = true; ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (ev) { window.removeEventListener(ev, quit, true); }); };
+    ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (ev) { window.addEventListener(ev, quit, { capture: true, passive: true }); });
+    var tick = function () {
+      if (stop) return;
+      var max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      var target = Math.min(y, max);
+      if (Math.abs((window.scrollY || 0) - target) > 2) window.scrollTo(0, target);
+      if (max >= y && Math.abs((window.scrollY || 0) - y) <= 2) { if (!lastOk) lastOk = Date.now(); } else lastOk = 0;
+      // kész: elértük a pozíciót és 600 ms-ig ott is maradt (a késve betöltődő tartalom már nem tolta el), vagy lejárt 5 mp
+      if ((lastOk && Date.now() - lastOk > 600) || Date.now() - t0 > 5000) { quit(); return; }
+      requestAnimationFrame(tick);
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tick); else tick();
+    window.addEventListener('load', function () { if (!stop) { t0 = Math.max(t0, Date.now() - 3000); requestAnimationFrame(tick); } });
+  } catch (_) {}
+})();
+
 (function () {
   'use strict';
   if (window.__caMM) return; window.__caMM = 1;
