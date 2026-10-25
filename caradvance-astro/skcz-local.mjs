@@ -24,6 +24,8 @@ const CFG = {
     kw: /komision[áa]ln|komision[áa]rsk|komisn[ýyé]|charit/i,
     other: [['https://www.caradvance.hu/', 'CarAdvance Maďarsko', 'hu'], ['https://www.caradvance.cz/', 'CarAdvance Česko', 'cs']],
     otherH: 'CarAdvance v regióne',
+    colRe: /<div><h4>(?:Predaj a naša spoločnosť|Naša spoločnosť)<\/h4>/,
+    colH: 'Naša spoločnosť',
     rep: [
       [' — a vaše auto predáme komisionálne.', '.'],
       [', dovoz a komisionálny predaj', ' a dovoz'],
@@ -53,6 +55,8 @@ const CFG = {
     kw: /komisn[íiě]|komisionářsk|charit/i,
     other: [['https://www.caradvance.hu/', 'CarAdvance Maďarsko', 'hu'], ['https://www.caradvance.sk/', 'CarAdvance Slovensko', 'sk']],
     otherH: 'CarAdvance v regionu',
+    colRe: /<div><h4>(?:Prodej a naše společnost|Naše společnost)<\/h4>/,
+    colH: 'Naše společnost',
     rep: [
       [' — a váš vůz prodáme v komisi.', '.'],
       [', dovoz a komisní prodej', ' a dovoz'],
@@ -198,10 +202,19 @@ function cleanHtml(h, l, C, rel) {
     } catch (e) { return all; }
   });
   // lábléc: linkek a többi CarAdvance oldalra (egyszer)
-  if (!/data-ca-other/.test(h)) h = h.replace(/(<div class="cafoot-legal">)/, (m0) => {
-    st.other = 1;
-    return '<div data-ca-other=""><h4>' + C.otherH + '</h4>' + C.other.map(([u, t, hl]) => '<a href="' + u + '" hreflang="' + hl + '">' + t + '</a>').join('') + '</div>   ' + m0;
-  });
+  // (a „Predaj a naša spoločnosť” oszlopba kerül, így a lábléc marad 4 oszlopos; a „Predaj” szó kimarad a címből)
+  if (!/data-ca-other/.test(h)) {
+    const cm = C.colRe.exec(h);
+    if (cm) {
+      const end = elEnd(h, cm.index);
+      if (end > 0) {
+        const col = h.slice(cm.index, end).replace(C.colRe, '<div><h4>' + C.colH + '</h4>');
+        const add = '<h4 data-ca-other="" style="margin-top:26px">' + C.otherH + '</h4>' + C.other.map(([u, t, hl]) => '<a href="' + u + '" hreflang="' + hl + '">' + t + '</a>').join('');
+        h = h.slice(0, cm.index) + col.replace(/<\/div>$/, add + '</div>') + h.slice(end);
+        st.other = 1;
+      }
+    }
+  }
   return [h, st];
 }
 
