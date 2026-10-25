@@ -60,7 +60,7 @@
     "sk": "https://www.caradvance.sk",
     "cs": "https://www.caradvance.cz"
   },
-  "domainsLive": false,
+  "domainsLive": true,
   "fx": {
     "HUF": 368,
     "CZK": 24.47,
