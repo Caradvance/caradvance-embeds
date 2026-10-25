@@ -22,8 +22,8 @@ export const CONTACT = {
 };
 
 export const LBL = {
-  sk: { rep: 'Zastúpenie na Slovensku', ico: 'IČO', dic: 'IČ DPH', note: 'Tento preklad má len informatívny charakter — právne záväzná je maďarská verzia.', name: 'Slovenčina', flag: 'sk' },
-  cs: { rep: 'Zastoupení pro Česko a Slovensko', ico: 'IČO', dic: 'DIČ', note: 'Tento překlad má pouze informativní charakter — právně závazná je maďarská verze.', name: 'Čeština', flag: 'cz' },
+  sk: { rep: 'Obchodný sprostredkovateľ na Slovensku', ico: 'IČO', dic: 'IČ DPH', note: 'Tento preklad má len informatívny charakter — právne záväzná je maďarská verzia.', name: 'Slovenčina', flag: 'sk' },
+  cs: { rep: 'Obchodní zprostředkovatel pro Česko a Slovensko', ico: 'IČO', dic: 'DIČ', note: 'Tento překlad má pouze informativní charakter — právně závazná je maďarská verze.', name: 'Čeština', flag: 'cz' },
 };
 
 /** Árfolyam-beállítás: 1 EUR = HUF Ft (a magyar oldal listája ezzel számol) ; 1 EUR = CZK Kč */

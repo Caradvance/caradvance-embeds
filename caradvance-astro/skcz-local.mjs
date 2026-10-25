@@ -14,6 +14,11 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
+import { legal } from './skcz-legal.mjs';
+import { CONTACT } from './i18n-skcz.mjs';
+
+const SITE = { sk: 'https://www.caradvance.sk', cs: 'https://www.caradvance.cz' };
 
 const DIST = process.argv[2] || 'dist';
 
@@ -221,6 +226,10 @@ function cleanHtml(h, l, C, rel) {
 /* ---------- futtatás ---------- */
 export function run(dist = DIST) {
   const out = [];
+  // ca-bt.js: a sk/cs oldalakon a tartalom-hash a verzió (a módosított, csak céges árat mutató változat azonnal betöltődik)
+  let BTV = '';
+  try { BTV = crypto.createHash('sha1').update(fs.readFileSync(path.join(dist, 'ca-bt.js'))).digest('hex').slice(0, 10); } catch (e) {}
+  globalThis.__BTV = BTV;
   for (const l of Object.keys(CFG)) {
     const C = CFG[l];
     for (const base of [path.join(dist, l), path.join(dist, '_np', l)]) {
@@ -249,7 +258,11 @@ export function run(dist = DIST) {
           if (e.isDirectory()) { walk(p); continue; }
           if (!/\.html$/.test(e.name)) continue;
           const s = fs.readFileSync(p, 'utf8');
-          const [n, st] = cleanHtml(s, l, C, path.relative(base, p));
+          const rel = path.relative(base, p).split(path.sep).join('/');
+          let [n, st] = cleanHtml(s, l, C, rel);
+          const [n2, st2] = legal(n, l, rel, CONTACT, SITE[l]);
+          n = n2; for (const k in st2) st['legal.' + k] = st2[k];
+          if (globalThis.__BTV) n = n.replace(/ca-bt\.js\?v=[0-9a-z]+/g, 'ca-bt.js?v=' + globalThis.__BTV);
           if (n !== s) { fs.writeFileSync(p, n); files++; for (const k in st) tot[k] = (tot[k] || 0) + st[k]; }
         }
       })(base);
