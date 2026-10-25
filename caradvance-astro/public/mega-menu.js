@@ -668,7 +668,7 @@
   var FEAT = { '/auto-rendeles/': 1, '/eladom/': 1, '/autoink/#berelheto': 1, '/egyedi-auto-rendeles/': 1 };
   function panelHtml(p) {
     var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">' + tx('Menü') + '</p>' +
-      p.links.map(function (l) { var f = FEAT[l[2]]; return '<a class="mm-l' + (f ? ' mm-lf' : '') + '" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) +  + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
+      p.links.map(function (l) { var f = FEAT[l[2]]; return '<a class="mm-l' + (f ? ' mm-lf' : '') + '" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
     if (p.brands) {
       h += '<div><p class="mm-h"><a href="' + p.bhref + '">' + tx(p.bt) + ' ›</a></p><div class="mm-brands" style="grid-template-columns:repeat(' + p.bcols + ',minmax(0,1fr))">' +
         /* első csempe: "Összes" — az összes autó (bérlés: /autoink/#berelheto, vásárlás: /egyedi-auto-rendeles/) */
