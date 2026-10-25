@@ -99,7 +99,7 @@
     'Azonnal elvihető': ['Available immediately', 'Sofort verfügbar', 'Disponible immédiatement', 'Доступно одразу', '即刻可提', 'Ihneď k odberu', 'Ihned k odběru'],
     'elérhető': ['available', 'verfügbar', 'disponibles', 'доступно', '辆可用', 'dostupné', 'k dispozici'],
     'azonnal elérhető': ['available now', 'sofort verfügbar', 'disponibles tout de suite', 'доступно одразу', '辆现车', 'ihneď dostupné', 'ihned k dispozici'],
-    'Hamarosan': ['Coming soon', 'Demnächst', 'Bientôt', 'Незабаром', '即将上市', 'Čoskoro', 'Brzy'],
+    'Hamarosan': ['Coming soon', 'Demnächst', 'Bientôt', 'Незабаром', '即将上市', 'Čoskoro', 'Brzy'], 'Kiemelt': ['Featured', 'Empfohlen', 'Recommandé', 'Рекомендовано', '推荐', 'Odporúčané', 'Doporučeno'],
     'Autó rendelés': ['Car order', 'Autobestellung', 'Commande de voiture', 'Замовлення авто', '订车', 'Objednávka auta', 'Objednávka vozu'],
     'Megkeressük, ellenőrizzük, hazahozzuk': ['We find, inspect and deliver it', 'Wir finden, prüfen und liefern es', 'Nous trouvons, contrôlons et livrons', 'Знайдемо, перевіримо, доставимо', '我们寻车、检测并运回', 'Nájdeme, preveríme, privezieme', 'Najdeme, prověříme, dovezeme'],
     'Beszerzési folyamat': ['Sourcing process', 'Beschaffungsablauf', 'Processus d’achat', 'Процес закупівлі', '采购流程', 'Proces obstarania', 'Průběh obstarání'],
@@ -330,7 +330,7 @@
     '.mm-l{display:flex;gap:12px;padding:9px 10px;border-radius:14px;text-decoration:none;color:#14151A}' +
     '.mm-l:hover,.mm-l:focus-visible{background:#F4F5F7;outline:none}.mm-l:hover .mm-ic{color:#E2001A}' +
     '.mm-l .mm-ic{color:#5A6B82;flex:none;margin-top:1px;transition:color .12s}' +
-    '.mm-l b{display:block;font-size:15px;font-weight:700;line-height:1.3}.mm-l span{display:block;font-size:13px;color:#5A6B82;line-height:1.4;margin-top:2px}' +
+    '.mm-l b{display:block;font-size:15px;font-weight:700;line-height:1.3}.mm-l span{display:block;font-size:13px;color:#5A6B82;line-height:1.4;margin-top:2px}.mm-l.mm-lf{background:linear-gradient(135deg,#FFF5F6 0%,#FFE9EC 100%);box-shadow:inset 0 0 0 1.5px #F7C3CB,0 4px 14px rgba(226,0,26,.08)}.mm-l.mm-lf:hover,.mm-l.mm-lf:focus-visible{background:linear-gradient(135deg,#FFEEF0 0%,#FFDDE2 100%);box-shadow:inset 0 0 0 1.5px #E2001A,0 6px 18px rgba(226,0,26,.14)}.mm-l.mm-lf .mm-ic{color:#E2001A}.mm-l.mm-lf b{color:#B4001A}.mm-l.mm-lf span{color:#7A4A52}.mm-lfb{display:inline-block;margin-left:8px;vertical-align:2px;font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:#E2001A;border-radius:999px;padding:2px 8px;line-height:1.5}' +
     '.mm-chip{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #E6EAF1;border-radius:14px;text-decoration:none;color:#14151A;font-weight:700;font-size:14px;margin-bottom:8px}' +
     '.mm-chip:hover{border-color:#E2001A;color:#E2001A}' +
     '.mm-card{display:block;border-radius:20px;overflow:hidden;background:#0B0B0D;color:#fff;text-decoration:none;position:relative;min-height:250px}' +
@@ -664,9 +664,11 @@
       '<div class="mm-panes"><div class="mm-cars mm-pane' + (isNw ? '' : ' off') + '" data-pane="new">' + cards(DATA.nw, 'new') + '</div><div class="mm-cars mm-pane' + (isNw ? ' off' : '') + '" data-pane="used">' + cards(list, 'sale') + '</div></div></div>';
   }
 
+  /* kiemelt (legfontosabb) menüpontok: piros keretes, halvány piros háttér + "Kiemelt" címke */
+  var FEAT = { '/auto-rendeles/': 1, '/eladom/': 1 };
   function panelHtml(p) {
     var h = '<div class="mm-in mm-split"><div class="mm-left"><p class="mm-h">' + tx('Menü') + '</p>' +
-      p.links.map(function (l) { return '<a class="mm-l" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
+      p.links.map(function (l) { var f = FEAT[l[2]]; return '<a class="mm-l' + (f ? ' mm-lf' : '') + '" href="' + l[2] + '">' + svg(l[0]) + '<div><b>' + tx(l[1]) + (f ? '<i class="mm-lfb">' + tx('Kiemelt') + '</i>' : '') + '</b><span>' + tx(l[3]) + '</span></div></a>'; }).join('') + '</div><div class="mm-right">';
     if (p.brands) {
       h += '<div><p class="mm-h"><a href="' + p.bhref + '">' + tx(p.bt) + ' ›</a></p><div class="mm-brands" style="grid-template-columns:repeat(' + p.bcols + ',minmax(0,1fr))">' +
         /* első csempe: "Összes" — az összes autó (bérlés: /autoink/#berelheto, vásárlás: /egyedi-auto-rendeles/) */
