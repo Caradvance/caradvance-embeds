@@ -428,7 +428,7 @@
     taxid: "IČ DPH",
     info: { sale: "Ceny sú orientačné. „bez DPH“ je cena bez dane, „s DPH“ zahŕňa slovenskú DPH 23 % pri dodaní na Slovensko. Konečnú cenu a daň uvádza písomná ponuka.", rent: "Mesačná splátka je uvedená bez DPH pre limit 2 000 km/mes. Konečnú cenu uvádza písomná ponuka." },
     kind: { rent: "Dopyt na prenájom", sale: "Dopyt (auto na predaj)" },
-    buyer: { "Magánszemély": "Súkromná osoba", "Cég": "Firma" },
+    buyer: { "Magánszemély": "Súkromná osoba", "Cég": "Firma s IČ DPH" },
     vals: [[/ hónap$/, " mesiacov"], [/ km \/ hó/, " km / mes."], [/^Egy összegben$/, "Jednorazovo"], [/^Finanszírozással$/, "S financovaním"], [/^Még nem tudom$/, "Ešte neviem"]]
   } : IMK === "cs" ? {
     email: "info@caradvance.cz",
@@ -595,11 +595,18 @@
     [].forEach.call(modal.querySelectorAll(".cain-tgl"), function(t){ t.classList.toggle("active", t.getAttribute("data-buyer")===v); });
     var isCo=(v==="Cég");
     var comp=modal.querySelector(".cain-company"); if(comp) comp.style.display=isCo?"":"none";
-    if (LOC) { modeRadios(isCo ? LOC.co : LOC.priv); return; }
+    if (LOC) { modeRadios(isCo ? LOC.co : (curNew ? [PNEW] : LOC.priv)); return; }
     var m1=modal.querySelector(".cain-mode1"), m1l=modal.querySelector(".cain-mode1lbl");
     if(m1&&m1l){ var txt=isCo?"Nettó EUR-ban, Németországból (Caradvance GmbH)":"19% német áfával, Németországból (Caradvance GmbH)"; m1.value=txt; m1l.textContent=txt; }
   }
+  var curNew=false;
+  var PNEW=(function(){var T={
+    sk:{sk:"Nov\u00e9 auto bez DPH \u2014 slovensk\u00fa DPH 23 % zaplat\u00edm na Slovensku (Caradvance GmbH)",en:"New car without VAT \u2014 I pay the Slovak VAT of 23 % in Slovakia (Caradvance GmbH)",de:"Neuwagen ohne MwSt. \u2014 die slowakische MwSt. von 23 % zahle ich in der Slowakei (Caradvance GmbH)",hu:"\u00daj aut\u00f3 \u00e1fa n\u00e9lk\u00fcl \u2014 a 23 %-os szlov\u00e1k \u00e1f\u00e1t Szlov\u00e1ki\u00e1ban fizetem meg (Caradvance GmbH)"},
+    cs:{cs:"Nov\u00fd v\u016fz bez DPH \u2014 \u010deskou DPH 21 % p\u0159izn\u00e1m a zaplat\u00edm v \u010cesku (Caradvance GmbH)",en:"New car without VAT \u2014 I declare and pay the Czech VAT of 21 % in the Czech Republic (Caradvance GmbH)",de:"Neuwagen ohne MwSt. \u2014 die tschechische MwSt. von 21 % melde und zahle ich in Tschechien (Caradvance GmbH)"},
+    pl:{pl:"Nowy samoch\u00f3d bez VAT \u2014 polski VAT 23 % rozlicz\u0119 w Polsce (Caradvance GmbH)",en:"New car without VAT \u2014 I pay the Polish VAT of 23 % in Poland (Caradvance GmbH)",de:"Neuwagen ohne MwSt. \u2014 die polnische MwSt. von 23 % zahle ich in Polen (Caradvance GmbH)"}};
+    var m=T[IMK]||{};return m[ILG]||m[IMK]||"";})();
   function openModal(d){
+    curNew=!!(d&&d.isNew);  /* új autó (EU-s áfaszabály): nincs „19 % német áfával, németországi átvétellel” változat */
     buildModal(); mForm.reset();
     setBuyer("Magánszemély");
     var fin=modal.querySelector(".cain-fin"); if(fin) fin.style.display="none";
@@ -715,7 +722,8 @@
     var t=card.querySelector(".title"), img=card.querySelector(".media img");
     var kind=cardKind(card);
     return { name:t?t.textContent.replace(/\s+/g," ").trim():"", img:img?img.getAttribute("src"):"",
-             price:priceOf(card), kind:kind, rent:(kind==="rent"?rentOf(card):null) };
+             price:priceOf(card), kind:kind, rent:(kind==="rent"?rentOf(card):null),
+             isNew:/^(Nov\u00e9|Nov\u00fd|New|Neu|\u00daj|Nowy)$/.test(((card.querySelector(".cond")||{}).textContent||"").trim()) };
   }
   function infoText(kind){
     if (LOC) return kind === "rent" ? LOC.info.rent : LOC.info.sale;
@@ -919,12 +927,26 @@
   if(location.pathname.indexOf('/auto/')<0) return;
   var C='<svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="8" stroke-linecap="butt"><path stroke="#33373D" d="M37 16.5 A15 15 0 1 0 37 31.5"/><path stroke="#E2001A" d="M10.6 30 A15 15 0 0 0 19.4 38.6"/></g></svg>';
   var W='//wa.me/';
+  var CMK=(function(){var m=/(^|\.)caradvance\.(sk|cz|pl)$/.exec(location.hostname);if(m)return m[2]==='cz'?'cs':m[2];var p=/^\/(sk|cs|pl)\//.exec(location.pathname);return p?p[1]:'';})();
+  var CLG=String(document.documentElement.lang||'').slice(0,2).toLowerCase();
+  function R(o){return o[CLG]||o.x;}
+  var SKCZ=[
+    {img:'/sk-team/pavel-horemuz.webp',name:'Pavel Horemu\u017e',role:R({x:CMK==='cs'?'Vedouc\u00ed pro Slovensko a \u010cesko':'Ved\u00faci pre Slovensko a \u010cesko',en:'Head of Slovakia & Czech Republic',de:'Leiter Slowakei & Tschechien',hu:'Szlov\u00e1kia \u00e9s Csehorsz\u00e1g vezet\u0151je'}),tel:'+421 915 410 555',telh:'tel:+421915410555',wah:W+'421915410555'},
+    {img:'/sk-team/veronika-dinicova.webp',name:'Veronika Dini\u010dov\u00e1',role:R({x:CMK==='cs'?'Pron\u00e1jem a prodej':'Pren\u00e1jom a predaj',en:'Rental & sales',de:'Miete & Verkauf',hu:'B\u00e9rl\u00e9s \u00e9s \u00e9rt\u00e9kes\u00edt\u00e9s'}),tel:'+421 918 700 722',telh:'tel:+421918700722',wah:W+'421918700722'},
+    {img:'/sk-team/andreas-horemuz.webp',name:'Andreas Horemu\u017e',role:R({x:CMK==='cs'?'Pron\u00e1jem a prodej':'Pren\u00e1jom a predaj',en:'Rental & sales',de:'Miete & Verkauf',hu:'B\u00e9rl\u00e9s \u00e9s \u00e9rt\u00e9kes\u00edt\u00e9s'}),tel:'+421 917 222 122',telh:'tel:+421917222122',wah:W+'421917222122'}
+  ];
+  var PLT=[
+    {img:'/csadi-ferenc.webp',name:'Ferenc Csadi',role:R({x:'Odpowiedzialny za rynek polski',en:'Polish market manager',de:'Verantwortlich f\u00fcr den polnischen Markt'}),tel:'+36 30 233 6060',telh:'tel:+36302336060',wah:W+'36302336060'},
+    {img:'/toth-karoly.webp',name:'K\u00e1roly T\u00f3th',role:R({x:'Dyrektor handlowy',en:'Sales Director',de:'Vertriebsleiter'}),tel:'+36 30 214 6989',telh:'tel:+36302146989',wah:W+'36302146989'},
+    {img:'/bajzath-balazs.webp',name:'Bal\u00e1zs Bajz\u00e1th',role:'Sales Manager',tel:'+36 30 094 2081',telh:'tel:+36300942081',wah:W+'36300942081'}
+  ];
   var people=[
     {office:true,name:'CarAdvance Iroda',role:'\u00dcgyint\u00e9z\u00e9s',tel:'+36 30 233 6060',telh:'tel:+36302336060',wah:W+'36302336060'},
     {img:'/toth-karoly.webp',name:'T\u00f3th K\u00e1roly',role:'Kereskedelmi Igazgat\u00f3',tel:'+36 30 214 6989',telh:'tel:+36302146989',wah:W+'36302146989'},
     {img:'/vadnai-zsombor.webp',name:'Vadnai Zsombor',role:'Sales Manager',tel:'+36 30 094 2105',telh:'tel:+36300942105',wah:W+'36300942105'},
     {img:'/bajzath-balazs.webp',name:'Bajz\u00e1th Bal\u00e1zs',role:'Sales Manager',tel:'+36 30 094 2081',telh:'tel:+36300942081',wah:W+'36300942081'}
   ];
+  if(CMK==='sk'||CMK==='cs')people=SKCZ; else if(CMK==='pl')people=PLT;
   function run(){
     try{
       var box=document.querySelector('.panel.contact'); if(!box) return false;
