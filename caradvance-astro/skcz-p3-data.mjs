@@ -42,6 +42,51 @@ const avail = (l) => [r('(\\d+) db azonnal elérhető; további autók — ([^<]
   return l === 'sk' ? n + ' ks dostupné ihneď; ďalšie autá — ' + list + '. Úplne nové autá s 0 km.' : n + ' ks k dispozici ihned; další vozy — ' + list + '. Zcela nové vozy s 0 km.';
 }];
 
+
+/* új autók (objednávka na mieru): a cím a milliós forintár átváltásából (pl. „od 22 283 €”) jött, a leírásban a pontos
+ * euróár áll („od 22 450 € bez DPH (cca 22 283 €)”). A pontos euróárat használjuk mindenhol; CZ-n a Kč ebből számolódik. */
+const WS = '[\\s\\u00a0\\u202f]';
+const exactNew = (l) => [/^[\s\S]+$/, (doc) => {
+  const m = doc.match(/od (\d[\d\u00a0\u202f .]*?)[\s\u00a0\u202f]€[\s\u00a0\u202f]bez DPH[\s\u00a0\u202f]\(cca[\s\u00a0\u202f](\d[\d\u00a0\u202f .]*?)[\s\u00a0\u202f](€|Kč)\)/);
+  if (!m) return doc;
+  const X = +m[1].replace(/[^\d]/g, ''), cur = m[3];
+  const Y = m[2].replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[\u00a0\u202f ]/g, WS);
+  if (cur === '€') {
+    return doc.replace(new RegExp(WS + '\\(cca' + WS + Y + WS + '€\\)', 'g'), '')
+      .replace(new RegExp('od' + WS + Y + WS + '€' + WS + 'bez DPH', 'g'), 'od ' + m[1] + ' € bez DPH');
+  }
+  const K = nb((Math.round(X * CZK / 100) * 100).toLocaleString('cs-CZ'));
+  return doc.replace(new RegExp('\\(cca' + WS + Y + WS + 'Kč\\)', 'g'), '(cca ' + K + ' Kč)')
+    .replace(new RegExp('od' + WS + Y + WS + 'Kč' + WS + 'bez DPH', 'g'), 'od ' + K + ' Kč bez DPH');
+}];
+
+/* bérlési oldalak: a leírásban/szövegben a havidíj a magyar, kerekített forintárból visszaszámolt összeg (pl. „od 1 196 €/mes.”),
+ * miközben a pontos euróár a címben és az adatokban áll („od 1199 €/mes.”). A ±2%-on belüli „od N €/mes.” (CZ: Kč/měs.)
+ * értékeket a pontos árra igazítjuk; a más felszereltségek (eltérő ár) érintetlenek maradnak. */
+const exactRent = (l) => [/^[\s\S]+$/, (doc) => {
+  const t = (doc.match(/<title>([^<]*)<\/title>/) || [])[1] || '';
+  const m = t.match(/od (\d[\d   ]*?)[\s  ]?€\/(?:mesiac|mes\.|měsíc|měs\.)/);
+  if (!m) return doc;
+  const E = +m[1].replace(/\D/g, '');
+  if (!E) return doc;
+  const fmt = (n) => nb(n.toLocaleString(l === 'cs' ? 'cs-CZ' : 'sk-SK'));
+  if (l === 'sk') {
+    return doc.replace(/od (\d[\d   ]*?)[\s  ]€\/mes\./g, (w, v) => {
+      const V = +v.replace(/\D/g, ''); return V !== E && Math.abs(V - E) / E < 0.02 ? 'od ' + fmt(E) + ' €/mes.' : w;
+    });
+  }
+  const K = Math.round(E * CZK / 10) * 10;
+  return doc.replace(/od (\d[\d   ]*?)[\s  ]Kč\/měs\./g, (w, v) => {
+    const V = +v.replace(/\D/g, ''); return V !== K && Math.abs(V - K) / K < 0.02 ? 'od ' + fmt(K) + ' Kč/měs.' : w;
+  });
+}];
+
+/* ezres pont („31.166 €”) → szóköz („31 166 €”), és a „(cca N €)” / „(cca N Kč)” zárójelek egységesítése az egész oldalon */
+const thousands = [/(\d{1,3})\.(\d{3})(?=[\s  ]?(?:€|Kč))/g, '$1 $2'];
+const ccaSk = [/[\s  ]\(cca[\s  ]\d[\d   ]*[\s  ]€(?=[,)])[^)]*\)/g, ''];
+const ccaCz = [/(\d[\d  ]*)[\s  ]€((?:[\s  ]bez DPH)?)[\s  ]\(cca[\s  ]\d[\d   ]*[\s  ]Kč\)/g,
+  (w, x, b) => x + ' €' + b + ' (cca ' + nb((Math.round(+x.replace(/\D/g, '') * CZK / 100) * 100).toLocaleString('cs-CZ')) + ' Kč)'];
+
 export const P3 = {
   sk: {
     RULES: [
@@ -98,6 +143,7 @@ export const P3 = {
       [r('(?:www\\.)?caradvance\\.hu/berlesi-feltetelek/?'), 'caradvance.sk/prenajom/podmienky-a-kaucia/'],
       [r('(\\d{4})\\. (januára|februára|marca|apríla|mája|júna|júla|augusta|septembra|októbra|novembra|decembra) (\\d{1,2})\\.'), '$3. $2 $1']
     ],
+    POST: [thousands, exactNew('sk'), exactRent('sk'), ccaSk],
     IMPORT: { img: '/sk-team/pavel-horemuz.webp', name: 'Pavel Horemuž', role: 'Dovoz áut z Nemecka', alt: 'Pavel Horemuž — dovoz áut z Nemecka, CarAdvance', flags: [['sk', 'slovenčina'], ['cz', 'čeština']], bio: 'Pavel vás osobne sprevádza celým dovozom — od výberu auta až po odovzdanie kľúčov. Komunikuje s vami po slovensky a so spoločnosťou Caradvance GmbH dohodne všetky podrobnosti.', email: 'info@caradvance.sk' },
     CONTACT: {
       sub: 'Máte otázku alebo hľadáte auto? Zavolajte nám, napíšte nám alebo sa obráťte priamo na niekoho z nášho tímu.',
@@ -164,6 +210,7 @@ export const P3 = {
       [r('(?:www\\.)?caradvance\\.hu/berlesi-feltetelek/?'), 'caradvance.cz/pronajem/podminky-a-kauce/'],
       [r('(\\d{4})\\. (ledna|února|března|dubna|května|června|července|srpna|září|října|listopadu|prosince) (\\d{1,2})\\.'), '$3. $2 $1']
     ],
+    POST: [thousands, exactNew('cs'), exactRent('cs'), ccaCz],
     IMPORT: { img: '/sk-team/pavel-horemuz.webp', name: 'Pavel Horemuž', role: 'Dovoz vozů z Německa', alt: 'Pavel Horemuž — dovoz vozů z Německa, CarAdvance', flags: [['sk', 'slovenština'], ['cz', 'čeština']], bio: 'Pavel vás osobně provede celým dovozem — od výběru vozu až po předání klíčů. Komunikuje s vámi česky i slovensky a se společností Caradvance GmbH domluví všechny podrobnosti.', email: 'info@caradvance.cz' },
     CONTACT: {
       sub: 'Máte dotaz nebo hledáte vůz? Zavolejte nám, napište nám nebo se obraťte přímo na někoho z našeho týmu.',

@@ -287,5 +287,7 @@ export function legal(h, l, rel, contact, site) {
   });
   // 7) üresen maradt bekezdések
   h = h.replace(/<p\b[^>]*>\s*<\/p>/g, '');
+  // 8) utólagos, egész oldalas javítások (a szöveg-szabályok átváltásai után: pontos euróárak)
+  if (Q.POST) h = applyRules(h, Q.POST, st, 'post');
   return [h, st];
 }

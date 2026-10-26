@@ -297,6 +297,45 @@ function launch(dist) {
   return 'launch: ' + changed + '/' + files + ' HTML, hreflang törölve ' + dropped + ', sitemap ' + Object.entries(sm).map(([l, n]) => l + ' ' + n).join(' ');
 }
 
+/* ---------- keresőindex frissítése a kész oldalakból ----------
+ * A kereses-index-sk/cs.json címei és leírásai a fordítás korábbi állapotából maradtak (pl. „BH Group Zrt.”,
+ * a magyar kalkulátor leírása, magyar blogcím). Itt minden tételt a végleges oldal <title>-jéből,
+ * meta leírásából, h1-éből és alcímeiből írunk újra; a nem létező oldalakat kivesszük; a kapcsolat a SK/CZ adat. */
+function refreshIndex(dist) {
+  const dec = (s) => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
+  const out = [];
+  for (const l of ['sk', 'cs']) {
+    const C = l === 'sk' ? { tel: '+421915410555', mail: 'info@caradvance.sk' } : { tel: '+421915410555', mail: 'info@caradvance.cz' };
+    for (const f of [path.join(dist, 'kereses-index-' + l + '.json'), path.join(dist, l, 'kereses-index.json'), path.join(dist, '_np', l, 'kereses-index.json')]) {
+      if (!fs.existsSync(f)) continue;
+      try {
+        const d = JSON.parse(fs.readFileSync(f, 'utf8')); const n0 = d.items.length; let upd = 0;
+        d.c = C;
+        d.items = d.items.filter((x) => {
+          const u = String(x.u || '').split(/[?#]/)[0];
+          const rel = u.replace(new RegExp('^/' + l + '(?=/)'), '');
+          const file = path.join(dist, l, rel.replace(/^\//, ''), 'index.html');
+          if (!fs.existsSync(file)) return false;
+          const h = fs.readFileSync(file, 'utf8');
+          if (/<meta\s+name=["']robots["'][^>]*noindex/i.test(h) && x.k !== 'eszkoz') return false;
+          const t = dec((h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]).replace(/\s*[|—–-]\s*CarAdvance\s*$/i, '');
+          const de = dec((h.match(/<meta\s+name="description"\s+content="([^"]*)"/i) || [])[1]);
+          const main = h.slice(Math.max(0, h.indexOf('<main')), h.lastIndexOf('</main>') > 0 ? h.lastIndexOf('</main>') : h.length);
+          const h1 = dec((main.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1]);
+          const subs = [...main.matchAll(/<h[23][^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => dec(m[1])).filter((s) => s && s.length < 120);
+          if (t) x.t = t; if (de) x.d = de.length > 160 ? de.slice(0, 157).replace(/\s+\S*$/, '') + '…' : de;
+          if (h1) x.h = h1; else delete x.h;
+          if (subs.length) x.x = [...new Set(subs)].join(' · ').slice(0, 300);
+          upd++; return true;
+        });
+        fs.writeFileSync(f, JSON.stringify(d));
+        out.push(path.relative(dist, f) + ' ' + n0 + '→' + d.items.length + ' (' + upd + ' frissítve)');
+      } catch (e) { out.push(f + ': hiba ' + e.message); }
+    }
+  }
+  return 'index: ' + out.join(', ');
+}
+
 /* ---------- 404-oldal (C12) ---------- */
 import { P3 } from './skcz-p3-data.mjs';
 function notFound(dist) {
@@ -391,6 +430,7 @@ export function run(dist = DIST) {
   try { out.push(hreflang(dist)); } catch (e) { out.push('hreflang hiba: ' + e.message); }
   // 4. fázis (indítás): végleges sk/cs címek a canonical / hreflang / sitemap URL-ekben
   try { out.push(launch(dist)); } catch (e) { out.push('launch hiba: ' + e.message); }
+  try { out.push(refreshIndex(dist)); } catch (e) { out.push('index hiba: ' + e.message); }
   // 404 (C12): a gyökér 404.html minden domainen ugyanaz — sk/cs változat külön fájlban, a .sk/.cz domainen ez töltődik be
   try { out.push(notFound(dist)); } catch (e) { out.push('404 hiba: ' + e.message); }
   return '[skcz-local] ' + out.join(' | ');
