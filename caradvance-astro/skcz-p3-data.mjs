@@ -47,7 +47,7 @@ const avail = (l) => [r('(\\d+) db azonnal elérhető; további autók — ([^<]
  * euróár áll („od 22 450 € bez DPH (cca 22 283 €)”). A pontos euróárat használjuk mindenhol; CZ-n a Kč ebből számolódik. */
 const WS = '[\\s\\u00a0\\u202f]';
 const exactNew = (l) => [/^[\s\S]+$/, (doc) => {
-  const m = doc.match(/od (\d[\d\u00a0\u202f .]*?)[\s\u00a0\u202f]€[\s\u00a0\u202f]bez DPH[\s\u00a0\u202f]\(cca[\s\u00a0\u202f](\d[\d\u00a0\u202f .]*?)[\s\u00a0\u202f](€|Kč)\)/);
+  const m = doc.match(/od (\d[\d\u00a0\u202f .]*?)[\s\u00a0\u202f]€[\s\u00a0\u202f]bez DPH[\s\u00a0\u202f]\((?:cca|zhruba)[\s\u00a0\u202f](\d[\d\u00a0\u202f .]*?)[\s\u00a0\u202f](€|Kč)\)/);
   if (!m) return doc;
   const X = +m[1].replace(/[^\d]/g, ''), cur = m[3];
   const Y = m[2].replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[\u00a0\u202f ]/g, WS);
@@ -56,7 +56,7 @@ const exactNew = (l) => [/^[\s\S]+$/, (doc) => {
       .replace(new RegExp('od' + WS + Y + WS + '€' + WS + 'bez DPH', 'g'), 'od ' + m[1] + ' € bez DPH');
   }
   const K = nb((Math.round(X * CZK / 100) * 100).toLocaleString('cs-CZ'));
-  return doc.replace(new RegExp('\\(cca' + WS + Y + WS + 'Kč\\)', 'g'), '(cca ' + K + ' Kč)')
+  return doc.replace(new RegExp('\\((cca|zhruba)' + WS + Y + WS + 'Kč\\)', 'g'), (w, c) => '(' + c + ' ' + K + ' Kč)')
     .replace(new RegExp('od' + WS + Y + WS + 'Kč' + WS + 'bez DPH', 'g'), 'od ' + K + ' Kč bez DPH');
 }];
 
@@ -84,8 +84,47 @@ const exactRent = (l) => [/^[\s\S]+$/, (doc) => {
 /* ezres pont („31.166 €”) → szóköz („31 166 €”), és a „(cca N €)” / „(cca N Kč)” zárójelek egységesítése az egész oldalon */
 const thousands = [/(\d{1,3})\.(\d{3})(?=[\s  ]?(?:€|Kč))/g, '$1 $2'];
 const ccaSk = [/[\s  ]\(cca[\s  ]\d[\d   ]*[\s  ]€(?=[,)])[^)]*\)/g, ''];
-const ccaCz = [/(\d[\d  ]*)[\s  ]€((?:[\s  ]bez DPH)?)[\s  ]\(cca[\s  ]\d[\d   ]*[\s  ]Kč\)/g,
-  (w, x, b) => x + ' €' + b + ' (cca ' + nb((Math.round(+x.replace(/\D/g, '') * CZK / 100) * 100).toLocaleString('cs-CZ')) + ' Kč)'];
+const ccaCz = [/(\d[\d  ]*)[\s  ]€((?:[\s  ]bez DPH)?)[\s  ]\((cca|zhruba)[\s  ]\d[\d   ]*[\s  ]Kč\)/g,
+  (w, x, b, c) => x + ' €' + b + ' (' + c + ' ' + nb((Math.round(+x.replace(/\D/g, '') * CZK / 100) * 100).toLocaleString('cs-CZ')) + ' Kč)'];
+
+/* 19 %-os német áfa ígérete az új autóknál és általános előnyként (a SK/CZ szabály szerint új autónál mindig a vevő országának áfája) */
+const vatPromise = (l) => l === 'sk' ? [
+  [/,?\s(?:—\s)?(?:až|aj)\s(?:so|s)\s\d+\s?%\snemeckou\sDPH(?:\s—\s(?:požiadajte o|vyžiadajte si)[^"<]*?(?:…|!|\.)|\sa…|…|\.|(?=["<]))/g, '.'],
+  [/,\s\d+\s?%\snemecká\sDPH,/g, ','],
+  [/\s\(bez\s\d+\s?%\snemeckej\sDPH\)/g, '']
+] : [
+  [/,?\s(?:—\s)?(?:až|i|také)\s(?:se|s)\s\d+\s?%\sněmeckou\sDPH(?:\s—\s(?:požádejte o|vyžádejte si)[^"<]*?(?:…|!|\.)|\sa…|…|\.|(?=["<]))/g, '.'],
+  [/,\s\d+\s?%\sněmecká\sDPH,/g, ','],
+  [/\s\(bez\s\d+\s?%\sněmecké\sDPH\)/g, '']
+];
+/* blog-főoldal JSON-LD: a SK/CZ oldalon nem létező (csak magyar) cikkek kivétele */
+const blogLd = [/(<script type="application\/ld\+json">)([\s\S]*?)(<\/script>)/g, (all, a, js, b) => {
+  if (!/BlogPosting/.test(js) || !/caradvance\.hu\//.test(js)) return all;
+  try {
+    const rm = (o) => { if (Array.isArray(o)) return o.filter((x) => !(x && (x['@type'] === 'BlogPosting' || (x.item && x.item['@type'] === 'BlogPosting')) && /caradvance\.hu\//.test(JSON.stringify(x)))).map(rm); if (o && typeof o === 'object') { for (const k of Object.keys(o)) o[k] = rm(o[k]); } return o; };
+    return a + JSON.stringify(rm(JSON.parse(js))).replace(/<\//g, '<\\/') + b;
+  } catch (e) { return all; }
+}];
+
+/* dovoz/import oldal költséglista: a magyar regadó / vagyonszerzési illeték logikája helyett a szlovák / cseh díjak */
+const feesSk = [
+  [/Určuje sa podľa výkonu, emisnej triedy a veku\. Pri elektrickom \(\d+E\) aute \d+[\s  ]?€\./g, 'Správny poplatok za zápis do evidencie: sadzba podľa výkonu motora × ekologický koeficient, najmenej 33 €. Elektromobil 33 €.'],
+  [/kW × €\/kW, podľa veku auta\. Pri elektrickom aute sa neplatí ani tento poplatok\./g, 'Pri dovoze sa neplatí osobitne — prihlásenie aj prepis sú na Slovensku ten istý poplatok (zápis držiteľa do evidencie).'],
+  [/([Kk])ontrola originality \(\d[\d\s  ]*–\d[\d\s  ]*[\s  ]?€\)/g, '$1ontrola originality (podľa cenníka stanice)'],
+  [/ \(časť I a II\) \(\d+[\s  ]?€\)/g, ' (časť I a II)'],
+  [/, doklady \(\d+[\s  ]?€\)/g, ''],
+  [/registračný poplatok \(podľa výkonu, emisnej triedy a veku\), poplatok za prepis,/g, 'správny poplatok za prihlásenie (podľa výkonu motora a ekologického koeficientu),'],
+  [/Registračný poplatok \+ poplatok \+ doklady v jednej sume, podľa tabuliek pre rok (\d{4})\./g, 'Správny poplatok za prihlásenie podľa sadzobníka platného v roku $1.']
+];
+const feesCz = [
+  [/Stanoví se podle výkonu, emisní třídy a stáří vozu\. U elektromobilu \(\d+E\) \d+[\s  ]?Kč\./g, 'Správní poplatek za zápis do registru 800 Kč, při přidělení značky EL 0 Kč. U vozů s normou Euro 2 a starší navíc emisní poplatek 3 000–10 000 Kč.'],
+  [/kW × Kč\/kW podle stáří vozu\. U elektromobilu se neplatí ani tento poplatek\./g, 'Při dovozu se neplatí — týká se až změny vlastníka vozu registrovaného v Česku (800 Kč).'],
+  [/([Ee])videnční kontrola \(\d[\d\s  ]*–\d[\d\s  ]*[\s  ]?Kč\)/g, '$1videnční kontrola (podle ceníku stanice)'],
+  [/, technické průkazy \(\d+[\s  ]?Kč\)/g, ', osvědčení o registraci'],
+  [/, doklady \(\d+[\s  ]?Kč\)/g, ''],
+  [/registrační poplatek \(podle výkonu, emisní třídy a stáří\), poplatek za přepis,/g, 'správní poplatek za registraci (800 Kč, se značkou EL 0 Kč), u vozů Euro 2 a starších emisní poplatek,'],
+  [/Registrační poplatek \+ poplatek za přepis \+ doklady v jedné částce, podle oficiálních tabulek pro rok (\d{4})\./g, 'Správní a emisní poplatek v jedné částce, podle předpisů platných v roce $1.']
+];
 
 export const P3 = {
   sk: {
@@ -143,7 +182,9 @@ export const P3 = {
       [r('(?:www\\.)?caradvance\\.hu/berlesi-feltetelek/?'), 'caradvance.sk/prenajom/podmienky-a-kaucia/'],
       [r('(\\d{4})\\. (januára|februára|marca|apríla|mája|júna|júla|augusta|septembra|októbra|novembra|decembra) (\\d{1,2})\\.'), '$3. $2 $1']
     ],
-    POST: [thousands, exactNew('sk'), exactRent('sk'), ccaSk],
+    POST: [thousands, exactNew('sk'), exactRent('sk'), ccaSk, ...vatPromise('sk'), blogLd, ...feesSk, [/(<option\b[^>]*>)Mindegy(<\/option>)/g, '$1Nezáleží$2'], [/(<option\b[^>]*>)Fekete(<\/option>)/g, '$1Čierna$2'], [/(<option\b[^>]*>)Piros(<\/option>)/g, '$1Červená$2'], [/(<option\b[^>]*>)Barna(<\/option>)/g, '$1Hnedá$2'], [/(<option\b[^>]*>)Arany(<\/option>)/g, '$1Zlatá$2'], [/(<option\b[^>]*>)Fix keret(<\/option>)/g, '$1Pevný rozpočet$2'], [/(<option\b[^>]*>)Kicsit rugalmas(<\/option>)/g, '$1Trochu flexibilný$2'], [/(<option\b[^>]*>)Minden modell(<\/option>)/g, '$1Všetky modely$2'], [/(<option\b[^>]*>)Sedan\/Limuzin(<\/option>)/g, '$1Sedan/Limuzína$2'], [/— [^<"]{0,80}?Használtautó\.hu\./g, '— mnohonásobne viac, než ponúka domáci trh.'], [/>kb\. €</g, '>cca €<'], [/, (?:už|až|aj|dokonca) s 19[\s ]% nemeckou DPH — /g, ' — '], ['Caradvance Hungary (Mr. Job SK s.r.o.)', 'Caradvance Slovensko (Mr. Job SK s.r.o.)'], [/(>[^<>]*?) képek</g, '$1 – fotografie<'],
+      [/ a \d+\s?%\snemecká…/g, '…'], [/(Mercedes-Benz|Mercedes-AMG) ([A-Z]{1,3})-osztály/g, '$1 trieda $2'], [/, limuzin — /g, ', limuzína — '], ['Áno, v eurách aj v eurách.', 'Áno, v eurách.'], [' — v eurách alebo eurách,', ' — v eurách,'], [/ — v eurách alebo v eurách\./g, '.'], ['Oplatí sa lízing v € alebo v eurách?', 'Oplatí sa lízing v eurách alebo v cudzej mene?'], ['Lízing v € je otvorený každému. Financovanie v eurách, spravidla s výhodnejšou úrokovou sadzbou, je určené podnikom s preukázateľným príjmom v eurách.', 'Lízing v eurách je otvorený každému. Financovanie v cudzej mene sa oplatí len podnikom s príjmami v tejto mene.'], ['Má firma financovať v eurách alebo v eurách?', 'Má firma financovať v eurách alebo v cudzej mene?'], ['Pre firmy s preukázateľným príjmom v eurách môže byť financovanie v eurách výhodnejšie z hľadiska úrokovej sadzby; inak je samozrejmou voľbou konštrukcia v eurách.', 'Na Slovensku je samozrejmou voľbou financovanie v eurách — v mene vašich príjmov, bez kurzového rizika. Financovanie v cudzej mene sa oplatí len firmám s príjmami v tejto mene.'], [/\(manuális\)/g, '(manuál)'], [/Hol találod a(?:z)? (.+?) konfigurátort\?/g, 'Kde nájdete konfigurátor $1?'], [/("name":")([^"]+?) modellek és német árak/g, '$1Modely $2 a nemecké ceny'],
+      ['Prémium német autók tartós bérlete 6 hónaptól, kedvező kaucióval, all-inclusive feltételekkel', 'Dlhodobý prenájom prémiových nemeckých áut od 6 mesiacov, s výhodnou kauciou a so všetkým v cene']],
     IMPORT: { img: '/sk-team/pavel-horemuz.webp', name: 'Pavel Horemuž', role: 'Dovoz áut z Nemecka', alt: 'Pavel Horemuž — dovoz áut z Nemecka, CarAdvance', flags: [['sk', 'slovenčina'], ['cz', 'čeština']], bio: 'Pavel vás osobne sprevádza celým dovozom — od výberu auta až po odovzdanie kľúčov. Komunikuje s vami po slovensky a so spoločnosťou Caradvance GmbH dohodne všetky podrobnosti.', email: 'info@caradvance.sk' },
     CONTACT: {
       sub: 'Máte otázku alebo hľadáte auto? Zavolajte nám, napíšte nám alebo sa obráťte priamo na niekoho z nášho tímu.',
@@ -210,7 +251,9 @@ export const P3 = {
       [r('(?:www\\.)?caradvance\\.hu/berlesi-feltetelek/?'), 'caradvance.cz/pronajem/podminky-a-kauce/'],
       [r('(\\d{4})\\. (ledna|února|března|dubna|května|června|července|srpna|září|října|listopadu|prosince) (\\d{1,2})\\.'), '$3. $2 $1']
     ],
-    POST: [thousands, exactNew('cs'), exactRent('cs'), ccaCz],
+    POST: [thousands, exactNew('cs'), exactRent('cs'), ccaCz, ...vatPromise('cs'), blogLd, ...feesCz, [/(<option\b[^>]*>)Mindegy(<\/option>)/g, '$1Nezáleží$2'], [/(<option\b[^>]*>)Fekete(<\/option>)/g, '$1Černá$2'], [/(<option\b[^>]*>)Piros(<\/option>)/g, '$1Červená$2'], [/(<option\b[^>]*>)Barna(<\/option>)/g, '$1Hnědá$2'], [/(<option\b[^>]*>)Arany(<\/option>)/g, '$1Zlatá$2'], [/(<option\b[^>]*>)Fix keret(<\/option>)/g, '$1Pevný rozpočet$2'], [/(<option\b[^>]*>)Kicsit rugalmas(<\/option>)/g, '$1Trochu flexibilní$2'], [/(<option\b[^>]*>)Minden modell(<\/option>)/g, '$1Všechny modely$2'], [/(<option\b[^>]*>)Sedan\/Limuzin(<\/option>)/g, '$1Sedan/Limuzína$2'], [/— [^<"]{0,80}?Használtautó\.hu\./g, '— mnohonásobně víc, než nabízí domácí trh.'], [/ · kaució /g, ' · kauce '], [/>kb\. Kč</g, '>cca Kč<'], [/ — a to i s německou DPH 19[\s ]%[\s ]a…/g, '…'], [/, (?:a to i|dokonce|až) s německou DPH 19[\s ]% — /g, ' — '], [/ a 19[\s ]% německé DPH\./g, '.'], ['Caradvance Hungary (Mr. Job SK s.r.o.)', 'Caradvance Česko (Mr. Job SK s.r.o.)'], [/(>[^<>]*?) képek</g, '$1 – fotografie<'],
+      [/ a \d+\s?%\sněmecká…/g, '…'], [/\(manuális\)/g, '(manuál)'], [/(Mercedes-Benz|Mercedes-AMG) ([A-Z]{1,3})-osztály/g, '$1 třída $2'], [/, limuzin — /g, ', limuzína — '], [/Hol találod a(?:z)? (.+?) konfigurátort\?/g, 'Kde najdete konfigurátor $1?'], [/("name":")([^"]+?) modellek és német árak/g, '$1Modely $2 a německé ceny'],
+      ['Prémium német autók tartós bérlete 6 hónaptól, kedvező kaucióval, all-inclusive feltételekkel', 'Dlouhodobý pronájem prémiových německých vozů od 6 měsíců, s výhodnou kaucí a vším v ceně']],
     IMPORT: { img: '/sk-team/pavel-horemuz.webp', name: 'Pavel Horemuž', role: 'Dovoz vozů z Německa', alt: 'Pavel Horemuž — dovoz vozů z Německa, CarAdvance', flags: [['sk', 'slovenština'], ['cz', 'čeština']], bio: 'Pavel vás osobně provede celým dovozem — od výběru vozu až po předání klíčů. Komunikuje s vámi česky i slovensky a se společností Caradvance GmbH domluví všechny podrobnosti.', email: 'info@caradvance.cz' },
     CONTACT: {
       sub: 'Máte dotaz nebo hledáte vůz? Zavolejte nám, napište nám nebo se obraťte přímo na někoho z našeho týmu.',
