@@ -5680,6 +5680,30 @@ export const CSL = {
 "(Caradvance GmbH, Germany). *",
 "(Caradvance GmbH, Deutschland). *"
 ],
+"Vedoucí pro Slovensko a Česko": [
+"Head of Slovakia and Czech Republic",
+"Leiter Slowakei und Tschechien"
+],
+"Pavel Horemuž — vedoucí CarAdvance pro Slovensko a Česko": [
+"Pavel Horemuž — head of CarAdvance for Slovakia and the Czech Republic",
+"Pavel Horemuž — Leiter von CarAdvance für die Slowakei und Tschechien"
+],
+"Pavel vede CarAdvance na Slovensku a v Česku a osobně vás provede celým dovozem — od výběru vozu až po předání klíčů. Komunikuje s vámi česky i slovensky a se společností Caradvance GmbH domluví všechny podrobnosti.": [
+"Pavel leads CarAdvance in Slovakia and the Czech Republic and personally guides you through the entire import — from choosing the car to handing over the keys. He communicates with you in Czech and Slovak and agrees all the details with Caradvance GmbH.",
+"Pavel leitet CarAdvance in der Slowakei und in Tschechien und begleitet Sie persönlich durch den gesamten Import — von der Autoauswahl bis zur Schlüsselübergabe. Er kommuniziert mit Ihnen auf Tschechisch und Slowakisch und stimmt alle Details mit der Caradvance GmbH ab."
+],
+"Bezplatně a nezávazně. Vedoucí pro Slovensko a Česko, Pavel Horemuž, vás dovozem osobně provede.": [
+"Free of charge and without obligation. Our head of Slovakia and the Czech Republic, Pavel Horemuž, personally guides you through the import.",
+"Kostenlos und unverbindlich. Unser Leiter für die Slowakei und Tschechien, Pavel Horemuž, begleitet Sie persönlich durch den Import."
+],
+"Řeknete nám, jaký vůz hledáte, a my vám nabídneme vozy z celého německého trhu: vůz prověříme, na místě zkontrolujeme a poté zajistíme přepravu, registraci a veškeré papírování. Na dovezené vozy platí odpovědnost za vady {1} rok. Pavel Horemuž, vedoucí pro Slovensko a Česko: <g0>+{2}</g0>.": [
+"Tell us what car you are looking for and we will offer you cars from the entire German market: we vet the car, inspect it on site and then arrange transport, registration and all the paperwork. Imported cars come with a {1}-year liability for defects. Pavel Horemuž, head of Slovakia and the Czech Republic: <g0>+{2}</g0>.",
+"Sagen Sie uns, welches Auto Sie suchen, und wir bieten Ihnen Autos aus dem gesamten deutschen Markt: Wir prüfen das Auto, kontrollieren es vor Ort und organisieren dann Transport, Zulassung und alle Formalitäten. Für importierte Autos gilt eine Mängelhaftung von {1} Jahr. Pavel Horemuž, Leiter für die Slowakei und Tschechien: <g0>+{2}</g0>."
+],
+"Vede CarAdvance na Slovensku a v Česku a osobně vás provede i dovozem vozu z Německa — od výběru až po předání klíčů.": [
+"He leads CarAdvance in Slovakia and the Czech Republic and also personally guides you through car imports from Germany — from the choice to the handover of the keys.",
+"Er leitet CarAdvance in der Slowakei und in Tschechien und begleitet Sie persönlich auch beim Autoimport aus Deutschland — von der Auswahl bis zur Schlüsselübergabe."
+],
 "⟨M1⟩ — {1} Kč/měs.": [
 "⟨M1⟩ — {1} Kč/month",
 "⟨M1⟩ — {1} Kč/Monat"

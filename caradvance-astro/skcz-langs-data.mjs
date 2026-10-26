@@ -7045,6 +7045,36 @@ export const SKL = {
 "deutschem Kennzeichen fahren",
 "német rendszámmal közlekednek"
 ],
+"Vedúci pre Slovensko a Česko": [
+"Head of Slovakia and Czech Republic",
+"Leiter Slowakei und Tschechien",
+"Szlovákiai és csehországi vezető"
+],
+"Pavel Horemuž — vedúci CarAdvance pre Slovensko a Česko": [
+"Pavel Horemuž — head of CarAdvance for Slovakia and the Czech Republic",
+"Pavel Horemuž — Leiter von CarAdvance für die Slowakei und Tschechien",
+"Pavel Horemuž — a CarAdvance szlovákiai és csehországi vezetője"
+],
+"Pavel vedie CarAdvance na Slovensku a v Česku a osobne vás sprevádza celým dovozom — od výberu auta až po odovzdanie kľúčov. Komunikuje s vami po slovensky a so spoločnosťou Caradvance GmbH dohodne všetky podrobnosti.": [
+"Pavel leads CarAdvance in Slovakia and the Czech Republic and personally accompanies you through the entire import — from choosing the car to handing over the keys. He communicates with you in Slovak and agrees all the details with Caradvance GmbH.",
+"Pavel leitet CarAdvance in der Slowakei und in Tschechien und begleitet Sie persönlich durch den gesamten Import — von der Autoauswahl bis zur Schlüsselübergabe. Er kommuniziert mit Ihnen auf Slowakisch und stimmt alle Details mit der Caradvance GmbH ab.",
+"Pavel vezeti a CarAdvance-t Szlovákiában és Csehországban, és személyesen kísér végig a teljes importon — az autó kiválasztásától a kulcsátadásig. Szlovákul kommunikál veled, és minden részletet egyeztet a Caradvance GmbH-val."
+],
+"Bezplatne a nezáväzne. Vedúci pre Slovensko a Česko, Pavel Horemuž, vás osobne sprevádza celým dovozom.": [
+"Free of charge and without obligation. Our head of Slovakia and the Czech Republic, Pavel Horemuž, personally accompanies you through the entire import.",
+"Kostenlos und unverbindlich. Unser Leiter für die Slowakei und Tschechien, Pavel Horemuž, begleitet Sie persönlich durch den gesamten Import.",
+"Ingyenesen és kötelezettség nélkül. Szlovákiai és csehországi vezetőnk, Pavel Horemuž személyesen kísér végig a teljes importon."
+],
+"Povedzte nám, aké auto hľadáte, a my vám ponúkneme výber z celého nemeckého trhu: auto preveríme, skontrolujeme na mieste a potom zabezpečíme prepravu, prihlásenie a všetku administratívu. Na dovezené autá platí zodpovednosť za vady {1} rok. Pavel Horemuž, vedúci pre Slovensko a Česko: <g0>+{2}</g0>.": [
+"Tell us what car you are looking for and we will offer you a selection from the entire German market: we vet the car, inspect it on site and then arrange transport, registration and all the paperwork. Imported cars come with a {1}-year liability for defects. Pavel Horemuž, head of Slovakia and the Czech Republic: <g0>+{2}</g0>.",
+"Sagen Sie uns, welches Auto Sie suchen, und wir bieten Ihnen eine Auswahl aus dem gesamten deutschen Markt: Wir prüfen das Auto, kontrollieren es vor Ort und organisieren dann Transport, Zulassung und alle Formalitäten. Für importierte Autos gilt eine Mängelhaftung von {1} Jahr. Pavel Horemuž, Leiter für die Slowakei und Tschechien: <g0>+{2}</g0>.",
+"Mondd el, milyen autót keresel, és az egész német piacról kínálunk választékot: átvilágítjuk, a helyszínen átvizsgáljuk az autót, majd intézzük a szállítást, a forgalomba helyezést és a teljes adminisztrációt. A behozott autókra {1} év kellékszavatosság vonatkozik. Pavel Horemuž, szlovákiai és csehországi vezető: <g0>+{2}</g0>."
+],
+"Vedie CarAdvance na Slovensku a v Česku a osobne sprevádza aj dovoz áut z Nemecka — od výberu až po odovzdanie kľúčov.": [
+"He leads CarAdvance in Slovakia and the Czech Republic and also personally handles car imports from Germany — from the choice to the handover of the keys.",
+"Er leitet CarAdvance in der Slowakei und in Tschechien und betreut persönlich auch den Autoimport aus Deutschland — von der Auswahl bis zur Schlüsselübergabe.",
+"Ő vezeti a CarAdvance-t Szlovákiában és Csehországban, és személyesen intézi az autóimportot is Németországból — a kiválasztástól a kulcsátadásig."
+],
 "⟨M1⟩ — {1} €/mes.": [
 "⟨M1⟩ — {1} €/month",
 "⟨M1⟩ — {1} €/Monat",
