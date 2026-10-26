@@ -459,6 +459,10 @@
     "en": "$1Indicative average fuel price in Poland (e-petrol, October 2026); you can adjust the price",
     "de": "$1Orientierender Durchschnittspreis für Kraftstoff in Polen (e-petrol, Oktober 2026); Sie können den Preis anpassen"
    }
+  ],
+  [
+   "(<div class=\"pname\">Balázs Bajzáth</div><div class=\"prole\">)[^<]*",
+   "$1Sales Manager"
   ]
  ],
  "jsfix": {
