@@ -7035,6 +7035,16 @@ export const SKL = {
 "Nächstes Foto",
 "Következő fotó"
 ],
+"Beriem na vedomie, že prenajaté autá jazdia s": [
+"I acknowledge that the rented cars run on",
+"Ich nehme zur Kenntnis, dass die Mietautos mit",
+"Tudomásul veszem, hogy a bérelt autók"
+],
+"nemeckým evidenčným číslom": [
+"German number plates",
+"deutschem Kennzeichen fahren",
+"német rendszámmal közlekednek"
+],
 "⟨M1⟩ — {1} €/mes.": [
 "⟨M1⟩ — {1} €/month",
 "⟨M1⟩ — {1} €/Monat",
@@ -7599,5 +7609,25 @@ export const SKL = {
 "Škoda",
 "Škoda",
 "Škoda"
+],
+"Ako firma · cena bez DPH": [
+"As a company · price excl. VAT",
+"Als Firma · Preis ohne MwSt.",
+"Cégként · ár áfa nélkül"
+],
+"Ako súkromná osoba – individuálna ponuka (ozveme sa vám)": [
+"As a private individual – individual offer (we will get back to you)",
+"Als Privatperson – individuelles Angebot (wir melden uns bei Ihnen)",
+"Magánszemélyként – egyedi ajánlat (felvesszük veled a kapcsolatot)"
+],
+"Orientačné nemecké cenníkové ceny. Firma: cena bez DPH. Súkromná osoba: vrátane slovenskej DPH {1} % – nové auto sa v rámci EÚ vždy zdaňuje v krajine kupujúceho. Konečná cena závisí od zvolenej výbavy a aktuálnej zľavy. Obrázky sú ilustračné.": [
+"Indicative German list prices. Company: price excl. VAT. Private individual: including Slovak VAT of {1} % – within the EU a new car is always taxed in the buyer’s country. The final price depends on the chosen equipment and the current discount. Images are for illustration.",
+"Unverbindliche deutsche Listenpreise. Firma: Preis ohne MwSt. Privatperson: inklusive slowakischer MwSt. von {1} % – ein Neuwagen wird in der EU immer im Land des Käufers besteuert. Der Endpreis hängt von der gewählten Ausstattung und dem aktuellen Rabatt ab. Die Bilder dienen der Illustration.",
+"Tájékoztató jellegű német listaárak. Cég: ár áfa nélkül. Magánszemély: a {1} %-os szlovák áfával – új autót az EU-n belül mindig a vevő országában adóznak. A végső ár a választott felszereltségtől és az aktuális kedvezménytől függ. A képek illusztrációk."
+],
+"s {1} % DPH": [
+"incl. {1} % VAT",
+"inkl. {1} % MwSt.",
+"{1} % áfával"
 ]
 };

@@ -5668,6 +5668,18 @@ export const CSL = {
 "Lowest deposit",
 "Niedrigste Kaution"
 ],
+"Beru na vědomí, že pronajaté vozy jezdí s": [
+"I acknowledge that the rented cars run on",
+"Ich nehme zur Kenntnis, dass die Mietautos mit"
+],
+"německou registrační značkou": [
+"German number plates",
+"deutschem Kennzeichen fahren"
+],
+"(Caradvance GmbH, Německo). *": [
+"(Caradvance GmbH, Germany). *",
+"(Caradvance GmbH, Deutschland). *"
+],
 "⟨M1⟩ — {1} Kč/měs.": [
 "⟨M1⟩ — {1} Kč/month",
 "⟨M1⟩ — {1} Kč/Monat"
@@ -6063,5 +6075,21 @@ export const CSL = {
 "Škoda": [
 "Škoda",
 "Škoda"
+],
+"Jako firma · cena bez DPH": [
+"As a company · price excl. VAT",
+"Als Firma · Preis ohne MwSt."
+],
+"Jako soukromá osoba – individuální nabídka (ozveme se vám)": [
+"As a private individual – individual offer (we will get back to you)",
+"Als Privatperson – individuelles Angebot (wir melden uns bei Ihnen)"
+],
+"Orientační německé ceníkové ceny. Firma: cena bez DPH. Soukromá osoba: včetně české DPH {1} % – nový vůz se v rámci EU vždy daní ve státě kupujícího. Konečná cena závisí na zvolené výbavě a aktuální slevě. Obrázky jsou ilustrační.": [
+"Indicative German list prices. Company: price excl. VAT. Private individual: including Czech VAT of {1} % – within the EU a new car is always taxed in the buyer’s country. The final price depends on the chosen equipment and the current discount. Images are for illustration.",
+"Unverbindliche deutsche Listenpreise. Firma: Preis ohne MwSt. Privatperson: inklusive tschechischer MwSt. von {1} % – ein Neuwagen wird in der EU immer im Land des Käufers besteuert. Der Endpreis hängt von der gewählten Ausstattung und dem aktuellen Rabatt ab. Die Bilder dienen der Illustration."
+],
+"s {1} % DPH": [
+"incl. {1} % VAT",
+"inkl. {1} % MwSt."
 ]
 };

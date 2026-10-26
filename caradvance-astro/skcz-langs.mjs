@@ -213,7 +213,33 @@ function run(ml) {
         return a + lead + unmaskNums(t, nums) + trail + b;
       }))).join('');
       // beágyazott szkriptek szöveg-literáljai (a P3 szabályok által szlovákra/csehre írt mondatok)
+      // HTML-sablonok a szkriptekben (hosszú sztringek): a címkék közti szlovák/cseh szövegek; az idézőjelek tipográfiaiak, hogy a JS-sztring ne törjön
+      h = h.replace(/(<script\b(?![^>]*\bsrc=)(?![^>]*ld\+json)[^>]*>)([\s\S]*?)(<\/script>)/gi, (all, a, js, b) => a + js.replace(/>([^<>\n'"`\\{}]*\p{L}[^<>\n'"`\\{}]*)</gu, (mm, txt) => {
+        const lead = txt.match(/^\s*/)[0], trail = txt.match(/\s*$/)[0];
+        const { k, nums } = maskNums(txt.trim().replace(/\s+/g, ' '));
+        if (!k || !/ /.test(k)) return mm;
+        const t = lookup(D, l, k);
+        if (t == null || t === k) {
+          if (t == null && /[äčďĺľňôŕšťžěřů]/i.test(k) && !/[őűöü]|ß/i.test(k) && (ML === 'cs' ? !/[ľĺŕôä]/.test(k) : !/[ěřů]/.test(k))) { const { km } = maskModels(k); const ms = miss.get(km) || { n: 0, l: new Set(), p: rel }; ms.n++; ms.l.add(l); miss.set(km, ms); }
+          return mm;
+        }
+        return '>' + lead + unmaskNums(t, nums).replace(/'/g, '’').replace(/"([^"]*)"/g, '“$1”').replace(/"/g, '”') + trail + '<';
+      }) + b);
       h = h.replace(/(<script\b(?![^>]*\bsrc=)(?![^>]*ld\+json)[^>]*>)([\s\S]*?)(<\/script>)/gi, (all, a, js, b) => a + js.replace(/(['"])((?:(?!\1)[^\\\n]|\\.){3,300}?)\1/g, (m, q, str) => {
+        if (/<[a-z\/]/i.test(str) && !/[{}]|\\u/.test(str)) {
+          // HTML-sablon a szkriptben: a címkék közti szövegek fordítása
+          const o2 = str.replace(/>([^<>]*\p{L}[^<>]*)</gu, (mm, txt) => {
+            const lead = txt.match(/^\s*/)[0], trail = txt.match(/\s*$/)[0];
+            const { k, nums } = maskNums(txt.trim().replace(/\s+/g, ' '));
+            const t = k ? lookup(D, l, k) : null;
+            if (t == null || t === k) {
+              if (t == null && / /.test(k) && /[äčďĺľňôŕšťžěřů]/i.test(k) && !/[őűöü]|ß/i.test(k)) { const { km } = maskModels(k); const ms = miss.get(km) || { n: 0, l: new Set(), p: rel }; ms.n++; ms.l.add(l); miss.set(km, ms); }
+              return mm;
+            }
+            return '>' + lead + unmaskNums(t, nums).split(q).join('\\' + q) + trail + '<';
+          });
+          return q + o2 + q;
+        }
         if (!/\p{L}{2,}/u.test(str) || /[{}<>]|\\u|^[\w.$#/-]+$/.test(str)) return m;
         const lead = str.match(/^\s*/)[0], trail = str.match(/\s*$/)[0];
         const { k, nums } = maskNums(str.trim().replace(/\s+/g, ' '));
