@@ -6375,5 +6375,585 @@ export const CSL = {
 "Kombinovaně": [
 "Mixed",
 "Gemischt"
+],
+"<g0>{1} Kč</g0><g1>s DPH · {2} € bez DPH</g1>": [
+"<g0>{1} Kč</g0><g1>incl. VAT · {2} € excl. VAT</g1>",
+"<g0>{1} Kč</g0><g1>inkl. MwSt. · {2} € ohne MwSt.</g1>"
+],
+"{1} · Automatická · Nafta": [
+"{1} · Automatic · Diesel",
+"{1} · Automatik · Diesel"
+],
+"<g0>Odpovědnost za vady</g0> — u ojetých vozů {1} rok (podle kupní smlouvy), u nových vozů {2} roky.": [
+"<g0>Liability for defects</g0> — {1} year for used cars (according to the purchase contract), {2} years for new cars.",
+"<g0>Mängelhaftung</g0> — bei Gebrauchtwagen {1} Jahr (laut Kaufvertrag), bei Neuwagen {2} Jahre."
+],
+"<g0>Výhodná cena</g0> — vyberete si variantu, která vám nejvíce vyhovuje: s doručením až k vám, nebo s osobním převzetím v Německu.": [
+"<g0>Great price</g0> — choose the option that suits you best: delivery right to your door or personal pickup in Germany.",
+"<g0>Attraktiver Preis</g0> — Sie wählen die Variante, die am besten zu Ihnen passt: Lieferung bis zu Ihnen oder Selbstabholung in Deutschland."
+],
+"<g0>Nový</g0><g1>{1}/{2}</g1>": [
+"<g0>New</g0><g1>{1}/{2}</g1>",
+"<g0>Neu</g0><g1>{1}/{2}</g1>"
+],
+"<g0>Prodáno</g0><g1>{1}/{2}</g1>": [
+"<g0>Sold</g0><g1>{1}/{2}</g1>",
+"<g0>Verkauft</g0><g1>{1}/{2}</g1>"
+],
+"<g0>{1} km / měsíc</g0><g1>{2} € <g2>≈ {3} Kč</g2></g1>": [
+"<g0>{1} km / month</g0><g1>{2} € <g2>≈ {3} Kč</g2></g1>",
+"<g0>{1} km / Monat</g0><g1>{2} € <g2>≈ {3} Kč</g2></g1>"
+],
+"Cena s doručením do Česka": [
+"Price with delivery to the Czech Republic",
+"Preis mit Lieferung nach Tschechien"
+],
+"{1} € · včetně {2} % DPH": [
+"{1} € · incl. {2} % VAT",
+"{1} € · inkl. {2} % MwSt."
+],
+"<g0>{1} € (≈ {2} Kč)</g0> při osobním převzetí v Německu, včetně {3} % německé DPH (pouze ojeté vozy; dopravu si zajišťujete sami)": [
+"<g0>{1} € (≈ {2} Kč)</g0> with personal pickup in Germany, incl. {3} % German VAT (used cars only; you arrange transport yourself)",
+"<g0>{1} € (≈ {2} Kč)</g0> bei Selbstabholung in Deutschland, inkl. {3} % deutscher MwSt. (nur Gebrauchtwagen; den Transport organisieren Sie selbst)"
+],
+"<g0>{1} € (≈ {2} Kč)</g0> pro firmy s DIČ, bez DPH (dodání v rámci EU)": [
+"<g0>{1} € (≈ {2} Kč)</g0> for companies with a VAT ID, excl. VAT (intra-EU supply)",
+"<g0>{1} € (≈ {2} Kč)</g0> für Unternehmen mit USt-IdNr., ohne MwSt. (innergemeinschaftliche Lieferung)"
+],
+"Nevíte, která varianta je pro vás nejvýhodnější? Zavolejte nám na <g0>+{1}</g0> – společně najdeme nejvhodnější řešení.": [
+"Not sure which option suits you best? Call us at <g0>+{1}</g0> – together we'll find the best solution.",
+"Sie sind nicht sicher, welche Variante für Sie am günstigsten ist? Rufen Sie uns an unter <g0>+{1}</g0> – gemeinsam finden wir die passende Lösung."
+],
+"<g0>Prodáno · {1}. {2}. {3} · podobný vůz vám dovezeme.</g0>": [
+"<g0>Sold · {1}/{2}/{3} · we can import a similar car for you.</g0>",
+"<g0>Verkauft · {1}.{2}.{3} · ein ähnliches Fahrzeug importieren wir gern für Sie.</g0>"
+],
+"Tento vůz byl prodán ({1}. {2}. {3}). Necháváme jej zde jako referenci — pokud hledáte podobný, dovezeme jej pro vás z celého německého trhu. <g0>Naše aktuální nabídka →</g0>": [
+"This car was sold ({1}/{2}/{3}). We keep it here as a reference — if you are looking for a similar one, we will source it for you from across the German market. <g0>Our current offer →</g0>",
+"Dieses Fahrzeug wurde verkauft ({1}.{2}.{3}). Wir lassen es hier als Referenz stehen — wenn Sie ein ähnliches suchen, beschaffen wir es für Sie aus dem gesamten deutschen Markt. <g0>Unser aktuelles Angebot →</g0>"
+],
+"Tento vůz byl prodán ({1}. {2}. {3}) — cena slouží jako reference. Podobný vůz vám dovezeme z celého německého trhu: včetně dopravy, registrace dovezeného vozu a kompletního vyřízení.": [
+"This car was sold ({1}/{2}/{3}) — the price serves as a reference. We can import a similar car for you from across the German market, including transport, registration of the imported car and full handling of all formalities.",
+"Dieses Fahrzeug wurde verkauft ({1}.{2}.{3}) — der Preis dient als Referenz. Ein ähnliches Fahrzeug importieren wir für Sie aus dem gesamten deutschen Markt: inklusive Transport, Zulassung des importierten Fahrzeugs und kompletter Abwicklung."
+],
+"<x0/><g1>fotografie brzy</g1><g2>Prodáno</g2><g3>Prodáno: {1}. {2}. {3}</g3>": [
+"<x0/><g1>photos coming soon</g1><g2>Sold</g2><g3>Sold: {1}/{2}/{3}</g3>",
+"<x0/><g1>Fotos folgen in Kürze</g1><g2>Verkauft</g2><g3>Verkauft: {1}.{2}.{3}</g3>"
+],
+"Prodáno: {1}. {2}. {3}": [
+"Sold: {1}/{2}/{3}",
+"Verkauft: {1}.{2}.{3}"
+],
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa – {2}": [
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa – {2}",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa – {2}"
+],
+"<g0>K pronájmu</g0><g1>{1}/{2}</g1>": [
+"<g0>For rent</g0><g1>{1}/{2}</g1>",
+"<g0>Zu vermieten</g0><g1>{1}/{2}</g1>"
+],
+"<g0>Nový</g0><g1></g1>": [
+"<g0>New</g0><g1></g1>",
+"<g0>Neu</g0><g1></g1>"
+],
+"Nový vůz podle pravidel EU": [
+"New car under EU rules",
+"Neufahrzeug nach EU-Regeln"
+],
+"bez DPH (≈ {1} Kč)": [
+"excl. VAT (≈ {1} Kč)",
+"ohne MwSt. (≈ {1} Kč)"
+],
+"Českou DPH {1} % přiznáte a zaplatíte v Česku – soukromá osoba do {2} dnů od pořízení vozu, firma ve svém daňovém přiznání. Potvrzení o zaplacení DPH je potřeba k registraci vozu.": [
+"You declare and pay the Czech VAT of {1} % in the Czech Republic – private individuals within {2} days of acquiring the car, companies in their tax return. Proof of VAT payment is required to register the car.",
+"Die tschechische MwSt. von {1} % melden und zahlen Sie in Tschechien – Privatpersonen innerhalb von {2} Tagen nach dem Erwerb des Fahrzeugs, Unternehmen in ihrer Steuererklärung. Der Nachweis über die gezahlte MwSt. ist für die Zulassung des Fahrzeugs erforderlich."
+],
+"Zavolejte nám a postup vám vysvětlíme: <g0>+{1}</g0>": [
+"Call us and we'll explain the process: <g0>+{1}</g0>",
+"Rufen Sie uns an, wir erklären Ihnen den Ablauf: <g0>+{1}</g0>"
+],
+"Jaguar F-Type S {1} V{2} S/C (Automata) – {3}": [
+"Jaguar F-Type S {1} V{2} S/C (Automata) – {3}",
+"Jaguar F-Type S {1} V{2} S/C (Automata) – {3}"
+],
+"Hybrid (Diesel/Elektro)": [
+"Hybrid (Diesel/Electric)",
+"Hybrid (Diesel/Elektro)"
+],
+"{1} km · Benzín": [
+"{1} km · Petrol",
+"{1} km · Benzin"
+],
+"<x0/><g1>fotografie již brzy</g1><g2>Novinka</g2>": [
+"<x0/><g1>photos coming soon</g1><g2>New listing</g2>",
+"<x0/><g1>Fotos folgen in Kürze</g1><g2>Neu im Angebot</g2>"
+],
+"{1} · Automatická · Hybrid (Diesel/Elektro)": [
+"{1} · Automatic · Hybrid (Diesel/Electric)",
+"{1} · Automatik · Hybrid (Diesel/Elektro)"
+],
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa": [
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa"
+],
+"Na prodej Ferrari {1}Cilindri Spider azzuro la plata let´s go!, {2} km, {3} k, benzín, automat. Cena bez DPH {4} Kč.": [
+"For sale: Ferrari {1}Cilindri Spider azzuro la plata let´s go!, {2} km, {3} hp, petrol, automatic. Price excl. VAT {4} Kč.",
+"Zu verkaufen: Ferrari {1}Cilindri Spider azzuro la plata let´s go!, {2} km, {3} PS, Benzin, Automatik. Preis ohne MwSt. {4} Kč."
+],
+"Na prodej Ferrari {1} GTS Zahnriemen+Service Historie, {2}, {3} km, {4} k, benzín, manuál. Cena bez DPH {5} Kč.": [
+"For sale: Ferrari {1} GTS Zahnriemen+Service Historie, {2}, {3} km, {4} hp, petrol, manual. Price excl. VAT {5} Kč.",
+"Zu verkaufen: Ferrari {1} GTS Zahnriemen+Service Historie, {2}, {3} km, {4} PS, Benzin, Schaltgetriebe. Preis ohne MwSt. {5} Kč."
+],
+"Prodej Ford Fiesta {1} GTDi ST{2}, {3}, {4} km, {5} k, benzin. Cena {6} Kč. Německý dovoz s ověřenou historií od CarAdvance.": [
+"For sale: Ford Fiesta {1} GTDi ST{2}, {3}, {4} km, {5} hp, petrol. Price {6} Kč. German import with verified history from CarAdvance.",
+"Zu verkaufen: Ford Fiesta {1} GTDi ST{2}, {3}, {4} km, {5} PS, Benzin. Preis {6} Kč. Import aus Deutschland mit geprüfter Historie von CarAdvance."
+],
+"Prodej Ford Focus {1} EcoBlue ST-Line (Automat), {2}, {3} km, {4} k, diesel. Cena {5} Kč. Německý dovoz s ověřenou historií od CarAdvance.": [
+"For sale: Ford Focus {1} EcoBlue ST-Line (Automatic), {2}, {3} km, {4} hp, diesel. Price {5} Kč. German import with verified history from CarAdvance.",
+"Zu verkaufen: Ford Focus {1} EcoBlue ST-Line (Automatik), {2}, {3} km, {4} PS, Diesel. Preis {5} Kč. Import aus Deutschland mit geprüfter Historie von CarAdvance."
+],
+"Na prodej Jaguar F-Type S {1} V{2} S/C (automat), {3}, {4} km, {5} k, benzín. Cena bez DPH {6} Kč. Prověřený dovoz z Německa s doloženou historií od CarAdvance.": [
+"For sale: Jaguar F-Type S {1} V{2} S/C (automatic), {3}, {4} km, {5} hp, petrol. Price excl. VAT {6} Kč. Verified import from Germany with documented history from CarAdvance.",
+"Zu verkaufen: Jaguar F-Type S {1} V{2} S/C (Automatik), {3}, {4} km, {5} PS, Benzin. Preis ohne MwSt. {6} Kč. Geprüfter Import aus Deutschland mit dokumentierter Historie von CarAdvance."
+],
+"Jaguar F-Type S {1} V{2} S/C (Automata)": [
+"Jaguar F-Type S {1} V{2} S/C (Automata)",
+"Jaguar F-Type S {1} V{2} S/C (Automata)"
+],
+"Prodáno: Lamborghini Urus S Nero-Matt Black {1}\" Garan, {2}, {3} km, {4} k, benzín. Hledáte podobný vůz? Podívejte se na aktuální nabídku.": [
+"Sold: Lamborghini Urus S Nero-Matt Black {1}\" Garan, {2}, {3} km, {4} hp, petrol. Looking for a similar car? Check out our current offer.",
+"Verkauft: Lamborghini Urus S Nero-Matt Black {1}\" Garan, {2}, {3} km, {4} PS, Benzin. Sie suchen ein ähnliches Fahrzeug? Sehen Sie sich unser aktuelles Angebot an."
+],
+"Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\"": [
+"Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\"",
+"Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\""
+],
+"Prodáno: Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa, {2}, {3} km, {4} k, diesel, automat.": [
+"Sold: Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa, {2}, {3} km, {4} hp, diesel, automatic.",
+"Verkauft: Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa, {2}, {3} km, {4} PS, Diesel, Automatik."
+],
+"Prodáno: Land Rover Range Rover Sport P{1}e Autobio White-Red Full, {2}, {3} km, {4} k, hybrid (benzín/elektro), automat.": [
+"Sold: Land Rover Range Rover Sport P{1}e Autobio White-Red Full, {2}, {3} km, {4} hp, hybrid (petrol/electric), automatic.",
+"Verkauft: Land Rover Range Rover Sport P{1}e Autobio White-Red Full, {2}, {3} km, {4} PS, Hybrid (Benzin/Elektro), Automatik."
+],
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go! na": [
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go! for sale",
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go! zu verkaufen"
+],
+"Ferrari {1} GTS Zahnriemen+Service Historie na prodej": [
+"Ferrari {1} GTS Zahnriemen+Service Historie for sale",
+"Ferrari {1} GTS Zahnriemen+Service Historie zu verkaufen"
+],
+"Prodej Ford Fiesta {1} GTDi ST{2} · {3} · {4} km": [
+"Ford Fiesta {1} GTDi ST{2} for sale · {3} · {4} km",
+"Ford Fiesta {1} GTDi ST{2} zu verkaufen · {3} · {4} km"
+],
+"S platnými českými doklady": [
+"With valid Czech documents",
+"Mit gültigen tschechischen Papieren"
+],
+"Cena je uvedena v Kč a zahrnuje DPH (český prodejce). Cena v eurech je orientační, podle aktuálního kurzu.": [
+"The price is stated in Kč and includes VAT (Czech seller). The euro price is indicative, based on the current exchange rate.",
+"Der Preis ist in Kč angegeben und enthält die MwSt. (tschechischer Verkäufer). Der Euro-Preis ist unverbindlich und richtet sich nach dem aktuellen Wechselkurs."
+],
+"Jaguar F-Type S {1} V{2} S/C (Automata) na prodej · {3}": [
+"Jaguar F-Type S {1} V{2} S/C (Automata) for sale · {3}",
+"Jaguar F-Type S {1} V{2} S/C (Automata) zu verkaufen · {3}"
+],
+"Prodáno: Lamborghini Urus S Nero-Matt Black {1}\" Garan": [
+"Sold: Lamborghini Urus S Nero-Matt Black {1}\" Garan",
+"Verkauft: Lamborghini Urus S Nero-Matt Black {1}\" Garan"
+],
+"Na prodej Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} k, benzín, automat. Cena bez DPH {7} Kč.": [
+"For sale: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} hp, petrol, automatic. Price excl. VAT {7} Kč.",
+"Zu verkaufen: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} PS, Benzin, Automatik. Preis ohne MwSt. {7} Kč."
+],
+"Prodáno: Land Rover Range Rover Evoque SE TD{1} Auto Xenon": [
+"Sold: Land Rover Range Rover Evoque SE TD{1} Auto Xenon",
+"Verkauft: Land Rover Range Rover Evoque SE TD{1} Auto Xenon"
+],
+"Prodáno: Land Rover Range Rover Sport P{1}e Autobio": [
+"Sold: Land Rover Range Rover Sport P{1}e Autobio",
+"Verkauft: Land Rover Range Rover Sport P{1}e Autobio"
+],
+"{1} · Benzín": [
+"{1} · Petrol",
+"{1} · Benzin"
+],
+"<x0/><g1>fotografie brzy</g1><g2>Pronajato</g2><g3>Pronajato: {1}. {2}. {3}</g3>": [
+"<x0/><g1>photos coming soon</g1><g2>Rented out</g2><g3>Rented out: {1}/{2}/{3}</g3>",
+"<x0/><g1>Fotos folgen in Kürze</g1><g2>Vermietet</g2><g3>Vermietet: {1}.{2}.{3}</g3>"
+],
+"<g0>Pronajato</g0><g1>{1}/{2}</g1>": [
+"<g0>Rented out</g0><g1>{1}/{2}</g1>",
+"<g0>Vermietet</g0><g1>{1}/{2}</g1>"
+],
+"{1} km · Automatická · Nafta": [
+"{1} km · Automatic · Diesel",
+"{1} km · Automatik · Diesel"
+],
+"<g0>první registrace v Česku</g0>": [
+"<g0>first registered in the Czech Republic</g0>",
+"<g0>Erstzulassung in Tschechien</g0>"
+],
+"první registrace v Česku": [
+"first registered in the Czech Republic",
+"Erstzulassung in Tschechien"
+],
+"<g0>Prodáno</g0><g1></g1>": [
+"<g0>Sold</g0><g1></g1>",
+"<g0>Verkauft</g0><g1></g1>"
+],
+"Automatická · Benzín": [
+"Automatic · Petrol",
+"Automatik · Benzin"
+],
+"Automatická · Nafta": [
+"Automatic · Diesel",
+"Automatik · Diesel"
+],
+"{1} km · Automat · Benzín": [
+"{1} km · Automatic · Petrol",
+"{1} km · Automatik · Benzin"
+],
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go!": [
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go!",
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go!"
+],
+"Ferrari {1}Cilindri Spider / azzuro la plata / let´s go! má najeto {2}, benzinový kabriolet. {3} k, automatická převodovka, pohon zadních kol. Cena podle zvolené varianty níže, s odpovědností za vady, dovoz CarAdvance.": [
+"Ferrari {1}Cilindri Spider / azzuro la plata / let´s go!, mileage {2}, petrol convertible. {3} hp, automatic transmission, rear-wheel drive. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Ferrari {1}Cilindri Spider / azzuro la plata / let´s go!, Laufleistung {2}, Cabrio mit Benzinmotor. {3} PS, Automatikgetriebe, Hinterradantrieb. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance."
+],
+"Ferrari {1} GTS Zahnriemen+Service Historie": [
+"Ferrari {1} GTS Zahnriemen+Service Historie",
+"Ferrari {1} GTS Zahnriemen+Service Historie"
+],
+"Ferrari {1} GTS / Zahnriemen+Service neu / Historie, ročník {2}/{3}, má najeto {4}, benzinový sportovní vůz. {5} k, manuální převodovka. Cena podle zvolené varianty níže, s odpovědností za vady, dovoz CarAdvance.": [
+"Ferrari {1} GTS / Zahnriemen+Service neu / Historie, year {2}/{3}, mileage {4}, petrol sports car. {5} hp, manual transmission. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Ferrari {1} GTS / Zahnriemen+Service neu / Historie, Baujahr {2}/{3}, Laufleistung {4}, Sportwagen mit Benzinmotor. {5} PS, Schaltgetriebe. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance."
+],
+"Ford Fiesta {1} GTDi ST{2}, ročník {3}, najeto {4} km, benzinový sportovní hatchback v limitované edici. {5} k, manuální {6}stupňová převodovka, pohon předních kol. Garážovaný, od druhého majitele, tuzemský vůz bez nehody — v nabídce CarAdvance.": [
+"Ford Fiesta {1} GTDi ST{2}, year {3}, {4} km, limited-edition petrol sports hatchback. {5} hp, {6}-speed manual transmission, front-wheel drive. Garage-kept, second owner, Czech-registered car with no accident history — offered by CarAdvance.",
+"Ford Fiesta {1} GTDi ST{2}, Baujahr {3}, {4} km, sportlicher Kompaktwagen mit Benzinmotor in limitierter Edition. {5} PS, manuelles {6}-Gang-Getriebe, Frontantrieb. Garagenfahrzeug aus zweiter Hand, unfallfrei, in Tschechien zugelassen — im Angebot von CarAdvance."
+],
+"Ford Focus {1} EcoBlue ST-Line (Automat), ročník {2}/{3}, najeto {4} km, dieselové kombi ve výbavě ST-Line. {5} k, automatická {6}stupňová převodovka, pohon předních kol. Od prvního majitele, garážovaný, tuzemský vůz — v nabídce CarAdvance.": [
+"Ford Focus {1} EcoBlue ST-Line (Automatic), year {2}/{3}, {4} km, diesel estate in ST-Line trim. {5} hp, {6}-speed automatic transmission, front-wheel drive. First owner, garage-kept, Czech-registered car — offered by CarAdvance.",
+"Ford Focus {1} EcoBlue ST-Line (Automatik), Baujahr {2}/{3}, {4} km, Diesel-Kombi in ST-Line-Ausstattung. {5} PS, {6}-Gang-Automatikgetriebe, Frontantrieb. Aus erster Hand, Garagenfahrzeug, in Tschechien zugelassen — im Angebot von CarAdvance."
+],
+"<g0>Úvod</g0> / <g1>Naše vozy</g1> / <g2>Jaguar F-Type S {1} V{2} S/C (Automata)</g2>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Jaguar F-Type S {1} V{2} S/C (Automata)</g2>",
+"<g0>Startseite</g0> / <g1>Unsere Fahrzeuge</g1> / <g2>Jaguar F-Type S {1} V{2} S/C (Automata)</g2>"
+],
+"A(z) Jaguar F-Type S {1} V{2} S/C (Automata) {3}/{4} évjáratú, {5} km-t futott, benzines, kompresszoros V{6} motoros, kétüléses cabrio (vászontető). {7} LE ({8} kW), {9} fokozatú automata váltó, hátsókerék-hajtás. Az S kivitel aktív sportkipufogóval, adaptív futóművel és sportos beltérrel érkezik. Amerikai import, érvényes magyar okmányokkal — a CarAdvance bizományos kínálatában.": [
+"Jaguar F-Type S {1} V{2} S/C (Automata), year {3}/{4}, {5} km, petrol, supercharged V{6} engine, two-seater convertible (soft top). {7} hp ({8} kW), {9}-speed automatic transmission, rear-wheel drive. The S version comes with an active sports exhaust, adaptive suspension and a sporty interior. US import with valid Hungarian documents — from CarAdvance's consignment offer.",
+"Jaguar F-Type S {1} V{2} S/C (Automata), Baujahr {3}/{4}, {5} km, Benzin, V{6}-Kompressormotor, zweisitziges Cabrio (Stoffverdeck). {7} PS ({8} kW), {9}-Gang-Automatikgetriebe, Hinterradantrieb. Die S-Version bietet eine aktive Sportabgasanlage, ein adaptives Fahrwerk und einen sportlichen Innenraum. US-Import mit gültigen ungarischen Papieren — aus dem Kommissionsangebot von CarAdvance."
+],
+"Hátsó kerék": [
+"Rear-wheel drive",
+"Hinterradantrieb"
+],
+"Cabrio (vászontető)": [
+"Convertible (soft top)",
+"Cabrio (Stoffverdeck)"
+],
+"{1} fő": [
+"{1} seats",
+"{1} Sitze"
+],
+"<g0>memóriás vezetőülés</g0>": [
+"<g0>memory driver's seat</g0>",
+"<g0>Fahrersitz mit Memory-Funktion</g0>"
+],
+"<g0>vászontető</g0>": [
+"<g0>soft top</g0>",
+"<g0>Stoffverdeck</g0>"
+],
+"<g0>bi-xenon fényszóró</g0>": [
+"<g0>bi-xenon headlights</g0>",
+"<g0>Bi-Xenon-Scheinwerfer</g0>"
+],
+"<g0>elektromos ülésállítás vezetőoldal</g0>": [
+"<g0>electric seat adjustment, driver's side</g0>",
+"<g0>elektrische Sitzverstellung Fahrerseite</g0>"
+],
+"<g0>elektromos ülésállítás utasoldal</g0>": [
+"<g0>electric seat adjustment, passenger side</g0>",
+"<g0>elektrische Sitzverstellung Beifahrerseite</g0>"
+],
+"<g0>EBD/EBV (elektronikus fékerő-elosztó)</g0>": [
+"<g0>EBD/EBV (electronic brake-force distribution)</g0>",
+"<g0>EBD/EBV (elektronische Bremskraftverteilung)</g0>"
+],
+"<g0>rádiós magnó</g0>": [
+"<g0>car radio</g0>",
+"<g0>Autoradio</g0>"
+],
+"<g0>amerikai modell</g0>": [
+"<g0>US model</g0>",
+"<g0>US-Modell</g0>"
+],
+"vászontető": [
+"soft top",
+"Stoffverdeck"
+],
+"bi-xenon fényszóró": [
+"bi-xenon headlights",
+"Bi-Xenon-Scheinwerfer"
+],
+"automata fényszórókapcsolás": [
+"automatic headlights",
+"Lichtautomatik"
+],
+"bőr belső": [
+"leather interior",
+"Lederausstattung"
+],
+"memóriás vezetőülés": [
+"memory driver's seat",
+"Fahrersitz mit Memory-Funktion"
+],
+"elektromos ülésállítás vezetőoldal": [
+"electric seat adjustment, driver's side",
+"elektrische Sitzverstellung Fahrerseite"
+],
+"elektromos ülésállítás utasoldal": [
+"electric seat adjustment, passenger side",
+"elektrische Sitzverstellung Beifahrerseite"
+],
+"hangvezérlés": [
+"voice control",
+"Sprachsteuerung"
+],
+"EBD/EBV (elektronikus fékerő-elosztó)": [
+"EBD/EBV (electronic brake-force distribution)",
+"EBD/EBV (elektronische Bremskraftverteilung)"
+],
+"riasztó": [
+"alarm system",
+"Alarmanlage"
+],
+"rádiós magnó": [
+"car radio",
+"Autoradio"
+],
+"amerikai modell": [
+"US model",
+"US-Modell"
+],
+"Lamborghini Urus S Nero-Matt Black {1}\" Garan": [
+"Lamborghini Urus S Nero-Matt Black {1}\" Garan",
+"Lamborghini Urus S Nero-Matt Black {1}\" Garan"
+],
+"<g0>Úvod</g0> / <g1>Naše vozy</g1> / <g2>Prodáno</g2> / <g3>Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan</g3>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Sold</g2> / <g3>Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan</g3>",
+"<g0>Startseite</g0> / <g1>Unsere Fahrzeuge</g1> / <g2>Verkauft</g2> / <g3>Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan</g3>"
+],
+"Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan, rok výroby {2}/{3}, najeto {4}, benzín, prémiový vůz. {5} k. Cena podle zvolené varianty níže, s odpovědností za vady, dovoz CarAdvance.": [
+"Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan, year of manufacture {2}/{3}, mileage {4}, petrol, premium car. {5} hp. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan, Baujahr {2}/{3}, Laufleistung {4}, Benzin, Premiumfahrzeug. {5} PS. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance."
+],
+"Na prodej Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} k, benzín, automat. Cena {7} Kč.": [
+"For sale: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} hp, petrol, automatic. Price {7} Kč.",
+"Zu verkaufen: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} PS, Benzin, Automatik. Preis {7} Kč."
+],
+"Land Rover {1} P{2} X-Dynamic HSE/Black-Tan/Sperrdiff\"/{3}'\", ročník {4}/{5}, má najeto {6}, benzinové SUV. {7} k, automatická převodovka. Cena podle zvolené varianty níže, s odpovědností za vady, dovoz CarAdvance.": [
+"Land Rover {1} P{2} X-Dynamic HSE/Black-Tan/Sperrdiff\"/{3}'\", year {4}/{5}, mileage {6}, petrol SUV. {7} hp, automatic transmission. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Land Rover {1} P{2} X-Dynamic HSE/Black-Tan/Sperrdiff\"/{3}'\", Baujahr {4}/{5}, Laufleistung {6}, SUV mit Benzinmotor. {7} PS, Automatikgetriebe. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance."
+],
+"Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa": [
+"Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa",
+"Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa"
+],
+"<g0>Úvod</g0> / <g1>Naše vozy</g1> / <g2>Prodáno</g2> / <g3>Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa</g3>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Sold</g2> / <g3>Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa</g3>",
+"<g0>Startseite</g0> / <g1>Unsere Fahrzeuge</g1> / <g2>Verkauft</g2> / <g3>Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa</g3>"
+],
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa, rok výroby {2}/{3}, najeto {4}, nafta, SUV. {5} k, Automatická, Pohon všech kol. Cena podle zvolené varianty níže, s odpovědností za vady, dovoz CarAdvance.": [
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa, year of manufacture {2}/{3}, mileage {4}, diesel, SUV. {5} hp, automatic, all-wheel drive. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa, Baujahr {2}/{3}, Laufleistung {4}, Diesel, SUV. {5} PS, Automatik, Allradantrieb. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance."
+],
+"<g0>Téli gumik</g0>": [
+"<g0>Winter tyres</g0>",
+"<g0>Winterreifen</g0>"
+],
+"Téli gumik": [
+"Winter tyres",
+"Winterreifen"
+],
+"Land Rover Range Rover Sport P{1}e Autobio White-Red Full": [
+"Land Rover Range Rover Sport P{1}e Autobio White-Red Full",
+"Land Rover Range Rover Sport P{1}e Autobio White-Red Full"
+],
+"<g0>Úvod</g0> / <g1>Naše vozy</g1> / <g2>Prodáno</g2> / <g3>Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full</g3>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Sold</g2> / <g3>Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full</g3>",
+"<g0>Startseite</g0> / <g1>Unsere Fahrzeuge</g1> / <g2>Verkauft</g2> / <g3>Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full</g3>"
+],
+"Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full, rok výroby {2}/{3}, najeto {4}, hybrid (benzin/elektro), SUV. {5} k, Automatická. Cena podle zvolené varianty níže, s odpovědností za vady, dovoz CarAdvance.": [
+"Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full, year of manufacture {2}/{3}, mileage {4}, hybrid (petrol/electric), SUV. {5} hp, automatic. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full, Baujahr {2}/{3}, Laufleistung {4}, Hybrid (Benzin/Elektro), SUV. {5} PS, Automatik. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance."
+],
+"<g0>Vászontető</g0>": [
+"<g0>Soft top</g0>",
+"<g0>Stoffverdeck</g0>"
+],
+"Vászontető": [
+"Soft top",
+"Stoffverdeck"
+],
+"<x0/><g1>Prodáno</g1><g2>Prodáno: {1}. {2}. {3}</g2> <g3><g4>{4}</g4> / {5}</g3>": [
+"<x0/><g1>Sold</g1><g2>Sold: {1}/{2}/{3}</g2> <g3><g4>{4}</g4> / {5}</g3>",
+"<x0/><g1>Verkauft</g1><g2>Verkauft: {1}.{2}.{3}</g2> <g3><g4>{4}</g4> / {5}</g3>"
+],
+"Modernizované A{1} Sportback přichází s širší, výraznější maskou Singleframe, volitelnou grafikou LED denního svícení a sportovním zadním difuzorem. Barvy k pronájmu: Nyílszürke gyöngyház.": [
+"The updated A{1} Sportback comes with a wider, bolder Singleframe grille, selectable LED daytime running light signatures and a sporty rear diffuser. Available colours: Arrow Grey pearl effect.",
+"Der modernisierte A{1} Sportback kommt mit einem breiteren, markanteren Singleframe-Grill, wählbaren LED-Tagfahrlichtsignaturen und einem sportlichen Heckdiffusor. Verfügbare Farben: Pfeilgrau Perleffekt."
+],
+"<g0>Kombi</g0><g1>Plug-in hybrid · Nafta</g1><g2>Automatická</g2><g3>{1}–{2} km/měs.</g3><g4>Zcela nový · {3} km</g4>": [
+"<g0>Estate</g0><g1>Plug-in hybrid · Diesel</g1><g2>Automatic</g2><g3>{1}–{2} km/month</g3><g4>Brand new · {3} km</g4>",
+"<g0>Kombi</g0><g1>Plug-in-Hybrid · Diesel</g1><g2>Automatik</g2><g3>{1}–{2} km/Monat</g3><g4>Fabrikneu · {3} km</g4>"
+],
+"Třetí generace Q{1} Sportback přichází s výraznou maskou Singleframe, úzkými LED světlomety a digitálními OLED zadními svítilnami. Svažující se linie střechy a silná linie ramen dodávají vozu dynamický, prémiový vzhled. Barvy k pronájmu: Mythos černá metalíza, Navarra modrá metalíza, Daytona šedá perleťová, Ledovcově bílá metalíza.": [
+"The third-generation Q{1} Sportback features a striking Singleframe grille, slim LED headlights and digital OLED tail lights. The sloping roofline and strong shoulder line give the car a dynamic, premium look. Available colours: Mythos Black metallic, Navarra Blue metallic, Daytona Grey pearl effect, Glacier White metallic.",
+"Die dritte Generation des Q{1} Sportback kommt mit markantem Singleframe-Grill, schmalen LED-Scheinwerfern und digitalen OLED-Heckleuchten. Die abfallende Dachlinie und die kräftige Schulterlinie verleihen dem Fahrzeug einen dynamischen, hochwertigen Auftritt. Verfügbare Farben: Mythosschwarz Metallic, Navarrablau Metallic, Daytonagrau Perleffekt, Gletscherweiß Metallic."
+],
+"SQ{1} Sportback má exkluzivní nárazníky S, kryty zrcátek v hliníkovém vzhledu, čtyři koncovky výfuku a větší kola. Svažující se linie střechy a široké blatníky vyzařují sílu a eleganci. Barvy k pronájmu: Daytona šedá perleťová.": [
+"The SQ{1} Sportback features exclusive S bumpers, aluminium-look mirror caps, four tailpipes and larger wheels. The sloping roofline and wide wheel arches radiate power and elegance. Available colours: Daytona Grey pearl effect.",
+"Der SQ{1} Sportback bietet exklusive S-Stoßfänger, Außenspiegelkappen in Aluminiumoptik, vier Endrohre und größere Räder. Die abfallende Dachlinie und die breiten Kotflügel strahlen Kraft und Eleganz aus. Verfügbare Farben: Daytonagrau Perleffekt."
+],
+"Řada {1} Active Tourer působí sebevědomým, moderním dojmem: výrazné ledvinky, čisté linie a kvalitní materiály — v praktické podobě MPV. Barvy k pronájmu: Fekete, Safírově černá metalíza.": [
+"The {1} Series Active Tourer makes a confident, modern impression: a prominent kidney grille, clean lines and high-quality materials — in a practical MPV format. Available colours: Black, Sapphire Black metallic.",
+"Der {1}er Active Tourer wirkt selbstbewusst und modern: markante Niere, klare Linien und hochwertige Materialien — im praktischen Van-Format. Verfügbare Farben: Schwarz, Saphirschwarz Metallic."
+],
+"Řada {1} Cabrio získala dlouhou kapotu, nízkou boční linii a textilní střechu v elegantním nadčasovém tvaru. Modernizovaný model přichází s úzkými světlomety a novými zadními světly. Barvy k pronájmu: Alpská bílá.": [
+"The {1} Series Convertible features a long bonnet, a low side profile and a fabric roof in an elegant, timeless shape. The updated model comes with slim headlights and new tail lights. Available colours: Alpine White.",
+"Das {1}er Cabrio bietet eine lange Motorhaube, eine niedrige Seitenlinie und ein Stoffverdeck in eleganter, zeitloser Form. Das modernisierte Modell kommt mit schmalen Scheinwerfern und neuen Heckleuchten. Verfügbare Farben: Alpinweiß."
+],
+"Nové X{1} působí ještě mohutněji: velkorysé plochy, dlouhá boční linie, široká záď a zcela nově pojatá, volitelně svítící ledvinková maska. Barvy k pronájmu: Safírově černá metalíza, Dune šedá metalíza, Sophisto šedá brilantní metalíza.": [
+"The new X{1} looks even more imposing: generous surfaces, a long side profile, a wide rear and a completely redesigned kidney grille, optionally illuminated. Available colours: Sapphire Black metallic, Dune Grey metallic, Sophisto Grey brilliant effect metallic.",
+"Der neue X{1} wirkt noch kraftvoller: großzügige Flächen, eine lange Seitenlinie, ein breites Heck und eine komplett neu gestaltete, optional beleuchtete Niere. Verfügbare Farben: Saphirschwarz Metallic, Dune Grey Metallic, Sophistograu Brillanteffekt Metallic."
+],
+"Rozšířená karoserie, zadní křídlo na „labutím krku“, nárazníky N a {1}\" kovaná kola. Barvy k pronájmu: Nocturne szürke.": [
+"Widened body, swan-neck rear wing, N bumpers and {1}\" forged wheels. Available colours: Nocturne Grey.",
+"Verbreiterte Karosserie, Heckflügel mit Schwanenhals-Halterung, N-Stoßfänger und {1}\"-Schmiederäder. Verfügbare Farben: Nocturne Grey."
+],
+"„Parametrická“ maska chladiče se skrytými LED světly pro denní svícení, ostré linie a sportovní nárazníky provedení N Line dělají z Tucsonu jedinečný vůz. Barvy k pronájmu: Stínově šedá, Zářivě červená, Hlubinná černá.": [
+"The “Parametric” grille with hidden LED daytime running lights, sharp lines and sporty N Line bumpers make the Tucson a unique car. Available colours: Shadow Grey, Ultimate Red, Abyss Black.",
+"Der „parametrische“ Kühlergrill mit versteckten LED-Tagfahrlichtern, scharfe Linien und sportliche Stoßfänger der N Line machen den Tucson einzigartig. Verfügbare Farben: Shadow Grey, Ultimate Red, Abyss Black."
+],
+"Dlouhá kapota, posunutá kabina, krátké převisy a sportovní proporce — třída C přináší designový jazyk třídy S do střední třídy. Barvy k pronájmu: Obsidiánově černá metalíza.": [
+"Long bonnet, set-back cabin, short overhangs and sporty proportions — the C-Class brings the design language of the S-Class to the mid-size segment. Available colours: Obsidian Black metallic.",
+"Lange Motorhaube, zurückversetzte Kabine, kurze Überhänge und sportliche Proportionen — die C-Klasse bringt die Designsprache der S-Klasse in die Mittelklasse. Verfügbare Farben: Obsidianschwarz Metallic."
+],
+"Plochá, napjatá karoserie, bezrámová okna dveří, maska chladiče se svítícím hvězdicovým vzorem a vzadu hvězdicovitá svítidla — nové CLA otevírá novou designovou éru Mercedesu. Barvy k pronájmu: Noční černá uni, MANUFAKTUR alpská šedá uni.": [
+"A flat, taut body, frameless door windows, a grille with an illuminated star pattern and star-shaped tail lights — the new CLA opens a new design era at Mercedes. Available colours: Night Black solid, MANUFAKTUR Alpine Grey solid.",
+"Flache, gespannte Karosserie, rahmenlose Türscheiben, ein Kühlergrill mit beleuchtetem Sternmuster und Heckleuchten in Sternform — der neue CLA läutet eine neue Designära bei Mercedes ein. Verfügbare Farben: Nachtschwarz uni, MANUFAKTUR alpingrau uni."
+],
+"Nová třída E dostala masku chladiče integrovanou do černého panelu, zadní světla s motivem hvězd a čistou, elegantní boční linii. Barvy k pronájmu: Polární bílá uni.": [
+"The new E-Class features a grille integrated into a black panel, tail lights with a star motif and a clean, elegant side profile. Available colours: Polar White solid.",
+"Die neue E-Klasse erhielt einen in eine schwarze Blende integrierten Kühlergrill, Heckleuchten mit Sternmotiv und eine klare, elegante Seitenlinie. Verfügbare Farben: Polarweiß uni."
+],
+"Krátké převisy, výrazné lemy blatníků, LED světlomety a sportovní detaily AMG Line — GLA má městské rozměry, a přesto působí sebevědomě. Barvy k pronájmu: MANUFAKTUR alpská šedá uni, Hegyiszürke metál.": [
+"Short overhangs, pronounced wheel-arch trims, LED headlights and sporty AMG Line details — the GLA has city-friendly dimensions yet still looks confident. Available colours: MANUFAKTUR Alpine Grey solid, Mountain Grey metallic.",
+"Kurze Überhänge, markante Radlaufverkleidungen, LED-Scheinwerfer und sportliche AMG Line Details — der GLA hat stadtfreundliche Abmessungen und wirkt dennoch selbstbewusst. Verfügbare Farben: MANUFAKTUR alpingrau uni, Mountaingrau Metallic."
+],
+"Nové GLC přichází s čistými, sportovními plochami, maskou chladiče spojenou se světlomety a volitelnými světlomety DIGITAL LIGHT. Barvy k pronájmu: Grafitově šedá metalíza, Fekete uni, MANUFAKTUR alpská šedá uni, Polární bílá uni, Obsidiánově černá metalíza.": [
+"The new GLC comes with clean, sporty surfaces, a grille connected to the headlights and optional DIGITAL LIGHT headlights. Available colours: Graphite Grey metallic, Black solid, MANUFAKTUR Alpine Grey solid, Polar White solid, Obsidian Black metallic.",
+"Der neue GLC kommt mit klaren, sportlichen Flächen, einem mit den Scheinwerfern verbundenen Kühlergrill und optionalen DIGITAL LIGHT Scheinwerfern. Verfügbare Farben: Graphitgrau Metallic, Schwarz uni, MANUFAKTUR alpingrau uni, Polarweiß uni, Obsidianschwarz Metallic."
+],
+"Klesající linie střechy, kosočtverečná maska chladiče, úzké světlomety DIGITAL LIGHT (podle výbavy) a sportovní nárazníky AMG Line — GLC Coupé je nápadné, a přesto elegantní. Barvy k pronájmu: Polární bílá uni, Obsidiánově černá metalíza, MANUFAKTUR alpská šedá uni, Grafitově šedá metalíza, Fekete uni.": [
+"A sloping roofline, diamond grille, slim DIGITAL LIGHT headlights (depending on equipment) and sporty AMG Line bumpers — the GLC Coupé is striking yet elegant. Available colours: Polar White solid, Obsidian Black metallic, MANUFAKTUR Alpine Grey solid, Graphite Grey metallic, Black solid.",
+"Abfallende Dachlinie, Diamantgrill, schmale DIGITAL LIGHT Scheinwerfer (je nach Ausstattung) und sportliche AMG Line Stoßfänger — das GLC Coupé ist auffällig und dennoch elegant. Verfügbare Farben: Polarweiß uni, Obsidianschwarz Metallic, MANUFAKTUR alpingrau uni, Graphitgrau Metallic, Schwarz uni."
+],
+"Široká maska chladiče, svalnaté blatníky, světlomety MULTIBEAM LED a nová světelná grafika omlazeného modelu — GLE je velké, a přesto elegantní. Barvy k pronájmu: Fekete uni, MANUFAKTUR alpská šedá uni, MANUFAKTUR opalitová bílá bright, Polární bílá uni.": [
+"A wide grille, muscular wings, MULTIBEAM LED headlights and the new lighting signature of the facelifted model — the GLE is large yet elegant. Available colours: Black solid, MANUFAKTUR Alpine Grey solid, MANUFAKTUR Opalite White bright, Polar White solid.",
+"Breiter Kühlergrill, muskulöse Kotflügel, MULTIBEAM LED Scheinwerfer und die neue Lichtgrafik des überarbeiteten Modells — der GLE ist groß und dennoch elegant. Verfügbare Farben: Schwarz uni, MANUFAKTUR alpingrau uni, MANUFAKTUR opalithweiß bright, Polarweiß uni."
+],
+"K pronájmu: {1}d {2}MATIC (diesel), {3}e {4}MATIC Plug-in-Hybrid (plug-in hybrid), {5}d {6}MATIC (diesel).": [
+"For rent: {1}d {2}MATIC (diesel), {3}e {4}MATIC Plug-in-Hybrid (plug-in hybrid), {5}d {6}MATIC (diesel).",
+"Zur Miete: {1}d {2}MATIC (Diesel), {3}e {4}MATIC Plug-in-Hybrid (Plug-in-Hybrid), {5}d {6}MATIC (Diesel)."
+],
+"Aktuálně si můžete vybrat z {1} verzí: <g0>{2}d {3}MATIC</g0> — diesel, od {4} €/měs.; <g1>{5}e {6}MATIC Plug-in-Hybrid</g1> — plug-in hybrid, od {7} €/měs.; <g2>{8}d {9}MATIC</g2> — diesel, od {10} €/měs.": [
+"You can currently choose from {1} versions: <g0>{2}d {3}MATIC</g0> — diesel, from {4} €/month; <g1>{5}e {6}MATIC Plug-in-Hybrid</g1> — plug-in hybrid, from {7} €/month; <g2>{8}d {9}MATIC</g2> — diesel, from {10} €/month.",
+"Aktuell können Sie aus {1} Versionen wählen: <g0>{2}d {3}MATIC</g0> — Diesel, ab {4} €/Monat; <g1>{5}e {6}MATIC Plug-in-Hybrid</g1> — Plug-in-Hybrid, ab {7} €/Monat; <g2>{8}d {9}MATIC</g2> — Diesel, ab {10} €/Monat."
+],
+"Aktuálně si můžete vybrat z {1} verzí: <g0>{2} eTSI DSG</g0> — mild-hybrid, automat · výbava: Energy, R-Line, od {3} €/měs.; <g1>{4} TSI {5}MOTION DSG</g1> — výkonný benzinový, pohon všech kol · výbava: Style, R-Line, od {6} €/měs.": [
+"You can currently choose from {1} versions: <g0>{2} eTSI DSG</g0> — mild hybrid, automatic · trim: Energy, R-Line, from {3} €/month; <g1>{4} TSI {5}MOTION DSG</g1> — powerful petrol, all-wheel drive · trim: Style, R-Line, from {6} €/month.",
+"Aktuell können Sie aus {1} Versionen wählen: <g0>{2} eTSI DSG</g0> — Mild-Hybrid, Automatik · Ausstattung: Energy, R-Line, ab {3} €/Monat; <g1>{4} TSI {5}MOTION DSG</g1> — leistungsstarker Benziner, Allradantrieb · Ausstattung: Style, R-Line, ab {6} €/Monat."
+],
+"Karoserie ID. {1} Tourer s nízkým odporem vzduchu, světelný pás a dlouhá linie střechy tvoří elegantní, moderní kombi — aerodynamika přispívá i k dojezdu. Barvy k pronájmu: Grenadill černá metalíza, Ledovcově bílá metalíza.": [
+"The low-drag body of the ID. {1} Tourer, the light strip and the long roofline create an elegant, modern estate — the aerodynamics also help extend the range. Available colours: Grenadilla Black metallic, Glacier White metallic.",
+"Die strömungsgünstige Karosserie des ID. {1} Tourer, das Lichtband und die lange Dachlinie ergeben einen eleganten, modernen Kombi — die Aerodynamik trägt auch zur Reichweite bei. Verfügbare Farben: Grenadillschwarz Metallic, Gletscherweiß Metallic."
+],
+"Nový Passat Variant je dlouhý {1} m: aerodynamický přední kryt, světelný pruh, dlouhá linie střechy a velké víko zavazadlového prostoru. Barvy k pronájmu: Čistě bílá uni, Grenadill černá metalíza, Ústřicově stříbrná metalíza.": [
+"The new Passat Variant is {1} m long: an aerodynamic front end, a light strip, a long roofline and a large tailgate. Available colours: Pure White, Grenadilla Black metallic, Oyster Silver metallic.",
+"Der neue Passat Variant ist {1} m lang: aerodynamische Front, Lichtband, lange Dachlinie und große Heckklappe. Verfügbare Farben: Pure White uni, Grenadillschwarz Metallic, Oyster Silver Metallic."
+],
+"Úzké LED světlomety, světelný pruh procházející přes masku chladiče (podle výbavy) a sportovní nárazníky provedení R-Line dělají z Pola dospělé, dynamické malé auto. Barvy k pronájmu: Hluboce černá perleťová, Reflexní stříbrná metalíza, Ascot šedá, Královská červená metalíza, Ascot šedá / černá.": [
+"Slim LED headlights, a light strip across the grille (depending on equipment) and sporty R-Line bumpers make the Polo a grown-up, dynamic small car. Available colours: Deep Black pearl effect, Reflex Silver metallic, Ascot Grey, Kings Red metallic, Ascot Grey / black.",
+"Schmale LED-Scheinwerfer, ein Leuchtband quer über den Kühlergrill (je nach Ausstattung) und sportliche R-Line Stoßfänger machen den Polo zu einem erwachsenen, dynamischen Kleinwagen. Verfügbare Farben: Deep Black Perleffekt, Reflexsilber Metallic, Ascotgrau, Kings Red Metallic, Ascotgrau / Schwarz."
+],
+"Omlazený T-Cross dostal nové nárazníky, LED světlomety IQ. LIGHT a ztmavený světelný pruh vedoucí přes celou zadní část. Barvy k pronájmu: Hluboce černá perleťová, Královská červená metalíza, Kouřově šedá metalíza.": [
+"The updated T-Cross gets new bumpers, IQ. LIGHT LED headlights and a darkened light strip running across the entire rear. Available colours: Deep Black pearl effect, Kings Red metallic, Smokey Grey metallic.",
+"Der überarbeitete T-Cross erhielt neue Stoßfänger, LED-Scheinwerfer IQ. LIGHT und ein abgedunkeltes Leuchtband über das gesamte Heck. Verfügbare Farben: Deep Black Perleffekt, Kings Red Metallic, Smokey Grey Metallic."
+],
+"K pronájmu: {1} TSI DSG (benzín), {2} eTSI DSG (benzín).": [
+"For rent: {1} TSI DSG (petrol), {2} eTSI DSG (petrol).",
+"Zur Miete: {1} TSI DSG (Benzin), {2} eTSI DSG (Benzin)."
+],
+"Nový T-Roc dostal světelný pruh a logo, úzké LED světlomety a kupéovitější linii střechy – sportovní a přitom praktické kompaktní SUV. Barvy k pronájmu: Wolf šedá metalíza, Pyritově stříbrná metalíza, Grenadill černá metalíza.": [
+"The new T-Roc features a light strip and illuminated logo, slim LED headlights and a more coupé-like roofline – a sporty yet practical compact SUV. Available colours: Wolf Grey metallic, Pyrite Silver metallic, Grenadilla Black metallic.",
+"Der neue T-Roc erhielt ein Leuchtband samt Logo, schmale LED-Scheinwerfer und eine coupéhaftere Dachlinie – ein sportliches und dennoch praktisches Kompakt-SUV. Verfügbare Farben: Wolfgrau Metallic, Pyritsilber Metallic, Grenadillschwarz Metallic."
+],
+"Aktuálně si můžete vybrat z {1} verzí: <g0>{2} TSI DSG</g0> — turbo benzín, automat · výbava: Style, R-Line, od {3} €/měs.; <g1>{4} eTSI DSG</g1> — mild-hybridní benzin, od · výbava: Style, R-Line, od {5} €/měs.": [
+"You can currently choose from {1} versions: <g0>{2} TSI DSG</g0> — turbo petrol, automatic · trim: Style, R-Line, from {3} €/month; <g1>{4} eTSI DSG</g1> — mild-hybrid petrol · trim: Style, R-Line, from {5} €/month.",
+"Aktuell können Sie aus {1} Versionen wählen: <g0>{2} TSI DSG</g0> — Turbo-Benziner, Automatik · Ausstattung: Style, R-Line, ab {3} €/Monat; <g1>{4} eTSI DSG</g1> — Mild-Hybrid-Benziner · Ausstattung: Style, R-Line, ab {5} €/Monat."
+],
+"T-Roc Cabrio spojuje vyšší posadovou polohu SUV se svobodou kabrioletu: látková střecha, čtyři sedadla, LED světlomety a sportovní detaily provedení R-Line. Barvy k pronájmu: Hluboce černá perleťová / černá, Elefántcsontezüst metál / fekete, Kouřově šedá metalíza / černá.": [
+"The T-Roc Cabriolet combines the higher seating position of an SUV with the freedom of a convertible: fabric roof, four seats, LED headlights and sporty R-Line details. Available colours: Deep Black pearl effect / black, Ivory Silver metallic / black, Smokey Grey metallic / black.",
+"Das T-Roc Cabriolet verbindet die erhöhte Sitzposition eines SUV mit der Freiheit eines Cabrios: Stoffverdeck, vier Sitze, LED-Scheinwerfer und sportliche R-Line Details. Verfügbare Farben: Deep Black Perleffekt / Schwarz, Elfenbeinsilber Metallic / Schwarz, Smokey Grey Metallic / Schwarz."
+],
+"Šikmá linie střechy, světelný pruh procházející přes masku chladiče (podle výbavy), průběžný pruh zadních svítilen a svalnaté lemy blatníků. Barvy k pronájmu: Hluboce černá perleťová.": [
+"A sloping roofline, a light strip across the grille (depending on equipment), a continuous tail-light strip and muscular wheel arches. Available colours: Deep Black pearl effect.",
+"Abfallende Dachlinie, ein Leuchtband quer über den Kühlergrill (je nach Ausstattung), ein durchgehendes Rückleuchtenband und muskulöse Radläufe. Verfügbare Farben: Deep Black Perleffekt."
+],
+"K pronájmu: {1} eTSI DSG (benzín), {2} TSI {3}MOTION DSG (benzín), {4} TDI {5}MOTION DSG (diesel).": [
+"For rent: {1} eTSI DSG (petrol), {2} TSI {3}MOTION DSG (petrol), {4} TDI {5}MOTION DSG (diesel).",
+"Zur Miete: {1} eTSI DSG (Benzin), {2} TSI {3}MOTION DSG (Benzin), {4} TDI {5}MOTION DSG (Diesel)."
+],
+"Aktuálně si můžete vybrat z {1} verzí: <g0>{2} eTSI DSG</g0> — mild-hybridní benzin, od · výbava: Life, R-Line, od {3} €/měs.; <g1>{4} TSI {5}MOTION DSG</g1> — výkonný benzinový, pohon všech kol · výbava: Elegance, R-Line, od {6} €/měs.; <g2>{7} TDI {8}MOTION DSG</g2> — výkonný diesel, pohon všech kol · výbava: Life, R-Line, od {9} €/měs.": [
+"You can currently choose from {1} versions: <g0>{2} eTSI DSG</g0> — mild-hybrid petrol · trim: Life, R-Line, from {3} €/month; <g1>{4} TSI {5}MOTION DSG</g1> — powerful petrol, all-wheel drive · trim: Elegance, R-Line, from {6} €/month; <g2>{7} TDI {8}MOTION DSG</g2> — powerful diesel, all-wheel drive · trim: Life, R-Line, from {9} €/month.",
+"Aktuell können Sie aus {1} Versionen wählen: <g0>{2} eTSI DSG</g0> — Mild-Hybrid-Benziner · Ausstattung: Life, R-Line, ab {3} €/Monat; <g1>{4} TSI {5}MOTION DSG</g1> — leistungsstarker Benziner, Allradantrieb · Ausstattung: Elegance, R-Line, ab {6} €/Monat; <g2>{7} TDI {8}MOTION DSG</g2> — leistungsstarker Diesel, Allradantrieb · Ausstattung: Life, R-Line, ab {9} €/Monat."
+],
+"<g0>{1} vozů skladem</g0>": [
+"<g0>{1} cars in stock</g0>",
+"<g0>{1} Fahrzeuge auf Lager</g0>"
+],
+"<g0>{1} vozů k pronájmu</g0>": [
+"<g0>{1} cars for rent</g0>",
+"<g0>{1} Fahrzeuge zur Miete</g0>"
+],
+"<g0>Vozy k pronájmu</g0>": [
+"<g0>Cars for rent</g0>",
+"<g0>Mietfahrzeuge</g0>"
+],
+"<g0>Naše aktuální nabídka</g0>": [
+"<g0>Our current offer</g0>",
+"<g0>Unser aktuelles Angebot</g0>"
+],
+"<g0>foto již brzy</g0><g1>Prodáno</g1><g2>Prodáno: {1}. {2}. {3}</g2>": [
+"<g0>photos coming soon</g0><g1>Sold</g1><g2>Sold: {1}/{2}/{3}</g2>",
+"<g0>Fotos folgen in Kürze</g0><g1>Verkauft</g1><g2>Verkauft: {1}.{2}.{3}</g2>"
+],
+"Automatická · Hybrid": [
+"Automatic · Hybrid",
+"Automatik · Hybrid"
+],
+"Prémiové vozy skladem <g0>({1})</g0>": [
+"Premium cars in stock <g0>({1})</g0>",
+"Premiumfahrzeuge auf Lager <g0>({1})</g0>"
+],
+"Prémiové vozy z vlastního skladu, ihned k dispozici k pronájmu za měsíční poplatek — od {1} měsíců, s limitem {2}–{3} km měsíčně podle vozu. Ceny jsou měsíční poplatky bez DPH.": [
+"Premium cars from our own stock, available immediately for rent for a monthly fee — from {1} months, with a limit of {2}–{3} km per month depending on the car. Prices are monthly fees excl. VAT.",
+"Premiumfahrzeuge aus unserem eigenen Bestand, sofort zur Miete gegen eine monatliche Gebühr verfügbar — ab {1} Monaten, mit einem Limit von {2}–{3} km pro Monat je nach Fahrzeug. Die Preise sind monatliche Gebühren ohne MwSt."
 ]
 };

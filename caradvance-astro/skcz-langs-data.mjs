@@ -7789,5 +7789,600 @@ export const SKL = {
 "Mixed",
 "Gemischt",
 "Vegyesen"
+],
+"<g0>{1} €</g0><g1>s DPH · {2} € bez DPH</g1>": [
+"<g0>{1} €</g0><g1>incl. VAT · {2} € excl. VAT</g1>",
+"<g0>{1} €</g0><g1>inkl. MwSt. · {2} € ohne MwSt.</g1>",
+"<g0>{1} €</g0><g1>áfával · {2} € áfa nélkül</g1>"
+],
+"<g0>Zodpovednosť za vady</g0> — pri ojazdených autách {1} rok (podľa kúpnej zmluvy), pri nových {2} roky.": [
+"<g0>Liability for defects</g0> — {1} year for used cars (as per the purchase contract), {2} years for new cars.",
+"<g0>Mängelhaftung</g0> — bei Gebrauchtwagen {1} Jahr (gemäß Kaufvertrag), bei Neuwagen {2} Jahre.",
+"<g0>Kellékszavatosság</g0> — használt autóknál {1} év (az adásvételi szerződés szerint), új autóknál {2} év."
+],
+"<g0>Výhodná cena</g0> — vyberiete si variant, ktorý vám najviac vyhovuje: s doručením až k vám alebo s osobným prevzatím v Nemecku.": [
+"<g0>Great price</g0> — choose the option that suits you best: delivered to your door or collected in person in Germany.",
+"<g0>Attraktiver Preis</g0> — Sie wählen die Variante, die am besten zu Ihnen passt: mit Lieferung bis zu Ihnen oder mit Abholung in Deutschland.",
+"<g0>Kedvező ár</g0> — Ön választja ki az Önnek legmegfelelőbb változatot: házhoz szállítással vagy személyes átvétellel Németországban."
+],
+"<g0>Nové</g0><g1>{1}/{2}</g1>": [
+"<g0>New</g0><g1>{1}/{2}</g1>",
+"<g0>Neu</g0><g1>{1}/{2}</g1>",
+"<g0>Új</g0><g1>{1}/{2}</g1>"
+],
+"<g0>Predané</g0><g1>{1}/{2}</g1>": [
+"<g0>Sold</g0><g1>{1}/{2}</g1>",
+"<g0>Verkauft</g0><g1>{1}/{2}</g1>",
+"<g0>Eladva</g0><g1>{1}/{2}</g1>"
+],
+"<g0>{1} km / mesiac:</g0><g1>{2} €</g1>": [
+"<g0>{1} km / month:</g0><g1>{2} €</g1>",
+"<g0>{1} km / Monat:</g0><g1>{2} €</g1>",
+"<g0>{1} km / hó:</g0><g1>{2} €</g1>"
+],
+"Cena s doručením na Slovensko": [
+"Price incl. delivery to Slovakia",
+"Preis inkl. Lieferung in die Slowakei",
+"Ár szlovákiai kiszállítással"
+],
+"vrátane {1} % DPH": [
+"incl. {1}% VAT",
+"inkl. {1} % MwSt.",
+"{1}% áfával"
+],
+"<g0>{1} €</g0> pri osobnom prevzatí v Nemecku, vrátane {2} % nemeckej DPH (len ojazdené autá; dopravu si zabezpečujete sami)": [
+"<g0>{1} €</g0> when collected in person in Germany, incl. {2}% German VAT (used cars only; you arrange transport yourself)",
+"<g0>{1} €</g0> bei Abholung in Deutschland, inkl. {2} % deutscher MwSt. (nur Gebrauchtwagen; den Transport organisieren Sie selbst)",
+"<g0>{1} €</g0> németországi személyes átvétel esetén, {2}% német áfával (csak használt autók; a szállításról Ön gondoskodik)"
+],
+"<g0>{1} €</g0> pre firmy s IČ DPH, bez DPH (dodanie v rámci EÚ)": [
+"<g0>{1} €</g0> for VAT-registered companies, excl. VAT (intra-EU supply)",
+"<g0>{1} €</g0> für Unternehmen mit USt-IdNr., ohne MwSt. (innergemeinschaftliche Lieferung)",
+"<g0>{1} €</g0> közösségi adószámmal rendelkező cégeknek, áfa nélkül (EU-n belüli értékesítés)"
+],
+"Neviete, ktorý variant je pre vás najvýhodnejší? Zavolajte nám na <g0>+{1}</g0> – spolu nájdeme najvhodnejšie riešenie.": [
+"Not sure which option is best for you? Call us at <g0>+{1}</g0> – together we will find the right solution.",
+"Sie wissen nicht, welche Variante für Sie am günstigsten ist? Rufen Sie uns an unter <g0>+{1}</g0> – gemeinsam finden wir die passende Lösung.",
+"Nem biztos benne, melyik változat a legelőnyösebb Önnek? Hívjon minket a <g0>+{1}</g0> számon – együtt megtaláljuk a legjobb megoldást."
+],
+"<g0>Predané · {1}. {2}. {3} · podobné auto vám privezieme.</g0>": [
+"<g0>Sold · {1}/{2}/{3} · we can bring you a similar car.</g0>",
+"<g0>Verkauft · {1}.{2}.{3} · ein ähnliches Auto besorgen wir Ihnen gerne.</g0>",
+"<g0>Eladva · {3}. {2}. {1}. · hasonló autót hozunk Önnek.</g0>"
+],
+"<x0/><g1>fotografie čoskoro</g1><g2>Predané</g2><g3>Predané: {1}. {2}. {3}</g3>": [
+"<x0/><g1>photos coming soon</g1><g2>Sold</g2><g3>Sold: {1}/{2}/{3}</g3>",
+"<x0/><g1>Fotos folgen in Kürze</g1><g2>Verkauft</g2><g3>Verkauft: {1}.{2}.{3}</g3>",
+"<x0/><g1>fotók hamarosan</g1><g2>Eladva</g2><g3>Eladva: {3}. {2}. {1}.</g3>"
+],
+"Toto auto bolo predané ({1}. {2}. {3}). Nechávame ho tu ako referenciu — ak hľadáte podobné, privezieme vám ho z celého nemeckého trhu. <g0>Naša aktuálna ponuka →</g0>": [
+"This car was sold ({1}/{2}/{3}). We keep it here as a reference — if you are looking for something similar, we will source it for you from across the German market. <g0>Our current offer →</g0>",
+"Dieses Auto wurde verkauft ({1}.{2}.{3}). Wir lassen es hier als Referenz — wenn Sie ein ähnliches suchen, besorgen wir es Ihnen vom gesamten deutschen Markt. <g0>Unser aktuelles Angebot →</g0>",
+"Ezt az autót eladtuk ({3}. {2}. {1}.). Referenciaként itt hagyjuk — ha hasonlót keres, a teljes német piacról beszerezzük Önnek. <g0>Aktuális kínálatunk →</g0>"
+],
+"Toto auto bolo predané ({1}. {2}. {3}) — cena je uvedená ako referencia. Podobné auto vám privezieme z celého nemeckého trhu: vrátane dopravy, prihlásenia a kompletného vybavenia formalít.": [
+"This car was sold ({1}/{2}/{3}) — the price is shown for reference. We can source a similar car for you from across the German market, including transport, registration and all the paperwork.",
+"Dieses Auto wurde verkauft ({1}.{2}.{3}) — der Preis dient als Referenz. Ein ähnliches Auto besorgen wir Ihnen vom gesamten deutschen Markt: inklusive Transport, Zulassung und kompletter Abwicklung aller Formalitäten.",
+"Ezt az autót eladtuk ({3}. {2}. {1}.) — az ár tájékoztató jellegű. Hasonló autót a teljes német piacról hozunk Önnek: szállítással, forgalomba helyezéssel és a teljes ügyintézéssel együtt."
+],
+"Predané: {1}. {2}. {3}": [
+"Sold: {1}/{2}/{3}",
+"Verkauft: {1}.{2}.{3}",
+"Eladva: {3}. {2}. {1}."
+],
+"<g0>Na prenájom</g0><g1>{1}/{2}</g1>": [
+"<g0>For rent</g0><g1>{1}/{2}</g1>",
+"<g0>Zu mieten</g0><g1>{1}/{2}</g1>",
+"<g0>Bérelhető</g0><g1>{1}/{2}</g1>"
+],
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa – {2}": [
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa – {2}",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa – {2}",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa – {2}"
+],
+"<g0>Nové</g0><g1></g1>": [
+"<g0>New</g0><g1></g1>",
+"<g0>Neu</g0><g1></g1>",
+"<g0>Új</g0><g1></g1>"
+],
+"Nové auto podľa pravidiel EÚ": [
+"New car under EU rules",
+"Neuwagen nach EU-Regeln",
+"Új autó az uniós szabályok szerint"
+],
+"Slovenskú DPH {1} % zaplatíte na Slovensku – konečná cena vrátane DPH <g0>{2} €</g0>.": [
+"You pay the Slovak VAT of {1}% in Slovakia – final price incl. VAT <g0>{2} €</g0>.",
+"Die slowakische MwSt. von {1} % zahlen Sie in der Slowakei – Endpreis inkl. MwSt. <g0>{2} €</g0>.",
+"A {1}%-os szlovák áfát Szlovákiában fizeti meg – a végső ár áfával <g0>{2} €</g0>."
+],
+"Zavolajte nám a postup vám vysvetlíme: <g0>+{1}</g0>": [
+"Call us and we will explain the process: <g0>+{1}</g0>",
+"Rufen Sie uns an, wir erklären Ihnen den Ablauf: <g0>+{1}</g0>",
+"Hívjon minket, és elmagyarázzuk a folyamatot: <g0>+{1}</g0>"
+],
+"Jaguar F-Type S {1} V{2} S/C (Automata) – {3}": [
+"Jaguar F-Type S {1} V{2} S/C (Automata) – {3}",
+"Jaguar F-Type S {1} V{2} S/C (Automata) – {3}",
+"Jaguar F-Type S {1} V{2} S/C (Automata) – {3}"
+],
+"<x0/><g1>fotografia čoskoro</g1><g2>Novinka</g2>": [
+"<x0/><g1>photo coming soon</g1><g2>New listing</g2>",
+"<x0/><g1>Foto folgt in Kürze</g1><g2>Neu im Angebot</g2>",
+"<x0/><g1>fotó hamarosan</g1><g2>Újdonság</g2>"
+],
+"Hybrid (Diesel/Elektro)": [
+"Hybrid (diesel/electric)",
+"Hybrid (Diesel/Elektro)",
+"Hibrid (dízel/elektromos)"
+],
+"{1} · Automat · Hybrid (Diesel/Elektro)": [
+"{1} · Automatic · Hybrid (diesel/electric)",
+"{1} · Automatik · Hybrid (Diesel/Elektro)",
+"{1} · Automata · Hibrid (dízel/elektromos)"
+],
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa": [
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa"
+],
+"Na predaj Ferrari {1}Cilindri Spider azzuro la plata let´s go!, {2} km, {3} k, benzín, automat. Cena bez DPH {4} €.": [
+"For sale: Ferrari {1}Cilindri Spider azzuro la plata let´s go!, {2} km, {3} hp, petrol, automatic. Price excl. VAT {4} €.",
+"Zu verkaufen: Ferrari {1}Cilindri Spider azzuro la plata let´s go!, {2} km, {3} PS, Benzin, Automatik. Preis ohne MwSt. {4} €.",
+"Eladó Ferrari {1}Cilindri Spider azzuro la plata let´s go!, {2} km, {3} LE, benzin, automata. Ár áfa nélkül: {4} €."
+],
+"Na predaj Ferrari {1} GTS Zahnriemen+Service Historie, {2}, {3} km, {4} k, benzín, manuál. Cena bez DPH {5} €.": [
+"For sale: Ferrari {1} GTS Zahnriemen+Service Historie, {2}, {3} km, {4} hp, petrol, manual. Price excl. VAT {5} €.",
+"Zu verkaufen: Ferrari {1} GTS Zahnriemen+Service Historie, {2}, {3} km, {4} PS, Benzin, Schaltgetriebe. Preis ohne MwSt. {5} €.",
+"Eladó Ferrari {1} GTS Zahnriemen+Service Historie, {2}, {3} km, {4} LE, benzin, manuális váltó. Ár áfa nélkül: {5} €."
+],
+"Na predaj Ford Fiesta {1} GTDi ST{2}, {3}, {4} km, {5} k, benzín. Cena bez DPH {6} €. Preverený dovoz z Nemecka od CarAdvance.": [
+"For sale: Ford Fiesta {1} GTDi ST{2}, {3}, {4} km, {5} hp, petrol. Price excl. VAT {6} €. Verified import from Germany by CarAdvance.",
+"Zu verkaufen: Ford Fiesta {1} GTDi ST{2}, {3}, {4} km, {5} PS, Benzin. Preis ohne MwSt. {6} €. Geprüfter Import aus Deutschland von CarAdvance.",
+"Eladó Ford Fiesta {1} GTDi ST{2}, {3}, {4} km, {5} LE, benzin. Ár áfa nélkül: {6} €. Ellenőrzött import Németországból a CarAdvance-től."
+],
+"Na predaj Ford Focus {1} EcoBlue ST-Line (Automata), {2}, {3} km, {4} k, diesel. Cena bez DPH {5} €. Preverený dovoz z Nemecka od CarAdvance.": [
+"For sale: Ford Focus {1} EcoBlue ST-Line (Automata), {2}, {3} km, {4} hp, diesel. Price excl. VAT {5} €. Verified import from Germany by CarAdvance.",
+"Zu verkaufen: Ford Focus {1} EcoBlue ST-Line (Automata), {2}, {3} km, {4} PS, Diesel. Preis ohne MwSt. {5} €. Geprüfter Import aus Deutschland von CarAdvance.",
+"Eladó Ford Focus {1} EcoBlue ST-Line (Automata), {2}, {3} km, {4} LE, dízel. Ár áfa nélkül: {5} €. Ellenőrzött import Németországból a CarAdvance-től."
+],
+"Na predaj Jaguar F-Type S {1} V{2} S/C (automat), {3}, {4} km, {5} k, benzín. Cena bez DPH {6} €. Overený dovoz z Nemecka s preukázanou históriou od CarAdvance.": [
+"For sale: Jaguar F-Type S {1} V{2} S/C (automatic), {3}, {4} km, {5} hp, petrol. Price excl. VAT {6} €. Verified import from Germany with documented history by CarAdvance.",
+"Zu verkaufen: Jaguar F-Type S {1} V{2} S/C (Automatik), {3}, {4} km, {5} PS, Benzin. Preis ohne MwSt. {6} €. Geprüfter Import aus Deutschland mit nachweisbarer Historie von CarAdvance.",
+"Eladó Jaguar F-Type S {1} V{2} S/C (automata), {3}, {4} km, {5} LE, benzin. Ár áfa nélkül: {6} €. Ellenőrzött import Németországból, igazolt előélettel a CarAdvance-től."
+],
+"Jaguar F-Type S {1} V{2} S/C (Automata)": [
+"Jaguar F-Type S {1} V{2} S/C (Automata)",
+"Jaguar F-Type S {1} V{2} S/C (Automata)",
+"Jaguar F-Type S {1} V{2} S/C (Automata)"
+],
+"Predané: Lamborghini Urus S Nero-Matt Black {1}\" Garan, {2}, {3} km, {4} k, benzín. Hľadáte podobné auto? Pozrite si aktuálnu ponuku.": [
+"Sold: Lamborghini Urus S Nero-Matt Black {1}\" Garan, {2}, {3} km, {4} hp, petrol. Looking for a similar car? See our current offer.",
+"Verkauft: Lamborghini Urus S Nero-Matt Black {1}\" Garan, {2}, {3} km, {4} PS, Benzin. Sie suchen ein ähnliches Auto? Sehen Sie sich unser aktuelles Angebot an.",
+"Eladva: Lamborghini Urus S Nero-Matt Black {1}\" Garan, {2}, {3} km, {4} LE, benzin. Hasonló autót keres? Nézze meg aktuális kínálatunkat."
+],
+"Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\"": [
+"Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\"",
+"Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\"",
+"Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\""
+],
+"Predané: Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa, {2}, {3} km, {4} k, diesel, automat.": [
+"Sold: Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa, {2}, {3} km, {4} hp, diesel, automatic.",
+"Verkauft: Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa, {2}, {3} km, {4} PS, Diesel, Automatik.",
+"Eladva: Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa, {2}, {3} km, {4} LE, dízel, automata."
+],
+"Predané: Land Rover Range Rover Sport P{1}e Autobio White-Red Full, {2}, {3} km, {4} k, hybrid (benzín/elektro), automat.": [
+"Sold: Land Rover Range Rover Sport P{1}e Autobio White-Red Full, {2}, {3} km, {4} hp, hybrid (petrol/electric), automatic.",
+"Verkauft: Land Rover Range Rover Sport P{1}e Autobio White-Red Full, {2}, {3} km, {4} PS, Hybrid (Benzin/Elektro), Automatik.",
+"Eladva: Land Rover Range Rover Sport P{1}e Autobio White-Red Full, {2}, {3} km, {4} LE, hibrid (benzin/elektromos), automata."
+],
+"<x0/><g1>fotografie čoskoro</g1><g2>Prenajaté</g2><g3>Prenajaté: {1}. {2}. {3}</g3>": [
+"<x0/><g1>photos coming soon</g1><g2>Rented</g2><g3>Rented: {1}/{2}/{3}</g3>",
+"<x0/><g1>Fotos folgen in Kürze</g1><g2>Vermietet</g2><g3>Vermietet: {1}.{2}.{3}</g3>",
+"<x0/><g1>fotók hamarosan</g1><g2>Bérbe adva</g2><g3>Bérbe adva: {3}. {2}. {1}.</g3>"
+],
+"<g0>Prenajaté</g0><g1>{1}/{2}</g1>": [
+"<g0>Rented</g0><g1>{1}/{2}</g1>",
+"<g0>Vermietet</g0><g1>{1}/{2}</g1>",
+"<g0>Bérbe adva</g0><g1>{1}/{2}</g1>"
+],
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go! na": [
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go! for sale",
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go! zu verkaufen",
+"Eladó Ferrari {1}Cilindri Spider azzuro la plata let´s go!"
+],
+"Ferrari {1} GTS Zahnriemen+Service Historie na predaj": [
+"Ferrari {1} GTS Zahnriemen+Service Historie for sale",
+"Ferrari {1} GTS Zahnriemen+Service Historie zu verkaufen",
+"Eladó Ferrari {1} GTS Zahnriemen+Service Historie"
+],
+"Na predaj Ford Fiesta {1} GTDi ST{2} · {3} · {4} km": [
+"For sale: Ford Fiesta {1} GTDi ST{2} · {3} · {4} km",
+"Zu verkaufen: Ford Fiesta {1} GTDi ST{2} · {3} · {4} km",
+"Eladó Ford Fiesta {1} GTDi ST{2} · {3} · {4} km"
+],
+"S platnými slovenskými dokladmi": [
+"With valid Slovak documents",
+"Mit gültigen slowakischen Papieren",
+"Érvényes szlovák okmányokkal"
+],
+"Cena je uvedená v mene zobrazenej na stránke a zahŕňa DPH. Prepočet na iné meny je orientačný, podľa aktuálneho výmenného kurzu.": [
+"The price is shown in the currency displayed on the page and includes VAT. Conversion to other currencies is indicative, based on the current exchange rate.",
+"Der Preis ist in der auf der Seite angezeigten Währung angegeben und enthält die MwSt. Die Umrechnung in andere Währungen ist unverbindlich und basiert auf dem aktuellen Wechselkurs.",
+"Az ár az oldalon megjelenített pénznemben értendő, és tartalmazza az áfát. A más pénznemekre történő átváltás tájékoztató jellegű, az aktuális árfolyam alapján."
+],
+"Na predaj Ford Focus {1} EcoBlue ST-Line (Automata)": [
+"For sale: Ford Focus {1} EcoBlue ST-Line (Automata)",
+"Zu verkaufen: Ford Focus {1} EcoBlue ST-Line (Automata)",
+"Eladó Ford Focus {1} EcoBlue ST-Line (Automata)"
+],
+"Jaguar F-Type S {1} V{2} S/C (Automata) na predaj · {3}": [
+"Jaguar F-Type S {1} V{2} S/C (Automata) for sale · {3}",
+"Jaguar F-Type S {1} V{2} S/C (Automata) zu verkaufen · {3}",
+"Eladó Jaguar F-Type S {1} V{2} S/C (Automata) · {3}"
+],
+"Predané: Lamborghini Urus S Nero-Matt Black {1}\" Garan": [
+"Sold: Lamborghini Urus S Nero-Matt Black {1}\" Garan",
+"Verkauft: Lamborghini Urus S Nero-Matt Black {1}\" Garan",
+"Eladva: Lamborghini Urus S Nero-Matt Black {1}\" Garan"
+],
+"Na predaj Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} k, benzín, automat. Cena bez DPH {7} €.": [
+"For sale: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} hp, petrol, automatic. Price excl. VAT {7} €.",
+"Zu verkaufen: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} PS, Benzin, Automatik. Preis ohne MwSt. {7} €.",
+"Eladó Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} LE, benzin, automata. Ár áfa nélkül: {7} €."
+],
+"Predané: Land Rover Range Rover Evoque SE TD{1} Auto Xenon": [
+"Sold: Land Rover Range Rover Evoque SE TD{1} Auto Xenon",
+"Verkauft: Land Rover Range Rover Evoque SE TD{1} Auto Xenon",
+"Eladva: Land Rover Range Rover Evoque SE TD{1} Auto Xenon"
+],
+"Predané: Land Rover Range Rover Sport P{1}e Autobio": [
+"Sold: Land Rover Range Rover Sport P{1}e Autobio",
+"Verkauft: Land Rover Range Rover Sport P{1}e Autobio",
+"Eladva: Land Rover Range Rover Sport P{1}e Autobio"
+],
+"<g0>Predané</g0><g1></g1>": [
+"<g0>Sold</g0><g1></g1>",
+"<g0>Verkauft</g0><g1></g1>",
+"<g0>Eladva</g0><g1></g1>"
+],
+"Automat · Benzín": [
+"Automatic · Petrol",
+"Automatik · Benzin",
+"Automata · Benzin"
+],
+"Automat · Diesel": [
+"Automatic · Diesel",
+"Automatik · Diesel",
+"Automata · Dízel"
+],
+"<g0>prvá evidencia na Slovensku</g0>": [
+"<g0>first registered in Slovakia</g0>",
+"<g0>Erstzulassung in der Slowakei</g0>",
+"<g0>első forgalomba helyezés Szlovákiában</g0>"
+],
+"prvá evidencia na Slovensku": [
+"first registered in Slovakia",
+"Erstzulassung in der Slowakei",
+"első forgalomba helyezés Szlovákiában"
+],
+"<g0>{1} áut v ponuke</g0>": [
+"<g0>{1} cars available</g0>",
+"<g0>{1} Autos im Angebot</g0>",
+"<g0>{1} autó a kínálatban</g0>"
+],
+"<g0>{1} áut na prenájom</g0>": [
+"<g0>{1} cars for rent</g0>",
+"<g0>{1} Autos zur Miete</g0>",
+"<g0>{1} bérelhető autó</g0>"
+],
+"<g0>Autá na prenájom</g0>": [
+"<g0>Cars for rent</g0>",
+"<g0>Autos zur Miete</g0>",
+"<g0>Bérelhető autók</g0>"
+],
+"<g0>Naša aktuálna ponuka</g0>": [
+"<g0>Our current offer</g0>",
+"<g0>Unser aktuelles Angebot</g0>",
+"<g0>Aktuális kínálatunk</g0>"
+],
+"<g0>foto čoskoro</g0><g1>Predané</g1><g2>Predané: {1}. {2}. {3}</g2>": [
+"<g0>photo coming soon</g0><g1>Sold</g1><g2>Sold: {1}/{2}/{3}</g2>",
+"<g0>Foto folgt in Kürze</g0><g1>Verkauft</g1><g2>Verkauft: {1}.{2}.{3}</g2>",
+"<g0>fotó hamarosan</g0><g1>Eladva</g1><g2>Eladva: {3}. {2}. {1}.</g2>"
+],
+"Automat · Hybrid": [
+"Automatic · Hybrid",
+"Automatik · Hybrid",
+"Automata · Hibrid"
+],
+"Prémiové autá skladom <g0>({1})</g0>": [
+"Premium cars in stock <g0>({1})</g0>",
+"Premium-Autos auf Lager <g0>({1})</g0>",
+"Prémium autók készleten <g0>({1})</g0>"
+],
+"Prémiové autá z vlastného skladu, ihneď k dispozícii na prenájom za mesačný poplatok — od {1} mesiacov, s limitom {2}–{3} km mesačne podľa auta. Ceny sú mesačné poplatky bez DPH.": [
+"Premium cars from our own stock, available to rent right away for a monthly fee — from {1} months, with a limit of {2}–{3} km per month depending on the car. Prices are monthly fees excl. VAT.",
+"Premium-Autos aus unserem eigenen Bestand, sofort gegen eine monatliche Gebühr mietbar — ab {1} Monaten, mit einem Limit von {2}–{3} km pro Monat je nach Fahrzeug. Die Preise sind monatliche Gebühren ohne MwSt.",
+"Prémium autók saját készletről, azonnal bérelhetők havi díjért — {1} hónaptól, autótól függően havi {2}–{3} km-es kerettel. Az árak áfa nélküli havi díjak."
+],
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go!": [
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go!",
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go!",
+"Ferrari {1}Cilindri Spider azzuro la plata let´s go!"
+],
+"Ferrari {1} GTS Zahnriemen+Service Historie": [
+"Ferrari {1} GTS Zahnriemen+Service Historie",
+"Ferrari {1} GTS Zahnriemen+Service Historie",
+"Ferrari {1} GTS Zahnriemen+Service Historie"
+],
+"Ford Fiesta {1} GTDi ST{2}, ročník {3}, najazdených {4} km, benzínový pohon, limitovaná športová verzia hatchback. {5} k, manuálna {6}-stupňová prevodovka, pohon predných kolies. Garážované, od druhého majiteľa, z domáceho trhu, bez nehody — v ponuke CarAdvance.": [
+"Ford Fiesta {1} GTDi ST{2}, model year {3}, {4} km on the clock, petrol engine, limited sports hatchback version. {5} hp, {6}-speed manual gearbox, front-wheel drive. Garage-kept, second owner, from the domestic market, accident-free — offered by CarAdvance.",
+"Ford Fiesta {1} GTDi ST{2}, Baujahr {3}, {4} km Laufleistung, Benzinmotor, limitierte Sportversion als Schrägheck. {5} PS, manuelles {6}-Gang-Getriebe, Frontantrieb. Garagengepflegt, aus zweiter Hand, vom Inlandsmarkt, unfallfrei — im Angebot von CarAdvance.",
+"Ford Fiesta {1} GTDi ST{2}, évjárat: {3}, futásteljesítmény: {4} km, benzinmotoros, limitált sportváltozatú ferdehátú. {5} LE, {6} fokozatú manuális váltó, elsőkerék-hajtás. Garázsban tartott, második tulajdonostól, belföldi piacról, balesetmentes — a CarAdvance kínálatában."
+],
+"Ford Focus {1} EcoBlue ST-Line (Automata), ročník {2}/{3}, najazdených {4} km, dieselový pohon, kombi vo výbave ST-Line. {5} k, automatická prevodovka ({6}-stupňová), pohon predných kolies. Od prvého majiteľa, garážované, z domáceho trhu — v ponuke CarAdvance.": [
+"Ford Focus {1} EcoBlue ST-Line (Automata), model year {2}/{3}, {4} km on the clock, diesel engine, estate in ST-Line trim. {5} hp, automatic gearbox ({6}-speed), front-wheel drive. First owner, garage-kept, from the domestic market — offered by CarAdvance.",
+"Ford Focus {1} EcoBlue ST-Line (Automata), Baujahr {2}/{3}, {4} km Laufleistung, Dieselmotor, Kombi in ST-Line-Ausstattung. {5} PS, Automatikgetriebe ({6}-Gang), Frontantrieb. Aus erster Hand, garagengepflegt, vom Inlandsmarkt — im Angebot von CarAdvance.",
+"Ford Focus {1} EcoBlue ST-Line (Automata), évjárat: {2}/{3}, futásteljesítmény: {4} km, dízelmotoros, ST-Line felszereltségű kombi. {5} LE, automata váltó ({6} fokozatú), elsőkerék-hajtás. Első tulajdonostól, garázsban tartott, belföldi piacról — a CarAdvance kínálatában."
+],
+"<g0>Hlavná stránka</g0> / <g1>Naše autá</g1> / <g2>Jaguar F-Type S {1} V{2} S/C (Automata)</g2>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Jaguar F-Type S {1} V{2} S/C (Automata)</g2>",
+"<g0>Startseite</g0> / <g1>Unsere Autos</g1> / <g2>Jaguar F-Type S {1} V{2} S/C (Automata)</g2>",
+"<g0>Főoldal</g0> / <g1>Autóink</g1> / <g2>Jaguar F-Type S {1} V{2} S/C (Automata)</g2>"
+],
+"A(z) Jaguar F-Type S {1} V{2} S/C (Automata) {3}/{4} évjáratú, {5} km-t futott, benzines, kompresszoros V{6} motoros, kétüléses cabrio (vászontető). {7} LE ({8} kW), {9} fokozatú automata váltó, hátsókerék-hajtás. Az S kivitel aktív sportkipufogóval, adaptív futóművel és sportos beltérrel érkezik. Amerikai import, érvényes magyar okmányokkal — a CarAdvance bizományos kínálatában.": [
+"Jaguar F-Type S {1} V{2} S/C (Automata), model year {3}/{4}, {5} km on the clock, petrol, supercharged V{6} engine, two-seater convertible (soft top). {7} hp ({8} kW), {9}-speed automatic gearbox, rear-wheel drive. The S version comes with an active sports exhaust, adaptive suspension and a sporty interior. US import with valid Hungarian documents — offered on consignment by CarAdvance.",
+"Jaguar F-Type S {1} V{2} S/C (Automata), Baujahr {3}/{4}, {5} km Laufleistung, Benziner mit kompressoraufgeladenem V{6}-Motor, zweisitziges Cabrio (Stoffverdeck). {7} PS ({8} kW), {9}-Gang-Automatikgetriebe, Hinterradantrieb. Die S-Version bietet eine aktive Sportabgasanlage, ein adaptives Fahrwerk und ein sportliches Interieur. US-Import mit gültigen ungarischen Papieren — im Kommissionsangebot von CarAdvance.",
+"A(z) Jaguar F-Type S {1} V{2} S/C (Automata) {3}/{4} évjáratú, {5} km-t futott, benzines, kompresszoros V{6} motoros, kétüléses cabrio (vászontető). {7} LE ({8} kW), {9} fokozatú automata váltó, hátsókerék-hajtás. Az S kivitel aktív sportkipufogóval, adaptív futóművel és sportos beltérrel érkezik. Amerikai import, érvényes magyar okmányokkal — a CarAdvance bizományos kínálatában."
+],
+"Hátsó kerék": [
+"Rear-wheel drive",
+"Hinterradantrieb",
+"Hátsó kerék"
+],
+"Cabrio (vászontető)": [
+"Convertible (soft top)",
+"Cabrio (Stoffverdeck)",
+"Cabrio (vászontető)"
+],
+"{1} fő": [
+"{1} seats",
+"{1} Sitze",
+"{1} fő"
+],
+"<g0>memóriás vezetőülés</g0>": [
+"<g0>driver's seat with memory</g0>",
+"<g0>Fahrersitz mit Memory-Funktion</g0>",
+"<g0>memóriás vezetőülés</g0>"
+],
+"<g0>vászontető</g0>": [
+"<g0>soft top</g0>",
+"<g0>Stoffverdeck</g0>",
+"<g0>vászontető</g0>"
+],
+"<g0>bi-xenon fényszóró</g0>": [
+"<g0>bi-xenon headlights</g0>",
+"<g0>Bi-Xenon-Scheinwerfer</g0>",
+"<g0>bi-xenon fényszóró</g0>"
+],
+"<g0>elektromos ülésállítás vezetőoldal</g0>": [
+"<g0>electric seat adjustment, driver's side</g0>",
+"<g0>elektrische Sitzverstellung Fahrerseite</g0>",
+"<g0>elektromos ülésállítás vezetőoldal</g0>"
+],
+"<g0>elektromos ülésállítás utasoldal</g0>": [
+"<g0>electric seat adjustment, passenger side</g0>",
+"<g0>elektrische Sitzverstellung Beifahrerseite</g0>",
+"<g0>elektromos ülésállítás utasoldal</g0>"
+],
+"<g0>EBD/EBV (elektronikus fékerő-elosztó)</g0>": [
+"<g0>EBD/EBV (electronic brake-force distribution)</g0>",
+"<g0>EBD/EBV (elektronische Bremskraftverteilung)</g0>",
+"<g0>EBD/EBV (elektronikus fékerő-elosztó)</g0>"
+],
+"<g0>rádiós magnó</g0>": [
+"<g0>radio/cassette player</g0>",
+"<g0>Radio/Kassettenspieler</g0>",
+"<g0>rádiós magnó</g0>"
+],
+"<g0>amerikai modell</g0>": [
+"<g0>US model</g0>",
+"<g0>US-Modell</g0>",
+"<g0>amerikai modell</g0>"
+],
+"vászontető": [
+"soft top",
+"Stoffverdeck",
+"vászontető"
+],
+"bi-xenon fényszóró": [
+"bi-xenon headlights",
+"Bi-Xenon-Scheinwerfer",
+"bi-xenon fényszóró"
+],
+"automata fényszórókapcsolás": [
+"automatic headlights",
+"automatische Fahrlichtschaltung",
+"automata fényszórókapcsolás"
+],
+"bőr belső": [
+"leather interior",
+"Lederausstattung",
+"bőr belső"
+],
+"memóriás vezetőülés": [
+"driver's seat with memory",
+"Fahrersitz mit Memory-Funktion",
+"memóriás vezetőülés"
+],
+"elektromos ülésállítás vezetőoldal": [
+"electric seat adjustment, driver's side",
+"elektrische Sitzverstellung Fahrerseite",
+"elektromos ülésállítás vezetőoldal"
+],
+"elektromos ülésállítás utasoldal": [
+"electric seat adjustment, passenger side",
+"elektrische Sitzverstellung Beifahrerseite",
+"elektromos ülésállítás utasoldal"
+],
+"hangvezérlés": [
+"voice control",
+"Sprachsteuerung",
+"hangvezérlés"
+],
+"EBD/EBV (elektronikus fékerő-elosztó)": [
+"EBD/EBV (electronic brake-force distribution)",
+"EBD/EBV (elektronische Bremskraftverteilung)",
+"EBD/EBV (elektronikus fékerő-elosztó)"
+],
+"riasztó": [
+"alarm system",
+"Alarmanlage",
+"riasztó"
+],
+"rádiós magnó": [
+"radio/cassette player",
+"Radio/Kassettenspieler",
+"rádiós magnó"
+],
+"amerikai modell": [
+"US model",
+"US-Modell",
+"amerikai modell"
+],
+"Lamborghini Urus S Nero-Matt Black {1}\" Garan": [
+"Lamborghini Urus S Nero-Matt Black {1}\" Garan",
+"Lamborghini Urus S Nero-Matt Black {1}\" Garan",
+"Lamborghini Urus S Nero-Matt Black {1}\" Garan"
+],
+"<g0>Hlavná stránka</g0> / <g1>Naše autá</g1> / <g2>Predané</g2> / <g3>Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan</g3>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Sold</g2> / <g3>Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan</g3>",
+"<g0>Startseite</g0> / <g1>Unsere Autos</g1> / <g2>Verkauft</g2> / <g3>Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan</g3>",
+"<g0>Főoldal</g0> / <g1>Autóink</g1> / <g2>Eladva</g2> / <g3>Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan</g3>"
+],
+"Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan, rok výroby {2}/{3}, najazdené {4}, benzín, prémiové auto. {5} k. Cena podľa zvoleného variantu nižšie, so zodpovednosťou za vady, dovoz CarAdvance.": [
+"Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan, year of manufacture {2}/{3}, mileage {4}, petrol, premium car. {5} hp. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan, Baujahr {2}/{3}, Laufleistung {4}, Benzin, Premiumfahrzeug. {5} PS. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance.",
+"Lamborghini Urus S Nero-Matt/Black/{1}\"/B&O/Garan, gyártási év: {2}/{3}, futásteljesítmény: {4}, benzin, prémium autó. {5} LE. Az ár az alább választott változattól függ, kellékszavatossággal, a CarAdvance importjából."
+],
+"Na predaj Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} k, benzín, automat. Cena {7} €.": [
+"For sale: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} hp, petrol, automatic. Price {7} €.",
+"Zu verkaufen: Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} PS, Benzin, Automatik. Preis {7} €.",
+"Eladó Land Rover {1} P{2} X-Dynamic HSE Black-Tan Sperrdiff\" {3}'\", {4}, {5} km, {6} LE, benzin, automata. Ár: {7} €."
+],
+"Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa": [
+"Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa",
+"Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa",
+"Land Rover Range Rover Evoque SE TD{1} Auto Xenon Keyless Pa"
+],
+"<g0>Hlavná stránka</g0> / <g1>Naše autá</g1> / <g2>Predané</g2> / <g3>Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa</g3>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Sold</g2> / <g3>Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa</g3>",
+"<g0>Startseite</g0> / <g1>Unsere Autos</g1> / <g2>Verkauft</g2> / <g3>Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa</g3>",
+"<g0>Főoldal</g0> / <g1>Autóink</g1> / <g2>Eladva</g2> / <g3>Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa</g3>"
+],
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa, rok výroby {2}/{3}, najazdené {4}, diesel, SUV. {5} k, Automat, Pohon všetkých kolies. Cena podľa zvoleného variantu nižšie, so zodpovednosťou za vady, dovoz CarAdvance.": [
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa, year of manufacture {2}/{3}, mileage {4}, diesel, SUV. {5} hp, automatic, all-wheel drive. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa, Baujahr {2}/{3}, Laufleistung {4}, Diesel, SUV. {5} PS, Automatik, Allradantrieb. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance.",
+"Land Rover Range Rover Evoque SE TD{1}/Auto/Xenon/Keyless/Pa, gyártási év: {2}/{3}, futásteljesítmény: {4}, dízel, SUV. {5} LE, automata, összkerékhajtás. Az ár az alább választott változattól függ, kellékszavatossággal, a CarAdvance importjából."
+],
+"<g0>Téli gumik</g0>": [
+"<g0>Winter tyres</g0>",
+"<g0>Winterreifen</g0>",
+"<g0>Téli gumik</g0>"
+],
+"Téli gumik": [
+"Winter tyres",
+"Winterreifen",
+"Téli gumik"
+],
+"Land Rover Range Rover Sport P{1}e Autobio White-Red Full": [
+"Land Rover Range Rover Sport P{1}e Autobio White-Red Full",
+"Land Rover Range Rover Sport P{1}e Autobio White-Red Full",
+"Land Rover Range Rover Sport P{1}e Autobio White-Red Full"
+],
+"<g0>Hlavná stránka</g0> / <g1>Naše autá</g1> / <g2>Predané</g2> / <g3>Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full</g3>": [
+"<g0>Home</g0> / <g1>Our cars</g1> / <g2>Sold</g2> / <g3>Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full</g3>",
+"<g0>Startseite</g0> / <g1>Unsere Autos</g1> / <g2>Verkauft</g2> / <g3>Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full</g3>",
+"<g0>Főoldal</g0> / <g1>Autóink</g1> / <g2>Eladva</g2> / <g3>Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full</g3>"
+],
+"Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full, rok výroby {2}/{3}, najazdené {4}, hybrid (benzin/elektro), SUV. {5} k, Automat. Cena podľa zvoleného variantu nižšie, so zodpovednosťou za vady, dovoz CarAdvance.": [
+"Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full, year of manufacture {2}/{3}, mileage {4}, hybrid (petrol/electric), SUV. {5} hp, automatic. Price depends on the option selected below, with liability for defects, imported by CarAdvance.",
+"Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full, Baujahr {2}/{3}, Laufleistung {4}, Hybrid (Benzin/Elektro), SUV. {5} PS, Automatik. Preis je nach unten gewählter Variante, mit Mängelhaftung, Import durch CarAdvance.",
+"Land Rover Range Rover Sport P{1}e Autobio/White-Red/Full, gyártási év: {2}/{3}, futásteljesítmény: {4}, hibrid (benzin/elektromos), SUV. {5} LE, automata. Az ár az alább választott változattól függ, kellékszavatossággal, a CarAdvance importjából."
+],
+"<g0>Vászontető</g0>": [
+"<g0>Soft top</g0>",
+"<g0>Stoffverdeck</g0>",
+"<g0>Vászontető</g0>"
+],
+"Vászontető": [
+"Soft top",
+"Stoffverdeck",
+"Vászontető"
+],
+"<x0/><g1>Predané</g1><g2>Predané: {1}. {2}. {3}</g2> <g3><g4>{4}</g4> / {5}</g3>": [
+"<x0/><g1>Sold</g1><g2>Sold: {1}/{2}/{3}</g2> <g3><g4>{4}</g4> / {5}</g3>",
+"<x0/><g1>Verkauft</g1><g2>Verkauft: {1}.{2}.{3}</g2> <g3><g4>{4}</g4> / {5}</g3>",
+"<x0/><g1>Eladva</g1><g2>Eladva: {3}. {2}. {1}.</g2> <g3><g4>{4}</g4> / {5}</g3>"
+],
+"<g0>Kombi</g0><g1>Plug-in hybrid · Diesel</g1><g2>Automat</g2><g3>{1}–{2} km/mes.</g3><g4>Úplne nové · {3} km</g4>": [
+"<g0>Estate</g0><g1>Plug-in hybrid · Diesel</g1><g2>Automatic</g2><g3>{1}–{2} km/month</g3><g4>Brand new · {3} km</g4>",
+"<g0>Kombi</g0><g1>Plug-in-Hybrid · Diesel</g1><g2>Automatik</g2><g3>{1}–{2} km/Monat</g3><g4>Fabrikneu · {3} km</g4>",
+"<g0>Kombi</g0><g1>Plug-in hibrid · Dízel</g1><g2>Automata</g2><g3>{1}–{2} km/hó</g3><g4>Vadonatúj · {3} km</g4>"
+],
+"Obnovený A{1} Sportback prichádza so širšou, výraznejšou maskou Singleframe, voliteľnou LED grafikou denného svietenia a športovým zadným difúzorom. Farby na prenájom: Nyílszürke gyöngyház.": [
+"The updated A{1} Sportback comes with a wider, bolder Singleframe grille, selectable LED daytime running light signatures and a sporty rear diffuser. Colours available for rent: Arrow Grey pearl effect.",
+"Der überarbeitete A{1} Sportback kommt mit einem breiteren, markanteren Singleframe, wählbarer LED-Tagfahrlichtsignatur und sportlichem Heckdiffusor. Verfügbare Farben zur Miete: Pfeilgrau Perleffekt.",
+"A megújult A{1} Sportback szélesebb, karakteresebb Singleframe hűtőmaszkkal, választható LED nappali menetfény-grafikával és sportos hátsó diffúzorral érkezik. Bérelhető színek: Nyílszürke gyöngyház."
+],
+"Q{1} Sportback tretej generácie prichádza s výraznou maskou Singleframe, úzkymi LED svetlometmi a digitálnymi OLED zadnými svetlami. Zvažujúca sa línia strechy a silná línia ramien dodávajú dynamický, prémiový vzhľad. Farby na prenájom: Mýtická čierna metalíza, Navarra modrá metalíza, Daytona sivá perleťová, Ľadovcovo biela metalíza.": [
+"The third-generation Q{1} Sportback features a striking Singleframe grille, slim LED headlights and digital OLED rear lights. The sloping roofline and strong shoulder line give it a dynamic, premium look. Colours available for rent: Mythos Black metallic, Navarra Blue metallic, Daytona Grey pearl effect, Glacier White metallic.",
+"Der Q{1} Sportback der dritten Generation kommt mit markantem Singleframe, schmalen LED-Scheinwerfern und digitalen OLED-Heckleuchten. Die abfallende Dachlinie und die kräftige Schulterlinie sorgen für einen dynamischen, hochwertigen Auftritt. Verfügbare Farben zur Miete: Mythosschwarz Metallic, Navarrablau Metallic, Daytonagrau Perleffekt, Gletscherweiß Metallic.",
+"A harmadik generációs Q{1} Sportback karakteres Singleframe hűtőmaszkkal, keskeny LED fényszórókkal és digitális OLED hátsó lámpákkal érkezik. A lejtős tetővonal és az erőteljes vállvonal dinamikus, prémium megjelenést kölcsönöz neki. Bérelhető színek: Mythosfekete metál, Navarrakék metál, Daytonaszürke gyöngyház, Gleccserfehér metál."
+],
+"SQ{1} Sportback dostáva špecifické nárazníky S, kryty zrkadiel v hliníkovom vzhľade, štyri koncovky výfuku a väčšie kolesá. Klesajúca línia strechy a široké blatníky vyžarujú silu a eleganciu. Farby na prenájom: Daytona sivá perleťová.": [
+"The SQ{1} Sportback gets specific S bumpers, aluminium-look mirror caps, four exhaust tailpipes and larger wheels. The sloping roofline and wide wheel arches exude power and elegance. Colours available for rent: Daytona Grey pearl effect.",
+"Der SQ{1} Sportback erhält spezifische S-Stoßfänger, Außenspiegelgehäuse in Aluminiumoptik, vier Endrohre und größere Räder. Die abfallende Dachlinie und die breiten Kotflügel strahlen Kraft und Eleganz aus. Verfügbare Farben zur Miete: Daytonagrau Perleffekt.",
+"Az SQ{1} Sportback egyedi S lökhárítókat, alumínium hatású tükörborításokat, négy kipufogóvéget és nagyobb kerekeket kap. A lejtős tetővonal és a széles sárvédők erőt és eleganciát sugároznak. Bérelhető színek: Daytonaszürke gyöngyház."
+],
+"Rad {1} Active Tourer pôsobí sebavedomo a moderne: výrazné ľadvinky, čisté línie a kvalitné materiály — v praktickej forme MPV. Farby na prenájom: Fekete, Zafírovo čierna metalíza.": [
+"The {1} Series Active Tourer looks confident and modern: a prominent kidney grille, clean lines and high-quality materials — in a practical MPV format. Colours available for rent: Black, Sapphire Black metallic.",
+"Der {1}er Active Tourer tritt selbstbewusst und modern auf: markante Niere, klare Linien und hochwertige Materialien — in praktischer Van-Form. Verfügbare Farben zur Miete: Schwarz, Saphirschwarz Metallic.",
+"A {1}-es sorozatú Active Tourer magabiztos és modern: hangsúlyos vesemaszk, letisztult vonalak és minőségi anyagok — praktikus egyterű formában. Bérelhető színek: Fekete, Zafírfekete metál."
+],
+"Rad {1} Cabrio dostal s dlhou kapotou, nízkou bočnou líniou a textilnou strechou elegantný nadčasový tvar. Zmodernizovaný model prichádza s úzkymi svetlometmi a novými zadnými svetlami. Farby na prenájom: Alpská biela.": [
+"With its long bonnet, low side line and fabric roof, the {1} Series Convertible has an elegant, timeless shape. The updated model comes with slim headlights and new rear lights. Colours available for rent: Alpine White.",
+"Mit langer Motorhaube, niedriger Seitenlinie und Stoffverdeck hat das {1}er Cabrio eine elegante, zeitlose Form. Das überarbeitete Modell kommt mit schmalen Scheinwerfern und neuen Heckleuchten. Verfügbare Farben zur Miete: Alpinweiß.",
+"Hosszú motorháztetőjével, alacsony oldalvonalával és vászontetejével a {1}-es sorozatú Cabrio elegáns, időtálló formát kapott. A megújult modell keskeny fényszórókkal és új hátsó lámpákkal érkezik. Bérelhető színek: Alpesi fehér."
+],
+"Nové X{1} pôsobí s väčšou prítomnosťou: veľkorysé plochy, dlhá bočná línia, široká zadná časť a úplne prepracovaná, voliteľne svietiaca ľadvinková maska. Farby na prenájom: Zafírovo čierna metalíza, Dune sivá metalíza, Sophisto sivá brilantná metalíza.": [
+"The new X{1} has a stronger presence: generous surfaces, a long side line, a wide rear and a completely redesigned, optionally illuminated kidney grille. Colours available for rent: Sapphire Black metallic, Dune Grey metallic, Sophisto Grey brilliant effect metallic.",
+"Der neue X{1} tritt präsenter auf: großzügige Flächen, eine lange Seitenlinie, ein breites Heck und eine komplett neu gestaltete, optional beleuchtete Niere. Verfügbare Farben zur Miete: Saphirschwarz Metallic, Dune Grau Metallic, Sophistograu Brillanteffekt Metallic.",
+"Az új X{1} még erőteljesebb megjelenésű: nagyvonalú felületek, hosszú oldalvonal, széles far és teljesen újratervezett, opcionálisan világító vesemaszk. Bérelhető színek: Zafírfekete metál, Dune szürke metál, Sophisto szürke briliáns metál."
+],
+"Rozšírená karoséria, zadné krídlo typu swan neck, nárazníky N a {1}\" kované disky. Farby na prenájom: Nocturne szürke.": [
+"Widened body, swan-neck rear wing, N bumpers and {1}\" forged wheels. Colours available for rent: Nocturne Grey.",
+"Verbreiterte Karosserie, Heckflügel in Swan-Neck-Ausführung, N-Stoßfänger und {1}\"-Schmiedefelgen. Verfügbare Farben zur Miete: Nocturne Grau.",
+"Kiszélesített karosszéria, hattyúnyak típusú hátsó szárny, N lökhárítók és {1} colos kovácsolt felnik. Bérelhető színek: Nocturne szürke."
+],
+"„Parametrická“ maska chladiča so skrytými LED svetlami pre denné svietenie, ostré línie a športové nárazníky verzie N Line robia z modelu Tucson jedinečné auto. Farby na prenájom: Tieňovo sivá, Žiarivá červená, Hlboká čierna.": [
+"The \"Parametric\" grille with hidden LED daytime running lights, sharp lines and the sporty N Line bumpers make the Tucson a truly distinctive car. Colours available for rent: Shadow Grey, Radiant Red, Deep Black.",
+"Der „parametrische“ Kühlergrill mit versteckten LED-Tagfahrleuchten, scharfe Linien und die sportlichen Stoßfänger der N Line machen den Tucson zu einem einzigartigen Auto. Verfügbare Farben zur Miete: Schattengrau, Leuchtendes Rot, Tiefschwarz.",
+"A „parametrikus” hűtőrács rejtett LED nappali menetfényekkel, az éles vonalak és az N Line változat sportos lökhárítói egyedülálló autóvá teszik a Tucsont. Bérelhető színek: Árnyékszürke, Ragyogó piros, Mélyfekete."
+],
+"Dlhá kapota, kabína posunutá dozadu, krátke previsy a športové proporcie — Trieda C prináša dizajnový jazyk Triedy S do strednej triedy. Farby na prenájom: Obsidiánová čierna metalíza.": [
+"Long bonnet, set-back cabin, short overhangs and sporty proportions — the C-Class brings the design language of the S-Class to the mid-size segment. Colours available for rent: Obsidian Black metallic.",
+"Lange Motorhaube, nach hinten versetzte Kabine, kurze Überhänge und sportliche Proportionen — die C-Klasse bringt die Designsprache der S-Klasse in die Mittelklasse. Verfügbare Farben zur Miete: Obsidianschwarz Metallic.",
+"Hosszú motorháztető, hátrébb helyezett utastér, rövid túlnyúlások és sportos arányok — a C-osztály az S-osztály formanyelvét hozza el a középkategóriába. Bérelhető színek: Obszidiánfekete metál."
+],
+"Plochá, napnutá karoséria, bezrámové okná dverí, maska chladiča so svietiacim hviezdicovým vzorom a vzadu hviezdicové svetlá — nové CLA otvára novú dizajnovú éru Mercedesu. Farby na prenájom: Polnočná čierna uni, MANUFAKTUR alpská sivá uni.": [
+"A flat, taut body, frameless door windows, a grille with an illuminated star pattern and star-shaped rear lights — the new CLA opens a new design era for Mercedes. Colours available for rent: Night Black solid, MANUFAKTUR Alpine Grey solid.",
+"Flache, straff gespannte Karosserie, rahmenlose Türfenster, ein Kühlergrill mit beleuchtetem Sternmuster und Sternenleuchten im Heck — der neue CLA läutet eine neue Designära bei Mercedes ein. Verfügbare Farben zur Miete: Nachtschwarz uni, MANUFAKTUR alpingrau uni.",
+"Lapos, feszes karosszéria, keret nélküli ajtóablakok, világító csillagmintás hűtőrács és hátul csillag alakú lámpák — az új CLA új formatervezési korszakot nyit a Mercedesnél. Bérelhető színek: Éjfekete egyszínű, MANUFAKTUR alpesi szürke egyszínű."
+],
+"Nová Trieda E dostala masku chladiča integrovanú do čierneho panelu, zadné svetlá s motívom hviezdy a čistú, elegantnú bočnú líniu. Farby na prenájom: Polárna biela uni.": [
+"The new E-Class features a grille integrated into a black panel, rear lights with a star motif and a clean, elegant side line. Colours available for rent: Polar White solid.",
+"Die neue E-Klasse erhielt einen in eine schwarze Blende integrierten Kühlergrill, Heckleuchten mit Sternmotiv und eine klare, elegante Seitenlinie. Verfügbare Farben zur Miete: Polarweiß uni.",
+"Az új E-osztály fekete panelbe integrált hűtőrácsot, csillagmotívumos hátsó lámpákat és letisztult, elegáns oldalvonalat kapott. Bérelhető színek: Polárfehér egyszínű."
 ]
 };
