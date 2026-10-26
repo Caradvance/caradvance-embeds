@@ -323,7 +323,7 @@ function run() {
     const sl = rtSk.slice(slR[0], slR[1]).replace(/"\/sk(\/[^"]*)"/g, (m, q) => { const p2 = skAbs(q); return p2 ? `"/pl${p2}"` : m; });
     const extra = `var PLNR=${R};var PLNADD=${PLNADD.toString()};` +
       `try{var CC2=window.CA_CFG;if(CC2){CC2.PHONE=${JSON.stringify(PL.phone)};CC2.WHATSAPP='https://wa.me/${PL.wa}';}}catch(e){}`;
-    const fixCur = (b) => b.replace(/CUR=function\(s\)\{return CONV\(s,FX\)\};/, 'CUR=function(s){return PLNADD(CONV(s,FX),PLNR)};')
+    const fixCur = (b) => b.replace(/CUR=function\(s\)\{return CONV\(s,FX\)\};/, 'CUR=function(s){var o=CONV(s,FX);return o!==s?PLNADD(o,PLNR):o};')
       .replace(/if\(\/\(\^\|\\\\?\.\)caradvance\\\\?\.\(sk\|cz\)\$\/\.test\(location\.hostname\)\)DOMSTRIP=\/\^\\\\?\/\(sk\|cs\)\\\\?\/\/;/, '')
       .replace('var UNITS=', `${extra}if(/(^|\\.)caradvance\\.pl$/.test(location.hostname))DOMSTRIP=/^\\/pl\\//;var UNITS=`);
     // lengyel

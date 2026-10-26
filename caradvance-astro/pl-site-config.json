@@ -246,7 +246,7 @@
   ],
   [
    "ul\\. Stawki 7, 821 04 (Warszawa|Warsaw|Warschau); \\+421 2 3231 3214",
-   "ul. Stawki 2, 00-193 \\1; +48 22 531 03 00"
+   "ul. Stawki 2, 00-193 $1; +48 22 531 03 00"
   ],
   [
    "mailto:statny\\.dozor@pdp\\.gov\\.sk",
@@ -259,9 +259,9 @@
   [
    "(www\\.lda\\.bayern\\.de</a></dd>)(?![\\s\\S]{0,200}naih)",
    {
-    "pl": "\\1<dt>Węgry (organ nadzorczy BH Group Zrt.)</dt><dd>Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH) — Falk Miksa utca 9–11, 1055 Budapeszt; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
-    "en": "\\1<dt>Hungary (supervisory authority of BH Group Zrt.)</dt><dd>Hungarian National Authority for Data Protection and Freedom of Information (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
-    "de": "\\1<dt>Ungarn (Aufsichtsbehörde der BH Group Zrt.)</dt><dd>Ungarische Behörde für Datenschutz und Informationsfreiheit (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>"
+    "pl": "$1<dt>Węgry (organ nadzorczy BH Group Zrt.)</dt><dd>Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH) — Falk Miksa utca 9–11, 1055 Budapeszt; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
+    "en": "$1<dt>Hungary (supervisory authority of BH Group Zrt.)</dt><dd>Hungarian National Authority for Data Protection and Freedom of Information (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
+    "de": "$1<dt>Ungarn (Aufsichtsbehörde der BH Group Zrt.)</dt><dd>Ungarische Behörde für Datenschutz und Informationsfreiheit (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>"
    }
   ],
   [
@@ -382,14 +382,14 @@
   ],
   [
    "(alt=\"Balázs Bajzáth\"[\\s\\S]{0,700}?<div class=\"rl\">)[^<]*(</div>)",
-   "\\1Sales Manager\\2"
+   "$1Sales Manager$2"
   ],
   [
    "(alt=\"Károly Tóth\"[\\s\\S]{0,700}?<div class=\"rl\">)[^<]*(</div><div class=\"bio\">)[^<]*(</div>)",
    {
-    "pl": "\\1Dyrektor handlowy\\2Odpowiada za kontakty na rynku niemieckim i cały proces importu — doradzi Ci przy wyborze auta do wynajmu lub zakupu i przygotuje ofertę dopasowaną do Twoich potrzeb.\\3",
-    "en": "\\1Sales Director\\2Responsible for our contacts on the German market and the whole import process — he advises you on choosing a car to rent or buy and prepares a tailor-made offer.\\3",
-    "de": "\\1Vertriebsdirektor\\2Verantwortlich für die Kontakte auf dem deutschen Markt und den gesamten Importprozess — er berät Sie bei der Wahl eines Miet- oder Kaufautos und erstellt Ihnen ein maßgeschneidertes Angebot.\\3"
+    "pl": "$1Dyrektor handlowy$2Odpowiada za kontakty na rynku niemieckim i cały proces importu — doradzi Ci przy wyborze auta do wynajmu lub zakupu i przygotuje ofertę dopasowaną do Twoich potrzeb.$3",
+    "en": "$1Sales Director$2Responsible for our contacts on the German market and the whole import process — he advises you on choosing a car to rent or buy and prepares a tailor-made offer.$3",
+    "de": "$1Vertriebsdirektor$2Verantwortlich für die Kontakte auf dem deutschen Markt und den gesamten Importprozess — er berät Sie bei der Wahl eines Miet- oder Kaufautos und erstellt Ihnen ein maßgeschneidertes Angebot.$3"
    }
   ],
   [
