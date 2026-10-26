@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caradvance Sourcing</title>
+<link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+<header><strong>caradvance</strong><span>Sourcing</span><span id="env" class="env" hidden>TESZT</span><a href="options.html" target="_blank" title="Beállítások">⚙︎</a></header>
+<main>
+  <section id="setup" hidden class="box warn">
+    <p>Még nincs beállítva a szerver címe és a token.</p>
+    <a class="btn" href="options.html" target="_blank">Beállítások megnyitása</a>
+  </section>
+
+  <section class="box" id="reqBox">
+    <label for="req">Ügyféligény</label>
+    <select id="req"><option value="">Betöltés…</option></select>
+    <div class="row"><button id="openSearch" class="btn line" type="button">Keresés megnyitása a mobile.de-n</button></div>
+    <p class="hint" id="reqHint"></p>
+  </section>
+
+  <section class="box" id="listingBox" hidden>
+    <div class="ttl"><span id="lTitle"></span><small id="lLayers"></small></div>
+    <img id="lImg" alt="">
+    <div class="grid">
+      <label>Bruttó ár (€)<input id="f_price_gross_eur" inputmode="numeric"></label>
+      <label>Km<input id="f_km" inputmode="numeric"></label>
+      <label>Első forg. (ÉÉÉÉ-HH)<input id="f_first_registration" placeholder="2024-09"></label>
+      <label>Teljesítmény (kW)<input id="f_power_kw" inputmode="numeric"></label>
+      <label>Irányítószám<input id="f_zip"></label>
+      <label>Város<input id="f_city"></label>
+    </div>
+    <p class="hint" id="lMeta"></p>
+    <div class="slots" role="radiogroup" aria-label="Hová kerüljön">
+      <label><input type="radio" name="slot" value="1"> Autó 1</label>
+      <label><input type="radio" name="slot" value="2"> Autó 2</label>
+      <label><input type="radio" name="slot" value="3"> Autó 3</label>
+      <label><input type="radio" name="slot" value="runner" checked> Tartalék</label>
+    </div>
+    <button id="send" class="btn red" type="button">Küldés az ajánlatba</button>
+    <div id="result" class="result" hidden></div>
+  </section>
+
+  <section class="box" id="emptyBox">
+    <p class="hint">Nyiss meg egy mobile.de hirdetést, és kattints a jobb alsó sarokban a „Küldés az ajánlatba” gombra. Keresési listán a „+” jelekkel több autót is kijelölhetsz.</p>
+  </section>
+
+  <section class="box" id="trayBox" hidden>
+    <div class="ttl"><span>Kijelölt autók</span><small id="trayCount"></small></div>
+    <ol id="tray"></ol>
+    <button id="sendTray" class="btn dark" type="button">Kijelöltek küldése (tartalékba)</button>
+    <p class="hint">Egyesével, kis szünettel nyitja meg a hirdetéseket, ahogy egy kolléga tenné. Max. 10 autó.</p>
+  </section>
+</main>
+<script src="parser.js"></script>
+<script src="sidepanel.js"></script>
+</body>
+</html>

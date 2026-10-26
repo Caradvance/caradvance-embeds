@@ -1,0 +1,1 @@
+{ "type": "commonjs", "private": true, "description": "Lets Node tests require parser.js; not part of the extension zip." }
