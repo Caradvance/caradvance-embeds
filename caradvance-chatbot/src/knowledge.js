@@ -24,6 +24,16 @@ export const SITES = {
     wa: '421915410555',
     email: 'info@caradvance.sk'
   },
+  pl: {
+    base: 'https://www.caradvance.pl',
+    indexBase: 'https://www.caradvance.hu',   // a keresőindex a közös Pages-projektben van (a .pl domain bekötése előtt is elérhető)
+    index: '/kereses-index-pl.json',
+    prefix: '/pl',
+    lang: 'pl',
+    phone: '+36 30 233 6060',
+    wa: '36302336060',
+    email: 'info@caradvance.hu'
+  },
   cz: {
     base: 'https://www.caradvance.cz',
     index: '/kereses-index-cs.json',
@@ -36,7 +46,7 @@ export const SITES = {
 };
 
 export const LANG_NAME = {
-  hu: 'Hungarian', sk: 'Slovak', cs: 'Czech', en: 'English', de: 'German', fr: 'French', uk: 'Ukrainian', zh: 'Simplified Chinese'
+  hu: 'Hungarian', sk: 'Slovak', cs: 'Czech', pl: 'Polish', en: 'English', de: 'German', fr: 'French', uk: 'Ukrainian', zh: 'Simplified Chinese'
 };
 
 const HU = `
@@ -72,6 +82,23 @@ const SK = `
 - Na Slovensku neponúkame komisionálny predaj ani charitatívny program — nespomínaj ich.
 `;
 
+const PL = `
+# CarAdvance — caradvance.pl (Polska)
+- Usługodawca, sprzedawca i wynajmujący (strona umowy): Caradvance GmbH, Bgm-Graf-Ring 21, 82538 Geretsried, Niemcy (Amtsgericht München, HRB 151009, VAT UE DE232664616). Działa od 2003 roku, ponad 5000 sprzedanych samochodów premium.
+- Pośrednik handlowy dla Polski: BH Group Zrt., biuro: Ibolya utca 18., 2083 Solymár, Węgry (pod Budapesztem). Przyjmuje zapytania, doradza i pomaga w formalnościach; umowy zawiera i podpisuje wyłącznie Caradvance GmbH. BH Group Zrt. nie jest sprzedawcą ani wynajmującym.
+- Kontakt: info@caradvance.hu · +36 30 233 6060 (także WhatsApp) · pn–pt 9:00–17:00 · https://www.caradvance.pl/kontakt/
+- Zespół: Ferenc Csadi — odpowiedzialny za rynek polski, rozmawia po polsku i prowadzi klientów z Polski przez cały import, +36 30 233 6060 · Károly Tóth — dyrektor handlowy (kontakty z rynkiem niemieckim, cały proces importu), +36 30 214 6989 · Balázs Bajzáth — Sales Manager (oferty, dokumenty, pytania handlowe), +36 30 094 2081. Wszyscy dostępni także przez WhatsApp; e-mail info@caradvance.hu.
+
+## Usługi
+1) Wynajem długoterminowy samochodów premium: minimum 6 miesięcy, potem umowa trwa na czas nieokreślony z 30-dniowym okresem wypowiedzenia. Limit kilometrów zależnie od samochodu 2 000–4 000 km/mies. Jednorazowa zwrotna kaucja 2 000–10 000 € zależnie od modelu (zabezpieczenie, nie czynsz; zwracana w ciągu 30 dni po zwrocie auta i zamknięciu otwartych spraw). W opłacie miesięcznej: serwis i przeglądy, podatek, ubezpieczenie OC i AC, opony letnie i zimowe, assistance. Udział własny w AC według indywidualnych ustaleń w umowie. Ceny wynajmu są podane netto (bez VAT) i są przeznaczone głównie dla firm z numerem VAT UE; osobom prywatnym przygotujemy indywidualną ofertę. Wynająć samochód mogą klienci z miejscem zamieszkania lub siedzibą w Polsce, w Niemczech lub w innym kraju. Umowy podpisuje się online (elektronicznie), bez wizyty w biurze. Wynajęte samochody jeżdżą na niemieckich tablicach rejestracyjnych. Wynajmu krótkoterminowego nie oferujemy. Warunki: https://www.caradvance.pl/wynajem/warunki-i-kaucja/ · samochody na wynajem: https://www.caradvance.pl/samochody/#berelheto
+2) Samochody na sprzedaż i zamówienie nowego samochodu skonfigurowanego pod klienta (BMW, MINI, Mercedes, Audi) z Niemiec; finansowanie (leasing, kredyt) zapewnia partnerska instytucja finansowa na własnych warunkach.
+3) Import samochodu z Niemiec: wyszukanie, sprawdzenie i oględziny na miejscu, transport do Polski, pomoc przy akcyzie i rejestracji. https://www.caradvance.pl/import/
+- VAT: Caradvance GmbH jest niemieckim przedsiębiorcą. Osobie prywatnej nalicza polski VAT 23 %, jeśli samochód do Polski dostarcza Caradvance GmbH lub osoba działająca na jej rzecz. Niemiecki VAT 19 % tylko przy samochodzie używanym, który kupujący sam odbiera w Niemczech i sam organizuje transport. Samochody w procedurze marży — VAT nie jest wykazywany na fakturze. Firmie z ważnym numerem VAT UE w innym państwie UE — bez VAT (wewnątrzwspólnotowa dostawa). Przy nowym samochodzie VAT zawsze płaci się w kraju kupującego (WNT). Nigdy nie obiecuj „niemieckiego VAT 19 %” jako ogólnej zasady.
+- Akcyza przy imporcie samochodu osobowego do Polski: 3,1 % wartości przy silniku do 2000 cm³, 18,6 % powyżej 2000 cm³; hybrydy 1,55 % (do 2000 cm³) i 9,3 % (2000–3500 cm³); hybrydy plug-in do 2000 cm³ zwolnione do 31.12.2029; samochody elektryczne i wodorowe 0 %. Kalkulator akcyzy: https://www.caradvance.pl/import/kalkulator-akcyzy/ · kalkulator PCC (2 % przy zakupie od osoby prywatnej w Polsce): https://www.caradvance.pl/import/kalkulator-pcc/
+- Ceny na stronie są orientacyjne i podane w euro; kwoty w złotych są tylko przybliżone (według bieżącego kursu). Ostateczną cenę zawiera pisemna oferta i umowa.
+- W Polsce nie oferujemy sprzedaży komisowej ani programu charytatywnego — nie wspominaj o nich.
+`;
+
 const CZ = `
 # CarAdvance — caradvance.cz (Česko)
 - Poskytovatel, prodávající a pronajímatel (smluvní strana): Caradvance GmbH, Bgm-Graf-Ring 21, 82538 Geretsried, Německo (Amtsgericht München, HRB 151009, DIČ DE232664616). Působí od roku 2003, 5000+ prodaných prémiových vozů.
@@ -89,4 +116,4 @@ const CZ = `
 - V Česku nenabízíme komisní prodej ani charitativní program — nezmiňuj je.
 `;
 
-export const KB = { hu: HU, sk: SK, cz: CZ };
+export const KB = { hu: HU, sk: SK, cz: CZ, pl: PL };
