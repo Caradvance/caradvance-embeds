@@ -122,8 +122,9 @@
 
   function lang() {
     var h = String(location.hostname || '');
-    if (/(^|\.)caradvance\.sk$/.test(h)) return 'sk';
-    if (/(^|\.)caradvance\.cz$/.test(h)) return 'cs';
+    var hl = String(document.documentElement.getAttribute('lang') || '').slice(0, 2).toLowerCase();
+    if (/(^|\.)caradvance\.sk$/.test(h)) return /^(en|de|hu)$/.test(hl) ? hl : 'sk';
+    if (/(^|\.)caradvance\.cz$/.test(h)) return /^(en|de)$/.test(hl) ? hl : 'cs';
     var m = String(location.pathname || '').match(/^\/(?:_np\/)?(en|de|fr|uk|zh|sk|cs)(\/|$)/);
     if (m) return m[1];
     var l = String(document.documentElement.getAttribute('lang') || 'hu').slice(0, 2).toLowerCase();
@@ -134,6 +135,8 @@
     var h = String(location.hostname || '');
     if (l === 'sk' && /caradvance\.sk$/.test(h)) return '/ochrana-osobnych-udajov/#cookie';
     if (l === 'cs' && /caradvance\.cz$/.test(h)) return '/ochrana-osobnich-udaju/#cookie';
+    if (/caradvance\.sk$/.test(h)) return '/' + l + '/ochrana-osobnych-udajov/#cookie';
+    if (/caradvance\.cz$/.test(h)) return '/' + l + '/ochrana-osobnich-udaju/#cookie';
     if (l === 'hu') return CFG.COOKIE_POLICY_URL || '/adatkezeles/#cookie';
     return '/' + l + '/adatkezeles/#cookie';
   }
