@@ -230,6 +230,67 @@
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .mfoot{padding:14px 18px;border-top:1px solid var(--line2);display:flex;justify-content:flex-end;gap:8px}
   .hint{font-size:11.5px;color:var(--faint)}
+
+  /* ===== CRM ügyféllista (üzletáganként) ===== */
+  .crm-panel{margin-bottom:22px}
+  .crm-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line2)}
+  .crm-tools input{flex:1 1 240px;min-width:0;font:inherit;font-size:13.5px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;outline:none;background:var(--line2)}
+  .crm-tools input:focus{background:#fff;border-color:#d3d8e0}
+  .crm-tools select{font:inherit;font-size:13px;font-weight:600;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;max-width:100%}
+  .crm-tools .cnt{font-size:12px;color:var(--muted);white-space:nowrap}
+  .crm-chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px 0}
+  .crm-chips button{font:inherit;font-size:11.5px;font-weight:700;border:1px solid var(--line);background:#fff;color:#5b6472;border-radius:999px;padding:5px 10px;cursor:pointer}
+  .crm-chips button b{font-weight:800;margin-left:4px;color:var(--ink)}
+  .crm-chips button.on{background:var(--ink);border-color:var(--ink);color:#fff}.crm-chips button.on b{color:#fff}
+  table.crm td{vertical-align:middle}
+  table.crm td.nm b{display:block;font-size:13.5px}
+  table.crm td.nm span{font-size:11.5px;color:var(--muted)}
+  table.crm a.lnk{color:var(--ink);text-decoration:none;font-weight:600;white-space:nowrap}
+  table.crm a.lnk:hover{color:var(--red);text-decoration:underline}
+  table.crm td.dt{white-space:nowrap;color:var(--muted);font-size:12.5px}
+  .stb{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:4px 10px;white-space:nowrap;background:var(--line2);color:#5b6472}
+  .stb.s0{background:#fdeceb;color:#b8000f}.stb.s1{background:#fff3df;color:#a2660b}.stb.s2{background:#e8eefb;color:#2f56a3}
+  .stb.s3{background:#e7f6ef;color:#128a63}.stb.s4{background:#f2f2f4;color:#7a2a2a}.stb.s5{background:#fff0e0;color:#b45a09}
+  .stb.s6{background:#f1e9f8;color:#6b32a0}.stb.s7{background:#e9ebef;color:#3d4452}
+  .btn-card{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:#fff;background:var(--red);border-radius:9px;padding:7px 11px;text-decoration:none;white-space:nowrap}
+  .btn-card:hover{filter:brightness(.93)}
+  .crm-empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:13px}
+  .board-toggle{font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);background:none;border:0;cursor:pointer;padding:4px 0;margin:0 0 10px}
+  .board-toggle:hover{color:var(--ink)}
+  .board.crm-hidden{display:none}
+  @media(max-width:760px){
+    table.crm thead{display:none}
+    table.crm,table.crm tbody,table.crm tr,table.crm td{display:block;width:100%}
+    table.crm tr{padding:12px 16px;border-bottom:1px solid var(--line2)}
+    table.crm td{border:0;padding:3px 0;display:flex;gap:10px;justify-content:space-between;align-items:center;font-size:13px}
+    table.crm td::before{content:attr(data-l);font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;flex:0 0 auto}
+    table.crm td.nm{display:block;padding-bottom:6px}table.crm td.nm::before{display:none}
+    table.crm td.go{padding-top:8px}table.crm td.go::before{display:none}
+    table.crm td.go .btn-card{width:100%;justify-content:center;padding:10px}
+    table.crm td.ad{text-align:right}
+  }
+  /* ===== mobil elrendezés ===== */
+  .menu-btn{display:none}
+  .nav-scrim{display:none}
+  @media(max-width:900px){
+    body{display:block}
+    .side{position:fixed;left:0;top:0;bottom:0;height:100%;z-index:70;transform:translateX(-100%);transition:transform .2s ease;box-shadow:0 0 40px rgba(0,0,0,.18);overflow-y:auto}
+    body.nav-open .side{transform:none}
+    body.nav-open .nav-scrim{display:block;position:fixed;inset:0;background:rgba(16,18,22,.4);z-index:65}
+    .menu-btn{display:flex}
+    .topbar{padding:10px 12px;gap:8px}
+    .topbar .icon-btn[title*="hamarosan"]{display:none}
+    .topbar .search{max-width:none;min-width:0}
+    .tb-spacer{display:none}
+    .profile{padding:2px}.profile .pinfo,.profile .chev{display:none}
+    .content{padding:16px 12px 64px}
+    .page-head{margin-bottom:14px}.page-head h1{font-size:19px}
+    .row2,.kv{grid-template-columns:1fr}
+    .modal{padding:0;align-items:flex-end}
+    .modal .m{width:100%;max-height:92vh;border-radius:16px 16px 0 0}
+    .panel{overflow-x:auto}
+    .board{grid-auto-columns:minmax(220px,82vw)}
+  }
 </style>
 </head>
 <body>
@@ -282,6 +343,7 @@
   emailEl.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();pwEl.focus();}});
 })();
 </script>
+<div class="nav-scrim" onclick="toggleNav(false)"></div>
 <aside class="side">
   <div class="brand">
     <img src="caradvance-logo.webp" alt="CarAdvance" style="height:52px;width:auto;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -293,6 +355,7 @@
 </aside>
 <div class="main">
   <div class="topbar">
+    <button class="icon-btn menu-btn" title="Menü" onclick="toggleNav()"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <button class="icon-btn" title="Áttekintés" onclick="go('overview')"><svg class="i" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.5V20h12V9.5"/></svg></button>
     <div class="search">
       <input id="globalSearch" type="search" placeholder="Keresés — név, autó, ügy…">
@@ -335,15 +398,15 @@
       </div>
     </section>
     <section class="view" id="v-eladas">
-      <div class="page-head"><div><h1>Eladási megkeresések</h1><div class="crumb">Irányítópult <span>/</span> <b>Eladási megkeresések</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
-      <div class="board" id="board-eladas"></div>
+      <div class="page-head"><div><h1>Eladási megkeresések</h1><div class="crumb">Irányítópult <span>/</span> <b>Eladási megkeresések</b></div></div><button class="btn red" onclick="openAdd('Eladás')">Új ügyfél</button></div><div class="panel crm-panel" id="crm-eladas"></div><button class="board-toggle" onclick="toggleBoard('eladas')" id="bt-eladas">▸ Kanban nézet megjelenítése</button>
+      <div class="board crm-hidden" id="board-eladas"></div>
       <div class="section-h" style="margin-top:26px"><h2>Árazó asztal</h2></div>
       <div class="ai-note" style="margin-bottom:14px"><span class="ico" id="aiIco2"></span><div>Nyisd meg a versenytárs-találatokat egy kattintással, írd be az árakat — az AI kiszámolja a piaci értéket, a javasolt árat és a becsült eladási időt.</div></div>
       <div id="deskWrap"></div>
     </section>
     <section class="view" id="v-import">
-      <div class="page-head"><div><h1>Import folyamat</h1><div class="crumb">Irányítópult <span>/</span> <b>Import folyamat</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
-      <div class="board" id="board-import"></div>
+      <div class="page-head"><div><h1>Import folyamat</h1><div class="crumb">Irányítópult <span>/</span> <b>Import folyamat</b></div></div><button class="btn red" onclick="openAdd('Import')">Új ügyfél</button></div><div class="panel crm-panel" id="crm-import"></div><button class="board-toggle" onclick="toggleBoard('import')" id="bt-import">▸ Kanban nézet megjelenítése</button>
+      <div class="board crm-hidden" id="board-import"></div>
       <div class="section-h" style="margin-top:26px"><h2>Autókeresés — jelöltek</h2></div>
       <!--
         Megjegyzés a fejlesztőnek: az automatikus, kritérium alapú mobile.de keresés (tetszőleges
@@ -358,8 +421,8 @@
       <div class="ai-note" style="margin-bottom:14px"><span class="ico" id="aiIco3"></span><div>Nyisd meg a mobile.de keresést a jelölt autóra, majd rögzítsd a legolcsóbb, az átlagos és 3 hasonló találatot. Válaszd ki a javasolt autót, és egy kattintással kiküldheted az ajánlatot e-mailben.</div></div>
       <div id="importDeskWrap"></div>
     </section>
-    <section class="view" id="v-berles"><div class="page-head"><div><h1>Bérlési megkeresések</h1><div class="crumb">Irányítópult <span>/</span> <b>Bérlési megkeresések</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div><div class="board" id="board-berles"></div></section>
-    <section class="view" id="v-bizomanyos"><div class="page-head"><div><h1>Bizományos értékesítés</h1><div class="crumb">Irányítópult <span>/</span> <b>Bizományos értékesítés</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div><div class="board" id="board-bizomanyos"></div></section>
+    <section class="view" id="v-berles"><div class="page-head"><div><h1>Bérlési megkeresések</h1><div class="crumb">Irányítópult <span>/</span> <b>Bérlési megkeresések</b></div></div><button class="btn red" onclick="openAdd('Bérlés')">Új ügyfél</button></div><div class="panel crm-panel" id="crm-berles"></div><button class="board-toggle" onclick="toggleBoard('berles')" id="bt-berles">▸ Kanban nézet megjelenítése</button><div class="board crm-hidden" id="board-berles"></div></section>
+    <section class="view" id="v-bizomanyos"><div class="page-head"><div><h1>Bizományos értékesítés</h1><div class="crumb">Irányítópult <span>/</span> <b>Bizományos értékesítés</b></div></div><button class="btn red" onclick="openAdd('Bizományos')">Új ügyfél</button></div><div class="panel crm-panel" id="crm-bizomanyos"></div><button class="board-toggle" onclick="toggleBoard('bizomanyos')" id="bt-bizomanyos">▸ Kanban nézet megjelenítése</button><div class="board crm-hidden" id="board-bizomanyos"></div></section>
     <section class="view" id="v-teendok">
       <div class="page-head"><div><h1>Teendők</h1><div class="crumb">Irányítópult <span>/</span> <b>Teendők</b></div></div><button class="btn red" onclick="openAdd()">Új bejegyzés</button></div>
       <div class="panel" style="max-width:640px"><div class="addrow"><input id="todoInput" placeholder="Új teendő… (Enter)"><button class="btn dark sm" onclick="addTodo()">Hozzáad</button></div><div id="todoList"></div></div>
@@ -434,10 +497,11 @@
         <div class="fld"><label>Telefon</label><input id="a-phone" placeholder="+36…"></div>
         <div class="fld"><label>E-mail</label><input id="a-email" placeholder="nev@pelda.hu"></div>
       </div>
+      <div class="fld"><label>Cím</label><input id="a-address" placeholder="Irányítószám, város, utca"></div>
       <div class="fld"><label>Autó</label><input id="a-car" placeholder="pl. BMW X5 2021"></div>
       <div class="fld"><label>Kért ár / keret (Ft)</label><input id="a-price" inputmode="numeric" placeholder="pl. 18000000"></div>
       <div class="fld"><label>Megjegyzés</label><textarea id="a-note" rows="2" placeholder="Rövid jegyzet…"></textarea></div>
-      <div class="hint">A bejegyzés a megfelelő fülre kerül. (Éles rendszerben egyben a Notionbe és a feedbe is.)</div>
+      <div class="hint">Az ügyfél a kiválasztott üzletág ügyféllistájára kerül „Kapcsolatfelvételre vár” státusszal.</div>
     </div>
     <div class="mfoot"><button class="btn ghost" onclick="closeAdd()">Mégse</button><button class="btn red" onclick="saveAdd()">Mentés</button></div>
   </div>
@@ -499,6 +563,8 @@ function go(v){
   document.querySelectorAll('.view').forEach(function(s){s.classList.toggle('active',s.id==='v-'+v);});
   var t={overview:'Áttekintés',eladas:'Eladás',import:'Import',berles:'Bérlés',bizomanyos:'Bizományos',teendok:'Teendők',ugyfelek:'Ügyfelek',ugyfelfiokok:'Ügyfélfiókok',felhasznalok:'Felhasználók',email:'E-mail',naptar:'Naptár',integraciok:'Integrációk'};
   document.getElementById('viewTitle').textContent=t[v];
+  try{history.replaceState(null,'',location.pathname+location.search+(v==='overview'?'':'#'+v));}catch(e){}
+  window.scrollTo(0,0);
 }
 document.getElementById('nav').addEventListener('click',function(e){var a=e.target.closest('a[data-v]');if(a)go(a.dataset.v);});
 var LINE_COLORS={'Eladás':'#128a63','Import':'#c07a1e','Bérlés':'#3a63b0','Bizományos':'#7a3ea8'};
@@ -1022,18 +1088,17 @@ function sendImportOffer(id){
     if(st)st.innerHTML='<span style="color:var(--red)">Hiba történt: '+esc((e&&e.error)||'ismeretlen hiba')+'</span>';
   });
 }
-function openAdd(){document.getElementById('addModal').classList.add('open');}
+function openAdd(line){if(line&&LINES.indexOf(line)>=0)document.getElementById('a-line').value=line;document.getElementById('addModal').classList.add('open');}
 function closeAdd(){document.getElementById('addModal').classList.remove('open');}
 function saveAdd(){
-  var g=function(id){return document.getElementById(id).value;};var line=g('a-line');
-  var payload={line:line,stage:STAGES[line][0],ch:g('a-ch'),name:g('a-name')||'Névtelen',phone:g('a-phone'),email:g('a-email'),car:g('a-car'),price:parseInt((g('a-price')||'').replace(/\D/g,''),10)||0,note:g('a-note'),when_text:'most'};
-  apiFetch('/deals',{method:'POST',body:payload}).then(function(r){
-    var local={id:r.id,when:'most',assigned_to:null};
-    for(var k in payload)if(k!=='when_text')local[k]=payload[k];
-    data.unshift(local);
-    ['a-name','a-phone','a-email','a-car','a-price','a-note'].forEach(function(id){document.getElementById(id).value='';});
-    closeAdd();renderAll();go(lineClass(line));
-  }).catch(function(){alert('Nem sikerült menteni az új bejegyzést.');});
+  var g=function(id){return document.getElementById(id).value.trim();};var line=g('a-line');
+  if(!g('a-name')){alert('Add meg az ügyfél nevét.');return;}
+  var payload={line:line,ch:g('a-ch'),name:g('a-name'),phone:g('a-phone'),email:g('a-email'),address:g('a-address'),car:g('a-car'),price:parseInt((g('a-price')||'').replace(/\D/g,''),10)||0,note:g('a-note')};
+  crmFetch('/clients',{method:'POST',body:payload}).then(function(r){
+    data.unshift({id:r.id,line:line,stage:STAGES[line][0],ch:payload.ch,name:payload.name,phone:payload.phone,email:payload.email,car:payload.car,price:payload.price,note:payload.note,when:'most',assigned_to:null});
+    ['a-name','a-phone','a-email','a-address','a-car','a-price','a-note'].forEach(function(id){document.getElementById(id).value='';});
+    closeAdd();renderAll();go(lineClass(line));loadCrm();
+  }).catch(function(e){alert('Nem sikerült menteni: '+((e&&e.message)||'ismeretlen hiba'));});
 }
 function addTodo(){
   var v=document.getElementById('todoInput').value.trim();if(!v)return;
@@ -1168,6 +1233,70 @@ function loadCalendar(){
   });
 }
 
+// ===================== CRM ügyféllista (üzletáganként) =====================
+var CRM_STATUSES=['Kapcsolatfelvételre vár','Ajánlatra vár','Ajánlat kiküldve','Ajánlat elfogadva','Ajánlat elutasítva','Ajánlat módosítva','Megvalósítás','Lezárva'];
+var crmClients=[],crmLoaded=false,crmState={};
+LINES.forEach(function(l){crmState[l]={q:'',st:''};});
+function crmFetch(path,opts){
+  opts=opts||{};
+  var init={method:opts.method||'GET',credentials:'same-origin',headers:{}};
+  if(opts.body!==undefined){init.headers['content-type']='application/json';init.body=JSON.stringify(opts.body);}
+  return fetch('/api/belso-crm'+path,init).then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j;});});
+}
+var __crmLast=0;
+function loadCrm(){
+  __crmLast=Date.now();
+  return crmFetch('/list').then(function(j){crmClients=j.clients||[];if(j.statuses)CRM_STATUSES=j.statuses;crmLoaded=true;LINES.forEach(renderCrm);})
+    .catch(function(e){LINES.forEach(function(l){var el=document.getElementById('crm-'+lineClass(l));if(el)el.innerHTML='<div class="crm-empty">Az ügyféllista nem tölthető be: '+esc(e.message)+'</div>';});});
+}
+window.addEventListener('focus',function(){if(currentUser&&Date.now()-__crmLast>15000)loadCrm();});
+function crmDate(s){if(!s)return '—';var d=new Date(String(s).replace(' ','T')+(/Z$/.test(s)?'':'Z'));return isNaN(d)?esc(s):d.toLocaleDateString('hu-HU',{year:'numeric',month:'2-digit',day:'2-digit'})+' '+d.toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});}
+function telHref(p){return 'tel:'+String(p||'').replace(/[^\d+]/g,'');}
+function renderCrm(line){
+  var el=document.getElementById('crm-'+lineClass(line));if(!el)return;
+  var st=crmState[line];
+  var all=crmClients.filter(function(c){return c.line===line;});
+  var counts={};all.forEach(function(c){counts[c.status]=(counts[c.status]||0)+1;});
+  var q=st.q.toLowerCase().trim(),qd=q.replace(/[^\d]/g,'');
+  var rows=all.filter(function(c){
+    if(st.st&&c.status!==st.st)return false;
+    if(!q)return true;
+    var hay=(c.name+' '+(c.company||'')+' '+(c.email||'')+' '+(c.phone||'')).toLowerCase();
+    if(hay.indexOf(q)>=0)return true;
+    return qd.length>=3&&String(c.phone||'').replace(/[^\d]/g,'').indexOf(qd)>=0;
+  });
+  var focusId=document.activeElement&&document.activeElement.id,caret=focusId==='crmq-'+lineClass(line)?document.activeElement.selectionStart:null;
+  var h='<div class="crm-tools"><input type="search" id="crmq-'+lineClass(line)+'" placeholder="Keresés név, e-mail vagy telefonszám alapján…" value="'+esc(st.q)+'">'
+    +'<select id="crms-'+lineClass(line)+'"><option value="">Minden státusz ('+all.length+')</option>'+CRM_STATUSES.map(function(s){return '<option value="'+esc(s)+'"'+(s===st.st?' selected':'')+'>'+esc(s)+' ('+(counts[s]||0)+')</option>';}).join('')+'</select>'
+    +'<span class="cnt">'+rows.length+' ügyfél</span></div>'
+    +'<div class="crm-chips">'+CRM_STATUSES.map(function(s,i){return counts[s]?'<button data-st="'+esc(s)+'" class="'+(s===st.st?'on':'')+'">'+esc(s)+'<b>'+counts[s]+'</b></button>':'';}).join('')+'</div>';
+  if(!crmLoaded)h+='<div class="crm-empty">Betöltés…</div>';
+  else if(!rows.length)h+='<div class="crm-empty">'+(all.length?'Nincs a szűrésnek megfelelő ügyfél.':'Még nincs ügyfél ezen az üzletágon. Az „Új ügyfél” gombbal felvehetsz egyet.')+'</div>';
+  else h+='<table class="crm"><thead><tr><th>Név</th><th>Cím</th><th>Telefonszám</th><th>E-mail</th><th>Státusz</th><th>Jelentkezett</th><th></th></tr></thead><tbody>'
+    +rows.map(function(c){
+      var si=CRM_STATUSES.indexOf(c.status);
+      return '<tr><td class="nm"><b>'+esc(c.company||c.name||'Névtelen')+'</b>'+(c.company&&c.name&&c.name!==c.company?'<span>'+esc(c.name)+'</span>':'')+(c.car?'<span>'+(c.company?' · ':'')+esc(c.car)+'</span>':'')+'</td>'
+        +'<td data-l="Cím" class="ad">'+esc(c.address||'—')+'</td>'
+        +'<td data-l="Telefon">'+(c.phone?'<a class="lnk" href="'+esc(telHref(c.phone))+'">'+esc(c.phone)+'</a>':'—')+'</td>'
+        +'<td data-l="E-mail">'+(c.email?'<a class="lnk" href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'—')+'</td>'
+        +'<td data-l="Státusz"><span class="stb s'+(si<0?0:si)+'">'+esc(c.status)+'</span></td>'
+        +'<td data-l="Jelentkezett" class="dt">'+crmDate(c.created_at)+'</td>'
+        +'<td class="go"><a class="btn-card" href="/belso/ugyfel/?id='+c.id+'" target="_blank" rel="noopener">Ügyfél adatlap ↗</a></td></tr>';
+    }).join('')+'</tbody></table>';
+  el.innerHTML=h;
+  var qi=document.getElementById('crmq-'+lineClass(line));
+  qi.addEventListener('input',function(){st.q=qi.value;renderCrm(line);});
+  if(caret!==null){qi.focus();try{qi.setSelectionRange(caret,caret);}catch(e){}}
+  document.getElementById('crms-'+lineClass(line)).addEventListener('change',function(){st.st=this.value;renderCrm(line);});
+  el.querySelectorAll('.crm-chips button').forEach(function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-st');st.st=st.st===v?'':v;renderCrm(line);});});
+}
+function toggleBoard(key){
+  var b=document.getElementById('board-'+key),t=document.getElementById('bt-'+key);if(!b)return;
+  var hidden=b.classList.toggle('crm-hidden');t.textContent=(hidden?'▸ Kanban nézet megjelenítése':'▾ Kanban nézet elrejtése');
+}
+function toggleNav(force){var on=typeof force==='boolean'?force:!document.body.classList.contains('nav-open');document.body.classList.toggle('nav-open',on);}
+document.getElementById('nav').addEventListener('click',function(){if(window.innerWidth<=900)toggleNav(false);});
+
 // ---- Boot: called after a successful login, or on page load if a session cookie is already valid ----
 function CA_boot(){
   return apiFetch('/me').then(function(r){
@@ -1185,6 +1314,10 @@ function CA_boot(){
     todos=results[2].todos||[];
     if(results[3])allUsers=results[3].users||[];
     renderAll();
+    var nx=new URLSearchParams(location.search).get('next');
+    if(nx&&/^\/belso\/ugyfel\/\?id=\d+$/.test(nx)){location.replace(nx);return;}
+    var hv=(location.hash||'').slice(1);if(hv&&document.getElementById('v-'+hv))go(hv);
+    LINES.forEach(renderCrm);loadCrm();
     if(currentUser.role==='admin'){loadIntegrations();loadMail();loadCalendar();}
   }).catch(function(e){
     if(!e||e.status!==401)console.error(e);
