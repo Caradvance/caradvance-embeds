@@ -33,6 +33,9 @@ or written through their normal fields.
 - Customer emails follow belső's test rule: they go to marc.nemethy@bhgeu.com, never to the customer
   (and only when `RESEND_API_KEY` exists in the environment; the preview has none, so links are copied by hand).
 
+- Intake Worker `ajanlatmotor-intake-test`: Workers Builds from this repo, branch `ajanlatmotor-teszt`, root `/ajanlatmotor`,
+  build `npm test`, deploy `npm run deploy` (applies `migrations-test` to the test DB, then deploys). No public URL.
+
 ## Run locally
 
 ```bash
