@@ -403,6 +403,62 @@
   [
    "\\(3 Jahre nach § 101 des Zivilgesetzbuchs, 4 Jahre nach § 397 des Handelsgesetzbuchs\\)",
    "(5 Jahre nach § 6:22 des ungarischen Zivilgesetzbuchs)"
+  ],
+  [
+   "const fuelPrice=\\{b:[0-9.]+,d:[0-9.]+,src:'[^']*'\\};",
+   {
+    "pl": "const fuelPrice={b:584.27,d:668.94,src:'Orientacyjna średnia cena paliw w Polsce (e-petrol, październik 2026); możesz zmienić cenę'};",
+    "en": "const fuelPrice={b:584.27,d:668.94,src:'Indicative average fuel price in Poland (e-petrol, October 2026); you can adjust the price'};",
+    "de": "const fuelPrice={b:584.27,d:668.94,src:'Orientierender Durchschnittspreis für Kraftstoff in Polen (e-petrol, Oktober 2026); Sie können den Preis anpassen'};"
+   }
+  ],
+  [
+   "let pe=128\\.8;",
+   "let pe=150.89;"
+  ],
+  [
+   "const pb=\\(\\+String\\(\\$\\('#pb'\\)\\.value\\)[\\s\\S]*?' €/kWh';",
+   "const pb=(+String($$('#pb').value).replace(',','.'))*83.82687927107062||fuelPrice.b,pd=(+String($$('#pd').value).replace(',','.'))*83.82687927107062||fuelPrice.d;$$('#fb').textContent=(x=>String(+(x/83.82687927107062).toFixed(2)).replace('.',','))(pb)+' zł/l';$$('#fd').textContent=(x=>String(+(x/83.82687927107062).toFixed(2)).replace('.',','))(pd)+' zł/l';$$('#fe').textContent=(x=>String(+(x/83.82687927107062).toFixed(2)).replace('.',','))(pe)+' zł/kWh';"
+  ],
+  [
+   "id=\"pb\" value=\"[0-9.]+\" step=\"0\\.01\"> €/l",
+   "id=\"pb\" value=\"6.97\" step=\"0.01\"> zł/l"
+  ],
+  [
+   "id=\"pd\" value=\"[0-9.]+\" step=\"0\\.01\"> €/l",
+   "id=\"pd\" value=\"7.98\" step=\"0.01\"> zł/l"
+  ],
+  [
+   "<b id=\"fb\">[^<]*</b>",
+   "<b id=\"fb\" class=\"ca-pv\">6,97 zł/l</b>"
+  ],
+  [
+   "<b id=\"fd\">[^<]*</b>",
+   "<b id=\"fd\" class=\"ca-pv\">7,98 zł/l</b>"
+  ],
+  [
+   "<b id=\"fe\">[^<]*</b>",
+   "<b id=\"fe\" class=\"ca-pv\">1,8 zł/kWh</b>"
+  ],
+  [
+   "<button data-p=\"73\\.6\">",
+   "<button data-p=\"92.21\">"
+  ],
+  [
+   "<button class=\"on\" data-p=\"128\\.8\">",
+   "<button class=\"on\" data-p=\"150.89\">"
+  ],
+  [
+   "<button data-p=\"202\\.4\">",
+   "<button data-p=\"217.95\">"
+  ],
+  [
+   "(<span class=\"fsrc\" id=\"fsrc\">)[^<]*",
+   {
+    "pl": "$1Orientacyjna średnia cena paliw w Polsce (e-petrol, październik 2026); możesz zmienić cenę",
+    "en": "$1Indicative average fuel price in Poland (e-petrol, October 2026); you can adjust the price",
+    "de": "$1Orientierender Durchschnittspreis für Kraftstoff in Polen (e-petrol, Oktober 2026); Sie können den Preis anpassen"
+   }
   ]
  ],
  "jsfix": {
