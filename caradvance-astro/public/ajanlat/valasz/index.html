@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>CarAdvance — Az Ön ajánlata</title>
+<link rel="icon" href="https://www.caradvance.hu/favicon.ico?v=2">
+<style>
+  :root{--red:#E2001A;--red-tint:#fdeceb;--ink:#161922;--muted:#6b7280;--faint:#9aa2b0;--line:#ECEEF2;--line2:#F5F6F8;--bg:#F6F7FB;--good:#128a63;
+    --shadow:0 1px 2px rgba(20,28,44,.04),0 1px 10px rgba(20,28,44,.05)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  header{background:#0b0b0d;padding:14px 20px;border-bottom:3px solid var(--red)}
+  header img{height:44px;width:auto;display:block}
+  main{max-width:720px;margin:0 auto;padding:22px 16px 60px}
+  .box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
+  h1{font-size:19px;margin:0 0 6px}
+  .muted{color:var(--muted);font-size:14px}
+  .msg{background:var(--line2);border-radius:10px;padding:12px 14px;white-space:pre-line;font-size:14px;margin-top:12px}
+  .car{display:flex;gap:14px;align-items:stretch;background:#fff;border:2px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:12px;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .car:hover{border-color:#d3d8e0}
+  .car.on{border-color:var(--red);box-shadow:0 0 0 3px var(--red-tint)}
+  .car .ph{flex:0 0 170px;background:var(--line2) center/cover no-repeat;min-height:120px}
+  .car .bd{flex:1;padding:14px 14px 14px 0;min-width:0;display:flex;flex-direction:column}
+  .car .t{font-weight:800;font-size:15.5px}
+  .car .s{font-size:13px;color:var(--muted);margin-top:2px}
+  .car .n{font-size:13px;margin-top:6px}
+  .car .p{font-size:19px;font-weight:800;color:var(--red);margin-top:auto;padding-top:8px}
+  .car .rd{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin-top:8px}
+  .car .rd i{width:20px;height:20px;border-radius:50%;border:2px solid #c9ced8;display:inline-block;position:relative;flex:0 0 auto}
+  .car.on .rd i{border-color:var(--red)}
+  .car.on .rd i::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--red)}
+  .car a.more{font-size:12.5px;color:var(--muted)}
+  @media(max-width:560px){.car{flex-direction:column;gap:0}.car .ph{flex-basis:auto;height:180px}.car .bd{padding:14px}}
+  textarea{width:100%;font:inherit;font-size:14px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;outline:none;resize:vertical;min-height:90px}
+  textarea:focus{border-color:#c9ced8}
+  label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:4px 0 6px}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{font:inherit;font-weight:800;font-size:15px;border-radius:999px;padding:13px 24px;cursor:pointer;border:0}
+  .btn.red{background:var(--red);color:#fff}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid #c9ced8}
+  .btn:disabled{opacity:.55;cursor:default}
+  @media(max-width:560px){.btn{flex:1 1 100%}}
+  .err{color:#c0392b;font-size:14px;margin-top:10px;min-height:1px}
+  .done{text-align:center;padding:30px 20px}
+  .done .ic{width:56px;height:56px;border-radius:50%;background:#e7f6ef;color:var(--good);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;font-weight:800}
+  .foot{color:var(--faint);font-size:12.5px;text-align:center;margin-top:18px}
+  .foot a{color:inherit}
+</style>
+</head>
+<body>
+<header><img src="/caradvance-logo-white.webp" alt="CarAdvance"></header>
+<main id="app"><div class="box muted">Ajánlat betöltése…</div></main>
+<div class="foot">CarAdvance · +36 30 233 6060 · <a href="mailto:info@caradvance.hu">info@caradvance.hu</a></div>
+<script>
+(function(){
+  var qs=new URLSearchParams(location.search),token=qs.get('t')||'',pre=parseInt(qs.get('v'),10),wantAction=qs.get('a');
+  var app=document.getElementById('app'),S=null,choice=-1;
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function fail(t){app.innerHTML='<div class="box"><h1>Az ajánlat nem nyitható meg</h1><div class="muted">'+esc(t)+'</div></div>';}
+  if(!/^[a-f0-9]{40}$/.test(token))return fail('Hibás vagy hiányos hivatkozás. Kérjük, nyissa meg újra az e-mailben kapott linket.');
+  fetch('/api/crm-ajanlat/'+token).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'Hiba');return j;});}).then(function(j){
+    S=j;
+    if(S.items.length===1)choice=0;
+    if(!isNaN(pre)&&pre>=0&&pre<S.items.length)choice=pre;
+    if(S.responded)return renderDone(S.action,S.choice,true);
+    render();
+  }).catch(function(e){fail(e.message);});
+
+  function render(){
+    var many=S.items.length>1;
+    var h='<div class="box"><h1>Kedves '+esc(S.clientName||'Ügyfelünk')+'!</h1><div class="muted">'
+      +(many?'Válassza ki, melyik autó érdekli — mindegyiknél látja a pontos árat. Ezután egy kattintással elfogadhatja az ajánlatot, vagy módosítást kérhet.':'Itt elfogadhatja az ajánlatot, vagy módosítást kérhet.')+'</div>'
+      +(S.superseded?'<div class="msg" style="background:#fff6e5">Figyelem: időközben újabb ajánlatot is küldtünk Önnek — kérjük, a legfrissebb e-mailben szereplőt nézze meg.</div>':'')
+      +(S.message?'<div class="msg">'+esc(S.message)+'</div>':'')+'</div>';
+    h+=S.items.map(function(it,i){
+      return '<div class="car'+(i===choice?' on':'')+'" data-i="'+i+'">'
+        +'<div class="ph"'+(it.image?' style="background-image:url(\''+esc(it.image)+'\')"':'')+'></div>'
+        +'<div class="bd"><div class="t">'+esc(it.title)+'</div>'
+        +(it.spec?'<div class="s">'+esc(it.spec)+'</div>':'')
+        +(it.note?'<div class="n">'+esc(it.note)+'</div>':'')
+        +(it.url?'<div style="margin-top:4px"><a class="more" href="'+esc(it.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Részletek a weboldalon ↗</a></div>':'')
+        +'<div class="p">'+esc(it.priceLabel)+'</div>'
+        +(many?'<div class="rd"><i></i>'+(i===choice?'Kiválasztva':'Ezt választom')+'</div>':'')
+        +'</div></div>';
+    }).join('');
+    h+='<div class="box"><label for="cmsg">Üzenet (módosítási kérésnél kötelező)</label>'
+      +'<textarea id="cmsg" placeholder="Pl. más szín, más futamidő, eltérő átadási időpont…"></textarea>'
+      +'<div class="btns"><button class="btn red" id="bAcc">Ajánlat elfogadása</button><button class="btn ghost" id="bMod">Módosítást kérek</button></div>'
+      +'<div class="err" id="err"></div></div>';
+    app.innerHTML=h;
+    app.querySelectorAll('.car').forEach(function(el){el.addEventListener('click',function(){choice=parseInt(el.getAttribute('data-i'),10);var m=document.getElementById('cmsg').value;render();document.getElementById('cmsg').value=m;});});
+    document.getElementById('bAcc').addEventListener('click',function(){send('elfogad');});
+    document.getElementById('bMod').addEventListener('click',function(){send('modosit');});
+    if(wantAction==='modosit'){var t=document.getElementById('cmsg');t.focus();wantAction=null;}
+  }
+  function send(action){
+    var err=document.getElementById('err'),msg=document.getElementById('cmsg').value.trim();err.textContent='';
+    if(action==='elfogad'&&choice<0){err.textContent='Kérjük, előbb válassza ki a kívánt autót.';return;}
+    if(action==='modosit'&&!msg){err.textContent='Kérjük, írja le röviden, mit módosítanánk.';document.getElementById('cmsg').focus();return;}
+    if(action==='elfogad'&&!confirm('Elfogadja a(z) '+S.items[choice].title+' ajánlatát ('+S.items[choice].priceLabel+')?'))return;
+    var b1=document.getElementById('bAcc'),b2=document.getElementById('bMod');b1.disabled=b2.disabled=true;
+    fetch('/api/crm-ajanlat/'+token+'/valasz',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:action,choice:choice,message:msg})})
+      .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'Hiba');return j;});})
+      .then(function(j){renderDone(j.action,j.choice,false);})
+      .catch(function(e){err.textContent=e.message;b1.disabled=b2.disabled=false;});
+  }
+  function renderDone(action,ch,earlier){
+    var it=(ch!=null&&S.items[ch])?S.items[ch]:null;
+    app.innerHTML='<div class="box done"><div class="ic">✓</div>'
+      +(action==='elfogad'
+        ?'<h1>Köszönjük, az ajánlatot elfogadta!</h1>'+(it?'<div class="muted" style="margin-top:6px"><b style="color:var(--ink)">'+esc(it.title)+'</b><br>'+esc(it.priceLabel)+'</div>':'')+'<p class="muted">Kollégánk hamarosan felveszi Önnel a kapcsolatot a következő lépésekkel (szerződés, átadás).</p>'
+        :'<h1>Köszönjük, megkaptuk a módosítási kérését!</h1><p class="muted">Átnézzük, és hamarosan módosított ajánlatot küldünk.</p>')
+      +(earlier?'<p class="muted" style="font-size:13px">(Erre az ajánlatra korábban már válaszolt.)</p>':'')
+      +'</div>';
+  }
+})();
+</script>
+</body>
+</html>
