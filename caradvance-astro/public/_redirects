@@ -761,6 +761,4 @@
 /sk/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /sk/berelheto-auto/audi-a5-avant-berles/ 301
 /cs/berelheto-auto/audi-a5-avant-e-hybrid-berles /cs/berelheto-auto/audi-a5-avant-berles/ 301
 /cs/berelheto-auto/audi-a5-avant-e-hybrid-berles/ /cs/berelheto-auto/audi-a5-avant-berles/ 301
-# sk / cs: előnézet a /sk/ /cs/ alatt, élesben caradvance.sk / .cz (functions/_middleware.js). pl: addig az angol oldalra.
-/pl /en/ 302
-/pl/* /en/ 302
+# sk / cs / pl: előnézet a /sk/ /cs/ /pl/ alatt, élesben caradvance.sk / .cz / .pl (functions/_middleware.js).
