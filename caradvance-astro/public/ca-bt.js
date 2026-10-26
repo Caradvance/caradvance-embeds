@@ -1,7 +1,7 @@
 (function(){if(window.__caBTi)return;window.__caBTi=1;
 var K='ca_bt';
 /* caradvance.sk / .cz: csak a céges (nettó) ár látszik, magánszemélynek egyedi ajánlat (Mr. JOB SK, 2026-10-23) */
-var NOPRIV=/^(sk|cs)/i.test(document.documentElement.lang||'');
+var _LGB=String(document.documentElement.lang||'').toLowerCase().slice(0,2);var MKT=(function(){var m=/(^|\.)caradvance\.(sk|cz)$/.exec(location.hostname);if(m)return m[2]==='cz'?'cs':'sk';var p=/^\/(sk|cs)\//.exec(location.pathname);if(p)return p[1];return /^(sk|cs)$/.test(_LGB)?_LGB:'';})();window.__CA_MKT=MKT;var NOPRIV=!!MKT;
 function get(){if(NOPRIV)return 'c';try{return localStorage.getItem(K)==='p'?'p':'c';}catch(e){return 'c';}}
 function fmt(n){return Math.round(n).toLocaleString('hu-HU');}
 function rnd(v,r){return Math.ceil(v/r)*r;}
@@ -9,7 +9,7 @@ function one(b,m){var p=m==='p';b.classList.toggle('is-p',p);
   [].forEach.call(b.querySelectorAll('[data-bt]'),function(x){var on=x.getAttribute('data-bt')===m;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on?'true':'false');});
   var t=b.querySelector('.ca-pt');if(t)t.textContent=window.__caPill?window.__caPill(p):(p?'19% német áfával':'nettó');
   var e=+b.getAttribute('data-bteur')||0;if(!e)return;
-  if(NOPRIV){/* sk/cs: egyetlen, pontos ár — sk: €, cs: Kč (a forintból visszaváltott második összeg nélkül) */var _cs=/^cs/i.test(document.documentElement.lang||''),_k=(window.__CA_FX&&+window.__CA_FX.T)||24.47;var _v=b.querySelector('.ca-pv');if(_v)_v.textContent=_cs?(Math.round(e*_k/10)*10).toLocaleString('cs-CZ').replace(/\s/g,'\u00a0')+'\u00a0Kč':Math.round(e).toLocaleString('sk-SK').replace(/\s/g,'\u00a0')+'\u00a0€';var _pe=b.querySelector('.ca-pe');if(_pe)_pe.textContent=_cs?Math.round(e).toLocaleString('cs-CZ').replace(/\s/g,'\u00a0')+'\u00a0€/měs. · bez DPH':'';b.setAttribute('data-applied',m);return;}
+  if(NOPRIV){/* sk/cs: egyetlen, pontos ár — sk: €, cs: Kč (a forintból visszaváltott második összeg nélkül) */var _cs=MKT==='cs',_k=(window.__CA_FX&&+window.__CA_FX.T)||24.47;var _v=b.querySelector('.ca-pv');if(_v)_v.textContent=_cs?(Math.round(e*_k/10)*10).toLocaleString('cs-CZ').replace(/\s/g,'\u00a0')+'\u00a0Kč':Math.round(e).toLocaleString('sk-SK').replace(/\s/g,'\u00a0')+'\u00a0€';var _pe=b.querySelector('.ca-pe');if(_pe)_pe.textContent=_cs?Math.round(e).toLocaleString('cs-CZ').replace(/\s/g,'\u00a0')+'\u00a0'+({en:'€/month · excl. VAT',de:'€/Monat · ohne MwSt.',hu:'€/hó · áfa nélkül'}[_LGB]||'€/měs. · bez DPH'):'';b.setAttribute('data-applied',m);return;}
   var fx=window.__caFX||+b.getAttribute('data-fx')||364,r=+b.getAttribute('data-r')||10000,eu=p?e*1.19:e;
   var v=b.querySelector('.ca-pv');if(v)v.textContent=fmt(rnd(eu*fx,r))+' Ft';
   var pe=b.querySelector('.ca-pe');if(pe){var _pt=fmt(eu)+' €/hó'+(p?' · bruttó':' · nettó');pe.textContent=window.__caTrS?window.__caTrS(_pt):_pt;}
