@@ -382,10 +382,10 @@ export function run(dist = DIST) {
       let del = 0;
       for (const sg of C.seg) { const d = path.join(base, sg); if (fs.existsSync(d)) { fs.rmSync(d, { recursive: true, force: true }); del++; } }
       // bizományos autó adatlapja (a magyar bizományos kínálatból) — sk/cs-n nincs bizományos értékesítés
-      const ad = path.join(base, 'auto');
+      const ad = path.join(base, 'auto'); const bz = [];
       if (fs.existsSync(ad)) for (const e of fs.readdirSync(ad, { withFileTypes: true })) {
         const f = path.join(ad, e.name, 'index.html');
-        if (e.isDirectory() && fs.existsSync(f) && /bizományos kínálat/i.test(fs.readFileSync(f, 'utf8').replace(/<script\b[\s\S]*?<\/script>/g, ''))) { fs.rmSync(path.join(ad, e.name), { recursive: true, force: true }); del++; }
+        if (e.isDirectory() && fs.existsSync(f) && /bizományos kínálat/i.test(fs.readFileSync(f, 'utf8').replace(/<script\b[\s\S]*?<\/script>/g, ''))) { fs.rmSync(path.join(ad, e.name), { recursive: true, force: true }); del++; bz.push(e.name); }
       }
       // 2. _slugs.json: régi magyar és a törölt szlovák/cseh címek → főoldal
       const sf = path.join(base, '_slugs.json');
@@ -398,6 +398,7 @@ export function run(dist = DIST) {
         for (const x of SUB) m['/' + C.seg[0] + '/' + x] = '/';
         m['/' + C.seg[1] + '/'] = '/blog/';
         m['/blog/bizomanyos-auto-ertekesites/'] = '/blog/';
+        for (const b of bz) m['/auto/' + b + '/'] = l === 'cs' ? '/vozy/' : '/auta/';   // törölt bizományos autó → 301 a listára
         fs.writeFileSync(sf, JSON.stringify(m));
       }
       // 3. HTML-ek
