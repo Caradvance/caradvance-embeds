@@ -125,7 +125,7 @@ async function askClaude(env, system, messages) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model, max_tokens: 700, temperature: 0.3, system, messages })
+      body: JSON.stringify({ model, max_tokens: 700, system, messages })
     });
     if (r.ok) {
       const d = await r.json();
