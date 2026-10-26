@@ -26,24 +26,26 @@
 
 ## Workflow
 - Publishing requires: 3 locked cars, descriptions for all 3, and no unconfirmed rate.
-- Queues are not used in the test build; the pipeline runs inline (a demo request finishes in
-  well under a second). Add Queues when real API sources add latency.
+- The module lives inside belső: requests are belső Import deals, published offers are crm_offers
+  rows, the customer's choice uses belső's statuses (Ajánlat elfogadva / Ajánlat módosítva).
+- Queues are not used; the pipeline runs inline (a demo request finishes in well under a second).
+  Add Queues when real API sources add latency.
 - Costs are recomputed live in the admin from listing + overrides + current rate version, and
   frozen into the offer snapshot at publish. The snapshot's public part is the only thing the
   customer page renders.
-- Images are copied into R2 at publish. Image resizing to AVIF/WebP needs Cloudflare Image
-  Transformations on the production zone; not in the test build.
+- Images are copied into D1 (am_images, base64, max 15 per car) at publish because R2 is not enabled
+  on the account. Move to R2 + Image Transformations (AVIF/WebP) when R2 is enabled.
 - Offer validity: 7 days. Expired offers show a contact page; the daily cron marks them EXPIRED.
 - Contact person on offers: Vadnai Zsombor, +36 30 233 6060 (WhatsApp), editable in settings.
 - Customer page UI strings exist in Hungarian and German; SK/CZ/PL/EN fall back to Hungarian.
   The template description fallback is Hungarian only; other languages need the Claude API.
-- Admin auth in test: HTTP Basic (`ADMIN_PASSWORD`), or open on localhost. Production: Cloudflare
-  Access JWT verified server-side. CSRF: same-origin check on every POST.
-- Extension tokens: shown once (handed over through a 2-minute KV entry, never in a URL),
-  stored as SHA-256 with a pepper, revocable.
+- Staff auth is belső's own login (ca_session cookie, users/sessions tables); the same role rule as
+  belső decides which deals a user sees. CSRF: same-origin check on every POST.
+- Extension tokens belong to a belső user, are shown once (handed over through a 2-minute cache
+  entry bound to that user, never in a URL), stored as SHA-256, revocable.
 
 ## Not done yet
-- Notion property mapping (only the page title is set); the database schemas were not inspected.
+- Notion push dropped: belső is the CRM now (the adatlap shows the offer and the choice).
 - Daily re-check of published listings against the live source (needs a live source).
 - PIN protection for offer links (optional per spec).
 - GDPR retention job and delete-customer action.

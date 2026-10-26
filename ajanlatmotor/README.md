@@ -1,72 +1,55 @@
-# Caradvance Ajánlatmotor (Offer Engine) – TESZT
+# Ajánlatmotor (offer engine) — inside belső
 
-Cloudflare Worker that turns a car request email into a private, three-car offer page.
+When a car request arrives (email to info@, phone, WhatsApp), the Ajánlatmotor finds the three best matching
+cars on mobile.de, prices each one delivered in Budapest (distance, logistics, regadó, illeték, fees, margin),
+and publishes a private premium offer page. The customer picks a car with one click.
 
-```
-info@ (Gmail filter) → intake@in.caradvance.hu → Email Worker → requirement extraction
-  → mobile.de source (mock | searchapi | apify) + Chrome extension → score → top 3
-  → admin review: distance, logistics, regadó, illeték, fees, margin → lock → descriptions
-  → publish → /o/<token> (customer) → "Ezt választom" → admin email + Notion
-```
+It runs **inside the belső system**:
 
-## Run locally (test environment)
-
-```bash
-npm install
-npm run db:migrate:local
-npm run dev                      # http://localhost:8787/admin  (open on localhost, no password)
-```
-
-In the admin, **„Demó e-mail szimulálása”** runs a realistic BMW i5 Touring request through the
-whole pipeline with fictional mock listings. Then: generate descriptions → confirm the yellow
-rates in *Díjak és beállítások* → lock the three cars → publish → open the customer link.
-
-A raw email can also be posted to the local email handler:
-
-```bash
-curl -X POST "http://localhost:8787/cdn-cgi/handler/email?from=a@example.com&to=intake@in.caradvance.hu" --data-binary @mail.eml
-```
-
-## Tests
-
-```bash
-npm test          # 25 tests: NAV regadó reference case, costs, status machine, extraction, scoring, parser layers
-npm run typecheck
-```
-
-## What is in the test build
-
-| Area | State |
+| Where | What |
 |---|---|
-| Email intake (Email Worker, postal-mime, Message-ID idempotency) | done |
-| Requirement extraction | Claude tool-use when `ANTHROPIC_API_KEY` is set, deterministic Hungarian heuristic otherwise |
-| mobile.de sources | `mock` working; `searchapi` and `apify` adapters written, field mapping to verify with real credentials |
-| Chrome extension | MV3, side panel, 3-layer parser, per-user tokens, batch send from search pages |
-| Scoring + top 3 | hard filters on delivered total, weighted score, diversity rule, positioning labels |
-| Costs | NAV 2026.01.01 regadó table (verified), all other fees placeholders flagged ELLENŐRIZNI 2026 |
-| Distance | OpenRouteService with `ORS_API_KEY`, otherwise haversine × 1.25 (flagged) |
-| EUR/HUF | ECB via Frankfurter, cron 08:00 Budapest (DST-safe), KV cache + last-good fallback |
-| Admin | inbox, request detail, overrides, lock, replace from runner-ups or link, description editor, preview, publish, settings with versioned rates, extension tokens |
-| Customer page | editorial layout, comparison table, price breakdown (margin never shown), choose + "egyik sem" flows, lightbox, view analytics, expiry |
-| Notifications | logged to `email_log`; sent when the `send_email` binding is enabled |
-| Notion | pushes a deal page when `NOTION_TOKEN` is set (property mapping to confirm) |
+| `/belso/ajanlatmotor/` | Staff UI: requests, top-3 review, cost overrides, lock, descriptions, preview, publish. Rates (admin), Chrome extension tokens. Same `ca_session` login and deal visibility as belső (admin sees all, others only their assigned deals). |
+| `/belso/` nav → **Ajánlatmotor** | Link into the module. The ügyfél adatlap of every **Import** deal has an "Ajánlatmotor megnyitása" button. |
+| belső `deals` + `crm_cards` | Every request is a belső Import deal with an adatlap card: *Ajánlatra vár* → *Ajánlat kiküldve* → *Ajánlat elfogadva* / *Ajánlat módosítva*. |
+| belső `crm_offers` | A published offer is a normal `crm_offers` row (3 items, customer answer), so the adatlap lists it and `/ajanlat/valasz/?t=` works too. |
+| `/ajanlat/auto/<token>/` | Premium customer page (BMW-style editorial, comparison, price breakdown, choose / "egyik sem"). Margin never appears. |
+| `/api/ajanlatmotor/*` | Chrome extension API (per-user token) + parser config. |
+| `ajanlatmotor/src/index.ts` | Email intake Worker: Cloudflare Email Routing → creates the deal + request in the same D1. Daily 08:00 Budapest: EUR/HUF refresh, offer expiry. |
+| `ajanlatmotor/extension/` | Chrome extension "Caradvance Sourcing" (side panel, sends a mobile.de listing into a deal). Download zip: `/belso/ajanlatmotor-bovitmeny.zip`. |
 
-See `SETUP.md` to deploy the test environment to Cloudflare, `ASSUMPTIONS.md` for every decision
-made without input, and `RATES.md` for the values a human must confirm before go-live.
+Code: `caradvance-astro/lib/ajanlatmotor/` (TypeScript, shared by the Pages Functions and the intake Worker).
+New tables (created on first use, prefix `am_`): `am_requests`, `am_candidates`, `am_offers`, `am_rates`,
+`am_settings`, `am_ext_tokens`, `am_events`, `am_cache`, `am_images`. Existing belső tables are only read
+or written through their normal fields.
 
-## Layout
+## Test environment (branch `ajanlatmotor-teszt`)
 
+- Website preview: `https://ajanlatmotor-teszt.caradvance-astro.pages.dev/belso/ajanlatmotor/`
+- Pages **Preview** environment binds `DB` → **`caradvance-offers-test`** (separate D1) and `AM_TEST_MODE=1`.
+  Production (`main`, www.caradvance.hu) keeps `caradvance-belso-db` and has no Ajánlatmotor until this branch is merged.
+- Test logins (admin + sales manager) are created by `migrations-test/0001_belso_core_test.sql` in the test DB only;
+  passwords are in `TEST-CREDENTIALS.md` (not in git).
+- Listings are fictional (`AM_SOURCE=mock`, TESZTKÉP images); fees are placeholders flagged ELLENŐRIZNI 2026 (`RATES.md`).
+- Customer emails follow belső's test rule: they go to marc.nemethy@bhgeu.com, never to the customer
+  (and only when `RESEND_API_KEY` exists in the environment; the preview has none, so links are copied by hand).
+
+## Run locally
+
+```bash
+cd ajanlatmotor && npm install && npm test          # 25 unit tests
+cd ../caradvance-astro && npm install
+P=/tmp/am && (cd ../ajanlatmotor && npx wrangler d1 migrations apply caradvance-offers-test --local --persist-to $P)
+../ajanlatmotor/node_modules/.bin/wrangler pages dev public --port 8788 --persist-to $P \
+  --d1 DB=c9e957c3-d388-4eca-bdef-73183fffe620 --binding AM_TEST_MODE=1
+# http://127.0.0.1:8788/belso/  → log in with a test user → Ajánlatmotor → "Demó e-mail szimulálása"
 ```
-src/index.ts              fetch / email / scheduled entry
-src/routes/               admin, public (offer page, images), ext (extension API)
-src/lib/engine.ts         pipeline: search → evaluate → score → slots
-src/lib/costs.ts          cost calculator (regadó, illeték, fees, logistics, margin)
-src/lib/rates.ts          versioned rate config + verification flags
-src/lib/sources/          mock, Search API, Apify adapters + normalisation/validation
-src/lib/ai/               Claude extraction + descriptions with deterministic fallbacks
-src/views/                admin + customer HTML (server-rendered, no framework)
-extension/                Chrome extension (load unpacked)
-migrations/               D1 schema
-test/                     vitest
-qa/                       screenshots (offer 375 / 768 / 1440 px, admin)
-```
+
+## Production go-live (later, deliberately)
+
+1. Confirm every value in `RATES.md` in *Díjak és beállítások*.
+2. mobile.de Search API credentials (Caradvance GmbH dealer account) as Pages secrets
+   `MOBILE_DE_API_USERNAME` / `MOBILE_DE_API_PASSWORD`; verify the field mapping in `lib/ajanlatmotor/sources.ts`.
+3. Optional: `ANTHROPIC_API_KEY` (Claude extraction + descriptions), `ORS_API_KEY` (road distances).
+4. Intake Worker production config: bind `caradvance-belso-db`, **without** the test migration.
+5. Gmail filter on info@ forwarding car enquiries to the intake address.
+6. Merge `ajanlatmotor-teszt` into `main`.
