@@ -401,6 +401,41 @@
   if (window.__caInqLoaded) return; window.__caInqLoaded = true;
   var INQ_API = "https://caradvance-chatbot.flat-fire-7e25.workers.dev/api/inquiry";
   var SALES_EMAIL = "info@caradvance.hu";
+  /* caradvance.sk / .cz: szlovák/cseh ÁFA-szabályok, finanszírozás és kapcsolat (a magyar 19%-os német áfa és a magyar bankok helyett) */
+  var ILG = String(document.documentElement.lang || "hu").slice(0, 2).toLowerCase();
+  var LOC = ILG === "sk" ? {
+    email: "info@caradvance.sk",
+    priv: ["So slovenskou DPH 23 %, s doručením na Slovensko (Caradvance GmbH)", "S nemeckou DPH 19 % — len ojazdené auto, ktoré si osobne prevezmem v Nemecku a prepravu zabezpečím sám"],
+    co: ["Bez DPH — firma s platným IČ DPH v EÚ (Caradvance GmbH)", "So slovenskou DPH 23 % — firma bez IČ DPH"],
+    fin: ["Prosím o pomoc s financovaním (lízing / úver cez partnera)", "Mám vlastné financovanie"],
+    taxid: "IČ DPH",
+    info: { sale: "Ceny sú orientačné. „bez DPH“ je cena bez dane, „s DPH“ zahŕňa slovenskú DPH 23 % pri dodaní na Slovensko. Konečnú cenu a daň uvádza písomná ponuka.", rent: "Mesačná splátka je uvedená bez DPH pre limit 2 000 km/mes. Konečnú cenu uvádza písomná ponuka." },
+    kind: { rent: "Dopyt na prenájom", sale: "Dopyt (auto na predaj)" },
+    buyer: { "Magánszemély": "Súkromná osoba", "Cég": "Firma" },
+    vals: [[/ hónap$/, " mesiacov"], [/ km \/ hó/, " km / mes."], [/^Egy összegben$/, "Jednorazovo"], [/^Finanszírozással$/, "S financovaním"], [/^Még nem tudom$/, "Ešte neviem"]]
+  } : ILG === "cs" ? {
+    email: "info@caradvance.cz",
+    priv: ["S českou DPH 21 %, s dodáním do Česka (Caradvance GmbH)", "S německou DPH 19 % — jen ojetý vůz, který si osobně převezmu v Německu a přepravu zajistím sám"],
+    co: ["Bez DPH — firma s platným DIČ v EU (Caradvance GmbH)", "S českou DPH 21 % — firma bez DIČ"],
+    fin: ["Prosím o pomoc s financováním (leasing / úvěr přes partnera)", "Mám vlastní financování"],
+    taxid: "DIČ",
+    info: { sale: "Ceny jsou orientační. „bez DPH“ je cena bez daně, „s DPH“ zahrnuje českou DPH 21 % při dodání do Česka. Konečnou cenu a daň uvádí písemná nabídka.", rent: "Měsíční splátka je uvedena bez DPH pro limit 2 000 km/měs. Konečnou cenu uvádí písemná nabídka." },
+    kind: { rent: "Poptávka pronájmu", sale: "Poptávka (vůz na prodej)" },
+    buyer: { "Magánszemély": "Soukromá osoba", "Cég": "Firma" },
+    vals: [[/ hónap$/, " měsíců"], [/ km \/ hó/, " km / měs."], [/^Egy összegben$/, "Jednorázově"], [/^Finanszírozással$/, "S financováním"], [/^Még nem tudom$/, "Ještě nevím"]]
+  } : null;
+  if (LOC) SALES_EMAIL = LOC.email;
+  function locVal(v) { if (!LOC || typeof v !== "string") return v; for (var i = 0; i < LOC.vals.length; i++) v = v.replace(LOC.vals[i][0], LOC.vals[i][1]); return LOC.buyer[v] || v; }
+  function modeRadios(list) {
+    var box = modal && modal.querySelector(".cain-modes"); if (!box) return;
+    box.innerHTML = "";
+    list.forEach(function (txt, i) {
+      var l = document.createElement("label"); l.className = "cain-radio";
+      var inp = document.createElement("input"); inp.type = "radio"; inp.name = "mode"; inp.value = txt; if (i === 0) inp.checked = true;
+      var sp = document.createElement("span"); sp.textContent = txt;
+      l.appendChild(inp); l.appendChild(sp); box.appendChild(l);
+    });
+  }
   function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded", fn); }
 
   function injectCss(){
@@ -474,7 +509,7 @@
           '<div class="cain-toggle"><button type="button" class="cain-tgl active" data-buyer="Magánszemély">Magánszemélyként</button><button type="button" class="cain-tgl" data-buyer="Cég">Cégként</button></div>'+
           '<div class="cain-block cain-buy">'+
             '<div class="cain-flabel">Hogyan szeretnéd megvásárolni?</div>'+
-            '<label class="cain-radio"><input type="radio" name="mode" class="cain-mode1" value="19% német áfával, Németországból (Caradvance GmbH)" checked/><span class="cain-mode1lbl">19% német áfával, Németországból (Caradvance GmbH)</span></label>'+
+            '<div class="cain-modes"><label class="cain-radio"><input type="radio" name="mode" class="cain-mode1" value="19% német áfával, Németországból (Caradvance GmbH)" checked/><span class="cain-mode1lbl">19% német áfával, Németországból (Caradvance GmbH)</span></label></div>'+
             '<div class="cain-sublabel">Fizetés módja</div>'+
             '<label class="cain-radio"><input type="radio" name="payment" value="Egy összegben"/><span>Egy összegben</span></label>'+
             '<label class="cain-radio"><input type="radio" name="payment" value="Finanszírozással"/><span>Finanszírozással</span></label>'+
@@ -508,6 +543,10 @@
         '</form>'+
       '</div>';
     (document.body||document.documentElement).appendChild(modal);
+    if (LOC) {
+      [].forEach.call(modal.querySelectorAll('input[name=financing]'), function (inp, i) { if (LOC.fin[i]) { inp.value = LOC.fin[i]; var sp = inp.parentNode.querySelector("span"); if (sp) sp.textContent = LOC.fin[i]; } });
+      var tx = modal.querySelector('input[name=taxid]'); if (tx) tx.placeholder = LOC.taxid;
+    }
     mImg=modal.querySelector(".cain-head img"); mTitle=modal.querySelector(".cain-head h3"); mSub=modal.querySelector(".cain-sub");
     mForm=modal.querySelector("form"); mCar=modal.querySelector('input[name=car]'); mMsg=modal.querySelector(".cain-msg");
     modal.addEventListener("click", function(e){ if(e.target && e.target.hasAttribute && e.target.hasAttribute("data-close")) closeModal(); });
@@ -522,6 +561,7 @@
     [].forEach.call(modal.querySelectorAll(".cain-tgl"), function(t){ t.classList.toggle("active", t.getAttribute("data-buyer")===v); });
     var isCo=(v==="Cég");
     var comp=modal.querySelector(".cain-company"); if(comp) comp.style.display=isCo?"":"none";
+    if (LOC) { modeRadios(isCo ? LOC.co : LOC.priv); return; }
     var m1=modal.querySelector(".cain-mode1"), m1l=modal.querySelector(".cain-mode1lbl");
     if(m1&&m1l){ var txt=isCo?"Nettó EUR-ban, Németországból (Caradvance GmbH)":"19% német áfával, Németországból (Caradvance GmbH)"; m1.value=txt; m1l.textContent=txt; }
   }
@@ -582,8 +622,10 @@
     if(!last||!first||!email){ showMsg("err","Kérlek add meg a vezeték- és keresztneved, valamint az e-mail címed."); return; }
     if(!fd.get("consent")){ showMsg("err","Kérlek fogadd el az ÁSZF-et és az adatkezelési tájékoztatót."); return; }
     var btn=mForm.querySelector(".cain-submit"); btn.disabled=true; btn.textContent="Küldés…";
-    fd.append("kind", isRent ? "Bérlési érdeklődés" : "Érdeklődés (készletautó)");
-    fetch(INQ_API,{method:"POST",body:fd}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
+    fd.append("kind", LOC ? LOC.kind[isRent ? "rent" : "sale"] : (isRent ? "Bérlési érdeklődés" : "Érdeklődés (készletautó)"));
+    var send = fd;
+    if (LOC) { send = new FormData(); fd.forEach(function (v, k) { send.append(k, locVal(v)); }); }
+    fetch(INQ_API,{method:"POST",body:send}).then(function(r){ if(!r.ok) throw 0; }).then(function(){
       showMsg("ok","Köszönjük! Megkaptuk az érdeklődésed — hamarosan keresünk.");
       mForm.reset(); setBuyer("Magánszemély"); btn.disabled=false; btn.textContent="Érdeklődés elküldése";
     }).catch(function(){
@@ -642,6 +684,7 @@
              price:priceOf(card), kind:kind, rent:(kind==="rent"?rentOf(card):null) };
   }
   function infoText(kind){
+    if (LOC) return kind === "rent" ? LOC.info.rent : LOC.info.sale;
     var fx="";
     try{ var m=(document.body.textContent||"").match(/1\s*€\s*=\s*([\d\s.,]+)\s*Ft/); if(m) fx=m[1].replace(/\s+/g," ").trim(); }catch(e){}
     if(kind==="biz") return "A feltüntetett ár forintban értendő, áfás ár, mivel az eladó magyarországi. Az euró ár csak tájékoztató jellegű, élő árfolyammal.";
