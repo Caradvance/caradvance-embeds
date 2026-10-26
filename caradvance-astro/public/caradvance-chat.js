@@ -72,6 +72,7 @@
   /* caradvance.sk / .cz: a szlovák / cseh kapcsolattartó (Mr. Job SK s.r.o.) WhatsAppja és szövege */
   var CLG = String(document.documentElement.lang || "hu").slice(0, 2).toLowerCase();
   if (CLG === "sk" || CLG === "cs") WA = "421915410555";
+  var WAH = (CLG === "sk" || CLG === "cs") ? "+421 915 410 555" : "+36 30 233 6060";
   var SESSION = null;                      // Phase 2: bejelentkezett ügyfél tokenje
   var LOGO = "/caradvance-logo.webp";      // tedd a public mappába
 
@@ -155,7 +156,11 @@
   var history = [], busy = false, greeted = false;
   function down() { Th.scrollTop = Th.scrollHeight; }
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-  function fmt(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>"); }
+  function fmt(s) {
+    return esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]])/g, '<a href="$1" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">$1</a>')
+      .replace(/\n/g, "<br>");
+  }
   function row(who, html) {
     var d = document.createElement("div"); d.className = "cac-r " + who;
     d.innerHTML = (who === "b" ? '<div class="cac-av">CA</div>' : "") + '<div class="cac-bb">' + html + "</div>";
@@ -169,17 +174,17 @@
   var CHIPS = ["Hogyan működik az import?", "Milyen árakkal számoljak?", "Van garancia?", "Mik az elérhetőségeitek?"];
   function chips() {
     Ch.innerHTML = "";
-    CHIPS.forEach(function (q) { var b = document.createElement("button"); b.className = "cac-c"; b.textContent = q; b.onclick = function () { send(q); }; Ch.appendChild(b); });
+    CHIPS.forEach(function (q) { var b = document.createElement("button"); b.className = "cac-c"; b.textContent = q; b.onclick = function () { send(b.textContent || q); }; Ch.appendChild(b); });
     down();
   }
   function send(t) {
     if (busy || !t.trim()) return; busy = true; Hf.classList.remove("on"); Ch.innerHTML = "";
     row("m", fmt(t)); history.push({ role: "user", content: t }); In.value = ""; size(); Sd.disabled = true;
     var tp = typing();
-    fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: history, session: SESSION }) })
+    fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: history, session: SESSION, lang: CLG, page: location.pathname, site: location.hostname }) })
       .then(function (r) { return r.json(); })
       .then(function (d) { tp.remove(); var rep = (d && d.reply) || "Elnézést, most nem tudok válaszolni."; row("b", fmt(rep)); history.push({ role: "assistant", content: rep }); chips(); })
-      .catch(function () { tp.remove(); row("b", "Elnézést, technikai hiba történt. Írj nekünk WhatsAppon: <strong>+36 30 233 6060</strong>."); Hf.classList.add("on"); })
+      .catch(function () { tp.remove(); row("b", "Elnézést, technikai hiba történt. Írj nekünk WhatsAppon: <strong>" + WAH + "</strong>."); Hf.classList.add("on"); })
       .finally(function () { busy = false; In.focus(); });
   }
   function open() {
