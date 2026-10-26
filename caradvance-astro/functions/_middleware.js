@@ -30,7 +30,7 @@ export async function onRequest(context) {
 const UJ_MAP = {"audi-a3":"audi-a3-sportback","audi-a6":"audi-a6-avant","audi-q5":"audi-q5-sportback","bmw-3-as-limuzin":"bmw-3-as-limuzin","bmw-4-es-coupe":"bmw-4-es-coupe","bmw-5-os-limuzin":"bmw-5-os-limuzin","bmw-5-os-touring":"bmw-5-os-touring","bmw-x1":"bmw-x1","bmw-x3":"bmw-x3","bmw-x5":"bmw-x5","bmw-x6":"bmw-x6","mercedes-amg-c-osztaly-limuzin":"mercedes-benz-c-osztaly","mercedes-amg-c-osztaly-t-modell":"mercedes-benz-c-osztaly","mercedes-c-osztaly-limuzin":"mercedes-benz-c-osztaly","mercedes-c-osztaly-t-modell":"mercedes-benz-c-osztaly","mercedes-amg-e-osztaly-limuzin":"mercedes-benz-e-osztaly-limuzin","mercedes-amg-e-osztaly-t-modell":"mercedes-benz-e-osztaly-limuzin","mercedes-e-osztaly-limuzin":"mercedes-benz-e-osztaly-limuzin","mercedes-e-osztaly-t-modell":"mercedes-benz-e-osztaly-limuzin","mercedes-gla":"mercedes-benz-gla","mercedes-glb":"mercedes-benz-glb","mercedes-glc":"mercedes-benz-glc","mercedes-glc-coupe":"mercedes-benz-glc-coupe","mercedes-gle":"mercedes-benz-gle","mercedes-gle-coupe":"mercedes-benz-gle-coupe","mini-cooper-3-ajtos":"mini-cooper","mini-cooper-5-ajtos":"mini-cooper","mini-john-cooper-works":"mini-cooper","mini-cooper-cabrio":"mini-cooper-cabrio","mini-countryman":"mini-countryman","audi-q7":"audi-q7","bmw-3-as-touring":"bmw-3-as-touring","bmw-m2-coupe":"bmw-m2-coupe","bmw-m3-limuzin":"bmw-m3-limuzin","bmw-m3-touring":"bmw-m3-touring","bmw-m4-coupe":"bmw-m4-coupe","bmw-m5-limuzin":"bmw-m5-limuzin","bmw-m5-touring":"bmw-m5-touring","mercedes-a-osztaly":"mercedes-a-osztaly","mercedes-amg-cle-coupe":"mercedes-amg-cle-coupe","mercedes-b-osztaly":"mercedes-b-osztaly","mercedes-cle-cabrio":"mercedes-cle-cabrio","mercedes-cle-coupe":"mercedes-cle-coupe","mercedes-s-osztaly":"mercedes-s-osztaly"};
 const UJ_LANDING = { en: '/en/car-rental-budapest/', de: '/de/auto-mieten-budapest/', fr: '/fr/location-voiture-budapest/', uk: '/uk/orenda-avto-budapesht/', zh: '/zh/budapest-car-rental/' };
 function ujRedirect(url) {
-  const m = url.pathname.match(/^(?:\/(en|de|fr|uk|zh|sk|cs))?\/uj-auto-berlese(?:\/([a-z0-9-]+))?\/?$/);
+  const m = url.pathname.match(/^(?:\/(en|de|fr|uk|zh|sk|cs|pl))?\/uj-auto-berlese(?:\/([a-z0-9-]+))?\/?$/);
   if (!m) return null;
   const l = m[1] || '', pre = l ? '/' + l : '';
   let to;
@@ -40,14 +40,16 @@ function ujRedirect(url) {
 }
 
 // Saját domainek: caradvance.sk → dist/sk/… , caradvance.cz → dist/cs/… (a build i18n-mirror.mjs lépése készíti)
-const DOMAINS = { 'caradvance.sk': 'sk', 'www.caradvance.sk': 'sk', 'caradvance.cz': 'cs', 'www.caradvance.cz': 'cs' };
+const DOMAINS = { 'caradvance.sk': 'sk', 'www.caradvance.sk': 'sk', 'caradvance.cz': 'cs', 'www.caradvance.cz': 'cs', 'caradvance.pl': 'pl', 'www.caradvance.pl': 'pl' };
 const HU_SITE = 'https://www.caradvance.hu';
-const LANG_SITE = { sk: 'https://www.caradvance.sk', cs: 'https://www.caradvance.cz' };
+const LANG_SITE = { sk: 'https://www.caradvance.sk', cs: 'https://www.caradvance.cz', pl: 'https://www.caradvance.pl' };
 // true = a caradvance.hu/sk/… és /cs/… címek 301-gyel a saját domainre mennek (csak ha a domainek már élnek!)
 const SKCZ_REDIRECT = true;
+// true = a caradvance.hu/pl/… címek is 301-gyel a caradvance.pl-re mennek — csak ha a .pl domain már a Pages-projekthez van kötve!
+const PL_REDIRECT = false;
 /** Abszolút caradvance.hu/sk|cs URL → saját domain (canonical, hreflang, og:url, linkek). */
 function toLangSite(v) {
-  const m = /^https:\/\/(?:www\.)?caradvance\.hu\/(sk|cs)(\/.*)?$/.exec(v);
+  const m = /^https:\/\/(?:www\.)?caradvance\.hu\/(sk|cs|pl)(\/.*)?$/.exec(v);
   return m ? LANG_SITE[m[1]] + (m[2] || '/') : v;
 }
 
@@ -97,9 +99,9 @@ async function serveDomain(context, url, l) {
       let n = v;
       if (v.startsWith(pre)) n = v.slice(l.length + 1);
       else if (v === '/' + l) n = '/';
-      else if (/^\/(sk|cs)(\/|$)/.test(v)) n = toLangSite(HU_SITE + v);                  // a másik saját domain
+      else if (/^\/(sk|cs|pl)(\/|$)/.test(v)) n = toLangSite(HU_SITE + v);                  // a másik saját domain
       else if (v.startsWith('/') && !v.startsWith('//') && !v.startsWith('/api/') && !isFileUrl(v)) n = HU_SITE + v; // magyar / más nyelvű oldal
-      else if (/^https:\/\/(?:www\.)?caradvance\.hu\/(sk|cs)(\/|$)/.test(v)) n = toLangSite(v); // abszolút .hu/sk|cs
+      else if (/^https:\/\/(?:www\.)?caradvance\.hu\/(sk|cs|pl)(\/|$)/.test(v)) n = toLangSite(v); // abszolút .hu/sk|cs
       if (n !== v) e.setAttribute(this.a, n);
     }
   }
@@ -120,7 +122,7 @@ async function handle(context) {
   const dl = DOMAINS[url.hostname];
   if (dl) return serveDomain(context, url, dl);
   if (SKCZ_REDIRECT && /(^|\.)caradvance\.hu$/.test(url.hostname)) {
-    const lm = /^\/(sk|cs)(\/.*)?$/.exec(p);
+    const lm = (PL_REDIRECT ? /^\/(sk|cs|pl)(\/.*)?$/ : /^\/(sk|cs)(\/.*)?$/).exec(p);
     if (lm) {
       const rest = lm[2] || '/';
       const loc = /\.[a-z0-9]{1,5}$/i.test(rest) ? rest : (locOf(await slugMap(env, lm[1], url.origin), rest) || rest);
