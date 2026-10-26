@@ -125,7 +125,7 @@ export async function onRequestPost(context) {
   // Automatikus visszaigazolás az ügyfélnek (csak ha a belső kézbesítés sikerült).
   let confirm = { status: 'skipped' };
   if ((notion.ok || mail.ok || hook.ok) && contact.email) {
-    try { confirm = await sendCustomerConfirm(env, data, contact, meta.page, region); } catch (e) { confirm = { status: 'error: ' + String(e && e.message || e).slice(0, 120) }; }
+    try { confirm = await sendCustomerConfirm(env, data, contact, meta.page, region, request.headers.get('origin') || ''); } catch (e) { confirm = { status: 'error: ' + String(e && e.message || e).slice(0, 120) }; }
   }
   const delivered = notion.ok || mail.ok || hook.ok;
   const configured = [notion, mail, hook].some((c) => c.status !== 'skipped');
@@ -401,7 +401,14 @@ function leadKind(data) {
 }
 
 /** Visszaigazoló e-mail az ügyfélnek: köszönet + a beküldött adatok összefoglalója. */
-async function sendCustomerConfirm(env, data, contact, page, region) {
+/** caradvance.pl (vagy a caradvance.hu/pl/ előnézet) → 'pl' / 'en' / 'de', különben null */
+function plLangOf(page, origin) {
+  const s = String(page || '') + ' ' + String(origin || '');
+  if (!/caradvance\.pl\b|(?:^|\s|https?:\/\/[^/\s]+)\/pl(?:\/|$)/.test(s)) return null;
+  const m = String(page || '').match(/^(?:https?:\/\/[^/]+)?(?:\/pl)?\/(en|de)\//);
+  return m ? m[1] : 'pl';
+}
+async function sendCustomerConfirm(env, data, contact, page, region, origin) {
   if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
   const k = leadKind(data);
   // Idegen nyelvű oldalakról érkező megkeresés: angol (német oldalról német) visszaigazolás.
@@ -409,6 +416,8 @@ async function sendCustomerConfirm(env, data, contact, page, region) {
   const pm = String(page || '').match(/^(?:https?:\/\/[^/]+)?\/(en|de|fr|uk|zh)\//);
   // Szlovák / cseh oldal: szlovák / cseh visszaigazolás, a válaszcím az országos postafiók.
   if (REGIONS[region]) return sendIntlConfirm(env, data, contact, REGIONS[region].lang, region);
+  // caradvance.pl: a magyar csapat kezeli (region üres), a visszaigazolás lengyelül (az angol / német oldalról angolul / németül)
+  { const pl = plLangOf(page, origin); if (pl) return sendIntlConfirm(env, data, contact, pl); }
   const L = String(data['Nyelv'] || (pm && pm[1]) || 'HU').toLowerCase();
   if (L !== 'hu') return sendIntlConfirm(env, data, contact, INTL_CONFIRM[L] ? L : 'en');
   const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'event_id', 'Choice link']);
@@ -450,6 +459,9 @@ async function sendCustomerConfirm(env, data, contact, page, region) {
 }
 
 const INTL_CONFIRM = {
+  pl: { perMonth: '/mies.', months: 'mies.', subjs: { berles: 'Otrzymaliśmy Twoje zapytanie o wynajem', rendeles: 'Otrzymaliśmy Twoje zamówienie samochodu', eladas: 'Otrzymaliśmy dane Twojego samochodu', import: 'Otrzymaliśmy Twoją prośbę o wyszukanie samochodu' }, bodies: { berles: 'dziękujemy za zapytanie o wynajem. Członek naszego zespołu skontaktuje się z Tobą <b>jak najszybciej</b> ze szczegółami i indywidualną ofertą.', rendeles: 'dziękujemy za zamówienie samochodu. Członek naszego zespołu skontaktuje się z Tobą <b>jak najszybciej</b> ze szczegółami i indywidualną ofertą.', eladas: 'dziękujemy za przesłanie danych samochodu. <b>Jak najszybciej</b> odezwiemy się z realną wyceną.', import: 'dziękujemy za prośbę o wyszukanie samochodu. <b>Jak najszybciej</b> skontaktujemy się z Tobą z odpowiednimi ofertami z rynku niemieckiego.' }, subj: 'Otrzymaliśmy Twoje zapytanie', hello: (n) => n ? 'Dzień dobry, ' + n + ',' : 'Dzień dobry,', body: 'dziękujemy za wiadomość. Członek naszego zespołu skontaktuje się z Tobą <b>jak najszybciej</b> ze szczegółami i indywidualną ofertą.',
+        data: 'Twoje zapytanie', urgent: 'W pilnej sprawie zadzwoń do nas:', or: 'lub po prostu odpowiedz na tego e-maila.', bye: 'Z poważaniem', role: 'Dyrektor handlowy', country: 'Niemcy', rep: 'Pośrednik handlowy dla Polski: BH Group Zrt. · Ibolya utca 18., 2083 Solymár, Węgry',
+        labels: { 'Név': 'Imię i nazwisko', 'E-mail': 'E-mail', 'Telefon': 'Telefon', 'Üzenet': 'Wiadomość', 'Nyelv': 'Język', 'Oldal': 'Strona', 'Típus': 'Zapytanie' } },
   en: { perMonth: '/month', months: 'months', subjs: { berles: 'We received your rental request', rendeles: 'We received your car order request', eladas: 'We received your car details', import: 'We received your car search request' }, bodies: { berles: 'thank you for your rental request. A member of our team will contact you <b>as soon as possible</b> with the details and a personal offer.', rendeles: 'thank you for your car order request. A member of our team will contact you <b>as soon as possible</b> with the details and a personal offer.', eladas: 'thank you for sending us your car details. We will get back to you <b>as soon as possible</b> with a realistic price estimate.', import: 'thank you for your car search request. We will contact you <b>as soon as possible</b> with suitable offers from the German market.' }, subj: 'We received your request', hello: (n) => n ? 'Dear ' + n + ',' : 'Hello,', body: 'thank you for your message. A member of our team will contact you <b>as soon as possible</b> with the details and a personal offer.',
         data: 'Your request', urgent: 'If it is urgent, call us on', or: 'or simply reply to this e-mail.', bye: 'Kind regards,', role: 'Head of Sales', country: 'Germany', rep: 'Hungarian representative: BH Group Zrt.',
         labels: { 'Név': 'Name', 'E-mail': 'E-mail', 'Telefon': 'Phone', 'Üzenet': 'Message', 'Nyelv': 'Language', 'Oldal': 'Page', 'Típus': 'Request' } },
@@ -474,6 +486,7 @@ const INTL_CONFIRM = {
 };
 
 const INTL_LABELS = {
+  pl: { 'Kívánt átvétel': 'Planowany początek najmu', 'Autó': 'Samochód', 'Becsült havidíj': 'Szacunkowa opłata miesięczna', 'Német rendszám': 'Niemieckie tablice rejestracyjne', 'Elérhetőség': 'Dostępność', 'Felszereltség': 'Wyposażenie', 'Futamidő': 'Okres najmu', 'Kaució': 'Kaucja', 'Km-keret': 'Limit kilometrów', 'Konstrukció': 'Rodzaj umowy', 'Megjegyzés': 'Uwagi', 'Szín': 'Kolor', 'Üzemanyag': 'Paliwo', 'Vásárló': 'Typ klienta', 'Cégnév': 'Nazwa firmy', 'Adószám': 'NIP', 'Finanszírozás': 'Finansowanie', 'Fizetés': 'Płatność', 'Vásárlás módja': 'Sposób zakupu', 'Kapcsolattartó': 'Osoba kontaktowa', 'Márka': 'Marka', 'Modell': 'Model', 'Évjárat': 'Rocznik', 'Kilométer': 'Przebieg', 'Futás': 'Przebieg', 'Ár': 'Cena', 'Kért ár': 'Oczekiwana cena', 'Költségkeret': 'Budżet', 'Város': 'Miasto', 'Székhely': 'Siedziba' },
   en: { 'Kívánt átvétel': 'Requested start date', 'Autó': 'Car', 'Becsült havidíj': 'Estimated monthly fee', 'Német rendszám': 'German licence plate', 'Elérhetőség': 'Availability', 'Felszereltség': 'Equipment', 'Futamidő': 'Term', 'Kaució': 'Deposit', 'Km-keret': 'Mileage allowance', 'Konstrukció': 'Contract type', 'Megjegyzés': 'Note', 'Szín': 'Colour', 'Üzemanyag': 'Fuel', 'Vásárló': 'Customer type', 'Cégnév': 'Company name', 'Adószám': 'Tax number', 'Finanszírozás': 'Financing', 'Fizetés': 'Payment', 'Vásárlás módja': 'Purchase method', 'Kapcsolattartó': 'Contact person', 'Márka': 'Make', 'Modell': 'Model', 'Évjárat': 'Year', 'Kilométer': 'Mileage', 'Futás': 'Mileage', 'Ár': 'Price', 'Kért ár': 'Asking price', 'Költségkeret': 'Budget', 'Város': 'City', 'Székhely': 'Registered office' },
   de: { 'Kívánt átvétel': 'Gewünschter Mietbeginn', 'Autó': 'Auto', 'Becsült havidíj': 'Geschätzte Monatsrate', 'Német rendszám': 'Deutsches Kennzeichen', 'Elérhetőség': 'Verfügbarkeit', 'Felszereltség': 'Ausstattung', 'Futamidő': 'Laufzeit', 'Kaució': 'Kaution', 'Km-keret': 'Kilometerpaket', 'Konstrukció': 'Vertragsart', 'Megjegyzés': 'Bemerkung', 'Szín': 'Farbe', 'Üzemanyag': 'Kraftstoff', 'Vásárló': 'Kundentyp', 'Cégnév': 'Firmenname', 'Adószám': 'Steuernummer', 'Finanszírozás': 'Finanzierung', 'Fizetés': 'Zahlung', 'Vásárlás módja': 'Kaufart', 'Kapcsolattartó': 'Ansprechpartner', 'Márka': 'Marke', 'Modell': 'Modell', 'Évjárat': 'Baujahr', 'Kilométer': 'Kilometerstand', 'Futás': 'Kilometerstand', 'Ár': 'Preis', 'Kért ár': 'Preisvorstellung', 'Költségkeret': 'Budget', 'Város': 'Stadt', 'Székhely': 'Firmensitz' },
   fr: { 'Kívánt átvétel': 'Date de début souhaitée', 'Autó': 'Voiture', 'Becsült havidíj': 'Loyer mensuel estimé', 'Elérhetőség': 'Disponibilité', 'Felszereltség': 'Équipement', 'Futamidő': 'Durée', 'Kaució': 'Dépôt de garantie', 'Km-keret': 'Kilométrage', 'Konstrukció': 'Type de contrat', 'Megjegyzés': 'Remarque', 'Szín': 'Couleur', 'Üzemanyag': 'Carburant', 'Vásárló': 'Type de client', 'Cégnév': 'Société', 'Adószám': 'Numéro fiscal', 'Finanszírozás': 'Financement', 'Fizetés': 'Paiement', 'Vásárlás módja': 'Mode d’achat', 'Kapcsolattartó': 'Contact', 'Márka': 'Marque', 'Modell': 'Modèle', 'Évjárat': 'Année', 'Kilométer': 'Kilométrage', 'Futás': 'Kilométrage', 'Ár': 'Prix', 'Kért ár': 'Prix demandé', 'Költségkeret': 'Budget', 'Város': 'Ville', 'Székhely': 'Siège' },
@@ -483,6 +496,7 @@ const INTL_LABELS = {
   cs: { 'Kívánt átvétel': 'Požadovaný začátek pronájmu', 'Autó': 'Vůz', 'Becsült havidíj': 'Odhadovaná měsíční splátka', 'Német rendszám': 'Německá SPZ', 'Elérhetőség': 'Dostupnost', 'Felszereltség': 'Výbava', 'Futamidő': 'Doba pronájmu', 'Kaució': 'Kauce', 'Km-keret': 'Limit km', 'Konstrukció': 'Typ smlouvy', 'Megjegyzés': 'Poznámka', 'Szín': 'Barva', 'Üzemanyag': 'Palivo', 'Vásárló': 'Typ zákazníka', 'Cégnév': 'Název firmy', 'Adószám': 'DIČ', 'Finanszírozás': 'Financování', 'Fizetés': 'Platba', 'Vásárlás módja': 'Způsob koupě', 'Kapcsolattartó': 'Kontaktní osoba', 'Márka': 'Značka', 'Modell': 'Model', 'Évjárat': 'Rok výroby', 'Kilométer': 'Najeto km', 'Futás': 'Najeto km', 'Ár': 'Cena', 'Kért ár': 'Požadovaná cena', 'Költségkeret': 'Rozpočet', 'Város': 'Město', 'Székhely': 'Sídlo' },
 };
 const INTL_VALUES = {
+  pl: { 'Magánszemély': 'Osoba prywatna', 'Magánszemélyként': 'Osoba prywatna', 'Cég': 'Firma', 'Cégként': 'Firma', 'Benzin': 'Benzyna', 'Dízel': 'Diesel', 'Elektromos': 'Elektryczny', 'Hibrid': 'Hybryda', 'Plug-in hibrid': 'Hybryda plug-in', 'Bérlés': 'Wynajem', 'Bérlés-vétel': 'Wynajem z wykupem', 'Azonnal': 'Od zaraz', 'Azonnal elérhető': 'Dostępny od zaraz', 'Készpénz': 'Gotówka', 'Lízing': 'Leasing', 'Hitel': 'Kredyt', 'Igen': 'Tak', 'Nem': 'Nie' },
   en: { 'Magánszemély': 'Private individual', 'Magánszemélyként': 'Private individual', 'Cég': 'Company', 'Cégként': 'Company', 'Benzin': 'Petrol', 'Dízel': 'Diesel', 'Elektromos': 'Electric', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in hybrid', 'Bérlés': 'Rental', 'Bérlés-vétel': 'Rent-to-own', 'Azonnal': 'Immediately', 'Azonnal elérhető': 'Available immediately', 'Készpénz': 'Cash', 'Lízing': 'Leasing', 'Hitel': 'Loan', 'Igen': 'Yes', 'Nem': 'No' },
   de: { 'Magánszemély': 'Privatperson', 'Magánszemélyként': 'Privatperson', 'Cég': 'Unternehmen', 'Cégként': 'Unternehmen', 'Benzin': 'Benzin', 'Dízel': 'Diesel', 'Elektromos': 'Elektro', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in-Hybrid', 'Bérlés': 'Miete', 'Bérlés-vétel': 'Mietkauf', 'Azonnal': 'Sofort', 'Azonnal elérhető': 'Sofort verfügbar', 'Készpénz': 'Barzahlung', 'Lízing': 'Leasing', 'Hitel': 'Kredit', 'Igen': 'Ja', 'Nem': 'Nein' },
   fr: { 'Magánszemély': 'Particulier', 'Magánszemélyként': 'Particulier', 'Cég': 'Entreprise', 'Cégként': 'Entreprise', 'Benzin': 'Essence', 'Dízel': 'Diesel', 'Elektromos': 'Électrique', 'Hibrid': 'Hybride', 'Plug-in hibrid': 'Hybride rechargeable', 'Bérlés': 'Location', 'Bérlés-vétel': 'Location avec option d’achat', 'Azonnal': 'Immédiatement', 'Azonnal elérhető': 'Disponible immédiatement', 'Készpénz': 'Comptant', 'Lízing': 'Leasing', 'Hitel': 'Crédit', 'Igen': 'Oui', 'Nem': 'Non' },
