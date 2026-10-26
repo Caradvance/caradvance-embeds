@@ -1,0 +1,27 @@
+# Ajánlatmotor — e-mail intake Worker, TEST environment.
+# Builds from GitHub Caradvance/caradvance-embeds, branch ajanlatmotor-teszt, root directory ajanlatmotor/ (Workers Builds).
+# Writes into the TEST database only. The website preview (branch ajanlatmotor-teszt) binds the same test database as DB.
+
+name = "ajanlatmotor-intake-test"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+preview_urls = false
+
+[triggers]
+crons = ["0 6 * * *", "0 7 * * *"]   # handler acts at 08:00 Europe/Budapest only
+
+[observability]
+enabled = true
+
+[vars]
+AM_TEST_MODE = "1"
+AM_SOURCE = "mock"
+AM_PUBLIC_BASE = "https://ajanlatmotor-teszt.caradvance-astro.pages.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "caradvance-offers-test"
+database_id = "c9e957c3-d388-4eca-bdef-73183fffe620"
+migrations_dir = "migrations-test"

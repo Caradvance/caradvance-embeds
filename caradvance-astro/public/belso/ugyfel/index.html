@@ -311,6 +311,7 @@ function renderChecklist(){
 function renderOffer(){
   var em=S.card.data.person.email||S.deal.email;
   var h='';
+  if(S.deal.line==='Import')h+='<div class="note" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>Ajánlatmotor:</b> a mobile.de-ről kikeresi a 3 legjobb autót, kiszámolja a teljes árat Budapestig, és prémium ajánlatoldalt készít az ügyfélnek.</span><a class="btn red sm" href="/belso/ajanlatmotor/igeny/'+ID+'">Ajánlatmotor megnyitása →</a></div>';
   if(S.testForward)h+='<div class="note"><b>Teszt-üzem:</b> az ügyfélnek szóló e-mailek most a(z) <b>'+esc(S.testForward)+'</b> címre mennek (a tárgyban ott a valódi címzett). Élesítéshez a fejlesztőnek ki kell kapcsolnia.</div>';
   h+='<div class="inv-tools"><input type="search" id="invQ" placeholder="Keresés a készletben — márka, modell…"><label class="chk" style="font-size:13px"><input type="checkbox" id="invAct" checked> Csak aktív</label><button class="btn ghost sm" id="invReload">Frissítés</button><button class="btn ghost sm" id="addManual">+ Egyedi autó</button></div>'
     +'<div class="inv" id="inv"><div class="loading" style="padding:30px">Készlet betöltése…</div></div>'

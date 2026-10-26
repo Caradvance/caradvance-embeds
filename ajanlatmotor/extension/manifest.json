@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Caradvance Sourcing (TESZT)",
+  "short_name": "Caradvance",
+  "version": "0.2.0",
+  "description": "mobile.de hirdetések küldése a Caradvance ajánlatmotorba egy kattintással.",
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://suchen.mobile.de/*",
+    "https://www.mobile.de/*",
+    "https://www.caradvance.hu/*",
+    "https://*.caradvance-astro.pages.dev/*",
+    "http://localhost:8788/*",
+    "http://127.0.0.1:8788/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Caradvance Sourcing",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://suchen.mobile.de/*",
+        "https://www.mobile.de/*"
+      ],
+      "js": [
+        "parser.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

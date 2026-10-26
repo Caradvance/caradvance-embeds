@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="hu">
+<head><meta charset="utf-8"><title>Caradvance Sourcing – beállítások</title><link rel="stylesheet" href="sidepanel.css">
+<style>body{max-width:520px;margin:40px auto}main{padding:0}</style></head>
+<body>
+<header><strong>caradvance</strong><span>Sourcing · beállítások</span></header>
+<main><section class="box">
+  <label for="base">Szerver címe</label>
+  <input id="base" placeholder="https://www.caradvance.hu  (teszt: https://ajanlatmotor-teszt.caradvance-astro.pages.dev)">
+  <label for="token" style="margin-top:12px">Személyes token</label>
+  <input id="token" placeholder="cax_…" autocomplete="off">
+  <p class="hint">A tokent a belső felületen kapod: Ajánlatmotor → Chrome bővítmény → Saját token létrehozása. Csak ezen a gépen tárolódik.</p>
+  <div class="row"><button id="save" class="btn red" type="button">Mentés és ellenőrzés</button></div>
+  <div id="out" class="result" hidden></div>
+</section></main>
+<script src="options.js"></script>
+</body></html>

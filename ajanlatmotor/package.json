@@ -1,0 +1,23 @@
+{
+  "name": "ajanlatmotor",
+  "version": "0.2.0-test",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p .",
+    "db:migrate:local": "wrangler d1 migrations apply caradvance-offers-test --local",
+    "deploy": "wrangler d1 migrations apply caradvance-offers-test --remote && wrangler deploy",
+    "ext:zip": "node scripts/ext-zip.mjs"
+  },
+  "dependencies": {
+    "postal-mime": "^4.1.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261026.1",
+    "hono": "^4.13.14",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.153.0"
+  }
+}
