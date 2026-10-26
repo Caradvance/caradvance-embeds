@@ -1,0 +1,20 @@
+# CarAdvance AI chat + érdeklődés-fogadó (Cloudflare Worker)
+# Élő cím: https://caradvance-chatbot.flat-fire-7e25.workers.dev  (/api/chat, /api/inquiry, /api/health)
+# Telepítés: Cloudflare Workers Builds — a Caradvance/caradvance-embeds repó caradvance-chatbot/ mappájából, minden pusholáskor.
+# Titkok (a Cloudflare felületen, NEM ide): ANTHROPIC_API_KEY, NOTION_TOKEN. A keep_vars megtartja a felületen beállított változókat.
+name = "caradvance-chatbot"
+main = "src/worker.js"
+compatibility_date = "2026-07-30"
+workers_dev = true
+keep_vars = true
+
+[vars]
+CHAT_MODEL = "claude-sonnet-5-5"
+NOTION_DB_ID = "c28d1db9-40f2-4ad3-a63d-500d0892dea2"
+
+[[kv_namespaces]]
+binding = "SELL_PHOTOS"
+id = "024f6d8192734bba875b700eb613c65a"
+
+[observability]
+enabled = true
