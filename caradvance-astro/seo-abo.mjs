@@ -165,6 +165,20 @@ console.log('[abo] kesz (' + done + ' fajl modositva)');
     + STRIP.replace(/<div class="brand-strip"[\s\S]*?<\/div><script>/, '<script>');
   const dir = 'dist/berelheto-auto';
   let n = 0;
+  // Elérhetőség (azonnal / hónapok, db) a modell-oldal űrlapján is: a window.SUB csak az /autoink/ oldalon van,
+  // ezért abból egy kis kivonatot (modell, now, later, count) teszünk a modal elé.
+  let SUBMINI = '';
+  try {
+    const ah = fs.readFileSync('dist/autoink/index.html', 'utf8');
+    const si = ah.indexOf('window.SUB=');
+    if (si > -1) {
+      const s0 = ah.slice(si + 11); let d = 0, j = 0, q = false;
+      for (; j < s0.length; j++) { const c = s0[j]; if (q) { if (c === '\\') { j++; continue; } if (c === '"') q = false; continue; } if (c === '"') { q = true; continue; } if (c === '{') d++; else if (c === '}') { d--; if (!d) break; } }
+      const S = JSON.parse(s0.slice(0, j + 1));
+      const mini = { models: (S.models || []).map((m) => ({ brand: m.brand, model: m.model, now: m.now || 0, later: (m.later || []).map((l) => ({ d: l.d, c: l.c })), count: m.count || 0 })) };
+      SUBMINI = '<script>window.SUB=window.SUB||' + JSON.stringify(mini).replace(/</g, '\\u003c') + ';</script>';
+    }
+  } catch (e) { console.log('[abo] SUB-kivonat hiba: ' + e.message); }
   if (fs.existsSync(dir)) {
     for (const sub of fs.readdirSync(dir)) {
       const f = dir + '/' + sub + '/index.html';
@@ -173,7 +187,7 @@ console.log('[abo] kesz (' + done + ' fajl modositva)');
       if (h.indexOf('sub-rent') < 0 || h.indexOf('window.__ABCFG') > -1) continue;
       const bi = h.lastIndexOf('</body>');
       if (bi < 0) continue;
-      h = h.slice(0, bi) + MODAL_ONLY + h.slice(bi);
+      h = h.slice(0, bi) + SUBMINI + MODAL_ONLY + h.slice(bi);
       fs.writeFileSync(f, h);
       n++;
     }
