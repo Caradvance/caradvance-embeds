@@ -1,0 +1,577 @@
+{
+ "_doc": "caradvance.pl — beállítások a pl-site.mjs build-lépéshez. live=false: minden oldal noindex, robots.txt tilt. Élesítéskor live=true.",
+ "site": "https://www.caradvance.pl",
+ "live": false,
+ "fxPLN": 4.39,
+ "phone": "+36 30 233 6060",
+ "wa": "36302336060",
+ "slugSeg": {
+  "auta": "samochody",
+  "auto-na-mieru": "samochod-na-zamowienie",
+  "caste-otazky": "czeste-pytania",
+  "ceny-dlhodobeho-prenajmu-aut-2026": "ceny-wynajmu-dlugoterminowego-2026",
+  "dlhodoby-prenajom-auta": "wynajem-dlugoterminowy-samochodu",
+  "dovoz": "import",
+  "dovoz-auta-z-nemecka": "import-samochodu-z-niemiec",
+  "dovoz-mercedesu-z-nemecka": "import-mercedesa-z-niemiec",
+  "financovanie-lizing": "finansowanie-leasing",
+  "firemne-auto-operativny-lizing-alebo-dlhodoby-prenajom-zdanovanie-dph": "samochod-firmowy-leasing-operacyjny-czy-wynajem-dlugoterminowy-vat",
+  "hladam-auto": "szukam-samochodu",
+  "kalkulacka-poplatkov": "kalkulator-akcyzy",
+  "kalkulacka-prepisu": "kalkulator-pcc",
+  "lizing-auta-pre-fyzicke-osoby-2026": "leasing-samochodu-dla-osob-prywatnych-2026",
+  "nakup-a-dovoz-bmw-x5-z-nemecka": "zakup-i-import-bmw-x5-z-niemiec",
+  "nakup-ojazdeneho-auta-z-nemecka": "zakup-uzywanego-samochodu-z-niemiec",
+  "nakup-ojazdeneho-premioveho-auta": "zakup-uzywanego-samochodu-premium",
+  "obchodne-podmienky": "regulamin",
+  "ochrana-osobnych-udajov": "polityka-prywatnosci",
+  "operativny-lizing": "leasing-operacyjny",
+  "podmienky-a-kaucia": "warunki-i-kaucja",
+  "podmienky-lizingu-ojazdeneho-auta-pre-fyzicke-osoby": "warunki-leasingu-uzywanego-samochodu-dla-osob-prywatnych",
+  "porovnanie-aut": "porownanie-samochodow",
+  "preco-caradvance": "dlaczego-caradvance",
+  "predaj": "sprzedaz",
+  "prenajom": "wynajem",
+  "prenajom-auta-v-bratislave-a-v-zahranici": "wynajem-samochodu-w-polsce-i-za-granica",
+  "referencie": "referencje",
+  "sami-alebo-s-nami": "samodzielnie-czy-z-nami",
+  "transparentnost": "przejrzystosc",
+  "ucet": "konto",
+  "vyhody": "zalety",
+  "zabezpecenie-kvality": "kontrola-jakosci",
+  "audi-bmw-alebo-mercedes": "audi-bmw-czy-mercedes"
+ },
+ "slugWord": {
+  "t-modell": "kombi",
+  "trieda": "klasa",
+  "limuzina": "limuzyna",
+  "dverova": "drzwiowy",
+  "elektricke": "elektryczny",
+  "benzin": "benzyna",
+  "hybrid": "hybryda"
+ },
+ "replace": [
+  [
+   "info@caradvance.sk",
+   "info@caradvance.hu"
+  ],
+  [
+   "info@caradvance.cz",
+   "info@caradvance.hu"
+  ],
+  [
+   "421915410555",
+   "36302336060"
+  ],
+  [
+   "421918700722",
+   "36302146989"
+  ],
+  [
+   "421917222122",
+   "36300942081"
+  ],
+  [
+   "Mr. Job SK s.r.o.",
+   "BH Group Zrt."
+  ],
+  [
+   "Mr. JOB SK s.r.o.",
+   "BH Group Zrt."
+  ],
+  [
+   "Mr. Job SK",
+   "BH Group Zrt."
+  ],
+  [
+   "Cesta na Senec 2/A",
+   "Ibolya utca 18."
+  ],
+  [
+   "SK2120860148",
+   "32488447-2-09"
+  ],
+  [
+   "52005445",
+   "09-10-000660"
+  ],
+  [
+   "/caradvance-logo-white-sk.webp",
+   "/caradvance-logo-white-pl.webp"
+  ],
+  [
+   "/caradvance-logo-sk.webp",
+   "/caradvance-logo-pl.webp"
+  ]
+ ],
+ "replaceRe": [
+  [
+   "\\+421[\\s\\u00a0]?915[\\s\\u00a0]?410[\\s\\u00a0]?555",
+   "+36 30 233 6060"
+  ],
+  [
+   "\\+421[\\s\\u00a0]?918[\\s\\u00a0]?700[\\s\\u00a0]?722",
+   "+36 30 214 6989"
+  ],
+  [
+   "\\+421[\\s\\u00a0]?917[\\s\\u00a0]?222[\\s\\u00a0]?122",
+   "+36 30 094 2081"
+  ],
+  [
+   "821[\\s\\u00a0]?04[\\s\\u00a0](?:Bratislava|Solymár)",
+   "2083 Solymár"
+  ],
+  [
+   "Ibolya utca 2(?:/A)?\\.?(?=[\\s,<])",
+   "Ibolya utca 18."
+  ],
+  [
+   "Ružinov,?[\\s\\u00a0]?",
+   ""
+  ],
+  [
+   "(?<![/\\w.-])(www\\.)?caradvance\\.sk\\b",
+   "$1caradvance.pl"
+  ]
+ ],
+ "team": [
+  {
+   "from": "/sk-team/pavel-horemuz.webp",
+   "img": "https://www.caradvance.hu/csadi-ferenc.webp",
+   "flags": [
+    "pl",
+    "gb",
+    "hu"
+   ]
+  },
+  {
+   "from": "/sk-team/veronika-dinicova.webp",
+   "img": "https://www.caradvance.hu/toth-karoly.webp",
+   "flags": [
+    "hu",
+    "de",
+    "gb",
+    "fr"
+   ]
+  },
+  {
+   "from": "/sk-team/andreas-horemuz.webp",
+   "img": "https://www.caradvance.hu/bajzath-balazs.webp?v=4",
+   "flags": [
+    "hu",
+    "gb"
+   ]
+  }
+ ],
+ "fix": [
+  [
+   "<dd>Ibolya utca 18\\., 2083 Solymár – </dd>",
+   {
+    "pl": "<dd>Petőfi utca 23., 4143 Vekerd, Węgry</dd>",
+    "en": "<dd>Petőfi utca 23., 4143 Vekerd, Hungary</dd>",
+    "de": "<dd>Petőfi utca 23., 4143 Vekerd, Ungarn</dd>"
+   }
+  ],
+  [
+   "(?:Nr identyfikacyjny|Company ID|Firmen-ID) 52 005 445 — [^<]*",
+   {
+    "pl": "Cg. 09-10-000660 (węgierski rejestr firm)",
+    "en": "Cg. 09-10-000660 (Hungarian company register)",
+    "de": "Cg. 09-10-000660 (ungarisches Firmenregister)"
+   }
+  ],
+  [
+   "DIČ 2120860148 · IČ DPH 32488447-2-09",
+   "32488447-2-09"
+  ],
+  [
+   "IČO 52 005 445 · IČ DPH 32488447-2-09",
+   "Cg. 09-10-000660 · 32488447-2-09"
+  ],
+  [
+   "IČ DPH",
+   {
+    "pl": "Numer VAT UE",
+    "en": "VAT ID",
+    "de": "USt-IdNr."
+   }
+  ],
+  [
+   "na Słowacji transponowanej ustawą nr 108/2024 Z\\. z\\. o ochronie konsumenta, w Polsce — ustawą o prawach konsumenta",
+   "w Polsce transponowanej ustawą o prawach konsumenta"
+  ],
+  [
+   "transposed in Slovakia by Act No\\. 108/2024 Coll\\. on consumer protection and in Poland by the Consumer Rights Act",
+   "transposed in Poland by the Consumer Rights Act"
+  ],
+  [
+   "in der Slowakei umgesetzt durch das Verbraucherschutzgesetz Nr\\. 108/2024 Slg\\., in Polen durch das Gesetz über Verbraucherrechte",
+   "in Polen umgesetzt durch das Gesetz über Verbraucherrechte"
+  ],
+  [
+   "<li\\b[^>]*>(?:(?!</li>)[\\s\\S])*?soi\\.sk/alternativne[\\s\\S]*?</li>",
+   {
+    "pl": "<li>w sporze dotyczącym własnych usług Pośrednika (np. pomocy przy rejestracji pojazdu) możesz zwrócić się do komitetu polubownego właściwego dla siedziby Pośrednika — Hajdú-Bihar Vármegyei Békéltető Testület, Petőfi tér 10, 4025 Debreczyn, Węgry; postępowanie jest bezpłatne; szczegóły: <a href=\"https://bekeltetes.hu\" target=\"_blank\" rel=\"noopener\">bekeltetes.hu</a>;</li>",
+    "en": "<li>in a dispute concerning the Agent's own services (e.g. help with vehicle registration) you can turn to the conciliation board competent for the Agent's registered office — Hajdú-Bihar County Conciliation Board (Hajdú-Bihar Vármegyei Békéltető Testület), Petőfi tér 10, 4025 Debrecen, Hungary; the procedure is free of charge; details: <a href=\"https://bekeltetes.hu\" target=\"_blank\" rel=\"noopener\">bekeltetes.hu</a>;</li>",
+    "de": "<li>bei Streitigkeiten über die eigenen Leistungen des Vermittlers (z. B. Hilfe bei der Zulassung) können Sie sich an die für den Sitz des Vermittlers zuständige Schlichtungsstelle wenden — Schlichtungsstelle des Komitats Hajdú-Bihar (Hajdú-Bihar Vármegyei Békéltető Testület), Petőfi tér 10, 4025 Debrecen, Ungarn; das Verfahren ist kostenlos; Details: <a href=\"https://bekeltetes.hu\" target=\"_blank\" rel=\"noopener\">bekeltetes.hu</a>;</li>"
+   }
+  ],
+  [
+   "https://www\\.esc-sr\\.sk",
+   "https://konsument.gov.pl"
+  ],
+  [
+   "https://www\\.soi\\.sk(?=\")",
+   "https://uokik.gov.pl"
+  ],
+  [
+   "węgierskie przepisy o ochronie danych osobowych \\(ustawa nr 18/2018\\), kodeks cywilny \\(ustawa nr 40/1964\\) oraz ustawa o rachunkowości \\(nr 431/2002\\)",
+   "węgierska ustawa o ochronie danych osobowych (ustawa CXII z 2011 r.), węgierski kodeks cywilny (ustawa V z 2013 r.) oraz węgierska ustawa o rachunkowości (ustawa C z 2000 r.)"
+  ],
+  [
+   "Hungarian legislation on the protection of personal data \\(Act No\\. 18/2018\\), the Civil Code \\(Act No\\. 40/1964\\) and the Accounting Act \\(No\\. 431/2002\\)",
+   "the Hungarian Data Protection Act (Act CXII of 2011), the Hungarian Civil Code (Act V of 2013) and the Hungarian Accounting Act (Act C of 2000)"
+  ],
+  [
+   "die ungarischen Vorschriften zum Datenschutz \\(Gesetz Nr\\. 18/2018\\), das Zivilgesetzbuch \\(Gesetz Nr\\. 40/1964\\) und das Rechnungslegungsgesetz \\(Nr\\. 431/2002\\)",
+   "das ungarische Datenschutzgesetz (Gesetz CXII von 2011), das ungarische Zivilgesetzbuch (Gesetz V von 2013) und das ungarische Rechnungslegungsgesetz (Gesetz C von 2000)"
+  ],
+  [
+   "(?:nr|No\\.|Nr\\.) 431/2002, § 35",
+   {
+    "pl": "(ustawa C z 2000 r.), § 169",
+    "en": "(Act C of 2000), § 169",
+    "de": "(Gesetz C von 2000), § 169"
+   }
+  ],
+  [
+   "ul\\. Stawki 7, 821 04 (Warszawa|Warsaw|Warschau); \\+421 2 3231 3214",
+   "ul. Stawki 2, 00-193 \\1; +48 22 531 03 00"
+  ],
+  [
+   "mailto:statny\\.dozor@pdp\\.gov\\.sk",
+   "mailto:kancelaria@uodo.gov.pl"
+  ],
+  [
+   "https://dataprotection\\.gov\\.sk/sk/",
+   "https://uodo.gov.pl"
+  ],
+  [
+   "(www\\.lda\\.bayern\\.de</a></dd>)(?![\\s\\S]{0,200}naih)",
+   {
+    "pl": "\\1<dt>Węgry (organ nadzorczy BH Group Zrt.)</dt><dd>Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH) — Falk Miksa utca 9–11, 1055 Budapeszt; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
+    "en": "\\1<dt>Hungary (supervisory authority of BH Group Zrt.)</dt><dd>Hungarian National Authority for Data Protection and Freedom of Information (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
+    "de": "\\1<dt>Ungarn (Aufsichtsbehörde der BH Group Zrt.)</dt><dd>Ungarische Behörde für Datenschutz und Informationsfreiheit (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>"
+   }
+  ],
+  [
+   "mniej więcej 14× większy niż polski",
+   "kilkakrotnie większy niż polski"
+  ],
+  [
+   "14× większy wybór",
+   "Wielokrotnie większy wybór"
+  ],
+  [
+   "\\(≈14× większy\\)",
+   "(wielokrotnie większy)"
+  ],
+  [
+   "roughly 14× larger than Poland",
+   "several times larger than Poland"
+  ],
+  [
+   "14× more choice",
+   "Far more choice"
+  ],
+  [
+   "\\(≈14× larger\\)",
+   "(many times larger)"
+  ],
+  [
+   "14× (?:größere Auswahl|mehr Auswahl)",
+   "Ein Vielfaches an Auswahl"
+  ],
+  [
+   "\\(≈14× größer\\)",
+   "(um ein Vielfaches größer)"
+  ],
+  [
+   "etwa 14× größer als",
+   "um ein Vielfaches größer als"
+  ],
+  [
+   "\"postalCode\":\"821 04\",\"addressLocality\":\"Bratislava\",\"addressRegion\":\"Bratislavský kraj\"",
+   "\"postalCode\":\"2083\",\"addressLocality\":\"Solymár\",\"addressRegion\":\"Pest\""
+  ],
+  [
+   "\"addressCountry\":\"SK\"",
+   "\"addressCountry\":\"HU\""
+  ],
+  [
+   "\"areaServed\":\"SK\"",
+   "\"areaServed\":\"PL\""
+  ],
+  [
+   "14× wider choice",
+   "Far wider choice"
+  ],
+  [
+   "\"reviewBody\":\"To najlepšie, čo si môžete prenajať — tu nájdete všetko\\.\"",
+   {
+    "pl": "\"reviewBody\":\"Najlepsze, co można wynająć — tu znajdziesz wszystko.\"",
+    "en": "\"reviewBody\":\"The best you can rent — you will find everything here.\"",
+    "de": "\"reviewBody\":\"Das Beste, was man mieten kann — hier finden Sie alles.\""
+   }
+  ],
+  [
+   "\"reviewBody\":\"Bolo\\ mi\\ potešením\\ spolupracovať\\ so\\ spoločnosťou\\ Caradvance\\ GmbH\\ a\\ môžem\\ hovoriť\\ len\\ o\\ pozitívnych\\ skúsenostiach!\\ Obsluha\\ bola\\ od\\ začiatku\\ do\\ konca\\ výborná\\.\\ Tím\\ je\\ mimoriadne\\ profesionálny,\\ priateľský\\ a\\ erudovaný\\.\\ Naozaj\\ si\\ na\\ mňa\\ našli\\ čas\\.\"",
+   {
+    "pl": "\"reviewBody\":\"Współpraca z Caradvance GmbH była dla mnie przyjemnością i mogę mówić wyłącznie o pozytywnych doświadczeniach! Obsługa od początku do końca była znakomita. Zespół jest niezwykle profesjonalny, życzliwy i kompetentny. Naprawdę znaleźli dla mnie czas.\"",
+    "en": "\"reviewBody\":\"It was a pleasure to work with Caradvance GmbH and I can only speak of positive experiences! The service was excellent from start to finish. The team is extremely professional, friendly and knowledgeable. They really took their time for me.\"",
+    "de": "\"reviewBody\":\"Es war mir eine Freude, mit der Caradvance GmbH zusammenzuarbeiten, und ich kann nur von positiven Erfahrungen berichten! Der Service war von Anfang bis Ende hervorragend. Das Team ist äußerst professionell, freundlich und kompetent. Man hat sich wirklich Zeit für mich genommen.\""
+   }
+  ],
+  [
+   "\"reviewBody\":\"Kúpil\\ som\\ auto\\ v\\ tejto\\ firme\\ —\\ bolo\\ to\\ veľmi\\ jednoduché,\\ s\\ ochotnými\\ predajcami\\.\\ Všetko\\ prebehlo\\ hladko\\ a\\ bez\\ komplikácií\\.\"",
+   {
+    "pl": "\"reviewBody\":\"Kupiłem samochód w tej firmie — było to bardzo proste, ze sprzedawcami chętnymi do pomocy. Wszystko przebiegło sprawnie i bez komplikacji.\"",
+    "en": "\"reviewBody\":\"I bought a car from this company — it was very easy, with helpful salespeople. Everything went smoothly and without complications.\"",
+    "de": "\"reviewBody\":\"Ich habe bei dieser Firma ein Auto gekauft — es war sehr einfach, mit hilfsbereiten Verkäufern. Alles lief reibungslos und ohne Komplikationen.\""
+   }
+  ],
+  [
+   "\"reviewBody\":\"Skvelá\\ obsluha!\"",
+   {
+    "pl": "\"reviewBody\":\"Świetna obsługa!\"",
+    "en": "\"reviewBody\":\"Great service!\"",
+    "de": "\"reviewBody\":\"Toller Service!\""
+   }
+  ],
+  [
+   "\"reviewBody\":\"Som\\ mimoriadne\\ spokojný\\ s\\ autom,\\ ktoré\\ som\\ kúpil\\ v\\ Caradvance!\\ Obsluha\\ bola\\ profesionálna,\\ priateľská\\ a\\ veľmi\\ erudovaná\\.\\ Pani\\ Ferataj\\ mi\\ venovala\\ množstvo\\ času\\ a\\ zodpovedala\\ všetky\\ moje\\ otázky\\ o\\ sivom\\ BMW\\ X3\\.\"",
+   {
+    "pl": "\"reviewBody\":\"Jestem niezwykle zadowolony z samochodu, który kupiłem w Caradvance! Obsługa była profesjonalna, życzliwa i bardzo kompetentna. Pani Ferataj poświęciła mi mnóstwo czasu i odpowiedziała na wszystkie moje pytania dotyczące szarego BMW X3.\"",
+    "en": "\"reviewBody\":\"I am extremely satisfied with the car I bought from Caradvance! The service was professional, friendly and very knowledgeable. Ms Ferataj took a lot of time for me and answered all my questions about the grey BMW X3.\"",
+    "de": "\"reviewBody\":\"Ich bin äußerst zufrieden mit dem Auto, das ich bei Caradvance gekauft habe! Der Service war professionell, freundlich und sehr kompetent. Frau Ferataj hat sich viel Zeit für mich genommen und alle meine Fragen zum grauen BMW X3 beantwortet.\""
+   }
+  ],
+  [
+   "\"reviewBody\":\"Spolupracovať\\ s\\ Caradvance\\ Mníchov\\ je\\ skutočné\\ potešenie\\.\\ Zamestnanci\\ sú\\ profesionálni,\\ predovšetkým\\ zdvorilí\\ a\\ priateľskí\\.\\ Na\\ otázky,\\ úpravy\\ a\\ e\\-maily\\ reagujú\\ rýchlo\\.\\ Osobitná\\ vďaka\\ pani\\ Iacobescu\\ a\\ pani\\ Ferataj\\ za\\ výbornú\\ obsluhu\\.\"",
+   {
+    "pl": "\"reviewBody\":\"Współpraca z Caradvance Monachium to prawdziwa przyjemność. Pracownicy są profesjonalni, a przede wszystkim uprzejmi i życzliwi. Szybko odpowiadają na pytania, zmiany i e-maile. Szczególne podziękowania dla pani Iacobescu i pani Ferataj za znakomitą obsługę.\"",
+    "en": "\"reviewBody\":\"Working with Caradvance Munich is a real pleasure. The staff are professional and, above all, polite and friendly. They respond quickly to questions, changes and e-mails. Special thanks to Ms Iacobescu and Ms Ferataj for the excellent service.\"",
+    "de": "\"reviewBody\":\"Die Zusammenarbeit mit Caradvance München ist eine echte Freude. Die Mitarbeiter sind professionell, vor allem höflich und freundlich. Auf Fragen, Änderungen und E-Mails reagieren sie schnell. Besonderer Dank an Frau Iacobescu und Frau Ferataj für den hervorragenden Service.\""
+   }
+  ],
+  [
+   "\"reviewBody\":\"Veľmi\\ priateľský\\ a\\ erudovaný\\ tím,\\ bezchybne\\ udržiavané\\ autá\\.\\ Na\\ rozdiel\\ od\\ Sixtu,\\ Europcaru\\ a\\ ďalších\\ tu\\ telefón\\ naozaj\\ dvíhajú\\ a\\ dostal\\ som\\ presne\\ to\\ auto,\\ ktoré\\ mi\\ sľúbili!\\ Z\\ všetkých\\ požičovní\\ a\\ firiem\\ s\\ vozovým\\ parkom\\ výrazne\\ vyčnieva\\.\\ Môžem\\ len\\ odporučiť\\.\"",
+   {
+    "pl": "\"reviewBody\":\"Bardzo życzliwy i kompetentny zespół, nienagannie utrzymane samochody. W przeciwieństwie do Sixta, Europcaru i innych tutaj naprawdę odbierają telefon, a ja dostałem dokładnie taki samochód, jaki mi obiecano! Zdecydowanie wyróżnia się spośród wszystkich wypożyczalni i firm flotowych. Mogę tylko polecić.\"",
+    "en": "\"reviewBody\":\"A very friendly and knowledgeable team, impeccably maintained cars. Unlike Sixt, Europcar and others, they really pick up the phone here, and I got exactly the car I was promised! It clearly stands out from all rental and fleet companies. I can only recommend it.\"",
+    "de": "\"reviewBody\":\"Ein sehr freundliches und kompetentes Team, tadellos gepflegte Autos. Anders als bei Sixt, Europcar und Co. geht hier wirklich jemand ans Telefon, und ich habe genau das Auto bekommen, das mir versprochen wurde! Unter allen Vermietern und Flottenanbietern sticht es deutlich hervor. Ich kann es nur empfehlen.\""
+   }
+  ],
+  [
+   "\"reviewBody\":\"Výborná\\ práca\\.\\ Prišiel\\ som\\ o\\ 11\\ dopoludnia\\ a\\ o\\ 14\\ hodine\\ som\\ už\\ po\\ zaplatení\\ odchádzal\\ s\\ autom\\.\\ Cena\\ sedela,\\ všetky\\ údaje\\ o\\ aute\\ boli\\ presné\\.\\ Ďakujem!\"",
+   {
+    "pl": "\"reviewBody\":\"Świetna robota. Przyjechałem o 11 przed południem, a o 14 po zapłaceniu odjeżdżałem już samochodem. Cena się zgadzała, wszystkie dane o aucie były dokładne. Dziękuję!\"",
+    "en": "\"reviewBody\":\"Excellent work. I arrived at 11 a.m. and by 2 p.m. I was already driving off in the car after paying. The price was right and all the details about the car were accurate. Thank you!\"",
+    "de": "\"reviewBody\":\"Hervorragende Arbeit. Ich kam um 11 Uhr vormittags an und fuhr um 14 Uhr nach der Bezahlung bereits mit dem Auto davon. Der Preis stimmte, alle Angaben zum Auto waren korrekt. Danke!\""
+   }
+  ],
+  [
+   "(alt=\"Balázs Bajzáth\"[\\s\\S]{0,700}?<div class=\"rl\">)[^<]*(</div>)",
+   "\\1Sales Manager\\2"
+  ],
+  [
+   "(alt=\"Károly Tóth\"[\\s\\S]{0,700}?<div class=\"rl\">)[^<]*(</div><div class=\"bio\">)[^<]*(</div>)",
+   {
+    "pl": "\\1Dyrektor handlowy\\2Odpowiada za kontakty na rynku niemieckim i cały proces importu — doradzi Ci przy wyborze auta do wynajmu lub zakupu i przygotuje ofertę dopasowaną do Twoich potrzeb.\\3",
+    "en": "\\1Sales Director\\2Responsible for our contacts on the German market and the whole import process — he advises you on choosing a car to rent or buy and prepares a tailor-made offer.\\3",
+    "de": "\\1Vertriebsdirektor\\2Verantwortlich für die Kontakte auf dem deutschen Markt und den gesamten Importprozess — er berät Sie bei der Wahl eines Miet- oder Kaufautos und erstellt Ihnen ein maßgeschneidertes Angebot.\\3"
+   }
+  ]
+ ],
+ "jsfix": {
+  "pl": [
+   [
+    "\"sk\": [\"{b} na prenájom\", \"{m} modelov {b}, {c} áut v mesačnom predplatnom — väčšina úplne nových, 0 km. Flexibilná doba a nájazd; kaucia sa vracia na konci prenájmu.\", \"{c} × {b} na prenájom\"]",
+    "\"sk\": [\"{b} na wynajem\", \"{b} — liczba modeli: {m}, samochodów w miesięcznej subskrypcji: {c} — większość fabrycznie nowych, 0 km. Elastyczny okres i przebieg; kaucja wraca do Ciebie na koniec najmu.\", \"{b} na wynajem: {c} szt.\"]"
+   ],
+   [
+    "L=\"Porovnať\"",
+    "L=\"Porównaj\""
+   ],
+   [
+    "\"label\":\"Zoradiť\"",
+    "\"label\":\"Sortuj\""
+   ],
+   [
+    "\"az\":\"Názov (A–Z)\"",
+    "\"az\":\"Nazwa (A–Z)\""
+   ],
+   [
+    "\" Pre súkromné osoby pripravíme individuálnu ponuku – ozveme sa vám.\"",
+    "\" Dla osób prywatnych przygotujemy indywidualną ofertę — skontaktujemy się z Tobą.\""
+   ],
+   [
+    "napr. ťažné zariadenie, panoramatická strecha, vyhrievané sedadlá, head-up, len nehavarované, slovenské doklady…",
+    "np. hak holowniczy, dach panoramiczny, podgrzewane fotele, head-up, tylko bezwypadkowe, polskie dokumenty…"
+   ],
+   [
+    "value=\"Financovanie (úver)\"",
+    "value=\"Finansowanie (kredyt)\""
+   ],
+   [
+    "value=\"Firma s Numer VAT UE — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Firma z numerem VAT UE — bez VAT (dostawa wewnątrzwspólnotowa)\""
+   ],
+   [
+    "value=\"Firma s USt-IdNr. — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Firma z numerem VAT UE — bez VAT (dostawa wewnątrzwspólnotowa)\""
+   ],
+   [
+    "value=\"Firma s VAT ID — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Firma z numerem VAT UE — bez VAT (dostawa wewnątrzwspólnotowa)\""
+   ],
+   [
+    "value=\"Hotovosť / vlastné zdroje\"",
+    "value=\"Gotówka / środki własne\""
+   ],
+   [
+    "value=\"S financovaním\"",
+    "value=\"Z finansowaniem\""
+   ],
+   [
+    "value=\"Súkromná osoba — cena s DPH podľa spôsobu dodania\"",
+    "value=\"Osoba prywatna — cena z VAT zależnie od sposobu dostawy\""
+   ],
+   [
+    "value=\"Súkromná osoba — faktúra bez nemeckej DPH, slovenská DPH 23 % na Slovensku\"",
+    "value=\"Osoba prywatna — faktura bez niemieckiego VAT, polski VAT 23 % w Polsce\""
+   ],
+   [
+    "value=\"Záujem o financovanie – súhlas s kontaktom partnerskej lízingovej spoločnosti\"",
+    "value=\"Zainteresowanie finansowaniem — zgoda na kontakt ze strony partnerskiej firmy leasingowej\""
+   ]
+  ],
+  "en": [
+   [
+    "napr. ťažné zariadenie, panoramatická strecha, vyhrievané sedadlá, head-up, len nehavarované, slovenské doklady…",
+    "e.g. tow bar, panoramic roof, heated seats, head-up display, accident-free only, Polish registration documents…"
+   ],
+   [
+    "value=\"Financovanie (úver)\"",
+    "value=\"Financing (loan)\""
+   ],
+   [
+    "value=\"Firma s Numer VAT UE — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Company with EU VAT ID — without VAT (intra-EU supply)\""
+   ],
+   [
+    "value=\"Firma s USt-IdNr. — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Company with EU VAT ID — without VAT (intra-EU supply)\""
+   ],
+   [
+    "value=\"Firma s VAT ID — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Company with EU VAT ID — without VAT (intra-EU supply)\""
+   ],
+   [
+    "value=\"Hotovosť / vlastné zdroje\"",
+    "value=\"Cash / own funds\""
+   ],
+   [
+    "value=\"S financovaním\"",
+    "value=\"With financing\""
+   ],
+   [
+    "value=\"Súkromná osoba — cena s DPH podľa spôsobu dodania\"",
+    "value=\"Private individual — price incl. VAT depending on the delivery method\""
+   ],
+   [
+    "value=\"Súkromná osoba — faktúra bez nemeckej DPH, slovenská DPH 23 % na Slovensku\"",
+    "value=\"Private individual — invoice without German VAT, Polish VAT 23% in Poland\""
+   ],
+   [
+    "value=\"Záujem o financovanie – súhlas s kontaktom partnerskej lízingovej spoločnosti\"",
+    "value=\"Interested in financing — consent to be contacted by a partner leasing company\""
+   ],
+   [
+    "\" Pre súkromné osoby pripravíme individuálnu ponuku – ozveme sa vám.\"",
+    "\" For private individuals we prepare an individual offer — we will get in touch.\""
+   ],
+   [
+    "L=\"Porovnať\"",
+    "L=\"Compare\""
+   ],
+   [
+    "\"label\":\"Zoradiť\"",
+    "\"label\":\"Sort\""
+   ],
+   [
+    "\"az\":\"Názov (A–Z)\"",
+    "\"az\":\"Name (A–Z)\""
+   ]
+  ],
+  "de": [
+   [
+    "napr. ťažné zariadenie, panoramatická strecha, vyhrievané sedadlá, head-up, len nehavarované, slovenské doklady…",
+    "z. B. Anhängerkupplung, Panoramadach, Sitzheizung, Head-up-Display, nur unfallfrei, polnische Zulassungspapiere…"
+   ],
+   [
+    "value=\"Financovanie (úver)\"",
+    "value=\"Finanzierung (Kredit)\""
+   ],
+   [
+    "value=\"Firma s Numer VAT UE — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Unternehmen mit USt-IdNr. — ohne MwSt. (innergemeinschaftliche Lieferung)\""
+   ],
+   [
+    "value=\"Firma s USt-IdNr. — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Unternehmen mit USt-IdNr. — ohne MwSt. (innergemeinschaftliche Lieferung)\""
+   ],
+   [
+    "value=\"Firma s VAT ID — bez DPH (dodanie v rámci EÚ)\"",
+    "value=\"Unternehmen mit USt-IdNr. — ohne MwSt. (innergemeinschaftliche Lieferung)\""
+   ],
+   [
+    "value=\"Hotovosť / vlastné zdroje\"",
+    "value=\"Barzahlung / Eigenmittel\""
+   ],
+   [
+    "value=\"S financovaním\"",
+    "value=\"Mit Finanzierung\""
+   ],
+   [
+    "value=\"Súkromná osoba — cena s DPH podľa spôsobu dodania\"",
+    "value=\"Privatperson — Preis inkl. MwSt. je nach Lieferart\""
+   ],
+   [
+    "value=\"Súkromná osoba — faktúra bez nemeckej DPH, slovenská DPH 23 % na Slovensku\"",
+    "value=\"Privatperson — Rechnung ohne deutsche MwSt., polnische MwSt. 23 % in Polen\""
+   ],
+   [
+    "value=\"Záujem o financovanie – súhlas s kontaktom partnerskej lízingovej spoločnosti\"",
+    "value=\"Interesse an Finanzierung — Einwilligung zur Kontaktaufnahme durch eine Partner-Leasinggesellschaft\""
+   ],
+   [
+    "\" Pre súkromné osoby pripravíme individuálnu ponuku – ozveme sa vám.\"",
+    "\" Für Privatpersonen erstellen wir ein individuelles Angebot — wir melden uns bei Ihnen.\""
+   ],
+   [
+    "L=\"Porovnať\"",
+    "L=\"Vergleichen\""
+   ],
+   [
+    "\"label\":\"Zoradiť\"",
+    "\"label\":\"Sortieren\""
+   ],
+   [
+    "\"az\":\"Názov (A–Z)\"",
+    "\"az\":\"Name (A–Z)\""
+   ]
+  ]
+ },
+ "monRe": "['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december','styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień','january','february','march','april','may','june','july','august','september','october','november','december','januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember']"
+}
