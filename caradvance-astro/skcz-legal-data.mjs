@@ -417,8 +417,10 @@ CS.JS = [
 ];
 
 /* Ár-blokk (B2/G1) — használt autó adatlapja és listák */
-SK.PRICE = { vat: 1.23, cc: 'SK', del: 'Cena s doručením na Slovensko', incl: 'vrátane 23 % DPH', pick: 'pri osobnom prevzatí v Nemecku, vrátane 19 % nemeckej DPH (len ojazdené autá; dopravu si zabezpečujete sami)', co: 'pre firmy s IČ DPH, bez DPH (dodanie v rámci EÚ)', call: 'Neviete, ktorý variant je pre vás najvýhodnejší? Zavolajte nám na', call2: '– spolu nájdeme najvhodnejšie riešenie.', net: 'bez DPH', with: 's DPH', label: 'Cena bez DPH' };
-CS.PRICE = { vat: 1.21, cc: 'CZ', del: 'Cena s doručením do Česka', incl: 'včetně 21 % DPH', pick: 'při osobním převzetí v Německu, včetně 19 % německé DPH (pouze ojeté vozy; dopravu si zajišťujete sami)', co: 'pro firmy s DIČ, bez DPH (dodání v rámci EU)', call: 'Nevíte, která varianta je pro vás nejvýhodnější? Zavolejte nám na', call2: '– společně najdeme nejvhodnější řešení.', net: 'bez DPH', with: 's DPH', label: 'Cena bez DPH' };
+SK.PRICE = { vat: 1.23, cc: 'SK', del: 'Cena s doručením na Slovensko', incl: 'vrátane 23 % DPH', pick: 'pri osobnom prevzatí v Nemecku, vrátane 19 % nemeckej DPH (len ojazdené autá; dopravu si zabezpečujete sami)', co: 'pre firmy s IČ DPH, bez DPH (dodanie v rámci EÚ)', call: 'Neviete, ktorý variant je pre vás najvýhodnejší? Zavolajte nám na', call2: '– spolu nájdeme najvhodnejšie riešenie.', net: 'bez DPH', with: 's DPH', label: 'Cena bez DPH',
+  nw: { cond: 'Nové', used: 'Ojazdené', label: 'Nové auto podľa pravidiel EÚ', txt: 'Slovenskú DPH 23 % zaplatíte na Slovensku – konečná cena vrátane DPH {fin}.', call: 'Zavolajte nám a postup vám vysvetlíme:' } };
+CS.PRICE = { vat: 1.21, cc: 'CZ', del: 'Cena s doručením do Česka', incl: 'včetně 21 % DPH', pick: 'při osobním převzetí v Německu, včetně 19 % německé DPH (pouze ojeté vozy; dopravu si zajišťujete sami)', co: 'pro firmy s DIČ, bez DPH (dodání v rámci EU)', call: 'Nevíte, která varianta je pro vás nejvýhodnější? Zavolejte nám na', call2: '– společně najdeme nejvhodnější řešení.', net: 'bez DPH', with: 's DPH', label: 'Cena bez DPH',
+  nw: { cond: 'Nový', used: 'Ojeté', label: 'Nový vůz podle pravidel EU', txt: 'Českou DPH 21 % přiznáte a zaplatíte v Česku – soukromá osoba do 10 dnů od pořízení vozu, firma ve svém daňovém přiznání. Potvrzení o zaplacení DPH je potřeba k registraci vozu.', call: 'Zavolejte nám a postup vám vysvětlíme:' } };
 
 SK.FIN = {
   re: /^predaj\/financovanie-lizing\/index\.html$/,

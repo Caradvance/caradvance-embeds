@@ -2233,8 +2233,8 @@ export const CSL = {
 "Premium-Autos aus Deutschland zum besten Marktpreis, mit schlüsselfertigem Import, als Ihr Eigentum — ohne Kilometerbegrenzung."
 ],
 "Od prvního rozhovoru až po předání klíčů jsme po celou dobu po vašem boku. Pomůžeme vám vybrat vůz, který odpovídá vám i vašemu rozpočtu, vyhledáme ho na trhu, zajistíme celý nákup, vyřídíme dovoz, registraci a veškeré papírování — vám prakticky zbývá jen rozhodnutí. Naše práce ale předáním nekončí: i po převzetí se na nás můžete kdykoli obrátit, ať jde o servis, nebo o další vůz.": [
-"We’re by your side from the first conversation to the handover of the keys. We help you choose a car that suits you and your budget, track it down on the market, handle the entire purchase, and take care of the import, customs, registration and all the paperwork — all that’s left for you is the decision. But our work doesn’t end at handover: you can count on us at any time afterwards, whether it’s about servicing or your next car.",
-"Vom ersten Gespräch bis zur Schlüsselübergabe stehen wir an Ihrer Seite. Wir helfen Ihnen, das passende Fahrzeug für Sie und Ihr Budget auszuwählen, finden es am Markt, wickeln den gesamten Kauf ab und kümmern uns um Import, Zoll, Zulassung und den gesamten Papierkram — Ihnen bleibt praktisch nur die Entscheidung. Doch unsere Arbeit endet nicht mit der Übergabe: Auch danach können Sie jederzeit auf uns zählen, ob beim Service oder beim nächsten Auto."
+"We’re by your side from the first conversation to the handover of the keys. We help you choose a car that suits you and your budget, track it down on the market, handle the entire purchase, and take care of the import, registration and all the paperwork — all that’s left for you is the decision. But our work doesn’t end at handover: you can count on us at any time afterwards, whether it’s about servicing or your next car.",
+"Vom ersten Gespräch bis zur Schlüsselübergabe stehen wir an Ihrer Seite. Wir helfen Ihnen, das passende Fahrzeug für Sie und Ihr Budget auszuwählen, finden es am Markt, wickeln den gesamten Kauf ab und kümmern uns um Import, Zulassung und den gesamten Papierkram — Ihnen bleibt praktisch nur die Entscheidung. Doch unsere Arbeit endet nicht mit der Übergabe: Auch danach können Sie jederzeit auf uns zählen, ob beim Service oder beim nächsten Auto."
 ],
 "Cena podle vašeho výběru": [
 "Price according to your choice",
@@ -6115,5 +6115,265 @@ export const CSL = {
 "s {1} % DPH": [
 "incl. {1} % VAT",
 "inkl. {1} % MwSt."
+],
+"<g0>Proč my?</g0><g1>Transparentnost</g1><g2>Zajištění kvality</g2><g3>Reference</g3><g4>Media</g4><g5>Blog</g5>": [
+"<g0>Why us?</g0><g1>Transparency</g1><g2>Quality assurance</g2><g3>References</g3><g4>Media</g4><g5>Blog</g5>",
+"<g0>Warum wir?</g0><g1>Transparenz</g1><g2>Qualitätssicherung</g2><g3>Referenzen</g3><g4>Medien</g4><g5>Blog</g5>"
+],
+"<g0>Objednávka vozu</g0><g1>Proces nákupu</g1><g2>Kalkulačky</g2><g3><g4>Kalkulačka poplatků za registraci</g4></g3><g5><g6>Kalkulačka poplatků za přepis</g6></g5><g7><g8>Financování – leasing</g8></g7><g9>Výhody</g9><g10>Sami, nebo s námi?</g10><g11>Reference</g11>": [
+"<g0>Car order</g0><g1>Purchase process</g1><g2>Calculators</g2><g3><g4>Registration fee calculator</g4></g3><g5><g6>Transfer fee calculator</g6></g5><g7><g8>Financing – leasing</g8></g7><g9>Benefits</g9><g10>On your own or with us?</g10><g11>References</g11>",
+"<g0>Autobestellung</g0><g1>Kaufprozess</g1><g2>Rechner</g2><g3><g4>Rechner Zulassungsgebühr</g4></g3><g5><g6>Rechner Umschreibung</g6></g5><g7><g8>Finanzierung – Leasing</g8></g7><g9>Vorteile</g9><g10>Selbst oder mit uns?</g10><g11>Referenzen</g11>"
+],
+"Nový vůz (do {1} měsíců od první registrace nebo s nejvýše {2} km) se v rámci EU vždy daní ve státě kupujícího – v Česku {3} % DPH. Caradvance GmbH vám vystaví fakturu bez německé DPH a českou DPH zaplatíte v Česku: soukromá osoba ji přizná a zaplatí na svém finančním úřadě do {4} dnů od pořízení vozu, firma ji uvede ve svém daňovém přiznání. Postup vám při objednávce vysvětlíme. Výhodou je německá cena a výběr, ne nižší DPH.": [
+"A new car (up to {1} months from first registration or with no more than {2} km) is always taxed within the EU in the buyer's country – in the Czech Republic at {3} % VAT. Caradvance GmbH issues you an invoice without German VAT, and you pay the Czech VAT in the Czech Republic: a private individual declares and pays it at their tax office within {4} days of acquiring the car, a company includes it in its tax return. We will explain the procedure when you order. The advantage is the German price and choice, not lower VAT.",
+"Ein Neuwagen (bis {1} Monate nach Erstzulassung oder mit höchstens {2} km) wird in der EU immer im Land des Käufers besteuert – in Tschechien mit {3} % MwSt. Die Caradvance GmbH stellt Ihnen eine Rechnung ohne deutsche MwSt. aus, und die tschechische MwSt. zahlen Sie in Tschechien: Eine Privatperson meldet und zahlt sie innerhalb von {4} Tagen nach dem Erwerb des Fahrzeugs bei ihrem Finanzamt, eine Firma gibt sie in ihrer Steuererklärung an. Den Ablauf erklären wir Ihnen bei der Bestellung. Der Vorteil ist der deutsche Preis und die Auswahl, nicht eine niedrigere MwSt."
+],
+"Financování – leasing →": [
+"Financing – leasing →",
+"Finanzierung – Leasing →"
+],
+"<g0>Měsíční splátka bez DPH</g0><g1>od {1} €/měs.</g1>": [
+"<g0>Monthly instalment excl. VAT</g0><g1>from {1} €/month</g1>",
+"<g0>Monatsrate ohne MwSt.</g0><g1>ab {1} €/Monat</g1>"
+],
+"Ano — u ojetých vozů odpovídáme za vady {1} rok od převzetí (podle kupní smlouvy), u nových vozů {2} roky; u nových navíc platí záruka výrobce. Povinné ručení a havarijní pojištění si sjednáváte sami u pojišťovny podle vlastního výběru.": [
+"Yes — for used cars we are liable for defects for {1} year from handover (under the purchase contract), for new cars {2} years; new cars are also covered by the manufacturer's warranty. You take out compulsory liability and comprehensive insurance yourself with an insurer of your choice.",
+"Ja — bei Gebrauchtwagen haften wir für Mängel {1} Jahr ab Übergabe (laut Kaufvertrag), bei Neuwagen {2} Jahre; für Neuwagen gilt zusätzlich die Herstellergarantie. Haftpflicht- und Kaskoversicherung schließen Sie selbst bei einer Versicherung Ihrer Wahl ab."
+],
+"Dovoz auta z Německa s kompletním vyřízením: vyhledání, kontrola na místě, přeprava, registrace a uvedení do provozu. Položková kalkulace nákladů, obvykle za {1}–{2} dní.": [
+"Car import from Germany with complete handling: search, on-site inspection, transport, registration and putting the car on the road. Itemised cost calculation, usually within {1}–{2} days.",
+"Autoimport aus Deutschland mit Komplettabwicklung: Suche, Kontrolle vor Ort, Transport, Zulassung und Inbetriebnahme. Kostenaufstellung nach Posten, in der Regel in {1}–{2} Tagen."
+],
+"Spolehlivý prodejce aut od roku {1}: {2}+ prodaných prémiových vozů, hodnocení na Googlu {3}★, odpovědnost za vady (ojeté vozy {4} rok, nové {5} roky), dovoz na klíč z Německa.": [
+"Reliable car dealer since {1}: {2}+ premium cars sold, {3}★ rating on Google, liability for defects (used cars {4} year, new cars {5} years), turnkey import from Germany.",
+"Zuverlässiger Autohändler seit {1}: über {2} verkaufte Premium-Autos, {3}★ Bewertung bei Google, Mängelhaftung (Gebrauchtwagen {4} Jahr, Neuwagen {5} Jahre), schlüsselfertiger Import aus Deutschland."
+],
+"Odpovědnost za vady — za každý vůz ručíme": [
+"Liability for defects — we stand behind every car",
+"Mängelhaftung — wir stehen für jedes Auto ein"
+],
+"Nákup, objednávka a financování — na jednom místě": [
+"Purchase, ordering and financing — all in one place",
+"Kauf, Bestellung und Finanzierung — alles an einem Ort"
+],
+"Prověřená historie, ověřené kilometry, kontrola na místě, fotoprotokol při předání a odpovědnost za vady (ojeté vozy {1} rok, nové {2} roky) — takto kontrolujeme dovezené, prodávané i pronajímané vozy.": [
+"Verified history, checked mileage, on-site inspection, photo report at handover and liability for defects (used cars {1} year, new cars {2} years) — this is how we check imported, sold and rented cars.",
+"Geprüfte Historie, verifizierter Kilometerstand, Kontrolle vor Ort, Fotoprotokoll bei der Übergabe und Mängelhaftung (Gebrauchtwagen {1} Jahr, Neuwagen {2} Jahre) — so prüfen wir importierte, verkaufte und vermietete Autos."
+],
+"Dlouhodobý pronájem {1} — nový vůz od {2} Kč/měs. bez DPH (pro firmy), od {3} měsíců": [
+"Long-term rental {1} — a new car from {2} Kč/month excl. VAT (for companies), from {3} months",
+"Langzeitmiete {1} — ein neues Auto ab {2} Kč/Monat ohne MwSt. (für Firmen), ab {3} Monaten"
+],
+"Od výběru po předání na klíč obvykle {1}–{2} dní, podle konkrétního vozu a vyřízení.": [
+"From selection to turnkey handover usually {1}–{2} days, depending on the specific car and the paperwork.",
+"Von der Auswahl bis zur schlüsselfertigen Übergabe in der Regel {1}–{2} Tage, je nach Fahrzeug und Formalitäten."
+],
+"Dlouhou, ověřitelnou firemní historií, skutečnými recenzemi zákazníků, písemnou smlouvou a odpovědností za vady, zdokumentovanými vozy a transparentním oceňováním. Za CarAdvance stojí společnost Caradvance GmbH, která působí od roku {1}, s hodnocením na Googlu {2} a více než {3} prodanými prémiovými vozy; odpovědnost za vady činí u ojetých vozů {4} rok (podle kupní smlouvy), u nových {5} roky.": [
+"By a long, verifiable company history, real customer reviews, a written contract and liability for defects, documented cars and transparent pricing. CarAdvance is backed by Caradvance GmbH, which has been operating since {1}, with a {2} rating on Google and more than {3} premium cars sold; liability for defects is {4} year for used cars (under the purchase contract) and {5} years for new cars.",
+"An einer langen, überprüfbaren Firmengeschichte, echten Kundenbewertungen, einem schriftlichen Vertrag und Mängelhaftung, dokumentierten Autos und transparenter Preisgestaltung. Hinter CarAdvance steht die Caradvance GmbH, die seit {1} tätig ist, mit einer Bewertung von {2} bei Google und mehr als {3} verkauften Premium-Autos; die Mängelhaftung beträgt bei Gebrauchtwagen {4} Jahr (laut Kaufvertrag), bei Neuwagen {5} Jahre."
+],
+"U ojetých vozů odpovídáme za vady {1} rok od převzetí – tuto dobu sjednáváme v kupní smlouvě. U nových vozů odpovídáme za vady {2} roky od převzetí a navíc platí záruka výrobce. Každý vůz před předáním prověříme a prohlédneme.": [
+"For used cars we are liable for defects for {1} year from handover – we agree this period in the purchase contract. For new cars we are liable for defects for {2} years from handover, and the manufacturer's warranty also applies. We vet and inspect every car before handover.",
+"Bei Gebrauchtwagen haften wir für Mängel {1} Jahr ab Übergabe – diese Frist vereinbaren wir im Kaufvertrag. Bei Neuwagen haften wir für Mängel {2} Jahre ab Übergabe, zusätzlich gilt die Herstellergarantie. Jedes Auto prüfen und besichtigen wir vor der Übergabe."
+],
+"Kontroly a odpovědnost za vady": [
+"Inspections and liability for defects",
+"Kontrollen und Mängelhaftung"
+],
+"Evidenční kontrola, technická kontrola, schválení a registrace vozidla — a odpovědnost za vady: u ojetých vozů {1} rok, u nových {2} roky.": [
+"Registration check, technical inspection, approval and registration of the vehicle — and liability for defects: {1} year for used cars, {2} years for new cars.",
+"Registrierungskontrolle, technische Prüfung, Zulassung und Anmeldung des Fahrzeugs — und Mängelhaftung: bei Gebrauchtwagen {1} Jahr, bei Neuwagen {2} Jahre."
+],
+"Odpovědnost za vady — u ojetých vozů {1} rok (podle kupní smlouvy), u nových vozů {2} roky. Zavolejte nám na číslo +{3} a domluvíme další postup.": [
+"Liability for defects — {1} year for used cars (under the purchase contract), {2} years for new cars. Call us on +{3} and we will agree on the next steps.",
+"Mängelhaftung — bei Gebrauchtwagen {1} Jahr (laut Kaufvertrag), bei Neuwagen {2} Jahre. Rufen Sie uns unter +{3} an, und wir besprechen das weitere Vorgehen."
+],
+"U ojetých vozů odpovídáme za vady {1} rok od převzetí – tuto dobu sjednáváme v kupní smlouvě. U nových vozů odpovídáme za vady {2} roky od převzetí a navíc platí záruka výrobce. Každý vůz před nákupem prověříme a zkontrolujeme na místě, takže přesně víte, co kupujete.": [
+"For used cars we are liable for defects for {1} year from handover – we agree this period in the purchase contract. For new cars we are liable for defects for {2} years from handover, and the manufacturer's warranty also applies. We vet every car before purchase and inspect it on site, so you know exactly what you are buying.",
+"Bei Gebrauchtwagen haften wir für Mängel {1} Jahr ab Übergabe – diese Frist vereinbaren wir im Kaufvertrag. Bei Neuwagen haften wir für Mängel {2} Jahre ab Übergabe, zusätzlich gilt die Herstellergarantie. Jedes Auto prüfen wir vor dem Kauf und kontrollieren es vor Ort, sodass Sie genau wissen, was Sie kaufen."
+],
+"Ano. Podmínky financování – dobu splácení, vlastní vklad i výši splátky – stanoví partnerská leasingová společnost podle své nabídky a posouzení bonity. S vaším souhlasem jí předáme vaše kontaktní údaje.": [
+"Yes. The financing terms – repayment period, down payment and instalment amount – are set by the partner leasing company according to its offer and credit assessment. With your consent, we pass your contact details on to it.",
+"Ja. Die Finanzierungsbedingungen – Laufzeit, Anzahlung und Ratenhöhe – legt die Partner-Leasinggesellschaft nach ihrem Angebot und ihrer Bonitätsprüfung fest. Mit Ihrer Zustimmung geben wir ihr Ihre Kontaktdaten weiter."
+],
+"Orientační splátku vám na požádání připraví přímo partnerská leasingová společnost.": [
+"The partner leasing company itself will prepare an indicative instalment for you on request.",
+"Eine unverbindliche Monatsrate erstellt Ihnen die Partner-Leasinggesellschaft auf Anfrage direkt."
+],
+"Orientační průměrná cena paliva v ČR (ČSÚ, říjen {1}); cenu můžete upravit": [
+"Indicative average fuel price in the Czech Republic (Czech Statistical Office, October {1}); you can adjust the price",
+"Orientierender Durchschnittspreis für Kraftstoff in Tschechien (Tschechisches Statistikamt, Oktober {1}); Sie können den Preis anpassen"
+],
+"Vyberte prosím alespoň značku.": [
+"Please select at least a brand.",
+"Bitte wählen Sie mindestens eine Marke."
+],
+"Pro nákup bez DPH pro firmu zadejte prosím DIČ (EU).": [
+"For a VAT-free purchase as a company, please enter your EU VAT ID (DIČ).",
+"Für einen Kauf ohne MwSt. als Firma geben Sie bitte Ihre EU-USt-IdNr. (DIČ) an."
+],
+"Potvrďte prosím souhlas s VOP a se zásadami ochrany osobních údajů.": [
+"Please confirm that you agree to the T&Cs and the privacy policy.",
+"Bitte bestätigen Sie Ihre Zustimmung zu den AGB und zur Datenschutzerklärung."
+],
+"Děkujeme! Vaši poptávku jsme přijali — brzy se vám ozveme s nabídkou na míru.": [
+"Thank you! We have received your request — we will get back to you shortly with a tailored offer.",
+"Vielen Dank! Wir haben Ihre Anfrage erhalten — wir melden uns in Kürze mit einem individuellen Angebot."
+],
+"Odeslání se nezdařilo — napište nám prosím na info@caradvance.cz.": [
+"Sending failed — please write to us at info@caradvance.cz.",
+"Senden fehlgeschlagen — bitte schreiben Sie uns an info@caradvance.cz."
+],
+"Nemusíte hádat. Orientační splátku vám na požádání připraví přímo partnerská leasingová společnost. Celý proces vysvětlujeme také na naší <g0>stránce Financování a leasing</g0>.": [
+"No need to guess. The partner leasing company itself will prepare an indicative instalment for you on request. We also explain the whole process on our <g0>Financing and leasing page</g0>.",
+"Sie müssen nicht raten. Eine unverbindliche Monatsrate erstellt Ihnen die Partner-Leasinggesellschaft auf Anfrage direkt. Den gesamten Ablauf erklären wir auch auf unserer <g0>Seite Finanzierung und Leasing</g0>."
+],
+"Akontace je i zde zpravidla {1}–{2} % kupní ceny; čím vyšší, tím nižší měsíční splátka. Splátku dohromady určuje kupní cena, akontace, doba splácení a zůstatková hodnota. Orientační splátku vám na požádání připraví přímo partnerská leasingová společnost.": [
+"The down payment here is also usually {1}–{2} % of the purchase price; the higher it is, the lower the monthly instalment. The instalment is determined jointly by the purchase price, down payment, repayment period and residual value. The partner leasing company itself will prepare an indicative instalment for you on request.",
+"Die Anzahlung beträgt auch hier in der Regel {1}–{2} % des Kaufpreises; je höher sie ist, desto niedriger die Monatsrate. Die Rate ergibt sich zusammen aus Kaufpreis, Anzahlung, Laufzeit und Restwert. Eine unverbindliche Monatsrate erstellt Ihnen die Partner-Leasinggesellschaft auf Anfrage direkt."
+],
+"<g0>Žádám o registrační značku EL</g0><x1/><g2>Značku EL lze přidělit vozidlu na elektřinu nebo vodík; u kombinovaného pohonu (např. plug-in hybrid) jen při emisích CO₂ nejvýše {1} g/km. Při jejím přidělení se správní poplatek neplatí.</g2>": [
+"<g0>I am applying for an EL registration plate</g0><x1/><g2>An EL plate can be assigned to a vehicle powered by electricity or hydrogen; for a combined drive (e.g. a plug-in hybrid) only if its CO₂ emissions are no more than {1} g/km. When it is assigned, no administrative fee is paid.</g2>",
+"<g0>Ich beantrage ein EL-Kennzeichen</g0><x1/><g2>Das EL-Kennzeichen kann einem Fahrzeug mit Elektro- oder Wasserstoffantrieb zugeteilt werden; bei kombiniertem Antrieb (z. B. Plug-in-Hybrid) nur bei CO₂-Emissionen von höchstens {1} g/km. Bei seiner Zuteilung entfällt die Verwaltungsgebühr.</g2>"
+],
+"<g0>Současně žádám o přidělení značky EL</g0><x1/><g2>Značku EL lze přidělit vozidlu na elektřinu nebo vodík; u kombinovaného pohonu (např. plug-in hybrid) jen při emisích CO₂ nejvýše {1} g/km. Při jejím přidělení se správní poplatek neplatí. Pokud už vůz značku EL má, poplatek se platí.</g2>": [
+"<g0>I am also applying for an EL plate</g0><x1/><g2>An EL plate can be assigned to a vehicle powered by electricity or hydrogen; for a combined drive (e.g. a plug-in hybrid) only if its CO₂ emissions are no more than {1} g/km. When it is assigned, no administrative fee is paid. If the car already has an EL plate, the fee is payable.</g2>",
+"<g0>Ich beantrage gleichzeitig ein EL-Kennzeichen</g0><x1/><g2>Das EL-Kennzeichen kann einem Fahrzeug mit Elektro- oder Wasserstoffantrieb zugeteilt werden; bei kombiniertem Antrieb (z. B. Plug-in-Hybrid) nur bei CO₂-Emissionen von höchstens {1} g/km. Bei seiner Zuteilung entfällt die Verwaltungsgebühr. Hat das Auto bereits ein EL-Kennzeichen, wird die Gebühr fällig.</g2>"
+],
+"Odpovědnost za vady: ojeté vozy {1} rok, nové {2} roky": [
+"Liability for defects: used cars {1} year, new cars {2} years",
+"Mängelhaftung: Gebrauchtwagen {1} Jahr, Neuwagen {2} Jahre"
+],
+"Odpovědnost za vady — u ojetých vozů {1} rok (podle kupní smlouvy), u nových vozů {2} roky. Protože si naší práce jsme jisti.": [
+"Liability for defects — {1} year for used cars (under the purchase contract), {2} years for new cars. Because we are confident in our work.",
+"Mängelhaftung — bei Gebrauchtwagen {1} Jahr (laut Kaufvertrag), bei Neuwagen {2} Jahre. Weil wir von unserer Arbeit überzeugt sind."
+],
+"U ojetých vozů odpovídáme za vady {1} rok (podle kupní smlouvy), u nových {2} roky — protože si stojíme za tím, co předáváme.": [
+"For used cars we are liable for defects for {1} year (under the purchase contract), for new cars {2} years — because we stand behind what we hand over.",
+"Bei Gebrauchtwagen haften wir für Mängel {1} Jahr (laut Kaufvertrag), bei Neuwagen {2} Jahre — weil wir zu dem stehen, was wir übergeben."
+],
+"Nejvýhodnější měsíční poplatek začíná od {1} Kč bez DPH (⟨M1⟩), ⟨M2⟩ od {2} Kč a ⟨M3⟩ od {3} Kč měsíčně bez DPH; konkrétní cena závisí na modelu, délce pronájmu a měsíčním limitu km. Aktuální <g0>vozy k pronájmu najdete zde</g0>, pro nabídku nám zavolejte: <g1>+{4}</g1>.": [
+"The most affordable monthly fee starts from {1} Kč excl. VAT (⟨M1⟩), ⟨M2⟩ from {2} Kč and ⟨M3⟩ from {3} Kč per month excl. VAT; the exact price depends on the model, the rental period and the monthly km limit. You can <g0>find the current cars for rent here</g0>; for an offer, call us: <g1>+{4}</g1>.",
+"Die günstigste Monatsrate beginnt bei {1} Kč ohne MwSt. (⟨M1⟩), ⟨M2⟩ ab {2} Kč und ⟨M3⟩ ab {3} Kč pro Monat ohne MwSt.; der konkrete Preis hängt vom Modell, der Mietdauer und dem monatlichen km-Limit ab. Die aktuellen <g0>Mietautos finden Sie hier</g0>, für ein Angebot rufen Sie uns an: <g1>+{4}</g1>."
+],
+"Řeknete nám, jaký vůz hledáte, a my vám nabídneme vozy z celého německého trhu: vůz prověříme, na místě zkontrolujeme a poté zajistíme přepravu, registraci a veškeré papírování. Odpovědnost za vady — u ojetých vozů {1} rok (podle kupní smlouvy), u nových vozů {2} roky. Pavel Horemuž, vedoucí pro Slovensko a Česko: <g0>+{3}</g0>.": [
+"Tell us what car you are looking for and we will offer you a selection from the entire German market: we vet the car, inspect it on site and then arrange transport, registration and all the paperwork. Liability for defects — {1} year for used cars (under the purchase contract), {2} years for new cars. Pavel Horemuž, head of Slovakia and the Czech Republic: <g0>+{3}</g0>.",
+"Sagen Sie uns, welches Auto Sie suchen, und wir bieten Ihnen eine Auswahl aus dem gesamten deutschen Markt: Wir prüfen das Auto, kontrollieren es vor Ort und organisieren dann Transport, Zulassung und alle Formalitäten. Mängelhaftung — bei Gebrauchtwagen {1} Jahr (laut Kaufvertrag), bei Neuwagen {2} Jahre. Pavel Horemuž, Leiter für die Slowakei und Tschechien: <g0>+{3}</g0>."
+],
+"U ojetých vozů odpovídáme za vady {1} rok od převzetí – tuto dobu sjednáváme v kupní smlouvě; u nových vozů {2} roky od převzetí a navíc platí záruka výrobce. Historie každého vozidla je známá a zdokumentovaná a před předáním prochází kontrolou na místě.": [
+"For used cars we are liable for defects for {1} year from handover – we agree this period in the purchase contract; for new cars {2} years from handover, and the manufacturer's warranty also applies. The history of every vehicle is known and documented, and it undergoes an on-site inspection before handover.",
+"Bei Gebrauchtwagen haften wir für Mängel {1} Jahr ab Übergabe – diese Frist vereinbaren wir im Kaufvertrag; bei Neuwagen {2} Jahre ab Übergabe, zusätzlich gilt die Herstellergarantie. Die Historie jedes Fahrzeugs ist bekannt und dokumentiert, und vor der Übergabe wird es vor Ort kontrolliert."
+],
+"Stojí za námi více než {1} prodaných vozů, hodnocení {2} na Googlu a {3} let zkušeností na německém trhu. Každý vůz prověřujeme a kontrolujeme, žádné drobné písmo a žádné skryté náklady — odpovědnost za vady u ojetých vozů {4} rok, u nových {5} roky.": [
+"We have more than {1} cars sold, a {2} rating on Google and {3} years of experience on the German market behind us. We vet and inspect every car, no small print and no hidden fees — liability for defects is {4} year for used cars and {5} years for new cars.",
+"Hinter uns stehen mehr als {1} verkaufte Autos, eine Bewertung von {2} bei Google und {3} Jahre Erfahrung auf dem deutschen Markt. Jedes Auto wird geprüft und kontrolliert, kein Kleingedrucktes und keine versteckten Gebühren — die Mängelhaftung beträgt bei Gebrauchtwagen {4} Jahr, bei Neuwagen {5} Jahre."
+],
+"<g0>Vůz na míru →</g0> <g1>⟨M1⟩, ⟨M2⟩ nebo ⟨M3⟩? →</g1><g2>Dovoz vozu z Německa →</g2> <g3>Financování – leasing →</g3><g4>Kalkulačka poplatků za registraci →</g4>": [
+"<g0>Custom-ordered car →</g0> <g1>⟨M1⟩, ⟨M2⟩ or ⟨M3⟩? →</g1><g2>Car import from Germany →</g2> <g3>Financing – leasing →</g3><g4>Registration fee calculator →</g4>",
+"<g0>Auto nach Maß →</g0> <g1>⟨M1⟩, ⟨M2⟩ oder ⟨M3⟩? →</g1><g2>Autoimport aus Deutschland →</g2> <g3>Finanzierung – Leasing →</g3><g4>Zulassungsgebührenrechner →</g4>"
+],
+"<g0>Vůz na míru →</g0> <g1>Dovoz Mercedesu z Německa →</g1><g2>⟨M1⟩, ⟨M2⟩ nebo ⟨M3⟩? →</g2> <g3>Financování – leasing →</g3><g4>Kalkulačka poplatků za registraci →</g4>": [
+"<g0>Custom-ordered car →</g0> <g1>Mercedes import from Germany →</g1><g2>⟨M1⟩, ⟨M2⟩ or ⟨M3⟩? →</g2> <g3>Financing – leasing →</g3><g4>Registration fee calculator →</g4>",
+"<g0>Auto nach Maß →</g0> <g1>Mercedes-Import aus Deutschland →</g1><g2>⟨M1⟩, ⟨M2⟩ oder ⟨M3⟩? →</g2> <g3>Finanzierung – Leasing →</g3><g4>Zulassungsgebührenrechner →</g4>"
+],
+"<g0>Vůz na míru →</g0>⟨M1⟩, ⟨M2⟩, ⟨M3⟩ konfigurátor → ⟨M4⟩, ⟨M5⟩, ⟨M6⟩ konfigurátor →<g1>Dovoz vozu z Německa →</g1> <g2>Financování – leasing →</g2><g3>Kalkulačka poplatků za registraci →</g3>": [
+"<g0>Custom-ordered car →</g0>⟨M1⟩, ⟨M2⟩, ⟨M3⟩ configurator → ⟨M4⟩, ⟨M5⟩, ⟨M6⟩ configurator →<g1>Car import from Germany →</g1> <g2>Financing – leasing →</g2><g3>Registration fee calculator →</g3>",
+"<g0>Auto nach Maß →</g0>⟨M1⟩, ⟨M2⟩, ⟨M3⟩ Konfigurator → ⟨M4⟩, ⟨M5⟩, ⟨M6⟩ Konfigurator →<g1>Autoimport aus Deutschland →</g1> <g2>Finanzierung – Leasing →</g2><g3>Zulassungsgebührenrechner →</g3>"
+],
+"Odpovědnost za vady — <g0>u ojetých vozů {1} rok</g0> (podle kupní smlouvy), <g1>u nových vozů {2} roky</g1>. Můžeme si to dovolit, protože každý vůz před předáním důkladně prověřujeme. Pokud se cokoli vyskytne, nemusíte se dohadovat s inzerentem: jednáte s námi, odpovědnou firmou, na základě písemné smlouvy.": [
+"Liability for defects — <g0>{1} year for used cars</g0> (under the purchase contract), <g1>{2} years for new cars</g1>. We can afford it because we check every car thoroughly before handover. If anything comes up, you don't have to argue with an advertiser: you deal with us, a responsible company, on the basis of a written contract.",
+"Mängelhaftung — <g0>bei Gebrauchtwagen {1} Jahr</g0> (laut Kaufvertrag), <g1>bei Neuwagen {2} Jahre</g1>. Das können wir uns leisten, weil wir jedes Auto vor der Übergabe gründlich prüfen. Tritt etwas auf, müssen Sie nicht mit einem Inserenten verhandeln: Sie haben es mit uns zu tun, einem verantwortlichen Unternehmen, auf Grundlage eines schriftlichen Vertrags."
+],
+"Naši zákazníci nás na Googlu hodnotí <g0>průměrem {1}</g0>. Opakující se zkušenost: rychlé vyřízení, korektní cena, přesné údaje o vozech — a to, že telefon opravdu zvedáme. Pomůžeme vám česky, slovensky, anglicky nebo německy, od první otázky až po předání klíčů i potom.": [
+"Our customers rate us on Google at an <g0>average of {1}</g0>. A recurring experience: quick handling, a fair price, accurate vehicle details — and the fact that we really do answer the phone. We can help you in Czech, Slovak, English or German, from the first question to the handover of the keys and beyond.",
+"Unsere Kunden bewerten uns bei Google mit <g0>durchschnittlich {1}</g0>. Die wiederkehrende Erfahrung: schnelle Abwicklung, fairer Preis, genaue Fahrzeugangaben — und dass wir tatsächlich ans Telefon gehen. Wir helfen Ihnen auf Tschechisch, Slowakisch, Englisch oder Deutsch, von der ersten Frage bis zur Schlüsselübergabe und darüber hinaus."
+],
+"Spolehlivý prodejce aut vystaví smlouvu a za vůz odpovídá — u nás platí odpovědnost za vady {1} rok u ojetých vozů (podle kupní smlouvy) a {2} roky u nových.": [
+"A reliable car dealer issues a contract and is liable for the car — with us, liability for defects is {1} year for used cars (under the purchase contract) and {2} years for new cars.",
+"Ein zuverlässiger Autohändler stellt einen Vertrag aus und haftet für das Auto — bei uns gilt eine Mängelhaftung von {1} Jahr bei Gebrauchtwagen (laut Kaufvertrag) und {2} Jahren bei Neuwagen."
+],
+"Provozuje tento web, komunikuje s vámi česky, slovensky, anglicky nebo německy a pomáhá s administrativou a s registrací vozidla. Přepravu vozidla zajišťuje Caradvance GmbH. Nevystupuje jako prodávající ani pronajímatel.": [
+"It operates this website, communicates with you in Czech, Slovak, English or German and helps with the paperwork and vehicle registration. Transport of the vehicle is arranged by Caradvance GmbH. It does not act as seller or lessor.",
+"Sie betreibt diese Website, kommuniziert mit Ihnen auf Tschechisch, Slowakisch, Englisch oder Deutsch und hilft bei den Formalitäten und der Fahrzeugzulassung. Den Transport des Fahrzeugs übernimmt die Caradvance GmbH. Sie tritt weder als Verkäufer noch als Vermieter auf."
+],
+"Takto platíte:": [
+"How you pay:",
+"So bezahlen Sie:"
+],
+"{1} % záloha": [
+"{1} % deposit",
+"{1} % Anzahlung"
+],
+"{1} % doplatek": [
+"{1} % balance",
+"{1} % Restzahlung"
+],
+"Odpovědnost za vady — u ojetých vozů {1} rok (podle kupní smlouvy), u nových vozů {2} roky.": [
+"Liability for defects — {1} year for used cars (under the purchase contract), {2} years for new cars.",
+"Mängelhaftung — bei Gebrauchtwagen {1} Jahr (laut Kaufvertrag), bei Neuwagen {2} Jahre."
+],
+"Německý trh je zhruba {1}× větší než český — my z něj dovážíme jen to, co splňuje všechny body.": [
+"The German market is roughly {1}× larger than the Czech one — and we only import the cars that pass on every point.",
+"Der deutsche Markt ist etwa {1}× größer als der tschechische — wir importieren daraus nur, was alle Punkte erfüllt."
+],
+"U ojetých vozidel prodávaných spotřebiteli je doba pro uplatnění práv z vad v kupní smlouvě zkrácena na {1} rok od převzetí (§ {2} občanského zákoníku); u nových vozidel činí {3} roky od převzetí (§ {4} odst. {5}). Z titulu odpovědnosti za vady můžete požadovat opravu nebo výměnu, a není-li to možné, slevu z ceny, nebo můžete od smlouvy odstoupit. Vadu nám prosím oznamte co nejdříve po jejím zjištění. U vady, která se projeví do jednoho roku od plnění, se — do prokázání opaku — má za to, že existovala již při plnění.": [
+"For used vehicles sold to consumers, the period for exercising rights arising from defects is shortened in the purchase contract to {1} year from handover (§ {2} of the Czech Civil Code); for new vehicles it is {3} years from handover (§ {4}({5})). Under a claim for defects, you may request repair or replacement or, if this is not possible, a price reduction, or you may withdraw from the contract. Please notify us of the defect as soon as possible after discovering it. A defect that becomes apparent within one year of performance is presumed — until proven otherwise — to have already existed at the time of performance.",
+"Bei Gebrauchtfahrzeugen, die an Verbraucher verkauft werden, ist die Frist für die Geltendmachung von Mängelrechten im Kaufvertrag auf {1} Jahr ab Übergabe verkürzt (§ {2} des tschechischen Bürgerlichen Gesetzbuchs); bei Neufahrzeugen beträgt sie {3} Jahre ab Übergabe (§ {4} Abs. {5}). Aufgrund eines Mängelanspruchs können Sie Nachbesserung oder Ersatzlieferung, falls dies nicht möglich ist, Minderung verlangen oder vom Vertrag zurücktreten. Bitte teilen Sie uns einen Mangel so bald wie möglich nach seiner Entdeckung mit. Bei einem Mangel, der sich innerhalb eines Jahres ab Lieferung zeigt, wird — bis zum Beweis des Gegenteils — vermutet, dass er bereits bei Lieferung vorlag."
+],
+"Vedle zákonné odpovědnosti za vady se na nová vozidla vztahuje i záruka výrobce.": [
+"In addition to the statutory liability for defects, new vehicles are also covered by the manufacturer's warranty.",
+"Neben der gesetzlichen Mängelhaftung gilt für Neufahrzeuge auch die Herstellergarantie."
+],
+"Na smlouvy uzavřené se společností Caradvance GmbH se použije právo uvedené ve smlouvě. U spotřebitele tím nesmí být spotřebitel zbaven ochrany, kterou mu poskytují kogentní ustanovení na ochranu spotřebitele práva státu jeho obvyklého bydliště (čl. {1} nařízení „Řím I“ č. {2}/{3}/ES). Na služby Mr. Job SK s.r.o. a používání Webu se vztahuje právo Slovenské republiky; spotřebitel tím není zbaven ochrany, kterou mu poskytují kogentní ustanovení práva státu jeho obvyklého bydliště (čl. {4} nařízení „Řím I“).": [
+"Contracts concluded with Caradvance GmbH are governed by the law stated in the contract. For a consumer, this cannot deprive the consumer of the protection afforded by mandatory consumer protection provisions of the law of the country of their habitual residence (“Rome I” Regulation {2}/{3}/EC, Art. {1}). The services of Mr. Job SK s.r.o. and the use of the Website are governed by the law of the Slovak Republic; this does not deprive a consumer of the protection afforded by the mandatory provisions of the law of the country of their habitual residence (“Rome I” Regulation, Art. {4}).",
+"Für mit der Caradvance GmbH geschlossene Verträge gilt das im Vertrag angegebene Recht. Bei einem Verbraucher darf dies ihm nicht den Schutz der zwingenden Verbraucherschutzbestimmungen des Rechts seines gewöhnlichen Aufenthaltsstaates entziehen (Verordnung „Rom I“ {2}/{3}/EG, Art. {1}). Für die Leistungen der Mr. Job SK s.r.o. und die Nutzung der Website gilt das Recht der Slowakischen Republik; einem Verbraucher wird dadurch nicht der Schutz entzogen, den ihm die zwingenden Bestimmungen des Rechts seines gewöhnlichen Aufenthaltsstaates gewähren (Verordnung „Rom I“, Art. {4})."
+],
+"německý spolkový zákon o ochraně osobních údajů (BDSG) a zákon o ochraně údajů v digitálních službách (TDDDG) — pokud jde o cookies; v Česku § {1} odst. {2} zákona č. {3}/{4} Sb.;": [
+"the German Federal Data Protection Act (BDSG) and the Telecommunications Digital Services Data Protection Act (TDDDG) — regarding cookies; in the Czech Republic § {1}({2}) of Act No. {3}/{4} Coll.;",
+"das deutsche Bundesdatenschutzgesetz (BDSG) und das Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz (TDDDG) — in Bezug auf Cookies; in Tschechien § {1} Abs. {2} des Gesetzes Nr. {3}/{4} Slg.;"
+],
+"Slovensko": [
+"Slovakia",
+"Slowakei"
+],
+"Slovensko (dozorový úřad společnosti Mr. Job SK s.r.o.)": [
+"Slovakia (supervisory authority of Mr. Job SK s.r.o.)",
+"Slowakei (Aufsichtsbehörde der Mr. Job SK s.r.o.)"
+],
+"Úrad na ochranu osobných údajov Slovenskej republiky — Hraničná {1}, {2} Bratislava; <g0>dataprotection.gov.sk</g0>": [
+"Office for Personal Data Protection of the Slovak Republic — Hraničná {1}, {2} Bratislava; <g0>dataprotection.gov.sk</g0>",
+"Amt für den Schutz personenbezogener Daten der Slowakischen Republik — Hraničná {1}, {2} Bratislava; <g0>dataprotection.gov.sk</g0>"
+],
+"Co je operativní leasing, kolik stojí, pro koho se vyplatí — a kdy je lepší volbou dlouhodobý pronájem, kde dostanete nový vůz od {1} Kč/měs. bez DPH (pro firmy), bez akontace, už na {2} měsíců.": [
+"What operating leasing is, what it costs, who it pays off for — and when long-term rental is the better choice, where you get a new car from {1} Kč/month excl. VAT (for companies), with no down payment, for as little as {2} months.",
+"Was Operating Leasing ist, was es kostet, für wen es sich lohnt — und wann die Langzeitmiete die bessere Wahl ist, bei der Sie ein neues Auto ab {1} Kč/Monat ohne MwSt. (für Firmen) erhalten, ohne Anzahlung, schon ab {2} Monaten."
+],
+"leasingové společnosti, na konci ho vrátíte": [
+"the leasing company's; you return it at the end",
+"gehört der Leasinggesellschaft, am Ende geben Sie es zurück"
+],
+"pronajímatele, na konci ho vrátíte": [
+"the lessor's; you return it at the end",
+"gehört dem Vermieter, am Ende geben Sie es zurück"
+],
+"Kdy zvolit kterou možnost?": [
+"When to choose which option?",
+"Wann welche Option wählen?"
+],
+"<g0>Dlouhodobý pronájem →</g0><g1>Dlouhodobý pronájem pro firmy →</g1><g2>Pro soukromé osoby →</g2> <g3>Financování – leasing →</g3><g4>Firemní vůz: leasing nebo pronájem →</g4>": [
+"<g0>Long-term rental →</g0><g1>Long-term rental for companies →</g1><g2>For private individuals →</g2> <g3>Financing – leasing →</g3><g4>Company car: leasing or rental →</g4>",
+"<g0>Langzeitmiete →</g0><g1>Langzeitmiete für Firmen →</g1><g2>Für Privatpersonen →</g2> <g3>Finanzierung – Leasing →</g3><g4>Firmenwagen: Leasing oder Miete →</g4>"
+],
+"Ať už jde o nové ⟨M1⟩, konkrétní model ⟨M2⟩ nebo ⟨M3⟩: transparentní ceny předvídatelné i v korunách, zdokumentovaná historie, u nových vozů {1} roky odpovědnosti za vady a záruka výrobce. Vyberte výše značku a podívejte se na dostupné modely.": [
+"Whether it's a new ⟨M1⟩, a specific ⟨M2⟩ or ⟨M3⟩ model: transparent prices that are predictable in crowns too, a documented history, and for new cars {1} years of liability for defects plus the manufacturer's warranty. Choose a brand above and see the available models.",
+"Ob ein neuer ⟨M1⟩, ein bestimmtes ⟨M2⟩ oder ⟨M3⟩ Modell: transparente, auch in Kronen planbare Preise, dokumentierte Historie und bei Neuwagen {1} Jahre Mängelhaftung plus Herstellergarantie. Wählen Sie oben eine Marke und sehen Sie sich die verfügbaren Modelle an."
+],
+"Doma": [
+"At home",
+"Zu Hause"
+],
+"Kombinovaně": [
+"Mixed",
+"Gemischt"
 ]
 };

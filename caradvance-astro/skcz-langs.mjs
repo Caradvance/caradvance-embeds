@@ -14,6 +14,7 @@
  * futásidejű fordító (i18n/rt-sk-<nyelv>.js), keresőindex, sitemap. 97% alatti lefedettségnél noindex.
  * Hibára exit 0 — a buildet sosem állítja meg.
  */
+import { langFix } from './skcz-rev26.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parse, serialize, visit, finishLd, maskNums, unmaskNums } from './i18n-core.mjs';
@@ -254,6 +255,7 @@ function run(ml) {
       }) + b);
       h = classFix(h, l);
       if (l === 'hu') h = huPost(h);
+      h = langFix(h, ML, l);
       h = h.replace(/[ \t]*<meta\s+name=["']robots["'][^>]*>\s*\n?/gi, (m) => (/noindex/i.test(m) ? m : ''));
       if (o.cover < MIN_COVER && !/<meta\s+name=["']robots["'][^>]*noindex/i.test(h)) h = h.replace(/<\/head>/i, '<meta name="robots" content="noindex,follow">\n</head>');
       if (/<meta\s+name=["']robots["'][^>]*noindex/i.test(h)) ok[l].delete(p);

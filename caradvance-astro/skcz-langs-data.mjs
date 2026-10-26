@@ -7659,5 +7659,135 @@ export const SKL = {
 "incl. {1} % VAT",
 "inkl. {1} % MwSt.",
 "{1} % áfával"
+],
+"<g0>Prečo my?</g0><g1>Transparentnosť</g1><g2>Zabezpečenie kvality</g2><g3>Referencie</g3><g4>Media</g4><g5>Blog</g5>": [
+"<g0>Why us?</g0><g1>Transparency</g1><g2>Quality assurance</g2><g3>References</g3><g4>Media</g4><g5>Blog</g5>",
+"<g0>Warum wir?</g0><g1>Transparenz</g1><g2>Qualitätssicherung</g2><g3>Referenzen</g3><g4>Medien</g4><g5>Blog</g5>",
+"<g0>Miért mi?</g0><g1>Átláthatóság</g1><g2>Minőségbiztosítás</g2><g3>Referenciák</g3><g4>Média</g4><g5>Blog</g5>"
+],
+"<g0>Objednávka auta</g0><g1>Proces nákupu</g1><g2>Kalkulačky</g2><g3><g4>Kalkulačka poplatkov za prihlásenie</g4></g3><g5><g6>Kalkulačka prepisu</g6></g5><g7><g8>Financovanie lízingom</g8></g7><g9>Výhody</g9><g10>Sám alebo s nami?</g10><g11>Referencie</g11>": [
+"<g0>Car order</g0><g1>Purchase process</g1><g2>Calculators</g2><g3><g4>Registration fee calculator</g4></g3><g5><g6>Transfer fee calculator</g6></g5><g7><g8>Leasing finance</g8></g7><g9>Benefits</g9><g10>On your own or with us?</g10><g11>References</g11>",
+"<g0>Autobestellung</g0><g1>Kaufprozess</g1><g2>Rechner</g2><g3><g4>Rechner Zulassungsgebühr</g4></g3><g5><g6>Rechner Umschreibung</g6></g5><g7><g8>Leasingfinanzierung</g8></g7><g9>Vorteile</g9><g10>Selbst oder mit uns?</g10><g11>Referenzen</g11>",
+"<g0>Autórendelés</g0><g1>Vásárlási folyamat</g1><g2>Kalkulátorok</g2><g3><g4>Forgalomba helyezési díj kalkulátor</g4></g3><g5><g6>Átírási díj kalkulátor</g6></g5><g7><g8>Lízingfinanszírozás</g8></g7><g9>Előnyök</g9><g10>Egyedül vagy velünk?</g10><g11>Referenciák</g11>"
+],
+"Financovanie lízingom →": [
+"Leasing finance →",
+"Leasingfinanzierung →",
+"Lízingfinanszírozás →"
+],
+"<g0>Mesačný poplatok bez DPH</g0><g1>od {1} €/mes.</g1>": [
+"<g0>Monthly fee excl. VAT</g0><g1>from {1} €/month</g1>",
+"<g0>Monatsrate ohne MwSt.</g0><g1>ab {1} €/Monat</g1>",
+"<g0>Havidíj áfa nélkül</g0><g1>{1} €/hó-tól</g1>"
+],
+"Áno. Podmienky financovania – dobu splácania, vlastný vklad aj výšku splátky – stanoví partnerská lízingová spoločnosť podľa svojej ponuky a posúdenia bonity. S vaším súhlasom jej odovzdáme vaše kontaktné údaje.": [
+"Yes. The financing terms – repayment period, down payment and instalment amount – are set by the partner leasing company according to its offer and credit assessment. With your consent, we pass your contact details on to it.",
+"Ja. Die Finanzierungsbedingungen – Laufzeit, Anzahlung und Ratenhöhe – legt die Partner-Leasinggesellschaft nach ihrem Angebot und ihrer Bonitätsprüfung fest. Mit Ihrer Zustimmung geben wir ihr Ihre Kontaktdaten weiter.",
+"Igen. A finanszírozás feltételeit – a futamidőt, az önerőt és a törlesztőrészlet összegét – a partner lízingcég határozza meg a saját ajánlata és hitelbírálata alapján. Az Ön hozzájárulásával továbbítjuk neki az elérhetőségeit."
+],
+"Orientačnú splátku vám na požiadanie pripraví partnerská lízingová spoločnosť.": [
+"The partner leasing company will prepare an indicative instalment for you on request.",
+"Eine unverbindliche Monatsrate erstellt Ihnen die Partner-Leasinggesellschaft auf Anfrage.",
+"Tájékoztató törlesztőrészletet kérésre a partner lízingcég készít Önnek."
+],
+"Orientačná priemerná cena palív na Slovensku (ŠÚ SR, október {1}); cenu môžete upraviť": [
+"Indicative average fuel price in Slovakia (Statistical Office of the SR, October {1}); you can adjust the price",
+"Orientierender Durchschnittspreis für Kraftstoff in der Slowakei (Statistikamt der SR, Oktober {1}); Sie können den Preis anpassen",
+"Tájékoztató átlagos üzemanyagár Szlovákiában (Szlovák Statisztikai Hivatal, {1}. október); az árat módosíthatja"
+],
+"Vyberte, prosím, aspoň značku.": [
+"Please select at least a brand.",
+"Bitte wählen Sie mindestens eine Marke.",
+"Kérjük, válasszon legalább egy márkát."
+],
+"Pri nákupe bez DPH pre firmu zadajte, prosím, IČ DPH (EÚ).": [
+"For a VAT-free purchase as a company, please enter your EU VAT ID (IČ DPH).",
+"Für einen Kauf ohne MwSt. als Firma geben Sie bitte Ihre EU-USt-IdNr. (IČ DPH) an.",
+"Áfa nélküli céges vásárláshoz kérjük, adja meg a közösségi adószámot (IČ DPH)."
+],
+"Prosím, potvrďte súhlas s VOP a so zásadami ochrany osobných údajov.": [
+"Please confirm that you agree to the T&Cs and the privacy policy.",
+"Bitte bestätigen Sie Ihre Zustimmung zu den AGB und zur Datenschutzerklärung.",
+"Kérjük, fogadja el az ÁSZF-et és az adatvédelmi tájékoztatót."
+],
+"Ďakujeme! Váš dopyt sme prijali — čoskoro sa vám ozveme s ponukou na mieru.": [
+"Thank you! We have received your request — we will get back to you shortly with a tailored offer.",
+"Vielen Dank! Wir haben Ihre Anfrage erhalten — wir melden uns in Kürze mit einem individuellen Angebot.",
+"Köszönjük! Megkaptuk a megkeresését — hamarosan jelentkezünk személyre szabott ajánlattal."
+],
+"Odoslanie sa nepodarilo — napíšte nám, prosím, na info@caradvance.sk.": [
+"Sending failed — please write to us at info@caradvance.sk.",
+"Senden fehlgeschlagen — bitte schreiben Sie uns an info@caradvance.sk.",
+"A küldés nem sikerült — kérjük, írjon nekünk az info@caradvance.sk címre."
+],
+"Nemusíte hádať. Orientačnú splátku vám na požiadanie pripraví partnerská lízingová spoločnosť. Celý proces vysvetľujeme aj na našej <g0>stránke o financovaní a lízingu</g0>.": [
+"No need to guess. The partner leasing company will prepare an indicative instalment for you on request. We also explain the whole process on our <g0>financing and leasing page</g0>.",
+"Sie müssen nicht raten. Eine unverbindliche Monatsrate erstellt Ihnen die Partner-Leasinggesellschaft auf Anfrage. Den gesamten Ablauf erklären wir auch auf unserer <g0>Seite zu Finanzierung und Leasing</g0>.",
+"Nem kell találgatnia. Tájékoztató törlesztőrészletet kérésre a partner lízingcég készít Önnek. A teljes folyamatot a <g0>finanszírozásról és lízingről szóló oldalunkon</g0> is elmagyarázzuk."
+],
+"<g0>Auto na mieru →</g0> <g1>⟨M1⟩, ⟨M2⟩ alebo ⟨M3⟩? →</g1><g2>Dovoz auta z Nemecka →</g2> <g3>Financovanie lízingom →</g3><g4>Kalkulačka poplatkov za prihlásenie →</g4>": [
+"<g0>Custom-ordered car →</g0> <g1>⟨M1⟩, ⟨M2⟩ or ⟨M3⟩? →</g1><g2>Car import from Germany →</g2> <g3>Leasing finance →</g3><g4>Registration fee calculator →</g4>",
+"<g0>Auto nach Maß →</g0> <g1>⟨M1⟩, ⟨M2⟩ oder ⟨M3⟩? →</g1><g2>Autoimport aus Deutschland →</g2> <g3>Leasingfinanzierung →</g3><g4>Rechner Zulassungsgebühr →</g4>",
+"<g0>Egyedi rendelésű autó →</g0> <g1>⟨M1⟩, ⟨M2⟩ vagy ⟨M3⟩? →</g1><g2>Autóbehozatal Németországból →</g2> <g3>Lízingfinanszírozás →</g3><g4>Forgalomba helyezési díj kalkulátor →</g4>"
+],
+"<g0>Auto na mieru →</g0> <g1>Dovoz Mercedesu z Nemecka →</g1><g2>⟨M1⟩, ⟨M2⟩ alebo ⟨M3⟩? →</g2> <g3>Financovanie lízingom →</g3><g4>Kalkulačka poplatkov za prihlásenie →</g4>": [
+"<g0>Custom-ordered car →</g0> <g1>Mercedes import from Germany →</g1><g2>⟨M1⟩, ⟨M2⟩ or ⟨M3⟩? →</g2> <g3>Leasing finance →</g3><g4>Registration fee calculator →</g4>",
+"<g0>Auto nach Maß →</g0> <g1>Mercedes-Import aus Deutschland →</g1><g2>⟨M1⟩, ⟨M2⟩ oder ⟨M3⟩? →</g2> <g3>Leasingfinanzierung →</g3><g4>Rechner Zulassungsgebühr →</g4>",
+"<g0>Egyedi rendelésű autó →</g0> <g1>Mercedes behozatala Németországból →</g1><g2>⟨M1⟩, ⟨M2⟩ vagy ⟨M3⟩? →</g2> <g3>Lízingfinanszírozás →</g3><g4>Forgalomba helyezési díj kalkulátor →</g4>"
+],
+"<g0>Auto na mieru →</g0>⟨M1⟩, ⟨M2⟩, ⟨M3⟩ konfigurátor → ⟨M4⟩, ⟨M5⟩, ⟨M6⟩ konfigurátor →<g1>Dovoz auta z Nemecka →</g1> <g2>Financovanie lízingom →</g2><g3>Kalkulačka poplatkov za prihlásenie →</g3>": [
+"<g0>Custom-ordered car →</g0>⟨M1⟩, ⟨M2⟩, ⟨M3⟩ configurator → ⟨M4⟩, ⟨M5⟩, ⟨M6⟩ configurator →<g1>Car import from Germany →</g1> <g2>Leasing finance →</g2><g3>Registration fee calculator →</g3>",
+"<g0>Auto nach Maß →</g0>⟨M1⟩, ⟨M2⟩, ⟨M3⟩ Konfigurator → ⟨M4⟩, ⟨M5⟩, ⟨M6⟩ Konfigurator →<g1>Autoimport aus Deutschland →</g1> <g2>Leasingfinanzierung →</g2><g3>Rechner Zulassungsgebühr →</g3>",
+"<g0>Egyedi rendelésű autó →</g0>⟨M1⟩, ⟨M2⟩, ⟨M3⟩ konfigurátor → ⟨M4⟩, ⟨M5⟩, ⟨M6⟩ konfigurátor →<g1>Autóbehozatal Németországból →</g1> <g2>Lízingfinanszírozás →</g2><g3>Forgalomba helyezési díj kalkulátor →</g3>"
+],
+"Prevádzkuje túto webovú stránku, komunikuje s vami po slovensky, anglicky alebo nemecky a pomáha s administratívou a s registráciou vozidla. Prepravu vozidla zabezpečuje Caradvance GmbH. Nevystupuje ako predávajúci ani prenajímateľ.": [
+"It operates this website, communicates with you in Slovak, English or German and helps with the paperwork and vehicle registration. Transport of the vehicle is arranged by Caradvance GmbH. It does not act as seller or lessor.",
+"Sie betreibt diese Website, kommuniziert mit Ihnen auf Slowakisch, Englisch oder Deutsch und hilft bei den Formalitäten und der Fahrzeugzulassung. Den Transport des Fahrzeugs übernimmt die Caradvance GmbH. Sie tritt weder als Verkäufer noch als Vermieter auf.",
+"Üzemelteti ezt a weboldalt, szlovákul, angolul vagy németül tartja Önnel a kapcsolatot, és segít az ügyintézésben és a jármű forgalomba helyezésében. A jármű szállítását a Caradvance GmbH végzi. Nem lép fel eladóként vagy bérbeadóként."
+],
+"Takto platíte:": [
+"How you pay:",
+"So bezahlen Sie:",
+"Így fizet:"
+],
+"{1} % doplatok": [
+"{1} % balance",
+"{1} % Restzahlung",
+"{1} % hátralék"
+],
+"Nemecký trh je zhruba {1}× väčší ako slovenský — my z neho dovážame iba to, čo spĺňa všetky body.": [
+"The German market is roughly {1}× larger than the Slovak one — and we only import the cars that pass on every point.",
+"Der deutsche Markt ist etwa {1}× größer als der slowakische — wir importieren daraus nur, was alle Punkte erfüllt.",
+"A német piac nagyjából {1}× nagyobb a szlováknál — mi csak azt hozzuk be belőle, ami minden ponton megfelel."
+],
+"lízingovej spoločnosti, na konci ho vrátite": [
+"the leasing company's; you return it at the end",
+"gehört der Leasinggesellschaft, am Ende geben Sie es zurück",
+"a lízingcégé, a végén visszaadja"
+],
+"prenajímateľa, na konci ho vrátite": [
+"the lessor's; you return it at the end",
+"gehört dem Vermieter, am Ende geben Sie es zurück",
+"a bérbeadóé, a végén visszaadja"
+],
+"Kedy zvoliť ktorú možnosť?": [
+"When to choose which option?",
+"Wann welche Option wählen?",
+"Mikor melyiket válassza?"
+],
+"<g0>Dlhodobý prenájom →</g0><g1>Dlhodobý prenájom pre firmy →</g1><g2>Pre súkromné osoby →</g2> <g3>Financovanie lízingom →</g3><g4>Firemné auto: lízing alebo prenájom →</g4>": [
+"<g0>Long-term rental →</g0><g1>Long-term rental for companies →</g1><g2>For private individuals →</g2> <g3>Leasing finance →</g3><g4>Company car: leasing or rental →</g4>",
+"<g0>Langzeitmiete →</g0><g1>Langzeitmiete für Firmen →</g1><g2>Für Privatpersonen →</g2> <g3>Leasingfinanzierung →</g3><g4>Firmenwagen: Leasing oder Miete →</g4>",
+"<g0>Hosszú távú bérlés →</g0><g1>Hosszú távú bérlés cégeknek →</g1><g2>Magánszemélyeknek →</g2> <g3>Lízingfinanszírozás →</g3><g4>Céges autó: lízing vagy bérlés →</g4>"
+],
+"Doma": [
+"At home",
+"Zu Hause",
+"Otthon"
+],
+"Kombinovane": [
+"Mixed",
+"Gemischt",
+"Vegyesen"
 ]
 };

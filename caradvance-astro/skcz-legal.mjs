@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import { LEGAL } from './skcz-legal-data.mjs';
 import { P3 } from './skcz-p3-data.mjs';
+import { REV } from './skcz-rev26.mjs';
 
 const VOID = /^(area|base|br|col|embed|hr|img|input|link|meta|source|track|wbr)$/i;
 function elEnd(s, i) {
@@ -117,12 +118,56 @@ const fmtE = (n) => nb(Math.round(n).toLocaleString('sk-SK')) + ' €';
 const fmtK = (n) => nb((Math.round(n * CZK / 10) * 10).toLocaleString('cs-CZ')) + ' Kč';
 const mainOf = (l, eur) => (l === 'cs' ? fmtK(eur) : fmtE(eur));             // a fő ár: sk → €, cs → Kč (a szerződés pénzneme €)
 const subOf = (l, eur) => (l === 'cs' ? fmtE(eur) + ' (≈ ' + fmtK(eur) + ')' : fmtE(eur));
+/* ---------- Új autó az EU-s áfaszabály szerint (Mr. JOB SK, 2026-10-26, SK 1 / CZ 1) ----------
+ * Új közlekedési eszköz (2006/112/EK 2. cikk (2) b)): az első forgalomba helyezéstől számított 6 hónapon belül
+ * VAGY legfeljebb 6 000 km. Az adatlap csak hónapot ad (MM/ÉÉÉÉ): a 6. hónapban — a nap ismerete nélkül —
+ * még újnak számít (óvatos besorolás, a blokk telefonos egyeztetést kér). Napi build frissíti. */
+const NOWM = (() => { const d = new Date(); return d.getFullYear() * 12 + d.getMonth() + 1; })();
+const kmNum = (s) => { const t = String(s == null ? '' : s).replace(/[\s\u00a0.]/g, ''); return /^\d+$/.test(t) ? +t : null; };
+function isNewCar(year, km) {
+  if (km != null && km <= 6000) return true;
+  const m = /^\s*(\d{1,2})\/(\d{4})\s*$/.exec(year || '');
+  return !!(m && NOWM - (+m[2] * 12 + +m[1]) <= 6);
+}
+function pageIsNew(h) {
+  const y = (/<div class="badge"><span class="cond">[^<]*<\/span><span class="year">([^<]*)<\/span>/.exec(h) || [])[1] || '';
+  const k = /class="k">[^<]*(?:kilomet|Najet|Najazd|km)[^<]*<\/div><div class="v">([\d\s\u00a0.]+)</i.exec(h);
+  const ld = /"mileageFromOdometer":\{[^}]*"value":(\d+)/.exec(h);
+  const km = k ? kmNum(k[1]) : (ld ? +ld[1] : null);
+  return isNewCar(y, km);
+}
+/* kártyák (lista, főoldal, hasonló autók) és az adatlap jelvénye: „Nové/Nový” a „Ojazdené/Ojeté” helyett */
+function newCond(h, L, st) {
+  const N = L.PRICE.nw; if (!N) return h;
+  h = h.replace(/<span class="cond">([^<]*)<\/span><span class="year">([^<]*)<\/span><\/div>(\s*<h3 class="title">[^<]*<\/h3>\s*<div class="specs"[^>]*>)([^<]*)/g, (all, c, y, mid, spec) => {
+    if (c !== N.used) return all;
+    const km = (/^\s*(\d[\d\s\u00a0.]*?)\s*(?:km\b|·|$)/.exec(spec) || [])[1];
+    if (!isNewCar(y, km != null ? kmNum(km) : null)) return all;
+    st.newcard = (st.newcard || 0) + 1;
+    return '<span class="cond">' + N.cond + '</span><span class="year">' + y + '</span></div>' + mid + spec;
+  });
+  return h;
+}
 function priceBlock(h, L, l, contact, st) {
   const P = L.PRICE;
+  const NEW = !!(P.nw && /<div class="badge"><span class="cond">/.test(h) && pageIsNew(h));
+  if (NEW) {
+    h = h.replace('<div class="badge"><span class="cond">' + P.nw.used + '</span>', '<div class="badge"><span class="cond">' + P.nw.cond + '</span>');
+    h = h.split('"itemCondition":"https://schema.org/UsedCondition"').join('"itemCondition":"https://schema.org/NewCondition"');
+  }
   const re = new RegExp('<div data-eur="(\\d+(?:\\.\\d+)?)" data-net="[^"]*">\\s*<div class="plabel">' + P.label + '</div>\\s*<div class="price" data-main[^>]*>[^<]*</div>\\s*<div class="peur">[^<]*</div>\\s*</div>\\s*<div class="taxnote">[^<]*</div>', 'g');
   return h.replace(re, (all, e) => {
     const eur = +e; if (!eur) return all;
     st.price = (st.price || 0) + 1;
+    if (NEW) {
+      const N = P.nw; st.newcar = (st.newcar || 0) + 1;
+      return '<div class="ca-vat ca-new" data-eur="' + e + '" data-new="1">' +
+        '<div class="plabel">' + N.label + '</div>' +
+        '<div class="price">' + fmtE(eur) + '</div>' +
+        '<div class="peur" style="font-size:14px">' + P.net + (l === 'cs' ? ' (≈ ' + fmtK(eur) + ')' : '') + '</div>' +
+        '<div class="ca-vatv" style="margin-top:12px;font-size:14px;line-height:1.45">' + N.txt.replace('{fin}', '<b>' + fmtE(eur * P.vat) + '</b>') + '</div>' +
+        '</div><div class="taxnote">' + N.call + ' <a href="tel:' + contact.tel + '">' + contact.phone + '</a></div>';
+    }
     return '<div class="ca-vat" data-eur="' + e + '">' +
       '<div class="plabel">' + P.del + '</div>' +
       '<div class="price">' + mainOf(l, eur * P.vat) + '</div>' +
@@ -254,13 +299,34 @@ function reviewsLd(h, st) {
   });
 }
 
+/* ---------- Autó-adatlap: kapcsolattartók = a Kontakt oldal csapata (SK 3 / CZ 5) ---------- */
+function carContact(h, Q, st) {
+  const team = Q.CONTACT && Q.CONTACT.team; if (!team) return h;
+  return h.replace(/(<div class="panel contact"><h4>[^<]*<\/h4>)((?:<div class="tmem">[\s\S]*?<\/div><\/div><\/div>)+)(?=<div class="crow")/, (all, head, mems) => {
+    const tpl = /<div class="tmem">[\s\S]*?<\/div><\/div><\/div>/.exec(mems)[0];
+    const out = team.map((p) => {
+      const d = p.phone.replace(/[^\d]/g, '');
+      return tpl
+        .replace(/<img\b[^>]*>/, '<img src="' + p.img + '" alt="' + esc(p.name) + '" loading="lazy" width="56" height="56">')
+        .replace(/(<div class="pname">)[^<]*/, '$1' + esc(p.name))
+        .replace(/(<div class="prole">)[^<]*/, '$1' + esc(p.role))
+        .replace(/href="tel:[^"]*"(>[\s\S]*?)[+\d][\d\s\u00a0]{6,}(?=<\/a>)/, 'href="tel:+' + d + '"$1' + p.phone)
+        .replace(/href="https:\/\/wa\.me\/\d+"/, 'href="https://wa.me/' + d + '"');
+    }).join('');
+    st.carcontact = (st.carcontact || 0) + 1;
+    return head + out;
+  });
+}
+
 export function legal(h, l, rel, contact, site) {
   const L0 = LEGAL[l]; const st = {};
   if (!L0) return [h, st];
   const Q = P3[l] || { RULES: [], JS: [] };
-  const L = Object.assign({}, L0, { JS: L0.JS.concat(Q.JS), RULES: L0.RULES.concat(Q.RULES) });
-  // 1) beágyazott scriptek / űrlapok (pontos egyezések)
+  const RV = REV[l] || { ALL: [], TEXT: [] };
+  const L = Object.assign({}, L0, { JS: L0.JS.concat(Q.JS), RULES: L0.RULES.concat(Q.RULES, RV.TEXT) });
+  // 1) beágyazott scriptek / űrlapok (pontos egyezések) + Mr. JOB SK 2026-10-26 (űrlap-értékek, összehasonlító)
   h = applyRules(h, L.JS, st, 'js');
+  h = applyRules(h, RV.ALL, st, 'rev');
   // 2) JSON-LD
   h = h.replace(/(<script type="application\/ld\+json">)([\s\S]*?)(<\/script>)/g, (all, a, js, b) => {
     try { return a + JSON.stringify(fixLd(JSON.parse(js), L, l, rel, site, st)).replace(/<\//g, '<\\/') + b; } catch (e) { return all; }
@@ -273,6 +339,8 @@ export function legal(h, l, rel, contact, site) {
   // 5) ár-blokk, kártyák, bérlési táblázat
   h = priceBlock(h, L, l, contact, st);
   h = cardPrices(h, L, l, st);
+  h = newCond(h, L, st);
+  if (/\/auto\//.test('/' + rel) || /^(auto|auta|vozy)\//.test(rel)) h = carContact(h, Q, st);
   h = dropPrivCol(h, st);
   if (L.FIN && L.FIN.re.test(rel)) h = financePage(h, L, st);
   if (rel === 'kontakt/index.html') h = contactPage(h, Q, st);
