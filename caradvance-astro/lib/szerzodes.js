@@ -721,3 +721,5 @@ export async function mailFirstPaid(env, c, ch) {
   await sendMailX(env, notifyTo(env), `Fizetve: ${c.number} – ${c.company || c.name}`, `<p>A(z) <b>${esc(c.number)}</b> szerződés első fizetése megérkezett (${esc(money(ch.amount, ch.currency))}). A szerződés aktív; az átadás után add meg az átadás napját, ettől indulnak a havi terhelések.</p>${btn(SITE + '/belso/szerzodesek/#' + c.id, 'Megnyitás')}`);
 }
 export { randomHex };
+// A CRM (lib/crm.js) ugyanezzel a PDF-motorral (beágyazott magyar betűkészlet) készíti a szerződéstervezeteket.
+export { Pdf, PW, PH, ML, MR, MB };
