@@ -72,7 +72,7 @@
   /* caradvance.sk / .cz: a szlovák / cseh kapcsolattartó (Mr. Job SK s.r.o.) WhatsAppja és szövege */
   var CLG = String(document.documentElement.lang || "hu").slice(0, 2).toLowerCase();
   /* piac a domain alapján (caradvance.sk/.cz — az angol, német, magyar nyelvű változaton is), különben a nyelv szerint */
-  var MKT = (function () { var m = /(^|\.)caradvance\.(sk|cz)$/.exec(location.hostname); if (m) return m[2] === "cz" ? "cs" : "sk"; var p = /^\/(sk|cs)\//.exec(location.pathname); if (p) return p[1]; return (CLG === "sk" || CLG === "cs") ? CLG : ""; })();
+  var MKT = (function () { var m = /(^|\.)caradvance\.(sk|cz|pl)$/.exec(location.hostname); if (m) return m[2] === "cz" ? "cs" : m[2]; var p = /^\/(sk|cs|pl)\//.exec(location.pathname); if (p) return p[1]; return (CLG === "sk" || CLG === "cs" || CLG === "pl") ? CLG : ""; })();
   if (MKT) WA = "421915410555";
   var WAH = MKT ? "+421 915 410 555" : "+36 30 233 6060";
   var SESSION = null;                      // Phase 2: bejelentkezett ügyfél tokenje
@@ -126,8 +126,8 @@
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
   var wrap = document.createElement("div"); wrap.className = "cac"; document.body.appendChild(wrap);
-  var SITE_N = MKT === "cs" ? "caradvance.cz" : MKT === "sk" ? "caradvance.sk" : "caradvance.hu";
-  var waMsg = CLG === "sk" ? "Dobrý deň, píšem z chatu na webe caradvance.sk a rád by som hovoril s vaším kolegom."
+  var SITE_N = MKT === "cs" ? "caradvance.cz" : MKT === "sk" ? "caradvance.sk" : MKT === "pl" ? "caradvance.pl" : "caradvance.hu";
+  var waMsg = CLG === "pl" ? "Dzień dobry, piszę z czatu na stronie caradvance.pl i chciałbym porozmawiać z konsultantem."     : CLG === "sk" ? "Dobrý deň, píšem z chatu na webe caradvance.sk a rád by som hovoril s vaším kolegom."
     : CLG === "cs" ? "Dobrý den, píšu z chatu na webu caradvance.cz a rád bych mluvil s vaším kolegou."
     : (MKT && CLG === "en") ? "Hello, I am writing from the chat on " + SITE_N + " and would like to speak to a colleague."
     : (MKT && CLG === "de") ? "Guten Tag, ich schreibe aus dem Chat auf " + SITE_N + " und möchte mit einem Mitarbeiter sprechen."
@@ -139,10 +139,10 @@
 
   wrap.innerHTML =
     '<button class="cac-launch" id="cacL" aria-label="Kérdése van? Segítek">' + carSvg + '<span class="cac-lt">Segítek</span></button>' +
-    '<section class="cac-w cl" id="cacW" role="dialog" aria-label="CarAdvance ' + (CLG === "sk" || CLG === "cs" ? "asistent" : "asszisztens") + '">' +
+    '<section class="cac-w cl" id="cacW" role="dialog" aria-label="CarAdvance ' + (CLG === "pl" ? "asystent" : CLG === "sk" || CLG === "cs" ? "asistent" : "asszisztens") + '">' +
       '<header class="cac-hd"><div class="cac-br">' +
         '<img class="cac-lg" src="' + LOGO + '" alt="CarAdvance" onerror="this.outerHTML=\'<div class=&quot;cac-lgt&quot;>Car<span>Advance</span></div>\'">' +
-        '<p class="cac-st"><span class="cac-dot"></span> <b>' + (CLG === "sk" || CLG === "cs" ? "AI asistent" : "AI asszisztens") + '</b> · online</p>' +
+        '<p class="cac-st"><span class="cac-dot"></span> <b>' + (CLG === "pl" ? "Asystent AI" : CLG === "sk" || CLG === "cs" ? "AI asistent" : "AI asszisztens") + '</b> · online</p>' +
       '</div><button class="cac-x" id="cacX" aria-label="Bezárás">✕</button></header>' +
       '<div class="cac-th" id="cacTh"><div class="cac-ms" id="cacMs"></div><div class="cac-ch" id="cacCh"></div>' +
         '<div class="cac-hf" id="cacHf"><div class="t"><b>Beszélnél egy munkatárssal?</b>Hétköznap 9–17h között WhatsAppon.</div>' +
@@ -409,8 +409,18 @@
   var SALES_EMAIL = "info@caradvance.hu";
   /* caradvance.sk / .cz: szlovák/cseh ÁFA-szabályok, finanszírozás és kapcsolat (a magyar 19%-os német áfa és a magyar bankok helyett) */
   var ILG = String(document.documentElement.lang || "hu").slice(0, 2).toLowerCase();
-  var IMK = (function () { var m = /(^|\.)caradvance\.(sk|cz)$/.exec(location.hostname); if (m) return m[2] === "cz" ? "cs" : "sk"; var p = /^\/(sk|cs)\//.exec(location.pathname); if (p) return p[1]; return (ILG === "sk" || ILG === "cs") ? ILG : ""; })();
-  var LOC = IMK === "sk" ? {
+  var IMK = (function () { var m = /(^|\.)caradvance\.(sk|cz|pl)$/.exec(location.hostname); if (m) return m[2] === "cz" ? "cs" : m[2]; var p = /^\/(sk|cs|pl)\//.exec(location.pathname); if (p) return p[1]; return (ILG === "sk" || ILG === "cs" || ILG === "pl") ? ILG : ""; })();
+  var LOC = IMK === "pl" ? {
+    email: "info@caradvance.hu",
+    priv: ["Z polskim VAT 23 %, z dostawą do Polski (Caradvance GmbH)", "Z niemieckim VAT 19 % — tylko samochód używany, który odbiorę osobiście w Niemczech i sam zorganizuję transport"],
+    co: ["Bez VAT — firma z ważnym numerem VAT UE (Caradvance GmbH)", "Z polskim VAT 23 % — firma bez numeru VAT UE"],
+    fin: ["Proszę o pomoc w finansowaniu (leasing / kredyt przez partnera)", "Mam własne finansowanie"],
+    taxid: "Numer VAT UE (NIP-UE)",
+    info: { sale: "Ceny są orientacyjne. „Netto” to cena bez podatku, „brutto” obejmuje polski VAT 23 % przy dostawie do Polski. Ostateczną cenę i podatek podaje pisemna oferta.", rent: "Opłata miesięczna jest podana netto dla limitu 2 000 km/mies. Ostateczną cenę podaje pisemna oferta." },
+    kind: { rent: "Zapytanie o wynajem", sale: "Zapytanie (samochód na sprzedaż)" },
+    buyer: { "Magánszemély": "Osoba prywatna", "Cég": "Firma" },
+    vals: [[/ hónap$/, " mies."], [/ km \/ hó/, " km / mies."], [/^Egy összegben$/, "Jednorazowo"], [/^Finanszírozással$/, "Z finansowaniem"], [/^Még nem tudom$/, "Jeszcze nie wiem"]]
+  } : IMK === "sk" ? {
     email: "info@caradvance.sk",
     priv: ["So slovenskou DPH 23 %, s doručením na Slovensko (Caradvance GmbH)", "S nemeckou DPH 19 % — len ojazdené auto, ktoré si osobne prevezmem v Nemecku a prepravu zabezpečím sám"],
     co: ["Bez DPH — firma s platným IČ DPH v EÚ (Caradvance GmbH)", "So slovenskou DPH 23 % — firma bez IČ DPH"],
@@ -433,6 +443,10 @@
   } : null;
   /* angol / német / magyar nyelvű oldal a .sk/.cz domainen: a felhasználónak szóló szövegek az oldal nyelvén (az e-mail értékei a piac nyelvén maradnak) */
   var LTX = {
+    pl: {
+      en: { priv: ["With Polish VAT 23 %, delivered to Poland (Caradvance GmbH)", "With German VAT 19 % — used car only, which I collect personally in Germany and transport myself"], co: ["Without VAT — company with a valid EU VAT ID (Caradvance GmbH)", "With Polish VAT 23 % — company without an EU VAT ID"], fin: ["Please help me with financing (leasing / loan via a partner)", "I have my own financing"], taxid: "EU VAT ID (NIP-UE)", info: { sale: "Prices are indicative. “excl. VAT” is the price without tax; “incl. VAT” includes Polish VAT of 23 % for delivery to Poland. The final price and tax are stated in the written offer.", rent: "The monthly fee is shown excl. VAT for a limit of 2,000 km/month. The final price is stated in the written offer." } },
+      de: { priv: ["Mit polnischer MwSt. 23 %, Lieferung nach Polen (Caradvance GmbH)", "Mit deutscher MwSt. 19 % — nur Gebrauchtwagen, den ich persönlich in Deutschland abhole und selbst transportiere"], co: ["Ohne MwSt. — Firma mit gültiger EU-USt-IdNr. (Caradvance GmbH)", "Mit polnischer MwSt. 23 % — Firma ohne USt-IdNr."], fin: ["Bitte um Hilfe bei der Finanzierung (Leasing / Kredit über einen Partner)", "Ich habe eine eigene Finanzierung"], taxid: "USt-IdNr. (NIP-UE)", info: { sale: "Die Preise sind unverbindlich. „ohne MwSt.“ ist der Preis ohne Steuer, „inkl. MwSt.“ enthält die polnische MwSt. von 23 % bei Lieferung nach Polen. Endpreis und Steuer nennt das schriftliche Angebot.", rent: "Die Monatsrate ist ohne MwSt. für ein Limit von 2.000 km/Monat angegeben. Den Endpreis nennt das schriftliche Angebot." } }
+    },
     sk: {
       en: { priv: ["With Slovak VAT 23 %, delivered to Slovakia (Caradvance GmbH)", "With German VAT 19 % — used car only, which I collect personally in Germany and transport myself"], co: ["Without VAT — company with a valid EU VAT ID (Caradvance GmbH)", "With Slovak VAT 23 % — company without a VAT ID"], fin: ["Please help me with financing (leasing / loan via a partner)", "I have my own financing"], taxid: "VAT ID (IČ DPH)", info: { sale: "Prices are indicative. “excl. VAT” is the price without tax; “incl. VAT” includes Slovak VAT of 23 % for delivery to Slovakia. The final price and tax are stated in the written offer.", rent: "The monthly fee is shown excl. VAT for a limit of 2,000 km/month. The final price is stated in the written offer." } },
       de: { priv: ["Mit slowakischer MwSt. 23 %, Lieferung in die Slowakei (Caradvance GmbH)", "Mit deutscher MwSt. 19 % — nur Gebrauchtwagen, den ich persönlich in Deutschland abhole und selbst transportiere"], co: ["Ohne MwSt. — Firma mit gültiger EU-USt-IdNr. (Caradvance GmbH)", "Mit slowakischer MwSt. 23 % — Firma ohne USt-IdNr."], fin: ["Bitte um Hilfe bei der Finanzierung (Leasing / Kredit über einen Partner)", "Ich habe eine eigene Finanzierung"], taxid: "USt-IdNr. (IČ DPH)", info: { sale: "Die Preise sind unverbindlich. „ohne MwSt.“ ist der Preis ohne Steuer, „inkl. MwSt.“ enthält die slowakische MwSt. von 23 % bei Lieferung in die Slowakei. Endpreis und Steuer nennt das schriftliche Angebot.", rent: "Die Monatsrate ist ohne MwSt. für ein Limit von 2.000 km/Monat angegeben. Den Endpreis nennt das schriftliche Angebot." } },

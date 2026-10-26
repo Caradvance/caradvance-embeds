@@ -106,6 +106,12 @@
       '必要', '— 始终启用。表单和安全所必需。',
       '分析', '— 访客数量以及页面效果。Google Analytics。',
       '广告', '— 广告效果衡量与个性化。Google Ads、Meta。', '保存'],
+    pl: ['Ustawienia plików cookie', 'Używamy plików cookie',
+      'Oprócz niezbędnych plików cookie chcielibyśmy używać także analitycznych i reklamowych plików cookie, aby sprawdzić, co naprawdę pomaga Ci znaleźć właściwy samochód. Prosimy o Twoją zgodę.',
+      'Polityka prywatności', 'Ustawienia', 'Tylko niezbędne', 'Akceptuję',
+      'Niezbędne', '— zawsze aktywne. Potrzebne do formularzy i bezpieczeństwa.',
+      'Analityka', '— ilu odwiedzających przychodzi i które strony działają. Google Analytics.',
+      'Reklama', '— pomiar i personalizacja reklam. Google Ads, Meta.', 'Zapisz'],
     sk: ['Nastavenia cookies', 'Používame cookies',
       'Okrem nevyhnutných cookies by sme radi používali aj analytické a reklamné cookies, aby sme videli, čo vám skutočne pomáha nájsť to správne auto. Na to potrebujeme váš súhlas.',
       'Zásady ochrany osobných údajov', 'Nastavenia', 'Len nevyhnutné', 'Súhlasím',
@@ -124,7 +130,7 @@
     var h = String(location.hostname || '');
     var hl = String(document.documentElement.getAttribute('lang') || '').slice(0, 2).toLowerCase();
     if (/(^|\.)caradvance\.sk$/.test(h)) return /^(en|de|hu)$/.test(hl) ? hl : 'sk';
-    if (/(^|\.)caradvance\.cz$/.test(h)) return /^(en|de)$/.test(hl) ? hl : 'cs';
+    if (/(^|\.)caradvance\.cz$/.test(h)) return /^(en|de)$/.test(hl) ? hl : 'cs';     if (/(^|\.)caradvance\.pl$/.test(h)) return /^(en|de)$/.test(hl) ? hl : 'pl';
     var m = String(location.pathname || '').match(/^\/(?:_np\/)?(en|de|fr|uk|zh|sk|cs)(\/|$)/);
     if (m) return m[1];
     var l = String(document.documentElement.getAttribute('lang') || 'hu').slice(0, 2).toLowerCase();
@@ -134,7 +140,7 @@
   function policyUrl(l) {
     var h = String(location.hostname || '');
     if (l === 'sk' && /caradvance\.sk$/.test(h)) return '/ochrana-osobnych-udajov/#cookie';
-    if (l === 'cs' && /caradvance\.cz$/.test(h)) return '/ochrana-osobnich-udaju/#cookie';
+    if (l === 'cs' && /caradvance\.cz$/.test(h)) return '/ochrana-osobnich-udaju/#cookie';     if (l === 'pl' && /caradvance\.pl$/.test(h)) return '/polityka-prywatnosci/#cookie';     if (/caradvance\.pl$/.test(h)) return '/' + l + '/polityka-prywatnosci/#cookie';
     if (/caradvance\.sk$/.test(h)) return '/' + l + '/ochrana-osobnych-udajov/#cookie';
     if (/caradvance\.cz$/.test(h)) return '/' + l + '/ochrana-osobnich-udaju/#cookie';
     if (l === 'hu') return CFG.COOKIE_POLICY_URL || '/adatkezeles/#cookie';
