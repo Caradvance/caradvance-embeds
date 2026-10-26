@@ -125,7 +125,9 @@ const SK = {
     // FAQ: lízing (mint CZ 3)
     ['Obe možnosti sú riešiteľné. Konštrukciu — dobu splácania, vlastný vklad, mesačnú splátku — prispôsobíme vašim potrebám a možnostiam, s transparentnými podmienkami.', 'Áno. Podmienky financovania – dobu splácania, vlastný vklad aj výšku splátky – stanoví partnerská lízingová spoločnosť podľa svojej ponuky a posúdenia bonity. S vaším súhlasom jej odovzdáme vaše kontaktné údaje.'],
     ['Áno, pomocou kalkulačky na stránke Financovanie – lízing si môžete predbežne odhadnúť očakávanú mesačnú splátku skôr, než sa rozhodnete.', 'Orientačnú splátku vám na požiadanie pripraví partnerská lízingová spoločnosť.'],
-    [T('5–14 dní'), '10–21 dní']
+    // doba dovozu: jednotne 5–14 dní (Marc, 2026-10-26)
+    [/10–21((?:\s|&nbsp;|\u00a0)+)(?:dní|dnů|dni)/g, '5–14$1dní'],
+    ['Závisí od modelu a zaobstarania, spravidla niekoľko týždňov.', 'Pri jazdenom aute zvyčajne 5–14 dní; pri novom aute na objednávku závisí od výroby.']
   ],
   LANG: {
     en: [['the import, customs, registration', 'the import, registration'], ["than Hungary's", 'than the Slovak one'],
@@ -215,13 +217,14 @@ const CS = {
     // CZ 20
     ['Na služby Mr. Job SK s.r.o. a používání Webu se vztahuje právo Slovenské republiky.', 'Na služby Mr. Job SK s.r.o. a používání Webu se vztahuje právo Slovenské republiky; spotřebitel tím není zbaven ochrany, kterou mu poskytují kogentní ustanovení práva státu jeho obvyklého bydliště (čl. 6 nařízení „Řím I“).'],
     // CZ 21 (cookies; a dozorový úřad és a Místo külön, lásd PRIV)
-    ['zákon o ochraně údajů v digitálních službách (TDDDG) — pokud jde o cookies;', 'zákon o ochraně údajů v digitálních službách (TDDDG) — pokud jde o cookies; v Česku § 89 odst. 3 zákona č. 127/2005 Sb.;'],
+    [/zákon o ochraně údajů v digitálních službách \(TDDDG\) — pokud jde o cookies;(?! v Česku)/g, 'zákon o ochraně údajů v digitálních službách (TDDDG) — pokud jde o cookies; v Česku § 89 odst. 3 zákona č. 127/2005 Sb.;'],
     ['péče o zákazníky (z pověření společnosti Caradvance GmbH)</td><td>Česko</td>', 'péče o zákazníky (z pověření společnosti Caradvance GmbH)</td><td>Slovensko</td>'],
     [/(<dt>Německo \(dozorový úřad společnosti Caradvance GmbH\)<\/dt><dd>[\s\S]*?<\/dd>)(\s*<\/dl>)/, '$1<dt>Slovensko (dozorový úřad společnosti Mr. Job SK s.r.o.)</dt><dd>Úrad na ochranu osobných údajov Slovenskej republiky — Hraničná 12, 820 07 Bratislava; <a href="https://dataprotection.gov.sk/" target="_blank" rel="noopener">dataprotection.gov.sk</a></dd>$2'],
     // CZ 22: doba dovozu sjednocená
-    [T('za 5–14 dnů'), 'obvykle za 10–21 dní'],
-    [T('obvykle 5–14 dnů'), 'obvykle 10–21 dní'],
-    [T('5–14 dnů'), '10–21 dní'],
+    // CZ 22: doba dovozu jednotně 5–14 dní (Marc, 2026-10-26)
+    [T('za 5–14 dnů'), 'obvykle za 5–14 dní'],
+    [/10–21((?:\s|&nbsp;|\u00a0)+)(?:dní|dnů|dni)/g, '5–14$1dní'],
+    ['Záleží na modelu a na obstarání, zpravidla to trvá několik týdnů.', 'U ojetého vozu zpravidla 5–14 dní; u nového vozu na objednávku záleží na výrobě.'],
     // jelvények
     ['z-index:3">Nový</span>', 'z-index:3">Novinka</span>'],
     ['<span class="cond">Bérbeadva</span>', '<span class="cond">Pronajato</span>']

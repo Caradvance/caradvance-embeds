@@ -6955,5 +6955,13 @@ export const CSL = {
 "Prémiové vozy z vlastního skladu, ihned k dispozici k pronájmu za měsíční poplatek — od {1} měsíců, s limitem {2}–{3} km měsíčně podle vozu. Ceny jsou měsíční poplatky bez DPH.": [
 "Premium cars from our own stock, available immediately for rent for a monthly fee — from {1} months, with a limit of {2}–{3} km per month depending on the car. Prices are monthly fees excl. VAT.",
 "Premiumfahrzeuge aus unserem eigenen Bestand, sofort zur Miete gegen eine monatliche Gebühr verfügbar — ab {1} Monaten, mit einem Limit von {2}–{3} km pro Monat je nach Fahrzeug. Die Preise sind monatliche Gebühren ohne MwSt."
+],
+"U ojetého vozu zpravidla {1}–{2} dní; u nového vozu na objednávku záleží na výrobě.": [
+"For a used car usually {1}–{2} days; for a new car ordered from the factory it depends on production.",
+"Bei einem Gebrauchtwagen in der Regel {1}–{2} Tage; bei einem bestellten Neuwagen hängt es von der Produktion ab."
+],
+"U ojetého vozu zpravidla {1}–{2} dní; u nového vozu na objednávku záleží na výrobě. Přesnou dobu s vámi předem upřesníme a po celou dobu vás budeme informovat o stavu procesu.": [
+"For a used car usually {1}–{2} days; for a new car ordered from the factory it depends on production. We agree the exact timing with you in advance and keep you informed throughout the process.",
+"Bei einem Gebrauchtwagen in der Regel {1}–{2} Tage; bei einem bestellten Neuwagen hängt es von der Produktion ab. Den genauen Zeitpunkt vereinbaren wir vorab mit Ihnen und informieren Sie während des gesamten Ablaufs."
 ]
 };

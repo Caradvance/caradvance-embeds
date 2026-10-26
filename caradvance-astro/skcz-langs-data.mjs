@@ -8384,5 +8384,15 @@ export const SKL = {
 "The new E-Class features a grille integrated into a black panel, rear lights with a star motif and a clean, elegant side line. Colours available for rent: Polar White solid.",
 "Die neue E-Klasse erhielt einen in eine schwarze Blende integrierten Kühlergrill, Heckleuchten mit Sternmotiv und eine klare, elegante Seitenlinie. Verfügbare Farben zur Miete: Polarweiß uni.",
 "Az új E-osztály fekete panelbe integrált hűtőrácsot, csillagmotívumos hátsó lámpákat és letisztult, elegáns oldalvonalat kapott. Bérelhető színek: Polárfehér egyszínű."
+],
+"Pri jazdenom aute zvyčajne {1}–{2} dní; pri novom aute na objednávku závisí od výroby.": [
+"For a used car usually {1}–{2} days; for a new car ordered from the factory it depends on production.",
+"Bei einem Gebrauchtwagen in der Regel {1}–{2} Tage; bei einem bestellten Neuwagen hängt es von der Produktion ab.",
+"Használt autónál általában {1}–{2} nap; rendelésre gyártott új autónál a gyártástól függ."
+],
+"Pri jazdenom aute zvyčajne {1}–{2} dní; pri novom aute na objednávku závisí od výroby. Presný čas dohodneme vopred a počas celého procesu vás informujeme o jeho stave.": [
+"For a used car usually {1}–{2} days; for a new car ordered from the factory it depends on production. We agree the exact timing with you in advance and keep you informed throughout the process.",
+"Bei einem Gebrauchtwagen in der Regel {1}–{2} Tage; bei einem bestellten Neuwagen hängt es von der Produktion ab. Den genauen Zeitpunkt vereinbaren wir vorab mit Ihnen und informieren Sie während des gesamten Ablaufs.",
+"Használt autónál általában {1}–{2} nap; rendelésre gyártott új autónál a gyártástól függ. A pontos időt előre egyeztetjük, és a folyamat során végig tájékoztatjuk Önt."
 ]
 };
