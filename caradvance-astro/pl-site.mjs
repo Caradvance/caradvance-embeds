@@ -127,7 +127,7 @@ function plnHtml(h, R) {
   const bi = h.search(/<body\b/i); if (bi < 0) return h;
   const head = h.slice(0, bi);
   const body = h.slice(bi).split(/(<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>|<option\b[\s\S]*?<\/option>|<title\b[\s\S]*?<\/title>)/i)
-    .map((part, i) => (i % 2 ? part : part.replace(/>([^<>]*€[^<>]*)</g, (m, t) => '>' + PLNADD(t, R) + '<'))).join('');
+    .map((part, i) => (i % 2 ? part : part.replace(/(<[^<>]*>)([^<>]*€[^<>]*)</g, (m, tag, t) => tag + (/class="[^"]*\bca-pv\b/.test(tag) ? t : PLNADD(t, R)) + '<'))).join('');
   return head + body;
 }
 
@@ -167,7 +167,7 @@ function switcher(h, cur, plPath) {
 function translate(src, l, D, rel, miss) {
   const doc = parse(src);
   const st = { miss: 0 }; let tot = 0;
-  const note = (k) => { const { km } = maskModels(k); const m = miss.get(km) || { n: 0, l: new Set(), p: rel }; m.n++; m.l.add(l); miss.set(km, m); };
+  const note = (k) => { const { km } = maskModels(k); const m = miss.get(km) || { n: 0, l: new Set(), p: rel, raw: k }; m.n++; m.l.add(l); miss.set(km, m); };
   visit(doc, (kind, k, apply) => {
     tot++;
     if (/English<\/g\d+>[\s\S]*Deutsch<\/g\d+>/.test(k)) return;
@@ -361,6 +361,14 @@ function run() {
     else console.log('[pl-site] _routes.json: több mint 100 szabály, nem írtam át');
   } catch (e) {}
 
+  // a hiányzó szlovák egységek darabokban (kb. 20 000 karakter), angol referenciával — a következő fordításhoz (https://www.caradvance.hu/_pl-missing/N.json)
+  try {
+    const dir = path.join(DIST, '_pl-missing'); fs.mkdirSync(dir, { recursive: true });
+    const all = [...miss].filter(([k, m]) => m.l.has('pl') && !/^dovoz\/kalkulacka-/.test(m.p)).map(([k, m]) => ({ k, p: m.p, en: (m.raw && look1(D, 'en', m.raw)) || null, raw: m.raw !== k ? m.raw : undefined }));
+    let cur = [], size = 0, n = 0; const flush = () => { if (!cur.length) return; n++; fs.writeFileSync(path.join(dir, n + '.json'), JSON.stringify(cur)); cur = []; size = 0; };
+    for (const x of all) { cur.push(x); size += JSON.stringify(x).length; if (size > 20000) flush(); }
+    flush(); fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify({ chunks: n, segments: all.length, built: new Date().toISOString() }));
+  } catch (e) {}
   try { fs.writeFileSync(path.join(DIST, '_pl-missing.json'), JSON.stringify([...miss].sort((a, b) => b[1].n - a[1].n).map(([k, m]) => ({ k, n: m.n, l: [...m.l], p: m.p })))); } catch (e) {}
   const pct = (l) => (100 * stat[l][0] / Math.max(1, stat[l][1])).toFixed(1) + '%';
   return `[pl-site] ${written} oldal (${LANGS.map((l) => l + ' ' + pct(l)).join(' | ')}), hiányzó egység ${miss.size}, hibás fordítás ${bad}, runtime ${rtn}, ${PL.live ? 'ÉLES' : 'noindex'}`;
