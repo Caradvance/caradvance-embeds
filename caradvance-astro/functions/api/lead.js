@@ -112,6 +112,8 @@ export async function onRequestPost(context) {
 
   // Szlovák / cseh oldalról érkező lead: a saját országos postafiókba megy (nem az info@caradvance.hu-ra).
   const region = regionOf(meta.page, data);
+  // SK / CZ: a régi (magyar) belső űrlap-értékek a piac nyelvén mennek tovább (e-mail, Notion, webhook) — Mr. JOB SK, 2026-10-26
+  if (REGIONS[region]) { localizeVals(data, REGIONS[region].lang); localizeVals(record, REGIONS[region].lang); }
 
   const results = await Promise.allSettled([
     createNotionLead(env, data, contact, meta),
@@ -505,6 +507,28 @@ const INTL_VALUES = {
   sk: { 'Magánszemély': 'Súkromná osoba', 'Magánszemélyként': 'Súkromná osoba', 'Cég': 'Firma', 'Cégként': 'Firma', 'Benzin': 'Benzín', 'Dízel': 'Diesel', 'Elektromos': 'Elektrické', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in hybrid', 'Bérlés': 'Prenájom', 'Bérlés-vétel': 'Prenájom s odkúpením', 'Azonnal': 'Ihneď', 'Azonnal elérhető': 'Dostupné ihneď', 'Készpénz': 'Hotovosť', 'Lízing': 'Lízing', 'Hitel': 'Úver', 'Igen': 'Áno', 'Nem': 'Nie' },
   cs: { 'Magánszemély': 'Soukromá osoba', 'Magánszemélyként': 'Soukromá osoba', 'Cég': 'Firma', 'Cégként': 'Firma', 'Benzin': 'Benzín', 'Dízel': 'Diesel', 'Elektromos': 'Elektrický', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in hybrid', 'Bérlés': 'Pronájem', 'Bérlés-vétel': 'Pronájem s odkupem', 'Azonnal': 'Ihned', 'Azonnal elérhető': 'Dostupné ihned', 'Készpénz': 'Hotovost', 'Lízing': 'Leasing', 'Hitel': 'Úvěr', 'Igen': 'Ano', 'Nem': 'Ne' },
 };
+
+/* ---------- SK / CZ: belső (magyar) értékek → piaci nyelv ---------- */
+const VAL_EXTRA = {
+  sk: { 'Cég': 'Firma s IČ DPH', 'Cégként': 'Firma s IČ DPH', 'Dízel': 'Nafta', 'Saját finanszírozás': 'Vlastné financovanie', 'Bérlés (Auto-Abo)': 'Prenájom (Auto-Abo)', 'Nettó EUR, Németországból (Caradvance GmbH)': 'Bez DPH, z Nemecka (Caradvance GmbH)', 'Finanszírozással': 'S financovaním', 'Egy összegben': 'Jednorazovo', 'Még nem tudom': 'Ešte neviem' },
+  cs: { 'Dízel': 'Nafta', 'Saját finanszírozás': 'Vlastní financování', 'Bérlés (Auto-Abo)': 'Pronájem (Auto-Abo)', 'Nettó EUR, Németországból (Caradvance GmbH)': 'Bez DPH, z Německa (Caradvance GmbH)', 'Finanszírozással': 'S financováním', 'Egy összegben': 'Jednorázově', 'Még nem tudom': 'Ještě nevím' }
+};
+const VAL_RE = {
+  sk: [[/\bBMW (\d)-(?:es|as|ös|os) /g, 'BMW rad $1 '], [/\bBMW (\d)-(?:es|as|ös|os)$/g, 'BMW rad $1'], [/trieda ([A-Z]+) Limuzin(?![\p{L}])/gu, 'triedy $1 Limuzína'], [/Limuzin(?![\p{L}])/gu, 'Limuzína'], [/ hónap(?![\p{L}])/gu, ' mesiacov'], [/ km \/ hó(?![\p{L}])/gu, ' km / mes.']],
+  cs: [[/\bBMW (\d)-(?:es|as|ös|os) /g, 'BMW řady $1 '], [/\bBMW (\d)-(?:es|as|ös|os)$/g, 'BMW řady $1'], [/třída ([A-Z]+) Limuzin(?![\p{L}])/gu, 'třídy $1 Limuzína'], [/Limuzin(?![\p{L}])/gu, 'Limuzína'], [/ hónap(?![\p{L}])/gu, ' měsíců'], [/ km \/ hó(?![\p{L}])/gu, ' km / měs.']]
+};
+const SKIP_LOC = /^(Típus|type|form|Nyelv|E-mail|email|Telefon|phone|Név|name|Cégnév|company|Vezetéknév|Keresztnév|Megjegyzés|Üzenet|message|forras_oldal|page|event_id|beerkezett|turnstile_token|fbp|fbc|user_agent)$/i;
+function localizeVals(obj, lang) {
+  const V = Object.assign({}, INTL_VALUES[lang] || {}, VAL_EXTRA[lang] || {}), R = VAL_RE[lang] || [];
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    if (typeof v !== 'string' || !v || SKIP_LOC.test(k)) continue;
+    let o = v.split(' · ').map((x) => V[x.trim()] || x).join(' · ');
+    if (V[o]) o = V[o];
+    for (const [a, b] of R) o = o.replace(a, b);
+    obj[k] = o;
+  }
+}
 
 /* ---------- országos postafiókok (SK / CZ) ---------- */
 const REGIONS = {
