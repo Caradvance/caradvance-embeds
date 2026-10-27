@@ -14,11 +14,11 @@
 
   /* ---------- szövegek ---------- */
   var TX = {
-    hu: { eurCons: 'Tudomásul veszem, hogy a havi bérleti díjat és a kauciót <b>euróban (EUR)</b> kell megfizetni a Caradvance GmbH részére; a forintösszegek csak tájékoztató jellegűek. *', docCons: 'Megismertem a bérléshez aláírandó <b>szerződésdokumentumokat</b>, és elfogadom, hogy a szerződés ezek alapján jön létre: *', docs: ['Bérleti szerződés', '1. sz. melléklet – Bérleti feltételek', '2. sz. melléklet – Átadási jegyzőkönyv', '3. sz. melléklet – Sérülésrajzok', '4. sz. melléklet – Jogosult vezetők'], consErr: 'Kérlek fogadd el az euróban történő fizetést és a szerződésdokumentumokat.', pdf: 'minta, PDF', recap: 'Összegzés', recapSub: 'Ellenőrizd a választásaidat, mielőtt elküldöd.', change: 'Módosítás', adapted: 'A választásodhoz igazítottuk a többi beállítást.', otherCfg: 'Más kivitellel elérhető — kattints, és átállítjuk', co: 'Cégként · nettó ár', priv: 'Magánszemélyként', vat19: '(19% német áfával)', plusVat: '+ áfa', estG: 'Becsült havi díj (bruttó)', estN: 'Becsült havi díj (nettó)', priceN: 'Ár (nettó)', priceG: 'Ár (bruttó)', price: 'Ár', cancel: 'Mégse', back: 'Vissza', next: 'Következő lépés', send: 'Ajánlat kérése', order: 'Rendelés elküldése', inq: 'Érdeklődés elküldése', sending: 'Küldés…', info: 'Fontos információ', pick: 'Kérlek válassz egy lehetőséget a továbblépéshez.', disc: 'Az ár tájékoztató jellegű. A pontos díj a kiválasztott konfigurációtól és elérhetőségtől függően változhat.', discSale: 'Az ár tájékoztató jellegű, élő árfolyammal számolva. A végleges árat az írásos ajánlat tartalmazza.', avail: 'Elérhető', availIn: function (c, m) { return 'A kiválasztott hónapban (' + m + ') ' + c + ' autó elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, availNow: function (c) { return c + ' autó azonnal elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, dep: 'Kaució', newCar: 'Új autó · rendelésre', fuels: 'Hajtás', opt: 'opcionális',
+    hu: { v2: { chosen: 'A választásod', change: 'Módosítás', monthly: 'Havi bérleti díj', gross: 'Bruttó · 19% német áfával', net: 'Nettó · + áfa', depT: 'Visszajáró kaució', incl: ['Szerviz, gumiabroncsok és gépjárműadó a díjban', 'Kötelező és casco biztosítás a díjban (önrésszel)', 'Assistance (autómentés) szolgáltatás'], declT: 'Nyilatkozatok és dokumentumok', declS: 'A folytatáshoz olvasd el és fogadd el az alábbi nyilatkozatokat.', contactT: 'Kapcsolatfelvétel', contactS: 'Kérd az ajánlatunkat — kollégánk rövid időn belül felveszi veled a kapcsolatot.', sendNote: 'Az elküldés nem végleges — felvesszük veled a kapcsolatot.', phoneReq: 'Kérlek add meg a telefonszámod is, hogy fel tudjunk hívni.', pick: 'Válassz', avail1: 'db elérhető', send: 'Ajánlatot kérek', lbl: { lastname: 'Vezetéknév', firstname: 'Keresztnév', company: 'Cégnév', taxid: 'Adószám', phone: 'Telefonszám', email: 'E-mail cím', message: 'Megjegyzés' }, ph: { lastname: 'pl. Kovács', firstname: 'pl. János', company: 'Cégnév', taxid: 'Adószám', phone: '+36 30 123 4567', email: 'pelda@email.hu', message: 'Megjegyzés, kívánt felszereltség…' }, months: 'hónap' }, eurCons: 'Tudomásul veszem, hogy a havi bérleti díjat és a kauciót <b>euróban (EUR)</b> kell megfizetni a Caradvance GmbH részére; a forintösszegek csak tájékoztató jellegűek. *', docCons: 'Megismertem a bérléshez aláírandó <b>szerződésdokumentumokat</b>, és elfogadom, hogy a szerződés ezek alapján jön létre: *', docs: ['Bérleti szerződés', '1. sz. melléklet – Bérleti feltételek', '2. sz. melléklet – Átadási jegyzőkönyv', '3. sz. melléklet – Sérülésrajzok', '4. sz. melléklet – Jogosult vezetők'], consErr: 'Kérlek fogadd el az euróban történő fizetést és a szerződésdokumentumokat.', pdf: 'minta, PDF', recap: 'Összegzés', recapSub: 'Ellenőrizd a választásaidat, mielőtt elküldöd.', change: 'Módosítás', adapted: 'A választásodhoz igazítottuk a többi beállítást.', otherCfg: 'Más kivitellel elérhető — kattints, és átállítjuk', co: 'Cégként · nettó ár', priv: 'Magánszemélyként', vat19: '(19% német áfával)', plusVat: '+ áfa', estG: 'Becsült havi díj (bruttó)', estN: 'Becsült havi díj (nettó)', priceN: 'Ár (nettó)', priceG: 'Ár (bruttó)', price: 'Ár', cancel: 'Mégse', back: 'Vissza', next: 'Következő lépés', send: 'Ajánlat kérése', order: 'Rendelés elküldése', inq: 'Érdeklődés elküldése', sending: 'Küldés…', info: 'Fontos információ', pick: 'Kérlek válassz egy lehetőséget a továbblépéshez.', disc: 'Az ár tájékoztató jellegű. A pontos díj a kiválasztott konfigurációtól és elérhetőségtől függően változhat.', discSale: 'Az ár tájékoztató jellegű, élő árfolyammal számolva. A végleges árat az írásos ajánlat tartalmazza.', avail: 'Elérhető', availIn: function (c, m) { return 'A kiválasztott hónapban (' + m + ') ' + c + ' autó elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, availNow: function (c) { return c + ' autó azonnal elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, dep: 'Kaució', newCar: 'Új autó · rendelésre', fuels: 'Hajtás', opt: 'opcionális',
       s: { avail: ['Elérhetőség', 'Válaszd ki, mikortól szeretnéd átvenni az autót.', 'Elérhetőség'], fuel: ['Üzemanyag', 'Válaszd ki a hajtásláncot.', 'Üzemanyag'], term: ['Bérlési futamidő', 'Mennyi időre szeretnéd bérelni az autót?', 'Futamidő'], km: ['Km-keret / hó', 'Válaszd ki a havi futásteljesítményt.', 'Km-keret'], spec: ['Szín és kivitel', 'Válaszd ki a színt és a felszereltséget.', 'Kivitel'], contact: ['Adataid', 'Add meg az elérhetőségeidet — ezekre küldjük az ajánlatot.', 'Adatok'], mode: ['Vásárlás módja', 'Hogyan szeretnéd megvásárolni az autót?', 'Vásárlás'], pay: ['Fizetés', 'Egy összegben vagy finanszírozással fizetnél?', 'Fizetés'], start: ['Kezdés', 'Mikortól szeretnéd az autót?', 'Kezdés'], file: ['Specifikáció', 'Ha van kész felszereltségi listád, töltsd fel (opcionális).', 'Specifikáció'] } },
-    en: { eurCons: 'I acknowledge that the monthly rent and the deposit are payable <b>in euros (EUR)</b> to Caradvance GmbH; forint amounts are for information only. *', docCons: 'I have read the <b>contract documents</b> I will sign for the rental and accept that the contract is concluded on this basis: *', docs: ['Rental agreement', 'Annex 1 – Rental conditions', 'Annex 2 – Handover protocol', 'Annex 3 – Damage sketches', 'Annex 4 – Authorised drivers'], consErr: 'Please accept payment in euros and the contract documents.', pdf: 'sample, PDF', recap: 'Summary', recapSub: 'Check your choices before sending.', change: 'Change', adapted: 'We adjusted the other settings to match your choice.', otherCfg: 'Available with another configuration — click to switch', co: 'As a company · net price', priv: 'As a private person', vat19: '(incl. 19% German VAT)', plusVat: '+ VAT', estG: 'Estimated monthly fee (gross)', estN: 'Estimated monthly fee (net)', priceN: 'Price (net)', priceG: 'Price (gross)', price: 'Price', cancel: 'Cancel', back: 'Back', next: 'Next step', send: 'Request offer', order: 'Send order', inq: 'Send inquiry', sending: 'Sending…', info: 'Important information', pick: 'Please choose an option to continue.', disc: 'The price is indicative. The exact fee depends on the selected configuration and availability.', discSale: 'The price is indicative, calculated with the live exchange rate. The final price is stated in the written offer.', avail: 'Available', availIn: function (c, m) { return c + ' car(s) available in the selected month (' + m + '). You can finalise your booking in the next steps.'; }, availNow: function (c) { return c + ' car(s) available immediately. You can finalise your booking in the next steps.'; }, dep: 'Deposit', newCar: 'New car · made to order', fuels: 'Powertrain', opt: 'optional',
+    en: { v2: { chosen: 'Your selection', change: 'Change', monthly: 'Monthly rent', gross: 'Gross · incl. 19% German VAT', net: 'Net · + VAT', depT: 'Refundable deposit', incl: ['Service, tyres and vehicle tax included', 'Liability and comprehensive insurance included (with excess)', 'Roadside assistance'], declT: 'Declarations and documents', declS: 'Please read and accept the following declarations to continue.', contactT: 'Contact', contactS: 'Request our offer — a colleague will contact you shortly.', sendNote: 'Sending is not binding — we will contact you.', phoneReq: 'Please enter your phone number so we can call you.', pick: 'Choose', avail1: 'available', send: 'Request offer', lbl: { lastname: 'Last name', firstname: 'First name', company: 'Company name', taxid: 'Tax number', phone: 'Phone', email: 'E-mail', message: 'Message' }, ph: { lastname: 'e.g. Smith', firstname: 'e.g. John', company: 'Company name', taxid: 'Tax number', phone: '+36 30 123 4567', email: 'name@example.com', message: 'Message, preferred equipment…' }, months: 'months' }, eurCons: 'I acknowledge that the monthly rent and the deposit are payable <b>in euros (EUR)</b> to Caradvance GmbH; forint amounts are for information only. *', docCons: 'I have read the <b>contract documents</b> I will sign for the rental and accept that the contract is concluded on this basis: *', docs: ['Rental agreement', 'Annex 1 – Rental conditions', 'Annex 2 – Handover protocol', 'Annex 3 – Damage sketches', 'Annex 4 – Authorised drivers'], consErr: 'Please accept payment in euros and the contract documents.', pdf: 'sample, PDF', recap: 'Summary', recapSub: 'Check your choices before sending.', change: 'Change', adapted: 'We adjusted the other settings to match your choice.', otherCfg: 'Available with another configuration — click to switch', co: 'As a company · net price', priv: 'As a private person', vat19: '(incl. 19% German VAT)', plusVat: '+ VAT', estG: 'Estimated monthly fee (gross)', estN: 'Estimated monthly fee (net)', priceN: 'Price (net)', priceG: 'Price (gross)', price: 'Price', cancel: 'Cancel', back: 'Back', next: 'Next step', send: 'Request offer', order: 'Send order', inq: 'Send inquiry', sending: 'Sending…', info: 'Important information', pick: 'Please choose an option to continue.', disc: 'The price is indicative. The exact fee depends on the selected configuration and availability.', discSale: 'The price is indicative, calculated with the live exchange rate. The final price is stated in the written offer.', avail: 'Available', availIn: function (c, m) { return c + ' car(s) available in the selected month (' + m + '). You can finalise your booking in the next steps.'; }, availNow: function (c) { return c + ' car(s) available immediately. You can finalise your booking in the next steps.'; }, dep: 'Deposit', newCar: 'New car · made to order', fuels: 'Powertrain', opt: 'optional',
       s: { avail: ['Availability', 'Choose when you would like to take over the car.', 'Availability'], fuel: ['Fuel', 'Choose the powertrain.', 'Fuel'], term: ['Rental term', 'How long would you like to rent the car?', 'Term'], km: ['Mileage / month', 'Choose your monthly mileage.', 'Mileage'], spec: ['Colour & trim', 'Choose the colour and the equipment.', 'Trim'], contact: ['Your details', 'Enter your contact details — we will send the offer there.', 'Details'], mode: ['Purchase type', 'How would you like to buy the car?', 'Purchase'], pay: ['Payment', 'Pay in one sum or with financing?', 'Payment'], start: ['Start', 'From when do you need the car?', 'Start'], file: ['Specification', 'Upload your equipment list if you have one (optional).', 'Spec'] } },
-    de: { eurCons: 'Ich nehme zur Kenntnis, dass Monatsmiete und Kaution <b>in Euro (EUR)</b> an die Caradvance GmbH zu zahlen sind; Forint-Beträge dienen nur zur Information. *', docCons: 'Ich habe die <b>Vertragsunterlagen</b> gelesen, die ich für die Miete unterzeichne, und akzeptiere, dass der Vertrag auf dieser Grundlage zustande kommt: *', docs: ['Mietvertrag', 'Anlage 1 – Mietbedingungen', 'Anlage 2 – Übergabeprotokoll', 'Anlage 3 – Schadenskizzen', 'Anlage 4 – Berechtigte Fahrer'], consErr: 'Bitte bestätigen Sie die Zahlung in Euro und die Vertragsunterlagen.', pdf: 'Muster, PDF', recap: 'Zusammenfassung', recapSub: 'Prüfen Sie Ihre Auswahl vor dem Absenden.', change: 'Ändern', adapted: 'Die übrigen Einstellungen wurden an Ihre Wahl angepasst.', otherCfg: 'Mit anderer Konfiguration verfügbar — klicken zum Umstellen', co: 'Als Firma · Nettopreis', priv: 'Als Privatperson', vat19: '(inkl. 19 % dt. MwSt.)', plusVat: '+ MwSt.', estG: 'Geschätzte Monatsrate (brutto)', estN: 'Geschätzte Monatsrate (netto)', priceN: 'Preis (netto)', priceG: 'Preis (brutto)', price: 'Preis', cancel: 'Abbrechen', back: 'Zurück', next: 'Nächster Schritt', send: 'Angebot anfordern', order: 'Bestellung senden', inq: 'Anfrage senden', sending: 'Wird gesendet…', info: 'Wichtige Information', pick: 'Bitte wählen Sie eine Option, um fortzufahren.', disc: 'Der Preis ist unverbindlich. Die genaue Rate hängt von Konfiguration und Verfügbarkeit ab.', discSale: 'Der Preis ist unverbindlich, mit dem Tageskurs berechnet. Den Endpreis nennt das schriftliche Angebot.', avail: 'Verfügbar', availIn: function (c, m) { return 'Im gewählten Monat (' + m + ') ist/sind ' + c + ' Fahrzeug(e) verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, availNow: function (c) { return c + ' Fahrzeug(e) sofort verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, dep: 'Kaution', newCar: 'Neuwagen · auf Bestellung', fuels: 'Antrieb', opt: 'optional',
+    de: { v2: { chosen: 'Ihre Auswahl', change: 'Ändern', monthly: 'Monatsmiete', gross: 'Brutto · inkl. 19 % dt. MwSt.', net: 'Netto · + MwSt.', depT: 'Rückzahlbare Kaution', incl: ['Wartung, Reifen und Kfz-Steuer inklusive', 'Haftpflicht- und Vollkaskoversicherung inklusive (mit Selbstbeteiligung)', 'Pannenhilfe'], declT: 'Erklärungen und Dokumente', declS: 'Bitte lesen und bestätigen Sie die folgenden Erklärungen.', contactT: 'Kontakt', contactS: 'Fordern Sie unser Angebot an — wir melden uns in Kürze.', sendNote: 'Die Anfrage ist unverbindlich — wir melden uns bei Ihnen.', phoneReq: 'Bitte geben Sie Ihre Telefonnummer an.', pick: 'Auswählen', avail1: 'verfügbar', send: 'Angebot anfordern', lbl: { lastname: 'Nachname', firstname: 'Vorname', company: 'Firmenname', taxid: 'Steuernummer', phone: 'Telefon', email: 'E-Mail', message: 'Nachricht' }, ph: { lastname: 'z. B. Müller', firstname: 'z. B. Anna', company: 'Firmenname', taxid: 'Steuernummer', phone: '+49 151 1234567', email: 'name@beispiel.de', message: 'Nachricht, gewünschte Ausstattung…' }, months: 'Monate' }, eurCons: 'Ich nehme zur Kenntnis, dass Monatsmiete und Kaution <b>in Euro (EUR)</b> an die Caradvance GmbH zu zahlen sind; Forint-Beträge dienen nur zur Information. *', docCons: 'Ich habe die <b>Vertragsunterlagen</b> gelesen, die ich für die Miete unterzeichne, und akzeptiere, dass der Vertrag auf dieser Grundlage zustande kommt: *', docs: ['Mietvertrag', 'Anlage 1 – Mietbedingungen', 'Anlage 2 – Übergabeprotokoll', 'Anlage 3 – Schadenskizzen', 'Anlage 4 – Berechtigte Fahrer'], consErr: 'Bitte bestätigen Sie die Zahlung in Euro und die Vertragsunterlagen.', pdf: 'Muster, PDF', recap: 'Zusammenfassung', recapSub: 'Prüfen Sie Ihre Auswahl vor dem Absenden.', change: 'Ändern', adapted: 'Die übrigen Einstellungen wurden an Ihre Wahl angepasst.', otherCfg: 'Mit anderer Konfiguration verfügbar — klicken zum Umstellen', co: 'Als Firma · Nettopreis', priv: 'Als Privatperson', vat19: '(inkl. 19 % dt. MwSt.)', plusVat: '+ MwSt.', estG: 'Geschätzte Monatsrate (brutto)', estN: 'Geschätzte Monatsrate (netto)', priceN: 'Preis (netto)', priceG: 'Preis (brutto)', price: 'Preis', cancel: 'Abbrechen', back: 'Zurück', next: 'Nächster Schritt', send: 'Angebot anfordern', order: 'Bestellung senden', inq: 'Anfrage senden', sending: 'Wird gesendet…', info: 'Wichtige Information', pick: 'Bitte wählen Sie eine Option, um fortzufahren.', disc: 'Der Preis ist unverbindlich. Die genaue Rate hängt von Konfiguration und Verfügbarkeit ab.', discSale: 'Der Preis ist unverbindlich, mit dem Tageskurs berechnet. Den Endpreis nennt das schriftliche Angebot.', avail: 'Verfügbar', availIn: function (c, m) { return 'Im gewählten Monat (' + m + ') ist/sind ' + c + ' Fahrzeug(e) verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, availNow: function (c) { return c + ' Fahrzeug(e) sofort verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, dep: 'Kaution', newCar: 'Neuwagen · auf Bestellung', fuels: 'Antrieb', opt: 'optional',
       s: { avail: ['Verfügbarkeit', 'Wählen Sie, ab wann Sie das Auto übernehmen möchten.', 'Verfügbarkeit'], fuel: ['Kraftstoff', 'Wählen Sie den Antrieb.', 'Kraftstoff'], term: ['Mietdauer', 'Wie lange möchten Sie das Auto mieten?', 'Laufzeit'], km: ['Kilometer / Monat', 'Wählen Sie Ihre monatliche Laufleistung.', 'Kilometer'], spec: ['Farbe & Ausstattung', 'Wählen Sie Farbe und Ausstattung.', 'Ausstattung'], contact: ['Ihre Daten', 'Geben Sie Ihre Kontaktdaten an — wir senden das Angebot dorthin.', 'Daten'], mode: ['Kaufart', 'Wie möchten Sie das Auto kaufen?', 'Kauf'], pay: ['Zahlung', 'Einmalzahlung oder Finanzierung?', 'Zahlung'], start: ['Beginn', 'Ab wann benötigen Sie das Auto?', 'Beginn'], file: ['Spezifikation', 'Laden Sie Ihre Ausstattungsliste hoch, falls vorhanden (optional).', 'Spezifikation'] } },
     sk: { recap: 'Zhrnutie', recapSub: 'Pred odoslaním skontrolujte svoj výber.', change: 'Zmeniť', adapted: 'Ostatné nastavenia sme prispôsobili vášmu výberu.', otherCfg: 'Dostupné s inou konfiguráciou — kliknite a prepneme', co: 'Ako firma · cena bez DPH', priv: 'Ako súkromná osoba', vat19: '(s DPH)', plusVat: '+ DPH', estG: 'Odhadovaný mesačný poplatok (s DPH)', estN: 'Odhadovaný mesačný poplatok (bez DPH)', priceN: 'Cena (bez DPH)', priceG: 'Cena (s DPH)', price: 'Cena', cancel: 'Zrušiť', back: 'Späť', next: 'Ďalší krok', send: 'Požiadať o ponuku', order: 'Odoslať objednávku', inq: 'Odoslať dopyt', sending: 'Odosiela sa…', info: 'Dôležitá informácia', pick: 'Pre pokračovanie vyberte jednu z možností.', disc: 'Cena je orientačná. Presný poplatok závisí od zvolenej konfigurácie a dostupnosti.', discSale: 'Cena je orientačná. Konečnú cenu uvedie písomná ponuka.', avail: 'Dostupné', availIn: function (c, m) { return 'Vo zvolenom mesiaci (' + m + ') je dostupných ' + c + ' áut. Rezerváciu dokončíte v ďalších krokoch.'; }, availNow: function (c) { return 'Ihneď dostupných: ' + c + '. Rezerváciu dokončíte v ďalších krokoch.'; }, dep: 'Kaucia', newCar: 'Nové auto · na objednávku', fuels: 'Pohon', opt: 'voliteľné',
       s: { avail: ['Dostupnosť', 'Vyberte, odkedy chcete auto prevziať.', 'Dostupnosť'], fuel: ['Palivo', 'Vyberte pohon.', 'Palivo'], term: ['Doba prenájmu', 'Na ako dlho si chcete auto prenajať?', 'Doba'], km: ['Km limit / mesiac', 'Vyberte mesačný nájazd.', 'Km limit'], spec: ['Farba a výbava', 'Vyberte farbu a výbavu.', 'Výbava'], contact: ['Vaše údaje', 'Zadajte kontaktné údaje — pošleme vám na ne ponuku.', 'Údaje'], mode: ['Spôsob kúpy', 'Ako chcete auto kúpiť?', 'Kúpa'], pay: ['Platba', 'Jednorazovo alebo s financovaním?', 'Platba'], start: ['Začiatok', 'Odkedy potrebujete auto?', 'Začiatok'], file: ['Špecifikácia', 'Ak máte zoznam výbavy, nahrajte ho (voliteľné).', 'Špecifikácia'] } },
@@ -43,7 +43,19 @@
     left: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
     check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     pin: '<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
-    doc: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>'
+    doc: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',
+    leaf: '<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l8-8"/>',
+    drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+    plug: '<path d="M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0zM12 16v5"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    coins: '<ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7"/><path d="M3 11v4c0 1.7 2.7 3 6 3 1.2 0 2.3-.2 3.2-.5"/><ellipse cx="17" cy="15" rx="4" ry="2"/><path d="M13 15v3c0 1.1 1.8 2 4 2s4-.9 4-2v-3"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+    phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+    bldg: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M10 21v-4h4v4"/>',
+    dl: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+    pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
+    chev: '<path d="M6 9l6 6 6-6"/>'
   };
   /* Fényezések: valós árnyalat + felület (metál / gyöngyház / uni / matt), névvel párosítva */
   var PAINT = {
@@ -436,6 +448,113 @@
       '.caf-b1:hover{filter:brightness(.94)}',
       '.caf-b1[disabled]{opacity:.6;cursor:wait}',
       '.caf-b1 .caf-ic,.caf-b0 .caf-ic{width:20px;height:20px;color:currentColor}',
+      /* V2 elrendezés */
+      '.caf.caf-v2 .caf-card{width:min(1120px,100%)!important;max-width:1120px!important}',
+      '.caf-v2 .caf-prices,.caf-v2 .caf-foot,.caf-v2 .caf-recap,.caf-v2 .caf-sum,.caf-v2 .caf-step:not(.caf-csec) .caf-sh p{display:none!important}',
+      '.caf-v2 .caf-top{grid-template-columns:360px minmax(0,1fr)!important;gap:28px!important}',
+      '.caf-v2 .caf-top>img{height:190px!important}',
+      '.caf-v2 .caf-top h3{font-size:32px!important;margin:6px 0 14px!important}',
+      '.caf-v2 .caf-specs{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px}',
+      '.caf-v2 .caf-spec{font-size:14.5px}',
+      '.caf-v2 .caf-spec .caf-ic{width:36px;height:36px;padding:8px;box-sizing:border-box;background:#f3f5f8;border-radius:10px}',
+      '.caf-gw{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr);gap:22px;align-items:start}',
+      '.caf-v2 .caf-steps{gap:14px}',
+      '.caf-v2 .caf-step{background:#fff!important;opacity:1!important;box-shadow:0 1px 3px rgba(15,27,45,.05)}',
+      '.caf-v2 .caf-step .caf-sb{display:grid!important;grid-template-columns:minmax(0,1fr)!important;padding:4px 20px 20px 70px!important}',
+      '.caf-v2 .caf-step .caf-ibox{display:none!important}',
+      '.caf-v2 .caf-sh{cursor:default!important;padding:18px 20px 8px!important;align-items:center!important}',
+      '.caf-v2 .caf-sh .n{width:36px;height:36px;font-size:17px;background:#eef1f5!important;color:var(--ink)!important;border:0!important}',
+      '.caf-v2 .caf-step.done .caf-sh .n{background:#e7f6ee!important;color:#0f8a4b!important}',
+      '.caf-v2 .caf-sh h4{color:var(--ink)!important;font-size:20px}',
+      '.caf-ii{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#e3e8ef;color:#5A6B82;font-size:11px;font-weight:800;font-style:italic;vertical-align:middle;margin-left:4px;cursor:help}',
+      '.caf-v2 #abTerm .ab-pick,.caf-v2 #abKm .ab-pick{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))}',
+      '.caf-v2 #abFuel .ab-pick{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))}',
+      '.caf-v2 .caf-body .ab-opt{justify-content:center}',
+      '.caf-v2 #abFuel .ab-opt{justify-content:flex-start;gap:12px}',
+      '.caf-oi{width:22px!important;height:22px!important}',
+      '.caf-v2 #abAvBlock{position:relative}',
+      '.caf-v2 #abAvBlock .ab-avtot{display:none!important}',
+      '.caf-v2 #abAvBlock:not(.caf-ddopen) #abAvPick{display:none!important}',
+      '.caf-v2 #abAvBlock.caf-ddopen #abAvPick{position:absolute;z-index:20;left:0;right:0;top:64px;background:#fff;border:1px solid #dfe4ec;border-radius:14px;box-shadow:0 16px 40px rgba(15,27,45,.16);padding:8px;display:flex!important;flex-direction:column;gap:6px!important}',
+      '.caf-v2 #abAvBlock.caf-ddopen #abAvPick .ab-opt{justify-content:space-between;width:100%;box-sizing:border-box}',
+      '.caf-dd{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:0 16px;border:1.5px solid #dfe4ec;border-radius:14px;background:#fff;box-shadow:0 2px 8px rgba(15,27,45,.05);font-size:16px;font-weight:600;color:var(--ink)}',
+      '.caf-dd .t{flex:1}',
+      '.caf-dd .bdg,.caf-ar .bdg{background:#dff5e9;color:#0f8a4b;font-size:12.5px;font-weight:700;border-radius:8px;padding:3px 9px;white-space:nowrap}',
+      '.caf-chev{width:18px!important;height:18px!important;color:#3a4556}',
+      '.caf-aside{position:sticky;top:96px;display:flex;flex-direction:column;gap:14px}',
+      '.caf-acard{background:#fff;border:1px solid #e3e8ef;border-radius:18px;padding:16px 18px;box-shadow:0 1px 3px rgba(15,27,45,.05)}',
+      '.caf-aside .caf-acard:first-child{background:#f6f8fb}',
+      '.caf-ah{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}',
+      '.caf-ah b{font-size:19px;font-weight:800;color:var(--ink)}',
+      '.caf-ah .caf-rch{display:inline-flex;align-items:center;gap:6px}',
+      '.caf-ah .caf-rch .caf-ic{width:15px;height:15px;color:var(--r)}',
+      '.caf-arows{background:#fff;border-radius:14px;border:1px solid #e9edf2}',
+      '.caf-ar{display:grid;grid-template-columns:22px 112px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 12px;border-top:1px solid #eef1f5;font-size:14px;cursor:pointer}',
+      '.caf-ar:first-child{border-top:0}',
+      '.caf-ar .caf-ic{width:20px;height:20px;color:#3a4556}',
+      '.caf-ar .k{color:#5A6B82}',
+      '.caf-ar .v{color:var(--ink);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.caf-ar .caf-rsw{width:20px;height:20px}',
+      '.caf-apr{display:flex;flex-direction:column;gap:2px}',
+      '.caf-apr .l{font-size:14.5px;font-weight:600;color:#3a4556}',
+      '.caf-apr .big{font-size:32px;font-weight:800;letter-spacing:-.01em;color:var(--ink);line-height:1.15}',
+      '.caf-apr .mid{font-size:22px;font-weight:800;color:var(--ink)}',
+      '.caf-apr .s{font-size:13.5px;color:var(--mut)}',
+      '.caf-apr .eu{font-size:15px;font-weight:800;color:#1f2a3a}',
+      '.caf-apr hr{border:0;border-top:1px solid #eef1f5;margin:12px 0;width:100%}',
+      '.caf-apr ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}',
+      '.caf-apr li{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:#2b3442}',
+      '.caf-apr li .caf-ic{width:18px;height:18px;flex:0 0 auto;color:#fff;background:#19a35b;border-radius:50%;padding:3px;box-sizing:border-box}',
+      '.caf-aseg{display:flex;gap:4px;background:#f1f4f8;border-radius:11px;padding:4px;margin-bottom:10px}',
+      '.caf-aseg button{all:unset;cursor:pointer;flex:1;text-align:center;font-size:13px;font-weight:700;color:#5A6B82;padding:8px 6px;border-radius:8px}',
+      '.caf-aseg button.on{background:#fff;color:var(--r);box-shadow:0 1px 3px rgba(15,27,45,.12)}',
+      '.caf-v2 .caf-csec{margin-top:18px}',
+      '.caf-v2 .caf-csec .caf-sh .n{background:var(--r)!important;color:#fff!important}',
+      '.caf-v2 .caf-csec .caf-sh p{display:block!important}',
+      '.caf-v2 .caf-csec .caf-sb{padding:6px 20px 20px!important}',
+      '.caf-v2 .caf-csec .caf-body{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}',
+      '.caf-v2 .caf-csec .caf-body>*{grid-column:1/-1}',
+      '.caf-v2 .caf-csec .caf-body>.ab-block{grid-column:1;grid-row:1}',
+      '.caf-v2 .caf-csec .caf-body>.caf-decl{grid-column:2;grid-row:1}',
+      '.caf-v2 .caf-csec .ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}',
+      '.caf-v2 .caf-csec .ab-grid[style*="none"]{display:none!important}',
+      '.caf-v2 .caf-csec .ab-block{display:flex!important;flex-direction:column;gap:14px}',
+      '.caf-f{display:flex;flex-direction:column;gap:6px;min-width:0}',
+      '.caf-fl{font-size:14px;font-weight:700;color:var(--ink)}',
+      '.caf-fl i{color:var(--r);font-style:normal}',
+      '.caf-in{position:relative;display:flex}',
+      '.caf-in>.caf-ic{position:absolute;left:13px;top:15px;width:19px;height:19px;color:#5A6B82;pointer-events:none}',
+      '.caf-v2 .caf-in input,.caf-v2 .caf-in textarea{padding-left:42px!important;background:#fff!important}',
+      '.caf-v2 .caf-in textarea{min-height:96px}',
+      '.caf-cnt{position:absolute;right:12px;bottom:8px;font-size:11.5px;color:#8c96a5}',
+      '.caf-f.caf-off>.caf-fl,.caf-f.caf-off .caf-in>.caf-ic,.caf-f.caf-off .caf-cnt{display:none}',
+      '.caf-decl{background:#fffaf2;border:1px solid #f1e3c7;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:14px}',
+      '.caf-dh{display:flex;gap:12px;align-items:flex-start}',
+      '.caf-dh .caf-ic{width:28px;height:28px;color:#1f2a3a}',
+      '.caf-dh b{display:block;font-size:17px;font-weight:800;color:var(--ink)}',
+      '.caf-dh span{display:block;font-size:13.5px;color:var(--mut)}',
+      '.caf-v2 .caf-decl .caf-cons{background:none;border:0;padding:0}',
+      '.caf-v2 .caf-docs{flex-direction:column;flex-wrap:nowrap}',
+      '.caf-v2 .caf-docs a{display:grid;grid-template-columns:18px minmax(0,1fr) auto 18px;align-items:center;gap:10px;padding:10px 12px}',
+      '.caf-pdf{font-size:11px;font-weight:700;color:#8c96a5;letter-spacing:.04em}',
+      '.caf-dli{width:17px!important;height:17px!important;color:#3a4556!important}',
+      '.caf-v2 .caf-decl small{display:none}',
+      '.caf-bar{position:sticky;bottom:0;margin:16px -28px 0;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -10px 24px rgba(15,27,45,.06);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(280px,1fr);gap:20px;align-items:center;padding:14px 28px 16px;z-index:7}',
+      '.caf-be,.caf-bd{display:flex;gap:12px;align-items:center;min-width:0}',
+      '.caf-bd{border-left:1px solid #eef1f5;padding-left:20px}',
+      '.caf-be>.caf-ic,.caf-bd>.caf-ic{width:30px;height:30px;color:#1f2a3a;flex:0 0 auto}',
+      '.caf-be .l,.caf-bd .l{display:block;font-size:13.5px;font-weight:600;color:#3a4556}',
+      '.caf-be .v{display:block;font-size:25px;font-weight:800;color:var(--ink);line-height:1.15}',
+      '.caf-be .v small{font-size:13px;font-weight:500;color:var(--mut)}',
+      '.caf-be .eu{display:block;font-size:14.5px;font-weight:800;color:#1f2a3a}',
+      '.caf-bd .v{display:block;font-size:20px;font-weight:800;color:var(--ink)}',
+      '.caf-bd .s{display:block;font-size:12.5px;color:var(--mut)}',
+      '.caf-bg{display:flex;flex-direction:column;align-items:stretch;gap:6px}',
+      '.caf-bg .caf-b1{width:100%}',
+      '.caf-bg small{font-size:12px;color:var(--mut);text-align:center}',
+      '@media(max-width:900px){.caf-gw{grid-template-columns:1fr}.caf-aside{position:static}.caf-v2 .caf-csec .caf-body{grid-template-columns:1fr}.caf-v2 .caf-csec .caf-body>.caf-decl{grid-column:1;grid-row:auto}.caf-bar{grid-template-columns:1fr auto}.caf-bd{display:none}.caf-bg small{display:none}}',
+      '@media(max-width:640px){.caf-v2 .caf-step:not(.on){display:block!important}.caf-v2 .caf-step .caf-sb{padding:4px 0 14px!important}.caf-v2 .caf-step{border:1px solid #e3e8ef!important;padding:0 14px}.caf-v2 .caf-sh{padding:14px 0 6px!important}.caf-v2 .caf-top{grid-template-columns:1fr!important}.caf-v2 .caf-top>img{height:130px!important}.caf-v2 .caf-top h3{font-size:22px!important}.caf-v2 .caf-specs{display:none}.caf-v2 #abTerm .ab-pick,.caf-v2 #abKm .ab-pick{grid-template-columns:repeat(2,1fr)}.caf-v2 #abFuel .ab-pick{grid-template-columns:1fr 1fr}.caf-v2 .caf-csec .ab-grid{grid-template-columns:1fr}.caf-bar{margin:12px -16px 0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));grid-template-columns:1fr;gap:8px}.caf-be .v{font-size:20px}.caf-ar{grid-template-columns:20px 100px minmax(0,1fr) auto}}',
+
       /* mobil */
       '@media(max-width:640px){',
       '.caf .caf-card{width:100%!important;max-height:100dvh!important;height:100dvh;border-radius:0!important;padding:0 16px 0!important;margin:0!important}',
@@ -478,6 +597,7 @@
       if (tn) { var sp = mk('span', 'caf-cn'); sp.textContent = tn.nodeValue.trim(); tn.replaceWith(sp); }
     });
     qa('.ab-opt.dis:not([title])', M.modal).forEach(function (l) { l.title = T.otherCfg; });
+    if (M.v2) decorateV2(M);
   }
   function activeVi(m, p) { var o = m.querySelector('.ab-opt.active[data-fp="' + p + '"]'); return o ? +o.getAttribute('data-vi') : null; }
   function forceSelect(M, fp, vi) {
@@ -496,7 +616,7 @@
       if (x && !x.classList.contains('dis') && !x.classList.contains('active')) x.click();
     });
     decorate(M); later(M);
-    var d = M.defs && M.defs[M.cur], body = d && q('.caf-body', d.sec);
+    var blk0 = q(['#abFuel', '#abTerm', '#abKm', '#abColor', '#abAus', '#abAvPick'][fp], m), d = M.defs && M.defs[M.cur], body = (M.v2 && blk0 && blk0.closest('.caf-body')) || (d && q('.caf-body', d.sec));
     if (body) {
       var n = q('.caf-note', body) || mk('div', 'caf-note');
       n.innerHTML = svg('check') + '<span>' + esc(T.adapted) + '</span>'; body.insertBefore(n, q('.caf-err', body));
@@ -605,7 +725,7 @@
       M.b0 = q('.caf-b0', M.foot); M.b1 = q('.caf-b1', M.foot);
       M.b0.addEventListener('click', function () { if (M.cur > 0) go(M, M.cur - 1); else { var x = q(A.close, m); if (x) x.click(); } });
       M.b1.addEventListener('click', function () { next(M); });
-      M.stepper.addEventListener('click', function (e) { var b = e.target.closest('.caf-sp'); if (b) go(M, +b.getAttribute('data-i')); });
+      M.stepper.addEventListener('click', function (e) { var b = e.target.closest('.caf-sp'); if (!b) return; var i = +b.getAttribute('data-i'); if (M.v2) scrollToSec(M, M.defs[i].sec); else go(M, i); });
       M.prices.addEventListener('click', function (e) {
         var b = e.target.closest('[data-who]'); if (!b) return;
         var who = b.getAttribute('data-who');
@@ -625,7 +745,7 @@
   function build(M) {
     var A = M.A, kind = A.kind(M);
     /* minden korábbi tartalmat parkolóba (a mezők a formon belül maradnak) */
-    qa('.caf-body', M.steps).forEach(function (b) { while (b.firstChild) M.park.appendChild(b.firstChild); });
+    qa('.caf-step', M.modal).forEach(function (sec) { qa('.caf-body', sec).forEach(function (b) { while (b.firstChild) M.park.appendChild(b.firstChild); }); if (sec.parentNode) sec.parentNode.removeChild(sec); });
     M.steps.innerHTML = ''; M.stepper.innerHTML = '';
     M.kind = kind; M.defs = A.steps(M, kind); M.cur = 0;
     M.defs.forEach(function (d, i) {
@@ -644,6 +764,7 @@
     });
     /* üresen maradt eredeti konténerek elrejtése */
     if (M.A === CAIN) { ['.cain-buy', '.cain-rent'].forEach(function (s) { var e = q(s, M.modal); if (e) e.classList.add('caf-hl'); }); }
+    M.v2 = isV2(M); layoutV2(M, M.v2);
     go(M, 0, true);
   }
 
@@ -663,7 +784,7 @@
       d.sp.classList.toggle('on', j === i); d.sp.classList.toggle('done', j < i);
     });
     clearErr(M); refresh(M);
-    if (!silent) {
+    if (!silent && !M.v2) {
       var card = q(M.A.card, M.modal), sec = list[i].sec;
       if (card) {
         var doScroll = function () {
@@ -790,10 +911,172 @@
       q('.dp', est).textContent = e.dep || ''; q('.d', est).textContent = e.disc || '';
       var eu = q('.eu', est); eu.textContent = e.eur || ''; eu.style.display = e.eur ? '' : 'none';
     }
+    if (M.v2) refreshV2(M);
     var last = M.cur >= lastIdx(M), ob = q(A.submit, m), busy = ob && ob.disabled;
     M.b0.innerHTML = M.cur > 0 ? svg('left') + esc(T.back) : esc(T.cancel);
     M.b1.innerHTML = busy ? esc(T.sending) : esc(last ? A.btn(M) : T.next) + svg('right');
     M.b1.disabled = !!busy;
+  }
+
+  /* ---------- V2 elrendezés (teszt: BMW X3, vagy ?caf=v2 az URL-ben) ---------- */
+  var TV = (T.v2 || TX.hu.v2);
+  function isV2(M) {
+    if (M.A !== AB) return false;
+    if (/[?&#]caf=v2/.test(location.href)) return true;
+    if (/[?&#]caf=v1/.test(location.href)) return false;
+    return /^BMW X3\b/i.test(tx(q('#abTitle', M.modal)));
+  }
+  function scrollToSec(M, sec) {
+    var card = q(M.A.card, M.modal); if (!card || !sec) return;
+    var top = card.scrollTop + (sec.getBoundingClientRect().top - card.getBoundingClientRect().top) - M.stepper.offsetHeight - 14;
+    card.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+  var FIELDS = { lastname: 'user', firstname: 'user', company: 'bldg', taxid: 'doc', phone: 'phone', email: 'mail', message: 'pen' };
+  function wrapFields(M, on) {
+    Object.keys(FIELDS).forEach(function (n) {
+      var inp = q('#abForm [name=' + n + ']', M.modal); if (!inp) return;
+      if (!inp.hasAttribute('data-ph0')) inp.setAttribute('data-ph0', inp.placeholder || '');
+      var w = inp.closest('.caf-f');
+      if (on && !w) {
+        w = mk('div', 'caf-f'); var req = /\*/.test(inp.getAttribute('data-ph0')) || n === 'phone';
+        w.innerHTML = '<label class="caf-fl">' + esc(TV.lbl[n] || n) + (req ? ' <i>*</i>' : '') + '</label><div class="caf-in">' + svg(FIELDS[n]) + '</div>';
+        inp.parentNode.insertBefore(w, inp); q('.caf-in', w).appendChild(inp);
+        if (n === 'message') { var cnt = mk('span', 'caf-cnt', '0 / 500'); q('.caf-in', w).appendChild(cnt); inp.addEventListener('input', function () { cnt.textContent = (inp.value || '').length + ' / 500'; }); }
+      }
+      if (w) w.classList.toggle('caf-off', !on);
+      inp.placeholder = on ? (TV.ph[n] || '') : inp.getAttribute('data-ph0');
+      if (n === 'message') { if (on) inp.maxLength = 500; else inp.removeAttribute('maxlength'); }
+    });
+  }
+  function layoutV2(M, on) {
+    var m = M.modal, form = q('#abForm', m), card = q('.ab-card', m);
+    m.classList.toggle('caf-v2', !!on);
+    if (!form || !card) return;
+    if (!on) {
+      if (M.gw && M.gw.parentNode) { form.insertBefore(M.steps, M.gw); M.gw.parentNode.removeChild(M.gw); }
+      if (M.bar) M.bar.style.display = 'none';
+      if (M.wrapped) wrapFields(M, false);
+      return;
+    }
+    if (!M.gw) {
+      M.gw = mk('div', 'caf-gw'); M.aside = mk('aside', 'caf-aside');
+      M.aside.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-go]'); if (b) { scrollToSec(M, M.defs[+b.getAttribute('data-go')].sec); return; }
+        var w = e.target.closest('[data-who]'); if (w) { var t = qa('.ab-tgl', m).filter(function (x) { return x.getAttribute('data-abb') === w.getAttribute('data-who'); })[0]; if (t) t.click(); later(M); }
+      });
+    }
+    form.insertBefore(M.gw, M.steps); M.gw.appendChild(M.steps); M.gw.appendChild(M.aside);
+    var cd = M.defs.filter(function (d) { return d.contact; })[0];
+    if (cd) {
+      form.insertBefore(cd.sec, M.gw.nextSibling); cd.sec.classList.add('caf-csec');
+      var h4 = q('.caf-sh h4', cd.sec), hp = q('.caf-sh p', cd.sec); if (h4) h4.textContent = TV.contactT; if (hp) hp.textContent = TV.contactS;
+      var spl = cd.sp && q('span', cd.sp); if (spl) spl.textContent = TV.contactT;
+      var body = q('.caf-body', cd.sec);
+      if (!M.decl) M.decl = mk('div', 'caf-decl', '<div class="caf-dh">' + svg('doc') + '<div><b>' + esc(TV.declT) + '</b><span>' + esc(TV.declS) + '</span></div></div>');
+      var cb = q('#abCo', m); cb = cb && cb.closest('.ab-block');
+      body.insertBefore(M.decl, cb ? cb.nextSibling : body.firstChild);
+      ['.ab-plate', '.caf-cons', '.ab-consent:not(.ab-plate):not(.caf-req)'].forEach(function (sel) { var e = q(sel, body); if (e && !M.decl.contains(e)) M.decl.appendChild(e); });
+      qa('.caf-docs a', M.decl).forEach(function (a) { if (!a.querySelector('.caf-pdf')) { a.insertAdjacentHTML('beforeend', '<span class="caf-pdf">PDF</span>' + svg('dl', 'caf-ic caf-dli')); } });
+    }
+    wrapFields(M, true); M.wrapped = true;
+    if (!M.bar) {
+      M.bar = mk('div', 'caf-bar',
+        '<div class="caf-be">' + svg('coins') + '<div><span class="l"></span><b class="v"></b><span class="eu"></span></div></div>' +
+        '<div class="caf-bd">' + svg('shield') + '<div><span class="l">' + esc(TV.depT) + '</span><b class="v"></b><span class="s"></span></div></div>' +
+        '<div class="caf-bg"><button type="button" class="caf-b1 caf-send">' + esc(TV.send) + svg('right') + '</button><small>' + esc(TV.sendNote) + '</small></div>');
+      card.appendChild(M.bar);
+      q('.caf-send', M.bar).addEventListener('click', function () { submitV2(M); });
+    }
+    M.bar.style.display = '';
+  }
+  function decorateV2(M) {
+    var m = M.modal;
+    qa('#abFuel .ab-opt:not([data-fic])', m).forEach(function (l) {
+      l.setAttribute('data-fic', '1'); var t = tx(l).toLowerCase();
+      var ic = /hibrid|hybrid|phev/.test(t) ? 'leaf' : /elektr|electric/.test(t) ? 'plug' : /benzin|petrol/.test(t) ? 'drop' : 'fuel';
+      l.insertAdjacentHTML('afterbegin', svg(ic, 'caf-ic caf-oi'));
+    });
+    qa('#abTerm .ab-opt:not([data-tx]), #abKm .ab-opt:not([data-tx])', m).forEach(function (l) {
+      l.setAttribute('data-tx', '1');
+      [].forEach.call(l.childNodes, function (c) {
+        if (c.nodeType !== 3) return;
+        c.nodeValue = c.nodeValue.replace(/(\d+)\s*hó\b\.?$/, '$1 ' + TV.months).replace(/(\d)(\d{3})\s*km\/hó/, '$1 $2 km');
+      });
+    });
+    var blk = q('#abAvBlock', m), pick = q('#abAvPick', m);
+    if (blk && pick) {
+      if (!M.dd || M.dd.parentNode !== blk) {
+        M.dd = mk('button', 'caf-dd'); M.dd.type = 'button';
+        M.dd.addEventListener('click', function (e) { e.preventDefault(); blk.classList.toggle('caf-ddopen'); });
+        blk.insertBefore(M.dd, pick);
+        pick.addEventListener('click', function (e) { if (e.target.closest('.ab-opt')) setTimeout(function () { blk.classList.remove('caf-ddopen'); }, 0); });
+      }
+      var a = q('.ab-opt.active', pick), cn = a && q('.ab-cnt', a), lab = a ? tx(a).replace(tx(cn), '').trim() : TV.pick + '…';
+      var html = svg('cal') + '<span class="t">' + esc(lab) + '</span>' + (cn ? '<span class="bdg">' + esc(tx(cn).replace(/\s*db\s*$/, '') + ' ' + TV.avail1) + '</span>' : '') + svg('chev', 'caf-ic caf-chev');
+      if (M.dd.__h !== html) { M.dd.innerHTML = html; M.dd.__h = html; }
+    }
+  }
+  function depParts(M) {
+    var d = tx(q('#abDep', M.modal)) || tx(q('#abStickyDep', M.modal));
+    var r = /:\s*(.+?Ft)\s*\(([^)]+)\)\s*·?\s*(.*)$/.exec(d);
+    return r ? { v: r[1], s: '(' + r[2] + ')' + (r[3] ? ' · ' + r[3] : '') } : { v: d.replace(/^[^:]*:\s*/, ''), s: '' };
+  }
+  function stepDone(M, d) {
+    if (d.contact) return false;
+    var names = d.names || (d.name ? [d.name] : []);
+    if (!names.length) return true;
+    return names.every(function (n) { var all = qa('input[name="' + n + '"]', d.sec); return !all.length || all.some(function (i) { return i.checked; }); });
+  }
+  function refreshV2(M) {
+    var m = M.modal, first = -1;
+    M.defs.forEach(function (d, i) {
+      var done = stepDone(M, d); if (!done && first < 0 && !d.sec.classList.contains('caf-x')) first = i;
+      d.sp.classList.toggle('done', done); d.sp.classList.toggle('on', false); d.sec.classList.toggle('done', done);
+      var ii = q('i', d.sp); if (done) { if (!q('svg', ii)) ii.innerHTML = svg('check', 'caf-ic'); } else if (q('svg', ii)) ii.textContent = q('.n', d.sec).textContent;
+      var hp = q('.caf-sh p', d.sec); if (hp && !d.contact) { var h4 = q('.caf-sh h4', d.sec); if (h4 && !q('.caf-ii', h4)) { h4.insertAdjacentHTML('beforeend', ' <span class="caf-ii" title="' + esc(hp.textContent) + '">i</span>'); } }
+    });
+    if (first >= 0) M.defs[first].sp.classList.add('on');
+    var rows = [], ic = { avail: 'cal', fuel: 'leaf', term: 'clock', km: 'gauge' };
+    M.defs.forEach(function (d, i) {
+      if (d.contact || d.sec.classList.contains('caf-x')) return;
+      if (d.split) {
+        [['#abColor', 'color', 'tag'], ['#abAus', 'ausstattung', 'car']].forEach(function (pr) {
+          var blk = q(pr[0], m); if (!blk || blk.style.display === 'none') return;
+          var inp = q('input[name=' + pr[1] + ']:checked', blk), lab = inp && inp.closest('label'), cs = lab && q('.caf-sw', lab);
+          rows.push('<div class="caf-ar" data-go="' + i + '">' + (cs ? '<i class="caf-rsw" style="background:' + esc(cs.style.background) + '"></i>' : svg(pr[2])) + '<span class="k">' + esc(tx(q('.ab-label', blk)).replace(/^\d+\.\s*/, '')) + '</span><span class="v">' + esc(lab ? tx(lab) : '—') + '</span></div>');
+        });
+        return;
+      }
+      var v = summary(M, d), bd = '';
+      if (d.k === 'avail') { var a = q('#abAvPick .ab-opt.active .ab-cnt', m); if (a) bd = '<span class="bdg">' + esc(tx(a)) + '</span>'; }
+      if (d.k === 'fuel') { var fl = (v || '').toLowerCase(); ic.fuel = /hibrid|hybrid|phev/.test(fl) ? 'leaf' : /elektr/.test(fl) ? 'plug' : /benzin/.test(fl) ? 'drop' : 'fuel'; }
+      if (d.k === 'term') v = (v || '').replace(/(\d+)\s*hó\b/, '$1 ' + TV.months);
+      if (d.k === 'km') v = (v || '').replace(/(\d)(\d{3})\s*km\/hó/, '$1 $2 km');
+      rows.push('<div class="caf-ar" data-go="' + i + '">' + svg(ic[d.k] || 'check') + '<span class="k">' + esc((T.s[d.k] || [d.k])[0]) + '</span><span class="v">' + esc(v || '—') + '</span>' + bd + '</div>');
+    });
+    var e = AB.est(M), priv = isPriv(M), dp = depParts(M), tg = qa('.ab-tgl', m);
+    var seg = tg.length > 1 ? '<div class="caf-aseg">' + tg.map(function (t) { return '<button type="button" data-who="' + esc(t.getAttribute('data-abb')) + '" class="' + (t.classList.contains('active') ? 'on' : '') + '">' + esc(shortLbl(tx(t)).replace(/\s*·.*$/, '')) + '</button>'; }).join('') + '</div>' : '';
+    var html = '<div class="caf-acard"><div class="caf-ah"><b>' + esc(TV.chosen) + '</b><button type="button" class="caf-rch" data-go="0">' + svg('pen') + esc(TV.change) + '</button></div><div class="caf-arows">' + rows.join('') + '</div></div>' +
+      '<div class="caf-acard caf-apr">' + seg + '<span class="l">' + esc(TV.monthly) + '</span><b class="big">' + esc((e.val || '').replace(/^≈\s*/, '')) + '</b><span class="s">' + esc(priv ? TV.gross : TV.net) + '</span>' + (e.eur ? '<span class="eu">' + esc(e.eur) + '</span>' : '') +
+      '<hr><span class="l">' + esc(TV.depT) + '</span><b class="mid">' + esc(dp.v) + '</b><span class="s">' + esc(dp.s) + '</span><hr><ul>' + TV.incl.map(function (x) { return '<li>' + svg('check') + esc(x) + '</li>'; }).join('') + '</ul></div>';
+    if (M.aside.__h !== html) { M.aside.innerHTML = html; M.aside.__h = html; }
+    if (M.bar) {
+      q('.caf-be .l', M.bar).textContent = e.label; q('.caf-be .v', M.bar).innerHTML = esc(e.val || '') + (e.sub ? ' <small>' + esc(e.sub) + '</small>' : ''); q('.caf-be .eu', M.bar).textContent = e.eur || '';
+      q('.caf-bd .v', M.bar).textContent = dp.v; q('.caf-bd .s', M.bar).textContent = dp.s;
+      var ob = q('.ab-submit', m), sb = q('.caf-send', M.bar), busy = !!(ob && ob.disabled), lbl = (busy ? esc(T.sending) : esc(TV.send)) + svg('right');
+      sb.disabled = busy; if (sb.__h !== lbl) { sb.innerHTML = lbl; sb.__h = lbl; }
+    }
+  }
+  function submitV2(M) {
+    var m = M.modal;
+    for (var i = 0; i < M.defs.length; i++) {
+      var d = M.defs[i]; if (d.contact || d.sec.classList.contains('caf-x')) continue;
+      if (!valid(M, d)) { var er = q('.caf-err', d.sec); if (er) er.classList.add('on'); scrollToSec(M, d.sec); return; }
+    }
+    var ph = q('#abForm [name=phone]', m);
+    if (ph && !(ph.value || '').trim()) { var g = q('#abMsg', m); if (g) { g.className = 'ab-msg err'; g.textContent = TV.phoneReq; } ph.focus(); return; }
+    if (!reqOk(M)) { var g2 = q('#abMsg', m); if (g2) { g2.className = 'ab-msg err'; g2.textContent = T.consErr; } var bl = q('.caf-req.bad', m); if (bl) bl.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    submit(M);
   }
 
   /* ---------- megnyitás figyelése ---------- */
