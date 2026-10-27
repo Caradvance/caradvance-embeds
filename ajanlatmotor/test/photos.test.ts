@@ -29,11 +29,15 @@ describe("car-photo filter", () => {
 
   it("removes logos and banners, keeps exterior and interior photos, uses the small rendition", async () => {
     stubFetch();
-    const AI = { async run(_m: string, i: any) { const n = seen(i.image); return { answer: n === "banner" ? "Banner" : n === "logo" ? "logo." : n === "interior" ? "Interior" : "exterior" }; } };
-    const r = await filterCarPhotos({ DB: fakeDb(), AI } as any, [img("banner"), img("interior"), img("logo"), img("front")]);
+    const AI = { async run(_m: string, i: any) {
+      const n = seen(i.image);
+      if (/company logo/.test(i.question)) return { answer: n === "branded" ? "Yes" : "No." }; // dealer branding check
+      return { answer: n === "banner" ? "Banner" : n === "logo" ? "logo." : n === "interior" ? "Interior" : "exterior" };
+    } };
+    const r = await filterCarPhotos({ DB: fakeDb(), AI } as any, [img("banner"), img("interior"), img("logo"), img("branded"), img("front")]);
     globalThis.fetch = realFetch;
-    expect(r.images).toEqual([img("front"), img("interior")]); // exterior photo becomes the cover
-    expect(r.removed.length).toBe(2);
+    expect(r.images).toEqual([img("front"), img("interior")]); // exterior photo becomes the cover; branded car photo removed
+    expect(r.removed.length).toBe(3);
     expect(r.checked).toBe(true);
     expect(fetched.every((u) => u.includes("rule=mo-640.jpg"))).toBe(true);
   });

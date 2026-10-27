@@ -14,6 +14,9 @@ const QUESTION =
   "Classify this image with exactly one word from this list: exterior, interior, wheel, engine, trunk, detail, logo, banner, text, people, building, other. " +
   "exterior = outside of a car; interior = inside of a car (seats, dashboard, steering wheel, screen); detail = close-up of a car part. " +
   "Use logo, banner or text if the image is mainly a logo, an advertisement, a dealer graphic or written text. Answer with the one word only.";
+/** Second question for car photos: dealer branding (logo backdrop, name banner, price/ad text) disqualifies the photo. */
+const BRANDING_Q =
+  "Does this image show a large company logo, a dealer name, a banner or advertising text (not counting the car's own badge and number plate)? Answer only yes or no.";
 const CAR = /^(exterior|interior|wheel|wheels|engine|trunk|boot|detail|car|seat|seats|dashboard)\b/;
 const NOT_CAR = /^(logo|banner|text|people|person|building|other|advertisement|document|map)\b/;
 
@@ -26,15 +29,20 @@ function checkUrl(u: string) {
 }
 
 async function verdict(env: Env, url: string): Promise<Seen> {
-  const key = "photo3:" + url.replace(/\?.*$/, "");
+  const key = "photo4:" + url.replace(/\?.*$/, "");
   const hit = await cacheGet<Seen>(env, key);
   if (hit) return hit;
   try {
     const { text } = await ask(env, url);
     const a = text.trim().toLowerCase().replace(/^[^a-z]+/, "");
-    const v: Verdict = CAR.test(a) ? "car" : NOT_CAR.test(a) ? "other" : "error";
+    let v: Verdict = CAR.test(a) ? "car" : NOT_CAR.test(a) ? "other" : "error";
     if (v === "error") lastPhotoError = "unexpected answer: " + text.slice(0, 200);
-    const c = a.split(/[^a-z]/)[0];
+    let c = a.split(/[^a-z]/)[0];
+    if (v === "car") {
+      const b = (await ask(env, url, BRANDING_Q)).text.trim().toLowerCase().replace(/^[^a-z]+/, "");
+      if (/^yes\b/.test(b)) { v = "other"; c = "branded"; }
+      else if (!/^no\b/.test(b)) { v = "error"; lastPhotoError = "unexpected branding answer: " + b.slice(0, 100); }
+    }
     if (v !== "error") await cachePut(env, key, { v, c }, 60 * 60 * 24 * 90);
     return { v, c };
   } catch (e: any) {
@@ -82,10 +90,10 @@ function dataUri(b: { bytes: Uint8Array; type: string }) {
  * Moondream with the image bytes (it cannot fetch mobile.de URLs itself), then LLaVA as fallback.
  * The first non-empty answer wins; `trace` explains each attempt for diagnostics.
  */
-async function ask(env: Env, url: string): Promise<{ text: string; trace: string[] }> {
+async function ask(env: Env, url: string, question = QUESTION): Promise<{ text: string; trace: string[] }> {
   const ai = env.AI as AI;
   const trace: string[] = [];
-  const mq = (image: string) => ({ task: "query", image, question: QUESTION, reasoning: false, stream: false, temperature: 0, max_tokens: 20 });
+  const mq = (image: string) => ({ task: "query", image, question, reasoning: false, stream: false, temperature: 0, max_tokens: 20 });
   const attempt = async (label: string, fn: () => Promise<any>) => {
     try {
       const raw = await fn();
@@ -103,7 +111,7 @@ async function ask(env: Env, url: string): Promise<{ text: string; trace: string
   if (!img) throw new Error(trace.join(" | "));
   text = await attempt("moondream-bytes", () => ai.run(PHOTO_MODEL, mq(dataUri(img!))));
   if (text) return { text, trace };
-  text = await attempt("llava", () => ai.run(FALLBACK_MODEL, { image: [...img!.bytes], prompt: QUESTION, max_tokens: 10 }));
+  text = await attempt("llava", () => ai.run(FALLBACK_MODEL, { image: [...img!.bytes], prompt: question, max_tokens: 10 }));
   if (text) return { text, trace };
   throw new Error(trace.join(" | "));
 }
@@ -112,7 +120,8 @@ async function ask(env: Env, url: string): Promise<{ text: string; trace: string
 export async function debugPhoto(env: Env, url: string) {
   try {
     const r = await ask(env, url);
-    return { ok: true, ...r };
+    const b = await ask(env, url, BRANDING_Q);
+    return { ok: true, ...r, branding: b.text, branding_trace: b.trace };
   } catch (e: any) {
     return { ok: false, error: String(e?.message || e) };
   }
