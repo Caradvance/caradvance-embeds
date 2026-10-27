@@ -217,6 +217,18 @@ staff.post("/jelolt/:cid/overrides", async (c) => {
   return back(c, reqPath(gc.dealId!), "Díjak mentve.");
 });
 
+/** Next photo becomes the cover (dealer banners are often the first mobile.de image). */
+staff.post("/jelolt/:cid/cover", async (c) => {
+  const cid = c.req.param("cid");
+  const gc = await guardCand(c, cid); if (gc.err) return gc.err;
+  const row = await c.env.DB.prepare("SELECT listing_json FROM am_candidates WHERE id = ?").bind(cid).first<{ listing_json: string }>();
+  const l = JSON.parse(row!.listing_json);
+  if (Array.isArray(l.images) && l.images.length > 1) l.images.push(l.images.shift());
+  await c.env.DB.prepare("UPDATE am_candidates SET listing_json = ? WHERE id = ?").bind(JSON.stringify(l), cid).run();
+  await logEvent(c.env, gc.dealId!, c.get("user").name, "cover_rotated", { cid });
+  return back(c, reqPath(gc.dealId!), "Borítókép cserélve.");
+});
+
 staff.post("/jelolt/:cid/lock", async (c) => {
   const cid = c.req.param("cid");
   const gc = await guardCand(c, cid); if (gc.err) return gc.err;
