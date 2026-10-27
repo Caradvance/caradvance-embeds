@@ -25,10 +25,10 @@ async function verdict(env: Env, url: string): Promise<Verdict> {
   const hit = await cacheGet<{ v: Verdict }>(env, key);
   if (hit) return hit.v;
   try {
-    const r = await ask(env, url);
-    const a = String(r?.answer ?? r?.response ?? r?.result?.answer ?? "").trim().toLowerCase();
+    const { text } = await ask(env, url);
+    const a = text.trim().toLowerCase().replace(/^[^a-z]+/, "");
     const v: Verdict = /^(yes|igen|ja)\b/.test(a) ? "car" : /^(no|nem|nein)\b/.test(a) ? "other" : "error";
-    if (v === "error") lastPhotoError = "unexpected answer: " + JSON.stringify(r).slice(0, 300);
+    if (v === "error") lastPhotoError = "unexpected answer: " + text.slice(0, 200);
     if (v !== "error") await cachePut(env, key, { v }, 60 * 60 * 24 * 90);
     return v;
   } catch (e: any) {
@@ -39,30 +39,75 @@ async function verdict(env: Env, url: string): Promise<Verdict> {
 
 export let lastPhotoError = "";
 
-/** The model fetches public URLs itself; if the image host refuses it, the bytes are sent as a data URI. */
-async function ask(env: Env, url: string): Promise<any> {
-  const ai = env.AI as { run(model: string, input: unknown): Promise<any> };
-  const input = (image: string) => ({ task: "query", image, question: QUESTION, reasoning: false, temperature: 0, max_tokens: 5 });
-  try {
-    return await ai.run(PHOTO_MODEL, input(checkUrl(url)));
-  } catch (first) {
-    const res = await fetch(checkUrl(url), { headers: { "User-Agent": "Mozilla/5.0 (Caradvance Ajanlatmotor)", Accept: "image/*", Referer: "https://suchen.mobile.de/" } });
-    if (!res.ok) throw new Error(`model: ${String((first as any)?.message || first).slice(0, 150)} · image fetch ${res.status}`);
-    const buf = new Uint8Array(await res.arrayBuffer());
-    let bin = "";
-    for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
-    return await ai.run(PHOTO_MODEL, input(`data:${res.headers.get("content-type") || "image/jpeg"};base64,${btoa(bin)}`));
+type AI = { run(model: string, input: unknown): Promise<any> };
+export const FALLBACK_MODEL = "@cf/llava-hf/llava-1.5-7b-hf";
+
+/** Workers AI answers come as plain objects, strings or (streamed) SSE bodies, depending on the model. */
+export async function answerText(r: any): Promise<string> {
+  if (r == null) return "";
+  if (typeof ReadableStream !== "undefined" && r instanceof ReadableStream) r = await new Response(r).text();
+  else if (typeof Response !== "undefined" && r instanceof Response) r = await r.text();
+  if (typeof r === "string") {
+    if (/^data:/m.test(r)) {
+      return r.split(/\n/).filter((l) => l.startsWith("data:") && !l.includes("[DONE]")).map((l) => {
+        try { const j = JSON.parse(l.slice(5)); return j.answer ?? j.response ?? j.token ?? j.text ?? ""; } catch { return ""; }
+      }).join("");
+    }
+    if (/^\s*[{\[]/.test(r)) { try { return answerText(JSON.parse(r)); } catch { /* plain text */ } }
+    return r;
   }
+  const v = r.answer ?? r.response ?? r.description ?? r.caption ?? r.result?.answer ?? r.result?.response ?? r.result?.description ?? r.output_text;
+  return typeof v === "string" ? v : "";
 }
 
-/** Raw model call for diagnostics (test environment only). */
+async function imageBytes(url: string) {
+  const res = await fetch(checkUrl(url), { headers: { "User-Agent": "Mozilla/5.0 (Caradvance Ajanlatmotor)", Accept: "image/*", Referer: "https://suchen.mobile.de/" } });
+  if (!res.ok) throw new Error(`image fetch ${res.status}`);
+  return { bytes: new Uint8Array(await res.arrayBuffer()), type: res.headers.get("content-type") || "image/jpeg" };
+}
+
+function dataUri(b: { bytes: Uint8Array; type: string }) {
+  let bin = "";
+  for (let i = 0; i < b.bytes.length; i += 0x8000) bin += String.fromCharCode(...b.bytes.subarray(i, i + 0x8000));
+  return `data:${b.type};base64,${btoa(bin)}`;
+}
+
+/**
+ * 1) Moondream with the public URL, 2) Moondream with the image bytes, 3) LLaVA with the bytes.
+ * The first non-empty answer wins; `trace` explains each attempt for diagnostics.
+ */
+async function ask(env: Env, url: string): Promise<{ text: string; trace: string[] }> {
+  const ai = env.AI as AI;
+  const trace: string[] = [];
+  const mq = (image: string) => ({ task: "query", image, question: QUESTION, reasoning: false, stream: false, temperature: 0, max_tokens: 20 });
+  const attempt = async (label: string, fn: () => Promise<any>) => {
+    try {
+      const raw = await fn();
+      const text = await answerText(raw);
+      trace.push(`${label}: ${text ? JSON.stringify(text.slice(0, 60)) : "empty " + Object.prototype.toString.call(raw) + " keys=" + Object.keys(raw || {}).join(",")}`);
+      return text;
+    } catch (e: any) {
+      trace.push(`${label}: error ${String(e?.message || e).slice(0, 160)}`);
+      return "";
+    }
+  };
+  let text = await attempt("moondream-url", () => ai.run(PHOTO_MODEL, mq(checkUrl(url))));
+  if (text) return { text, trace };
+  let img: { bytes: Uint8Array; type: string } | null = null;
+  try { img = await imageBytes(url); } catch (e: any) { trace.push(String(e?.message || e)); }
+  if (!img) throw new Error(trace.join(" | "));
+  text = await attempt("moondream-bytes", () => ai.run(PHOTO_MODEL, mq(dataUri(img!))));
+  if (text) return { text, trace };
+  text = await attempt("llava", () => ai.run(FALLBACK_MODEL, { image: [...img!.bytes], prompt: QUESTION, max_tokens: 10 }));
+  if (text) return { text, trace };
+  throw new Error(trace.join(" | "));
+}
+
+/** Diagnostics (test environment only). */
 export async function debugPhoto(env: Env, url: string) {
   try {
-    const ai = env.AI as { run(model: string, input: unknown): Promise<any> };
-    let direct: any;
-    try { direct = await ai.run(PHOTO_MODEL, { task: "query", image: checkUrl(url), question: QUESTION, reasoning: false, temperature: 0, max_tokens: 5 }); }
-    catch (e: any) { direct = { error: String(e?.message || e) }; }
-    return { ok: true, direct, viaAsk: await ask(env, url).catch((e: any) => ({ error: String(e?.message || e) })) };
+    const r = await ask(env, url);
+    return { ok: true, ...r };
   } catch (e: any) {
     return { ok: false, error: String(e?.message || e) };
   }

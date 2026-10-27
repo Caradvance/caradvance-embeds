@@ -43,3 +43,14 @@ describe("car-photo filter", () => {
     expect(r.checked).toBe(false);
   });
 });
+
+import { answerText } from "../../caradvance-astro/lib/ajanlatmotor/photos";
+describe("answerText", () => {
+  it("reads objects, strings, JSON and SSE", async () => {
+    expect(await answerText({ answer: "Yes" })).toBe("Yes");
+    expect(await answerText({ description: " No." })).toBe(" No.");
+    expect(await answerText('{"result":{"response":"yes"}}')).toBe("yes");
+    expect(await answerText('data: {"response":"Y"}\ndata: {"response":"es"}\ndata: [DONE]\n')).toBe("Yes");
+    expect(await answerText(new Response('{"answer":"no"}').body)).toBe("no");
+  });
+});
