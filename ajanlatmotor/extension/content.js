@@ -63,7 +63,7 @@
         <select id="req">${reqs.map((q) => `<option value="${q.id}" ${String(q.id) === String(r.lastReq) ? "selected" : ""}>${esc(q.customer || "?")} · ${esc((q.summary || "").slice(0, 50))}</option>`).join("")}</select>
         <div class="slots"><button data-s="1">1. hely</button><button data-s="2">2. hely</button><button data-s="3">3. hely</button><button data-s="runner" class="alt">Tartalék</button></div>
         <div class="muted">${esc(l.title || [l.make, l.model].filter(Boolean).join(" "))} · ${l.price_gross_eur ? Number(l.price_gross_eur).toLocaleString("hu-HU") + " €" : "ár?"} · ${l.km != null ? Number(l.km).toLocaleString("hu-HU") + " km" : "km?"} · ${(l.images || []).length} kép${parsed.missing.length ? ` · <span class="err">hiányzik: ${esc(parsed.missing.join(", "))}</span>` : ""}</div>
-        <div class="msg"></div><div class="muted">Bejelentkezve: ${esc(String(r.body.user || "").replace(/^ext:/, ""))}</div>`;
+        <div class="msg"></div><div class="muted">Bejelentkezve: ${esc(String(r.body.user || "").replace(/^ext:/, ""))} · v${chrome.runtime.getManifest().version}</div>`;
       panel.querySelectorAll(".slots button").forEach((b) => b.addEventListener("click", async (e) => {
         e.stopPropagation();
         panel.querySelectorAll(".slots button").forEach((x) => (x.disabled = true));
