@@ -622,7 +622,7 @@
       var specs = [];
       var yr = tx(panel.querySelector('.year')); if (cond || yr) specs.push(['cal', [cond, yr].filter(Boolean).join(' · ')]);
       var facts = {};
-      qa('main *').forEach(function (el) {
+      qa('.k, dt, th').forEach(function (el) {
         if (el.children.length) return;
         var t = tx(el); if (!/^(Kilométer|Üzemanyag|Sebességváltó|Váltó|Teljesítmény|Mileage|Fuel|Gearbox|Power|Kilometerstand|Kraftstoff|Getriebe|Leistung|Najazdené|Palivo|Prevodovka|Výkon|Najeto|Převodovka|Przebieg|Paliwo|Skrzynia|Moc)$/i.test(t)) return;
         var v = tx(el.parentElement).replace(t, '').trim(); if (v && !facts[t]) facts[t] = v;

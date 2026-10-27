@@ -1,5 +1,5 @@
 /* Egységes, lépésenkénti autó-űrlapok (bérlés / vásárlás / rendelés) — /ca-forms.js */
-(function(){ if(window.__cafL) return; window.__cafL=1; var s=document.createElement("script"); s.src="/ca-forms.js?v=1"; s.defer=true; (document.head||document.documentElement).appendChild(s); })();
+(function(){ if(window.__cafL) return; window.__cafL=1; var s=document.createElement("script"); s.src="/ca-forms.js?v=2"; s.defer=true; (document.head||document.documentElement).appendChild(s); })();
 /* ── /berelheto/ -> /autoink/#berelheto (Marc, 2026.08.30.) ──
    A ket berlés-lista eggye valik: a kulon /berelheto/ oldal atvezet a keszlet-oldal
    "Berelheto" fulere. Ugyanaz az adat, ugyanazok az arak, egy helyen. ── */
