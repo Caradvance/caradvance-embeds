@@ -123,13 +123,15 @@
     b = t.closest('[data-egl-order]'); if (b) { CTX = { k: 'egl', ds: b.dataset, t: Date.now() }; }
   }, true);
   function ctx(k) { return CTX && CTX.k === k && Date.now() - CTX.t < 8000 ? CTX : null; }
+  /* a megnyitáskor rögzített kontextus — a modál nyitva tartása alatt nem jár le */
+  function octx(M, k) { var c = M && M.oc; if (!c) return null; if (k === 'card' && c.k === 'page') return c; return c.k === k ? c : null; }
 
   /* ---------- adapterek ---------- */
   function abCfg(M) {
     var c = window.__ABCFG; if (!c) return null;
     var t = tx(q('#abTitle', M.modal));
     var dn = function (s) { return String(s).replace(/(\d)er\b/g, '$1').replace(/^VW(?=\s|$)/, 'Volkswagen'); };
-    var x = ctx('rent'); if (x && x.ds && x.ds.name && c[x.ds.name]) return c[x.ds.name];
+    var x = octx(M, 'rent'); if (x && x.ds && x.ds.name && c[x.ds.name]) return c[x.ds.name];
     for (var k in c) { if (dn(k) === t || k === t) return c[k]; }
     return null;
   }
@@ -182,12 +184,19 @@
       return { label: priv ? T.estG : T.estN, val: c.v, sub: c.sub, eur: eur, dep: dep, disc: T.disc };
     },
     specs: function (M) {
-      var out = [], c = ctx('rent'), card = c && c.card, m = M.modal;
+      var out = [], c = octx(M, 'rent'), card = c && c.card, m = M.modal;
       var av = tx(q('#abAvail', m)).replace(/^●\s*/, '');
       if (av) out.push(['cal', av]);
       var cfg = abCfg(M), fo = q('#abFuel .ab-opt.active', m);
       var fl = fo ? tx(fo) : (cfg && cfg.F ? cfg.F.map(function (f) { return f === 'PHEV' ? 'Hibrid' : f; }).join(' / ') : (c && c.ds && c.ds.fuels) || '');
       if (fl) out.push(['fuel', fl]);
+      if (!card) {
+        qa('.r').forEach(function (r) {
+          var k = tx(q('.k', r)); if (!k) return; var v = tx(r).replace(k, '').trim(); if (!v) return;
+          if (/^Hajtás|^Váltó/.test(k) && !out.some(function (o) { return o[0] === 'gear'; })) out.push(['gear', /aut/i.test(v) ? 'Automata' : v]);
+          else if (/^Karosszéria|^Kategória/.test(k) && !out.some(function (o) { return o[0] === 'car'; })) out.push(['car', v]);
+        });
+      }
       if (card) {
         var sp = tx(q('.sub-specs', card)).split('·').map(function (x) { return x.trim(); }).filter(Boolean);
         if (sp[1]) out.push(['gear', sp[1]]); if (sp[0]) out.push(['car', sp[0]]);
@@ -231,7 +240,7 @@
     },
     prices: function (M, kind) {
       var priv = isPriv(M), raw = tx(q('.cain-sub', M.modal)), first = raw.split('·')[0].trim();
-      var c = ctx('card'), card = c && c.card, biz = card && card.classList.contains('bizcard'), isNew = /^(Új|New|Neu|Nové|Nový|Nowy)$/.test(tx(card && q('.cond', card)));
+      var c = octx(M, 'card'), card = c && c.card, biz = card && card.classList.contains('bizcard'), isNew = /^(Új|New|Neu|Nové|Nový|Nowy)$/.test(tx(card && q('.cond', card)));
       var n = huN(first);
       if (MK === 'hu' && kind === 'sale' && n && !biz && !isNew && qa('.cain-tgl', M.modal).length > 1) {
         return { pair: { co: fmtFt(n), priv: fmtFt(Math.ceil(n * 1.19 / 10000) * 10000) }, cur: first, priv: priv };
@@ -245,7 +254,7 @@
       return { label: T.price, val: p.cur, sub: '', disc: T.discSale };
     },
     specs: function (M) {
-      var out = [], c = ctx('card') || (CTX && CTX.k === 'page' ? CTX : null);
+      var out = [], c = octx(M, 'card');
       if (c && c.specs) return c.specs;
       var card = c && c.card; if (!card) return out;
       var cond = tx(q('.cond', card)), yr = tx(q('.year', card));
@@ -277,8 +286,8 @@
     },
     prices: function (M) { var p = tx(q('#eglOrderPrice', M.modal)), tol = q('#eglOrderTol', M.modal); return { pair: null, cur: p ? p + (tol && shown(tol) ? ' ' + tx(tol) : '') : '', priv: isPriv(M) }; },
     est: function (M) { var p = EGL.prices(M); return { label: T.price, val: p.cur, sub: p.cur ? T.plusVat : '', disc: T.discSale }; },
-    specs: function () {
-      var c = ctx('egl'), out = [['tag', T.newCar]];
+    specs: function (M) {
+      var c = octx(M, 'egl'), out = [['tag', T.newCar]];
       var f = c && c.ds && c.ds.fuels; if (f) out.push(['fuel', f.split(',').map(function (x) { return x.trim(); }).join(' / ')]);
       return out;
     },
@@ -453,6 +462,7 @@
       '.caf-v2 .caf-prices,.caf-v2 .caf-foot,.caf-v2 .caf-recap,.caf-v2 .caf-sum,.caf-v2 .caf-step:not(.caf-csec) .caf-sh p{display:none!important}',
       '.caf-v2 .caf-top{grid-template-columns:360px minmax(0,1fr)!important;gap:28px!important}',
       '.caf-v2 .caf-top>img{height:190px!important}',
+      '.caf.ab-modal .caf-top>img{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important;outline:0!important;mix-blend-mode:multiply}',
       '.caf-v2 .caf-top h3{font-size:32px!important;margin:6px 0 14px!important}',
       '.caf-v2 .caf-specs{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px}',
       '.caf-v2 .caf-spec{font-size:14.5px}',
@@ -1091,6 +1101,7 @@
   }
   function onOpen(modal) {
     var M = stateOf(modal); if (!M) return;
+    M.oc = (CTX && (Date.now() - CTX.t < 8000 || (CTX.k === 'page' && Date.now() - CTX.t < 600000))) ? CTX : null;
     try { if (setup(M)) { var card = q(M.A.card, modal); if (card) card.scrollTop = 0; } } catch (err) { if (window.console) console.warn('ca-forms', err); }
     clearInterval(M.iv); M.iv = setInterval(function () { if (modal.getAttribute('aria-hidden') !== 'false') { clearInterval(M.iv); return; } refresh(M); }, 500);
   }
@@ -1136,7 +1147,7 @@
       CTX = { k: 'page', specs: specs.slice(0, 6), t: Date.now() };
       var kind = /bizomány|komis/i.test(cond) ? 'biz' : 'sale';
       window.caInquiry({ name: name, img: img ? img.getAttribute('src') : '', price: price, kind: kind, isNew: /^(Új|New|Neu|Nové|Nový|Nowy)$/.test(cond) });
-      setTimeout(function () { CTX = { k: 'page', specs: specs.slice(0, 6), t: Date.now() }; var mo = document.querySelector('.cain-modal'); var M = mo && stateOf(mo); if (M) refresh(M); }, 60);
+      setTimeout(function () { CTX = { k: 'page', specs: specs.slice(0, 6), t: Date.now() }; var mo = document.querySelector('.cain-modal'); var M = mo && stateOf(mo); if (M) { M.oc = CTX; refresh(M); } }, 60);
     }, true);
   }
   /* a page-kontextust a CAIN adapter is olvassa */
