@@ -3,7 +3,7 @@
 // Csak a véletlen, kitalálhatatlan token által címzett sort olvassa/írja.
 // A státusz CSAK a POST-ra változik (az e-mailes link megnyitása önmagában nem — a levelezők
 // biztonsági előtöltése így nem fogad el ajánlatot az ügyfél helyett).
-import { ensureCrm, json, parseJ, clean, cleanMulti, saveCard, getCard, sendCrmMail, notifyTo, esc, priceLabel, specLine, SITE } from '../../../lib/crm.js';
+import { ensureCrm, addEvent, json, parseJ, clean, cleanMulti, saveCard, getCard, sendCrmMail, notifyTo, esc, priceLabel, specLine, SITE } from '../../../lib/crm.js';
 
 const TOKEN_RE = /^[a-f0-9]{40}$/;
 const PUBLIC_KEYS = ['title', 'brand', 'year', 'km', 'fuel', 'power', 'gearbox', 'image', 'url', 'note', 'price', 'currency', 'period'];
@@ -18,6 +18,10 @@ async function getOffer(env, token) {
 async function handleGet(env, token) {
   const { row, error } = await getOffer(env, token); if (error) return error;
   const items = parseJ(row.items, []).map((it) => { const o = {}; for (const k of PUBLIC_KEYS) o[k] = it[k]; o.spec = specLine(it); o.priceLabel = priceLabel(it); return o; });
+  if (!row.responded_at) {
+    const seen = await env.DB.prepare(`SELECT 1 FROM crm_events WHERE deal_id = ? AND kind = ? LIMIT 1`).bind(row.deal_id, 'opened:' + token.slice(0, 12)).first().catch(() => null);
+    if (!seen) await addEvent(env, row.deal_id, 'opened:' + token.slice(0, 12), `Ügyfél megnyitotta az ajánlatot (kiküldve: ${new Date(String(row.created_at).replace(' ', 'T') + 'Z').toLocaleString('hu-HU', { timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })})`, 'Ügyfél');
+  }
   const newer = await env.DB.prepare(`SELECT 1 FROM crm_offers WHERE deal_id = ? AND created_at > ? LIMIT 1`).bind(row.deal_id, row.created_at).first();
   return json({
     clientName: row.client_name || '', line: row.line || '', message: row.message || '', items, createdAt: row.created_at,
@@ -54,7 +58,11 @@ async function handleRespond(request, env, token) {
     for (const [k, val] of Object.entries(fill)) if (!v[k] && val) { v[k] = String(val).slice(0, 200); changed = true; }
     if (changed) fields.data = { ...data, vehicle: v };
   }
-  await saveCard(env, row.deal_id, fields, null);
+  await saveCard(env, row.deal_id, fields, null, 'Ügyfél', 'válasz az ajánlatra');
+  const pick = choice >= 0 ? items[choice] : null;
+  await addEvent(env, row.deal_id, 'client', action === 'elfogad'
+    ? `Ügyfél elfogadta az ajánlatot: ${pick ? pick.title + ' (' + priceLabel(pick) + ')' : ''}${msg ? ' — üzenet: ' + msg : ''}`
+    : `Ügyfél módosítást kért${pick ? ' (' + pick.title + ')' : ''}: ${msg}`, 'Ügyfél');
 
   const it = choice >= 0 ? items[choice] : null;
   try {
@@ -71,6 +79,7 @@ export async function onRequest(context) {
   const { request, env } = context;
   const path = new URL(request.url).pathname.replace(/^\/api\/crm-ajanlat/, '') || '/';
   try {
+    await ensureCrm(env);
     let m = path.match(/^\/([a-f0-9]{40})$/);
     if (m && request.method === 'GET') return await handleGet(env, m[1]);
     m = path.match(/^\/([a-f0-9]{40})\/valasz$/);
