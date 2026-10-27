@@ -1,6 +1,15 @@
 // Caradvance Sourcing – service worker: opens the side panel, relays parsed listings and talks to the Ajánlatmotor API.
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
 
+// Unpacked installs: when newer files are on disk (manifest version differs from the running one), reload by itself.
+function checkForUpdate() {
+  fetch(chrome.runtime.getURL("manifest.json"), { cache: "no-store" })
+    .then((r) => r.json())
+    .then((m) => { if (m.version && m.version !== chrome.runtime.getManifest().version) chrome.runtime.reload(); })
+    .catch(() => {});
+}
+checkForUpdate();
+
 // TESZT build: preset to the test site; the belső login in this Chrome is enough (token optional).
 const DEFAULT_BASE = "https://ajanlatmotor-teszt.caradvance-astro.pages.dev";
 
@@ -27,6 +36,7 @@ async function api(path, opts = {}) {
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  setTimeout(checkForUpdate, 3000); // after answering this message
   if (msg.type === "parsed" && sender.tab) {
     chrome.storage.session.set({ current: { ...msg.payload, tabId: sender.tab.id, at: Date.now() } }).then(() => {
       // called synchronously from a click in the page, so the user-gesture requirement is met

@@ -227,6 +227,40 @@
     return out;
   }
 
+  // ---------- layer 0: mobile.de vehicle page (2026 layout: dt/dd technical data, data-testid gallery and features) ----------
+  function fromVip(html) {
+    var out = {}, m;
+    var txt = function (x) { return decode(String(x).replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim(); };
+    var dt = {}, re = /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi;
+    while ((m = re.exec(html))) dt[txt(m[1])] = txt(m[2]);
+    if (!Object.keys(dt).length) return out;
+    var g = function (k) { return dt[k] != null ? dt[k] : null; };
+    if (g("Kilometerstand") != null) out.km = num(g("Kilometerstand"));
+    if (g("Erstzulassung")) out.first_registration = firstReg(g("Erstzulassung"));
+    if ((m = String(g("Leistung") || "").match(/(\d+)\s*kW/))) out.power_kw = num(m[1]);
+    out.fuel = g("Kraftstoffart") || g("Antriebsart") || null;
+    out.gearbox = g("Getriebe");
+    out.color = g("Farbe (Hersteller)") || g("Farbe");
+    out.body = g("Kategorie");
+    out.condition = /neu/i.test(g("Fahrzeugzustand") || "") && !/gebraucht/i.test(g("Fahrzeugzustand") || "") ? "new" : g("Fahrzeugzustand") ? "used" : null;
+    if (g("Anzahl der Fahrzeughalter") != null) out.previous_owners = num(g("Anzahl der Fahrzeughalter"));
+    var bat = Object.keys(dt).filter(function (k) { return /^Batteriekapazit/.test(k); })[0];
+    if (bat) out.battery_kwh = num(dt[bat]);
+    // gallery: data-testid="image-N" slides, in order, full-size rendition
+    var imgs = [], seen = {}, ire = /data-testid="image-\d+"[\s\S]{0,1500}?mo-prod\/images\/([0-9a-f]{2}\/[0-9a-f-]{36})/g;
+    while ((m = ire.exec(html))) if (!seen[m[1]]) { seen[m[1]] = 1; imgs.push("https://img.classistatic.de/api/v1/mo-prod/images/" + m[1] + "?rule=mo-1024.jpg"); }
+    if (imgs.length) out.images = imgs.slice(0, 40);
+    // equipment list
+    var fi = html.search(/data-testid="vip-features-(list|content)"/);
+    if (fi !== -1) {
+      var chunk = html.slice(fi, fi + 40000), items = [], lre = /<li[^>]*>([\s\S]*?)<\/li>/gi;
+      while ((m = lre.exec(chunk))) { var t = txt(m[1]); if (t && t.length < 80 && items.indexOf(t) === -1) items.push(t); }
+      if (items.length) out.equipment = items;
+    }
+    if ((m = html.match(/([\d.]+)\s*(?:&nbsp;|\s)?€\s*Netto/))) { out.price_net_eur = num(m[1]); out.vat_reclaimable = true; }
+    return out;
+  }
+
   function set(target, src) {
     Object.keys(src).forEach(function (k) {
       var v = src[k];
@@ -254,12 +288,19 @@
     cfg = cfg || DEFAULT_CONFIG;
     var layers = [];
     var out = {};
-    var l1 = fromJsonLd(html), l2 = fromState(html, cfg), l3 = fromDom(html, cfg);
+    var l0 = fromVip(html), l1 = fromJsonLd(html), l2 = fromState(html, cfg), l3 = fromDom(html, cfg);
+    if (Object.keys(l0).length) { layers.push("vip"); set(out, l0); }
     if (Object.keys(l1).length) layers.push("jsonld");
     if (Object.keys(l2).length) layers.push("state");
     if (Object.keys(l3).length) layers.push("dom");
     set(out, l1); set(out, l2); set(out, l3);
     splitMakeModel(out);
+    // new car (0 km, no first registration yet): it is registered now, in Hungary
+    if (!out.first_registration && (out.condition === "new" || out.km === 0)) {
+      var d = new Date();
+      out.first_registration = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+      out.condition = "new";
+    }
     out.ad_id = adIdFromUrl(url) || out.ad_id || null;
     out.url = url;
     out.seller = out.seller || {};

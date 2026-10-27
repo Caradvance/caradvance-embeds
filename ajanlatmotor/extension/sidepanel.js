@@ -159,7 +159,7 @@ async function openSearch() {
 }
 
 // Unpacked installs don't pick up new background/content code until reloaded; the panel is served from disk, so it does it.
-const BUILD = "0.4.0";
+const BUILD = "0.4.1";
 if (chrome.runtime.getManifest().version !== BUILD) chrome.runtime.reload();
 
 async function init() {
