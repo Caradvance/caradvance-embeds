@@ -130,7 +130,10 @@ function slotCard(cv: CarView, published: boolean) {
   <div class="row" style="justify-content:space-between"><h2 style="margin:0">${c.slot}. autó ${c.positioning ? `<span class="chip">${esc(c.positioning)}</span>` : ""}</h2>
    <span class="muted small">pont: <strong>${c.score ?? "–"}</strong> · forrás: ${esc(c.source)}</span></div>
   <img class="thumb" src="${esc(l.images[0] || "")}" alt="" style="margin:10px 0 4px">
-  ${l.images.length > 1 ? `<form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/cover" style="margin:0 0 8px"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Másik borítókép ↻</button> <span class="muted small">${l.images.length} kép</span></form>` : ""}
+  ${mock ? "" : `<div class="row" style="gap:6px;margin:0 0 8px;align-items:center">
+   ${l.images.length > 1 ? `<form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/cover" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Másik borítókép ↻</button></form>` : ""}
+   <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/photos" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Fotók szűrése</button></form>
+   <span class="muted small">${l.images.length} kép · ${(l as any).photos_checked ? `<span class="ok">✓ csak autófotó</span>${(l as any).photos_removed ? ` (${(l as any).photos_removed} kiszűrve)` : ""}` : `<span style="color:var(--red)">fotók nincsenek ellenőrizve</span>`}</span></div>`}
   <h3>${esc(l.title)}</h3>
   <div class="muted small">${mock ? "TESZTHIRDETÉS (mock)" : `<a href="${esc(l.url)}" target="_blank" rel="noopener">mobile.de hirdetés ↗</a>`} · ${esc(l.seller.name)} · ${esc(l.seller.city)} · <strong>${Math.round(cv.distanceKm)} km</strong> Budapesttől (${cv.distanceMethod === "ors" ? "útvonal" : "becslés"})</div>
   <dl class="kv" style="margin:10px 0"><dt>Első forg.</dt><dd>${l.first_registration}</dd><dt>Km</dt><dd>${l.km.toLocaleString("hu-HU")}</dd>

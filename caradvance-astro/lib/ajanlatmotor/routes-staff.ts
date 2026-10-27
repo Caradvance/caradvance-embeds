@@ -3,6 +3,7 @@
  * Admin sees every request; other staff only deals assigned to them (same rule as belső).
  */
 import { Hono } from "hono";
+import { withCarPhotos } from "./photos";
 import type { Env, Lang, Requirements, Section } from "./types";
 import {
   baseUrl, canSeeDeal, ensureAm, getSetting, isAdmin, isTest, logEvent, newId, nowIso, randomHex, sessionUser, setSetting, sha256Hex, type Staff,
@@ -215,6 +216,21 @@ staff.post("/jelolt/:cid/overrides", async (c) => {
   await c.env.DB.prepare("UPDATE am_candidates SET overrides_json = ? WHERE id = ?").bind(JSON.stringify(ov), cid).run();
   await logEvent(c.env, gc.dealId!, c.get("user").name, "overrides", { cid, ov });
   return back(c, reqPath(gc.dealId!), "Díjak mentve.");
+});
+
+/** Re-run the car-photo check (removes dealer logos, banners, team photos). */
+staff.post("/jelolt/:cid/photos", async (c) => {
+  const cid = c.req.param("cid");
+  const gc = await guardCand(c, cid); if (gc.err) return gc.err;
+  const row = await c.env.DB.prepare("SELECT listing_json FROM am_candidates WHERE id = ?").bind(cid).first<{ listing_json: string }>();
+  const before = JSON.parse(row!.listing_json);
+  const l = await withCarPhotos(c.env, { ...before, photos_checked: false });
+  await c.env.DB.prepare("UPDATE am_candidates SET listing_json = ? WHERE id = ?").bind(JSON.stringify(l), cid).run();
+  await logEvent(c.env, gc.dealId!, c.get("user").name, "photos_checked", { cid, kept: l.images.length, removed: l.photos_removed, checked: l.photos_checked });
+  if (!c.env.AI) return back(c, reqPath(gc.dealId!), undefined, "A fotószűrő nincs bekötve (Workers AI „AI” binding hiányzik).");
+  return back(c, reqPath(gc.dealId!), l.photos_checked
+    ? `Fotók ellenőrizve: ${l.images.length} autófotó maradt, ${l.photos_removed} nem autós kép kiszűrve.`
+    : undefined, l.photos_checked ? undefined : "A fotók egy részét nem sikerült ellenőrizni, próbálja újra.");
 });
 
 /** Next photo becomes the cover (dealer banners are often the first mobile.de image). */

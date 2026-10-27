@@ -25,3 +25,7 @@ binding = "DB"
 database_name = "caradvance-offers-test"
 database_id = "c9e957c3-d388-4eca-bdef-73183fffe620"
 migrations_dir = "migrations-test"
+
+# Workers AI: car-photo filter (only real car photos reach the customer)
+[ai]
+binding = "AI"

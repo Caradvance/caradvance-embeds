@@ -4,6 +4,7 @@
  */
 export interface Env {
   DB: D1Database;
+  AI?: { run(model: string, input: unknown): Promise<any> }; // Workers AI (car-photo filter)
   // optional configuration (Pages "Variables" or Worker vars)
   AM_TEST_MODE?: string;          // "1" on preview/test only: TESZT banner, mock source allowed, test seed
   AM_SOURCE?: string;             // mock | searchapi | apify  (default: mock in test, searchapi in production)

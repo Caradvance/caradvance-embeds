@@ -12,6 +12,7 @@ import { transition } from "./status";
 import { clarifyDraft } from "./extract";
 import { cacheGet, cachePut, ensureAm, logEvent, newId, nowIso } from "./am";
 import { notifyStaff } from "./notify";
+import { withCarPhotos } from "./photos";
 
 export interface RequestRow {
   deal_id: number; status: string; source: string; message_id: string | null; from_email: string | null; subject: string | null;
@@ -127,6 +128,8 @@ export async function processRequest(env: Env, dealId: number, actor = "system",
   const taken = new Set(keep.filter((c) => c.slot).map((c) => c.slot));
   const { top, runners } = pickTop3(eligible);
   const freeSlots = [1, 2, 3].filter((n) => !taken.has(n));
+  // photo check for the cars that go into the free slots (runners are checked when moved into a slot)
+  for (const s of top.slice(0, freeSlots.length)) s.listing = await withCarPhotos(env, s.listing);
   const ins = env.DB.prepare(insertSql);
   const stmts: D1PreparedStatement[] = [];
   const put = (s: Scored, slot: number | null, poolName: string) =>
@@ -163,6 +166,7 @@ export async function addListing(env: Env, dealId: number, listing: Listing, tar
   const existing = await env.DB.prepare("SELECT id FROM am_candidates WHERE deal_id = ? AND ad_id = ?").bind(dealId, listing.ad_id).first<{ id: string }>();
   if (existing) return { duplicate: true as const, candidateId: existing.id };
 
+  listing = await withCarPhotos(env, listing); // only real car photos (no dealer logos / banners)
   const ctx = await loadCtx(env);
   const { listing: l, dist, costs } = await evaluate(env, ctx, req, listing);
   const rejected = hardFilter(l, req, costs);
@@ -196,6 +200,8 @@ export async function moveToSlot(env: Env, candidateId: string, slot: number, ac
   const stmts: D1PreparedStatement[] = [];
   if (prev) stmts.push(env.DB.prepare("UPDATE am_candidates SET slot = NULL, pool = 'runner' WHERE id = ?").bind(prev.id));
   stmts.push(env.DB.prepare("UPDATE am_candidates SET slot = ?, pool = 'top' WHERE id = ?").bind(slot, candidateId));
+  const cl = JSON.parse(c.listing_json) as Listing & { photos_checked?: boolean };
+  if (!cl.photos_checked) stmts.push(env.DB.prepare("UPDATE am_candidates SET listing_json = ? WHERE id = ?").bind(JSON.stringify(await withCarPhotos(env, cl)), candidateId));
   await env.DB.batch(stmts);
   await refreshPositioning(env, c.deal_id);
   await logEvent(env, c.deal_id, actor, "slot_change", { candidateId, slot, replaced: prev?.id });
@@ -251,6 +257,11 @@ export function publishBlockers(cars: CarView[]): string[] {
     if (!c.candidate.locked) out.push(`${n}: nincs zárolva`);
     if (!c.sections) out.push(`${n}: nincs leírás`);
     if (c.costs.unverified.length) out.push(`${n}: megerősítetlen díjak (${c.costs.unverified.join(", ")})`);
+    const pl = c.listing as Listing & { photos_checked?: boolean };
+    if (!pl.url.startsWith("mock://")) {
+      if (!pl.photos_checked) out.push(`${n}: a fotók nincsenek ellenőrizve (csak autófotó mehet ki) – „Fotók szűrése”`);
+      else if (!pl.images.length) out.push(`${n}: nincs autófotó`);
+    }
   }
   return out;
 }
