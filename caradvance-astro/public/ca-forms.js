@@ -13,11 +13,11 @@
 
   /* ---------- szövegek ---------- */
   var TX = {
-    hu: { recap: 'Összegzés', recapSub: 'Ellenőrizd a választásaidat, mielőtt elküldöd.', change: 'Módosítás', adapted: 'A választásodhoz igazítottuk a többi beállítást.', otherCfg: 'Más kivitellel elérhető — kattints, és átállítjuk', co: 'Cégként · nettó ár', priv: 'Magánszemélyként', vat19: '(19% német áfával)', plusVat: '+ áfa', estG: 'Becsült havi díj (bruttó)', estN: 'Becsült havi díj (nettó)', priceN: 'Ár (nettó)', priceG: 'Ár (bruttó)', price: 'Ár', cancel: 'Mégse', back: 'Vissza', next: 'Következő lépés', send: 'Ajánlat kérése', order: 'Rendelés elküldése', inq: 'Érdeklődés elküldése', sending: 'Küldés…', info: 'Fontos információ', pick: 'Kérlek válassz egy lehetőséget a továbblépéshez.', disc: 'Az ár tájékoztató jellegű. A pontos díj a kiválasztott konfigurációtól és elérhetőségtől függően változhat.', discSale: 'Az ár tájékoztató jellegű, élő árfolyammal számolva. A végleges árat az írásos ajánlat tartalmazza.', avail: 'Elérhető', availIn: function (c, m) { return 'A kiválasztott hónapban (' + m + ') ' + c + ' autó elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, availNow: function (c) { return c + ' autó azonnal elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, dep: 'Kaució', newCar: 'Új autó · rendelésre', fuels: 'Hajtás', opt: 'opcionális',
+    hu: { eurCons: 'Tudomásul veszem, hogy a havi bérleti díjat és a kauciót <b>euróban (EUR)</b> kell megfizetni a Caradvance GmbH részére; a forintösszegek csak tájékoztató jellegűek. *', docCons: 'Megismertem a bérléshez aláírandó <b>szerződésdokumentumokat</b>, és elfogadom, hogy a szerződés ezek alapján jön létre: *', docs: ['Bérleti szerződés', '1. sz. melléklet – Bérleti feltételek', '2. sz. melléklet – Átadási jegyzőkönyv', '3. sz. melléklet – Sérülésrajzok', '4. sz. melléklet – Jogosult vezetők'], consErr: 'Kérlek fogadd el az euróban történő fizetést és a szerződésdokumentumokat.', pdf: 'minta, PDF', recap: 'Összegzés', recapSub: 'Ellenőrizd a választásaidat, mielőtt elküldöd.', change: 'Módosítás', adapted: 'A választásodhoz igazítottuk a többi beállítást.', otherCfg: 'Más kivitellel elérhető — kattints, és átállítjuk', co: 'Cégként · nettó ár', priv: 'Magánszemélyként', vat19: '(19% német áfával)', plusVat: '+ áfa', estG: 'Becsült havi díj (bruttó)', estN: 'Becsült havi díj (nettó)', priceN: 'Ár (nettó)', priceG: 'Ár (bruttó)', price: 'Ár', cancel: 'Mégse', back: 'Vissza', next: 'Következő lépés', send: 'Ajánlat kérése', order: 'Rendelés elküldése', inq: 'Érdeklődés elküldése', sending: 'Küldés…', info: 'Fontos információ', pick: 'Kérlek válassz egy lehetőséget a továbblépéshez.', disc: 'Az ár tájékoztató jellegű. A pontos díj a kiválasztott konfigurációtól és elérhetőségtől függően változhat.', discSale: 'Az ár tájékoztató jellegű, élő árfolyammal számolva. A végleges árat az írásos ajánlat tartalmazza.', avail: 'Elérhető', availIn: function (c, m) { return 'A kiválasztott hónapban (' + m + ') ' + c + ' autó elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, availNow: function (c) { return c + ' autó azonnal elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, dep: 'Kaució', newCar: 'Új autó · rendelésre', fuels: 'Hajtás', opt: 'opcionális',
       s: { avail: ['Elérhetőség', 'Válaszd ki, mikortól szeretnéd átvenni az autót.', 'Elérhetőség'], fuel: ['Üzemanyag', 'Válaszd ki a hajtásláncot.', 'Üzemanyag'], term: ['Bérlési futamidő', 'Mennyi időre szeretnéd bérelni az autót?', 'Futamidő'], km: ['Km-keret / hó', 'Válaszd ki a havi futásteljesítményt.', 'Km-keret'], spec: ['Szín és kivitel', 'Válaszd ki a színt és a felszereltséget.', 'Kivitel'], contact: ['Adataid', 'Add meg az elérhetőségeidet — ezekre küldjük az ajánlatot.', 'Adatok'], mode: ['Vásárlás módja', 'Hogyan szeretnéd megvásárolni az autót?', 'Vásárlás'], pay: ['Fizetés', 'Egy összegben vagy finanszírozással fizetnél?', 'Fizetés'], start: ['Kezdés', 'Mikortól szeretnéd az autót?', 'Kezdés'], file: ['Specifikáció', 'Ha van kész felszereltségi listád, töltsd fel (opcionális).', 'Specifikáció'] } },
-    en: { recap: 'Summary', recapSub: 'Check your choices before sending.', change: 'Change', adapted: 'We adjusted the other settings to match your choice.', otherCfg: 'Available with another configuration — click to switch', co: 'As a company · net price', priv: 'As a private person', vat19: '(incl. 19% German VAT)', plusVat: '+ VAT', estG: 'Estimated monthly fee (gross)', estN: 'Estimated monthly fee (net)', priceN: 'Price (net)', priceG: 'Price (gross)', price: 'Price', cancel: 'Cancel', back: 'Back', next: 'Next step', send: 'Request offer', order: 'Send order', inq: 'Send inquiry', sending: 'Sending…', info: 'Important information', pick: 'Please choose an option to continue.', disc: 'The price is indicative. The exact fee depends on the selected configuration and availability.', discSale: 'The price is indicative, calculated with the live exchange rate. The final price is stated in the written offer.', avail: 'Available', availIn: function (c, m) { return c + ' car(s) available in the selected month (' + m + '). You can finalise your booking in the next steps.'; }, availNow: function (c) { return c + ' car(s) available immediately. You can finalise your booking in the next steps.'; }, dep: 'Deposit', newCar: 'New car · made to order', fuels: 'Powertrain', opt: 'optional',
+    en: { eurCons: 'I acknowledge that the monthly rent and the deposit are payable <b>in euros (EUR)</b> to Caradvance GmbH; forint amounts are for information only. *', docCons: 'I have read the <b>contract documents</b> I will sign for the rental and accept that the contract is concluded on this basis: *', docs: ['Rental agreement', 'Annex 1 – Rental conditions', 'Annex 2 – Handover protocol', 'Annex 3 – Damage sketches', 'Annex 4 – Authorised drivers'], consErr: 'Please accept payment in euros and the contract documents.', pdf: 'sample, PDF', recap: 'Summary', recapSub: 'Check your choices before sending.', change: 'Change', adapted: 'We adjusted the other settings to match your choice.', otherCfg: 'Available with another configuration — click to switch', co: 'As a company · net price', priv: 'As a private person', vat19: '(incl. 19% German VAT)', plusVat: '+ VAT', estG: 'Estimated monthly fee (gross)', estN: 'Estimated monthly fee (net)', priceN: 'Price (net)', priceG: 'Price (gross)', price: 'Price', cancel: 'Cancel', back: 'Back', next: 'Next step', send: 'Request offer', order: 'Send order', inq: 'Send inquiry', sending: 'Sending…', info: 'Important information', pick: 'Please choose an option to continue.', disc: 'The price is indicative. The exact fee depends on the selected configuration and availability.', discSale: 'The price is indicative, calculated with the live exchange rate. The final price is stated in the written offer.', avail: 'Available', availIn: function (c, m) { return c + ' car(s) available in the selected month (' + m + '). You can finalise your booking in the next steps.'; }, availNow: function (c) { return c + ' car(s) available immediately. You can finalise your booking in the next steps.'; }, dep: 'Deposit', newCar: 'New car · made to order', fuels: 'Powertrain', opt: 'optional',
       s: { avail: ['Availability', 'Choose when you would like to take over the car.', 'Availability'], fuel: ['Fuel', 'Choose the powertrain.', 'Fuel'], term: ['Rental term', 'How long would you like to rent the car?', 'Term'], km: ['Mileage / month', 'Choose your monthly mileage.', 'Mileage'], spec: ['Colour & trim', 'Choose the colour and the equipment.', 'Trim'], contact: ['Your details', 'Enter your contact details — we will send the offer there.', 'Details'], mode: ['Purchase type', 'How would you like to buy the car?', 'Purchase'], pay: ['Payment', 'Pay in one sum or with financing?', 'Payment'], start: ['Start', 'From when do you need the car?', 'Start'], file: ['Specification', 'Upload your equipment list if you have one (optional).', 'Spec'] } },
-    de: { recap: 'Zusammenfassung', recapSub: 'Prüfen Sie Ihre Auswahl vor dem Absenden.', change: 'Ändern', adapted: 'Die übrigen Einstellungen wurden an Ihre Wahl angepasst.', otherCfg: 'Mit anderer Konfiguration verfügbar — klicken zum Umstellen', co: 'Als Firma · Nettopreis', priv: 'Als Privatperson', vat19: '(inkl. 19 % dt. MwSt.)', plusVat: '+ MwSt.', estG: 'Geschätzte Monatsrate (brutto)', estN: 'Geschätzte Monatsrate (netto)', priceN: 'Preis (netto)', priceG: 'Preis (brutto)', price: 'Preis', cancel: 'Abbrechen', back: 'Zurück', next: 'Nächster Schritt', send: 'Angebot anfordern', order: 'Bestellung senden', inq: 'Anfrage senden', sending: 'Wird gesendet…', info: 'Wichtige Information', pick: 'Bitte wählen Sie eine Option, um fortzufahren.', disc: 'Der Preis ist unverbindlich. Die genaue Rate hängt von Konfiguration und Verfügbarkeit ab.', discSale: 'Der Preis ist unverbindlich, mit dem Tageskurs berechnet. Den Endpreis nennt das schriftliche Angebot.', avail: 'Verfügbar', availIn: function (c, m) { return 'Im gewählten Monat (' + m + ') ist/sind ' + c + ' Fahrzeug(e) verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, availNow: function (c) { return c + ' Fahrzeug(e) sofort verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, dep: 'Kaution', newCar: 'Neuwagen · auf Bestellung', fuels: 'Antrieb', opt: 'optional',
+    de: { eurCons: 'Ich nehme zur Kenntnis, dass Monatsmiete und Kaution <b>in Euro (EUR)</b> an die Caradvance GmbH zu zahlen sind; Forint-Beträge dienen nur zur Information. *', docCons: 'Ich habe die <b>Vertragsunterlagen</b> gelesen, die ich für die Miete unterzeichne, und akzeptiere, dass der Vertrag auf dieser Grundlage zustande kommt: *', docs: ['Mietvertrag', 'Anlage 1 – Mietbedingungen', 'Anlage 2 – Übergabeprotokoll', 'Anlage 3 – Schadenskizzen', 'Anlage 4 – Berechtigte Fahrer'], consErr: 'Bitte bestätigen Sie die Zahlung in Euro und die Vertragsunterlagen.', pdf: 'Muster, PDF', recap: 'Zusammenfassung', recapSub: 'Prüfen Sie Ihre Auswahl vor dem Absenden.', change: 'Ändern', adapted: 'Die übrigen Einstellungen wurden an Ihre Wahl angepasst.', otherCfg: 'Mit anderer Konfiguration verfügbar — klicken zum Umstellen', co: 'Als Firma · Nettopreis', priv: 'Als Privatperson', vat19: '(inkl. 19 % dt. MwSt.)', plusVat: '+ MwSt.', estG: 'Geschätzte Monatsrate (brutto)', estN: 'Geschätzte Monatsrate (netto)', priceN: 'Preis (netto)', priceG: 'Preis (brutto)', price: 'Preis', cancel: 'Abbrechen', back: 'Zurück', next: 'Nächster Schritt', send: 'Angebot anfordern', order: 'Bestellung senden', inq: 'Anfrage senden', sending: 'Wird gesendet…', info: 'Wichtige Information', pick: 'Bitte wählen Sie eine Option, um fortzufahren.', disc: 'Der Preis ist unverbindlich. Die genaue Rate hängt von Konfiguration und Verfügbarkeit ab.', discSale: 'Der Preis ist unverbindlich, mit dem Tageskurs berechnet. Den Endpreis nennt das schriftliche Angebot.', avail: 'Verfügbar', availIn: function (c, m) { return 'Im gewählten Monat (' + m + ') ist/sind ' + c + ' Fahrzeug(e) verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, availNow: function (c) { return c + ' Fahrzeug(e) sofort verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, dep: 'Kaution', newCar: 'Neuwagen · auf Bestellung', fuels: 'Antrieb', opt: 'optional',
       s: { avail: ['Verfügbarkeit', 'Wählen Sie, ab wann Sie das Auto übernehmen möchten.', 'Verfügbarkeit'], fuel: ['Kraftstoff', 'Wählen Sie den Antrieb.', 'Kraftstoff'], term: ['Mietdauer', 'Wie lange möchten Sie das Auto mieten?', 'Laufzeit'], km: ['Kilometer / Monat', 'Wählen Sie Ihre monatliche Laufleistung.', 'Kilometer'], spec: ['Farbe & Ausstattung', 'Wählen Sie Farbe und Ausstattung.', 'Ausstattung'], contact: ['Ihre Daten', 'Geben Sie Ihre Kontaktdaten an — wir senden das Angebot dorthin.', 'Daten'], mode: ['Kaufart', 'Wie möchten Sie das Auto kaufen?', 'Kauf'], pay: ['Zahlung', 'Einmalzahlung oder Finanzierung?', 'Zahlung'], start: ['Beginn', 'Ab wann benötigen Sie das Auto?', 'Beginn'], file: ['Spezifikation', 'Laden Sie Ihre Ausstattungsliste hoch, falls vorhanden (optional).', 'Spezifikation'] } },
     sk: { recap: 'Zhrnutie', recapSub: 'Pred odoslaním skontrolujte svoj výber.', change: 'Zmeniť', adapted: 'Ostatné nastavenia sme prispôsobili vášmu výberu.', otherCfg: 'Dostupné s inou konfiguráciou — kliknite a prepneme', co: 'Ako firma · cena bez DPH', priv: 'Ako súkromná osoba', vat19: '(s DPH)', plusVat: '+ DPH', estG: 'Odhadovaný mesačný poplatok (s DPH)', estN: 'Odhadovaný mesačný poplatok (bez DPH)', priceN: 'Cena (bez DPH)', priceG: 'Cena (s DPH)', price: 'Cena', cancel: 'Zrušiť', back: 'Späť', next: 'Ďalší krok', send: 'Požiadať o ponuku', order: 'Odoslať objednávku', inq: 'Odoslať dopyt', sending: 'Odosiela sa…', info: 'Dôležitá informácia', pick: 'Pre pokračovanie vyberte jednu z možností.', disc: 'Cena je orientačná. Presný poplatok závisí od zvolenej konfigurácie a dostupnosti.', discSale: 'Cena je orientačná. Konečnú cenu uvedie písomná ponuka.', avail: 'Dostupné', availIn: function (c, m) { return 'Vo zvolenom mesiaci (' + m + ') je dostupných ' + c + ' áut. Rezerváciu dokončíte v ďalších krokoch.'; }, availNow: function (c) { return 'Ihneď dostupných: ' + c + '. Rezerváciu dokončíte v ďalších krokoch.'; }, dep: 'Kaucia', newCar: 'Nové auto · na objednávku', fuels: 'Pohon', opt: 'voliteľné',
       s: { avail: ['Dostupnosť', 'Vyberte, odkedy chcete auto prevziať.', 'Dostupnosť'], fuel: ['Palivo', 'Vyberte pohon.', 'Palivo'], term: ['Doba prenájmu', 'Na ako dlho si chcete auto prenajať?', 'Doba'], km: ['Km limit / mesiac', 'Vyberte mesačný nájazd.', 'Km limit'], spec: ['Farba a výbava', 'Vyberte farbu a výbavu.', 'Výbava'], contact: ['Vaše údaje', 'Zadajte kontaktné údaje — pošleme vám na ne ponuku.', 'Údaje'], mode: ['Spôsob kúpy', 'Ako chcete auto kúpiť?', 'Kúpa'], pay: ['Platba', 'Jednorazovo alebo s financovaním?', 'Platba'], start: ['Začiatok', 'Odkedy potrebujete auto?', 'Začiatok'], file: ['Špecifikácia', 'Ak máte zoznam výbavy, nahrajte ho (voliteľné).', 'Špecifikácia'] } },
@@ -41,7 +41,8 @@
     right: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     left: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
     check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
-    pin: '<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>'
+    pin: '<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+    doc: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>'
   };
   /* Fényezések: valós árnyalat + felület (metál / gyöngyház / uni / matt), névvel párosítva */
   var PAINT = {
@@ -133,7 +134,7 @@
     });
     if (lo === null) return null;
     var r = window.__ABRATE || 364, f = function (vm) { return Math.ceil((lo + 650) * vm * r / 10000) * 10000; };
-    return { co: f(1), priv: f(1.19), from: lo !== hi };
+    return { co: f(1), priv: f(1.19), coE: lo + 650, privE: Math.round((lo + 650) * 1.19), from: lo !== hi };
   }
 
   var AB = {
@@ -155,14 +156,17 @@
     prices: function (M) {
       var priv = isPriv(M), cur = tx(q('#abStickyPrice', M.modal)) || tx(q('#abPrice', M.modal));
       var p = MK === 'hu' && qa('.ab-tgl', M.modal).length > 1 ? abPrices(M) : null;
-      return { pair: p ? { co: fmtFt(p.co) + '/hó' + (p.from ? '-tól' : ''), priv: fmtFt(p.priv) + '/hó' + (p.from ? '-tól' : '') } : null, cur: cur, priv: priv };
+      var fe = function (e) { return Math.round(e).toLocaleString('hu-HU').replace(/\u00a0/g, ' ') + ' €/hó' + (p.from ? '-tól' : ''); };
+      return { pair: p ? { co: fmtFt(p.co) + '/hó' + (p.from ? '-tól' : ''), priv: fmtFt(p.priv) + '/hó' + (p.from ? '-tól' : ''), coE: fe(p.coE), privE: fe(p.privE) } : null, cur: cur, priv: priv };
     },
     est: function (M) {
       var s = tx(q('#abStickyPrice', M.modal)) || tx(q('#abPrice', M.modal));
       var priv = isPriv(M);
       var c = cleanP(s);
       var dep = tx(q('#abStickyDep', M.modal)) || tx(q('#abDep', M.modal));
-      return { label: priv ? T.estG : T.estN, val: c.v, sub: c.sub, dep: dep, disc: T.disc };
+      var pp = MK === 'hu' ? abPrices(M) : null, eur = '';
+      if (pp) eur = Math.round(priv ? pp.privE : pp.coE).toLocaleString('hu-HU').replace(/\u00a0/g, ' ') + ' €/hó' + (pp.from ? '-tól' : '') + (priv ? ' · bruttó' : ' · nettó');
+      return { label: priv ? T.estG : T.estN, val: c.v, sub: c.sub, eur: eur, dep: dep, disc: T.disc };
     },
     specs: function (M) {
       var out = [], c = ctx('rent'), card = c && c.card, m = M.modal;
@@ -384,6 +388,19 @@
       '.caf .caf-body .ab-opt.caf-col .caf-cn{font-size:13.5px;line-height:1.3;font-weight:600;color:var(--ink);padding:0 2px}',
       '.caf .caf-body .ab-opt.caf-col.active .caf-cn{color:var(--r)}',
       '.caf .caf-body .ab-opt.caf-col.active .caf-sw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),0 0 0 2px #fff,0 0 0 4px rgba(226,0,26,.35)}',
+      '.caf-pbox .e{font-size:14px;font-weight:700;opacity:.95}',
+      '.caf-pbox:not(.on) .e{color:#3a4556}',
+      '.caf-est .eu{font-size:15px;font-weight:800;color:#1f2a3a;margin-top:1px}',
+      '.caf-rr .v em{font-style:normal;font-size:14px;font-weight:700;color:#3a4556}',
+      '.caf-cons{display:flex;flex-direction:column;gap:12px;background:#fffaf0;border:1px solid #f3e2bf;border-radius:14px;padding:14px 16px}',
+      '.caf-cons .ab-consent span{display:block}',
+      '.caf-cons b{font-weight:800}',
+      '.caf-docs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}',
+      '.caf-docs a{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ink);background:#fff;border:1px solid #dfe4ec;border-radius:10px;padding:7px 10px;text-decoration:none}',
+      '.caf-docs a:hover{border-color:var(--r);color:var(--r)}',
+      '.caf-docs a .caf-ic{width:16px;height:16px;color:var(--r)}',
+      '.caf-cons small{font-size:12px;color:var(--mut)}',
+      '.caf-req.bad{outline:2px solid #f4a3ad;outline-offset:4px;border-radius:8px}',
       '.caf-note{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#0f6b3d;background:#e6f6ec;border-radius:10px;padding:9px 12px}',
       '.caf-note .caf-ic{width:17px;height:17px;color:#0f6b3d}',
       '.caf-recap{border:1px solid #dfe4ec;border-radius:16px;background:#f8f9fb;padding:14px 16px 6px;margin-bottom:6px}',
@@ -493,6 +510,45 @@
     forceSelect(M, +o.getAttribute('data-fp'), +o.getAttribute('data-vi'));
   }, true);
 
+  /* ---------- euró-fizetés + szerződésdokumentumok elfogadása (HU bérlés) ---------- */
+  var DOCS = ['/szerzodes-minta/1-berleti-szerzodes-mietvertrag.pdf', '/szerzodes-minta/2-berleti-feltetelek-mietbedingungen.pdf', '/szerzodes-minta/3-atadasi-jegyzokonyv-uebergabeprotokoll.pdf', '/szerzodes-minta/4-serulesrajzok-schadenskizzen.pdf', '/szerzodes-minta/5-jogosult-vezetok-fahrer.pdf'];
+  function consents(M) {
+    if (M.cons) return M.cons;
+    var w = mk('div', 'caf-cons');
+    w.innerHTML =
+      '<label class="ab-consent caf-req"><input type="checkbox" name="eurpay" data-caf-req="1"><span>' + T.eurCons + '</span></label>' +
+      '<label class="ab-consent caf-req"><input type="checkbox" name="contractdocs" data-caf-req="1"><span>' + T.docCons +
+      '<span class="caf-docs">' + DOCS.map(function (u, i) { return '<a href="' + u + '" target="_blank" rel="noopener">' + svg('doc') + esc(T.docs[i]) + '</a>'; }).join('') + '</span><small>(' + esc(T.pdf) + ')</small></span></label>';
+    w.addEventListener('click', function (e) { if (e.target.closest('a')) e.stopPropagation(); });
+    M.cons = w; return w;
+  }
+  function reqOk(M) {
+    var bad = qa('input[data-caf-req]', M.modal).filter(function (i) { return !i.checked && i.closest('.caf-step'); });
+    qa('.caf-req', M.modal).forEach(function (l) { var i = q('input', l); l.classList.toggle('bad', !!(i && !i.checked && bad.length)); });
+    return !bad.length;
+  }
+  document.addEventListener('submit', function (e) {   /* Enterrel sem lehet megkerülni */
+    var f = e.target; if (!f || f.id !== 'abForm') return;
+    var mo = f.closest('.ab-modal'), M = mo && stateOf(mo); if (!M || !M.cons || !M.cons.closest('form')) return;
+    if (!reqOk(M)) { e.preventDefault(); e.stopImmediatePropagation(); var g = q('#abMsg', mo); if (g) { g.className = 'ab-msg err'; g.textContent = T.consErr; } }
+  }, true);
+  (function () {   /* a lead-ben is jelenjen meg */
+    var prev = window.caLeadExtras;
+    var mine = function () {
+      var r = {}; try { if (prev) r = prev.apply(this, arguments) || {}; } catch (e) { }
+      try {
+        var m = document.getElementById('abRent');
+        if (m && m.getAttribute('aria-hidden') === 'false') {
+          var a = m.querySelector('input[name=eurpay]'), b = m.querySelector('input[name=contractdocs]');
+          if (a) r['Euróban fizet'] = a.checked ? 'Tudomásul vette (bérleti díj és kaució EUR-ban)' : 'NEM';
+          if (b) r['Szerződésdokumentumok'] = b.checked ? 'Megismerte és elfogadta (bérleti szerződés + 1–4. sz. melléklet)' : 'NEM';
+        }
+      } catch (e) { }
+      return r;
+    };
+    window.caLeadExtras = mine;
+  })();
+
   /* ---------- összegzés (utolsó lépés) ---------- */
   function recap(M) {
     var d = M.defs.filter(function (x) { return x.contact; })[0]; if (!d || !d.recap) return;
@@ -516,7 +572,7 @@
     });
     var e = M.A.est(M, M.kind), car = tx(q(M.A.title, M.modal)), img = q(M.A.img, M.modal);
     var html = '<div class="caf-rh">' + (img && img.getAttribute('src') ? '<img src="' + esc(img.getAttribute('src')) + '" alt="">' : '') + '<div><b>' + esc(T.recap) + '</b><span>' + esc(car) + '</span></div></div>' + rows.join('') +
-      (e && e.val ? '<div class="caf-rr tot"><span class="k">' + esc(e.label) + '</span><span class="v">' + esc(e.val) + (e.sub ? ' <small>' + esc(e.sub) + '</small>' : '') + '</span></div>' : '');
+      (e && e.val ? '<div class="caf-rr tot"><span class="k">' + esc(e.label) + '</span><span class="v">' + esc(e.val) + (e.eur ? ' <em>' + esc(e.eur) + '</em>' : '') + (e.sub ? ' <small>' + esc(e.sub) + '</small>' : '') + '</span></div>' : '');
     if (d.recap.__h !== html) { d.recap.innerHTML = html; d.recap.__h = html; }
     d.recap.style.display = rows.length ? '' : 'none';
   }
@@ -542,7 +598,7 @@
       M.steps = mk('div', 'caf-steps'); form.insertBefore(M.steps, form.firstChild);
       M.park = mk('div', 'caf-park'); form.appendChild(M.park);
       M.foot = mk('div', 'caf-foot',
-        '<div class="caf-est"><div><div class="l"></div><div class="v"></div><div class="s"></div><div class="dp"></div></div><div class="d"></div></div>' +
+        '<div class="caf-est"><div><div class="l"></div><div class="v"></div><div class="eu"></div><div class="s"></div><div class="dp"></div></div><div class="d"></div></div>' +
         '<div class="caf-nav"><button type="button" class="caf-b0"></button><button type="button" class="caf-b1"></button></div>');
       card.appendChild(M.foot);
       M.b0 = q('.caf-b0', M.foot); M.b1 = q('.caf-b1', M.foot);
@@ -578,6 +634,7 @@
       d.nodes.forEach(function (n) { var e = resolve(M, n); if (e) body.appendChild(e); });
       if (d.info) { sec.classList.add('hasinfo'); q('.caf-sb', sec).appendChild(mk('div', 'caf-ibox', '<b>' + svg('info') + esc(T.info) + '</b><span class="t"></span>')); }
       if (d.hideFirstLabel) { var fl = q(d.hideFirstLabel, body); if (fl) fl.classList.add('caf-hl'); }
+      if (d.contact && M.A === AB && MK === 'hu') { var cw = consents(M), asz = q('.ab-consent:not(.ab-plate):not(.caf-req)', body); body.insertBefore(cw, asz || q('.caf-err', body)); }
       if (d.contact) { d.recap = mk('div', 'caf-recap'); body.insertBefore(d.recap, body.firstChild); d.recap.addEventListener('click', function (e) { var b = e.target.closest('[data-go]'); if (b) go(M, +b.getAttribute('data-go')); }); }
       body.appendChild(mk('div', 'caf-err', esc(T.pick)));
       q('.caf-sh', sec).addEventListener('click', function () { if (M.cur !== i) go(M, i); });
@@ -640,7 +697,10 @@
   function next(M) {
     var d = M.defs[M.cur];
     if (!valid(M, d)) { var e = q('.caf-err', d.sec); if (e) e.classList.add('on'); return; }
-    if (M.cur >= lastIdx(M)) { submit(M); return; }
+    if (M.cur >= lastIdx(M)) {
+      if (!reqOk(M)) { var g = q(M.A.msg, M.modal); if (g) { g.className = (M.A === AB ? 'ab-msg' : 'cain-msg') + ' err'; g.textContent = T.consErr; } var bl = q('.caf-req.bad', M.modal); if (bl) bl.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+      submit(M); return;
+    }
     var j = M.cur + 1; while (j < M.defs.length && M.defs[j].sec.classList.contains('caf-x')) j++;
     go(M, j);
   }
@@ -710,8 +770,8 @@
       if (p.pair) {
         M.prices.className = 'caf-prices';
         M.prices.innerHTML =
-          '<button type="button" class="caf-pbox' + (!p.priv ? ' on' : '') + '" data-who="Cég"><span class="l">' + esc(T.co) + '</span><span class="v">' + esc(p.pair.co) + '</span></button>' +
-          '<button type="button" class="caf-pbox' + (p.priv ? ' on' : '') + '" data-who="Magánszemély"><span class="l">' + esc(T.priv) + '</span><span class="v">' + esc(p.pair.priv) + '</span><span class="s">' + esc(T.vat19) + '</span></button>';
+          '<button type="button" class="caf-pbox' + (!p.priv ? ' on' : '') + '" data-who="Cég"><span class="l">' + esc(T.co) + '</span><span class="v">' + esc(p.pair.co) + '</span>' + (p.pair.coE ? '<span class="e">' + esc(p.pair.coE) + ' + ' + esc(T.plusVat.replace(/^\+\s*/, '')) + '</span>' : '') + '</button>' +
+          '<button type="button" class="caf-pbox' + (p.priv ? ' on' : '') + '" data-who="Magánszemély"><span class="l">' + esc(T.priv) + '</span><span class="v">' + esc(p.pair.priv) + '</span>' + (p.pair.privE ? '<span class="e">' + esc(p.pair.privE) + ' ' + esc(T.vat19) + '</span>' : '<span class="s">' + esc(T.vat19) + '</span>') + '</button>';
       } else {
         M.prices.className = 'caf-prices single';
         var seg = tg.length > 1 ? '<div class="caf-seg">' + tg.map(function (t) { var w = t.getAttribute(A.tglAttr); return '<button type="button" data-who="' + esc(w) + '" class="' + (t.classList.contains('active') ? 'on' : '') + '" title="' + esc(tx(t)) + '">' + esc(shortLbl(tx(t))) + '</button>'; }).join('') + '</div>' : '';
@@ -727,6 +787,7 @@
     if (e && e.val) {
       q('.l', est).textContent = e.label; q('.v', est).innerHTML = esc(e.val) + (e.sub ? ' <small>' + esc(e.sub) + '</small>' : ''); q('.s', est).textContent = '';
       q('.dp', est).textContent = e.dep || ''; q('.d', est).textContent = e.disc || '';
+      var eu = q('.eu', est); eu.textContent = e.eur || ''; eu.style.display = e.eur ? '' : 'none';
     }
     var last = M.cur >= lastIdx(M), ob = q(A.submit, m), busy = ob && ob.disabled;
     M.b0.innerHTML = M.cur > 0 ? svg('left') + esc(T.back) : esc(T.cancel);
