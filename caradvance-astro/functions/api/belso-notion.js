@@ -72,6 +72,32 @@ async function queryNotion(env) {
   return out;
 }
 
+/* a lead.js az űrlap minden mezőjét a Notion-oldal törzsébe írja („- Autó: …”, „- Becsült havidíj: …”) —
+   ha a „Keresett autó / igény” mezőben nincs autó (pl. bérlésnél csak az üzemanyag), innen olvassuk ki. */
+async function pageFields(env, page) {
+  const key = new Request('https://cache.caradvance.internal/notion-fields/' + page.id + '/' + encodeURIComponent(page.last_edited_time || ''));
+  const cache = typeof caches !== 'undefined' ? caches.default : null;
+  if (cache) { const hit = await cache.match(key); if (hit) return hit.json(); }
+  const r = await fetch(`https://api.notion.com/v1/blocks/${page.id}/children?page_size=60`, {
+    headers: { authorization: 'Bearer ' + env.NOTION_TOKEN, 'notion-version': env.NOTION_VERSION || NOTION_VERSION }
+  });
+  if (!r.ok) return {};
+  const j = await r.json(); const f = {};
+  (j.results || []).forEach((b) => {
+    const blk = b[b.type]; if (!blk || !blk.rich_text) return;
+    const t = blk.rich_text.map((x) => x.plain_text).join('');
+    const m = /^([^:]{2,40}):\s*(.+)$/.exec(t); if (m && !f[m[1].trim()]) f[m[1].trim()] = m[2].trim();
+  });
+  const out = { car: f['Autó'] || f['Kiválasztott autó'] || '', fee: f['Becsült havidíj'] || '', price: f['Ár (tájékoztató)'] || f['Ár'] || '', page: f['Oldal'] || '' };
+  if (cache) await cache.put(key, new Response(JSON.stringify(out), { headers: { 'cache-control': 'max-age=2592000' } }));
+  return out;
+}
+async function limitAll(items, n, fn) {
+  const out = new Array(items.length); let i = 0;
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const k = i++; out[k] = await fn(items[k], k).catch(() => null); } }));
+  return out;
+}
+
 export async function onRequestGet({ request, env }) {
   const user = await sessionUser(request, env).catch(() => null);
   if (!user) return json({ error: 'Nincs bejelentkezve.' }, 401);
@@ -91,6 +117,18 @@ export async function onRequestGet({ request, env }) {
       car: carOf(want)
     };
   }).filter((l) => l.name && !TEST_NAME.test(l.name) && !/example\.com$/i.test(l.email));
+
+  // hiányzó autó / havidíj: az oldal törzséből (csak ahol kell, max. 3 párhuzamos Notion-hívás)
+  const byId = {}; pages.forEach((p) => { byId[p.id] = p; });
+  const need = leads.filter((l) => !l.car || !l.budget).slice(0, 60);
+  const fields = await limitAll(need, 3, (l) => pageFields(env, byId[l.id]));
+  need.forEach((l, i) => {
+    const f = fields[i] || {};
+    if (!l.car && f.car) { l.car = carOf(f.car); l.carText = f.car; }
+    if (f.fee) l.fee = f.fee.replace(/\s*\(.*?\)\s*$/, '').replace(/^(nettó|bruttó)\s*/i, '');
+    if (!l.budget && f.price) { const n = Number(String(f.price).replace(/[^\d]/g, '')); if (n > 1000) l.budget = /€/.test(f.price) ? 0 : n; l.priceText = f.price; }
+    if (f.page) l.page = f.page;
+  });
 
   // autóképek (márka + modell szerint, egyszer kérdezve)
   const labels = [...new Set(leads.map((l) => l.car && l.car.label).filter(Boolean))].slice(0, 60);
