@@ -2,7 +2,8 @@
    A meglévő modálokat (ab-modal = bérlés, cain-modal = kártyás érdeklődés, egl-modal = új autó rendelése)
    alakítja át: fejléc specifikációkkal, ár-kártyák (cég / magánszemély), lépésjelző, lépés-kártyák,
    becsült díj + Mégse / Következő lépés. Az eredeti mezők, árlogika és beküldés változatlan marad —
-   csak áthelyezzük őket a lépésekbe. Betöltés: caradvance-chat.js. */
+   csak áthelyezzük őket a lépésekbe. Betöltés: caradvance-chat.js.
+   Bérlés (HU): euró árak, kötelező EUR-fizetés + szerződésdokumentumok (/szerzodes-minta/). */
 (function () {
   'use strict';
   if (window.__caForms) return; window.__caForms = 1;
