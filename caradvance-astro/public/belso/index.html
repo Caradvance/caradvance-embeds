@@ -254,6 +254,12 @@
   .stb.s6{background:#f1e9f8;color:#6b32a0}.stb.s7{background:#e9ebef;color:#3d4452}
   .btn-card{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:#fff;background:var(--red);border-radius:9px;padding:7px 11px;text-decoration:none;white-space:nowrap}
   .btn-card:hover{filter:brightness(.93)}
+  table.crm td.nm{min-width:160px}
+  table.crm td.pg{white-space:nowrap}
+  .pgw{display:inline-flex;align-items:center;gap:8px}
+  .pgb{width:70px;height:6px;border-radius:999px;background:var(--line2);overflow:hidden;display:inline-block}
+  .pgb i{display:block;height:100%;background:var(--red);border-radius:999px}.pgb i.full{background:var(--good)}
+  .pgw b{font-size:12.5px;font-weight:800;min-width:34px;text-align:right}
   .crm-empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:13px}
   .board-toggle{font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);background:none;border:0;cursor:pointer;padding:4px 0;margin:0 0 10px}
   .board-toggle:hover{color:var(--ink)}
@@ -1272,7 +1278,7 @@ function renderCrm(line){
     +'<div class="crm-chips">'+CRM_STATUSES.map(function(s,i){return counts[s]?'<button data-st="'+esc(s)+'" class="'+(s===st.st?'on':'')+'">'+esc(s)+'<b>'+counts[s]+'</b></button>':'';}).join('')+'</div>';
   if(!crmLoaded)h+='<div class="crm-empty">Betöltés…</div>';
   else if(!rows.length)h+='<div class="crm-empty">'+(all.length?'Nincs a szűrésnek megfelelő ügyfél.':'Még nincs ügyfél ezen az üzletágon. Az „Új ügyfél” gombbal felvehetsz egyet.')+'</div>';
-  else h+='<table class="crm"><thead><tr><th>Név</th><th>Cím</th><th>Telefonszám</th><th>E-mail</th><th>Státusz</th><th>Jelentkezett</th><th></th></tr></thead><tbody>'
+  else h+='<table class="crm"><thead><tr><th>Név</th><th>Cím</th><th>Telefonszám</th><th>E-mail</th><th>Státusz</th><th>Készültség</th><th>Jelentkezett</th><th></th></tr></thead><tbody>'
     +rows.map(function(c){
       var si=CRM_STATUSES.indexOf(c.status);
       return '<tr><td class="nm"><b>'+esc(c.company||c.name||'Névtelen')+'</b>'+(c.company&&c.name&&c.name!==c.company?'<span>'+esc(c.name)+'</span>':'')+(c.car?'<span>'+(c.company?' · ':'')+esc(c.car)+'</span>':'')+'</td>'
@@ -1280,6 +1286,7 @@ function renderCrm(line){
         +'<td data-l="Telefon">'+(c.phone?'<a class="lnk" href="'+esc(telHref(c.phone))+'">'+esc(c.phone)+'</a>':'—')+'</td>'
         +'<td data-l="E-mail">'+(c.email?'<a class="lnk" href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'—')+'</td>'
         +'<td data-l="Státusz"><span class="stb s'+(si<0?0:si)+'">'+esc(c.status)+'</span></td>'
+        +'<td data-l="Készültség" class="pg"><span class="pgw" title="'+(c.done||0)+' / '+(c.total||11)+' feladat kész"><span class="pgb"><i style="width:'+(c.progress||0)+'%"'+(c.progress>=100?' class="full"':'')+'></i></span><b>'+(c.progress||0)+'%</b></span></td>'
         +'<td data-l="Jelentkezett" class="dt">'+crmDate(c.created_at)+'</td>'
         +'<td class="go"><a class="btn-card" href="/belso/ugyfel/?id='+c.id+'" target="_blank" rel="noopener">Ügyfél adatlap ↗</a></td></tr>';
     }).join('')+'</tbody></table>';
