@@ -30,6 +30,9 @@ or written through their normal fields.
 - Test logins (admin + sales manager) are created by `migrations-test/0001_belso_core_test.sql` in the test DB only;
   passwords are in `TEST-CREDENTIALS.md` (not in git).
 - Listings are fictional (`AM_SOURCE=mock`, TESZTKÉP images); fees are placeholders flagged ELLENŐRIZNI 2026 (`RATES.md`).
+- Car-photo filter: every listing that enters a slot is checked by Workers AI (`AI` binding, model `@cf/moondream/moondream3.1-9B-A2B`);
+  dealer logos, banners, team photos and text graphics are removed. Publishing is blocked until all three cars are checked
+  ("Fotók szűrése" on the card re-runs it). Production needs the same `AI` binding on the Pages project.
 - Customer emails follow belső's test rule: they go to marc.nemethy@bhgeu.com, never to the customer
   (and only when `RESEND_API_KEY` exists in the environment; the preview has none, so links are copied by hand).
 
