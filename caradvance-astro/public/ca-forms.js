@@ -148,7 +148,7 @@
         { k: 'fuel', nodes: ['#abFuel'], name: 'fuel' },
         { k: 'term', nodes: ['#abTerm'], name: 'term' },
         { k: 'km', nodes: ['#abKm'], name: 'km' },
-        { k: 'spec', nodes: ['#abColor', '#abAus', '#abAusInfo'], name: null, renum: true },
+        { k: 'spec', nodes: ['#abColor', '#abAus', '#abAusInfo'], name: null, names: ['color', 'ausstattung'], renum: true, split: true },
         { k: 'contact', nodes: [cb, '.ab-plate', '.ab-consent:not(.ab-plate)', '#abMsg', '.ab-note'], contact: true, hideFirstLabel: '.ab-label' }
       ];
     },
@@ -374,6 +374,9 @@
       '.caf .caf-body input[type=file]{font-size:14px;padding:12px;border:1.5px dashed #c9d2e0;border-radius:12px;background:#f7f9fc;width:100%;box-sizing:border-box}',
       '.caf .caf-hl{display:none!important}',
       '.caf .caf-body .ab-opt.dis{text-decoration:none!important;opacity:.5;cursor:pointer!important;border-style:dashed!important}',
+      '.caf .caf-body .ab-opt.dis.caf-col{opacity:1}',
+      '.caf .caf-body .ab-opt.dis.caf-col .caf-sw{opacity:.8}',
+      '.caf .caf-body .ab-opt.dis.caf-col .caf-cn{color:#8c96a5}',
       '.caf .caf-body .ab-opt.dis:hover{opacity:.85;border-color:#b9c3d1!important}',
       '.caf .caf-body .ab-opt.dis *{text-decoration:none!important}',
       '.caf .caf-body .ab-opt.caf-col{flex-direction:column!important;align-items:stretch!important;gap:8px!important;width:148px;padding:8px 8px 10px!important;min-height:0!important;text-align:left}',
@@ -496,6 +499,16 @@
     var rows = [];
     M.defs.forEach(function (x, i) {
       if (x.contact || x.sec.classList.contains('caf-x')) return;
+      if (x.split) {
+        [['#abColor', 'color'], ['#abAus', 'ausstattung']].forEach(function (pr) {
+          var blk = q(pr[0], M.modal); if (!blk || blk.style.display === 'none') return;
+          var inp = q('input[name=' + pr[1] + ']:checked', blk), lab = inp && inp.closest('label'), sw2 = '';
+          var cs2 = lab && q('.caf-sw', lab); if (cs2) sw2 = '<i class="caf-rsw" style="background:' + esc(cs2.style.background) + '"></i>';
+          var kt = tx(q('.ab-label', blk)).replace(/^\d+\.\s*/, '');
+          rows.push('<div class="caf-rr"><span class="k">' + esc(kt) + '</span><span class="v">' + sw2 + esc(lab ? tx(lab) : '—') + '</span><button type="button" class="caf-rch" data-go="' + i + '">' + esc(T.change) + '</button></div>');
+        });
+        return;
+      }
       var s = T.s[x.k] || [x.k], v = summary(M, x), sw = '';
       var ci = q('input[name=color]:checked', x.sec);
       if (ci) { var cl = ci.closest('label'), cs = cl && q('.caf-sw', cl); if (cs) sw = '<i class="caf-rsw" style="background:' + esc(cs.style.background) + '"></i>'; }
@@ -616,6 +629,7 @@
   function clearErr(M) { qa('.caf-err.on', M.modal).forEach(function (e) { e.classList.remove('on'); }); }
 
   function valid(M, d) {
+    if (d.names) return d.names.every(function (n) { return valid(M, { name: n, sec: d.sec }); });
     if (!d.name) return true;
     var f = q(M.A.form, M.modal), all = qa('input[name="' + d.name + '"]', f).filter(function (i) { return d.sec.contains(i) || d.name === 'mode'; });
     if (!all.length) return true;
@@ -649,7 +663,7 @@
     qa('input:checked', body).forEach(function (i) {
       if (i.type === 'checkbox') return;
       var l = i.closest('label'), t = i.value;
-      if (l) { var cn = l.querySelector('.ab-cnt'); t = cn ? tx(l).slice(0, tx(l).length - tx(cn).length).trim() + ' · ' + tx(cn) : tx(l); }
+      if (l) { var cn = l.querySelector('.ab-cnt'); t = cn ? tx(l).slice(0, tx(l).length - tx(cn).length).trim() : tx(l); }
       out.push(t);
     });
     qa('input[type=text],input[type=date]', body).forEach(function (i) {
