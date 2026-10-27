@@ -88,7 +88,8 @@ async function pageFields(env, page) {
     const t = blk.rich_text.map((x) => x.plain_text).join('');
     const m = /^([^:]{2,40}):\s*(.+)$/.exec(t); if (m && !f[m[1].trim()]) f[m[1].trim()] = m[2].trim();
   });
-  const out = { car: f['Autó'] || f['Kiválasztott autó'] || '', fee: f['Becsült havidíj'] || '', price: f['Ár (tájékoztató)'] || f['Ár'] || '', page: f['Oldal'] || '' };
+  const out = { car: f['Autó'] || f['Kiválasztott autó'] || '', fee: f['Becsült havidíj'] || '', price: f['Ár (tájékoztató)'] || f['Ár'] || '', page: f['Oldal'] || '',
+    first: f['Első megkeresés'] || '', last: f['Utolsó aktivitás'] || '', keret: f['Keret'] || '' };
   if (cache) await cache.put(key, new Response(JSON.stringify(out), { headers: { 'cache-control': 'max-age=2592000' } }));
   return out;
 }
@@ -120,15 +121,22 @@ export async function onRequestGet({ request, env }) {
 
   // hiányzó autó / havidíj: az oldal törzséből (csak ahol kell, max. 3 párhuzamos Notion-hívás)
   const byId = {}; pages.forEach((p) => { byId[p.id] = p; });
-  const need = leads.filter((l) => !l.car || !l.budget).slice(0, 60);
+  // e-mailből felvett leadek: az oldal törzse tartalmazza az első megkeresés dátumát és a keretet (EUR)
+  const need = leads.filter((l) => !l.car || !l.budget || l.source === 'E-mail').slice(0, 150);
   const fields = await limitAll(need, 3, (l) => pageFields(env, byId[l.id]));
+  const isoDay = (s) => { const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(s || '').trim()); return m ? m[1] : ''; };
   need.forEach((l, i) => {
     const f = fields[i] || {};
     if (!l.car && f.car) { l.car = carOf(f.car); l.carText = f.car; }
     if (f.fee) l.fee = f.fee.replace(/\s*\(.*?\)\s*$/, '').replace(/^(nettó|bruttó)\s*/i, '');
     if (!l.budget && f.price) { const n = Number(String(f.price).replace(/[^\d]/g, '')); if (n > 1000) l.budget = /€/.test(f.price) ? 0 : n; l.priceText = f.price; }
+    if (!l.budget && !l.fee && f.keret) l.fee = f.keret;
     if (f.page) l.page = f.page;
+    const d1 = isoDay(f.first), d2 = isoDay(f.last);
+    if (d1) { l.imported = l.created; l.created = d1 + 'T09:00:00.000Z'; }
+    if (d2) l.edited = d2 + 'T09:00:00.000Z';
   });
+  leads.sort((a, b) => String(b.created).localeCompare(String(a.created)));
 
   // autóképek (márka + modell szerint, egyszer kérdezve)
   const labels = [...new Set(leads.map((l) => l.car && l.car.label).filter(Boolean))].slice(0, 60);
