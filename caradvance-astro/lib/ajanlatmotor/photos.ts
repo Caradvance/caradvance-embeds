@@ -118,10 +118,10 @@ export async function debugPhoto(env: Env, url: string) {
   }
 }
 
-export interface PhotoCheck { images: string[]; removed: string[]; checked: boolean }
+export interface PhotoCheck { images: string[]; tags: string[]; removed: string[]; checked: boolean }
 
 export async function filterCarPhotos(env: Env, images: string[]): Promise<PhotoCheck> {
-  if (!env.AI || !images.length) return { images, removed: [], checked: false };
+  if (!env.AI || !images.length) return { images, tags: [], removed: [], checked: false };
   const head = images.slice(0, MAX_IMAGES);
   const seen = await Promise.all(head.map((u) => verdict(env, u)));
   const kept = head.map((u, i) => ({ u, s: seen[i] })).filter((x) => x.s.v !== "other");
@@ -130,14 +130,42 @@ export async function filterCarPhotos(env: Env, images: string[]): Promise<Photo
   const ext = kept.findIndex((x) => x.s.c === "exterior");
   if (ext > 0) kept.unshift(...kept.splice(ext, 1));
   const keep = kept.map((x) => x.u);
+  const tags = kept.map((x) => x.s.c || "");
   // a failed check keeps the image but the listing counts as unchecked
   const checked = !seen.some((x) => x.v === "error");
-  return { images: keep.length ? keep : [], removed, checked };
+  return { images: keep, tags, removed, checked };
 }
 
 /** Returns a copy of the listing with only car photos and the check flag set. */
-export async function withCarPhotos(env: Env, l: Listing): Promise<Listing & { photos_checked?: boolean; photos_removed?: number }> {
+export async function withCarPhotos(env: Env, l: Listing): Promise<Listing & { photos_checked?: boolean; photos_removed?: number; photo_tags?: string[] }> {
   if (l.url.startsWith("mock://")) return { ...l, photos_checked: true, photos_removed: 0 };
   const r = await filterCarPhotos(env, l.images);
-  return { ...l, images: r.images, photos_checked: r.checked, photos_removed: r.removed.length };
+  return { ...l, images: r.images, photo_tags: r.tags, photos_checked: r.checked, photos_removed: r.removed.length };
+}
+
+/** Which photo categories suit each description section, best first. */
+const SECTION_TAGS: Record<string, string[]> = {
+  design: ["exterior", "detail"],
+  interior: ["interior", "dashboard", "seats", "seat"],
+  performance: ["wheel", "wheels", "engine", "exterior"],
+  technology: ["interior", "dashboard", "detail"],
+  condition: ["exterior", "trunk", "boot", "detail"],
+};
+
+/**
+ * Gives every section a fitting photo (interior text → interior photo), without repeats and
+ * never the cover photo. Sections keep their index when the listing has no photo categories.
+ */
+export function pickSectionImages<S extends { key: string; image_index: number }>(sections: S[], images: string[], tags?: string[]): S[] {
+  if (!tags?.length || tags.length !== images.length) return sections;
+  const used = new Set<number>([0]);
+  return sections.map((sec) => {
+    const want = SECTION_TAGS[sec.key] || [];
+    let idx = -1;
+    for (const t of want) { idx = tags.findIndex((x, i) => x === t && !used.has(i)); if (idx >= 0) break; }
+    if (idx < 0) idx = tags.findIndex((_, i) => !used.has(i));
+    if (idx < 0) return sec;
+    used.add(idx);
+    return { ...sec, image_index: idx };
+  });
 }

@@ -63,3 +63,14 @@ describe("answerText", () => {
     expect(await answerText(new Response('{"answer":"no"}').body)).toBe("no");
   });
 });
+
+import { pickSectionImages } from "../../caradvance-astro/lib/ajanlatmotor/photos";
+describe("section photos", () => {
+  it("puts an interior photo next to the interior text and never reuses the cover", () => {
+    const imgs = ["a", "b", "c", "d"];
+    const tags = ["exterior", "exterior", "interior", "wheel"];
+    const secs = ["design", "interior", "performance"].map((key) => ({ key, image_index: 0 }));
+    expect(pickSectionImages(secs, imgs, tags).map((s) => s.image_index)).toEqual([1, 2, 3]);
+    expect(pickSectionImages(secs, imgs, undefined)).toBe(secs);
+  });
+});

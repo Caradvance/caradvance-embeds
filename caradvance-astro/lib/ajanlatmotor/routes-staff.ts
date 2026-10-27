@@ -245,7 +245,10 @@ staff.post("/jelolt/:cid/cover", async (c) => {
   const gc = await guardCand(c, cid); if (gc.err) return gc.err;
   const row = await c.env.DB.prepare("SELECT listing_json FROM am_candidates WHERE id = ?").bind(cid).first<{ listing_json: string }>();
   const l = JSON.parse(row!.listing_json);
-  if (Array.isArray(l.images) && l.images.length > 1) l.images.push(l.images.shift());
+  if (Array.isArray(l.images) && l.images.length > 1) {
+    l.images.push(l.images.shift());
+    if (Array.isArray(l.photo_tags) && l.photo_tags.length) l.photo_tags.push(l.photo_tags.shift());
+  }
   await c.env.DB.prepare("UPDATE am_candidates SET listing_json = ? WHERE id = ?").bind(JSON.stringify(l), cid).run();
   await logEvent(c.env, gc.dealId!, c.get("user").name, "cover_rotated", { cid });
   return back(c, reqPath(gc.dealId!), "Borítókép cserélve.");

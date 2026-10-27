@@ -4,6 +4,7 @@
  * ügyfél adatlap lists it and /ajanlat/valasz/ works too; am_offers keeps the premium snapshot.
  */
 import type { Env, Requirements } from "./types";
+import { pickSectionImages } from "./photos";
 import { getDeal, getRequest, publishBlockers, slotViews, type CarView } from "./engine";
 import { transition } from "./status";
 import { ensureAm, getSetting, logEvent, nowIso, putImage, randomHex, validDays, isTest, type Staff } from "./am";
@@ -55,7 +56,7 @@ export function toPublicCar(cv: CarView, req: Requirements, images: string[]): P
     drivetrain: l.drivetrain, color: l.color, battery_kwh: l.battery_kwh, range_km: l.range_km, previous_owners: l.previous_owners,
     accident_free: l.accident_free, service_book: l.service_book, equipment_count: l.equipment.length, equipment: groupEquipment(l.equipment),
     key_equipment: wanted.filter((e) => l.equipment.includes(e)).map((e) => equipHu(e).hu), city: l.seller.city, country: l.seller.country,
-    distance_km: cv.distanceKm, images, sections: cv.sections || [], customer_lines: cv.costs.customer_lines,
+    distance_km: cv.distanceKm, images, sections: pickSectionImages(cv.sections || [], l.images, (l as any).photo_tags), customer_lines: cv.costs.customer_lines,
     total_huf: cv.costs.customer_total_huf, total_eur: cv.costs.customer_total_eur,
   };
 }
@@ -99,6 +100,7 @@ async function copyImages(env: Env, token: string, cv: CarView): Promise<string[
       out.push(`/ajanlat/auto/${token}/kep/${cv.candidate.slot}/${i}`);
     } catch (e) {
       console.error("image copy failed", src, e);
+      out.push(src); // keep positions aligned with the section photo indexes
     }
   }
   return out.length ? out : cv.listing.images;
