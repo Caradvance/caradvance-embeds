@@ -25,14 +25,46 @@ async function verdict(env: Env, url: string): Promise<Verdict> {
   const hit = await cacheGet<{ v: Verdict }>(env, key);
   if (hit) return hit.v;
   try {
-    const ai = env.AI as { run(model: string, input: unknown): Promise<any> };
-    const r = await ai.run(PHOTO_MODEL, { task: "query", image: checkUrl(url), question: QUESTION, reasoning: false, temperature: 0, max_tokens: 5 });
+    const r = await ask(env, url);
     const a = String(r?.answer ?? r?.response ?? r?.result?.answer ?? "").trim().toLowerCase();
     const v: Verdict = /^(yes|igen|ja)\b/.test(a) ? "car" : /^(no|nem|nein)\b/.test(a) ? "other" : "error";
+    if (v === "error") lastPhotoError = "unexpected answer: " + JSON.stringify(r).slice(0, 300);
     if (v !== "error") await cachePut(env, key, { v }, 60 * 60 * 24 * 90);
     return v;
-  } catch {
+  } catch (e: any) {
+    lastPhotoError = String(e?.message || e).slice(0, 300);
     return "error";
+  }
+}
+
+export let lastPhotoError = "";
+
+/** The model fetches public URLs itself; if the image host refuses it, the bytes are sent as a data URI. */
+async function ask(env: Env, url: string): Promise<any> {
+  const ai = env.AI as { run(model: string, input: unknown): Promise<any> };
+  const input = (image: string) => ({ task: "query", image, question: QUESTION, reasoning: false, temperature: 0, max_tokens: 5 });
+  try {
+    return await ai.run(PHOTO_MODEL, input(checkUrl(url)));
+  } catch (first) {
+    const res = await fetch(checkUrl(url), { headers: { "User-Agent": "Mozilla/5.0 (Caradvance Ajanlatmotor)", Accept: "image/*", Referer: "https://suchen.mobile.de/" } });
+    if (!res.ok) throw new Error(`model: ${String((first as any)?.message || first).slice(0, 150)} · image fetch ${res.status}`);
+    const buf = new Uint8Array(await res.arrayBuffer());
+    let bin = "";
+    for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+    return await ai.run(PHOTO_MODEL, input(`data:${res.headers.get("content-type") || "image/jpeg"};base64,${btoa(bin)}`));
+  }
+}
+
+/** Raw model call for diagnostics (test environment only). */
+export async function debugPhoto(env: Env, url: string) {
+  try {
+    const ai = env.AI as { run(model: string, input: unknown): Promise<any> };
+    let direct: any;
+    try { direct = await ai.run(PHOTO_MODEL, { task: "query", image: checkUrl(url), question: QUESTION, reasoning: false, temperature: 0, max_tokens: 5 }); }
+    catch (e: any) { direct = { error: String(e?.message || e) }; }
+    return { ok: true, direct, viaAsk: await ask(env, url).catch((e: any) => ({ error: String(e?.message || e) })) };
+  } catch (e: any) {
+    return { ok: false, error: String(e?.message || e) };
   }
 }
 
