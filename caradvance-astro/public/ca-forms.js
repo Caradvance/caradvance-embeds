@@ -524,7 +524,8 @@
       '.caf-fl i{color:var(--r);font-style:normal}',
       '.caf-in{position:relative;display:flex}',
       '.caf-in>.caf-ic{position:absolute;left:13px;top:15px;width:19px;height:19px;color:#5A6B82;pointer-events:none}',
-      '.caf-v2 .caf-in input,.caf-v2 .caf-in textarea{padding-left:42px!important;background:#fff!important}',
+      '.caf.caf-v2 .caf-body .caf-in input,.caf.caf-v2 .caf-body .caf-in textarea{padding-left:42px!important;background:#fff!important}',
+      '.caf-v2 .caf-csec .ab-note{display:none!important}',
       '.caf-v2 .caf-in textarea{min-height:96px}',
       '.caf-cnt{position:absolute;right:12px;bottom:8px;font-size:11.5px;color:#8c96a5}',
       '.caf-f.caf-off>.caf-fl,.caf-f.caf-off .caf-in>.caf-ic,.caf-f.caf-off .caf-cnt{display:none}',
@@ -1000,8 +1001,9 @@
       l.setAttribute('data-tx', '1');
       [].forEach.call(l.childNodes, function (c) {
         if (c.nodeType !== 3) return;
-        c.nodeValue = c.nodeValue.replace(/(\d+)\s*hó\b\.?$/, '$1 ' + TV.months).replace(/(\d)(\d{3})\s*km\/hó/, '$1 $2 km');
+        c.nodeValue = c.nodeValue.replace(/(\d+)\s*hó\.?\s*$/, '$1 ' + TV.months).replace(/(\d)(\d{3})\s*km\/hó/, '$1 $2 km');
       });
+      var num = parseInt(tx(l).replace(/[^\d]/g, ''), 10); if (!isNaN(num)) l.style.order = num;
     });
     var blk = q('#abAvBlock', m), pick = q('#abAvPick', m);
     if (blk && pick) {
@@ -1050,7 +1052,7 @@
       var v = summary(M, d), bd = '';
       if (d.k === 'avail') { var a = q('#abAvPick .ab-opt.active .ab-cnt', m); if (a) bd = '<span class="bdg">' + esc(tx(a)) + '</span>'; }
       if (d.k === 'fuel') { var fl = (v || '').toLowerCase(); ic.fuel = /hibrid|hybrid|phev/.test(fl) ? 'leaf' : /elektr/.test(fl) ? 'plug' : /benzin/.test(fl) ? 'drop' : 'fuel'; }
-      if (d.k === 'term') v = (v || '').replace(/(\d+)\s*hó\b/, '$1 ' + TV.months);
+      if (d.k === 'term') v = (v || '').replace(/(\d+)\s*hó(?![a-záéíóöőúüű])/i, '$1 ' + TV.months);
       if (d.k === 'km') v = (v || '').replace(/(\d)(\d{3})\s*km\/hó/, '$1 $2 km');
       rows.push('<div class="caf-ar" data-go="' + i + '">' + svg(ic[d.k] || 'check') + '<span class="k">' + esc((T.s[d.k] || [d.k])[0]) + '</span><span class="v">' + esc(v || '—') + '</span>' + bd + '</div>');
     });
