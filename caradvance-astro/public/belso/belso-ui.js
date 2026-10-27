@@ -157,8 +157,8 @@
   }
 
   /* ---------------- oldalsáv ---------------- */
-  var NAV_ORDER = [['sec', 'Főmenü'], 'overview', 'eladas', 'import', 'berles', 'bizomanyos', ['sec', 'Ügyfélkezelés'], 'teendok', 'ugyfelek', 'ugyfelfiokok', 'szerzodesek', ['sec', 'Adminisztráció'], 'email', 'naptar', 'felhasznalok', 'integraciok'];
-  var NAV_LABEL = { overview: 'Irányítópult', eladas: 'Eladás', import: 'Import', berles: 'Bérlés', bizomanyos: 'Bizományos', teendok: 'Teendők', ugyfelek: 'Ügyfelek', ugyfelfiokok: 'Ügyfélfiókok', szerzodesek: 'Szerződések', email: 'E-mail', naptar: 'Naptár', felhasznalok: 'Felhasználók', integraciok: 'Integrációk' };
+  var NAV_ORDER = [['sec', 'Főmenü'], 'overview', 'eladas', 'import', 'berles', 'bizomanyos', ['sec', 'Ügyfélkezelés'], 'teendok', 'ugyfelek', 'ugyfelfiokok', 'szerzodesek', ['sec', 'Adminisztráció'], 'penzugy', 'email', 'naptar', 'felhasznalok', 'integraciok'];
+  var NAV_LABEL = { overview: 'Irányítópult', eladas: 'Eladás', import: 'Import', berles: 'Bérlés', bizomanyos: 'Bizományos', teendok: 'Teendők', ugyfelek: 'Ügyfelek', ugyfelfiokok: 'Ügyfélfiókok', szerzodesek: 'Szerződések', penzugy: 'Pénzügy', email: 'E-mail', naptar: 'Naptár', felhasznalok: 'Felhasználók', integraciok: 'Integrációk' };
   function decorateNav() {
     var nav = d.getElementById('nav'); if (!nav || nav.__caui === nav.innerHTML) return;
     var links = {}; [].forEach.call(nav.querySelectorAll('a[data-v]'), function (a) { links[a.dataset.v] = a; });
@@ -172,6 +172,12 @@
       var a = d.createElement('a'); a.href = '/belso/szerzodesek/'; a.dataset.ext = '1';
       a.innerHTML = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + IC.doc + '</svg> <span>Szerződések</span>';
       links.szerzodesek = a;
+    }
+    if (!links.penzugy && !(W.currentUser && W.currentUser.role && W.currentUser.role !== 'admin')) {
+      var ap = d.createElement('a'); ap.href = '/belso/penzugy/'; ap.dataset.ext = '1'; ap.dataset.v = 'penzugy';
+      if (/\/belso\/penzugy\//.test(location.pathname)) ap.className = 'active';
+      ap.innerHTML = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + IC.ft + '</svg> <span>Pénzügy</span>';
+      links.penzugy = ap;
     }
     var frag = d.createDocumentFragment(), pendingSec = null;
     NAV_ORDER.forEach(function (k) {
@@ -431,7 +437,7 @@
     var wrapEl = d.createElement('div'); wrapEl.className = 'caui-subwrap';
     kids.forEach(function (n) { wrapEl.appendChild(n); });
     var side = d.createElement('aside'); side.className = 'side';
-    var cur = /szerzodesek/.test(location.pathname) ? 'szerzodesek' : 'ugyfelek';
+    var cur = /szerzodesek/.test(location.pathname) ? 'szerzodesek' : /penzugy/.test(location.pathname) ? 'penzugy' : 'ugyfelek';
     var items = [['overview', 'home', '/belso/'], ['eladas', null, '/belso/#eladas'], ['import', null, '/belso/#import'], ['berles', null, '/belso/#berles'], ['bizomanyos', null, '/belso/#bizomanyos'], ['teendok', null, '/belso/#teendok'], ['ugyfelek', 'users', '/belso/#ugyfelek'], ['ugyfelfiokok', 'user', '/belso/#ugyfelfiokok'], ['szerzodesek', 'doc', '/belso/szerzodesek/']];
     var navIc = { eladas: 'cart', import: 'upload', berles: 'car', bizomanyos: 'swap', teendok: 'check' };
     side.innerHTML = '<div class="brand"><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance" style="height:50px;width:auto"></a></div>'
@@ -460,7 +466,7 @@
 
   function init() {
     if (isIndex) hookIndex();
-    else if (!isLoginOnly || /\/belso\/(ugyfel|szerzodesek)\//.test(location.pathname)) hookSub();
+    else if (!isLoginOnly || /\/belso\/(ugyfel|szerzodesek|penzugy)\//.test(location.pathname)) hookSub();
     var role = $('#curUserRole'); if (role && /^Admin$/.test(role.textContent)) role.textContent = 'Adminisztrátor';
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init); else init();
