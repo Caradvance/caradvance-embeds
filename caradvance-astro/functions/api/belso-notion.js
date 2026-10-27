@@ -50,11 +50,11 @@ async function wikiImage(label) {
   const u = 'https://en.wikipedia.org/w/api.php?action=query&format=json&generator=search&gsrlimit=1&gsrnamespace=0&prop=pageimages&piprop=thumbnail&pithumbsize=320&gsrsearch=' + encodeURIComponent(q);
   try {
     const r = await fetch(u, { headers: { 'user-agent': 'CarAdvance-admin/1.0 (info@caradvance.hu)' }, cf: { cacheTtl: 604800, cacheEverything: true } });
-    if (!r.ok) return '';
+    if (!r.ok) return null; // átmeneti hiba: nem gyorsítótárazzuk
     const j = await r.json(); const pages = j && j.query && j.query.pages; if (!pages) return '';
     const p = Object.values(pages)[0];
     return (p && p.thumbnail && p.thumbnail.source) || '';
-  } catch (e) { return ''; }
+  } catch (e) { return null; }
 }
 
 async function queryNotion(env) {
@@ -75,23 +75,26 @@ async function queryNotion(env) {
 /* a lead.js az űrlap minden mezőjét a Notion-oldal törzsébe írja („- Autó: …”, „- Becsült havidíj: …”) —
    ha a „Keresett autó / igény” mezőben nincs autó (pl. bérlésnél csak az üzemanyag), innen olvassuk ki. */
 async function pageFields(env, page) {
-  const key = new Request('https://cache.caradvance.internal/notion-fields/' + page.id + '/' + encodeURIComponent(page.last_edited_time || ''));
-  const cache = typeof caches !== 'undefined' ? caches.default : null;
-  if (cache) { const hit = await cache.match(key); if (hit) return hit.json(); }
   const r = await fetch(`https://api.notion.com/v1/blocks/${page.id}/children?page_size=60`, {
     headers: { authorization: 'Bearer ' + env.NOTION_TOKEN, 'notion-version': env.NOTION_VERSION || NOTION_VERSION }
   });
-  if (!r.ok) return {};
+  if (!r.ok) return null;
   const j = await r.json(); const f = {};
   (j.results || []).forEach((b) => {
     const blk = b[b.type]; if (!blk || !blk.rich_text) return;
     const t = blk.rich_text.map((x) => x.plain_text).join('');
     const m = /^([^:]{2,40}):\s*(.+)$/.exec(t); if (m && !f[m[1].trim()]) f[m[1].trim()] = m[2].trim();
   });
-  const out = { car: f['Autó'] || f['Kiválasztott autó'] || '', fee: f['Becsült havidíj'] || '', price: f['Ár (tájékoztató)'] || f['Ár'] || '', page: f['Oldal'] || '',
+  return { car: f['Autó'] || f['Kiválasztott autó'] || '', fee: f['Becsült havidíj'] || '', price: f['Ár (tájékoztató)'] || f['Ár'] || '', page: f['Oldal'] || '',
     first: f['Első megkeresés'] || '', last: f['Utolsó aktivitás'] || '', keret: f['Keret'] || '' };
-  if (cache) await cache.put(key, new Response(JSON.stringify(out), { headers: { 'cache-control': 'max-age=2592000' } }));
-  return out;
+}
+/* Egy közös gyorsítótár-bejegyzés (a Cloudflare kérésenkénti al-kérés korlátja miatt nem oldalanként) */
+const CACHE_BASE = 'https://cache.caradvance.internal/belso-notion/';
+async function cacheGet(name) {
+  try { const c = caches.default; const hit = await c.match(new Request(CACHE_BASE + name)); return hit ? await hit.json() : {}; } catch (e) { return {}; }
+}
+async function cachePut(name, obj) {
+  try { await caches.default.put(new Request(CACHE_BASE + name), new Response(JSON.stringify(obj), { headers: { 'content-type': 'application/json', 'cache-control': 'max-age=2592000' } })); } catch (e) { /* nem kritikus */ }
 }
 async function limitAll(items, n, fn) {
   const out = new Array(items.length); let i = 0;
@@ -119,14 +122,16 @@ export async function onRequestGet({ request, env }) {
     };
   }).filter((l) => l.name && !TEST_NAME.test(l.name) && !/example\.com$/i.test(l.email));
 
-  // hiányzó autó / havidíj: az oldal törzséből (csak ahol kell, max. 3 párhuzamos Notion-hívás)
+  // az oldal törzséből: autó, havidíj, keret, első megkeresés (e-mailből felvett leadeknél). Kérésenként max. 20 új oldal-olvasás.
   const byId = {}; pages.forEach((p) => { byId[p.id] = p; });
-  // e-mailből felvett leadek: az oldal törzse tartalmazza az első megkeresés dátumát és a keretet (EUR)
-  const need = leads.filter((l) => !l.car || !l.budget || l.source === 'E-mail').slice(0, 150);
-  const fields = await limitAll(need, 3, (l) => pageFields(env, byId[l.id]));
-  const isoDay = (s) => { const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(s || '').trim()); return m ? m[1] : ''; };
-  need.forEach((l, i) => {
-    const f = fields[i] || {};
+  const fc = await cacheGet('fields-v2'); let fcDirty = false;
+  const need = leads.filter((l) => !l.car || !l.budget || l.source === 'E-mail');
+  const stale = need.filter((l) => !fc[l.id] || fc[l.id].e !== byId[l.id].last_edited_time).slice(0, 20);
+  const got = await limitAll(stale, 4, (l) => pageFields(env, byId[l.id]));
+  stale.forEach((l, i) => { if (got[i]) { fc[l.id] = { e: byId[l.id].last_edited_time, f: got[i] }; fcDirty = true; } });
+  const isoDay = (x) => { const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(x || '').trim()); return m ? m[1] : ''; };
+  need.forEach((l) => {
+    const f = (fc[l.id] && fc[l.id].f) || {};
     if (!l.car && f.car) { l.car = carOf(f.car); l.carText = f.car; }
     if (f.fee) l.fee = f.fee.replace(/\s*\(.*?\)\s*$/, '').replace(/^(nettó|bruttó)\s*/i, '');
     if (!l.budget && f.price) { const n = Number(String(f.price).replace(/[^\d]/g, '')); if (n > 1000) l.budget = /€/.test(f.price) ? 0 : n; l.priceText = f.price; }
@@ -136,13 +141,17 @@ export async function onRequestGet({ request, env }) {
     if (d1) { l.imported = l.created; l.created = d1 + 'T09:00:00.000Z'; }
     if (d2) l.edited = d2 + 'T09:00:00.000Z';
   });
-  leads.sort((a, b) => String(b.created).localeCompare(String(a.created)));
+  leads.sort((x, y) => String(y.created).localeCompare(String(x.created)));
 
-  // autóképek (márka + modell szerint, egyszer kérdezve)
-  const labels = [...new Set(leads.map((l) => l.car && l.car.label).filter(Boolean))].slice(0, 60);
-  const imgs = {};
-  await Promise.all(labels.map(async (lb) => { imgs[lb] = await wikiImage(lb); }));
-  leads.forEach((l) => { l.img = l.car ? imgs[l.car.label] || '' : ''; });
+  // autóképek márka + modell szerint; közös gyorsítótár, kérésenként max. 15 új Wikipédia-lekérdezés
+  const ic = await cacheGet('imgs-v2'); let icDirty = false;
+  const labels = [...new Set(leads.map((l) => l.car && l.car.label).filter(Boolean))];
+  const missing = labels.filter((lb) => !(lb in ic)).slice(0, 15);
+  const found = await limitAll(missing, 5, (lb) => wikiImage(lb));
+  missing.forEach((lb, i) => { if (found[i] !== null && found[i] !== undefined) { ic[lb] = found[i] || ''; icDirty = true; } });
+  leads.forEach((l) => { l.img = l.car ? ic[l.car.label] || '' : ''; });
+  if (fcDirty) await cachePut('fields-v2', fc);
+  if (icDirty) await cachePut('imgs-v2', ic);
 
   return json({ leads, statuses: ['Új érdeklődő', 'Kapcsolatfelvétel', 'Igényfelmérés', 'Autókeresés', 'Ajánlat kiküldve', 'Foglaló beérkezett', 'Behozatal folyamatban', 'Bizomány – hirdetés alatt', 'Átadás', 'Lezárt – sikeres', 'Lezárt – elveszett'], at: new Date().toISOString() });
 }
