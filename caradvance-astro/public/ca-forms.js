@@ -13,17 +13,17 @@
 
   /* ---------- szövegek ---------- */
   var TX = {
-    hu: { co: 'Cégként · nettó ár', priv: 'Magánszemélyként', vat19: '(19% német áfával)', plusVat: '+ áfa', estG: 'Becsült havi díj (bruttó)', estN: 'Becsült havi díj (nettó)', priceN: 'Ár (nettó)', priceG: 'Ár (bruttó)', price: 'Ár', cancel: 'Mégse', back: 'Vissza', next: 'Következő lépés', send: 'Ajánlat kérése', order: 'Rendelés elküldése', inq: 'Érdeklődés elküldése', sending: 'Küldés…', info: 'Fontos információ', pick: 'Kérlek válassz egy lehetőséget a továbblépéshez.', disc: 'Az ár tájékoztató jellegű. A pontos díj a kiválasztott konfigurációtól és elérhetőségtől függően változhat.', discSale: 'Az ár tájékoztató jellegű, élő árfolyammal számolva. A végleges árat az írásos ajánlat tartalmazza.', avail: 'Elérhető', availIn: function (c, m) { return 'A kiválasztott hónapban (' + m + ') ' + c + ' autó elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, availNow: function (c) { return c + ' autó azonnal elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, dep: 'Kaució', newCar: 'Új autó · rendelésre', fuels: 'Hajtás', opt: 'opcionális',
+    hu: { recap: 'Összegzés', recapSub: 'Ellenőrizd a választásaidat, mielőtt elküldöd.', change: 'Módosítás', adapted: 'A választásodhoz igazítottuk a többi beállítást.', otherCfg: 'Más kivitellel elérhető — kattints, és átállítjuk', co: 'Cégként · nettó ár', priv: 'Magánszemélyként', vat19: '(19% német áfával)', plusVat: '+ áfa', estG: 'Becsült havi díj (bruttó)', estN: 'Becsült havi díj (nettó)', priceN: 'Ár (nettó)', priceG: 'Ár (bruttó)', price: 'Ár', cancel: 'Mégse', back: 'Vissza', next: 'Következő lépés', send: 'Ajánlat kérése', order: 'Rendelés elküldése', inq: 'Érdeklődés elküldése', sending: 'Küldés…', info: 'Fontos információ', pick: 'Kérlek válassz egy lehetőséget a továbblépéshez.', disc: 'Az ár tájékoztató jellegű. A pontos díj a kiválasztott konfigurációtól és elérhetőségtől függően változhat.', discSale: 'Az ár tájékoztató jellegű, élő árfolyammal számolva. A végleges árat az írásos ajánlat tartalmazza.', avail: 'Elérhető', availIn: function (c, m) { return 'A kiválasztott hónapban (' + m + ') ' + c + ' autó elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, availNow: function (c) { return c + ' autó azonnal elérhető. Foglalásod a következő lépésekben véglegesítheted.'; }, dep: 'Kaució', newCar: 'Új autó · rendelésre', fuels: 'Hajtás', opt: 'opcionális',
       s: { avail: ['Elérhetőség', 'Válaszd ki, mikortól szeretnéd átvenni az autót.', 'Elérhetőség'], fuel: ['Üzemanyag', 'Válaszd ki a hajtásláncot.', 'Üzemanyag'], term: ['Bérlési futamidő', 'Mennyi időre szeretnéd bérelni az autót?', 'Futamidő'], km: ['Km-keret / hó', 'Válaszd ki a havi futásteljesítményt.', 'Km-keret'], spec: ['Szín és kivitel', 'Válaszd ki a színt és a felszereltséget.', 'Kivitel'], contact: ['Adataid', 'Add meg az elérhetőségeidet — ezekre küldjük az ajánlatot.', 'Adatok'], mode: ['Vásárlás módja', 'Hogyan szeretnéd megvásárolni az autót?', 'Vásárlás'], pay: ['Fizetés', 'Egy összegben vagy finanszírozással fizetnél?', 'Fizetés'], start: ['Kezdés', 'Mikortól szeretnéd az autót?', 'Kezdés'], file: ['Specifikáció', 'Ha van kész felszereltségi listád, töltsd fel (opcionális).', 'Specifikáció'] } },
-    en: { co: 'As a company · net price', priv: 'As a private person', vat19: '(incl. 19% German VAT)', plusVat: '+ VAT', estG: 'Estimated monthly fee (gross)', estN: 'Estimated monthly fee (net)', priceN: 'Price (net)', priceG: 'Price (gross)', price: 'Price', cancel: 'Cancel', back: 'Back', next: 'Next step', send: 'Request offer', order: 'Send order', inq: 'Send inquiry', sending: 'Sending…', info: 'Important information', pick: 'Please choose an option to continue.', disc: 'The price is indicative. The exact fee depends on the selected configuration and availability.', discSale: 'The price is indicative, calculated with the live exchange rate. The final price is stated in the written offer.', avail: 'Available', availIn: function (c, m) { return c + ' car(s) available in the selected month (' + m + '). You can finalise your booking in the next steps.'; }, availNow: function (c) { return c + ' car(s) available immediately. You can finalise your booking in the next steps.'; }, dep: 'Deposit', newCar: 'New car · made to order', fuels: 'Powertrain', opt: 'optional',
+    en: { recap: 'Summary', recapSub: 'Check your choices before sending.', change: 'Change', adapted: 'We adjusted the other settings to match your choice.', otherCfg: 'Available with another configuration — click to switch', co: 'As a company · net price', priv: 'As a private person', vat19: '(incl. 19% German VAT)', plusVat: '+ VAT', estG: 'Estimated monthly fee (gross)', estN: 'Estimated monthly fee (net)', priceN: 'Price (net)', priceG: 'Price (gross)', price: 'Price', cancel: 'Cancel', back: 'Back', next: 'Next step', send: 'Request offer', order: 'Send order', inq: 'Send inquiry', sending: 'Sending…', info: 'Important information', pick: 'Please choose an option to continue.', disc: 'The price is indicative. The exact fee depends on the selected configuration and availability.', discSale: 'The price is indicative, calculated with the live exchange rate. The final price is stated in the written offer.', avail: 'Available', availIn: function (c, m) { return c + ' car(s) available in the selected month (' + m + '). You can finalise your booking in the next steps.'; }, availNow: function (c) { return c + ' car(s) available immediately. You can finalise your booking in the next steps.'; }, dep: 'Deposit', newCar: 'New car · made to order', fuels: 'Powertrain', opt: 'optional',
       s: { avail: ['Availability', 'Choose when you would like to take over the car.', 'Availability'], fuel: ['Fuel', 'Choose the powertrain.', 'Fuel'], term: ['Rental term', 'How long would you like to rent the car?', 'Term'], km: ['Mileage / month', 'Choose your monthly mileage.', 'Mileage'], spec: ['Colour & trim', 'Choose the colour and the equipment.', 'Trim'], contact: ['Your details', 'Enter your contact details — we will send the offer there.', 'Details'], mode: ['Purchase type', 'How would you like to buy the car?', 'Purchase'], pay: ['Payment', 'Pay in one sum or with financing?', 'Payment'], start: ['Start', 'From when do you need the car?', 'Start'], file: ['Specification', 'Upload your equipment list if you have one (optional).', 'Spec'] } },
-    de: { co: 'Als Firma · Nettopreis', priv: 'Als Privatperson', vat19: '(inkl. 19 % dt. MwSt.)', plusVat: '+ MwSt.', estG: 'Geschätzte Monatsrate (brutto)', estN: 'Geschätzte Monatsrate (netto)', priceN: 'Preis (netto)', priceG: 'Preis (brutto)', price: 'Preis', cancel: 'Abbrechen', back: 'Zurück', next: 'Nächster Schritt', send: 'Angebot anfordern', order: 'Bestellung senden', inq: 'Anfrage senden', sending: 'Wird gesendet…', info: 'Wichtige Information', pick: 'Bitte wählen Sie eine Option, um fortzufahren.', disc: 'Der Preis ist unverbindlich. Die genaue Rate hängt von Konfiguration und Verfügbarkeit ab.', discSale: 'Der Preis ist unverbindlich, mit dem Tageskurs berechnet. Den Endpreis nennt das schriftliche Angebot.', avail: 'Verfügbar', availIn: function (c, m) { return 'Im gewählten Monat (' + m + ') ist/sind ' + c + ' Fahrzeug(e) verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, availNow: function (c) { return c + ' Fahrzeug(e) sofort verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, dep: 'Kaution', newCar: 'Neuwagen · auf Bestellung', fuels: 'Antrieb', opt: 'optional',
+    de: { recap: 'Zusammenfassung', recapSub: 'Prüfen Sie Ihre Auswahl vor dem Absenden.', change: 'Ändern', adapted: 'Die übrigen Einstellungen wurden an Ihre Wahl angepasst.', otherCfg: 'Mit anderer Konfiguration verfügbar — klicken zum Umstellen', co: 'Als Firma · Nettopreis', priv: 'Als Privatperson', vat19: '(inkl. 19 % dt. MwSt.)', plusVat: '+ MwSt.', estG: 'Geschätzte Monatsrate (brutto)', estN: 'Geschätzte Monatsrate (netto)', priceN: 'Preis (netto)', priceG: 'Preis (brutto)', price: 'Preis', cancel: 'Abbrechen', back: 'Zurück', next: 'Nächster Schritt', send: 'Angebot anfordern', order: 'Bestellung senden', inq: 'Anfrage senden', sending: 'Wird gesendet…', info: 'Wichtige Information', pick: 'Bitte wählen Sie eine Option, um fortzufahren.', disc: 'Der Preis ist unverbindlich. Die genaue Rate hängt von Konfiguration und Verfügbarkeit ab.', discSale: 'Der Preis ist unverbindlich, mit dem Tageskurs berechnet. Den Endpreis nennt das schriftliche Angebot.', avail: 'Verfügbar', availIn: function (c, m) { return 'Im gewählten Monat (' + m + ') ist/sind ' + c + ' Fahrzeug(e) verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, availNow: function (c) { return c + ' Fahrzeug(e) sofort verfügbar. Die Buchung schließen Sie in den nächsten Schritten ab.'; }, dep: 'Kaution', newCar: 'Neuwagen · auf Bestellung', fuels: 'Antrieb', opt: 'optional',
       s: { avail: ['Verfügbarkeit', 'Wählen Sie, ab wann Sie das Auto übernehmen möchten.', 'Verfügbarkeit'], fuel: ['Kraftstoff', 'Wählen Sie den Antrieb.', 'Kraftstoff'], term: ['Mietdauer', 'Wie lange möchten Sie das Auto mieten?', 'Laufzeit'], km: ['Kilometer / Monat', 'Wählen Sie Ihre monatliche Laufleistung.', 'Kilometer'], spec: ['Farbe & Ausstattung', 'Wählen Sie Farbe und Ausstattung.', 'Ausstattung'], contact: ['Ihre Daten', 'Geben Sie Ihre Kontaktdaten an — wir senden das Angebot dorthin.', 'Daten'], mode: ['Kaufart', 'Wie möchten Sie das Auto kaufen?', 'Kauf'], pay: ['Zahlung', 'Einmalzahlung oder Finanzierung?', 'Zahlung'], start: ['Beginn', 'Ab wann benötigen Sie das Auto?', 'Beginn'], file: ['Spezifikation', 'Laden Sie Ihre Ausstattungsliste hoch, falls vorhanden (optional).', 'Spezifikation'] } },
-    sk: { co: 'Ako firma · cena bez DPH', priv: 'Ako súkromná osoba', vat19: '(s DPH)', plusVat: '+ DPH', estG: 'Odhadovaný mesačný poplatok (s DPH)', estN: 'Odhadovaný mesačný poplatok (bez DPH)', priceN: 'Cena (bez DPH)', priceG: 'Cena (s DPH)', price: 'Cena', cancel: 'Zrušiť', back: 'Späť', next: 'Ďalší krok', send: 'Požiadať o ponuku', order: 'Odoslať objednávku', inq: 'Odoslať dopyt', sending: 'Odosiela sa…', info: 'Dôležitá informácia', pick: 'Pre pokračovanie vyberte jednu z možností.', disc: 'Cena je orientačná. Presný poplatok závisí od zvolenej konfigurácie a dostupnosti.', discSale: 'Cena je orientačná. Konečnú cenu uvedie písomná ponuka.', avail: 'Dostupné', availIn: function (c, m) { return 'Vo zvolenom mesiaci (' + m + ') je dostupných ' + c + ' áut. Rezerváciu dokončíte v ďalších krokoch.'; }, availNow: function (c) { return 'Ihneď dostupných: ' + c + '. Rezerváciu dokončíte v ďalších krokoch.'; }, dep: 'Kaucia', newCar: 'Nové auto · na objednávku', fuels: 'Pohon', opt: 'voliteľné',
+    sk: { recap: 'Zhrnutie', recapSub: 'Pred odoslaním skontrolujte svoj výber.', change: 'Zmeniť', adapted: 'Ostatné nastavenia sme prispôsobili vášmu výberu.', otherCfg: 'Dostupné s inou konfiguráciou — kliknite a prepneme', co: 'Ako firma · cena bez DPH', priv: 'Ako súkromná osoba', vat19: '(s DPH)', plusVat: '+ DPH', estG: 'Odhadovaný mesačný poplatok (s DPH)', estN: 'Odhadovaný mesačný poplatok (bez DPH)', priceN: 'Cena (bez DPH)', priceG: 'Cena (s DPH)', price: 'Cena', cancel: 'Zrušiť', back: 'Späť', next: 'Ďalší krok', send: 'Požiadať o ponuku', order: 'Odoslať objednávku', inq: 'Odoslať dopyt', sending: 'Odosiela sa…', info: 'Dôležitá informácia', pick: 'Pre pokračovanie vyberte jednu z možností.', disc: 'Cena je orientačná. Presný poplatok závisí od zvolenej konfigurácie a dostupnosti.', discSale: 'Cena je orientačná. Konečnú cenu uvedie písomná ponuka.', avail: 'Dostupné', availIn: function (c, m) { return 'Vo zvolenom mesiaci (' + m + ') je dostupných ' + c + ' áut. Rezerváciu dokončíte v ďalších krokoch.'; }, availNow: function (c) { return 'Ihneď dostupných: ' + c + '. Rezerváciu dokončíte v ďalších krokoch.'; }, dep: 'Kaucia', newCar: 'Nové auto · na objednávku', fuels: 'Pohon', opt: 'voliteľné',
       s: { avail: ['Dostupnosť', 'Vyberte, odkedy chcete auto prevziať.', 'Dostupnosť'], fuel: ['Palivo', 'Vyberte pohon.', 'Palivo'], term: ['Doba prenájmu', 'Na ako dlho si chcete auto prenajať?', 'Doba'], km: ['Km limit / mesiac', 'Vyberte mesačný nájazd.', 'Km limit'], spec: ['Farba a výbava', 'Vyberte farbu a výbavu.', 'Výbava'], contact: ['Vaše údaje', 'Zadajte kontaktné údaje — pošleme vám na ne ponuku.', 'Údaje'], mode: ['Spôsob kúpy', 'Ako chcete auto kúpiť?', 'Kúpa'], pay: ['Platba', 'Jednorazovo alebo s financovaním?', 'Platba'], start: ['Začiatok', 'Odkedy potrebujete auto?', 'Začiatok'], file: ['Špecifikácia', 'Ak máte zoznam výbavy, nahrajte ho (voliteľné).', 'Špecifikácia'] } },
-    cs: { co: 'Jako firma · cena bez DPH', priv: 'Jako soukromá osoba', vat19: '(s DPH)', plusVat: '+ DPH', estG: 'Odhadovaný měsíční poplatek (s DPH)', estN: 'Odhadovaný měsíční poplatek (bez DPH)', priceN: 'Cena (bez DPH)', priceG: 'Cena (s DPH)', price: 'Cena', cancel: 'Zrušit', back: 'Zpět', next: 'Další krok', send: 'Požádat o nabídku', order: 'Odeslat objednávku', inq: 'Odeslat poptávku', sending: 'Odesílá se…', info: 'Důležitá informace', pick: 'Pro pokračování vyberte jednu z možností.', disc: 'Cena je orientační. Přesný poplatek závisí na zvolené konfiguraci a dostupnosti.', discSale: 'Cena je orientační. Konečnou cenu uvede písemná nabídka.', avail: 'Dostupné', availIn: function (c, m) { return 'Ve zvoleném měsíci (' + m + ') je dostupných ' + c + ' vozů. Rezervaci dokončíte v dalších krocích.'; }, availNow: function (c) { return 'Ihned dostupných: ' + c + '. Rezervaci dokončíte v dalších krocích.'; }, dep: 'Kauce', newCar: 'Nový vůz · na objednávku', fuels: 'Pohon', opt: 'volitelné',
+    cs: { recap: 'Shrnutí', recapSub: 'Před odesláním zkontrolujte svůj výběr.', change: 'Změnit', adapted: 'Ostatní nastavení jsme přizpůsobili vašemu výběru.', otherCfg: 'Dostupné s jinou konfigurací — klikněte a přepneme', co: 'Jako firma · cena bez DPH', priv: 'Jako soukromá osoba', vat19: '(s DPH)', plusVat: '+ DPH', estG: 'Odhadovaný měsíční poplatek (s DPH)', estN: 'Odhadovaný měsíční poplatek (bez DPH)', priceN: 'Cena (bez DPH)', priceG: 'Cena (s DPH)', price: 'Cena', cancel: 'Zrušit', back: 'Zpět', next: 'Další krok', send: 'Požádat o nabídku', order: 'Odeslat objednávku', inq: 'Odeslat poptávku', sending: 'Odesílá se…', info: 'Důležitá informace', pick: 'Pro pokračování vyberte jednu z možností.', disc: 'Cena je orientační. Přesný poplatek závisí na zvolené konfiguraci a dostupnosti.', discSale: 'Cena je orientační. Konečnou cenu uvede písemná nabídka.', avail: 'Dostupné', availIn: function (c, m) { return 'Ve zvoleném měsíci (' + m + ') je dostupných ' + c + ' vozů. Rezervaci dokončíte v dalších krocích.'; }, availNow: function (c) { return 'Ihned dostupných: ' + c + '. Rezervaci dokončíte v dalších krocích.'; }, dep: 'Kauce', newCar: 'Nový vůz · na objednávku', fuels: 'Pohon', opt: 'volitelné',
       s: { avail: ['Dostupnost', 'Vyberte, odkdy chcete vůz převzít.', 'Dostupnost'], fuel: ['Palivo', 'Vyberte pohon.', 'Palivo'], term: ['Doba pronájmu', 'Na jak dlouho si chcete vůz pronajmout?', 'Doba'], km: ['Km limit / měsíc', 'Vyberte měsíční nájezd.', 'Km limit'], spec: ['Barva a výbava', 'Vyberte barvu a výbavu.', 'Výbava'], contact: ['Vaše údaje', 'Zadejte kontaktní údaje — pošleme na ně nabídku.', 'Údaje'], mode: ['Způsob koupě', 'Jak chcete vůz koupit?', 'Koupě'], pay: ['Platba', 'Jednorázově, nebo s financováním?', 'Platba'], start: ['Začátek', 'Odkdy potřebujete vůz?', 'Začátek'], file: ['Specifikace', 'Pokud máte seznam výbavy, nahrajte ho (volitelné).', 'Specifikace'] } },
-    pl: { co: 'Jako firma · cena netto', priv: 'Jako osoba prywatna', vat19: '(z VAT)', plusVat: '+ VAT', estG: 'Szacowana opłata miesięczna (brutto)', estN: 'Szacowana opłata miesięczna (netto)', priceN: 'Cena (netto)', priceG: 'Cena (brutto)', price: 'Cena', cancel: 'Anuluj', back: 'Wstecz', next: 'Dalej', send: 'Poproś o ofertę', order: 'Wyślij zamówienie', inq: 'Wyślij zapytanie', sending: 'Wysyłanie…', info: 'Ważna informacja', pick: 'Wybierz jedną z opcji, aby kontynuować.', disc: 'Cena orientacyjna. Dokładna opłata zależy od wybranej konfiguracji i dostępności.', discSale: 'Cena orientacyjna. Ostateczną cenę podamy w pisemnej ofercie.', avail: 'Dostępny', availIn: function (c, m) { return 'W wybranym miesiącu (' + m + ') dostępnych aut: ' + c + '. Rezerwację dokończysz w kolejnych krokach.'; }, availNow: function (c) { return 'Od ręki dostępnych aut: ' + c + '. Rezerwację dokończysz w kolejnych krokach.'; }, dep: 'Kaucja', newCar: 'Nowy samochód · na zamówienie', fuels: 'Napęd', opt: 'opcjonalnie',
+    pl: { recap: 'Podsumowanie', recapSub: 'Sprawdź swój wybór przed wysłaniem.', change: 'Zmień', adapted: 'Pozostałe ustawienia dopasowaliśmy do Twojego wyboru.', otherCfg: 'Dostępne w innej konfiguracji — kliknij, aby przełączyć', co: 'Jako firma · cena netto', priv: 'Jako osoba prywatna', vat19: '(z VAT)', plusVat: '+ VAT', estG: 'Szacowana opłata miesięczna (brutto)', estN: 'Szacowana opłata miesięczna (netto)', priceN: 'Cena (netto)', priceG: 'Cena (brutto)', price: 'Cena', cancel: 'Anuluj', back: 'Wstecz', next: 'Dalej', send: 'Poproś o ofertę', order: 'Wyślij zamówienie', inq: 'Wyślij zapytanie', sending: 'Wysyłanie…', info: 'Ważna informacja', pick: 'Wybierz jedną z opcji, aby kontynuować.', disc: 'Cena orientacyjna. Dokładna opłata zależy od wybranej konfiguracji i dostępności.', discSale: 'Cena orientacyjna. Ostateczną cenę podamy w pisemnej ofercie.', avail: 'Dostępny', availIn: function (c, m) { return 'W wybranym miesiącu (' + m + ') dostępnych aut: ' + c + '. Rezerwację dokończysz w kolejnych krokach.'; }, availNow: function (c) { return 'Od ręki dostępnych aut: ' + c + '. Rezerwację dokończysz w kolejnych krokach.'; }, dep: 'Kaucja', newCar: 'Nowy samochód · na zamówienie', fuels: 'Napęd', opt: 'opcjonalnie',
       s: { avail: ['Dostępność', 'Wybierz, od kiedy chcesz odebrać samochód.', 'Dostępność'], fuel: ['Paliwo', 'Wybierz napęd.', 'Paliwo'], term: ['Okres najmu', 'Na jak długo chcesz wynająć samochód?', 'Okres'], km: ['Limit km / mies.', 'Wybierz miesięczny przebieg.', 'Limit km'], spec: ['Kolor i wersja', 'Wybierz kolor i wyposażenie.', 'Wersja'], contact: ['Twoje dane', 'Podaj dane kontaktowe — wyślemy na nie ofertę.', 'Dane'], mode: ['Sposób zakupu', 'Jak chcesz kupić samochód?', 'Zakup'], pay: ['Płatność', 'Jednorazowo czy z finansowaniem?', 'Płatność'], start: ['Start', 'Od kiedy potrzebujesz samochodu?', 'Start'], file: ['Specyfikacja', 'Jeśli masz listę wyposażenia, prześlij ją (opcjonalnie).', 'Specyfikacja'] } }
   };
   var T = TX[LG] || TX[MK] || TX.hu;
@@ -43,6 +43,41 @@
     check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     pin: '<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>'
   };
+  /* Fényezések: valós árnyalat + felület (metál / gyöngyház / uni / matt), névvel párosítva */
+  var PAINT = {
+    'alpesi fehér': '#f1f2ef', 'ascot szürke': '#9a9ea0', 'brooklyn szürke metál': '#7c8186', 'chili piros': '#c8102e',
+    'csillogó rézszürke metál': '#6f6761', 'daytonaszürke gyöngyház': '#4a4d52', 'delfinszürke metál': '#6d7276', 'dűne szürke metál': '#a39c8f',
+    'ecotronic szürke': '#7a7e80', 'fekete uni': '#0e0f10', 'floretezüst metál': '#b9bcbe', 'füstszürke metál / fekete': '#5e6266',
+    'gleccserfehér metál': '#e8e9e6', 'grafitszürke metál': '#4d5155', 'grenadillfekete metál': '#17181a', 'indiumszürke metál': '#5c5f62',
+    'királyvörös metál': '#a3141f', 'királyvörös metál / fekete': '#a3141f', 'kozmoszfekete metál': '#121314', 'krémfehér': '#edebe3',
+    'legend szürke': '#3b3f42', 'manufaktur alpesi szürke uni': '#a7aaa6', 'manhattan szürke metál': '#5e6266', 'melting ezüst': '#a9acae',
+    'mélyfekete gyöngyház': '#0f1012', 'mélyfekete gyöngyház / fekete': '#0f1012', 'mélységfekete': '#0d0e11', 'mítoszfekete metál': '#101113',
+    'nanuq fehér': '#eeefeb', 'navarrakék metál': '#1f3a6b', 'obszidiánfekete metál': '#121314', 'oryxfehér gyöngyház': '#f2f1ea',
+    'osztrigaezüst metál': '#a7a9a8', 'piritezüst metál': '#a39a88', 'poláris fehér uni': '#ecedee', 'reflexezüst metál': '#b7babc',
+    'scale ezüst metál': '#9ea2a4', 'sophisto szürke briliáns metál': '#3c3f42', 'storm bay metál': '#4f5a61', 'tavascan kék metál': '#2b3e5e',
+    'tiszta fehér': '#f1f2f2', 'tiszta fehér uni': '#f1f2f2', 'tiszta kék metál': '#2e6aa8', 'wolf szürke': '#5e6266', 'wolf szürke metál': '#5e6266',
+    'zafírfekete metál': '#101215', 'árnyékszürke': '#55585b', 'éjkék metál': '#1e2a44', 'élénkpiros': '#b5121b', 'éjfekete uni': '#0b0c0d',
+    'éjfélfekete': '#121418', 'éjfélfekete metál': '#121418'
+  };
+  function hexRgb(h) { h = String(h || '').replace('#', ''); if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join(''); var n = parseInt(h, 16); if (isNaN(n)) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function cssRgb(c) { var m = c.slice(0, 3).map(function (v) { return Math.max(0, Math.min(255, Math.round(v))); }); return 'rgb(' + m.join(',') + ')'; }
+  function mixC(c, t, a) { return c.map(function (v, i) { return v + (t[i] - v) * a; }); }
+  function rgbOf(cssCol) { var m = /rgba?\((\d+)\D+(\d+)\D+(\d+)/.exec(cssCol || ''); return m ? [+m[1], +m[2], +m[3]] : hexRgb(cssCol); }
+  function finishOf(name) { var n = String(name || '').toLowerCase(); return /matt/.test(n) ? 'matt' : /gyöngyház|pearl|perleffekt/.test(n) ? 'pearl' : /metál|metal|briliáns|ezüst|silver/.test(n) ? 'metal' : 'uni'; }
+  function swatch(name, fallback) {
+    var n = String(name || '').toLowerCase().trim();
+    if (/lásd a fotókon|see photos|siehe fotos/.test(n)) return 'conic-gradient(from 210deg,#e8ebef,#9aa3ad,#2b3442,#c6c9cd,#e8ebef)';
+    var b = hexRgb(PAINT[n]) || rgbOf(fallback) || [150, 155, 160];
+    var W = [255, 255, 255], K = [0, 0, 0], f = finishOf(n), lum = (0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2]) / 255;
+    var hi = f === 'matt' ? 0.14 : f === 'uni' ? 0.42 : 0.62, dk = lum < 0.15 ? 0.0 : 0.3;
+    var top = mixC(b, W, (lum < 0.15 ? 0.35 : 0.28)), mid = b, band = mixC(b, W, hi), pre = mixC(b, W, hi * 0.35), low = mixC(b, K, dk), refl = mixC(b, W, f === 'matt' ? 0.04 : 0.12);
+    var g = 'linear-gradient(180deg,' + cssRgb(top) + ' 0%,' + cssRgb(mid) + ' 30%,' + cssRgb(pre) + ' 39%,' + cssRgb(band) + ' 45%,' + cssRgb(mid) + ' 51.5%,' + cssRgb(mixC(b, K, dk * 0.6)) + ' 57%,' + cssRgb(refl) + ' 72%,' + cssRgb(low) + ' 100%)';
+    var layers = [];
+    if (/\/\s*fekete|\/\s*black|\/\s*schwarz/.test(n)) layers.push('linear-gradient(135deg,transparent 70%,#111214 70.5%)');
+    if (f === 'metal' || f === 'pearl') layers.push('radial-gradient(120% 55% at 25% 8%,rgba(255,255,255,' + (f === 'pearl' ? '.4' : '.28') + '),transparent 60%)');
+    layers.push(g);
+    return layers.join(',');
+  }
   function svg(k, cls) { return '<svg class="' + (cls || 'caf-ic') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
 
   /* ---------- segédek ---------- */
@@ -338,6 +373,29 @@
       '.caf .caf-body .egl-fblock{display:flex!important;flex-direction:column;gap:10px}',
       '.caf .caf-body input[type=file]{font-size:14px;padding:12px;border:1.5px dashed #c9d2e0;border-radius:12px;background:#f7f9fc;width:100%;box-sizing:border-box}',
       '.caf .caf-hl{display:none!important}',
+      '.caf .caf-body .ab-opt.dis{text-decoration:none!important;opacity:.5;cursor:pointer!important;border-style:dashed!important}',
+      '.caf .caf-body .ab-opt.dis:hover{opacity:.85;border-color:#b9c3d1!important}',
+      '.caf .caf-body .ab-opt.dis *{text-decoration:none!important}',
+      '.caf .caf-body .ab-opt.caf-col{flex-direction:column!important;align-items:stretch!important;gap:8px!important;width:148px;padding:8px 8px 10px!important;min-height:0!important;text-align:left}',
+      '.caf .caf-body .ab-opt.caf-col .caf-sw{display:block;height:74px;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}',
+      '.caf .caf-body .ab-opt.caf-col .caf-cn{font-size:13.5px;line-height:1.3;font-weight:600;color:var(--ink);padding:0 2px}',
+      '.caf .caf-body .ab-opt.caf-col.active .caf-cn{color:var(--r)}',
+      '.caf .caf-body .ab-opt.caf-col.active .caf-sw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),0 0 0 2px #fff,0 0 0 4px rgba(226,0,26,.35)}',
+      '.caf-note{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#0f6b3d;background:#e6f6ec;border-radius:10px;padding:9px 12px}',
+      '.caf-note .caf-ic{width:17px;height:17px;color:#0f6b3d}',
+      '.caf-recap{border:1px solid #dfe4ec;border-radius:16px;background:#f8f9fb;padding:14px 16px 6px;margin-bottom:6px}',
+      '.caf-rh{display:flex;align-items:center;gap:12px;margin-bottom:8px}',
+      '.caf-rh img{width:84px;height:54px;object-fit:contain;background:#fff;border-radius:10px;flex:0 0 auto}',
+      '.caf-rh b{display:block;font-size:16px;font-weight:800;color:var(--ink)}',
+      '.caf-rh span{display:block;font-size:13.5px;color:var(--mut)}',
+      '.caf-rr{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid #e6eaf1;font-size:14px}',
+      '.caf-rr .k{color:var(--mut);font-weight:600}',
+      '.caf-rr .v{color:var(--ink);font-weight:700;display:flex;align-items:center;gap:8px;min-width:0}',
+      '.caf-rr .v small{font-weight:500;color:var(--mut)}',
+      '.caf-rr.tot .v{font-size:17px;font-weight:800}',
+      '.caf-rsw{display:inline-block;width:22px;height:22px;border-radius:6px;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}',
+      '.caf-rch{all:unset;cursor:pointer;font-size:13px;font-weight:700;color:var(--r);padding:4px 6px;border-radius:8px}',
+      '.caf-rch:hover{background:#fff0f2}',
       '.caf #abAvBlock>.ab-label,.caf #abFuel>.ab-label,.caf #abTerm>.ab-label,.caf #abKm>.ab-label,.caf .caf-body .egl-flabel{display:none!important}',
       '.caf .caf-park{display:none!important}',
       /* lábléc */
@@ -377,12 +435,77 @@
       '.caf-sb,.caf-step.on.hasinfo .caf-sb{padding:10px 0 12px;grid-template-columns:1fr}',
       '.caf .caf-body .ab-grid,.caf .caf-body .cain-grid,.caf .caf-body .egl-fgrid{grid-template-columns:1fr}',
       '.caf .caf-body .ab-opt,.caf .caf-body .egl-fuelopt{flex:1 1 calc(50% - 10px);justify-content:center}',
+      '.caf .caf-body .ab-opt.caf-col{width:auto;flex:1 1 calc(50% - 10px)}',
+      '.caf-rr{grid-template-columns:1fr auto;gap:2px 10px}.caf-rr .k{grid-column:1/-1;font-size:12.5px}',
       '.caf-foot{margin:10px -16px 0}',
       '.caf-est{grid-template-columns:1fr;gap:4px;padding:10px 16px}.caf-est .v{font-size:22px}.caf-est .d{display:none}',
       '.caf-nav{padding:10px 16px calc(12px + env(safe-area-inset-bottom))}.caf-b0{min-height:50px;padding:0 16px;font-size:15px}.caf-b1{min-width:0;flex:1;min-height:52px;font-size:16px;padding:0 16px}',
       '}'
     ].join('\n');
     (document.head || document.documentElement).appendChild(st);
+  }
+
+  /* ---------- színminták + nem kompatibilis opciók ---------- */
+  function decorate(M) {
+    if (M.A !== AB) return;
+    qa('#abColor .ab-opt:not([data-csw])', M.modal).forEach(function (l) {
+      l.setAttribute('data-csw', '1'); l.classList.add('caf-col');
+      var dot = l.querySelector('i'), nm = tx(l);
+      var sw = mk('span', 'caf-sw'); sw.style.background = swatch(nm, dot ? dot.style.background || dot.style.backgroundColor : '');
+      if (dot) dot.replaceWith(sw); else l.insertBefore(sw, l.firstChild);
+      var tn = [].filter.call(l.childNodes, function (c) { return c.nodeType === 3 && c.nodeValue.trim(); })[0];
+      if (tn) { var sp = mk('span', 'caf-cn'); sp.textContent = tn.nodeValue.trim(); tn.replaceWith(sp); }
+    });
+    qa('.ab-opt.dis:not([title])', M.modal).forEach(function (l) { l.title = T.otherCfg; });
+  }
+  function activeVi(m, p) { var o = m.querySelector('.ab-opt.active[data-fp="' + p + '"]'); return o ? +o.getAttribute('data-vi') : null; }
+  function forceSelect(M, fp, vi) {
+    var m = M.modal, prev = [];
+    for (var p = 0; p <= 5; p++) prev[p] = activeVi(m, p);
+    for (var c = 0; c < 3; c++) {            /* minden választás törlése (az egyértelmű, automatikus értékek visszajönnek) */
+      for (p = 0; p <= 5; p++) { var o = m.querySelector('.ab-opt.active[data-fp="' + p + '"]'); if (o) o.click(); }
+    }
+    var t = m.querySelector('.ab-opt[data-fp="' + fp + '"][data-vi="' + vi + '"]');
+    if (!t || t.classList.contains('dis')) { /* visszaállítás */ prev.forEach(function (v, i) { if (v === null) return; var x = m.querySelector('.ab-opt[data-fp="' + i + '"][data-vi="' + v + '"]:not(.dis):not(.active)'); if (x) x.click(); }); return; }
+    if (!t.classList.contains('active')) t.click();
+    var order = [5, 0, 4, 3, 1, 2];           /* a korábbi választások visszaállítása, ahol még összeillenek */
+    order.forEach(function (i) {
+      if (i === fp || prev[i] === null) return;
+      var x = m.querySelector('.ab-opt[data-fp="' + i + '"][data-vi="' + prev[i] + '"]');
+      if (x && !x.classList.contains('dis') && !x.classList.contains('active')) x.click();
+    });
+    decorate(M); later(M);
+    var d = M.defs && M.defs[M.cur], body = d && q('.caf-body', d.sec);
+    if (body) {
+      var n = q('.caf-note', body) || mk('div', 'caf-note');
+      n.innerHTML = svg('check') + '<span>' + esc(T.adapted) + '</span>'; body.insertBefore(n, q('.caf-err', body));
+      clearTimeout(M.nt); M.nt = setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 5000);
+    }
+  }
+  document.addEventListener('click', function (e) {
+    var o = e.target && e.target.closest && e.target.closest('.caf .ab-opt.dis');
+    if (!o) return;
+    var mo = o.closest('.ab-modal'), M = mo && stateOf(mo); if (!M) return;
+    e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    forceSelect(M, +o.getAttribute('data-fp'), +o.getAttribute('data-vi'));
+  }, true);
+
+  /* ---------- összegzés (utolsó lépés) ---------- */
+  function recap(M) {
+    var d = M.defs.filter(function (x) { return x.contact; })[0]; if (!d || !d.recap) return;
+    var rows = [];
+    M.defs.forEach(function (x, i) {
+      if (x.contact || x.sec.classList.contains('caf-x')) return;
+      var s = T.s[x.k] || [x.k], v = summary(M, x), sw = '';
+      var ci = q('input[name=color]:checked', x.sec);
+      if (ci) { var cl = ci.closest('label'), cs = cl && q('.caf-sw', cl); if (cs) sw = '<i class="caf-rsw" style="background:' + esc(cs.style.background) + '"></i>'; }
+      rows.push('<div class="caf-rr"><span class="k">' + esc(s[0]) + '</span><span class="v">' + sw + esc(v || '—') + '</span><button type="button" class="caf-rch" data-go="' + i + '">' + esc(T.change) + '</button></div>');
+    });
+    var e = M.A.est(M, M.kind), car = tx(q(M.A.title, M.modal)), img = q(M.A.img, M.modal);
+    var html = '<div class="caf-rh">' + (img && img.getAttribute('src') ? '<img src="' + esc(img.getAttribute('src')) + '" alt="">' : '') + '<div><b>' + esc(T.recap) + '</b><span>' + esc(car) + '</span></div></div>' + rows.join('') +
+      (e && e.val ? '<div class="caf-rr tot"><span class="k">' + esc(e.label) + '</span><span class="v">' + esc(e.val) + (e.sub ? ' <small>' + esc(e.sub) + '</small>' : '') + '</span></div>' : '');
+    if (d.recap.__h !== html) { d.recap.innerHTML = html; d.recap.__h = html; }
+    d.recap.style.display = rows.length ? '' : 'none';
   }
 
   /* ---------- felépítés ---------- */
@@ -422,6 +545,7 @@
       m.addEventListener('click', function () { later(M); });
       m.addEventListener('change', function () { later(M); });
       m.addEventListener('input', function (e) { if (e.target && e.target.closest('.caf-step')) clearErr(M); });
+      try { new MutationObserver(function () { decorate(M); }).observe(m, { childList: true, subtree: true }); } catch (e) { }
       M.ready = true;
     }
     build(M);
@@ -441,6 +565,7 @@
       d.nodes.forEach(function (n) { var e = resolve(M, n); if (e) body.appendChild(e); });
       if (d.info) { sec.classList.add('hasinfo'); q('.caf-sb', sec).appendChild(mk('div', 'caf-ibox', '<b>' + svg('info') + esc(T.info) + '</b><span class="t"></span>')); }
       if (d.hideFirstLabel) { var fl = q(d.hideFirstLabel, body); if (fl) fl.classList.add('caf-hl'); }
+      if (d.contact) { d.recap = mk('div', 'caf-recap'); body.insertBefore(d.recap, body.firstChild); d.recap.addEventListener('click', function (e) { var b = e.target.closest('[data-go]'); if (b) go(M, +b.getAttribute('data-go')); }); }
       body.appendChild(mk('div', 'caf-err', esc(T.pick)));
       q('.caf-sh', sec).addEventListener('click', function () { if (M.cur !== i) go(M, i); });
       d.sec = sec; M.steps.appendChild(sec);
@@ -516,6 +641,7 @@
   function summary(M, d) {
     var body = q('.caf-body', d.sec); if (!body) return '';
     if (d.contact) {
+      if (d.recap && d.recap.contains(body)) return '';
       var ln = q('input[name=lastname]', body), fn = q('input[name=firstname]', body), em = q('input[name=email]', body);
       return [(ln && ln.value || '') + ' ' + (fn && fn.value || ''), em && em.value].map(function (x) { return (x || '').trim(); }).filter(Boolean).join(' · ');
     }
@@ -540,6 +666,7 @@
   function refresh(M) {
     if (!M.defs || M.modal.getAttribute('aria-hidden') !== 'false') return;
     var A = M.A, m = M.modal;
+    decorate(M);
     /* később érkező blokkok (pl. átvételi dátum) a helyükre */
     M.defs.forEach(function (d) {
       if (d.late) { var e = q(d.late, m), body = q('.caf-body', d.sec); if (e && e.parentNode !== body) { var err = q('.caf-err', body); body.insertBefore(e, err); } }
@@ -554,6 +681,7 @@
       s.innerHTML = v ? svg('check') + '<span>' + esc(v) + '</span>' : '';
       if (d.info) { var t = q('.caf-ibox .t', d.sec), it = A.info ? A.info(M) : ''; t.textContent = it; q('.caf-ibox', d.sec).style.display = it ? '' : 'none'; d.sec.classList.toggle('hasinfo', !!it); }
     });
+    recap(M);
     /* sorszámok újraszámolása */
     var vi = 0; M.defs.forEach(function (d, j) { if (d.sec.classList.contains('caf-x')) return; vi++; q('.n', d.sec).textContent = vi; if (j >= M.cur) q('i', d.sp).textContent = vi; });
     /* specifikációk */
