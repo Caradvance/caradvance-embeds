@@ -45,7 +45,11 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_files (
       id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, name TEXT DEFAULT '', mime TEXT DEFAULT 'application/octet-stream',
       size INTEGER NOT NULL DEFAULT 0, data TEXT NOT NULL, created_by INTEGER, created_at TEXT DEFAULT (datetime('now')))`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_files_deal ON crm_files (deal_id)`)
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_files_deal ON crm_files (deal_id)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, at TEXT DEFAULT (datetime('now')),
+      actor TEXT DEFAULT '', kind TEXT DEFAULT '', text TEXT DEFAULT '')`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_events_deal ON crm_events (deal_id, id)`)
   ]);
   READY = true;
 }
@@ -74,13 +78,58 @@ export function bytesToB64(u) { let s = ''; const CH = 0x8000; for (let i = 0; i
 export async function sha256hex(u) { const b = await crypto.subtle.digest('SHA-256', typeof u === 'string' ? new TextEncoder().encode(u) : u); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
 
 /** A kártya (crm_cards) sora — ha még nincs, alapértelmezett értékekkel. */
+/**
+ * Kiinduló státusz azoknál az ügyfeleknél, akiknek még nincs CRM-kártyájuk: a régi kanban-fázisból
+ * (deals.stage) képezzük, hogy a már folyamatban lévő ügyek ne „Kapcsolatfelvételre vár”-ként jelenjenek meg.
+ */
+const STAGE_TO_STATUS = {
+  'Új': 'Kapcsolatfelvételre vár', 'Érdeklődés': 'Kapcsolatfelvételre vár',
+  'Egyeztetés': 'Ajánlatra vár', 'Igény pontosítva': 'Ajánlatra vár', 'Autó keresése': 'Ajánlatra vár', 'Árazás': 'Ajánlatra vár',
+  'Ajánlat': 'Ajánlat kiküldve', 'Kiválasztva': 'Ajánlat elfogadva',
+  'Folyamatban': 'Megvalósítás', 'Megrendelve': 'Megvalósítás', 'Szállítás': 'Megvalósítás', 'Vám / forgalomba': 'Megvalósítás',
+  'Aktív bérlés': 'Megvalósítás', 'Bizományba véve': 'Megvalósítás', 'Hirdetve': 'Megvalósítás',
+  'Lezárva – sikeres': 'Lezárva', 'Lezárva': 'Lezárva', 'Átadva': 'Lezárva', 'Eladva': 'Lezárva'
+};
+export function statusFromDeal(d) {
+  if (!d) return DEFAULT_STATUS;
+  const st = STAGE_TO_STATUS[d.stage] || DEFAULT_STATUS;
+  // az ügyfél már választott autót a (régi) import-ajánlatból → legalább „Ajánlat elfogadva”
+  if (d.client_responded_at && STATUSES.indexOf(st) < STATUSES.indexOf('Ajánlat elfogadva')) return 'Ajánlat elfogadva';
+  return st;
+}
 export async function getCard(env, dealId) {
   const r = await env.DB.prepare(`SELECT * FROM crm_cards WHERE deal_id = ?`).bind(dealId).first();
-  if (!r) return { deal_id: dealId, status: DEFAULT_STATUS, address: '', data: {}, checklist: {}, contract: {}, status_at: null, updated_at: null, exists: false };
+  if (!r) {
+    const d = await env.DB.prepare(`SELECT stage, client_responded_at FROM deals WHERE id = ?`).bind(dealId).first();
+    return { deal_id: dealId, status: statusFromDeal(d), address: '', data: {}, checklist: {}, contract: {}, status_at: null, updated_at: null, exists: false };
+  }
   return { ...r, data: parseJ(r.data, {}), checklist: parseJ(r.checklist, {}), contract: parseJ(r.contract, {}), exists: true };
 }
 /** Részleges frissítés (upsert). fields: { status, address, data, checklist, contract } — az objektumokat egészben cseréli. */
-export async function saveCard(env, dealId, fields, userId) {
+/* ============================== történésnapló ============================== */
+/**
+ * Egy bejegyzés az ügyfél történésnaplójába. mergeMin > 0: ha ugyanaz a szereplő ugyanilyen típusú
+ * bejegyzést írt az elmúlt mergeMin percben, azt frissíti (pl. az adatlap automatikus mentései ne töltsék tele a naplót).
+ */
+export async function addEvent(env, dealId, kind, text, actor, mergeMin) {
+  try {
+    if (mergeMin) {
+      const last = await env.DB.prepare(`SELECT id, kind, actor, at FROM crm_events WHERE deal_id = ? AND kind = ? AND actor = ? ORDER BY id DESC LIMIT 1`).bind(dealId, kind, actor || '').first();
+      if (last && Date.now() - new Date(String(last.at).replace(' ', 'T') + 'Z').getTime() < mergeMin * 60000) {
+        await env.DB.prepare(`UPDATE crm_events SET at = datetime('now'), text = ? WHERE id = ?`).bind(String(text).slice(0, 1000), last.id).run();
+        return;
+      }
+    }
+    await env.DB.prepare(`INSERT INTO crm_events (deal_id, actor, kind, text) VALUES (?, ?, ?, ?)`).bind(dealId, actor || '', kind || '', String(text).slice(0, 1000)).run();
+  } catch (e) { /* a napló hibája soha nem akadályozza a műveletet */ }
+}
+export async function listEvents(env, dealId) {
+  return ((await env.DB.prepare(`SELECT id, at, actor, kind, text FROM crm_events WHERE deal_id = ? ORDER BY at DESC, id DESC LIMIT 500`).bind(dealId).all()).results || [])
+    .map((e) => ({ ...e, kind: String(e.kind || '').split(':')[0] }));
+}
+
+/** actor: ki végezte (munkatárs neve / „Ügyfél”) — a státuszváltozás bekerül a naplóba. */
+export async function saveCard(env, dealId, fields, userId, actor, reason) {
   const cur = await getCard(env, dealId);
   const next = {
     status: fields.status !== undefined ? fields.status : cur.status,
@@ -97,6 +146,7 @@ export async function saveCard(env, dealId, fields, userId) {
         status_at = CASE WHEN crm_cards.status <> excluded.status THEN datetime('now') ELSE crm_cards.status_at END,
         updated_at = datetime('now'), updated_by = excluded.updated_by`)
     .bind(dealId, next.status, next.address || '', JSON.stringify(next.data || {}), JSON.stringify(next.checklist || {}), JSON.stringify(next.contract || {}), userId || null).run();
+  if (next.status !== cur.status) await addEvent(env, dealId, 'status', `Státusz: ${cur.status} → ${next.status}${reason ? ' (' + reason + ')' : ''}`, actor);
   return { ...next, statusChanged };
 }
 
