@@ -224,3 +224,5 @@ body.caui-sub .caui-subwrap>header #sys{color:var(--muted)}
 .caui-tbl .car{max-width:300px}
 .caui-src{display:inline-block;vertical-align:middle;margin-left:8px;font-size:11px;font-weight:700;color:#6b7280;background:var(--line2);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
 .caui-src.err{color:#b45309;background:var(--warn-tint);border-color:#f6dfb4}
+
+.caui-src.mail{margin-left:6px;font-size:10px;padding:1px 7px;color:#1d4ed8;background:#eef4ff;border-color:#d6e4ff}

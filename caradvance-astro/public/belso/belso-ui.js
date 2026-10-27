@@ -99,7 +99,7 @@
       return {
         id: l.id, url: l.url, name: l.name, company: '', phone: l.phone, email: l.email, line: line,
         car: l.carText ? l.carText : l.car ? l.car.label : (fuelOnly ? (line ? line + ' · ' + l.want.toLowerCase() : l.want) : l.want),
-        img: l.img || '', price: Number(l.budget) || 0, fee: l.fee || '', status: l.status || 'Új érdeklődő',
+        img: l.img || '', src: l.source || '', price: Number(l.budget) || 0, fee: l.fee || '', status: l.status || 'Új érdeklődő',
         status_at: l.status && l.status !== 'Új érdeklődő' ? toDate(l.edited) : null, created: toDate(l.created), notion: true
       };
     });
@@ -365,7 +365,7 @@
     if (!list.length) return '<div class="caui-empty">Még nincs megkeresés.</div>';
     return '<table><thead><tr><th>Dátum</th><th>Ügyfél</th><th>Autó</th><th>Ország</th><th>Státusz</th><th>Érték</th></tr></thead><tbody>' + list.map(function (r) {
       var c = country(r);
-      return '<tr data-id="' + r.id + '"' + (r.url ? ' data-url="' + esc(r.url) + '"' : '') + '><td>' + esc(fmtDay(r.created)) + '</td><td><b style="font-weight:600">' + esc(r.company || r.name || 'Névtelen') + '</b></td>'
+      return '<tr data-id="' + r.id + '"' + (r.url ? ' data-url="' + esc(r.url) + '"' : '') + '><td>' + esc(fmtDay(r.created)) + '</td><td><b style="font-weight:600">' + esc(r.company || r.name || 'Névtelen') + '</b>' + (r.src === 'E-mail' ? ' <span class="caui-src mail" title="E-mailből felvett megkeresés">E-mail</span>' : '') + '</td>'
         + '<td><div class="car">' + (r.img ? '<i class="ph" style="background-image:url(\'' + esc(r.img) + '\')"></i>' : '<i>' + svg('car') + '</i>') + '<span title="' + esc(r.car || '') + '">' + esc(r.car || '—') + '</span></div></td>'
         + '<td>' + (c ? '<span class="fl" title="' + esc(c.n) + '" style="background-image:url(' + flagUrl(c) + ')"></span>' : '<span style="color:var(--faint)">—</span>') + '</td>'
         + '<td>' + pill(r) + '</td><td class="val">' + (r.price ? esc(ftFull(r.price)) : r.fee ? esc(r.fee) : '<span style="color:var(--faint);font-weight:500">—</span>') + '</td></tr>';
