@@ -152,7 +152,11 @@ staff.post("/igeny/:id/add", async (c) => {
   const target = f.target === "runner" ? "runner" : Number(f.target);
   let listing;
   try { listing = await getSource(c.env).getById(String(f.url || "")); } catch (e: any) { return back(c, reqPath(id), undefined, e.message); }
-  if (!listing) return back(c, reqPath(id), undefined, isTest(c.env) ? "A hirdetés nem található (tesztben: 1001–1007, 2001, 3001)." : "A hirdetés nem található.");
+  if (!listing) return back(c, reqPath(id), undefined, isTest(c.env)
+    ? (/mobile\.de/i.test(String(f.url || ""))
+      ? "Tesztben a szerver nem kérdezi le a mobile.de-t (mock forrás). Valódi hirdetést a Chrome bővítménnyel küldjön be („Küldés az ajánlatba”), vagy próbáljon tesztazonosítót: 1001–1007, 2001, 3001."
+      : "A hirdetés nem található (tesztben: 1001–1007, 2001, 3001).")
+    : "A hirdetés nem található.");
   try {
     const r = await addListing(c.env, id, listing, target as any, "manual", c.get("user").name);
     if (r.duplicate) return back(c, reqPath(id), undefined, "Ez a hirdetés már szerepel az igénynél.");
