@@ -219,3 +219,8 @@ body.caui-sub .caui-subwrap>header #sys{color:var(--muted)}
   body.caui-sub .menu-btn{display:inline-flex}
 }
 @media(max-width:560px){.caui-kpis{grid-template-columns:1fr}.caui-hero h2{font-size:25px}}
+/* Notion-adatok: autókép, forrás-címke */
+.caui-tbl .car i.ph{width:58px;height:38px;border-radius:8px;background-size:cover;background-position:center;background-color:#eef0f4;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+.caui-tbl .car{max-width:300px}
+.caui-src{display:inline-block;vertical-align:middle;margin-left:8px;font-size:11px;font-weight:700;color:#6b7280;background:var(--line2);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.caui-src.err{color:#b45309;background:var(--warn-tint);border-color:#f6dfb4}

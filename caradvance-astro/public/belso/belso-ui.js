@@ -79,7 +79,33 @@
 
   /* ---------------- adatok összefésülése ---------------- */
   var CLOSED = /Lezárva|Átadva|Eladva/;
+  /* ---------------- valódi megkeresések: Notion „Ügyfelek” (/api/belso-notion) ---------------- */
+  var NL = null, nlLoading = false, nlErr = '';
+  function loadNotion(force) {
+    if (nlLoading || (NL && !force)) return;
+    nlLoading = true;
+    fetch('/api/belso-notion', { credentials: 'same-origin' }).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status)); return j; }); })
+      .then(function (j) { NL = j.leads || []; nlErr = ''; nlLoading = false; renderDash(); updateBell(); })
+      .catch(function (e) { nlErr = e.message || String(e); nlLoading = false; if (!NL) renderDash(); });
+  }
+  function lineOf(tags) {
+    var t = (tags || []).join(' ');
+    return /Bérlés/.test(t) ? 'Bérlés' : /Bizomány/.test(t) ? 'Bizományos' : /Autóimport/.test(t) ? 'Import' : /Egyedi/.test(t) ? 'Egyedi rendelés' : /Használt/.test(t) ? 'Eladás' : (tags && tags[0]) || '';
+  }
+  function notionRows() {
+    return NL.map(function (l) {
+      var fuelOnly = /^(benzin|dízel|diesel|hibrid|elektromos|plug-in hibrid|mindegy)$/i.test(l.want || '');
+      var line = lineOf(l.tags);
+      return {
+        id: l.id, url: l.url, name: l.name, company: '', phone: l.phone, email: l.email, line: line,
+        car: l.car ? l.car.label : (fuelOnly ? (line ? line + ' · ' + l.want.toLowerCase() : l.want) : l.want),
+        img: l.img || '', price: Number(l.budget) || 0, status: l.status || 'Új érdeklődő',
+        status_at: l.status && l.status !== 'Új érdeklődő' ? toDate(l.edited) : null, created: toDate(l.created), notion: true
+      };
+    });
+  }
   function rows() {
+    if (NL) return notionRows();
     var deals = Array.isArray(W.data) ? W.data : [];
     var crm = Array.isArray(W.crmClients) ? W.crmClients : [];
     var byId = {}; crm.forEach(function (c) { byId[c.id] = c; });
@@ -94,11 +120,15 @@
     if (!out.length && crm.length) out = crm.map(function (c) { return { id: c.id, line: c.line, stage: '', ch: c.ch, name: c.name, company: c.company, phone: c.phone, email: c.email, car: c.car, price: 0, status: c.status, status_at: toDate(c.status_at), created: toDate(c.created_at) }; });
     return out;
   }
-  function isWon(r) { return r.status === 'Lezárva' || (!r.status && CLOSED.test(r.stage || '')); }
+  function isWon(r) { return r.status === 'Lezárva' || r.status === 'Lezárt – sikeres' || (!r.status && CLOSED.test(r.stage || '')); }
+  function isLost(r) { return r.status === 'Ajánlat elutasítva' || r.status === 'Lezárt – elveszett'; }
   var PILL = {
     'Kapcsolatfelvételre vár': ['p-new', 'Új'], 'Ajánlatra vár': ['p-cont', 'Ajánlatra vár'], 'Ajánlat kiküldve': ['p-offer', 'Ajánlat kiküldve'],
     'Ajánlat módosítva': ['p-neg', 'Módosítás kérve'], 'Ajánlat elfogadva': ['p-won', 'Elfogadva'], 'Ajánlat elutasítva': ['p-lost', 'Elutasítva'],
-    'Megvalósítás': ['p-won', 'Megvalósítás'], 'Lezárva': ['p-won', 'Lezárva']
+    'Megvalósítás': ['p-won', 'Megvalósítás'], 'Lezárva': ['p-won', 'Lezárva'],
+    'Új érdeklődő': ['p-new', 'Új'], 'Kapcsolatfelvétel': ['p-cont', 'Kapcsolatfelvétel'], 'Igényfelmérés': ['p-cont', 'Igényfelmérés'], 'Autókeresés': ['p-cont', 'Autókeresés'],
+    'Foglaló beérkezett': ['p-neg', 'Foglaló beérkezett'], 'Behozatal folyamatban': ['p-neg', 'Behozatal'], 'Bizomány – hirdetés alatt': ['p-cont', 'Hirdetés alatt'],
+    'Átadás': ['p-won', 'Átadás'], 'Lezárt – sikeres': ['p-won', 'Sikeres'], 'Lezárt – elveszett': ['p-lost', 'Elveszett']
   };
   function pill(r) {
     var p = PILL[r.status];
@@ -188,7 +218,7 @@
     var dd = $('.caui-ndrop'); if (!dd) return;
     var list = rows().filter(function (r) { return r.created; }).sort(function (a, b) { return b.created - a.created; }).slice(0, 6);
     dd.innerHTML = '<div class="nh">Legutóbbi megkeresések</div>' + (list.length ? list.map(function (r) {
-      return '<a href="/belso/ugyfel/?id=' + r.id + '">' + '<span style="color:var(--red);padding-top:2px">' + svgInline('car') + '</span><span><b>' + esc(r.company || r.name || 'Névtelen') + '</b><small>' + esc([r.car, r.line].filter(Boolean).join(' · ')) + ' · ' + esc(rel(r.created)) + '</small></span></a>';
+      return '<a href="' + (r.url ? esc(r.url) + '" target="_blank" rel="noopener' : '/belso/ugyfel/?id=' + r.id) + '">' + '<span style="color:var(--red);padding-top:2px">' + svgInline('car') + '</span><span><b>' + esc(r.company || r.name || 'Névtelen') + '</b><small>' + esc([r.car, r.line].filter(Boolean).join(' · ')) + ' · ' + esc(rel(r.created)) + '</small></span></a>';
     }).join('') : '<div class="empty">Nincs új megkeresés.</div>');
   }
   function updateBell() { var c = $('.caui-bell .cnt'); if (c) { var n = newOnes().length; c.textContent = n ? (n > 99 ? '99+' : n) : ''; } }
@@ -213,14 +243,22 @@
     var w1 = daysAgo(6), w0 = daysAgo(13);
     var newCur = R.filter(function (r) { return inRange(r, w1, tomorrow); }).length;
     var newPrev = R.filter(function (r) { return inRange(r, w0, w1); }).length;
-    var offerSt = /^(Ajánlat kiküldve|Ajánlat módosítva)$/;
+    var offerSt = /^(Ajánlat kiküldve|Ajánlat módosítva|Foglaló beérkezett)$/;
     var offers = R.filter(function (r) { return offerSt.test(r.status) || (!r.status && r.stage === 'Ajánlat'); });
     var offCur = offers.filter(function (r) { return r.status_at && r.status_at >= w1; }).length;
     var offPrev = offers.filter(function (r) { return r.status_at && r.status_at >= w0 && r.status_at < w1; }).length;
-    var cl = Array.isArray(W.clients) ? W.clients : [];
-    var clDate = function (c) { return toDate(c.created_at || c.created || c.date); };
-    var cliCur = cl.filter(function (c) { var x = clDate(c); return x && x >= w1; }).length;
-    var cliPrev = cl.filter(function (c) { var x = clDate(c); return x && x >= w0 && x < w1; }).length;
+    var cliCur, cliPrev;
+    if (NL) {
+      var first = {};
+      R.slice().sort(function (a, b) { return (a.created || 0) - (b.created || 0); }).forEach(function (r) { var k = (r.email || r.phone || r.name || '').toLowerCase(); if (k && !first[k]) first[k] = r.created; });
+      var fs = Object.keys(first).map(function (k) { return first[k]; });
+      cliCur = fs.filter(function (x) { return x && x >= w1; }).length; cliPrev = fs.filter(function (x) { return x && x >= w0 && x < w1; }).length;
+    } else {
+      var cl = Array.isArray(W.clients) ? W.clients : [];
+      var clDate = function (c) { return toDate(c.created_at || c.created || c.date); };
+      cliCur = cl.filter(function (c) { var x = clDate(c); return x && x >= w1; }).length;
+      cliPrev = cl.filter(function (c) { var x = clDate(c); return x && x >= w0 && x < w1; }).length;
+    }
     var mStart = new Date(now.getFullYear(), now.getMonth(), 1), pmStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     var pmSame = new Date(pmStart.getTime() + (now - mStart));
     var wonAt = function (r) { return r.status_at || r.created; };
@@ -231,7 +269,7 @@
     var sale = INV ? INV.sale : [], rent = INV ? INV.rent : [], biz = INV ? INV.biz : [];
     var saleAct = sale.filter(function (x) { return x.active !== false; }).length, saleInact = sale.length - saleAct;
     var invTotal = INV ? sale.length + rent.length + biz.length : null;
-    var openCnt = R.filter(function (r) { return !isWon(r) && r.status !== 'Ajánlat elutasítva'; }).length;
+    var openCnt = R.filter(function (r) { return !isWon(r) && !isLost(r); }).length;
     var todayCnt = R.filter(function (r) { return inRange(r, t0, tomorrow); }).length;
 
     var html = ''
@@ -259,7 +297,7 @@
       + '<div class="caui-card caui-ch"><div class="hd"><h3>Készlet állapota</h3></div>' + donutStock(saleAct, saleInact, rent.length, biz.length) + '</div>'
       + '</div>'
       + '<div class="caui-row4">'
-      + '<div class="caui-card caui-tbl"><div class="hd"><h3>Legutóbbi megkeresések</h3><a class="caui-va" data-act="clients">Összes →</a></div>' + latestTable(R) + '</div>'
+      + '<div class="caui-card caui-tbl"><div class="hd"><h3>Legutóbbi megkeresések' + (NL ? ' <span class="caui-src">Notion</span>' : nlErr ? ' <span class="caui-src err" title="' + esc(nlErr) + '">Notion nem érhető el</span>' : '') + '</h3><a class="caui-va" data-act="clients">Összes →</a></div>' + latestTable(R) + '</div>'
       + '<div class="caui-card caui-act"><div class="hd"><h3>Legutóbbi események</h3><a class="caui-va" data-act="todo">Teendők →</a></div>' + activity(R) + '</div>'
       + '</div>';
     host.innerHTML = html;
@@ -268,6 +306,7 @@
     drawLine(R);
     updateBell();
     loadInventory();
+    if (W.currentUser) loadNotion();
   }
   function kpi(ic, label, val, tr, sub) {
     return '<div class="caui-card caui-kpi"><div class="ic">' + svg(ic) + '</div><div><div class="lb">' + esc(label) + '</div><div class="vl"><b>' + esc(val) + '</b>' + tr + '</div><div class="sb">' + esc(sub) + '</div></div></div>';
@@ -326,8 +365,8 @@
     if (!list.length) return '<div class="caui-empty">Még nincs megkeresés.</div>';
     return '<table><thead><tr><th>Dátum</th><th>Ügyfél</th><th>Autó</th><th>Ország</th><th>Státusz</th><th>Érték</th></tr></thead><tbody>' + list.map(function (r) {
       var c = country(r);
-      return '<tr data-id="' + r.id + '"><td>' + esc(fmtDay(r.created)) + '</td><td><b style="font-weight:600">' + esc(r.company || r.name || 'Névtelen') + '</b></td>'
-        + '<td><div class="car"><i>' + svg('car') + '</i><span>' + esc(r.car || '—') + '</span></div></td>'
+      return '<tr data-id="' + r.id + '"' + (r.url ? ' data-url="' + esc(r.url) + '"' : '') + '><td>' + esc(fmtDay(r.created)) + '</td><td><b style="font-weight:600">' + esc(r.company || r.name || 'Névtelen') + '</b></td>'
+        + '<td><div class="car">' + (r.img ? '<i class="ph" style="background-image:url(\'' + esc(r.img) + '\')"></i>' : '<i>' + svg('car') + '</i>') + '<span title="' + esc(r.car || '') + '">' + esc(r.car || '—') + '</span></div></td>'
         + '<td>' + (c ? '<span class="fl" title="' + esc(c.n) + '" style="background-image:url(' + flagUrl(c) + ')"></span>' : '<span style="color:var(--faint)">—</span>') + '</td>'
         + '<td>' + pill(r) + '</td><td class="val">' + (r.price ? esc(ftFull(r.price)) : '<span style="color:var(--faint);font-weight:500">—</span>') + '</td></tr>';
     }).join('') + '</tbody></table>';
@@ -336,16 +375,17 @@
     var ev = [];
     R.forEach(function (r) {
       var who = r.company || r.name || 'Névtelen', c = country(r);
-      if (r.created) ev.push({ t: r.created, id: r.id, ic: 'car', cl: 'r', h: 'Új megkeresés érkezett', s: [r.car, r.line, c && c.n].filter(Boolean).join(' · ') || who });
-      if (r.status_at && r.status && r.status !== 'Kapcsolatfelvételre vár') {
-        var m = { 'Ajánlat kiküldve': ['send', 'b', 'Ajánlat elküldve'], 'Ajánlat elfogadva': ['check', 'g', 'Ajánlat elfogadva'], 'Ajánlat elutasítva': ['x', 'o', 'Ajánlat elutasítva'], 'Ajánlat módosítva': ['swap', 'v', 'Módosítást kértek'], 'Megvalósítás': ['gear', 'v', 'Megvalósítás indult'], 'Lezárva': ['check', 'g', 'Ügylet lezárva'], 'Ajánlatra vár': ['doc', 'b', 'Ajánlatra vár'] }[r.status] || ['doc', 'b', r.status];
-        ev.push({ t: r.status_at, id: r.id, ic: m[0], cl: m[1], h: m[2], s: who + (r.car ? ' · ' + r.car : '') });
+      if (r.created) ev.push({ t: r.created, id: r.id, url: r.url, ic: 'car', cl: 'r', h: 'Új megkeresés érkezett', s: [who, r.car, c && c.n].filter(Boolean).join(' · ') });
+      if (r.status_at && r.status && r.status !== 'Kapcsolatfelvételre vár' && r.status !== 'Új érdeklődő') {
+        var m = { 'Ajánlat kiküldve': ['send', 'b', 'Ajánlat elküldve'], 'Ajánlat elfogadva': ['check', 'g', 'Ajánlat elfogadva'], 'Ajánlat elutasítva': ['x', 'o', 'Ajánlat elutasítva'], 'Ajánlat módosítva': ['swap', 'v', 'Módosítást kértek'], 'Megvalósítás': ['gear', 'v', 'Megvalósítás indult'], 'Lezárva': ['check', 'g', 'Ügylet lezárva'], 'Ajánlatra vár': ['doc', 'b', 'Ajánlatra vár'],
+          'Kapcsolatfelvétel': ['user', 'b', 'Kapcsolatfelvétel'], 'Igényfelmérés': ['doc', 'b', 'Igényfelmérés'], 'Autókeresés': ['search', 'v', 'Autókeresés indult'], 'Foglaló beérkezett': ['check', 'g', 'Foglaló beérkezett'], 'Behozatal folyamatban': ['upload', 'v', 'Behozatal folyamatban'], 'Bizomány – hirdetés alatt': ['swap', 'o', 'Hirdetés alatt'], 'Átadás': ['car', 'g', 'Átadás'], 'Lezárt – sikeres': ['check', 'g', 'Ügylet sikeresen lezárva'], 'Lezárt – elveszett': ['x', 'o', 'Ügylet elveszett'] }[r.status] || ['doc', 'b', r.status];
+        ev.push({ t: r.status_at, id: r.id, url: r.url, ic: m[0], cl: m[1], h: m[2], s: who + (r.car ? ' · ' + r.car : '') });
       }
     });
     ev.sort(function (a, b) { return b.t - a.t; });
     ev = ev.slice(0, 6);
     if (!ev.length) return '<div class="caui-empty">Még nincs esemény.</div>';
-    return '<ul>' + ev.map(function (e) { return '<li data-id="' + e.id + '"><span class="ai ' + e.cl + '">' + svg(e.ic) + '</span><span class="tx"><b>' + esc(e.h) + '</b><span>' + esc(e.s) + '</span></span><span class="tm">' + esc(rel(e.t)) + '</span></li>'; }).join('') + '</ul>';
+    return '<ul>' + ev.map(function (e) { return '<li data-id="' + e.id + '"' + (e.url ? ' data-url="' + esc(e.url) + '"' : '') + '><span class="ai ' + e.cl + '">' + svg(e.ic) + '</span><span class="tx"><b>' + esc(e.h) + '</b><span>' + esc(e.s) + '</span></span><span class="tm">' + esc(rel(e.t)) + '</span></li>'; }).join('') + '</ul>';
   }
   function onDashClick(e) {
     var a = e.target.closest('[data-act]');
@@ -359,7 +399,7 @@
       return;
     }
     var row = e.target.closest('tr[data-id],li[data-id]');
-    if (row) location.href = '/belso/ugyfel/?id=' + row.getAttribute('data-id');
+    if (row) { var u = row.getAttribute('data-url'); if (u) window.open(u, '_blank', 'noopener'); else location.href = '/belso/ugyfel/?id=' + row.getAttribute('data-id'); }
   }
 
   /* ---------------- beépülés a meglévő index-oldalba ---------------- */
@@ -414,6 +454,7 @@
       d.getElementById('curUserLabel').textContent = j.user.name || '';
       d.getElementById('curUserRole').textContent = j.user.role === 'admin' ? 'Adminisztrátor' : 'Sales manager';
       d.getElementById('avatarCircle').textContent = String(j.user.name || '?').trim().charAt(0).toUpperCase();
+      loadNotion();
     }).catch(function () {});
   }
 
