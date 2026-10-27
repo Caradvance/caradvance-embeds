@@ -112,6 +112,7 @@ const SEED_CATS = [
   ['COGS_ARU', 'Árubeszerzés', 'cogs', 'Közvetlen költségek', 'invoice', 0],
   ['COGS_LOG', 'Szállítás, logisztika, vám', 'cogs', 'Közvetlen költségek', 'invoice', 27],
   ['COGS_ELOK', 'Autó előkészítés, javítás', 'cogs', 'Közvetlen költségek', 'invoice', 27],
+  ['COGS_REG', 'Forgalomba helyezés, rendszám, okmányok', 'cogs', 'Közvetlen költségek', 'invoice', 0],
   ['PERS_BER', 'Bérek (nettó)', 'opex', 'Személyi jellegű', 'none', 0],
   ['PERS_JAR', 'Bérjárulékok, SZJA, TB, szocho', 'opex', 'Személyi jellegű', 'none', 0],
   ['PERS_MEGB', 'Megbízási, alvállalkozói díjak', 'opex', 'Személyi jellegű', 'invoice', 0],
@@ -123,7 +124,7 @@ const SEED_CATS = [
   ['OFF_EGYEB', 'Egyéb működési költség', 'opex', 'Iroda és működés', 'invoice', 27],
   ['VEH_UZEM', 'Üzemanyag', 'opex', 'Jármű és utazás', 'invoice', 0],
   ['VEH_UTDIJ', 'Útdíj, matrica, parkolás', 'opex', 'Jármű és utazás', 'invoice', 0],
-  ['VEH_BERLES', 'Autóbérlés, lízing (használt autók)', 'opex', 'Jármű és utazás', 'invoice', 0],
+  ['VEH_BERLES', 'Autóbérlés, lízing (Caradvance GmbH bérleti számlák)', 'opex', 'Jármű és utazás', 'invoice', 0],
   ['VEH_SZERVIZ', 'Jármű szerviz, mosás', 'opex', 'Jármű és utazás', 'invoice', 0],
   ['TRAVEL', 'Utazás, szállás', 'opex', 'Jármű és utazás', 'invoice', 0],
   ['MKT_ADS', 'Online hirdetés (Google, Meta)', 'opex', 'Marketing', 'invoice', 0],
@@ -140,7 +141,8 @@ const SEED_CATS = [
   ['EX_ATVEZ', 'Belső átvezetés (saját számlák, cégek)', 'excl', 'Nem eredményhatású', 'none', 0],
   ['EX_HITEL', 'Hitel, kölcsön (felvétel, törlesztés)', 'excl', 'Nem eredményhatású', 'none', 0],
   ['EX_TULAJ', 'Tulajdonosi befizetés, kivét', 'excl', 'Nem eredményhatású', 'none', 0],
-  ['EX_ELOLEG', 'Előleg (még nem bevétel/költség)', 'excl', 'Nem eredményhatású', 'invoice', 0]
+  ['EX_ELOLEG', 'Előleg (még nem bevétel/költség)', 'excl', 'Nem eredményhatású', 'invoice', 0],
+  ['EX_KIZART', 'Kizárt tétel (nem tartozik a kimutatásba)', 'excl', 'Nem eredményhatású', 'none', 0]
 ];
 /* ---- alap szabályok: [prio, név, regex (a normalizált „TÍPUS | PARTNER | KÖZLEMÉNY | IBAN” szövegen), irány, kategória, üzletág-kód(ok), doc_mode] ---- */
 const SEED_RULES = [
@@ -170,8 +172,12 @@ const SEED_RULES = [
   [65, 'Tárhely, domain (Rackhost)', 'RACKHOST|NETHELY|DOTROLL|GODADDY', 'out', 'IT_HOST', 'KOZOS'],
   [70, 'Kereskedelmi kamara tagdíj', 'IPARKAMAR', 'out', 'OFF_TAGDIJ', 'KOZOS'],
   [80, 'Cukor beszerzés (Krajowa Grupa Spożywcza)', 'KRAJOWA GRUPA SPOZYWCZA|SUDZUCKER|SUEDZUCKER|NORDZUCKER|PFEIFER', 'out', 'COGS_ARU', 'CUKOR'],
-  [81, 'Designyourdrink – vevői befizetés', 'DESIGNYOURDRINK', 'in', 'REV_ARU', 'CUKOR'],
-  [90, 'Caradvance GmbH (kategória ellenőrizendő)', 'CARADVANCE GMBH', 'any', null, 'CA']
+  [13, 'Kizárva: Designyourdrink', 'DESIGNYOURDRINK', 'any', 'EX_KIZART', null],
+  [14, 'Kizárva: UNR Sales GmbH', 'UNR SALES', 'any', 'EX_KIZART', null],
+  [15, 'Kizárva: Brit-Magyar Oktatásért Alapítvány', 'BRIT-MAGYAR OKTATASERT', 'any', 'EX_KIZART', null],
+  [42, 'Stadler István EV – rendszám', 'STADLER ISTVAN', 'out', 'COGS_REG', 'CA'],
+  [43, 'Caradvance GmbH – autóbérlés (saját és továbbbérelt autók)', 'CARADVANCE GMBH', 'out', 'VEH_BERLES', 'CA'],
+  [44, 'Caradvance GmbH – jóváírás', 'CARADVANCE GMBH', 'in', 'REV_BERLES', 'CA']
 ];
 
 async function seed(env) {
