@@ -158,6 +158,10 @@ async function openSearch() {
   if (r.ok) chrome.tabs.create({ url: r.body.url });
 }
 
+// Unpacked installs don't pick up new background/content code until reloaded; the panel is served from disk, so it does it.
+const BUILD = "0.4.0";
+if (chrome.runtime.getManifest().version !== BUILD) chrome.runtime.reload();
+
 async function init() {
   settings = { base: DEFAULT_BASE, token: "", ...((await chrome.storage.local.get("settings")).settings || {}) };
   if (!settings.base) { $("setup").hidden = false; $("reqBox").hidden = true; return; }

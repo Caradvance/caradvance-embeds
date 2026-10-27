@@ -26,17 +26,60 @@
   const btn = shadow.getElementById("b");
   const label = shadow.getElementById("t");
 
+  // In-page panel: pick the customer request and the slot, send. (The side panel still works for editing fields.)
+  const panel = document.createElement("div");
+  panel.id = "p";
   async function onListing() {
     label.textContent = "Küldés az ajánlatba";
+    shadow.querySelector("style").textContent += `
+      #p{position:absolute;right:0;bottom:58px;width:340px;background:#fff;color:#0B0B0D;border-radius:16px;padding:16px;
+        box-shadow:0 24px 60px -18px rgba(0,0,0,.45);font:14px/1.4 system-ui,-apple-system,sans-serif;display:none}
+      #p.open{display:block} #p h3{margin:0 0 10px;font-size:15px} #p select{width:100%;padding:8px;border-radius:10px;border:1px solid #ccc;font:inherit}
+      #p .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+      #p .slots button{padding:10px 0;justify-content:center;font-size:13px;box-shadow:none}
+      #p .slots button.alt{background:#0B0B0D} #p .msg{margin-top:10px;font-size:13px} #p .err{color:#E2001A} #p a{color:#E2001A;font-weight:700}
+      #p .muted{color:#666;font-size:12px;margin-top:6px}`;
+    shadow.appendChild(panel);
+    let parsed = null;
+    const msg = (html) => { panel.querySelector(".msg").innerHTML = html; };
     btn.onclick = async () => {
+      if (panel.classList.toggle("open") === false) return;
+      panel.innerHTML = `<h3>Küldés az Ajánlatmotorba</h3><div class="msg">Igények betöltése…</div>`;
       const cfg = await config();
       const html = document.documentElement.outerHTML;
-      const parsed = P.parseListing(html, location.href, cfg);
+      parsed = P.parseListing(html, location.href, cfg);
       parsed.page_snapshot_hash = await sha256(html.slice(0, 200000));
-      chrome.runtime.sendMessage({ type: "parsed", payload: parsed });
-      label.textContent = "Megnyitva az oldalsávban";
-      setTimeout(() => (label.textContent = "Küldés az ajánlatba"), 2500);
+      const r = await chrome.runtime.sendMessage({ type: "ext-requests" });
+      if (!r.ok) {
+        const login = r.base + "/belso/?next=" + encodeURIComponent("/belso/ajanlatmotor/");
+        msg(r.status === 401 ? `<span class="err">Nincs belépve.</span> <a href="${login}" target="_blank">Belépés a belső felületre ↗</a>, utána kattints újra.` : `<span class="err">A szerver nem érhető el (${r.status}).</span>`);
+        return;
+      }
+      const reqs = r.body.requests || [];
+      if (!reqs.length) { msg("Nincs nyitott ügyféligény."); return; }
+      const esc = (x) => String(x ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+      const l = parsed.listing;
+      panel.innerHTML = `<h3>Küldés az Ajánlatmotorba</h3>
+        <select id="req">${reqs.map((q) => `<option value="${q.id}" ${String(q.id) === String(r.lastReq) ? "selected" : ""}>${esc(q.customer || "?")} · ${esc((q.summary || "").slice(0, 50))}</option>`).join("")}</select>
+        <div class="slots"><button data-s="1">1. hely</button><button data-s="2">2. hely</button><button data-s="3">3. hely</button><button data-s="runner" class="alt">Tartalék</button></div>
+        <div class="muted">${esc(l.title || [l.make, l.model].filter(Boolean).join(" "))} · ${l.price_gross_eur ? Number(l.price_gross_eur).toLocaleString("hu-HU") + " €" : "ár?"} · ${l.km != null ? Number(l.km).toLocaleString("hu-HU") + " km" : "km?"} · ${(l.images || []).length} kép${parsed.missing.length ? ` · <span class="err">hiányzik: ${esc(parsed.missing.join(", "))}</span>` : ""}</div>
+        <div class="msg"></div><div class="muted">Bejelentkezve: ${esc(String(r.body.user || "").replace(/^ext:/, ""))}</div>`;
+      panel.querySelectorAll(".slots button").forEach((b) => b.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        panel.querySelectorAll(".slots button").forEach((x) => (x.disabled = true));
+        msg("Küldés… (fotószűrés, költségszámítás)");
+        const s = b.dataset.s;
+        const res = await chrome.runtime.sendMessage({ type: "ext-push", body: {
+          request_id: panel.querySelector("#req").value, slot: s === "runner" ? "runner" : Number(s), listing: parsed.listing,
+          source_url: location.href.split("#")[0], parser_version: parsed.parser_version, parser_layers: parsed.layers, page_snapshot_hash: parsed.page_snapshot_hash } });
+        panel.querySelectorAll(".slots button").forEach((x) => (x.disabled = false));
+        if (res.ok) msg(`✓ Hozzáadva · ≈ ${Number(res.body.customer_total_huf).toLocaleString("hu-HU")} Ft Budapesten · ${res.body.distance_km} km${res.body.not_matching && res.body.not_matching.length ? `<br><span class="err">Nem felel meg: ${esc(res.body.not_matching.join(", "))}</span>` : ""}<br><a href="${res.body.admin_url}" target="_blank">Megnyitás az Ajánlatmotorban ↗</a>`);
+        else if (res.status === 409) msg(`Ez az autó már szerepel az igénynél. <a href="${res.body.admin_url}" target="_blank">Megnyitás ↗</a>`);
+        else if (res.status === 422) msg(`<span class="err">Hiányos adatok: ${esc((res.body.fields || []).join(", "))}.</span> Nyisd meg az oldalsávban és pótold.`);
+        else msg(`<span class="err">Hiba: ${esc(res.body && res.body.error || res.status)}</span>`);
+      }));
     };
+    panel.addEventListener("click", (e) => e.stopPropagation());
     document.documentElement.appendChild(host);
   }
 
