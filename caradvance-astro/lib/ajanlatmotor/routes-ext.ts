@@ -49,7 +49,8 @@ ext.use("/ext/*", async (c, next) => {
   if (!token) {
     const origin = c.req.header("Origin") || "";
     const site = c.req.header("Sec-Fetch-Site") || "";
-    if (origin === new URL(c.req.url).origin && (site === "same-origin" || site === "")) {
+    const self = new URL(c.req.url).origin;
+    if ((origin === self && (site === "same-origin" || site === "")) || (!origin && site === "same-origin")) {
       const su = await sessionUser(c.env, c.req.raw);
       if (su) { c.set("user", su); return next(); }
     }
