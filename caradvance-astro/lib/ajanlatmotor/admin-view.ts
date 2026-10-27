@@ -162,7 +162,7 @@ export function requestPage(o: {
   row: RequestRow; deal: DealRow; cardStatus: string; req: Requirements | null; cars: CarView[]; runners: CandidateRow[]; rejected: CandidateRow[];
   blockers: string[]; offers: { token: string; offer_no: string; published_at: string; expires_at: string; first_viewed_at: string | null; responded_at: string | null; action: string | null; choice: number | null; sent_to: string | null; sent: number }[];
   events: { actor: string; type: string; from_status: string | null; to_status: string | null; at: string; data_json: string | null }[];
-  baseUrl: string; extraction: any; hasEmail: boolean;
+  baseUrl: string; extraction: any; hasEmail: boolean; searchUrl?: string | null;
 }) {
   const { row, req } = o;
   const published = ["PUBLISHED", "VIEWED", "CHOSEN", "CLOSED"].includes(row.status);
@@ -188,6 +188,7 @@ export function requestPage(o: {
   <div><h1>${esc(d.name || req?.customer.name || row.from_email || "Ismeretlen ügyfél")} <span class="chip ${row.status}">${STATUS_LABEL[row.status as Status] || row.status}</span></h1>
   <div class="muted">${esc(d.email || row.from_email || "")}${d.phone ? " · " + esc(d.phone) : ""} · adatlap: <b>${esc(o.cardStatus)}</b> · <a href="/belso/ugyfel/?id=${row.deal_id}" target="_blank">Ügyfél adatlap ↗</a> · forrás: ${esc(row.source)} · ${new Date(row.created_at).toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })} · kinyerés: ${esc(o.extraction?.engine || "–")}</div></div>
   <div class="row">
+   ${o.searchUrl && !published ? `<a class="btn red" href="${esc(o.searchUrl)}" target="_blank" rel="noopener" title="Az igény alapján előre kitöltött mobile.de keresés. A jó hirdetést a Chrome bővítménnyel küldd be („Küldés az ajánlatba”).">mobile.de keresés ↗</a>` : ""}
    <form method="post" action="${B}/search"><button class="btn" ${published ? "disabled" : ""}>Keresés újrafuttatása</button></form>
    <form method="post" action="${B}/describe"><button class="btn" ${published ? "disabled" : ""}>Mindhárom leírás generálása</button></form>
    <a class="btn" href="${B}/preview" target="_blank">Előnézet ↗</a>

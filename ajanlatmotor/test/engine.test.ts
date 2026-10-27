@@ -144,9 +144,11 @@ describe("listing normalisation (extension input)", () => {
     expect(adIdFrom("https://suchen.mobile.de/fahrzeuge/details.html?id=412345678&lang=de")).toBe("412345678");
     const req = heuristicExtract(DEMO_EMAIL.text);
     const u = new URL(buildSearchUrl(req, 55000));
-    expect(u.searchParams.get("ms")).toBe("3500;;;");
+    expect(u.searchParams.get("ms")).toBe("3500;;;i5"); // model goes into the 4th field, "Touring" via body type
+    expect(u.searchParams.get("c")).toBe("EstateCar");
     expect(u.searchParams.get("ft")).toBe("ELECTRICITY");
     expect(u.searchParams.get("p")).toBe(":55000");
+    expect(u.searchParams.getAll("fe")).toEqual(expect.arrayContaining(["PANORAMIC_GLASS_ROOF", "TRAILER_COUPLING"]));
   });
 });
 

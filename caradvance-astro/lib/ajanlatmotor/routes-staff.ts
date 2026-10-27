@@ -12,7 +12,7 @@ import {
 import { addListing, getCandidates, getDeal, getRequest, moveToSlot, processRequest, publishBlockers, slotViews, type RequestRow } from "./engine";
 import { createRequest, startForDeal } from "./intake";
 import { describe } from "./describe";
-import { getSource } from "./sources";
+import { buildSearchUrl, getSource } from "./sources";
 import { buildPublicOffer, DEFAULT_CONTACT, publishOffer } from "./offers";
 import { loadRates, saveRates, setVerified, unverifiedPaths, type RateConfig } from "./rates";
 import { transition } from "./status";
@@ -102,8 +102,11 @@ staff.get("/igeny/:id", async (c) => {
   const offers = (await c.env.DB.prepare(`SELECT a.token, a.offer_no, a.published_at, a.expires_at, a.first_viewed_at, o.responded_at, o.action, o.choice, o.sent_to, o.sent
       FROM am_offers a JOIN crm_offers o ON o.token = a.token WHERE a.deal_id = ? ORDER BY a.published_at DESC`).bind(id).all<any>()).results;
   const events = (await c.env.DB.prepare("SELECT actor, type, from_status, to_status, at, data_json FROM am_events WHERE deal_id = ? ORDER BY id DESC LIMIT 60").bind(id).all<any>()).results;
+  // vehicle-price ceiling for the search: budget minus ~2.5 M Ft import costs, at the cached EUR/HUF rate
+  const fx = (await cacheGet<{ rate: number }>(c.env, "fx:EURHUF"))?.rate || 395;
+  const searchUrl = req ? buildSearchUrl(req, req.vehicle.budget_huf_max ? (req.vehicle.budget_huf_max - 2_500_000) / fx : req.vehicle.budget_eur_max) : null;
   return page(c, deal.name || "Igény", requestPage({
-    row, deal, cardStatus: card?.status || "", req, cars, runners: all.filter((x) => !x.slot && x.pool === "runner"), rejected: all.filter((x) => x.pool === "rejected"),
+    row, deal, cardStatus: card?.status || "", req, cars, searchUrl, runners: all.filter((x) => !x.slot && x.pool === "runner"), rejected: all.filter((x) => x.pool === "rejected"),
     blockers: publishBlockers(cars), offers, events, baseUrl: baseUrl(c.env, c.req.raw), extraction: row.meta_json ? JSON.parse(row.meta_json) : null,
     hasEmail: !!(card?.data?.person?.email || deal.email),
   }), "igenyek");

@@ -35,22 +35,38 @@ const FUEL_CODE: Record<Fuel, string> = {
   electric: "ELECTRICITY", petrol: "PETROL", diesel: "DIESEL", hybrid: "HYBRID", phev: "HYBRID",
 };
 
+/** mobile.de feature codes for equipment the customer insists on (codes seen in live search URLs). */
+const FEATURE_CODE: Record<string, string> = {
+  "Panorama-Dach": "PANORAMIC_GLASS_ROOF",
+  "Anhängerkupplung": "TRAILER_COUPLING",
+  "Head-Up Display": "HEAD_UP_DISPLAY",
+  "Standheizung": "AUXILIARY_HEATING",
+  "Navigationssystem": "NAVIGATION_SYSTEM",
+  "Sitzheizung": "ELECTRIC_HEATED_SEATS",
+  "Schiebedach": "SUNROOF",
+  "Allradantrieb": "FOUR_WHEEL_DRIVE",
+};
+
 /**
- * Prefilled mobile.de search URL for the extension's "Keresés megnyitása" helper.
- * Parameter names follow the public search URL format; verify against a live search before go-live.
+ * Prefilled mobile.de search for a request (button "mobile.de keresés" and the extension helper).
+ * Format checked against a live search 2026-10: ms=<makeId>;;;<model>, c=EstateCar, ft, fr, ml, p, fe, dam=false.
  */
 export function buildSearchUrl(req: Requirements, maxVehicleEur?: number): string {
-  const p = new URLSearchParams({ isSearchRequest: "true", s: "Car", vc: "Car", sb: "p", od: "up", lang: "de" });
+  const p = new URLSearchParams({ dam: "false", isSearchRequest: "true", s: "Car", vc: "Car", sb: "p", od: "up", ref: "srp" });
   const make = req.vehicle.makes[0]?.toLowerCase();
-  if (make && MAKE_IDS[make]) p.set("ms", `${MAKE_IDS[make]};;;`);
+  const model = (req.vehicle.models[0] || "").replace(/\b(touring|avant|kombi|sportback|limousine|limuzin)\b/gi, "").trim();
+  if (make && MAKE_IDS[make]) p.set("ms", `${MAKE_IDS[make]};;;${model}`);
+  else if (req.vehicle.models[0]) p.set("q", req.vehicle.models[0]);
+  if (req.vehicle.body_types.includes("estate")) p.set("c", "EstateCar");
+  if (req.vehicle.fuel[0]) p.set("ft", FUEL_CODE[req.vehicle.fuel[0]]);
   if (req.vehicle.year_min) p.set("fr", `${req.vehicle.year_min}:`);
   if (req.vehicle.km_max) p.set("ml", `:${req.vehicle.km_max}`);
-  if (maxVehicleEur) p.set("p", `:${Math.round(maxVehicleEur)}`);
-  if (req.vehicle.fuel[0]) p.set("ft", FUEL_CODE[req.vehicle.fuel[0]]);
+  if (maxVehicleEur && maxVehicleEur > 1000) p.set("p", `:${Math.round(maxVehicleEur / 1000) * 1000}`);
   if (req.vehicle.gearbox === "automatic") p.set("tr", "AUTOMATIC_GEAR");
-  if (req.vehicle.body_types.includes("estate")) p.set("c", "EstateCar");
-  const q = req.vehicle.models[0];
-  if (q) p.set("q", q);
+  for (const e of req.vehicle.must_have_equipment || []) {
+    const code = Object.entries(FEATURE_CODE).find(([k]) => e.toLowerCase().startsWith(k.toLowerCase()))?.[1];
+    if (code) p.append("fe", code);
+  }
   return `https://suchen.mobile.de/fahrzeuge/search.html?${p.toString()}`;
 }
 
