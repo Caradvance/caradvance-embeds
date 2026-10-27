@@ -90,7 +90,8 @@ var CADV_SYNC = (function () {
       net: typeof it.Price === 'number' ? it.Price : null,
       gross: typeof ro.PriceProducer1 === 'number' ? ro.PriceProducer1 : null,
       term: it.RuntimeMonths || null, km: it.MileagePerMonth || null,
-      rank: av.rank, avail: av.lab, eq: eq
+      rank: av.rank, avail: av.lab, eq: eq,
+      n: Math.max(1, Math.round(+it.VehiclesCount) || 1)
     };
   }
 
@@ -123,7 +124,7 @@ var CADV_SYNC = (function () {
     var groups = {}, order = [];
     recs.forEach(function (r) { if (!groups[r.key]) { groups[r.key] = []; order.push(r.key); } groups[r.key].push(r); });
 
-    var report = { today: today, items: items.length, added: [], removed: [], changed: [], missingPhoto: [], photoAdded: photoAdded, untranslatedColors: [], newFeat: [], totalCars: recs.length };
+    var report = { today: today, items: items.length, added: [], removed: [], changed: [], missingPhoto: [], photoAdded: photoAdded, untranslatedColors: [], newFeat: [], totalCars: recs.reduce(function (a, r) { return a + r.n; }, 0) };
     var untrans = {};
 
     // ---------- SUB models ----------
@@ -132,13 +133,13 @@ var CADV_SYNC = (function () {
       var cnt = {}, deOf = {}, variants = [], fuels = [], gears = [], ps = [], kms = {}, months = {}, now = 0, later = {}, minnet = null, cat = null;
       v.forEach(function (r) {
         var cn = r.colHu || r.colDe; if (!r.colHu && r.colDe !== '—') untrans[r.colDe] = 1;
-        cnt[cn] = (cnt[cn] || 0) + 1; deOf[cn] = r.colDe;
+        cnt[cn] = (cnt[cn] || 0) + r.n; deOf[cn] = r.colDe;
         if (r.trim !== '—' && variants.indexOf(r.trim) < 0) variants.push(r.trim);
         if (r.fuel && fuels.indexOf(r.fuel) < 0) fuels.push(r.fuel);
         if (r.gear && gears.indexOf(r.gear) < 0) gears.push(r.gear);
         if (r.ps != null) ps.push(r.ps);
         if (r.net != null) minnet = minnet == null ? r.net : Math.min(minnet, r.net);
-        if (r.rank === 0) now++; else later[r.rank] = { d: r.avail, c: ((later[r.rank] || {}).c || 0) + 1 };
+        if (r.rank === 0) now += r.n; else later[r.rank] = { d: r.avail, c: ((later[r.rank] || {}).c || 0) + r.n };
         if (!cat && r.cat) cat = r.cat;
         var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|');
         (combos[id] || [[r.term, r.km]]).concat([[r.term, r.km]]).forEach(function (tk) { if (tk[0]) months[tk[0]] = 1; if (tk[1]) kms[tk[1]] = 1; });
@@ -147,7 +148,7 @@ var CADV_SYNC = (function () {
       var ph = colorHex(deOf[cols[0]]);
       var m = {
         brand: v[0].brand, model: v[0].model, cat: cat || (old && old.cat) || '',
-        count: v.length, now: now,
+        count: v.reduce(function (a, r) { return a + r.n; }, 0), now: now,
         later: Object.keys(later).sort().map(function (k) { return { d: later[k].d, c: later[k].c }; }),
         ph: ph, pd: isDark(ph),
         colors: cols.map(function (c) { return { n: c, h: colorHex(deOf[c]) }; }),
