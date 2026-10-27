@@ -3,7 +3,7 @@
 // Ugyanazt a munkamenetet (ca_session süti) és jogosultságot használja, mint az /api/belso/*:
 // admin mindent lát, a többi munkatárs csak a hozzá rendelt ügyfeleket.
 import {
-  ensureCrm, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, MAX_FILE,
+  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, MAX_FILE,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE
 } from '../../../lib/crm.js';
@@ -39,17 +39,19 @@ async function loadDeal(env, user, id) {
 
 /* ---------------- lista ---------------- */
 async function handleList(env, user) {
-  const sql = `SELECT d.id, d.line, d.stage, d.ch, d.name, d.phone, d.email, d.car, d.price, d.created_at, d.when_text, d.assigned_to,
-      c.status, c.address, c.status_at, c.data
+  const sql = `SELECT d.id, d.line, d.stage, d.ch, d.name, d.phone, d.email, d.car, d.price, d.created_at, d.when_text, d.assigned_to, d.client_responded_at,
+      c.status, c.address, c.status_at, c.data, c.checklist
     FROM deals d LEFT JOIN crm_cards c ON c.deal_id = d.id ${user.role === 'admin' ? '' : 'WHERE d.assigned_to = ?'} ORDER BY d.id DESC`;
   const st = env.DB.prepare(sql);
   const rows = (user.role === 'admin' ? await st.all() : await st.bind(user.id).all()).results || [];
   const clients = rows.map((r) => {
     const data = parseJ(r.data, {});
     const isCo = data.kind === 'ceg' && data.company && data.company.name;
+    const cl = parseJ(r.checklist, {}); const done = CHECKLIST.filter(([k]) => cl[k] && cl[k].done).length;
     return {
       id: r.id, line: r.line, ch: r.ch, name: (isCo && data.person && data.person.name) || r.name, company: isCo ? data.company.name : '', phone: r.phone, email: r.email, car: r.car,
-      address: r.address || '', status: r.status || STATUSES[0], status_at: r.status_at, created_at: r.created_at, when_text: r.when_text, assigned_to: r.assigned_to
+      address: r.address || '', status: r.status || statusFromDeal(r), status_at: r.status_at,
+      progress: Math.round(done / CHECKLIST.length * 100), done, total: CHECKLIST.length, created_at: r.created_at, when_text: r.when_text, assigned_to: r.assigned_to
     };
   });
   return json({ clients, statuses: STATUSES });
@@ -62,11 +64,12 @@ async function handleGetCard(env, user, id) {
   const offers = ((await env.DB.prepare(`SELECT token, items, message, sent_to, sent, created_at, responded_at, action, choice, client_msg FROM crm_offers WHERE deal_id = ? ORDER BY created_at DESC`).bind(id).all()).results || [])
     .map((o) => ({ ...o, items: parseJ(o.items, []), link: `${SITE}/ajanlat/valasz/?t=${o.token}` }));
   const files = (await env.DB.prepare(`SELECT id, name, mime, size, created_at FROM crm_files WHERE deal_id = ? ORDER BY id`).bind(id).all()).results || [];
+  const events = await listEvents(env, id);
   let users = [];
   if (user.role === 'admin') users = (await env.DB.prepare(`SELECT id, name, email FROM users ORDER BY name`).all()).results || [];
   return json({
     deal, card: { status: card.status, address: card.address, data: card.data, checklist: card.checklist, contract: card.contract, status_at: card.status_at, updated_at: card.updated_at },
-    offers, files, statuses: STATUSES, checklist: CHECKLIST, me: user, users, testForward: testForward(env)
+    offers, files, events, statuses: STATUSES, checklist: CHECKLIST, me: user, users, testForward: testForward(env)
   });
 }
 
@@ -104,15 +107,27 @@ async function handlePatchCard(request, env, user, id) {
       next[k] = on ? { done: true, at: (prev[k] && prev[k].done && prev[k].at) || new Date().toISOString().slice(0, 19), by: (prev[k] && prev[k].done && prev[k].by) || user.name } : { done: false };
     }
     f.checklist = next;
+    for (const [k, label] of CHECKLIST) {
+      const was = !!(prev[k] && prev[k].done);
+      if (was !== next[k].done) f._log = (f._log || []).concat([['checklist', (next[k].done ? '✓ Kipipálva: ' : '✗ Pipa levéve: ') + label]]);
+    }
     // „Átadva” kipipálva → Lezárva
-    if (next.atadva.done && !(prev.atadva && prev.atadva.done)) f.status = 'Lezárva';
+    if (next.atadva.done && !(prev.atadva && prev.atadva.done)) { f.status = 'Lezárva'; f._reason = '„Átadva” kipipálva'; }
   }
   if (b.contract !== undefined) {
     const c = b.contract || {}; const vars = {};
     for (const [k, v] of Object.entries(c.vars || {})) if (/^[a-z0-9_]{1,40}$/.test(k)) vars[k] = clean(v, 400);
     f.contract = { ...(cur.contract || {}), text: cleanMulti(c.text, 60000), vars, saved_at: new Date().toISOString().slice(0, 19), saved_by: user.name };
   }
-  const res = await saveCard(env, id, f, user.id);
+  const logs = f._log || []; const reason = f._reason; delete f._log; delete f._reason;
+  if (f.data) {
+    const o = normData(cur.data || {}); const n = f.data; const J = (x) => JSON.stringify(x || {});
+    if (J([o.kind, o.person, o.company, o.contact_differs, o.contact]) !== J([n.kind, n.person, n.company, n.contact_differs, n.contact])) logs.push(['data', 'Ügyfél személyes / céges adatai módosítva', 15]);
+    if (J(o.vehicle) !== J(n.vehicle)) logs.push(['vehicle', 'Gépjármű adatai módosítva', 15]);
+  }
+  if (f.contract) logs.push(['draft', 'Szerződés-piszkozat mentve', 15]);
+  const res = await saveCard(env, id, f, user.id, user.name, reason);
+  for (const [kind, text, merge] of logs) await addEvent(env, id, kind, text, user.name, merge);
   // a lista/kanban alapadatai (név, telefon, e-mail) kövessék az adatlapot
   if (f.data) {
     const p = f.data.person; const sets = []; const vals = [];
@@ -138,6 +153,7 @@ async function handleCreate(request, env, user) {
     .bind(line, firstStage, clean(b.ch, 40) || 'Kézi', name, clean(b.phone, 60), clean(b.email, 160), clean(b.car, 160), Number(b.price) || 0, cleanMulti(b.note, 2000), 'most', user.role === 'admin' ? (b.assigned_to || null) : user.id).run();
   const id = res.meta.last_row_id;
   await saveCard(env, id, { status: STATUSES[0], address: clean(b.address, 300), data: normData({ kind: 'magan', person: { name, phone: b.phone, email: b.email, address: b.address } }) }, user.id);
+  await addEvent(env, id, 'create', `Ügyfél felvéve a rendszerbe (${line}, csatorna: ${clean(b.ch, 40) || 'Kézi'})`, user.name);
   return json({ ok: true, id });
 }
 
@@ -171,8 +187,10 @@ async function handleSendOffer(request, env, user, id) {
   const r = await sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link }));
   await env.DB.prepare(`INSERT INTO crm_offers (token, deal_id, line, client_name, items, message, sent_to, sent, created_by) VALUES (?,?,?,?,?,?,?,?,?)`)
     .bind(token, id, deal.line || '', clientName || '', JSON.stringify(items), message, fwd || to, r.ok ? 1 : 0, user.id).run();
-  if (!r.ok) return json({ ok: false, error: r.error + ' — az ajánlat-link elkészült, kézzel is elküldheted.', link }, 502);
-  await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id);
+  const carList = items.map((it) => `${it.title} (${priceLabel(it)})`).join('; ');
+  if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat küldése sikertelen — ${items.length} autó: ${carList}`, user.name); return json({ ok: false, error: r.error + ' — az ajánlat-link elkészült, kézzel is elküldheted.', link }, 502); }
+  await addEvent(env, id, 'offer', `Ajánlat elküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${items.length} autó: ${carList}`, user.name);
+  await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id, user.name, 'ajánlat elküldve');
   return json({ ok: true, link, status: 'Ajánlat kiküldve', sentTo: fwd || to, test: !!fwd });
 }
 
@@ -187,6 +205,7 @@ async function handleUpload(request, env, user, id) {
   const name = clean(b.name, 160).replace(/[\\/]/g, '_') || 'dokumentum';
   const mime = /^[a-z]+\/[a-z0-9.+-]+$/i.test(b.mime || '') ? b.mime : 'application/octet-stream';
   const res = await env.DB.prepare(`INSERT INTO crm_files (deal_id, name, mime, size, data, created_by) VALUES (?,?,?,?,?,?)`).bind(id, name, mime, size, data, user.id).run();
+  await addEvent(env, id, 'file', `Dokumentum feltöltve: ${name}`, user.name);
   return json({ ok: true, file: { id: res.meta.last_row_id, name, mime, size } });
 }
 async function handleDownload(env, user, id, fid) {
@@ -197,7 +216,9 @@ async function handleDownload(env, user, id, fid) {
 }
 async function handleDeleteFile(env, user, id, fid) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
+  const f = await env.DB.prepare(`SELECT name FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
   await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).run();
+  if (f) await addEvent(env, id, 'file', `Dokumentum törölve: ${f.name}`, user.name);
   return json({ ok: true });
 }
 
@@ -262,7 +283,8 @@ async function handleContractSend(request, env, user, id) {
     `<p>Kedves ${esc(name || 'Ügyfelünk')}!</p><p>Csatoltan küldjük a(z) <b>${esc(title.toLowerCase())}</b> végleges példányát (PDF)${att.length > 1 ? ', valamint a kapcsolódó dokumentumokat' : ''}.</p>${msg ? `<p style="white-space:pre-line">${esc(msg)}</p>` : ''}<p>Kérjük, nézze át; kérdés esetén keressen minket bizalommal.</p><p>Üdvözlettel:<br>CarAdvance</p>`, att);
   if (!r.ok) return json({ error: r.error }, 502);
   const contract = { ...(card.contract || {}), text: input.text, vars: input.vars, sent_at: new Date().toISOString().slice(0, 19), sent_by: user.name, sent_to: fwd || to, sent_hash: hash, sent_files: fileIds };
-  await saveCard(env, id, { contract }, user.id);
+  await saveCard(env, id, { contract }, user.id, user.name);
+  await addEvent(env, id, 'contract', `Végleges szerződés elküldve e-mailben (${number}, ${fwd ? 'TESZT → ' + fwd : to})${att.length > 1 ? ' + ' + (att.length - 1) + ' dokumentum' : ''}`, user.name);
   return json({ ok: true, sentTo: fwd || to, test: !!fwd, contract });
 }
 
@@ -282,6 +304,8 @@ export async function onRequest(context) {
     let m = path.match(/^\/card\/(\d+)$/);
     if (m && method === 'GET') return await handleGetCard(env, user, Number(m[1]));
     if (m && method === 'PATCH') return await handlePatchCard(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/events$/);
+    if (m && method === 'GET') { const { error } = await loadDeal(env, user, Number(m[1])); if (error) return error; return json({ events: await listEvents(env, Number(m[1])) }); }
     m = path.match(/^\/card\/(\d+)\/offer$/);
     if (m && method === 'POST') return await handleSendOffer(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/files$/);
