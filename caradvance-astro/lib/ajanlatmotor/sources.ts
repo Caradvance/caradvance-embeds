@@ -35,10 +35,9 @@ const FUEL_CODE: Record<Fuel, string> = {
   electric: "ELECTRICITY", petrol: "PETROL", diesel: "DIESEL", hybrid: "HYBRID", phev: "HYBRID",
 };
 
-/** mobile.de feature codes for equipment the customer insists on (codes seen in live search URLs). */
+/** mobile.de feature codes (fe=) for must-have equipment; Panorama, HUD and Standheizung checked in a live search 2026-10. Tow bar is its own parameter (tct). */
 const FEATURE_CODE: Record<string, string> = {
   "Panorama-Dach": "PANORAMIC_GLASS_ROOF",
-  "Anhängerkupplung": "TRAILER_COUPLING",
   "Head-Up Display": "HEAD_UP_DISPLAY",
   "Standheizung": "AUXILIARY_HEATING",
   "Navigationssystem": "NAVIGATION_SYSTEM",
@@ -63,6 +62,7 @@ export function buildSearchUrl(req: Requirements, maxVehicleEur?: number): strin
   if (req.vehicle.km_max) p.set("ml", `:${req.vehicle.km_max}`);
   if (maxVehicleEur && maxVehicleEur > 1000) p.set("p", `:${Math.round(maxVehicleEur / 1000) * 1000}`);
   if (req.vehicle.gearbox === "automatic") p.set("tr", "AUTOMATIC_GEAR");
+  if ((req.vehicle.must_have_equipment || []).some((e) => /^anhängerkupplung/i.test(e))) p.set("tct", "TRAILER_COUPLING_FIX"); // fixed, detachable or swivelling
   for (const e of req.vehicle.must_have_equipment || []) {
     const code = Object.entries(FEATURE_CODE).find(([k]) => e.toLowerCase().startsWith(k.toLowerCase()))?.[1];
     if (code) p.append("fe", code);

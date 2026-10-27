@@ -148,7 +148,8 @@ describe("listing normalisation (extension input)", () => {
     expect(u.searchParams.get("c")).toBe("EstateCar");
     expect(u.searchParams.get("ft")).toBe("ELECTRICITY");
     expect(u.searchParams.get("p")).toBe(":55000");
-    expect(u.searchParams.getAll("fe")).toEqual(expect.arrayContaining(["PANORAMIC_GLASS_ROOF", "TRAILER_COUPLING"]));
+    expect(u.searchParams.getAll("fe")).toContain("PANORAMIC_GLASS_ROOF");
+    expect(u.searchParams.get("tct")).toBe("TRAILER_COUPLING_FIX");
   });
 });
 
