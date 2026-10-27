@@ -26,7 +26,7 @@ function checkUrl(u: string) {
 }
 
 async function verdict(env: Env, url: string): Promise<Seen> {
-  const key = "photo2:" + url.replace(/\?.*$/, "");
+  const key = "photo3:" + url.replace(/\?.*$/, "");
   const hit = await cacheGet<Seen>(env, key);
   if (hit) return hit;
   try {
