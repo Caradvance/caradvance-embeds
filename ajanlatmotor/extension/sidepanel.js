@@ -3,12 +3,15 @@ const $ = (id) => document.getElementById(id);
 const P = self.CaradvanceParser;
 const CRIT = ["price_gross_eur", "km", "first_registration", "power_kw"];
 let settings = null;
+// TESZT build: works out of the box against the test site; the belső login in this Chrome is enough (token optional).
+const DEFAULT_BASE = "https://ajanlatmotor-teszt.caradvance-astro.pages.dev";
 let current = null;
 
 async function api(path, opts = {}) {
   const r = await fetch(settings.base.replace(/\/$/, "") + "/api/ajanlatmotor/ext" + path, {
     ...opts,
-    headers: { Authorization: "Bearer " + settings.token, "Content-Type": "application/json", ...(opts.headers || {}) },
+    credentials: "include", // belső session cookie (ca_session) when no token is set
+    headers: { ...(settings.token ? { Authorization: "Bearer " + settings.token } : {}), "Content-Type": "application/json", ...(opts.headers || {}) },
   });
   let body = null;
   try { body = await r.json(); } catch (e) { /* empty */ }
@@ -33,7 +36,11 @@ async function loadRequests() {
   const sel = $("req");
   const r = await api("/requests");
   if (!r.ok) {
-    sel.innerHTML = `<option value="">${r.status === 401 ? "Érvénytelen token" : "A szerver nem érhető el"}</option>`;
+    sel.innerHTML = `<option value="">${r.status === 401 ? (settings.token ? "Érvénytelen token" : "Nincs belépve") : "A szerver nem érhető el"}</option>`;
+    if (r.status === 401 && !settings.token) {
+      const login = settings.base.replace(/\/$/, "") + "/belso/?next=" + encodeURIComponent("/belso/ajanlatmotor/");
+      $("reqHint").innerHTML = `Lépj be a belső felületre ebben a Chrome-ban, utána nyisd újra ezt a panelt: <a href="${login}" target="_blank">Belépés ↗</a>`;
+    }
     return;
   }
   const { lastReq } = await chrome.storage.local.get("lastReq");
@@ -152,8 +159,9 @@ async function openSearch() {
 }
 
 async function init() {
-  settings = (await chrome.storage.local.get("settings")).settings || null;
-  if (!settings?.base || !settings?.token) { $("setup").hidden = false; $("reqBox").hidden = true; return; }
+  settings = { base: DEFAULT_BASE, token: "", ...((await chrome.storage.local.get("settings")).settings || {}) };
+  if (!settings.base) { $("setup").hidden = false; $("reqBox").hidden = true; return; }
+  $("setup").hidden = true; $("reqBox").hidden = false;
   $("env").hidden = !/localhost|127\.0\.0\.1|pages\.dev/.test(settings.base);
   await parserConfig();
   await loadRequests();

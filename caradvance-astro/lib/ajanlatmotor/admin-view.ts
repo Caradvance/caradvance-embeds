@@ -252,7 +252,7 @@ export function settingsPage(o: { version: number; rates: RateConfig; history: {
 
 export function extensionPage(tokens: { id: string; user_name: string; label: string | null; created_at: string; last_used_at: string | null; revoked_at: string | null }[], newToken: string | null, baseUrl: string, isAdminUser: boolean) {
   return `<h1>Chrome bővítmény (Caradvance Sourcing)</h1>
-  <p class="muted">A bővítménnyel egy kattintással küldhetsz autót egy mobile.de hirdetésről az ügyfél ajánlatába. Mindenki a saját tokenjét használja; a bővítmény azt látja, amit te a belső felületen.${isAdminUser ? " Adminként mindenki tokenjét látod." : ""}</p>
+  <p class="muted">A bővítménnyel egy kattintással küldhetsz autót egy mobile.de hirdetésről az ügyfél ajánlatába. Ha ebben a Chrome-ban be vagy lépve a belső felületre, a bővítmény token nélkül működik, és azt látja, amit te. Token csak más böngészőhöz kell.${isAdminUser ? " Adminként mindenki tokenjét látod." : ""}</p>
   ${newToken ? `<div class="msg">Új token (most másold ki, többet nem látszik):<br><code style="font-size:15px;user-select:all">${esc(newToken)}</code><br>Szerver címe a bővítményben: <code style="user-select:all">${esc(baseUrl)}</code></div>` : ""}
   <form method="post" action="/belso/ajanlatmotor/bovitmeny" class="card row"><input name="label" placeholder="Melyik gép? (pl. irodai laptop)" style="max-width:320px"><button class="btn red">Saját token létrehozása</button></form>
   <div class="card" style="padding:0"><table><thead><tr><th>Felhasználó</th><th>Megjegyzés</th><th>Létrehozva</th><th>Utoljára használva</th><th></th></tr></thead><tbody>
@@ -261,7 +261,7 @@ export function extensionPage(tokens: { id: string; user_name: string; label: st
   </tbody></table></div>
   <div class="card"><h2>Telepítés</h2><ol><li>Töltsd le a bővítményt: <a href="/belso/ajanlatmotor-bovitmeny.zip">ajanlatmotor-bovitmeny.zip</a>, és csomagold ki.</li>
   <li>Chrome → <code>chrome://extensions</code> → Fejlesztői mód be → „Kicsomagolt bővítmény betöltése” → a kicsomagolt mappa.</li>
-  <li>A bővítmény beállításaiban: szerver címe + a fenti token.</li><li>Nyiss meg egy mobile.de hirdetést → „Küldés az ajánlatba”.</li></ol></div>`;
+  <li>Maradj belépve a belső felületre ugyanebben a Chrome-ban (token nem kell).</li><li>Nyiss meg egy mobile.de hirdetést → „Küldés az ajánlatba”.</li></ol></div>`;
 }
 
 export function startPage(deal: DealRow) {

@@ -22,13 +22,13 @@ ext.use("*", async (c, next) => {
   const allowed = sameOrigin || (id ? origin === `chrome-extension://${id}` : origin.startsWith("chrome-extension://") || !origin);
   if (c.req.method === "OPTIONS") {
     return c.body(null, allowed ? 204 : 403, allowed ? {
-      "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "GET, POST", "Access-Control-Allow-Headers": "Authorization, Content-Type", "Access-Control-Max-Age": "600",
+      "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Credentials": "true", "Access-Control-Allow-Methods": "GET, POST", "Access-Control-Allow-Headers": "Authorization, Content-Type", "Access-Control-Max-Age": "600",
     } : {});
   }
   if (origin && !allowed) return c.json({ error: "origin not allowed" }, 403);
   await ensureAm(c.env);
   await next();
-  if (origin && !sameOrigin) c.res.headers.set("Access-Control-Allow-Origin", origin);
+  if (origin && !sameOrigin) { c.res.headers.set("Access-Control-Allow-Origin", origin); c.res.headers.set("Access-Control-Allow-Credentials", "true"); }
   c.res.headers.set("Vary", "Origin");
   c.res.headers.set("Cache-Control", "no-store");
 });
@@ -44,13 +44,17 @@ ext.get("/mock-img/:ad/:file", (c) => {
 ext.use("/ext/*", async (c, next) => {
   const h = c.req.header("Authorization") || "";
   const token = h.startsWith("Bearer ") ? h.slice(7).trim() : "";
-  // Same-origin calls from a logged-in belső page (e.g. bulk import tools) use the belső session instead of a token.
-  // Cross-site requests never reach this branch: a foreign Origin is rejected above, and the cookie is SameSite.
+  // Without a token the belső session (ca_session) is used: from the site itself, or from the Caradvance extension
+  // (its origin passed the check above). Foreign web origins were rejected above, so a POST can't be forged
+  // cross-site; a GET without Origin only returns data to the logged-in user's own browser.
   if (!token) {
     const origin = c.req.header("Origin") || "";
     const site = c.req.header("Sec-Fetch-Site") || "";
     const self = new URL(c.req.url).origin;
-    if ((origin === self && (site === "same-origin" || site === "")) || (!origin && site === "same-origin")) {
+    const fromSite = origin === self && (site === "same-origin" || site === "");
+    const fromExtension = origin.startsWith("chrome-extension://");
+    const plainGet = !origin && c.req.method === "GET";
+    if (fromSite || fromExtension || plainGet) {
       const su = await sessionUser(c.env, c.req.raw);
       if (su) { c.set("user", su); return next(); }
     }
