@@ -223,7 +223,7 @@ var CADV_SYNC = (function () {
     var out = text.replace(secLit[1], function () { return secB64; });
     var sl = jsStrLit(out, 'STRIP');
     out = out.slice(0, sl.start) + JSON.stringify(stripNew) + out.slice(sl.end);
-    out = out.replace(/const SUB_TOTAL = \d+;/, 'const SUB_TOTAL = ' + recs.length + ';');
+    out = out.replace(/const SUB_TOTAL = \d+;/, 'const SUB_TOTAL = ' + report.totalCars + ';');
     report.modelsBefore = subOld.models.length; report.modelsAfter = models.length;
     report.carsBefore = subOld.models.reduce(function (a, m) { return a + m.count; }, 0);
     report.fileChanged = out !== text;
