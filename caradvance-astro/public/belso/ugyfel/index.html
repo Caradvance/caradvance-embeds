@@ -147,6 +147,7 @@
     .sec>.sb{padding:14px}
   }
 </style>
+<link rel="stylesheet" href="/belso/belso-ui.css?v=1">
 </head>
 <body>
 <div class="top"><div class="top-in">
@@ -555,5 +556,6 @@ var __lt=null;
 function refreshLog(){clearTimeout(__lt);__lt=setTimeout(function(){api('/card/'+ID+'/events').then(function(j){S.events=j.events;renderLog();}).catch(function(){});},400);}
 window.addEventListener('beforeunload',function(e){if(CT.dirty){e.preventDefault();e.returnValue='';}});
 </script>
+<script src="/belso/belso-ui.js?v=1" defer></script>
 </body>
 </html>
