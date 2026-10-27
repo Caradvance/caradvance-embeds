@@ -242,9 +242,9 @@
       '.caf{--r:#E2001A;--ink:#141519;--mut:#5A6B82;--ln:#E6EAF1;--bg:#F4F6F9;--bl:#1D5FD1}',
       '.caf.cain-modal{font-family:inherit!important}',
 
-      '.caf .caf-card{width:min(760px,100%)!important;max-width:760px!important;padding:22px 28px 0!important;border-radius:24px!important;scroll-behavior:smooth}',
+      '.caf .caf-card{width:min(760px,100%)!important;max-width:760px!important;padding:0 28px 0!important;border-radius:24px!important;scroll-behavior:smooth}',
       /* fejléc */
-      '.caf .caf-top{display:grid!important;grid-template-columns:230px minmax(0,1fr);gap:22px;align-items:center;margin:0 0 14px!important;padding-right:40px!important}',
+      '.caf .caf-top{display:grid!important;grid-template-columns:230px minmax(0,1fr);gap:22px;align-items:center;margin:22px 0 14px!important;padding-right:40px!important}',
       '.caf .caf-top>img{width:100%!important;height:136px!important;object-fit:contain!important;background:linear-gradient(180deg,#f3f5f9,#e9edf3);border-radius:14px!important;padding:6px;box-sizing:border-box;filter:none}',
       '.caf .caf-top h3{font-size:24px!important;line-height:1.15!important;margin:4px 0 10px!important;letter-spacing:-.01em;color:var(--ink)!important}',
       '.caf .caf-top h3.long{font-size:19px!important}',
@@ -359,7 +359,8 @@
       '.caf-b1 .caf-ic,.caf-b0 .caf-ic{width:20px;height:20px;color:currentColor}',
       /* mobil */
       '@media(max-width:640px){',
-      '.caf .caf-card{width:100%!important;max-height:100dvh!important;height:100dvh;border-radius:0!important;padding:18px 16px 0!important;margin:0!important}',
+      '.caf .caf-card{width:100%!important;max-height:100dvh!important;height:100dvh;border-radius:0!important;padding:0 16px 0!important;margin:0!important}',
+      '.caf .caf-top{margin-top:16px!important}',
       '.caf{padding:0!important;align-items:stretch!important}',
       '.caf .caf-top{grid-template-columns:1fr;gap:10px;padding-right:0!important;text-align:left}',
       '.caf .caf-top>img{height:120px!important}',
@@ -474,7 +475,7 @@
           if (window.innerWidth <= 640) top = M.stepper.offsetTop;
           else {
             var cr = card.getBoundingClientRect(), sr = sec.getBoundingClientRect();
-            top = card.scrollTop + (sr.top - cr.top) - M.stepper.offsetHeight - 14;
+            top = card.scrollTop + (sr.top - cr.top) - M.stepper.offsetHeight - 16;
           }
           card.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
         };
