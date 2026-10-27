@@ -18,26 +18,28 @@ const CAR = /^(exterior|interior|wheel|wheels|engine|trunk|boot|detail|car|seat|
 const NOT_CAR = /^(logo|banner|text|people|person|building|other|advertisement|document|map)\b/;
 
 type Verdict = "car" | "other" | "error";
+type Seen = { v: Verdict; c?: string };
 
 /** Smaller mobile.de rendition is enough for the check. */
 function checkUrl(u: string) {
   return /classistatic\.de/.test(u) ? u.replace(/rule=mo-\d+\.jpg/, "rule=mo-640.jpg") : u;
 }
 
-async function verdict(env: Env, url: string): Promise<Verdict> {
+async function verdict(env: Env, url: string): Promise<Seen> {
   const key = "photo2:" + url.replace(/\?.*$/, "");
-  const hit = await cacheGet<{ v: Verdict }>(env, key);
-  if (hit) return hit.v;
+  const hit = await cacheGet<Seen>(env, key);
+  if (hit) return hit;
   try {
     const { text } = await ask(env, url);
     const a = text.trim().toLowerCase().replace(/^[^a-z]+/, "");
     const v: Verdict = CAR.test(a) ? "car" : NOT_CAR.test(a) ? "other" : "error";
     if (v === "error") lastPhotoError = "unexpected answer: " + text.slice(0, 200);
-    if (v !== "error") await cachePut(env, key, { v }, 60 * 60 * 24 * 90);
-    return v;
+    const c = a.split(/[^a-z]/)[0];
+    if (v !== "error") await cachePut(env, key, { v, c }, 60 * 60 * 24 * 90);
+    return { v, c };
   } catch (e: any) {
     lastPhotoError = String(e?.message || e).slice(0, 300);
-    return "error";
+    return { v: "error" };
   }
 }
 
@@ -121,11 +123,15 @@ export interface PhotoCheck { images: string[]; removed: string[]; checked: bool
 export async function filterCarPhotos(env: Env, images: string[]): Promise<PhotoCheck> {
   if (!env.AI || !images.length) return { images, removed: [], checked: false };
   const head = images.slice(0, MAX_IMAGES);
-  const verdicts = await Promise.all(head.map((u) => verdict(env, u)));
-  const keep = head.filter((_, i) => verdicts[i] !== "other");
-  const removed = head.filter((_, i) => verdicts[i] === "other");
+  const seen = await Promise.all(head.map((u) => verdict(env, u)));
+  const kept = head.map((u, i) => ({ u, s: seen[i] })).filter((x) => x.s.v !== "other");
+  const removed = head.filter((_, i) => seen[i].v === "other");
+  // the cover (first photo) should show the car from outside
+  const ext = kept.findIndex((x) => x.s.c === "exterior");
+  if (ext > 0) kept.unshift(...kept.splice(ext, 1));
+  const keep = kept.map((x) => x.u);
   // a failed check keeps the image but the listing counts as unchecked
-  const checked = !verdicts.includes("error");
+  const checked = !seen.some((x) => x.v === "error");
   return { images: keep.length ? keep : [], removed, checked };
 }
 
