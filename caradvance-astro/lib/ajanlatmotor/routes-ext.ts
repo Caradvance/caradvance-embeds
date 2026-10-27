@@ -4,7 +4,7 @@
  */
 import { Hono } from "hono";
 import type { Env, Requirements } from "./types";
-import { baseUrl, cacheGet, canSeeDeal, ensureAm, isAdmin, isTest, logEvent, nowIso, rateLimit, type Staff } from "./am";
+import { baseUrl, cacheGet, canSeeDeal, ensureAm, isAdmin, isTest, logEvent, nowIso, rateLimit, sessionUser, type Staff } from "./am";
 import { addListing, getRequest } from "./engine";
 import { buildSearchUrl, ListingValidationError, normalizeListing } from "./sources";
 import { mockImageSvg } from "./mock";
@@ -18,7 +18,8 @@ export const ext = new Hono<H>({ strict: false }).basePath("/api/ajanlatmotor");
 ext.use("*", async (c, next) => {
   const origin = c.req.header("Origin") || "";
   const id = c.env.AM_EXTENSION_ID as string | undefined;
-  const allowed = id ? origin === `chrome-extension://${id}` : origin.startsWith("chrome-extension://") || !origin;
+  const sameOrigin = !!origin && origin === new URL(c.req.url).origin;
+  const allowed = sameOrigin || (id ? origin === `chrome-extension://${id}` : origin.startsWith("chrome-extension://") || !origin);
   if (c.req.method === "OPTIONS") {
     return c.body(null, allowed ? 204 : 403, allowed ? {
       "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "GET, POST", "Access-Control-Allow-Headers": "Authorization, Content-Type", "Access-Control-Max-Age": "600",
@@ -27,7 +28,7 @@ ext.use("*", async (c, next) => {
   if (origin && !allowed) return c.json({ error: "origin not allowed" }, 403);
   await ensureAm(c.env);
   await next();
-  if (origin) c.res.headers.set("Access-Control-Allow-Origin", origin);
+  if (origin && !sameOrigin) c.res.headers.set("Access-Control-Allow-Origin", origin);
   c.res.headers.set("Vary", "Origin");
   c.res.headers.set("Cache-Control", "no-store");
 });
@@ -43,6 +44,17 @@ ext.get("/mock-img/:ad/:file", (c) => {
 ext.use("/ext/*", async (c, next) => {
   const h = c.req.header("Authorization") || "";
   const token = h.startsWith("Bearer ") ? h.slice(7).trim() : "";
+  // Same-origin calls from a logged-in belső page (e.g. bulk import tools) use the belső session instead of a token.
+  // Cross-site requests never reach this branch: a foreign Origin is rejected above, and the cookie is SameSite.
+  if (!token) {
+    const origin = c.req.header("Origin") || "";
+    const site = c.req.header("Sec-Fetch-Site") || "";
+    if (origin === new URL(c.req.url).origin && (site === "same-origin" || site === "")) {
+      const su = await sessionUser(c.env, c.req.raw);
+      if (su) { c.set("user", su); return next(); }
+    }
+    return c.json({ error: "missing token" }, 401);
+  }
   if (token.length < 20) return c.json({ error: "missing token" }, 401);
   const row = await c.env.DB.prepare(`SELECT t.id, u.id AS uid, u.email, u.name, u.role FROM am_ext_tokens t JOIN users u ON u.id = t.user_id
       WHERE t.token_hash = ? AND t.revoked_at IS NULL`).bind(await hashExtToken(token)).first<{ id: string; uid: number; email: string; name: string; role: string }>();
