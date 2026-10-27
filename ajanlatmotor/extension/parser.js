@@ -253,7 +253,11 @@
     // equipment list
     var fi = html.search(/data-testid="vip-features-(list|content)"/);
     if (fi !== -1) {
-      var chunk = html.slice(fi, fi + 40000), items = [], lre = /<li[^>]*>([\s\S]*?)<\/li>/gi;
+      var chunk = html.slice(fi, fi + 40000);
+      // stop at the next page block (dealer description, technical data …): only mobile.de's own feature list counts
+      var nx = chunk.slice(20).search(/data-testid="(?!vip-features-(list|content))[^"]*"/);
+      if (nx !== -1) chunk = chunk.slice(0, nx + 20);
+      var items = [], lre = /<li[^>]*>([\s\S]*?)<\/li>/gi;
       while ((m = lre.exec(chunk))) { var t = txt(m[1]); if (t && t.length < 80 && items.indexOf(t) === -1) items.push(t); }
       if (items.length) out.equipment = items;
     }
@@ -295,6 +299,10 @@
     if (Object.keys(l3).length) layers.push("dom");
     set(out, l1); set(out, l2); set(out, l3);
     splitMakeModel(out);
+    if (!out.variant && out.title && out.model) {
+      var ti = out.title.toLowerCase().indexOf(String(out.model).toLowerCase());
+      if (ti !== -1) out.variant = out.title.slice(ti + String(out.model).length).trim() || null;
+    }
     // new car (0 km, no first registration yet): it is registered now, in Hungary
     if (!out.first_registration && (out.condition === "new" || out.km === 0)) {
       var d = new Date();

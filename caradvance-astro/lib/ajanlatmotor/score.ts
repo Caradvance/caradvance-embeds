@@ -18,7 +18,7 @@ export function hardFilter(l: Listing, req: Requirements, costs: CostResult): st
   const v = req.vehicle;
   const r: string[] = [];
   if (v.makes.length && !v.makes.some((m) => norm(l.make).includes(norm(m)) || norm(m).includes(norm(l.make)))) r.push("márka");
-  if (v.models.length && !v.models.some((m) => norm(`${l.model} ${l.variant || ""}`).includes(norm(m)))) r.push("modell");
+  if (v.models.length && !v.models.some((m) => { const hay = ` ${norm(`${l.model} ${l.variant || ""} ${l.title || ""}`)} `; return norm(m).split(" ").every((t) => hay.includes(` ${t} `)); })) r.push("modell");
   if (v.fuel.length && !v.fuel.includes(l.fuel)) r.push("üzemanyag");
   if (v.gearbox && v.gearbox !== l.gearbox) r.push("váltó");
   const year = Number(l.first_registration.slice(0, 4));
