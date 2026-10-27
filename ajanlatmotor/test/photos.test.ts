@@ -21,19 +21,28 @@ function fakeDb() {
 const img = (n: string) => `https://img.classistatic.de/api/v1/mo-prod/images/aa/${n}?rule=mo-1024.jpg`;
 
 describe("car-photo filter", () => {
-  it("removes logos and banners, keeps car photos, checks the small rendition", async () => {
-    const seen: string[] = [];
-    const AI = { async run(_m: string, i: any) { seen.push(i.image); return { answer: /banner|logo/.test(i.image) ? "No" : "Yes." }; } };
+  const realFetch = globalThis.fetch;
+  const fetched: string[] = [];
+  // image bytes = the file name, so the fake model can "see" what the picture is
+  const stubFetch = () => { globalThis.fetch = (async (u: string) => { fetched.push(String(u)); return new Response(String(u).match(/images\/aa\/(\w+)/)![1], { headers: { "content-type": "image/jpeg" } }); }) as any; };
+  const seen = (dataUri: string) => atob(dataUri.split(",")[1]);
+
+  it("removes logos and banners, keeps exterior and interior photos, uses the small rendition", async () => {
+    stubFetch();
+    const AI = { async run(_m: string, i: any) { const n = seen(i.image); return { answer: n === "banner" ? "Banner" : n === "logo" ? "logo." : n === "interior" ? "Interior" : "exterior" }; } };
     const r = await filterCarPhotos({ DB: fakeDb(), AI } as any, [img("banner"), img("front"), img("logo"), img("interior")]);
+    globalThis.fetch = realFetch;
     expect(r.images).toEqual([img("front"), img("interior")]);
     expect(r.removed.length).toBe(2);
     expect(r.checked).toBe(true);
-    expect(seen.every((u) => u.includes("rule=mo-640.jpg"))).toBe(true);
+    expect(fetched.every((u) => u.includes("rule=mo-640.jpg"))).toBe(true);
   });
 
   it("keeps images but stays unchecked when the model fails", async () => {
+    stubFetch();
     const AI = { async run() { throw new Error("down"); } };
     const r = await filterCarPhotos({ DB: fakeDb(), AI } as any, [img("a"), img("b")]);
+    globalThis.fetch = realFetch;
     expect(r.images.length).toBe(2);
     expect(r.checked).toBe(false);
   });

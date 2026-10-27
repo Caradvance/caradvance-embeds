@@ -9,9 +9,13 @@ import { cacheGet, cachePut } from "./am";
 
 export const PHOTO_MODEL = "@cf/moondream/moondream3.1-9B-A2B";
 const MAX_IMAGES = 12;
+/** Categorical question: the model names what it sees, we decide. Yes/no prompts proved unreliable for interiors. */
 const QUESTION =
-  "Is this a real photograph of a car or of part of a car (exterior, interior, seats, dashboard, steering wheel, wheels, boot or engine bay)? " +
-  "Answer no if the image is mainly a logo, a banner, an advertisement, a text or price graphic, a document, a map, people or a building. Answer only yes or no.";
+  "Classify this image with exactly one word from this list: exterior, interior, wheel, engine, trunk, detail, logo, banner, text, people, building, other. " +
+  "exterior = outside of a car; interior = inside of a car (seats, dashboard, steering wheel, screen); detail = close-up of a car part. " +
+  "Use logo, banner or text if the image is mainly a logo, an advertisement, a dealer graphic or written text. Answer with the one word only.";
+const CAR = /^(exterior|interior|wheel|wheels|engine|trunk|boot|detail|car|seat|seats|dashboard)\b/;
+const NOT_CAR = /^(logo|banner|text|people|person|building|other|advertisement|document|map)\b/;
 
 type Verdict = "car" | "other" | "error";
 
@@ -21,13 +25,13 @@ function checkUrl(u: string) {
 }
 
 async function verdict(env: Env, url: string): Promise<Verdict> {
-  const key = "photo:" + url.replace(/\?.*$/, "");
+  const key = "photo2:" + url.replace(/\?.*$/, "");
   const hit = await cacheGet<{ v: Verdict }>(env, key);
   if (hit) return hit.v;
   try {
     const { text } = await ask(env, url);
     const a = text.trim().toLowerCase().replace(/^[^a-z]+/, "");
-    const v: Verdict = /^(yes|igen|ja)\b/.test(a) ? "car" : /^(no|nem|nein)\b/.test(a) ? "other" : "error";
+    const v: Verdict = CAR.test(a) ? "car" : NOT_CAR.test(a) ? "other" : "error";
     if (v === "error") lastPhotoError = "unexpected answer: " + text.slice(0, 200);
     if (v !== "error") await cachePut(env, key, { v }, 60 * 60 * 24 * 90);
     return v;
@@ -73,7 +77,7 @@ function dataUri(b: { bytes: Uint8Array; type: string }) {
 }
 
 /**
- * 1) Moondream with the public URL, 2) Moondream with the image bytes, 3) LLaVA with the bytes.
+ * Moondream with the image bytes (it cannot fetch mobile.de URLs itself), then LLaVA as fallback.
  * The first non-empty answer wins; `trace` explains each attempt for diagnostics.
  */
 async function ask(env: Env, url: string): Promise<{ text: string; trace: string[] }> {
@@ -91,8 +95,7 @@ async function ask(env: Env, url: string): Promise<{ text: string; trace: string
       return "";
     }
   };
-  let text = await attempt("moondream-url", () => ai.run(PHOTO_MODEL, mq(checkUrl(url))));
-  if (text) return { text, trace };
+  let text = "";
   let img: { bytes: Uint8Array; type: string } | null = null;
   try { img = await imageBytes(url); } catch (e: any) { trace.push(String(e?.message || e)); }
   if (!img) throw new Error(trace.join(" | "));
