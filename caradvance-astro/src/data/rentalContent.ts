@@ -173,11 +173,11 @@ export const CONTENT: Record<string, RentalContent> = {
     overviewH2: 'BMW 4-es Coupé tartós bérlet — sportos kupé havidíjjal',
     guideIntro: 'A <strong>BMW 4-es Coupé</strong> a klasszikus, kétajtós sportkupé: alacsony, széles sziluett, a jellegzetes függőleges veserács és hátsókerék-hajtás. <strong>Tartós bérletben</strong> úgy élvezheted a kupé-életérzést, hogy nem kell a vételárral és a továbbeladással foglalkoznod.',
     guideBlocks: [ { h3: 'BMW 420i Coupé', html: 'A bérelhető <strong>420i</strong> négyhengeres benzinmotorral és 8 fokozatú Steptronic automatával érkezik: kulturált, mégis dinamikus — a mindennapi használatra és a hétvégi kanyargós utakra egyaránt.' } ],
-    design: { h3: 'Alacsony sziluett, markáns arc', text: 'A 4-es Coupé széles nyomtávja, lecsapott tetővonala és a nagy, függőleges veserács azonnal felismerhetővé teszi. A frissített modell keskenyebb fényszórókat és átrajzolt hátsó lámpákat kapott.', bullets: ['Függőleges BMW veserács', 'Adaptív LED fényszórók', 'M Sport kivitel, 18–19" keréktárcsák'], img: P('bmw-4-es-coupe', 'design'), alt: 'BMW 4-es Coupé és Cabrio' },
+    design: { h3: 'Alacsony sziluett, markáns arc', text: 'A 4-es Coupé széles nyomtávja, lecsapott tetővonala és a nagy, függőleges veserács azonnal felismerhetővé teszi. A frissített modell keskenyebb fényszórókat és átrajzolt hátsó lámpákat kapott.', bullets: ['Függőleges BMW veserács', 'Adaptív LED fényszórók', 'M Sport kivitel, 18–19" keréktárcsák'], img: P('bmw-4-es-coupe', 'design2'), alt: 'BMW 4-es Coupé oldalnézet' },
     interior: { h3: 'Sportos, digitális utastér', text: 'A BMW Curved Display, a sportülések és a vezetőre fordított kezelőfelület teszik teljessé a kupé-élményt. Elöl bőséges a hely, hátul alkalmi utasoknak kényelmes, a csomagtér 440 literes.', bullets: ['BMW Curved Display', 'Sportülések, M bőrkormány', 'Vezeték nélküli okostelefon-integráció'], img: P('bmw-4-es-coupe', 'interior'), alt: 'BMW 4-es Coupé belső tér' },
     boot: '440 liter', drive: 'Hátsókerék / 8 fok. Steptronic',
     specs: { '420i': { fuel: 'Benzin', power: '184 LE (135 kW)', torque: '300 Nm', accel: '7,5 mp', vmax: '240 km/h', rec: 'Kulturált, dinamikus kupé', note: 'négyhengeres benzines', img: P('bmw-4-es-coupe', 'g1') } },
-    gallery: G('bmw-4-es-coupe', 'BMW 4-es Coupé', [['g1', 'piros színben, Alpokban'], ['g2', 'stúdiófotó'], ['g3', 'fehér színben, pályán'], ['g4', 'kék színben, hegyi úton'], ['g5', 'elölnézet, hegyek között'], ['g6', 'hátsó háromnegyedes nézet'], ['g7', 'oldalnézet'], ['g8', 'LED fényszóró'], ['g9', 'hátulról, hegyek előtt'], ['g10', 'kék színben, mezőn']]),
+    gallery: G('bmw-4-es-coupe', 'BMW 4-es Coupé', [['g1', 'piros színben, Alpokban'], ['g2b', 'városban'], ['g3', 'fehér színben, pályán'], ['g4', 'kék színben, hegyi úton'], ['g5', 'elölnézet, hegyek között'], ['g6', 'hátsó háromnegyedes nézet'], ['g7', 'oldalnézet'], ['g8', 'LED fényszóró'], ['g9', 'hátulról, hegyek előtt'], ['g10', 'kék színben, mezőn']]),
   },
 
   'BMW 4er Cabrio': {
@@ -204,8 +204,8 @@ export const CONTENT: Record<string, RentalContent> = {
     mainImg: P('bmw-4-es-gran-coupe', 'main'), mainAlt: 'BMW 4-es Gran Coupé bérlés — négyajtós sportkupé tartós bérletben',
     heroVideo: '/caradvance-hero-x5.mp4', body: 'Gran Coupé',
     design: { h3: 'Négyajtós kupé-sziluett', text: 'Hosszú motorháztető, lecsapott tetővonal, keret nélküli ajtóablakok és nagy csomagtérajtó — a 4-es Gran Coupé a kupé eleganciáját a mindennapi praktikummal ötvözi.', bullets: ['Keret nélküli ajtóablakok', 'Adaptív LED fényszórók (felszereltségtől függően)', 'M Sport kivitel, 18–19" keréktárcsák'], img: P('bmw-4-es-gran-coupe', 'design'), alt: 'BMW 4-es Gran Coupé hátsó háromnegyedes nézet' },
-    interior: { h3: 'Sportos, vezetőközpontú utastér', text: 'Sportülések, M bőrkormány, digitális műszerfal és a vezető felé fordított középkonzol — hátul pedig négyajtós kényelem, a lecsapott tető ellenére is.', bullets: ['BMW Live Cockpit / Curved Display (évjárattól függően)', 'Sportülések, M bőrkormány', 'Vezeték nélküli Apple CarPlay / Android Auto'], img: P('bmw-4-es-gran-coupe', 'interior'), alt: 'BMW 4-es Gran Coupé vezetőtér' },
-    gallery: G('bmw-4-es-gran-coupe', 'BMW 4-es Gran Coupé', [['g1', 'piros színben, stúdiófotó'], ['g2', 'oldalnézet, stúdió'], ['g3', 'műszerfal']]),
+    interior: { h3: 'Sportos, vezetőközpontú utastér', text: 'Sportülések, M bőrkormány, digitális műszerfal és a vezető felé fordított középkonzol — hátul pedig négyajtós kényelem, a lecsapott tető ellenére is.', bullets: ['BMW Live Cockpit / Curved Display (évjárattól függően)', 'Sportülések, M bőrkormány', 'Vezeték nélküli Apple CarPlay / Android Auto'], img: P('bmw-4-es-gran-coupe', 'interior2'), alt: 'BMW 4-es Gran Coupé vezetőtér' },
+    gallery: G('bmw-4-es-gran-coupe', 'BMW 4-es Gran Coupé', [['g1', 'piros színben, stúdiófotó'], ['g2', 'oldalnézet, stúdió'], ['g4', 'városi utcán'], ['g5', 'hátulról'], ['g6', 'garázs előtt'], ['g7', 'keréktárcsa'], ['g3b', 'BMW Curved Display'], ['g8', 'sportülések']]),
     overviewH2: 'BMW 4-es Gran Coupé tartós bérlet — négyajtós sportkupé havidíjjal',
     guideIntro: 'A <strong>BMW 4-es Gran Coupé</strong> a kupé eleganciáját ötvözi a négyajtós praktikummal: lecsapott tetővonal, nagy csomagtérajtó és 470 literes csomagtér. <strong>Tartós bérletben</strong> egyetlen havi díjat fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
     guideBlocks: [ { h3: 'BMW 430d xDrive Gran Coupé', html: 'A bérelhető <strong>430d xDrive</strong> hathengeres dízelmotorral (286 LE, 650 Nm) és összkerékhajtással érkezik: erős, nyugodt és hosszú utakon kiemelkedően takarékos — igazi gran turismo.' } ],
@@ -267,5 +267,6 @@ const ALIAS: Record<string, string> = {
   'Seat Leon Sportstourer e-HYBRID': 'Seat Leon Sportstourer',
   'Audi A5 Avant e-hybrid': 'Audi A5 Avant',
   'Mercedes-Benz C-Klasse Limousine': 'Mercedes-Benz C-Klasse',
+  'Hyundai SANTA FE': 'Hyundai Santa Fe',
 };
 for (const [a, b] of Object.entries(ALIAS)) if (!CONTENT[a] && CONTENT[b]) CONTENT[a] = CONTENT[b];

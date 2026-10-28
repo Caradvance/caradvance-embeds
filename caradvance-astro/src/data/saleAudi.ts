@@ -21,7 +21,7 @@ export const SALE_AUDI: Record<string, SaleFacts> = {
       ['Audi A3 Limousine 35 TFSI', 'Benzin (mild-hybrid)', '150 LE (110 kW)', '250 Nm', ST(), '8,4 mp', '232 km/h'],
       ['Audi A3 Limousine 35 TDI', 'Dízel', '150 LE (110 kW)', '360 Nm', ST(), '8,4 mp', '232 km/h'],
     ],
-    boot: '425 liter', press: 'audi-a3lim', gal: [['g1', 'csomagtér'], ['g2', 'sportülések']],
+    boot: '425 liter', press: 'audi-a3lim', gal: [['g3', 'elölnézet, háromnegyedes'], ['g4', 'elölnézet'], ['g6', 'oldalnézet'], ['g5', 'műszerfal'], ['g1', 'csomagtér'], ['g2', 'sportülések']],
     design: ['Klasszikus kompakt limuzin', 'Széles Singleframe hűtőrács, választható digitális nappali menetfény-mintázat és elegáns, lapos tetővonal.', ['Matrix LED fényszóró (opció)', 'S line exteriőr (opció)', '17–19" keréktárcsák']],
     interior: ['Digitális Audi utastér', 'Vezetőre orientált műszerfal, ambient világítás és prémium anyagok.', [MMI3, 'Kétzónás klíma', 'Bang & Olufsen hangrendszer (opció)']],
     rel: ['a3sb-benzin', 'rs3lim-benzin', 'a5lim-benzin', 'mercedes-benz-a-osztaly'],

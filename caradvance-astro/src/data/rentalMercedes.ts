@@ -74,7 +74,7 @@ export const MERCEDES: Record<string, RentalContent> = {
     specs: {
       '180': { label: 'C 180', fuel: 'Benzin (mild-hybrid)', power: '170 LE (125 kW) + 23 LE EQ Boost', drive: 'Hátsókerék / 9G-TRONIC', rec: 'Takarékos prémium limuzin', note: 'négyhengeres benzines, 48 V mild-hybrid', img: P('mercedes-benz-c-osztaly', 'g1') },
     },
-    gallery: G('mercedes-benz-c-osztaly', 'Mercedes-Benz C-osztály', [['g1', 'folyóparton'], ['g2', 'naplementében'], ['g3', 'oldalnézet'], ['g4', 'menet közben'], ['g5', 'városban'], ['g6', 'modern épület előtt'], ['g7', 'töltés közben']]),
+    gallery: G('mercedes-benz-c-osztaly', 'Mercedes-Benz C-osztály', [['g1', 'folyóparton'], ['g3', 'oldalnézet'], ['g4', 'menet közben'], ['g5', 'városban'], ['g6', 'modern épület előtt'], ['g7', 'töltés közben']]),
     faqExtra: [],
   },
 
@@ -137,7 +137,7 @@ export const MERCEDES: Record<string, RentalContent> = {
       '200': { label: 'E 200', fuel: 'Benzin (mild-hybrid)', power: '204 LE (150 kW) + EQ Boost', drive: 'Hátsókerék / 9G-TRONIC', rec: 'Kifinomult, csendes', note: 'négyhengeres benzines, mild-hybrid', img: P('mercedes-benz-e-osztaly-limuzin', 'g2') },
       '200d': { label: 'E 200 d', fuel: 'Dízel', drive: 'Hátsókerék / 9G-TRONIC', rec: 'Takarékos, hosszú utakra', note: 'takarékos négyhengeres dízel', img: P('mercedes-benz-e-osztaly-limuzin', 'g3') },
     },
-    gallery: G('mercedes-benz-e-osztaly-limuzin', 'Mercedes-Benz E-osztály', [['g1', 'városi úton'], ['g2', 'hegyek között'], ['g3', 'hegyi úton'], ['g4', 'modern épület előtt'], ['g5', 'műszerfal'], ['g6', 'hangulatvilágítás'], ['g7', 'utas-kijelző']]),
+    gallery: G('mercedes-benz-e-osztaly-limuzin', 'Mercedes-Benz E-osztály', [['g1', 'városi úton'], ['g3', 'hegyi úton'], ['g4', 'modern épület előtt'], ['g5', 'műszerfal'], ['g6', 'hangulatvilágítás'], ['g7', 'utas-kijelző']]),
     faqExtra: [
       { q: 'Mekkora az E-osztály limuzin csomagtartója?', a: 'Az E-osztály limuzin csomagtere 540 literes (plug-in hibrideknél kisebb).' },
     ],
