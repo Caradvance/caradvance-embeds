@@ -9,7 +9,7 @@
  *
  * Használja: functions/api/belso-crm/[[path]].js (munkatárs) és functions/api/crm-ajanlat/[[path]].js (ügyfél).
  */
-import { Pdf, PW, ML, MR } from './szerzodes.js';
+import { renderDocPdf } from './docpdf.js';
 import { LESSOR } from './szerzodes-tpl.js';
 
 export const SITE = 'https://www.caradvance.hu';
@@ -559,55 +559,8 @@ export function fillTemplate(text, vars) {
 /* ============================== PDF ============================== */
 /** Egyszerű, egyhasábos szerződés-PDF a kitöltött szövegből (ugyanaz a betűkészlet, mint az online bérleti szerződésé). */
 export function contractPdfFromText(filled, meta) {
-  meta = meta || {};
-  const p = new Pdf();
-  const PH = 841.89;
-  const head = () => {
-    p.rect(0, PH - 58, PW, 58, '0.043 0.043 0.051'); p.rect(0, PH - 61, PW, 3, '0.886 0 0.102');
-    p.draw('CarAdvance', ML, PH - 36, 'B', 17, '1 1 1');
-    p.draw(meta.sub || 'Bérlés · Import · Eladás', ML, PH - 49, 'R', 8, '0.75 0.77 0.82');
-    const t = meta.number || ''; p.draw(t, PW - MR - p.width(t, 'R', 8.5), PH - 36, 'R', 8.5, '0.85 0.86 0.9');
-    p.y = PH - 84;
-  };
-  head();
-  const box = (x, y, on) => { p.cur.push(`0.25 0.28 0.35 RG 0.7 w ${x.toFixed(2)} ${(y - 1).toFixed(2)} 7.5 7.5 re S`); if (on) p.cur.push(`0.1 0.1 0.12 RG 1 w ${(x + 1.5).toFixed(2)} ${(y + 0.5).toFixed(2)} m ${(x + 6).toFixed(2)} ${(y + 5).toFixed(2)} l S ${(x + 6).toFixed(2)} ${(y + 0.5).toFixed(2)} m ${(x + 1.5).toFixed(2)} ${(y + 5).toFixed(2)} l S`); };
-  const cbTxt = (t) => String(t).replace(/^\[ \]\s*/, '☐ ').replace(/^\[x\]\s*/i, '☒ ').replace(/^☐ /, '[  ] ').replace(/^☒ /, '[X] ');
-  const lines = String(filled || '').split('\n');
-  let blank = false;
-  for (const raw of lines) {
-    const ln = raw.replace(/\t/g, '    ').replace(/\s+$/, '');
-    if (!ln.trim()) { if (!blank) p.y -= 5; blank = true; continue; }
-    blank = false;
-    if (/^\[oldaltörés\]$/i.test(ln.trim())) { p.newPage(); head(); continue; }
-    if (/^-{3,}$/.test(ln.trim())) { p.rule(); continue; }
-    if (/^(Kelt|Datum|Dátum|Kelt \/ Datum)\b/.test(ln)) p.ensure(110); // a keltezés maradjon együtt az aláírásokkal
-    const sg = ln.match(/^\[aláírás\]\s*(.*)$/i);
-    if (sg) { // aláírási blokk: vonal(ak), alatta a felek megnevezése
-      const parts = sg[1].split('|').map((x) => x.trim()).filter((x, i) => x || i === 0); const colW = (PW - ML - MR - 40) / 2; const x2 = ML + colW + 40;
-      p.ensure(80); p.y -= 40;
-      p.cur.push(`0.5 0.52 0.6 RG 0.6 w ${ML} ${p.y.toFixed(2)} m ${(ML + colW).toFixed(2)} ${p.y.toFixed(2)} l S`);
-      if (parts[1]) p.cur.push(`0.5 0.52 0.6 RG 0.6 w ${x2.toFixed(2)} ${p.y.toFixed(2)} m ${(PW - MR).toFixed(2)} ${p.y.toFixed(2)} l S`);
-      const y0 = p.y - 4; let yl = y0, yr = y0;
-      for (const l of p.wrap(parts[0] || '', 'B', 8.6, colW)) { yl -= 11; p.draw(l, ML, yl, 'B', 8.6); }
-      if (parts[1]) for (const l of p.wrap(parts[1], 'B', 8.6, colW)) { yr -= 11; p.draw(l, x2, yr, 'B', 8.6); }
-      p.y = Math.min(yl, yr) - 8; continue;
-    }
-    const isH1 = ln.startsWith('# '), isH2 = ln.startsWith('## ');
-    const body = isH1 ? ln.slice(2) : isH2 ? ln.slice(3) : ln;
-    if (body.indexOf('||') >= 0) { // kéthasábos sor (pl. DE || HU)
-      const [l, r] = body.split('||').map((x) => cbTxt(x.trim()));
-      if (isH1) { p.ensure(40); p.y -= 4; p.pair(l, r, { bold: true, size: 11.5, after: 6, colorEn: '0.08 0.08 0.1' }); continue; }
-      if (isH2) { p.ensure(34); p.y -= 6; p.pair(l, r, { bold: true, size: 9.4, after: 3, color: '0.886 0 0.102', colorEn: '0.886 0 0.102' }); continue; }
-      p.pair(l, r, { size: 8.4, after: 2.4, colorEn: '0.08 0.08 0.1' }); continue;
-    }
-    if (isH1) { p.ensure(30); p.y -= 4; p.para(body, { bold: true, size: 13.5, after: 6 }); continue; }
-    if (isH2) { p.ensure(34); p.y -= 6; p.para(body, { bold: true, size: 10.5, after: 3, color: '0.886 0 0.102' }); continue; }
-    const cb = ln.match(/^\[( |x)\]\s*(.*)$/i);
-    if (cb) { p.ensure(14); const y = p.y - 9.6 * 1.42; box(ML, y, cb[1].toLowerCase() === 'x'); p.para(cb[2], { size: 9.6, after: 2, indent: 13 }); continue; }
-    if (/^- /.test(ln)) { p.bullet(ln.slice(2), { size: 9.4 }); continue; }
-    p.para(ln, { size: 9.6, after: 2 });
-  }
-  return p.build({ title: meta.title || 'Szerződés', number: meta.number || '', hash: meta.hash || '' });
+  // a CarAdvance-arculatú dokumentummotor (lib/docpdf.js): logó, táblázatok, keretek, lábléc — a régi sablonokkal is működik
+  return renderDocPdf(filled, meta);
 }
 
 /* ============================== e-mail (Resend) ============================== */
