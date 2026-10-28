@@ -57,6 +57,9 @@
   .sub-h{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 10px}
   .chk{display:flex;align-items:center;gap:10px;font-weight:600;cursor:pointer;user-select:none}
   .chk input{width:18px;height:18px;accent-color:var(--red);flex:0 0 auto;margin:0}
+  .phase-h{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:800;color:var(--ink);margin:0 0 10px;padding:8px 12px;background:var(--line2);border-radius:10px}
+  .phase-h .sp{flex:1}.phase-h .pp{font-size:12.5px;min-width:36px;text-align:right}
+  .prog.sm{max-width:140px;min-width:80px;height:6px;display:inline-block}
   .cl{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
   @media(max-width:640px){.cl{grid-template-columns:1fr}}
   .cl .it{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:11px 13px;cursor:pointer}
@@ -163,7 +166,12 @@ var API='/api/belso-crm';
 var S={};          // a teljes betöltött állapot
 var INV=null;      // készlet
 var PICK=[];       // ajánlatba jelölt autók
-var CT={text:'',vars:{},fields:[],dirty:false}; // szerződés
+var CTS={};        // szerződés-piszkozatok sablononként ('' | Eladásnál 'berles' / 'eladas')
+var CTPL='';       // aktuális sablon
+var CT={text:'',vars:{},fields:[],dirty:false}; // az aktuális szerződés
+function isSale(){return S.deal&&S.deal.line==='Eladás';}
+function draftOf(key){var c=S.card.contract||{};return key?((c.drafts||{})[key]||{}):c;}
+function useTpl(key){CTPL=key;if(!CTS[key]){var d=draftOf(key);CTS[key]={text:d.text||'',vars:d.vars||{},fields:[],dirty:false};}CT=CTS[key];}
 var LCLASS={'Eladás':'eladas','Import':'import','Bérlés':'berles','Bizományos':'bizomanyos'};
 var LTAB={'Eladás':'eladas','Import':'import','Bérlés':'berles','Bizományos':'bizomanyos'};
 
@@ -197,8 +205,8 @@ function load(){
     S=j;
     S.card.data=normData(S.card.data,S.deal,S.card.address);
     $('backLink').href='/belso/#'+(LTAB[S.deal.line]||'');
-    renderHead();renderAll();
-    if(S.card.contract&&S.card.contract.text){CT.text=S.card.contract.text;CT.vars=S.card.contract.vars||{};loadTemplateFields(false);}
+    useTpl(isSale()?'berles':'');renderHead();renderAll();
+    if(CT.text)loadTemplateFields(false);
   }).catch(function(e){$('root').innerHTML='<div class="loading">'+esc(e.message)+'</div>';});
 }
 function normData(d,deal,addr){
@@ -211,6 +219,7 @@ function normData(d,deal,addr){
     contact_differs:!!d.contact_differs,
     contact:Object.assign({name:'',role:'',phone:'',email:''},d.contact||{}),
     vehicle:Object.assign({brand:'',model:'',year:'',vin:'',color:'',engine:'',fuel:'',km:'',hybrid:false},d.vehicle||{}),
+    buyer:{kind:d.buyer&&d.buyer.kind==='ceg'?'ceg':'magan',person:Object.assign({name:'',address:'',phone:'',email:'',tax:''},(d.buyer&&d.buyer.person)||{}),company:Object.assign({name:'',address:'',tax:'',reg:''},(d.buyer&&d.buyer.company)||{})},
     notes:d.notes||''
   };
 }
@@ -250,6 +259,7 @@ function inp(path,label,val,type,extra){
 function renderPersonal(){
   var d=S.card.data,p=d.person,c=d.company,k=d.contact;
   var h='<div class="seg" id="kindSeg"><button data-k="magan" class="'+(d.kind==='magan'?'on':'')+'">Magánszemély</button><button data-k="ceg" class="'+(d.kind==='ceg'?'on':'')+'">Cég</button></div>';
+  if(isSale())h='<div class="phase-h">1. ütem — Bérlő</div>'+h;
   h+='<div class="sub-h" style="margin-top:0">'+(d.kind==='ceg'?'Jelentkező':'Személyes adatok')+'</div><div class="grid">'
     +inp('person.name','Név',p.name)+inp('person.phone','Telefonszám',p.phone,'tel')+inp('person.email','E-mail',p.email,'email')
     +inp('person.address','Cím',p.address,'text',' wide')+(d.kind==='magan'?inp('person.tax','Adószám / adóazonosító',p.tax):'')+'</div>';
@@ -263,7 +273,18 @@ function renderPersonal(){
         +inp('contact.name','Név',k.name)+inp('contact.role','Beosztás',k.role)+inp('contact.phone','Telefonszám',k.phone,'tel')+inp('contact.email','E-mail',k.email,'email')+'</div>';
     }
   }
+  if(isSale()){
+    var B=d.buyer,bp=B.person,bc=B.company;
+    var same=(bp.name&&bp.name.trim().toLowerCase()===(p.name||'').trim().toLowerCase())||(bp.email&&bp.email.trim().toLowerCase()===(p.email||'').trim().toLowerCase())||(B.kind==='ceg'&&d.kind==='ceg'&&bc.name&&bc.name.trim().toLowerCase()===(c.name||'').trim().toLowerCase());
+    h+='<div class="phase-h" style="margin-top:26px">2. ütem — Vevő <span class="hint">(a vevő a bérlőtől eltérő személy / cég)</span></div>'
+      +(same?'<div id="buyerWarn" class="note" style="background:#fdeceb;border-color:#f8c9c9;color:#b8000f">Figyelem: a vevő adatai megegyeznek a bérlőével — a vevőnek különböznie kell a bérlőtől.</div>':'')
+      +'<div class="seg" id="buyerSeg"><button data-k="magan" class="'+(B.kind==='magan'?'on':'')+'">Magánszemély</button><button data-k="ceg" class="'+(B.kind==='ceg'?'on':'')+'">Cég</button></div>'
+      +(B.kind==='ceg'?'<div class="grid">'+inp('buyer.company.name','Cégnév',bc.name)+inp('buyer.company.tax','Adószám',bc.tax)+inp('buyer.company.reg','Cégjegyzékszám',bc.reg)+inp('buyer.company.address','Cím (székhely)',bc.address,'text',' wide')+'</div><div class="sub-h">Kapcsolattartó / képviselő</div>':'')
+      +'<div class="grid">'+inp('buyer.person.name','Név',bp.name)+inp('buyer.person.phone','Telefonszám',bp.phone,'tel')+inp('buyer.person.email','E-mail',bp.email,'email')
+      +inp('buyer.person.address','Cím',bp.address,'text',' wide')+(B.kind==='magan'?inp('buyer.person.tax','Adószám / adóazonosító',bp.tax):'')+'</div>';
+  }
   $('b1').innerHTML=h;
+  var bs=$('buyerSeg');if(bs)bs.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;d.buyer.kind=b.getAttribute('data-k');renderPersonal();saveData();});
   $('kindSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;d.kind=b.getAttribute('data-k');renderPersonal();saveData();});
   var cd=$('cDiff');if(cd)cd.addEventListener('change',function(){d.contact_differs=this.checked;renderPersonal();saveData();});
   bindInputs($('b1'));
@@ -271,18 +292,27 @@ function renderPersonal(){
 function bindInputs(root){
   root.querySelectorAll('input[data-p]').forEach(function(el){
     el.addEventListener('input',function(){
-      var parts=el.getAttribute('data-p').split('.'),o=S.card.data;
-      o[parts[0]][parts[1]]=el.type==='checkbox'?el.checked:el.value;
+      setPath(el.getAttribute('data-p'),el.type==='checkbox'?el.checked:el.value);
       saveDataSoon();
     });
-    if(el.type==='checkbox')el.addEventListener('change',function(){var parts=el.getAttribute('data-p').split('.');S.card.data[parts[0]][parts[1]]=el.checked;saveData();});
+    if(el.type==='checkbox')el.addEventListener('change',function(){setPath(el.getAttribute('data-p'),el.checked);saveData();});
   });
 }
+function setPath(path,val){var parts=path.split('.'),o=S.card.data;for(var i=0;i<parts.length-1;i++){if(!o[parts[i]])o[parts[i]]={};o=o[parts[i]];}o[parts[parts.length-1]]=val;}
 var __dt=null;
 function saveDataSoon(){clearTimeout(__dt);$('saveSt').className='savest';$('saveSt').textContent='…';__dt=setTimeout(saveData,800);}
 function saveData(){
   clearTimeout(__dt);saving();
-  return api('/card/'+ID,{method:'PATCH',body:{data:S.card.data}}).then(function(){saved();renderHead();}).catch(saveErr);
+  return api('/card/'+ID,{method:'PATCH',body:{data:S.card.data}}).then(function(){saved();renderHead();if(isSale())updateBuyerWarn();}).catch(saveErr);
+}
+
+function updateBuyerWarn(){
+  // a figyelmeztetést újrarajzolás nélkül frissítjük (a fókusz ne ugorjon el)
+  var d=S.card.data,p=d.person,c=d.company,B=d.buyer,bp=B.person,bc=B.company;
+  var same=(bp.name&&bp.name.trim().toLowerCase()===(p.name||'').trim().toLowerCase())||(bp.email&&bp.email.trim().toLowerCase()===(p.email||'').trim().toLowerCase())||(B.kind==='ceg'&&d.kind==='ceg'&&bc.name&&bc.name.trim().toLowerCase()===(c.name||'').trim().toLowerCase());
+  var w=document.getElementById('buyerWarn');
+  if(same&&!w){var seg=$('buyerSeg');if(seg){w=document.createElement('div');w.id='buyerWarn';w.className='note';w.style.cssText='background:#fdeceb;border-color:#f8c9c9;color:#b8000f';w.textContent='Figyelem: a vevő adatai megegyeznek a bérlőével — a vevőnek különböznie kell a bérlőtől.';seg.parentNode.insertBefore(w,seg);}}
+  else if(!same&&w)w.remove();
 }
 
 /* ---------------- 2. gépjármű ---------------- */
@@ -297,24 +327,31 @@ function renderVehicle(){
 }
 
 /* ---------------- 3. checklist ---------------- */
+function clItems(){return S.checklist.phases.reduce(function(a,p){return a.concat(p.items);},[]);}
 function renderChecklist(){
-  var cl=S.card.checklist||{},done=0;
-  $('b3').innerHTML='<div class="cl">'+S.checklist.map(function(c){
-    var st=cl[c[0]]||{};if(st.done)done++;
-    var last=c[0]==='atadva';
-    return '<label class="it'+(st.done?' done':'')+(last?' last':'')+'"><input type="checkbox" data-k="'+c[0]+'"'+(st.done?' checked':'')+' style="width:18px;height:18px;accent-color:var(--good)">'
-      +'<span class="lb">'+esc(c[1])+(last?' <span class="hint">→ státusz: Lezárva</span>':'')+'</span>'
-      +'<span class="meta">'+(st.done?esc(fmtDate(st.at))+(st.by?'<br>'+esc(st.by):''):'')+'</span></label>';
-  }).join('')+'</div>';
-  $('clProg').style.width=Math.round(done/S.checklist.length*100)+'%';$('clProg').style.background=done===S.checklist.length?'var(--good)':'var(--red)';
-  var pct=Math.round(done/S.checklist.length*100);
-  $('clCnt').innerHTML='<b style="color:var(--ink);font-size:14px">'+pct+'% kész</b> · '+done+' / '+S.checklist.length;
+  var cl=S.card.checklist||{},items=clItems(),rule=S.checklist.close,done=0;
+  items.forEach(function(c){if(cl[c[0]]&&cl[c[0]].done)done++;});
+  $('b3').innerHTML=S.checklist.phases.map(function(ph){
+    var pd=ph.items.filter(function(c){return cl[c[0]]&&cl[c[0]].done;}).length,pp=Math.round(pd/ph.items.length*100);
+    return (ph.title?'<div class="phase-h" style="margin-top:'+(ph===S.checklist.phases[0]?'0':'22px')+'">'+esc(ph.title)+'<span class="sp"></span><span class="prog sm"><i style="width:'+pp+'%;background:'+(pp===100?'var(--good)':'var(--red)')+'"></i></span><b class="pp">'+pp+'%</b></div>':'')
+      +'<div class="cl">'+ph.items.map(function(c){
+        var st=cl[c[0]]||{},last=rule===c[0];
+        return '<label class="it'+(st.done?' done':'')+(last?' last':'')+'"><input type="checkbox" data-k="'+c[0]+'"'+(st.done?' checked':'')+' style="width:18px;height:18px;accent-color:var(--good)">'
+          +'<span class="lb">'+esc(c[1])+(last?' <span class="hint">→ státusz: Lezárva</span>':'')+'</span>'
+          +'<span class="meta">'+(st.done?esc(fmtDate(st.at))+(st.by?'<br>'+esc(st.by):''):'')+'</span></label>';
+      }).join('')+'</div>';
+  }).join('')+(rule==='all'?'<div class="hint" style="margin-top:12px">Ha mindkét ütem minden feladata kész, a státusz „Lezárva” lesz.</div>':'');
+  var pct=Math.round(done/items.length*100);
+  $('clProg').style.width=pct+'%';$('clProg').style.background=done===items.length?'var(--good)':'var(--red)';
+  $('clCnt').innerHTML='<b style="color:var(--ink);font-size:14px">'+pct+'% kész</b> · '+done+' / '+items.length;
   $('b3').querySelectorAll('input[data-k]').forEach(function(el){
     el.addEventListener('change',function(){
       var k=el.getAttribute('data-k');
-      if(k==='atadva'&&el.checked&&!confirm('Az „Átadva” kipipálásával az ügyfél státusza „Lezárva” lesz. Folytatod?')){el.checked=false;return;}
-      var next={};S.checklist.forEach(function(c){next[c[0]]=!!(cl[c[0]]&&cl[c[0]].done);});
-      next[k]=el.checked;saving();
+      var next={};items.forEach(function(c){next[c[0]]=!!(cl[c[0]]&&cl[c[0]].done);});
+      next[k]=el.checked;
+      var closes=el.checked&&(rule==='all'?items.every(function(c){return next[c[0]];}):k===rule);
+      if(closes&&!confirm((rule==='all'?'Ezzel minden checklist-feladat kész':'Az „Átadva” kipipálásával')+' — az ügyfél státusza „Lezárva” lesz. Folytatod?')){el.checked=false;return;}
+      saving();
       api('/card/'+ID,{method:'PATCH',body:{checklist:next}}).then(function(r){
         S.card.checklist=r.checklist;if(r.status&&r.status!==S.card.status){S.card.status=r.status;renderHead();toast('Státusz: '+r.status);}
         renderChecklist();saved();
@@ -419,9 +456,12 @@ function renderOffers(){
 }
 
 /* ---------------- 5. szerződés + dokumentumok ---------------- */
+function tplName(){return CTPL==='berles'?'Bérleti szerződés':CTPL==='eladas'?'Adásvételi szerződés':S.deal.line;}
+function ctrRecipient(){return CTPL==='eladas'?(S.card.data.buyer.person.email||''):(S.card.data.person.email||S.deal.email||'');}
 function renderContract(){
-  var c=S.card.contract||{};
-  var h='<div class="actions" style="margin-top:0"><button class="btn dark" id="loadTpl">'+(c.text?'Tervezet újratöltése (alapértékekkel)':'Szerződéstervezet betöltése ('+esc(S.deal.line)+')')+'</button>'
+  var c=draftOf(CTPL);
+  var h=(isSale()?'<div class="seg" id="tplSeg"><button data-t="berles" class="'+(CTPL==='berles'?'on':'')+'">1. ütem — Bérleti szerződés (bérlő)</button><button data-t="eladas" class="'+(CTPL==='eladas'?'on':'')+'">2. ütem — Adásvételi szerződés (vevő)</button></div>':'')
+    +'<div class="actions" style="margin-top:0"><button class="btn dark" id="loadTpl">'+(CT.text?'Tervezet újratöltése (alapértékekkel)':'Szerződéstervezet betöltése ('+esc(tplName())+')')+'</button>'
     +'<span class="hint" id="draftInfo">'+(c.saved_at?'Piszkozat mentve: '+esc(fmtDate(c.saved_at))+(c.saved_by?' · '+esc(c.saved_by):''):'Még nincs mentett piszkozat.')
     +(c.sent_at?' · <b style="color:var(--good)">Elküldve: '+esc(fmtDate(c.sent_at))+'</b>':'')+'</span></div>'
     +'<div id="ctrBody" style="margin-top:14px"></div>'
@@ -429,6 +469,7 @@ function renderContract(){
     +'<div class="docs" id="docs"></div>'
     +'<div class="actions"><label class="btn ghost sm" style="cursor:pointer">+ Fájl feltöltése<input type="file" id="docUp" multiple style="display:none"></label><span class="hint">PDF / kép, max. 1,4 MB fájlonként. A bepipáltak a szerződéssel együtt mennek ki.</span></div>';
   $('b5').innerHTML=h;
+  var ts=$('tplSeg');if(ts)ts.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var t=b.getAttribute('data-t');if(t===CTPL)return;useTpl(t);renderContract();if(CT.text&&!CT.fields.length)loadTemplateFields(false);});
   $('loadTpl').addEventListener('click',function(){
     if(CT.text&&!confirm('A tervezet szövege és a változók visszaállnak az alapértékekre (a mentett piszkozat felülíródik, ha mentesz). Folytatod?'))return;
     loadTemplateFields(true);
@@ -438,7 +479,9 @@ function renderContract(){
   if(CT.text)renderCtrBody();
 }
 function loadTemplateFields(reset){
-  return api('/card/'+ID+'/contract/template').then(function(j){
+  var key=CTPL;
+  return api('/card/'+ID+'/contract/template'+(key?'?tpl='+key:'')).then(function(j){
+    if(key!==CTPL)return;
     CT.fields=j.fields;
     if(reset||!CT.text){CT.text=j.text;CT.vars=j.vars;CT.dirty=true;}
     else{for(var k in j.vars)if(CT.vars[k]===undefined)CT.vars[k]=j.vars[k];}
@@ -456,7 +499,7 @@ function renderCtrBody(){
     +'<div class="actions"><button class="btn ghost" id="saveDraft">Piszkozat mentése</button><button class="btn ghost" id="pdfPrev">PDF előnézet</button></div>'
     +'<div class="sub-h">Küldés az ügyfélnek</div>'
     +'<div class="fld"><label>Kísérő üzenet (nem kötelező)</label><textarea id="ctrMsg" rows="2" placeholder="Pl. Kérjük, aláírva küldje vissza, vagy hozza magával az átadásra."></textarea></div>'
-    +'<div class="actions"><button class="btn red" id="ctrSend">Végleges szerződés küldése e-mailben (PDF)</button><span class="hint">Címzett: <b>'+esc(S.card.data.person.email||S.deal.email||'—')+'</b> · a bepipált dokumentumok csatolva</span></div>';
+    +'<div class="actions"><button class="btn red" id="ctrSend">Végleges szerződés küldése e-mailben (PDF)</button><span class="hint">Címzett'+(CTPL==='eladas'?' (vevő)':CTPL==='berles'?' (bérlő)':'')+': <b>'+esc(ctrRecipient()||'—')+'</b> · a bepipált dokumentumok csatolva</span></div>';
   $('tplText').value=CT.text;
   el.querySelectorAll('input[data-v]').forEach(function(i){i.addEventListener('input',function(){CT.vars[i.getAttribute('data-v')]=i.value;CT.dirty=true;renderPreview();});});
   $('tplText').addEventListener('input',function(){CT.text=this.value;CT.dirty=true;renderPreview();});
@@ -480,28 +523,28 @@ function renderPreview(){
 }
 function saveDraft(){
   saving();
-  return api('/card/'+ID,{method:'PATCH',body:{contract:{text:CT.text,vars:CT.vars}}}).then(function(r){
-    CT.dirty=false;S.card.contract=Object.assign(S.card.contract||{},r.contract||{});saved();
-    $('draftInfo').textContent='Piszkozat mentve: '+fmtDate(r.contract&&r.contract.saved_at);toast('Piszkozat mentve');
+  return api('/card/'+ID,{method:'PATCH',body:{contract:{text:CT.text,vars:CT.vars,tpl:CTPL}}}).then(function(r){
+    CT.dirty=false;S.card.contract=r.contract||S.card.contract;saved();
+    $('draftInfo').textContent='Piszkozat mentve: '+fmtDate(draftOf(CTPL).saved_at);toast('Piszkozat mentve');
   }).catch(saveErr);
 }
 function pdfPreview(){
   var w=window.open('','_blank');
-  api('/card/'+ID+'/contract/pdf',{method:'POST',body:{text:CT.text,vars:CT.vars},raw:true}).then(function(r){return r.blob();}).then(function(b){
+  api('/card/'+ID+'/contract/pdf',{method:'POST',body:{text:CT.text,vars:CT.vars,tpl:CTPL},raw:true}).then(function(r){return r.blob();}).then(function(b){
     var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;
   }).catch(function(e){if(w)w.close();toast(e.message,4500);});
 }
 function sendContract(){
-  var em=S.card.data.person.email||S.deal.email;
-  if(!em)return toast('Az ügyfélnek nincs e-mail címe.');
+  var em=ctrRecipient();
+  if(!em)return toast(CTPL==='eladas'?'A vevőnek nincs e-mail címe (1. szekció, Vevő).':'Az ügyfélnek nincs e-mail címe.',4000);
   var files=[].slice.call(document.querySelectorAll('#docs input[data-f]:checked')).map(function(i){return parseInt(i.getAttribute('data-f'),10);});
   var empty=CT.fields.filter(function(f){return CT.text.indexOf('{{'+f.key)>=0&&!(CT.vars[f.key]&&String(CT.vars[f.key]).trim());}).map(function(f){return f.label;});
   if(empty.length&&!confirm('Üres mezők a szerződésben: '+empty.join(', ')+'.\nÍgy is elküldöd?'))return;
   if(!confirm('Elküldöd a végleges szerződést (PDF'+(files.length?' + '+files.length+' dokumentum':'')+') erre a címre: '+em+'?'))return;
   var b=$('ctrSend');b.disabled=true;b.textContent='Küldés…';
-  api('/card/'+ID+'/contract/send',{method:'POST',body:{text:CT.text,vars:CT.vars,files:files,message:$('ctrMsg').value}}).then(function(r){
+  api('/card/'+ID+'/contract/send',{method:'POST',body:{text:CT.text,vars:CT.vars,tpl:CTPL,files:files,message:$('ctrMsg').value}}).then(function(r){
     CT.dirty=false;S.card.contract=r.contract;refreshLog();toast(r.test?'Szerződés elküldve (TESZT: '+r.sentTo+')':'Szerződés elküldve: '+r.sentTo,4000);
-    $('draftInfo').innerHTML='Piszkozat mentve · <b style="color:var(--good)">Elküldve: '+esc(fmtDate(r.contract.sent_at))+'</b>';
+    $('draftInfo').innerHTML='Piszkozat mentve · <b style="color:var(--good)">Elküldve: '+esc(fmtDate(draftOf(CTPL).sent_at))+'</b>';
   }).catch(function(e){toast(e.message,6000);}).then(function(){b.disabled=false;b.textContent='Végleges szerződés küldése e-mailben (PDF)';});
 }
 function renderDocs(){
@@ -529,7 +572,7 @@ function uploadDocs(e){
   });
 }
 /* ---------------- 6. történésnapló ---------------- */
-var LOG_IC={status:'⇄',client:'★',opened:'👁',offer:'✉',contract:'📄',draft:'✎',checklist:'✓',file:'📎',data:'👤',vehicle:'🚗',create:'＋',start:'●'};
+var LOG_IC={status:'⇄',client:'★',opened:'👁',offer:'✉',contract:'📄',draft:'✎',checklist:'✓',file:'📎',data:'👤',buyer:'🤝',vehicle:'🚗',create:'＋',start:'●'};
 var LOG_GROUP={'':'Mind',status:'Státusz',client:'Ügyfél',offer:'Ajánlat',contract:'Szerződés',checklist:'Checklist'};
 var logFilter='';
 function renderLog(){
@@ -554,7 +597,7 @@ function renderLog(){
 }
 var __lt=null;
 function refreshLog(){clearTimeout(__lt);__lt=setTimeout(function(){api('/card/'+ID+'/events').then(function(j){S.events=j.events;renderLog();}).catch(function(){});},400);}
-window.addEventListener('beforeunload',function(e){if(CT.dirty){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',function(e){if(Object.keys(CTS).some(function(k){return CTS[k].dirty;})){e.preventDefault();e.returnValue='';}});
 </script>
 <script src="/belso/belso-ui.js?v=4" defer></script>
 </body>
