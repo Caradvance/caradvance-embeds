@@ -88,7 +88,14 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_events (
       id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, at TEXT DEFAULT (datetime('now')),
       actor TEXT DEFAULT '', kind TEXT DEFAULT '', text TEXT DEFAULT '')`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_events_deal ON crm_events (deal_id, id)`)
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_events_deal ON crm_events (deal_id, id)`),
+    // ügyletenkénti pénzügy: bevételek (eladási / bérleti ár) és költségek, számlával (crm_files)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_fin (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, kind TEXT NOT NULL DEFAULT 'cost', title TEXT DEFAULT '',
+      amount REAL NOT NULL DEFAULT 0, currency TEXT NOT NULL DEFAULT 'HUF', fx REAL, amount_huf REAL NOT NULL DEFAULT 0,
+      fdate TEXT DEFAULT '', note TEXT DEFAULT '', file_id INTEGER, created_by INTEGER, created_name TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')), updated_at TEXT)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_fin_deal ON crm_fin (deal_id)`)
   ]);
   READY = true;
 }
@@ -145,6 +152,28 @@ export async function getCard(env, dealId) {
   return { ...r, data: parseJ(r.data, {}), checklist: parseJ(r.checklist, {}), contract: parseJ(r.contract, {}), exists: true };
 }
 /** Részleges frissítés (upsert). fields: { status, address, data, checklist, contract } — az objektumokat egészben cseréli. */
+/* ============================== árfolyam ============================== */
+/** EUR→HUF napi árfolyam (frankfurter.dev, 1 órás cache). Hiba esetén null. */
+export async function eurHuf() {
+  const cache = (typeof caches !== 'undefined') ? caches.default : null;
+  const key = 'https://internal.cache/crm-fx-eur-huf';
+  try {
+    if (cache) { const c = await cache.match(key); if (c) return (await c.json()).rate; }
+    const r = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF');
+    if (!r.ok) return null;
+    const j = await r.json(); const rate = j && j.rates && j.rates.HUF;
+    if (!rate) return null;
+    if (cache) await cache.put(key, new Response(JSON.stringify({ rate }), { headers: { 'content-type': 'application/json', 'Cache-Control': 'max-age=3600' } }));
+    return rate;
+  } catch (e) { return null; }
+}
+/** Egy ügylet pénzügyi összesítője (HUF). */
+export function finSummary(items) {
+  const inc = items.filter((x) => x.kind === 'income').reduce((a, x) => a + (Number(x.amount_huf) || 0), 0);
+  const cost = items.filter((x) => x.kind === 'cost').reduce((a, x) => a + (Number(x.amount_huf) || 0), 0);
+  return { income: Math.round(inc), cost: Math.round(cost), profit: Math.round(inc - cost), margin: inc ? Math.round((inc - cost) / inc * 1000) / 10 : null };
+}
+
 /* ============================== történésnapló ============================== */
 /**
  * Egy bejegyzés az ügyfél történésnaplójába. mergeMin > 0: ha ugyanaz a szereplő ugyanilyen típusú
