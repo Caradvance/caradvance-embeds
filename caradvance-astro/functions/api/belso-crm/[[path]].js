@@ -6,7 +6,7 @@ import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
-  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile
 } from '../../../lib/crm.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
@@ -109,7 +109,7 @@ async function handleGetCard(env, user, id) {
 const PERSON_KEYS = ['name', 'address', 'phone', 'email', 'tax', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'residence', 'bank', 'licence'];
 const COMPANY_KEYS = ['name', 'address', 'tax', 'reg'];
 const CONTACT_KEYS = ['name', 'phone', 'email', 'role'];
-const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km'];
+const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km', 'ad_id', 'config_code'];
 function pick(src, keys, max) { const o = {}; src = src || {}; for (const k of keys) o[k] = clean(src[k], max || 200); return o; }
 function normVehicles(b) {
   const list = Array.isArray(b.vehicles) ? b.vehicles : vehiclesOf(b);
@@ -162,7 +162,9 @@ function normData(b) {
     vehicle: (() => { const v0 = normVehicles(b)[0]; return v0 ? { ...pick(v0, VEHICLE_KEYS), hybrid: !!v0.hybrid } : { ...pick({}, VEHICLE_KEYS), hybrid: false }; })(),
     // Eladás 2. üteme: a vevő (a bérlőtől eltérő személy / cég)
     buyer: { kind: b.buyer && b.buyer.kind === 'ceg' ? 'ceg' : 'magan', person: pick(b.buyer && b.buyer.person, PERSON_KEYS), company: pick(b.buyer && b.buyer.company, COMPANY_KEYS) },
-    notes: cleanMulti(b.notes, 4000)
+    notes: cleanMulti(b.notes, 4000),
+    // Import: az ügyfél igénye (a munkatárs pontosíthatja)
+    request: cleanMulti(b.request, 4000)
   };
 }
 
@@ -268,8 +270,12 @@ async function handleSendOffer(request, env, user, id) {
   const items = (Array.isArray(b.items) ? b.items : []).slice(0, 12).map((it) => ({
     key: clean(it.key, 120), title: clean(it.title, 200), brand: clean(it.brand, 60), year: clean(it.year, 30), km: clean(it.km, 40),
     fuel: clean(it.fuel, 40), power: clean(it.power, 40), gearbox: clean(it.gearbox, 40), image: /^https:\/\//.test(it.image || '') ? clean(it.image, 600) : '',
-    url: /^https:\/\//.test(it.url || '') ? clean(it.url, 400) : '', note: clean(it.note, 400),
-    price: Math.max(0, Number(it.price) || 0), currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(it.period, 20), deposit: Math.max(0, Number(it.deposit) || 0)
+    url: /^https:\/\//.test(it.url || '') && it.src !== 'mobile' ? clean(it.url, 400) : '', note: clean(it.note, 400),
+    price: Math.max(0, Number(it.price) || 0), currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(it.period, 20), deposit: Math.max(0, Number(it.deposit) || 0),
+    // forrás: készlet / mobile.de hirdetés (Import) / gyári konfigurátor (Eladás) / egyedi
+    src: ['inv', 'mobile', 'config', 'manual'].includes(it.src) ? it.src : 'manual', color: clean(it.color, 60),
+    ad_id: /^\d{6,12}$/.test(String(it.ad_id || '')) ? String(it.ad_id) : '', ad_url: /^https:\/\/([a-z0-9-]+\.)*mobile\.de\//i.test(it.ad_url || '') ? clean(it.ad_url, 400) : '',
+    src_price: Math.max(0, Number(it.src_price) || 0), config_code: clean(it.config_code, 60), file_id: Number.isInteger(it.file_id) ? it.file_id : null
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
   const message = cleanMulti(b.message, 2000).trim();
@@ -278,10 +284,17 @@ async function handleSendOffer(request, env, user, id) {
   const clientName = (card.data.kind === 'ceg' && card.data.contact_differs && card.data.contact && card.data.contact.name) || (card.data.person && card.data.person.name) || deal.name;
   const fwd = testForward(env);
   const subject = `${fwd ? '[TESZT — ' + to + '] ' : ''}Ajánlatunk — ${items.length > 1 ? items.length + ' autó' : items[0].title}`;
-  const r = await sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link }));
+  // a gyári konfigurátoros ajánlatok (PDF) csatolva
+  const att = [];
+  for (const it of items) {
+    if (!it.file_id) continue;
+    const f = await env.DB.prepare(`SELECT id, name, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(it.file_id, id).first();
+    if (f) att.push({ filename: f.name, content: await fileData(env, f) }); else it.file_id = null;
+  }
+  const r = await sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link }), att);
   await env.DB.prepare(`INSERT INTO crm_offers (token, deal_id, line, client_name, items, message, sent_to, sent, created_by) VALUES (?,?,?,?,?,?,?,?,?)`)
     .bind(token, id, deal.line || '', clientName || '', JSON.stringify(items), message, fwd || to, r.ok ? 1 : 0, user.id).run();
-  const carList = items.map((it) => `${it.title} (${priceLabel(it)})`).join('; ');
+  const carList = items.map((it) => `${it.title} (${priceLabel(it)}${it.ad_id ? ', mobile.de: ' + it.ad_id : ''}${it.config_code ? ', konfig.: ' + it.config_code : ''})`).join('; ');
   if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat küldése sikertelen — ${items.length} autó: ${carList}`, user.name); return json({ ok: false, error: r.error + ' — az ajánlat-link elkészült, kézzel is elküldheted.', link }, 502); }
   await addEvent(env, id, 'offer', `Ajánlat elküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${items.length} autó: ${carList}`, user.name);
   await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id, user.name, 'ajánlat elküldve');
@@ -382,23 +395,23 @@ async function handleUpload(request, env, user, id) {
   const data = String(b.data || '').replace(/^data:[^,]*,/, '');
   if (!data) return json({ error: 'Üres fájl.' }, 400);
   const size = Math.floor(data.length * 3 / 4);
-  if (size > MAX_FILE) return json({ error: 'A fájl legfeljebb 1,4 MB lehet.' }, 400);
+  if (size > DOC_MAX) return json({ error: 'A fájl legfeljebb 9 MB lehet.' }, 400);
   const name = clean(b.name, 160).replace(/[\\/]/g, '_') || 'dokumentum';
   const mime = /^[a-z]+\/[a-z0-9.+-]+$/i.test(b.mime || '') ? b.mime : 'application/octet-stream';
-  const res = await env.DB.prepare(`INSERT INTO crm_files (deal_id, name, mime, size, data, created_by) VALUES (?,?,?,?,?,?)`).bind(id, name, mime, size, data, user.id).run();
-  await addEvent(env, id, 'file', `Dokumentum feltöltve: ${name}`, user.name);
-  return json({ ok: true, file: { id: res.meta.last_row_id, name, mime, size } });
+  const res = await putFile(env, id, name, mime, data, user.id);
+  if (!b.silent) await addEvent(env, id, 'file', `Dokumentum feltöltve: ${name}`, user.name);
+  return json({ ok: true, file: { id: res.id, name, mime, size } });
 }
 async function handleDownload(env, user, id, fid) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const f = await env.DB.prepare(`SELECT * FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
   if (!f) return json({ error: 'Nem található.' }, 404);
-  return new Response(b64ToBytes(f.data), { headers: { 'content-type': f.mime, 'content-disposition': `inline; filename*=UTF-8''${encodeURIComponent(f.name)}`, 'cache-control': 'private, no-store' } });
+  return new Response(b64ToBytes(await fileData(env, f)), { headers: { 'content-type': f.mime, 'content-disposition': `inline; filename*=UTF-8''${encodeURIComponent(f.name)}`, 'cache-control': 'private, no-store' } });
 }
 async function handleDeleteFile(env, user, id, fid) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const f = await env.DB.prepare(`SELECT name FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
-  await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).run();
+  await deleteFile(env, id, fid);
   if (f) await addEvent(env, id, 'file', `Dokumentum törölve: ${f.name}`, user.name);
   return json({ ok: true });
 }
@@ -475,8 +488,8 @@ async function handleContractSend(request, env, user, id) {
   const fileIds = (Array.isArray(b.files) ? b.files : []).map(Number).filter(Number.isInteger).slice(0, 10);
   let total = pdf.length;
   for (const fid of fileIds) {
-    const f = await env.DB.prepare(`SELECT name, data, size FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
-    if (f) { total += f.size; att.push({ filename: f.name, content: f.data }); }
+    const f = await env.DB.prepare(`SELECT id, name, data, size FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
+    if (f) { total += f.size; att.push({ filename: f.name, content: await fileData(env, f) }); }
   }
   if (total > 30 * 1024 * 1024) return json({ error: 'A csatolmányok együtt túl nagyok (max. ~30 MB).' }, 400);
   const name = isSale ? ((buyer.person && buyer.person.name) || (buyer.company && buyer.company.name) || '')
@@ -714,8 +727,8 @@ async function handleDocsSend(request, env, user, id) {
     total += pdf.length; att.push({ filename: fname, content: bytesToB64(pdf) }); names.push(r.name); sentDocs.push(r);
   }
   for (const fid of fileIds) {
-    const f = await env.DB.prepare(`SELECT name, data, size FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
-    if (f) { total += f.size; att.push({ filename: f.name, content: f.data }); names.push(f.name); }
+    const f = await env.DB.prepare(`SELECT id, name, data, size FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
+    if (f) { total += f.size; att.push({ filename: f.name, content: await fileData(env, f) }); names.push(f.name); }
   }
   if (!att.length) return json({ error: 'A kijelölt dokumentumok nem találhatók.' }, 404);
   if (total > 30 * 1024 * 1024) return json({ error: 'A csatolmányok együtt túl nagyok (max. ~30 MB).' }, 400);
