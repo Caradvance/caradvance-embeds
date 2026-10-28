@@ -136,8 +136,18 @@ export async function ensureCrm(env) {
       created_by TEXT DEFAULT '', created_at TEXT DEFAULT (datetime('now')), updated_at TEXT, updated_by TEXT, sent_at TEXT, sent_to TEXT DEFAULT '')`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_docs_deal ON crm_docs (deal_id)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_settings (k TEXT PRIMARY KEY, v TEXT)`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_file_chunks (file_id INTEGER NOT NULL, idx INTEGER NOT NULL, data TEXT NOT NULL, PRIMARY KEY (file_id, idx))`)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_file_chunks (file_id INTEGER NOT NULL, idx INTEGER NOT NULL, data TEXT NOT NULL, PRIMARY KEY (file_id, idx))`),
+    // elektronikus aláírás: aláírási kérelmek (a link tokenje csak SHA-256 lenyomatként tárolódik), rate-limit számlálók
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_sign (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, deal_id INTEGER NOT NULL, signer_role TEXT NOT NULL DEFAULT 'client',
+      signer_name TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '', docs TEXT NOT NULL DEFAULT '[]', message TEXT DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'pending', created_by TEXT DEFAULT '', created_at TEXT DEFAULT (datetime('now')), expires_at INTEGER NOT NULL,
+      opened_at TEXT, code_hash TEXT, code_exp INTEGER, code_attempts INTEGER NOT NULL DEFAULT 0, fails INTEGER NOT NULL DEFAULT 0, otp_at TEXT,
+      signed_at TEXT, sign_name TEXT, sign_ip TEXT, sign_ua TEXT, sig_sha TEXT, result TEXT DEFAULT '[]', revoked_by TEXT)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_sign_deal ON crm_sign (deal_id)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)`)
   ]);
+  for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   READY = true;
 }
 
@@ -663,3 +673,18 @@ export function docVars(deal, card, vehicle, tpl, persons, seq) {
   for (const role of Object.keys(PERSON_ROLES)) Object.assign(base, personVars(role, (persons || {})[role]));
   return base;
 }
+
+/* ============================== elektronikus aláírás — segédfüggvények ============================== */
+/** Egyszerű, D1-alapú rate limit: k kulcsra max n kérés / win másodperc. true = mehet. */
+export async function rateOk(env, k, n, win) {
+  const now = Math.floor(Date.now() / 1000);
+  const r = await env.DB.prepare(`SELECT n, reset FROM crm_rate WHERE k = ?`).bind(k).first();
+  if (!r || r.reset < now) { await env.DB.prepare(`INSERT OR REPLACE INTO crm_rate (k, n, reset) VALUES (?, 1, ?)`).bind(k, now + win).run(); return true; }
+  if (r.n >= n) return false;
+  await env.DB.prepare(`UPDATE crm_rate SET n = n + 1 WHERE k = ?`).bind(k).run();
+  return true;
+}
+export function randomDigits(n) { const a = new Uint32Array(n); crypto.getRandomValues(a); return [...a].map((x) => String(x % 10)).join(''); }
+export function maskEmail(e) { const [u, d] = String(e || '').split('@'); if (!d) return ''; return u.slice(0, 2) + '•••@' + d; }
+export function huDateTime(iso) { const d = iso ? new Date(String(iso).replace(' ', 'T') + (/Z$/.test(iso) ? '' : 'Z')) : new Date(); return d.toLocaleString('hu-HU', { timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+export const SIGN_STATEMENT = 'A fenti dokumentumo(ka)t elolvastam, tartalmukat megértettem, és elektronikus aláírásommal elfogadom. Tudomásul veszem, hogy az aláírás adatai (név, e-mail cím, időpont, IP-cím, eszköz) a hitelesség igazolására rögzítésre kerülnek.';
