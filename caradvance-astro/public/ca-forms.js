@@ -570,6 +570,11 @@
       '.caf-apr li .caf-ic{width:18px;height:18px;flex:0 0 auto;color:#fff;background:#19a35b;border-radius:50%;padding:3px;box-sizing:border-box}',
       '.caf-aseg{display:flex;gap:4px;background:#f1f4f8;border-radius:11px;padding:4px;margin-bottom:10px}',
       '.caf-aseg button{all:unset;cursor:pointer;flex:1;text-align:center;font-size:13px;font-weight:700;color:#5A6B82;padding:8px 6px;border-radius:8px}',
+      '.caf-cseg{display:flex;gap:4px;background:#f1f4f8;border-radius:12px;padding:4px;margin:0 0 6px;max-width:460px}',
+      '.caf-cseg button{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;font-size:14.5px;font-weight:700;color:#5A6B82;border-radius:9px;text-align:center}',
+      '.caf-cseg button .caf-ic{width:18px;height:18px}',
+      '.caf-cseg button.on{background:#fff;color:var(--r);box-shadow:0 1px 3px rgba(15,27,45,.12)}',
+      '.caf-v2 .caf-csec .caf-body>.caf-cseg{align-self:flex-start!important;width:100%!important;max-width:460px!important}',
       '.caf-aseg button.on{background:#fff;color:var(--r);box-shadow:0 1px 3px rgba(15,27,45,.12)}',
       '.caf-v2 .caf-csec{margin-top:18px}',
       '.caf-v2 .caf-csec .caf-sh .n{background:var(--r)!important;color:#fff!important}',
@@ -1006,6 +1011,26 @@
   }
 
   var tm = 0;
+  // Adataid / Kapcsolatfelvétel: Magánszemély / Cég fül (a meglévő ár-kapcsolóhoz kötve: a cégadatok mezői ettől jelennek meg)
+  function contactSeg(M) {
+    if (M.A !== AB || !M.defs) return;
+    var cd = M.defs.filter(function (d) { return d.contact; })[0], body = cd && q('.caf-body', cd.sec);
+    var tg = qa('.ab-tgl', M.modal); if (!body || tg.length < 2) return;
+    if (!M.cseg || M.cseg.parentNode !== body) {
+      M.cseg = mk('div', 'caf-cseg'); M.cseg.setAttribute('role', 'tablist');
+      var blk = q('.ab-block', body); body.insertBefore(M.cseg, blk || body.firstChild);
+      M.cseg.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-who]'); if (!b) return; e.preventDefault();
+        var t = qa('.ab-tgl', M.modal).filter(function (x) { return x.getAttribute('data-abb') === b.getAttribute('data-who'); })[0];
+        if (t && !t.classList.contains('active')) t.click(); later(M);
+      });
+    }
+    var html = tg.map(function (t) {
+      var lab = shortLbl(tx(t)).replace(/\s*·.*$/, ''), on = t.classList.contains('active'), co = /cég|company|firm|unterneh|spoloč|společ|biznes/i.test(lab);
+      return '<button type="button" role="tab" aria-selected="' + on + '" data-who="' + esc(t.getAttribute('data-abb')) + '" class="' + (on ? 'on' : '') + '">' + svg(co ? 'bldg' : 'user') + '<span>' + esc(lab) + '</span></button>';
+    }).join('');
+    if (M.cseg.__h !== html) { M.cseg.innerHTML = html; M.cseg.__h = html; }
+  }
   function later(M) { clearTimeout(tm); tm = setTimeout(function () { refresh(M); }, 30); }
 
   function refresh(M) {
@@ -1060,6 +1085,7 @@
       q('.dp', est).textContent = e.dep || ''; q('.d', est).textContent = e.disc || '';
       var eu = q('.eu', est); eu.textContent = e.eur || ''; eu.style.display = e.eur ? '' : 'none';
     }
+    try { contactSeg(M); } catch (e) { }
     if (M.v2) refreshV2(M);
     var last = M.cur >= lastIdx(M), ob = q(A.submit, m), busy = ob && ob.disabled;
     M.b0.innerHTML = M.cur > 0 ? svg('left') + esc(T.back) : esc(T.cancel);
