@@ -350,7 +350,7 @@ function renderChecklist(){
       var next={};items.forEach(function(c){next[c[0]]=!!(cl[c[0]]&&cl[c[0]].done);});
       next[k]=el.checked;
       var closes=el.checked&&(rule==='all'?items.every(function(c){return next[c[0]];}):k===rule);
-      if(closes&&!confirm((rule==='all'?'Ezzel minden checklist-feladat kész':'Az „Átadva” kipipálásával')+' — az ügyfél státusza „Lezárva” lesz. Folytatod?')){el.checked=false;return;}
+      if(closes&&!confirm((rule==='all'?'Ezzel minden checklist-feladat kész':'A(z) „'+((items.filter(function(c){return c[0]===rule;})[0]||[])[1]||rule)+'” kipipálásával')+' — az ügyfél státusza „Lezárva” lesz. Folytatod?')){el.checked=false;return;}
       saving();
       api('/card/'+ID,{method:'PATCH',body:{checklist:next}}).then(function(r){
         S.card.checklist=r.checklist;if(r.status&&r.status!==S.card.status){S.card.status=r.status;renderHead();toast('Státusz: '+r.status);}
