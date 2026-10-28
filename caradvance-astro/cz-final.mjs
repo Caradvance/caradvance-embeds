@@ -5,7 +5,7 @@
 //  2  „1 év kellékszavatosság” maradékok: használt autó 1 év, új autó 2 év (cs / en / de)
 // 17  autó-adatlap leírása: „Cena bez DPH, se zárukou” → a választott változat szerinti ár, kellékszavatossággal
 // 22  behozatali idő: egységesen 5–14 nap (raktári autó); gyári rendelésnél a gyártástól függ
-//  +  magyar maradványok: képek alt-szövegei, köszönő / hiba-üzenet (CA_CFG), „Vászontető”, Balaton (en/de),
+//  +  magyar maradványok: képek alt-szövegei, „Vászontető”, Balaton (en/de),
 //     az /alairas/ (magyar e-aláírás) oldal: noindex + kikerül a cseh sitemapből
 // Hiba esetén csak logol, a buildet nem állítja meg.
 import fs from 'node:fs';
@@ -36,27 +36,33 @@ const LEASE_FIX = {
     [/(·\s*<a [^>]*>)leasingová kalkulačka(<\/a>)/g, '$1financování – leasing$2'],
     [/(<h[1-6][^>]*>)Spočítejte si měsíční splátku v leasingové kalkulačce(<\/h[1-6]>)/g, '$1Orientační splátka na vyžádání$2'],
     [/Je k dispozici leasingová kalkulačka\?/g, 'Jak zjistím orientační splátku?'],
-    [/je k dispozici leasingová kalkulačka\??/g, 'jak zjistím orientační splátku?']
+    [/je k dispozici leasingová kalkulačka\??/g, 'jak zjistím orientační splátku?'],
+    [/podmínky, kalkulačka, (0[\s\u00a0]?%[\s\u00a0]akontace)/g, 'podmínky a $1'],
+    [/\s*Kalkulačka je dobrým přiblížením pro rozhodnutí\./g, '']
   ],
   en: [
     ['Car leasing and financing – leasing calculator', 'Car leasing and financing'],
     [/(·\s*<a [^>]*>)leasing calculator(<\/a>)/g, '$1financing – leasing$2'],
     [/(<h[1-6][^>]*>)Calculate your monthly instalment with the leasing calculator(<\/h[1-6]>)/g, '$1Indicative instalment on request$2'],
     [/Is there a leasing calculator\?/g, 'How can I find out the indicative instalment?'],
-    [/is there a leasing calculator\??/g, 'how can i find out the indicative instalment?']
+    [/is there a leasing calculator\??/g, 'how can i find out the indicative instalment?'],
+    [/conditions, calculator, (0[\s\u00a0]?%)/g, 'conditions and $1'],
+    [/\s*The calculator is a good approximation for your decision\./g, '']
   ],
   de: [
     ['Autoleasing und Finanzierung – Leasingrechner', 'Autoleasing und Finanzierung'],
     [/(·\s*<a [^>]*>)Leasingrechner(<\/a>)/g, '$1Finanzierung – Leasing$2'],
     [/(<h[1-6][^>]*>)Berechnen Sie Ihre Monatsrate mit dem Leasingrechner(<\/h[1-6]>)/g, '$1Unverbindliche Monatsrate auf Anfrage$2'],
     [/Gibt es einen Leasingrechner\?/g, 'Wie erfahre ich die voraussichtliche Monatsrate?'],
-    [/gibt es einen leasingrechner\??/g, 'wie erfahre ich die voraussichtliche monatsrate?']
+    [/gibt es einen leasingrechner\??/g, 'wie erfahre ich die voraussichtliche monatsrate?'],
+    [/Bedingungen, Rechner, (0[\s\u00a0]?% Anzahlung)/g, 'Bedingungen und $1'],
+    [/\s*Der Rechner ist eine gute Annäherung für Ihre Entscheidung\./g, '']
   ]
 };
 const LEASE_KEY = { cs: 'kalkulač[^\\s<.,]*', en: 'calculator', de: '[Rr]echner' };
 const LEASE_OK = {
   cs: (s) => /leasing|financ|splát/i.test(s) && !/poplat|přepis|registrac|pronájmu|pronájem auta/i.test(s),
-  en: (s) => /leasing|financ|instalment/i.test(s) && !/\bfee|registration|transfer|rental cost|long-term rental/i.test(s),
+  en: (s) => /leasing|financ|instalment/i.test(s) && !/fee calculator|registration|transfer|rental cost|long-term rental/i.test(s),
   de: (s) => /Leasing|Finanz|Rate/.test(s) && !/Gebühr|Zulassung|Umschreib|Mietkosten|Langzeitmiete/.test(s)
 };
 function lease(h, L) {
@@ -70,20 +76,21 @@ function lease(h, L) {
 /* ---------- 2: kellékszavatosság ---------- */
 const ODP = {
   cs: [
-    ['s odpovědností za vady 1 rok.', 's odpovědností za vady (u ojetých vozů 1 rok, u nových 2 roky).'],
-    ['odpovědností za vady 1 rok, transparentní cenou', 'odpovědností za vady (ojeté vozy 1 rok, nové 2 roky), transparentní cenou'],
+    [/odpovědností za vady 1 rok(<\/strong>)?\./g, 'odpovědností za vady (u ojetých vozů 1 rok, u nových 2 roky)$1.'],
+    [/([Oo])dpovědností za vady 1 rok, /g, '$1dpovědností za vady (ojeté vozy 1 rok, nové 2 roky), '],
+    [/Odpovědnost za vady 1 rok, /g, 'odpovědnost za vady (ojeté vozy 1 rok, nové 2 roky), '],
     [/>1 rok((?:<\/[^>]+>|<[^>]+>|\s)*)odpovědnost za vady u každého vozu/g, '>1–2 roky$1odpovědnost za vady (ojeté vozy 1 rok, nové 2 roky)'],
     ['1 rok na každý vůz', '1 rok u ojetých, 2 roky u nových vozů']
   ],
   en: [
-    [/(?<!A used car comes )with a 1-year liability for defects\./g, 'with liability for defects (1 year for used cars, 2 years for new cars).'],
-    ['with vetted cars, a 1-year liability for defects, a transparent price', 'with vetted cars, liability for defects (1 year for used cars, 2 years for new cars), a transparent price'],
+    [/(?<!A used car comes )with a (<strong>)?1-year liability for defects(<\/strong>)?\./g, 'with $1liability for defects (1 year for used cars, 2 years for new cars)$2.'],
+    [/a 1-year liability for defects, /g, 'liability for defects (1 year for used cars, 2 years for new cars), '],
     [/>1 year((?:<\/[^>]+>|<[^>]+>|\s)*)liability for defects on every car/g, '>1–2 years$1liability for defects (used cars 1 year, new cars 2 years)'],
     ['1 year on every car', '1 year for used, 2 years for new cars']
   ],
   de: [
-    ['kommt mit 1 Jahr Mängelhaftung.', 'kommt mit Mängelhaftung (Gebrauchtwagen 1 Jahr, Neuwagen 2 Jahre).'],
-    ['mit geprüften Autos, 1 Jahr Mängelhaftung, transparentem Preis', 'mit geprüften Autos, Mängelhaftung (Gebrauchtwagen 1 Jahr, Neuwagen 2 Jahre), transparentem Preis'],
+    [/mit (<strong>)?1 Jahr Mängelhaftung(<\/strong>)?\./g, 'mit $1Mängelhaftung (Gebrauchtwagen 1 Jahr, Neuwagen 2 Jahre)$2.'],
+    [/1 Jahr Mängelhaftung, /g, 'Mängelhaftung (Gebrauchtwagen 1 Jahr, Neuwagen 2 Jahre), '],
     [/>1 Jahr((?:<\/[^>]+>|<[^>]+>|\s)*)Mängelhaftung bei jedem Auto/g, '>1–2 Jahre$1Mängelhaftung (Gebrauchtwagen 1 Jahr, Neuwagen 2 Jahre)'],
     ['1 Jahr auf jedes Auto', '1 Jahr bei Gebraucht-, 2 Jahre bei Neuwagen']
   ]
@@ -160,20 +167,7 @@ function alts(h, L) {
   return h.replace(/"alt":"([^"\\]*)"/g, (m, v) => '"alt":"' + altText(v, L) + '"');
 }
 
-/* ---------- köszönő / hiba üzenet a beküldés után (window.CA_CFG) ---------- */
-const CFG = {
-  cs: { THANKS_TITLE: 'Děkujeme za váš zájem!', THANKS_TEXT: 'Vaši poptávku jsme přijali a brzy se vám ozveme s nabídkou na míru.', THANKS_NOTE: 'Pokud spěcháte, klidně nám zavolejte.',
-    ERROR_TITLE: 'Odeslání se nezdařilo', ERROR_TEXT: 'Vaši poptávku se bohužel nepodařilo přijmout. Zavolejte nám prosím nebo napište na info@caradvance.cz — vyřídíme to během pár minut.', COOKIE_POLICY_URL: '/ochrana-osobnich-udaju/#cookie' },
-  en: { THANKS_TITLE: 'Thank you for your interest!', THANKS_TEXT: 'We have received your request and will get back to you shortly with a tailored offer.', THANKS_NOTE: 'If it is urgent, feel free to call us.',
-    ERROR_TITLE: 'Sending failed', ERROR_TEXT: 'Unfortunately, we could not receive your request. Please call us or write to info@caradvance.cz — we will sort it out in a few minutes.', COOKIE_POLICY_URL: '/en/ochrana-osobnich-udaju/#cookie' },
-  de: { THANKS_TITLE: 'Vielen Dank für Ihr Interesse!', THANKS_TEXT: 'Wir haben Ihre Anfrage erhalten und melden uns in Kürze mit einem individuellen Angebot.', THANKS_NOTE: 'Wenn es eilt, rufen Sie uns gerne an.',
-    ERROR_TITLE: 'Senden fehlgeschlagen', ERROR_TEXT: 'Leider konnten wir Ihre Anfrage nicht empfangen. Bitte rufen Sie uns an oder schreiben Sie an info@caradvance.cz — wir erledigen das in wenigen Minuten.', COOKIE_POLICY_URL: '/de/ochrana-osobnich-udaju/#cookie' }
-};
-function cfg(h, L) {
-  return h.replace(/(window\.CA_CFG\s*=\s*)(\{[^<]*?\})(\s*;?\s*<\/script>)/, (m, a, j, c) => {
-    try { const o = JSON.parse(j); Object.assign(o, CFG[L], { PHONE: '+420 604 313 136', WHATSAPP: 'https://wa.me/421915410555' }); return a + JSON.stringify(o) + c; } catch (e) { return m; }
-  });
-}
+/* (a köszönő / hiba üzenet — window.CA_CFG — nyelvét az inject-tracking.mjs állítja be, mert az e lépés után fut) */
 
 /* ---------- /alairas/ (magyar e-aláírás): ne indexelődjön ---------- */
 function alairas(h) {
@@ -184,7 +178,6 @@ function alairas(h) {
 /** egy kész HTML oldal javítása — L: 'cs' | 'en' | 'de', P: útvonal (pl. '/en/o-nas/') */
 export function fix(h, L, P) {
   if (P === '/alairas/' || P === '/en/alairas/' || P === '/de/alairas/') return alairas(h);
-  h = cfg(h, L);
   // a JS-kód érintetlen marad; a szöveg + a JSON-LD (GYIK) javul
   const parts = h.split(/(<script\b[^>]*>[\s\S]*?<\/script>|<style\b[^>]*>[\s\S]*?<\/style>)/i);
   for (let i = 0; i < parts.length; i++) {
