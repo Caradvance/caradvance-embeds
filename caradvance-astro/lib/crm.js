@@ -97,6 +97,8 @@ export async function ensureCrm(env) {
       created_at TEXT DEFAULT (datetime('now')), updated_at TEXT)`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_fin_deal ON crm_fin (deal_id)`)
   ]);
+  // több autó / ügyfél: a pénzügyi tétel autóhoz köthető (régi táblában az oszlop még hiányozhat)
+  try { await env.DB.prepare(`ALTER TABLE crm_fin ADD COLUMN vehicle_id TEXT DEFAULT ''`).run(); } catch (e) { /* már létezik */ }
   READY = true;
 }
 
@@ -446,10 +448,33 @@ A Megbízó szavatol azért, hogy a gépjármű per-, teher- és igénymentes, �
 ${CLOSING('Bizományos', 'Megbízó')}`
 };
 
+/* ============================== autók (több autó / ügyfél) ============================== */
+export const VEH_KEYS = ['brand', 'model', 'year', 'vin', 'color', 'engine', 'fuel', 'km'];
+/** Az adatlap autói: data.vehicles; a régi, egyetlen data.vehicle „v1” azonosítóval kerül át. */
+export function vehiclesOf(data) {
+  data = data || {};
+  if (Array.isArray(data.vehicles)) return data.vehicles;
+  const v = data.vehicle || {};
+  const has = VEH_KEYS.some((k) => v[k]) || v.hybrid;
+  return has ? [{ id: 'v1', source: 'manual', ...v }] : [];
+}
+/** Ajánlott / készletbeli autó → adatlap-autó. */
+export function itemToVehicle(it, id, source) {
+  const brand = it.brand || '';
+  return {
+    id, source: source || 'offer', key: it.key || '', title: it.title || '', brand,
+    model: brand && String(it.title || '').indexOf(brand) === 0 ? String(it.title).slice(brand.length).trim() : (it.title || ''),
+    year: it.year || '', vin: '', color: '', engine: it.power || '', fuel: it.fuel || '', km: it.km ? String(it.km) : '', hybrid: /hybrid|hibrid|PHEV/i.test(String(it.title || '') + ' ' + String(it.fuel || '')),
+    price: Number(it.price) || 0, currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: it.period || '', deposit: Number(it.deposit) || 0,
+    image: it.image || '', url: it.url || ''
+  };
+}
+export function newVehicleId(list) { let i = (list || []).length + 1; const ids = new Set((list || []).map((v) => v.id)); while (ids.has('v' + i)) i++; return 'v' + i; }
+
 /** A változók alapértékei az adatlapból + a kiválasztott (elfogadott) autóból. */
 export function defaultVars(deal, card, chosen, opts) {
   opts = opts || {};
-  const all = card.data || {}; const v = all.vehicle || {};
+  const all = card.data || {}; const v = opts.vehicle || vehiclesOf(all)[0] || {};
   // party: kinek a nevére szól a szerződés — alapból az ügyfél (Eladásnál a bérlő), az adásvételinél a vevő
   const d = opts.party || all; const p = d.person || {}; const co = d.company || {};
   const useDeal = !opts.party; // a vevőnél nem töltjük az érdeklődő adataival
@@ -458,7 +483,7 @@ export function defaultVars(deal, card, chosen, opts) {
   const priceTxt = ch ? priceLabel(ch) : (deal.price ? fmtPrice(deal.price, 'HUF') : '');
   const contactSep = isCo && d.contact_differs && d.contact ? d.contact : null;
   const vars = {
-    szerzodes_szam: `CA-${opts.code || ({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER', 'Bizományos': 'BIZ' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}`,
+    szerzodes_szam: `CA-${opts.code || ({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER', 'Bizományos': 'BIZ' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}${opts.suffix ? '-' + opts.suffix : ''}`,
     keltezes_hely: 'Solymár', keltezes_datum: huToday(),
     ceg_nev: LESSOR.name, ceg_szekhely: LESSOR.seat[0], ceg_cegjegyzek: LESSOR.reg, ceg_adoszam: LESSOR.vat, ceg_kepviselo: LESSOR.md,
     ugyfel_nev: isCo ? (co.name || (useDeal ? deal.name : '') || '') : (p.name || (useDeal ? deal.name : '') || ''),
@@ -468,13 +493,13 @@ export function defaultVars(deal, card, chosen, opts) {
     ugyfel_kepviselo: contactSep ? [contactSep.name, contactSep.phone, contactSep.email].filter(Boolean).join(', ') : (isCo ? (p.name || (useDeal ? deal.name : '') || '') : '—'),
     ugyfel_telefon: (contactSep && contactSep.phone) || p.phone || (useDeal ? deal.phone : '') || '',
     ugyfel_email: (contactSep && contactSep.email) || p.email || (useDeal ? deal.email : '') || '',
-    auto_megnevezes: ch ? ch.title : ([v.brand, v.model].filter(Boolean).join(' ') || deal.car || ''),
-    // ha az ügyfél elfogadott egy ajánlott autót, annak adatai az elsődlegesek; az alvázszám/szín az adatlapról jön
-    auto_marka: (ch && ch.brand) || v.brand || '',
-    auto_tipus: ch ? (ch.brand && ch.title.indexOf(ch.brand) === 0 ? ch.title.slice(ch.brand.length).trim() : ch.title) : (v.model || ''),
-    auto_evjarat: (ch && ch.year) || v.year || '',
-    auto_alvazszam: v.vin || '', auto_szin: v.color || '', auto_motor: (ch && ch.power) || v.engine || '',
-    auto_uzemanyag: (ch && ch.fuel) || v.fuel || '', auto_km: (ch && ch.km) || v.km || '', auto_hibrid: v.hybrid ? 'igen' : 'nem',
+    // autónkénti szerződésnél (opts.vehicle) az adatlap autójának adatai az elsődlegesek; egyébként az elfogadott ajánlaté
+    auto_megnevezes: opts.vehicle ? (v.title || [v.brand, v.model].filter(Boolean).join(' ') || (ch && ch.title) || '') : (ch ? ch.title : (v.title || [v.brand, v.model].filter(Boolean).join(' ') || deal.car || '')),
+    auto_marka: opts.vehicle ? (v.brand || '') : ((ch && ch.brand) || v.brand || ''),
+    auto_tipus: opts.vehicle ? (v.model || '') : (ch ? (ch.brand && ch.title.indexOf(ch.brand) === 0 ? ch.title.slice(ch.brand.length).trim() : ch.title) : (v.model || '')),
+    auto_evjarat: opts.vehicle ? (v.year || '') : ((ch && ch.year) || v.year || ''),
+    auto_alvazszam: v.vin || '', auto_szin: v.color || '', auto_motor: opts.vehicle ? (v.engine || '') : ((ch && ch.power) || v.engine || ''),
+    auto_uzemanyag: opts.vehicle ? (v.fuel || '') : ((ch && ch.fuel) || v.fuel || ''), auto_km: opts.vehicle ? (v.km || '') : ((ch && ch.km) || v.km || ''), auto_hibrid: v.hybrid ? 'igen' : 'nem',
     ar: priceTxt, fizetesi_mod: 'banki átutalás', atadas_datum: '', atadas_hely: 'Solymár, Ibolya utca 18',
     havi_dij: ch && ch.period ? fmtPrice(ch.price, ch.currency) : priceTxt, kaucio: ch && ch.deposit ? fmtPrice(ch.deposit, ch.currency) : '',
     futamido: '12 hónap', km_keret: '1 500 km/hó',
