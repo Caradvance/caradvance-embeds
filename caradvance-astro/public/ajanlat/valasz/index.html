@@ -79,6 +79,7 @@
         +'<div class="ph"'+(it.image?' style="background-image:url(\''+esc(it.image)+'\')"':'')+'></div>'
         +'<div class="bd"><div class="t">'+esc(it.title)+'</div>'
         +(it.spec?'<div class="s">'+esc(it.spec)+'</div>':'')
+        +(it.ids?'<div class="s" style="margin-top:4px;color:#374151;font-weight:600">'+esc(it.ids)+'</div>':'')
         +(it.note?'<div class="n">'+esc(it.note)+'</div>':'')
         +(it.url?'<div style="margin-top:4px"><a class="more" href="'+esc(it.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Részletek a weboldalon ↗</a></div>':'')
         +'<div class="p">'+esc(it.priceLabel)+'</div>'

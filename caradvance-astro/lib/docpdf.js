@@ -57,7 +57,13 @@ class Doc {
     const p = page || this.cur; p.push(`${C.mut} RG 0.6 w ${n2(x)} ${n2(y - 1)} ${n2(s)} ${n2(s)} re S`);
     if (on) p.push(`${C.ink} RG 0.9 w ${n2(x + 1.6)} ${n2(y + s * 0.45 - 1)} m ${n2(x + s * 0.42)} ${n2(y + 0.6)} l ${n2(x + s - 1.4)} ${n2(y + s - 2.4)} l S`);
   }
-  image(x, y, w, h, page) { (page || this.cur).push(`q ${n2(w)} 0 0 ${n2(h)} ${n2(x)} ${n2(y)} cm /Im0 Do Q`); this.hasImg = true; }
+  /** Kép: alapból a logó; img = { bytes: Uint8Array JPEG, w, h, comps } egyéb (pl. aláírás) JPEG-hez. */
+  image(x, y, w, h, page, img) {
+    if (!this.imgs) this.imgs = [];
+    let k = img ? this.imgs.indexOf(img) : this.imgs.findIndex((q) => q.logo);
+    if (k < 0) { this.imgs.push(img || { logo: true }); k = this.imgs.length - 1; }
+    (page || this.cur).push(`q ${n2(w)} 0 0 ${n2(h)} ${n2(x)} ${n2(y)} cm /Im${k} Do Q`);
+  }
   build(info, decorate) {
     const te = new TextEncoder(); const chunks = []; const offs = []; let pos = 0;
     const push = (x) => { const u = typeof x === 'string' ? te.encode(x) : x; chunks.push(u); pos += u.length; };
@@ -78,14 +84,17 @@ class Doc {
       const tu = add({ dict: '', stream: te.encode(cm) });
       fontRef[f] = add(`<< /Type /Font /Subtype /Type0 /BaseFont /${F.name} /Encoding /Identity-H /DescendantFonts [${cid} 0 R] /ToUnicode ${tu} 0 R >>`);
     }
-    let imgRef = 0;
-    if (this.hasImg) { const jb = BYTES.logo || (BYTES.logo = b64ToBytes(LOGO_JPG)); imgRef = add({ dict: `/Type /XObject /Subtype /Image /Width ${LOGO_W} /Height ${LOGO_H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode`, stream: jb }); }
+    const imgRefs = (this.imgs || []).map((im) => {
+      if (im.logo) { const jb = BYTES.logo || (BYTES.logo = b64ToBytes(LOGO_JPG)); return add({ dict: `/Type /XObject /Subtype /Image /Width ${LOGO_W} /Height ${LOGO_H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode`, stream: jb }); }
+      return add({ dict: `/Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /${im.comps === 1 ? 'DeviceGray' : 'DeviceRGB'} /BitsPerComponent 8 /Filter /DCTDecode`, stream: im.bytes });
+    });
+    const xobj = imgRefs.length ? `/XObject << ${imgRefs.map((r, k) => `/Im${k} ${r} 0 R`).join(' ')} >>` : '';
     const pagesId = objs.length + this.pages.length * 2 + 1;
     const pageIds = [];
     const fontDict = fonts.map((f) => `/F${f} ${fontRef[f]} 0 R`).join(' ');
     for (const ops of this.pages) {
       const cId = add({ dict: '', stream: te.encode(ops.join('\n')) });
-      pageIds.push(add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /Font << ${fontDict} >> ${imgRef ? `/XObject << /Im0 ${imgRef} 0 R >>` : ''} >> /Contents ${cId} 0 R >>`));
+      pageIds.push(add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /Font << ${fontDict} >> ${xobj} >> /Contents ${cId} 0 R >>`));
     }
     const pid = add(`<< /Type /Pages /Kids [${pageIds.map((p) => p + ' 0 R').join(' ')}] /Count ${pageIds.length} >>`);
     if (pid !== pagesId) throw new Error('pdf pages id');
@@ -160,6 +169,19 @@ function drawLine(d, ln, x, y, size, color, base, page, align, maxW) {
 /* ============================== dokumentum-elrendezés ============================== */
 const NUM_RE = /^((?:\d+\.)+\d*|\d+\)|[a-z]\)|\([a-z0-9]+\))\s+/i;
 const isBlank = (v) => !String(v || '').replace(/[\s…._—-]/g, '');
+const normName = (v) => String(v || '').replace(/\*\*/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+/** JPEG méretei (SOF marker) */
+export function jpegInfo(u) {
+  if (!u || u[0] !== 0xff || u[1] !== 0xd8) return null;
+  let i = 2;
+  while (i < u.length - 9) {
+    if (u[i] !== 0xff) { i++; continue; }
+    const mk = u[i + 1]; const len = (u[i + 2] << 8) + u[i + 3];
+    if (mk >= 0xc0 && mk <= 0xcf && mk !== 0xc4 && mk !== 0xc8 && mk !== 0xcc) return { h: (u[i + 5] << 8) + u[i + 6], w: (u[i + 7] << 8) + u[i + 8], comps: u[i + 9] };
+    i += 2 + len;
+  }
+  return null;
+}
 
 class Layout {
   constructor(meta) {
@@ -297,7 +319,7 @@ class Layout {
     const P = parts.map((p) => {
       const [main, name] = p.split('~~').map((s) => s.trim()); const [t, sub] = main.split(/\s+~\s+|~/).map((s) => (s || '').trim());
       return { T: this.measure(t || '', { w: cw, size: 8.4, f: 'S', num: false, bullets: false, lh: 1.4 }), S: sub ? this.measure(sub, { w: cw, size: 7.4, f: 'L', num: false, bullets: false, lh: 1.4 }) : null,
-        N: name && !isBlank(name) ? this.measure(name, { w: cw - 6, size: 7.6, f: 'R', num: false, bullets: false, lh: 1.35 }) : null };
+        N: name && !isBlank(name) ? this.measure(name, { w: cw - 6, size: 7.6, f: 'R', num: false, bullets: false, lh: 1.35 }) : null, nameRaw: name || '' };
     });
     const headH = Math.max(...P.map((q) => q.T.lines.length * q.T.lh + (q.S ? q.S.lines.length * q.S.lh : 0)));
     const nameH = Math.max(0, ...P.map((q) => (q.N ? q.N.lines.length * q.N.lh : 0)));
@@ -313,12 +335,32 @@ class Layout {
           yy -= 16; this.d.text(lb, x, yy, 'L', 7.4, C.mut); const lx = x + this.d.width(lb, 'L', 7.4) + 4; this.d.line(lx, yy - 1, Math.min(x + cw - 6, lx + 92), yy - 1, C.blank, 0.5);
         }
       }
+      if (this.meta.sig && q.nameRaw && normName(q.nameRaw) === normName(this.meta.sig.name)) {
+        const im = this.meta.sig.img; const ih = 34; const iw = Math.min(cw - 10, ih * im.w / im.h);
+        this.d.image(x + 2, lineY + 1.5, iw, iw * im.h / im.w, null, im);
+        this.d.text('elektronikusan aláírva · ' + this.meta.sig.when, x + cw - 6 - this.d.width('elektronikusan aláírva · ' + this.meta.sig.when, 'L', 5.6), lineY + 2.5, 'L', 5.6, C.red);
+      }
       this.d.line(x, lineY, x + cw - 6, lineY, '0.35 0.37 0.42', 0.6);
       let yb = lineY - 2; if (q.N) { this.drawMeasured(q.N, x, yb, C.ink); yb -= q.N.lines.length * q.N.lh; }
       this.d.text(caption, x, yb - 8, 'L', 6.8, C.mut);
     });
     this.y = lineY - nameH - 22;
   }
+}
+
+/** Az elektronikus aláírás tanúsítvány-oldala (audit-napló) a dokumentum végén. */
+function certificatePage(L, sg, img) {
+  const d = L.d; L.newPage();
+  L.tag('Elektronikus aláírás · Signaturprotokoll');
+  L.title('Aláírási tanúsítvány', 'Az elektronikus aláírás adatai és ellenőrző kódjai');
+  L.note('Ez a lap a dokumentum elválaszthatatlan része. A dokumentum tartalmának SHA-256 ellenőrzőkódja az aláíráskor rögzítésre került; bármilyen utólagos módosítás megváltoztatja a kódot. Egyszerű elektronikus aláírás (eIDAS-rendelet 3. cikk 10. pont), az aláíró azonosítása az e-mail címére küldött egyszeri kóddal (OTP) történt.');
+  for (const [k, v] of sg.rows || []) L.row([[k, String(v == null ? '' : v)]]);
+  if (img) {
+    L.ensure(120); L.y -= 14; d.text('Az aláíró saját kezű (digitálisan rajzolt) aláírása:', L.x0, L.y, 'R', 8, C.mut); L.y -= 8;
+    const h = 80; const w = Math.min(260, h * img.w / img.h);
+    d.stroke(L.x0, L.y - h - 8, w + 16, h + 8, C.line, 0.6); d.image(L.x0 + 8, L.y - h - 4, w, w * img.h / img.w > h ? h : w * img.h / img.w, null, img); L.y -= h + 20;
+  }
+  if (sg.statement) { L.y -= 6; L.para('Az aláíró nyilatkozata: „' + sg.statement + '”', { size: 7.6, color: C.mut }); }
 }
 
 /** A futó fejléc / címlap-fej / lábléc kirajzolása (minden oldalon, az oldalszám ismeretében). */
@@ -388,6 +430,9 @@ export function renderDocPdf(filled, meta) {
     header: M.header || [plainT([t1, t2].filter(Boolean).join(' / ')), meta.sub || ''],
     footer: M.footer, bilingual, number: meta.number || '', hash: meta.hash || ''
   };
+  let sigImg = null;
+  if (meta.sign && meta.sign.jpeg) { const inf = jpegInfo(meta.sign.jpeg); if (inf) sigImg = { bytes: meta.sign.jpeg, ...inf }; }
+  if (sigImg) meta2.sig = { img: sigImg, name: meta.sign.match || '', when: meta.sign.when || '' };
   const L = new Layout(meta2);
   L.bottom = M.footer ? 92 : 46;
   const caption = M.caption || (bilingual ? 'Unterschrift / Aláírás' : 'aláírás');
@@ -435,5 +480,6 @@ export function renderDocPdf(filled, meta) {
     L.para(t, { after: 3 });
   }
   while (L.frames.length) L.endFrame();
+  if (meta.sign) certificatePage(L, meta.sign, sigImg);
   return d.build({ title: meta.title || plainT(t1), author: 'CarAdvance' }, decorate(L, meta2));
 }

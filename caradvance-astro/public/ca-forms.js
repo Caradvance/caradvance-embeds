@@ -220,7 +220,12 @@
       var dep = tx(q('#abStickyDep', M.modal)) || tx(q('#abDep', M.modal));
       var pp = MK === 'hu' ? abPrices(M) : null, eur = '';
       if (pp) eur = Math.round(priv ? pp.privE : pp.coE).toLocaleString('hu-HU').replace(/\u00a0/g, ' ') + ' €/hó' + (pp.from ? '-tól' : '') + (priv ? ' · bruttó' : ' · nettó');
-      return { label: priv ? T.estG : T.estN, val: c.v, sub: c.sub, eur: eur, dep: dep, disc: T.disc };
+      var val = c.v;
+      if (MK !== 'hu' && val && /-\s*t[óő]l\b/.test(val)) {   // magyar „-tól” rag a lefordított árban → „od …”
+        val = val.replace(/\s*-\s*t[óő]l\b/, '');
+        if (!/\bod\b/i.test(val)) val = val.replace(/^(≈\s*)?/, function (m0) { return (m0 || '') + 'od '; });
+      }
+      return { label: priv ? T.estG : T.estN, val: val, sub: c.sub, eur: eur, dep: dep, disc: T.disc };
     },
     specs: function (M) {
       var out = [], c = octx(M, 'rent'), card = c && c.card, m = M.modal;

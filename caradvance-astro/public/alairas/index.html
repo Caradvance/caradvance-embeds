@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src blob: 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Dokumentumok aláírása — CarAdvance</title>
+<link rel="icon" href="/favicon-32.png">
+<!-- ca-tracking:start --><!-- Ezen az oldalon szándékosan nincs követőkód (személyes adatok, aláírás). --><!-- ca-tracking:end -->
+<style>
+:root{--red:#E2001A;--red2:#B80015;--ink:#0F172A;--ink2:#334155;--mut:#5A6B82;--line:#E6EAF1;--bg:#F4F5F7;--ok:#15803D;--okbg:#DCFCE7}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+.top{background:#0B0B0D;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.top img{height:34px;display:block}.top span{color:#cbd2dc;font-size:12.5px;display:flex;align-items:center;gap:6px}
+.hero{background:radial-gradient(900px 300px at 85% -40%,rgba(226,0,26,.45),transparent 60%),linear-gradient(180deg,#0B0B0D,#151821);color:#fff;padding:26px 20px 70px}
+.hero h1{margin:0 0 4px;font-size:25px;line-height:1.2}.hero p{margin:0;color:#c9cfda}
+.wrap{max-width:860px;margin:-48px auto 40px;padding:0 14px}
+.card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(15,23,42,.06);margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:18px;display:flex;align-items:center;gap:10px}
+.card h2 .n{width:28px;height:28px;border-radius:9px;background:#fdeceb;color:var(--red);font-size:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.card.off{opacity:.55;pointer-events:none}
+.muted{color:var(--mut)}.small{font-size:13px}
+.doc{border:1.5px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.doc .h{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-wrap:wrap}
+.doc .h b{flex:1;min-width:180px;font-size:14.5px}
+.doc.ok{border-color:#bfe8cd;background:#f8fdf9}
+.pv{border-top:1px solid var(--line);padding:16px 18px;max-height:520px;overflow:auto;font-size:12.5px;line-height:1.55;background:#fff;display:none}
+.doc.open .pv{display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 22px;font:700 15px/1 inherit;font-family:inherit;cursor:pointer;text-decoration:none}
+.btn.red{background:var(--red);color:#fff}.btn.red:hover{background:var(--red2)}.btn.dark{background:#0F172A;color:#fff}
+.btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}.btn.sm{padding:8px 14px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:10px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:1px;accent-color:var(--red);flex:none}
+.in{width:100%;margin-top:4px;padding:12px;border:1.5px solid var(--line);border-radius:14px;background:#F7F9FC;font:inherit;color:var(--ink)}
+.in:focus{outline:none;border-color:#22447d;background:#fff}
+.code{font:700 26px/1 "Courier New",monospace;letter-spacing:8px;text-align:center;max-width:240px}
+label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-top:10px}
+.pad{position:relative;border:1.5px dashed #c8ced8;border-radius:16px;background:#fff;touch-action:none}
+.pad canvas{display:block;width:100%;height:200px;border-radius:16px;cursor:crosshair}
+.pad .ln{position:absolute;left:24px;right:24px;bottom:44px;border-top:1px solid #d6dae1;pointer-events:none}
+.pad .ph{position:absolute;left:0;right:0;top:44%;text-align:center;color:#a3abb8;pointer-events:none;font-size:14px}
+.note{border-radius:12px;padding:10px 12px;margin:10px 0;font-size:13.5px;background:#EEF4FF;color:#1e3a8a}
+.note.err{background:#FDE8EB;color:#9f1239}.note.ok{background:var(--okbg);color:var(--ok)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sec{font-size:12px;color:var(--mut);display:flex;gap:8px;align-items:flex-start;margin-top:14px}
+.big{font-size:44px;line-height:1;margin-bottom:6px}
+@media(max-width:560px){.card{padding:18px}.hero h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="top"><img src="/caradvance-logo-white.webp" alt="CarAdvance"><span>🔒 Biztonságos aláírás</span></div>
+<div class="hero"><h1>Dokumentumok elektronikus aláírása</h1><p id="sub">Betöltés…</p></div>
+<div class="wrap" id="app"><div class="card">Betöltés…</div></div>
+<script src="/belso/doc-render.js?v=2"></script>
+<script>
+(function(){
+'use strict';
+var A='/api/crm-alairas',T='',S=null,READ={},PAD=null,app=document.getElementById('app');
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+var ERR={bad_link:'Érvénytelen aláírási link.',not_found:'Ez az aláírási kérelem nem található.',locked:'Ez az aláírási kérelem már nem aktív.',too_many_codes:'Túl sok kódkérés — kérjük, próbálja újra egy óra múlva.',mail_failed:'A kódot most nem sikerült elküldeni, kérjük, próbálja újra.',bad_name:'Kérjük, írja be a teljes nevét.',consent:'Kérjük, fogadja el a nyilatkozatot.',bad_signature:'Kérjük, írja alá a dokumentumot a keretben.',code_expired:'A kód lejárt vagy még nem kért kódot — kérjen újat.',too_many:'Túl sok hibás próbálkozás — kérjen új kódot.',wrong_code:'Hibás kód.',integrity:'A dokumentum sértetlensége nem igazolható — kérjük, vegye fel velünk a kapcsolatot.',rate:'Túl sok kérés — kérjük, várjon néhány percet.',server:'Váratlan hiba — kérjük, próbálja újra.'};
+function post(p,body,raw){
+  body=Object.assign({t:T},body||{});
+  return fetch(A+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer'}).then(function(r){
+    if(raw&&r.ok)return r;
+    return r.json().catch(function(){return {ok:false,error:'server'};}).then(function(j){if(!j.ok){var e=new Error(ERR[j.error]||j.error||'Hiba');e.code=j.error;e.left=j.left;throw e;}return j;});
+  });
+}
+// a token a # utáni részben érkezik — elmentjük a lapfülhöz, és eltüntetjük a címsorból
+(function(){
+  var h=(location.hash||'').replace(/^#/,'');
+  try{if(/^[a-f0-9]{64}$/.test(h)){sessionStorage.setItem('ca_sign_t',h);}T=sessionStorage.getItem('ca_sign_t')||'';}catch(e){T=h;}
+  if(!T&&/^[a-f0-9]{64}$/.test(h))T=h;
+  if(h)try{history.replaceState(null,'',location.pathname);}catch(e){}
+})();
+function fail(msg){$('sub').textContent='';app.innerHTML='<div class="card"><div class="big">⚠️</div><h2>'+esc(msg)+'</h2><p class="muted">Ha kérdése van, írjon nekünk (info@caradvance.hu) vagy hívjon: +36 30 233 6060.</p></div>';}
+function load(){
+  if(!T)return fail('Hiányzó vagy érvénytelen aláírási link.');
+  post('/view').then(function(j){S=j;render();}).catch(function(e){fail(e.message);});
+}
+function openPdf(i){
+  var w=window.open('','_blank');
+  post('/pdf',{i:i},true).then(function(r){return r.blob();}).then(function(b){var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();alert(e.message);});
+}
+function render(){
+  if(S.status==='signed')return renderSigned();
+  if(S.status!=='pending'){var m={expired:'Az aláírási link lejárt.',revoked:'Az aláírási kérelmet visszavonták.',locked:'Biztonsági okból ez az aláírási kérelem zárolva lett (túl sok hibás kód).',signing:'Az aláírás feldolgozása folyamatban — frissítse az oldalt egy perc múlva.'}[S.status]||'Ez az aláírási kérelem már nem aktív.';return fail(m);}
+  $('sub').textContent='Aláíró: '+S.signer+' · '+S.docs.length+' dokumentum';
+  var allRead=S.docs.every(function(d){return READ[d.i];});
+  var h='<div class="card"><h2><span class="n">1</span>Olvassa el a dokumentumokat</h2>'
+    +(S.message?'<div class="note" style="white-space:pre-line">'+esc(S.message)+'</div>':'')
+    +'<p class="muted small" style="margin:4px 0 0">Nyissa meg és olvassa el mindegyiket, majd jelölje be, hogy elolvasta. A PDF változat le is tölthető.</p>'
+    +S.docs.map(function(d){return '<div class="doc'+(READ[d.i]?' ok':'')+'" id="d'+d.i+'"><div class="h"><b>'+esc(d.name)+'</b><button class="btn ghost sm" data-v="'+d.i+'">Megnyitás</button><button class="btn ghost sm" data-p="'+d.i+'">PDF</button></div>'
+      +'<div class="pv dpv" id="pv'+d.i+'"></div><div style="padding:0 14px 6px"><label class="chk"><input type="checkbox" data-r="'+d.i+'"'+(READ[d.i]?' checked':'')+'> Elolvastam és megértettem</label></div></div>';}).join('')
+    +'</div>'
+    +'<div class="card'+(allRead?'':' off')+'" id="c2"><h2><span class="n">2</span>Azonosítás egyszeri kóddal</h2><p class="muted small" style="margin:4px 0 10px">Az aláíráshoz egy 6 jegyű kódot küldünk a(z) <b>'+esc(S.email)+'</b> e-mail címre. A kód 10 percig érvényes.</p>'
+    +'<div class="row"><button class="btn dark" id="getCode">Kód küldése e-mailben</button><span class="small muted" id="codeSt"></span></div>'
+    +'<label class="f">A kapott kód<input class="in code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></label></div>'
+    +'<div class="card'+(allRead?'':' off')+'" id="c3"><h2><span class="n">3</span>Aláírás</h2>'
+    +'<label class="f">Teljes neve<input class="in" id="nm" autocomplete="name" value="'+esc(S.signer||'')+'"></label>'
+    +'<p class="small muted" style="margin:14px 0 6px">Írjon alá ujjal vagy egérrel a keretben:</p><div class="pad"><canvas id="pad"></canvas><div class="ln"></div><div class="ph" id="ph">Ide írjon alá</div></div>'
+    +'<div class="row" style="margin:8px 0"><button class="btn ghost sm" id="clr" type="button">Törlés</button></div>'
+    +'<label class="chk"><input type="checkbox" id="cons"> <span>'+esc(S.statement)+'</span></label>'
+    +'<div id="err"></div><div class="row" style="margin-top:10px"><button class="btn red" id="go">Aláírom a dokumentumokat</button></div>'
+    +'<div class="sec">🔒 <span>Egyszerű elektronikus aláírás. A dokumentumok tartalma a kiküldéskor rögzítve lett (SHA-256), az aláírás időpontja, az IP-cím és az eszköz adatai a hitelesség igazolására a dokumentumhoz csatolt tanúsítványban rögzülnek. Az aláírt példányt e-mailben megkapja.</span></div></div>';
+  app.innerHTML=h;
+  app.querySelectorAll('[data-v]').forEach(function(b){b.addEventListener('click',function(){var i=b.getAttribute('data-v'),d=$('d'+i),pv=$('pv'+i);if(!pv.innerHTML)pv.innerHTML=window.CADoc?CADoc.preview(S.docs[i].text,{}):'<pre>'+esc(S.docs[i].text)+'</pre>';d.classList.toggle('open');b.textContent=d.classList.contains('open')?'Bezárás':'Megnyitás';});});
+  app.querySelectorAll('[data-p]').forEach(function(b){b.addEventListener('click',function(){openPdf(+b.getAttribute('data-p'));});});
+  app.querySelectorAll('[data-r]').forEach(function(c){c.addEventListener('change',function(){READ[c.getAttribute('data-r')]=c.checked;var all=S.docs.every(function(d){return READ[d.i];});$('d'+c.getAttribute('data-r')).classList.toggle('ok',c.checked);$('c2').classList.toggle('off',!all);$('c3').classList.toggle('off',!all);});});
+  $('getCode').addEventListener('click',function(){
+    var b=this;b.disabled=true;$('codeSt').textContent='Küldés…';
+    post('/code').then(function(j){$('codeSt').textContent='Elküldtük: '+j.email+' — nézze meg a postafiókját (a Spam mappát is).';$('code').focus();setTimeout(function(){b.disabled=false;b.textContent='Új kód kérése';},30000);})
+      .catch(function(e){$('codeSt').textContent=e.message;b.disabled=false;});
+  });
+  PAD=pad($('pad'),'ph');$('clr').addEventListener('click',function(){PAD.clear();});
+  $('go').addEventListener('click',signNow);
+}
+function pad(cv,ph){
+  var ctx,drawing=false,last=null,dirty=false;
+  function size(){var r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.lineWidth=2.4;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#14244a';dirty=false;$(ph).style.display='';}
+  size();window.addEventListener('resize',function(){if(!dirty)size();});
+  function pos(e){var r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
+  cv.addEventListener('pointerdown',function(e){drawing=true;last=pos(e);cv.setPointerCapture(e.pointerId);$(ph).style.display='none';e.preventDefault();});
+  cv.addEventListener('pointermove',function(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;dirty=true;e.preventDefault();});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){cv.addEventListener(ev,function(){drawing=false;});});
+  return {cv:cv,isEmpty:function(){return !dirty;},clear:function(){size();},jpeg:function(){var w=900,h=Math.round(cv.height/cv.width*900),o=document.createElement('canvas');o.width=w;o.height=h;var x=o.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(cv,0,0,w,h);return o.toDataURL('image/jpeg',0.85);}};
+}
+function showErr(m){$('err').innerHTML=m?'<div class="note err">'+esc(m)+'</div>':'';}
+function signNow(){
+  showErr('');
+  var code=($('code').value||'').replace(/\D/g,''),nm=($('nm').value||'').trim();
+  if(code.length!==6)return showErr('Adja meg az e-mailben kapott 6 jegyű kódot (2. lépés).');
+  if(nm.length<3)return showErr(ERR.bad_name);
+  if(PAD.isEmpty())return showErr(ERR.bad_signature);
+  if(!$('cons').checked)return showErr(ERR.consent);
+  var b=$('go');b.disabled=true;b.textContent='Aláírás folyamatban…';
+  post('/sign',{code:code,name:nm,sig:PAD.jpeg(),consent:true}).then(function(){return post('/view');}).then(function(j){S=j;try{sessionStorage.setItem('ca_sign_t',T);}catch(e){}render();window.scrollTo(0,0);})
+    .catch(function(e){showErr(e.message+(e.code==='wrong_code'&&e.left!=null?' Még '+e.left+' próbálkozás.':''));b.disabled=false;b.textContent='Aláírom a dokumentumokat';});
+}
+function renderSigned(){
+  $('sub').textContent='Aláírva: '+(S.sign_name||S.signer)+(S.signed_at?' · '+S.signed_at:'');
+  app.innerHTML='<div class="card"><div class="big">✅</div><h2>Köszönjük, a dokumentumokat aláírta.</h2><p class="muted">Az aláírt példányokat (aláírási tanúsítvánnyal) e-mailben is elküldtük. Itt le is töltheti őket:</p>'
+    +S.docs.map(function(d){return '<div class="doc ok"><div class="h"><b>'+esc(d.name)+'</b><button class="btn ghost sm" data-p="'+d.i+'">Aláírt PDF</button></div></div>';}).join('')+'</div>';
+  app.querySelectorAll('[data-p]').forEach(function(b){b.addEventListener('click',function(){openPdf(+b.getAttribute('data-p'));});});
+}
+load();
+})();
+</script>
+</body>
+</html>

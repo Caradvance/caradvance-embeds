@@ -66,6 +66,27 @@ export function checklistProgress(line, cl) {
 }
 
 export const MAX_FILE = 1400 * 1024;
+/** Az ügyfél-dokumentumok (pl. gyári konfigurátoros ajánlat PDF) nagyobbak is lehetnek: darabolva tároljuk (D1 sorlimit). */
+export const DOC_MAX = 9 * 1024 * 1024;
+const CHUNK = 1400000; // base64 karakter / sor
+/** base64 adat mentése crm_files-ba (az első darab a sorban, a többi a crm_file_chunks táblában). */
+export async function putFile(env, dealId, name, mime, b64, userId) {
+  const size = Math.floor(b64.length * 3 / 4);
+  const res = await env.DB.prepare(`INSERT INTO crm_files (deal_id, name, mime, size, data, created_by) VALUES (?,?,?,?,?,?)`).bind(dealId, name, mime, size, b64.slice(0, CHUNK), userId).run();
+  const id = res.meta.last_row_id;
+  for (let i = CHUNK, n = 1; i < b64.length; i += CHUNK, n++) await env.DB.prepare(`INSERT INTO crm_file_chunks (file_id, idx, data) VALUES (?,?,?)`).bind(id, n, b64.slice(i, i + CHUNK)).run();
+  return { id, size };
+}
+/** A teljes base64 tartalom (darabokkal együtt). f: crm_files sor (id, data). */
+export async function fileData(env, f) {
+  if (!f) return '';
+  const rows = (await env.DB.prepare(`SELECT data FROM crm_file_chunks WHERE file_id = ? ORDER BY idx`).bind(f.id).all()).results || [];
+  return f.data + rows.map((r) => r.data).join('');
+}
+export async function deleteFile(env, dealId, fid) {
+  await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, dealId).run();
+  await env.DB.prepare(`DELETE FROM crm_file_chunks WHERE file_id = ? AND file_id NOT IN (SELECT id FROM crm_files)`).bind(fid).run();
+}
 
 /* ============================== táblák ============================== */
 let READY = false;
@@ -114,8 +135,19 @@ export async function ensureCrm(env) {
       vehicle_id TEXT DEFAULT '', persons TEXT DEFAULT '{}', text TEXT NOT NULL DEFAULT '', vars TEXT NOT NULL DEFAULT '{}',
       created_by TEXT DEFAULT '', created_at TEXT DEFAULT (datetime('now')), updated_at TEXT, updated_by TEXT, sent_at TEXT, sent_to TEXT DEFAULT '')`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_docs_deal ON crm_docs (deal_id)`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_settings (k TEXT PRIMARY KEY, v TEXT)`)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_settings (k TEXT PRIMARY KEY, v TEXT)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_file_chunks (file_id INTEGER NOT NULL, idx INTEGER NOT NULL, data TEXT NOT NULL, PRIMARY KEY (file_id, idx))`),
+    // elektronikus aláírás: aláírási kérelmek (a link tokenje csak SHA-256 lenyomatként tárolódik), rate-limit számlálók
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_sign (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, deal_id INTEGER NOT NULL, signer_role TEXT NOT NULL DEFAULT 'client',
+      signer_name TEXT NOT NULL DEFAULT '', email TEXT NOT NULL DEFAULT '', docs TEXT NOT NULL DEFAULT '[]', message TEXT DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'pending', created_by TEXT DEFAULT '', created_at TEXT DEFAULT (datetime('now')), expires_at INTEGER NOT NULL,
+      opened_at TEXT, code_hash TEXT, code_exp INTEGER, code_attempts INTEGER NOT NULL DEFAULT 0, fails INTEGER NOT NULL DEFAULT 0, otp_at TEXT,
+      signed_at TEXT, sign_name TEXT, sign_ip TEXT, sign_ua TEXT, sig_sha TEXT, result TEXT DEFAULT '[]', revoked_by TEXT)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_sign_deal ON crm_sign (deal_id)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)`)
   ]);
+  for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   READY = true;
 }
 
@@ -290,7 +322,11 @@ export async function inventory(line) {
 
 /* ============================== ajánlat e-mail ============================== */
 export function specLine(it) {
-  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : it.km + ' km') : '', it.fuel, it.power, it.gearbox].filter(Boolean).join(' · ');
+  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : it.km + ' km') : '', it.fuel, it.power, it.gearbox, it.color].filter(Boolean).join(' · ');
+}
+/** Az ajánlott autó azonosítói (mobile.de hirdetés-azonosító, gyári konfigurációs kód) — e-mailben és a válaszoldalon. */
+export function idLine(it) {
+  return [it.ad_id ? 'mobile.de hirdetés-azonosító: ' + it.ad_id : '', it.config_code ? (it.brand ? it.brand + ' ' : '') + 'konfigurációs kód: ' + it.config_code : ''].filter(Boolean).join(' · ');
 }
 export function priceLabel(it) { return fmtPrice(it.price, it.currency) + (it.period ? ' / ' + it.period : ''); }
 
@@ -302,6 +338,8 @@ export function offerEmailHtml({ clientName, items, message, link }) {
       <tr><td style="padding:14px 16px">
         <div style="font-size:16px;font-weight:bold;color:#141519">${esc(it.title)}</div>
         ${specLine(it) ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">${esc(specLine(it))}</div>` : ''}
+        ${idLine(it) ? `<div style="font-size:12px;color:#374151;margin-top:5px;background:#f4f7fb;border-radius:6px;padding:5px 8px;display:inline-block">${esc(idLine(it))}</div>` : ''}
+        ${it.file_id ? `<div style="font-size:12px;color:#6b7280;margin-top:5px">A gyári konfigurátoros ajánlatot csatoltan küldjük (PDF).</div>` : ''}
         ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
         <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it))}</div>
         <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block">Ezt választom</a></div>
@@ -489,7 +527,7 @@ ${CLOSING('Bizományos', 'Megbízó')}`
 };
 
 /* ============================== autók (több autó / ügyfél) ============================== */
-export const VEH_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km'];
+export const VEH_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km', 'ad_id', 'config_code'];
 /** Az adatlap autói: data.vehicles; a régi, egyetlen data.vehicle „v1” azonosítóval kerül át. */
 export function vehiclesOf(data) {
   data = data || {};
@@ -504,9 +542,9 @@ export function itemToVehicle(it, id, source) {
   return {
     id, source: source || 'offer', key: it.key || '', title: it.title || '', brand,
     model: brand && String(it.title || '').indexOf(brand) === 0 ? String(it.title).slice(brand.length).trim() : (it.title || ''),
-    year: it.year || '', vin: '', color: '', engine: it.power || '', fuel: it.fuel || '', km: it.km ? String(it.km) : '', hybrid: /hybrid|hibrid|PHEV/i.test(String(it.title || '') + ' ' + String(it.fuel || '')),
+    year: it.year || '', vin: '', color: it.color || '', engine: it.power || '', ad_id: it.ad_id || '', config_code: it.config_code || '', fuel: it.fuel || '', km: it.km ? String(it.km) : '', hybrid: /hybrid|hibrid|PHEV/i.test(String(it.title || '') + ' ' + String(it.fuel || '')),
     price: Number(it.price) || 0, currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: it.period || '', deposit: Number(it.deposit) || 0,
-    image: it.image || '', url: it.url || ''
+    image: it.image || '', url: it.ad_url || it.url || ''
   };
 }
 export function newVehicleId(list) { let i = (list || []).length + 1; const ids = new Set((list || []).map((v) => v.id)); while (ids.has('v' + i)) i++; return 'v' + i; }
@@ -635,3 +673,18 @@ export function docVars(deal, card, vehicle, tpl, persons, seq) {
   for (const role of Object.keys(PERSON_ROLES)) Object.assign(base, personVars(role, (persons || {})[role]));
   return base;
 }
+
+/* ============================== elektronikus aláírás — segédfüggvények ============================== */
+/** Egyszerű, D1-alapú rate limit: k kulcsra max n kérés / win másodperc. true = mehet. */
+export async function rateOk(env, k, n, win) {
+  const now = Math.floor(Date.now() / 1000);
+  const r = await env.DB.prepare(`SELECT n, reset FROM crm_rate WHERE k = ?`).bind(k).first();
+  if (!r || r.reset < now) { await env.DB.prepare(`INSERT OR REPLACE INTO crm_rate (k, n, reset) VALUES (?, 1, ?)`).bind(k, now + win).run(); return true; }
+  if (r.n >= n) return false;
+  await env.DB.prepare(`UPDATE crm_rate SET n = n + 1 WHERE k = ?`).bind(k).run();
+  return true;
+}
+export function randomDigits(n) { const a = new Uint32Array(n); crypto.getRandomValues(a); return [...a].map((x) => String(x % 10)).join(''); }
+export function maskEmail(e) { const [u, d] = String(e || '').split('@'); if (!d) return ''; return u.slice(0, 2) + '•••@' + d; }
+export function huDateTime(iso) { const d = iso ? new Date(String(iso).replace(' ', 'T') + (/Z$/.test(iso) ? '' : 'Z')) : new Date(); return d.toLocaleString('hu-HU', { timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+export const SIGN_STATEMENT = 'A fenti dokumentumo(ka)t elolvastam, tartalmukat megértettem, és elektronikus aláírásommal elfogadom. Tudomásul veszem, hogy az aláírás adatai (név, e-mail cím, időpont, IP-cím, eszköz) a hitelesség igazolására rögzítésre kerülnek.';
