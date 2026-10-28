@@ -667,9 +667,13 @@
       '.caf-bd{border-left:1px solid #eef1f5;padding-left:20px}',
       '.caf-be>.caf-ic,.caf-bd>.caf-ic{width:30px;height:30px;color:#1f2a3a;flex:0 0 auto}',
       '.caf-be .l,.caf-bd .l{display:block;font-size:13.5px;font-weight:600;color:#3a4556}',
-      '.caf-be .v{display:block;font-size:25px;font-weight:800;color:var(--ink);line-height:1.15}',
+      '.caf-be .v{display:block;font-size:25px;font-weight:800;color:var(--ink);line-height:1.15;white-space:nowrap}',
+      '.caf-be>div{min-width:0}',
       '.caf-be .v small{font-size:13px;font-weight:500;color:var(--mut)}',
-      '.caf-be .eu{display:block;font-size:14.5px;font-weight:800;color:#1f2a3a}',
+      '.caf-be .eu{display:block;font-size:13.5px;line-height:1.35;margin-top:2px;color:#1f2a3a}',
+      '.caf-be .eu b{font-weight:800}',
+      '.caf-be .eu span{font-weight:500;color:var(--mut)}',
+      '@media(max-width:560px){.caf-be .v{font-size:20px}.caf-be .eu{font-size:12.5px}}',
       '.caf-bd .v{display:block;font-size:20px;font-weight:800;color:var(--ink)}',
       '.caf-bd .s{display:block;font-size:12.5px;color:var(--mut)}',
       '.caf-bg{display:flex;flex-direction:column;align-items:stretch;gap:6px}',
@@ -1288,7 +1292,7 @@
       qa('.caf-csec .caf-f', m).forEach(function (f) { var i = q('input,textarea', f); var on = !!(i && i.value); if (f.classList.contains('fl') !== on) f.classList.toggle('fl', on); });
     }
     if (M.bar) {
-      q('.caf-be .l', M.bar).textContent = e.label; q('.caf-be .v', M.bar).innerHTML = esc(e.val || '') + (e.sub ? ' <small>' + esc(e.sub) + '</small>' : ''); q('.caf-be .eu', M.bar).textContent = e.eur || '';
+      q('.caf-be .l', M.bar).textContent = e.label; q('.caf-be .v', M.bar).textContent = e.val || ''; var bsub = String(e.sub || '').replace(/^\s*\(|\)\s*$/g, '').trim(); var beu = (e.eur ? '<b>' + esc(e.eur) + '</b>' : '') + (bsub ? '<span>' + (e.eur ? ' · ' : '') + esc(bsub) + '</span>' : ''); var beuEl = q('.caf-be .eu', M.bar); if (beuEl.__h !== beu) { beuEl.innerHTML = beu; beuEl.__h = beu; }
       q('.caf-bd .v', M.bar).textContent = dp.v; q('.caf-bd .s', M.bar).textContent = dp.s;
       var ob = q('.ab-submit', m), sb = q('.caf-send', M.bar), busy = !!(ob && ob.disabled), lbl = (busy ? esc(T.sending) : esc(TV.send)) + svg('right');
       sb.disabled = busy; if (sb.__h !== lbl) { sb.innerHTML = lbl; sb.__h = lbl; }
@@ -1372,4 +1376,4 @@
   ready(function () { watch(); pageInquiry(); });
 })();
 
-/* rebuild 1 */
+/* rebuild 2 */
