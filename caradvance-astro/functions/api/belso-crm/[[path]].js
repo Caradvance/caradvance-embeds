@@ -51,10 +51,41 @@ async function handleList(env, user) {
     return {
       id: r.id, line: r.line, ch: r.ch, name: (isCo && data.person && data.person.name) || r.name, company: isCo ? data.company.name : '', phone: r.phone, email: r.email, car: r.car,
       address: r.address || '', status: r.status || statusFromDeal(r), status_at: r.status_at,
-      progress: pr.progress, done: pr.done, total: pr.total, created_at: r.created_at, when_text: r.when_text, assigned_to: r.assigned_to
+      progress: pr.progress, done: pr.done, total: pr.total, rent: rentAlert(data), created_at: r.created_at, when_text: r.when_text, assigned_to: r.assigned_to
     };
   });
   return json({ clients, statuses: STATUSES });
+}
+
+/* ---------------- bérlet-figyelmeztetések (napi futás) ---------------- */
+// POST /api/belso-crm/cron — fejléc: X-Cron-Token = env.CRON_TOKEN (ugyanaz, mint a szerződés-cronnál).
+// Az esedékes (dátuma elérkezett, még el nem küldött) figyelmeztetésekről összesítő e-mail megy a munkatársaknak,
+// a figyelmeztetés „elküldve” jelölést kap, és bekerül az ügyfél történésnaplójába.
+async function handleCron(request, env) {
+  const tok = request.headers.get('X-Cron-Token') || '';
+  if (!env.CRON_TOKEN || String(env.CRON_TOKEN).length < 16 || tok !== env.CRON_TOKEN) return json({ ok: false, error: 'forbidden' }, 403);
+  const today = huToday();
+  const rows = (await env.DB.prepare(`SELECT c.deal_id, c.data, d.name, d.line FROM crm_cards c JOIN deals d ON d.id = c.deal_id WHERE c.data LIKE '%"reminders"%'`).all()).results || [];
+  const due = [];
+  for (const r of rows) {
+    const data = parseJ(r.data, {}); const list = vehiclesOf(data); let changed = false;
+    for (const v of list) for (const rm of (v.reminders || [])) {
+      if (rm.date && rm.date <= today && !rm.sent_at) {
+        rm.sent_at = new Date().toISOString().slice(0, 19).replace('T', ' '); changed = true;
+        due.push({ deal_id: r.deal_id, name: r.name, line: r.line, car: v.title || [v.brand, v.model].filter(Boolean).join(' ') || 'autó', end: v.rent_end, days: v.rent_end ? daysTo(v.rent_end) : null, note: rm.note });
+      }
+    }
+    if (changed) await saveCard(env, r.deal_id, { data: { ...data, vehicles: list } }, null);
+  }
+  for (const x of due) await addEvent(env, x.deal_id, 'rent', `Figyelmeztetés: bérlet lejár — ${x.car}${x.end ? ' (' + x.end + (x.days != null ? ', ' + (x.days < 0 ? Math.abs(x.days) + ' napja lejárt' : x.days + ' nap múlva') : '') + ')' : ''}${x.note ? ' · ' + x.note : ''}`, 'Rendszer');
+  let mailed = false;
+  if (due.length) {
+    const rowsHtml = due.map((x) => `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee"><b>${esc(x.name || '')}</b><br><span style="color:#6b7280;font-size:12px">${esc(x.line)}</span></td><td style="padding:6px 8px;border-bottom:1px solid #eee">${esc(x.car)}${x.note ? '<br><span style="color:#6b7280;font-size:12px">' + esc(x.note) + '</span>' : ''}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;white-space:nowrap"><b>${esc(x.end || '—')}</b><br><span style="color:${x.days != null && x.days < 0 ? '#c0392b' : '#a2660b'};font-size:12px">${x.days == null ? '' : x.days < 0 ? Math.abs(x.days) + ' napja lejárt' : x.days + ' nap van hátra'}</span></td><td style="padding:6px 8px;border-bottom:1px solid #eee"><a href="${SITE}/belso/ugyfel/?id=${x.deal_id}#s2">Adatlap</a></td></tr>`).join('');
+    const r = await sendCrmMail(env, notifyTo(env), `Lejáró bérletek — ${due.length} figyelmeztetés (${today})`,
+      `<p>Az alábbi bérletekhez ma esedékes figyelmeztetés tartozik:</p><table cellpadding="0" cellspacing="0" style="width:100%;font-size:13px;border-collapse:collapse">${rowsHtml}</table>`);
+    mailed = r.ok;
+  }
+  return json({ ok: true, today, due: due.length, mailed });
 }
 
 /* ---------------- adatlap ---------------- */
@@ -89,9 +120,33 @@ function normVehicles(b) {
       id, ...pick(v, VEHICLE_KEYS), hybrid: !!(v && v.hybrid), title: clean(v && v.title, 200),
       source: ['inv', 'offer', 'manual'].includes(v && v.source) ? v.source : 'manual', key: clean(v && v.key, 120),
       price: Math.max(0, Number(v && v.price) || 0), currency: v && v.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(v && v.period, 20), deposit: Math.max(0, Number(v && v.deposit) || 0),
-      image: /^https:\/\//.test((v && v.image) || '') ? clean(v.image, 600) : '', url: /^https:\/\//.test((v && v.url) || '') ? clean(v.url, 400) : ''
+      image: /^https:\/\//.test((v && v.image) || '') ? clean(v.image, 600) : '', url: /^https:\/\//.test((v && v.url) || '') ? clean(v.url, 400) : '',
+      // bérlet (Eladás 1. üteme és Bérlés): kezdet, vég, figyelmeztetések a lejárat előtt
+      rent_start: isoDate(v && v.rent_start), rent_end: isoDate(v && v.rent_end),
+      reminders: (Array.isArray(v && v.reminders) ? v.reminders : []).slice(0, 20).map((r, j) => ({
+        id: /^[a-z0-9_-]{1,20}$/i.test(r && r.id || '') ? r.id : 'r' + (j + 1),
+        date: isoDate(r && r.date), days: Number.isInteger(r && r.days) && r.days >= 0 && r.days <= 730 ? r.days : null,
+        note: clean(r && r.note, 200), sent_at: /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test((r && r.sent_at) || '') ? String(r.sent_at).slice(0, 19) : ''
+      })).filter((r) => r.date)
     };
   });
+}
+function isoDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s || '') && !isNaN(Date.parse(s + 'T00:00:00Z')) ? s : ''; }
+function huToday() { return new Date(Date.now() + 2 * 3600e3).toISOString().slice(0, 10); } // közép-európai nap (közelítőleg)
+function daysTo(d) { return Math.round((Date.parse(d + 'T00:00:00Z') - Date.parse(huToday() + 'T00:00:00Z')) / 864e5); }
+/** Az ügyfél legsürgősebb bérlet-figyelmeztetése (lista-jelvényhez): lejárt / esedékes emlékeztető / 60 napon belül lejár. */
+function rentAlert(data) {
+  let best = null;
+  for (const v of vehiclesOf(data)) {
+    if (!v.rent_end) continue;
+    const d = daysTo(v.rent_end);
+    const due = (v.reminders || []).some((r) => r.date && r.date <= huToday());
+    if (d < 0 || due || d <= 60) {
+      const a = { days: d, due, car: v.title || [v.brand, v.model].filter(Boolean).join(' '), end: v.rent_end };
+      if (!best || d < best.days) best = a;
+    }
+  }
+  return best;
 }
 function normData(b) {
   b = b || {};
@@ -116,7 +171,15 @@ async function handlePatchCard(request, env, user, id) {
   const cur = await getCard(env, id);
   const f = {};
   if (b.status !== undefined) { if (!STATUSES.includes(b.status)) return json({ error: 'Ismeretlen státusz.' }, 400); f.status = b.status; }
-  if (b.data !== undefined) f.data = normData(b.data);
+  if (b.data !== undefined) {
+    f.data = normData(b.data);
+    // a napi futás által beállított „elküldve” jelölést egy régebben megnyitott adatlap mentése se törölje
+    const prevV = vehiclesOf(cur.data || {});
+    for (const v of f.data.vehicles) {
+      const pv = prevV.find((x) => x.id === v.id); if (!pv) continue;
+      for (const r of v.reminders) { const pr = (pv.reminders || []).find((x) => x.id === r.id && x.date === r.date); if (pr && pr.sent_at && !r.sent_at) r.sent_at = pr.sent_at; }
+    }
+  }
   if (b.address !== undefined) f.address = clean(b.address, 300);
   else if (f.data) f.address = f.data.kind === 'ceg' ? (f.data.company.address || f.data.person.address) : f.data.person.address;
   if (b.checklist !== undefined) {
@@ -437,6 +500,7 @@ export async function onRequest(context) {
   let path = url.pathname.replace(/^\/api\/belso-crm/, '') || '/';
   const method = request.method;
   try {
+    if (path === '/cron' && method === 'POST') { await ensureCrm(env); return await handleCron(request, env); }
     const user = await getSessionUser(request, env);
     if (!user) return json({ error: 'Nincs bejelentkezve.' }, 401);
     await ensureCrm(env);
