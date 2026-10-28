@@ -50,12 +50,11 @@ P=/tmp/am && (cd ../ajanlatmotor && npx wrangler d1 migrations apply caradvance-
 # http://127.0.0.1:8788/belso/  → log in with a test user → Ajánlatmotor → "Demó e-mail szimulálása"
 ```
 
-## Production go-live (later, deliberately)
+## Live (since 2026-10-28)
 
-1. Confirm every value in `RATES.md` in *Díjak és beállítások*.
-2. mobile.de Search API credentials (Caradvance GmbH dealer account) as Pages secrets
-   `MOBILE_DE_API_USERNAME` / `MOBILE_DE_API_PASSWORD`; verify the field mapping in `lib/ajanlatmotor/sources.ts`.
-3. Optional: `ANTHROPIC_API_KEY` (Claude extraction + descriptions), `ORS_API_KEY` (road distances).
-4. Intake Worker production config: bind `caradvance-belso-db`, **without** the test migration.
-5. Gmail filter on info@ forwarding car enquiries to the intake address.
-6. Merge `ajanlatmotor-teszt` into `main`.
+- **www.caradvance.hu/belso/ajanlatmotor/** runs on the live belső database (`caradvance-belso-db`); the `am_*` tables are created on first use. Pages Production has the `DB` and `AI` bindings.
+- mobile.de source: **manual** until Search API credentials exist (`MOBILE_DE_API_USERNAME` / `MOBILE_DE_API_PASSWORD` switch it to `searchapi` automatically). Staff open the prefilled search with „mobile.de keresés ↗” and send cars with the Chrome extension.
+- Chrome extension 0.5.0 („Caradvance Sourcing”) points to www.caradvance.hu and uses the belső login (no token). Unpacked installs update themselves when newer files are in their folder.
+- Publishing stays blocked until every fee in *Díjak és beállítások* is confirmed (`RATES.md`) and every car's photos are checked.
+- Still on the test setup: the email intake Worker (`intake@in.caradvance.hu` → test DB). Production intake: bind `caradvance-belso-db` without the test migration, then a Gmail filter on info@.
+- The test site (branch `ajanlatmotor-teszt`, preview DB `caradvance-offers-test`) keeps working for experiments.
