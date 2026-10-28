@@ -20,7 +20,9 @@ const CH = '(?:[^<>.!?"\\n]|' + INL + ')';
 /** mondat-szintű csere: a kulcsszót tartalmazó teljes mondatot (inline tagekkel együtt) cseréli, ha ok(mondat) igaz */
 function sentences(h, key, ok, std) {
   const re = new RegExp('((?:^|[>.!?"]|\\n)\\s*)(' + CH + '*?(?:' + key + ')' + CH + '*[.!?]?)', 'gi');
-  return h.replace(re, (m, a, s) => (ok(s.replace(/<[^>]+>/g, '')) ? a + std : m));
+  // modellnevekben a pont nem mondatvég (pl. „ID.7”, „ID.4”)
+  h = h.replace(/\bID\.(?=\d)/g, 'ID\u0000');
+  return h.replace(re, (m, a, s) => (ok(s.replace(/<[^>]+>/g, '')) ? a + std : m)).replace(/ID\u0000/g, 'ID.');
 }
 const R = (h, list) => { for (const [a, b] of list) h = typeof a === 'string' ? h.split(a).join(b) : h.replace(a, b); return h; };
 
