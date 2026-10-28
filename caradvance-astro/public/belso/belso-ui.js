@@ -437,7 +437,7 @@
     var wrapEl = d.createElement('div'); wrapEl.className = 'caui-subwrap';
     kids.forEach(function (n) { wrapEl.appendChild(n); });
     var side = d.createElement('aside'); side.className = 'side';
-    var cur = /szerzodesek/.test(location.pathname) ? 'szerzodesek' : /penzugy/.test(location.pathname) ? 'penzugy' : 'ugyfelek';
+    var cur = /szerzodesek|dokumentumok/.test(location.pathname) ? 'szerzodesek' : /penzugy/.test(location.pathname) ? 'penzugy' : 'ugyfelek';
     var items = [['overview', 'home', '/belso/'], ['eladas', null, '/belso/#eladas'], ['import', null, '/belso/#import'], ['berles', null, '/belso/#berles'], ['bizomanyos', null, '/belso/#bizomanyos'], ['teendok', null, '/belso/#teendok'], ['ugyfelek', 'users', '/belso/#ugyfelek'], ['ugyfelfiokok', 'user', '/belso/#ugyfelfiokok'], ['szerzodesek', 'doc', '/belso/szerzodesek/']];
     var navIc = { eladas: 'cart', import: 'upload', berles: 'car', bizomanyos: 'swap', teendok: 'check' };
     side.innerHTML = '<div class="brand"><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance" style="height:50px;width:auto"></a></div>'
@@ -466,7 +466,7 @@
 
   function init() {
     if (isIndex) hookIndex();
-    else if (!isLoginOnly || /\/belso\/(ugyfel|szerzodesek|penzugy)\//.test(location.pathname)) hookSub();
+    else if (!isLoginOnly || /\/belso\/(ugyfel|szerzodesek|dokumentumok|penzugy)\//.test(location.pathname)) hookSub();
     var role = $('#curUserRole'); if (role && /^Admin$/.test(role.textContent)) role.textContent = 'Adminisztrátor';
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init); else init();
