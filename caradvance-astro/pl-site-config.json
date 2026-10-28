@@ -73,27 +73,27 @@
   ],
   [
    "Mr. Job SK s.r.o.",
-   "BH Group Zrt."
+   "Mr.JOB POLAND Sp. z o.o."
   ],
   [
    "Mr. JOB SK s.r.o.",
-   "BH Group Zrt."
+   "Mr.JOB POLAND Sp. z o.o."
   ],
   [
    "Mr. Job SK",
-   "BH Group Zrt."
+   "Mr.JOB POLAND Sp. z o.o."
   ],
   [
    "Cesta na Senec 2/A",
-   "Ibolya utca 18."
+   "ul. Pory 78"
   ],
   [
    "SK2120860148",
-   "32488447-2-09"
+   "PL5213804274"
   ],
   [
    "52005445",
-   "09-10-000660"
+   "368854599"
   ],
   [
    "/caradvance-logo-white-sk.webp",
@@ -119,11 +119,11 @@
   ],
   [
    "821[\\s\\u00a0]?04[\\s\\u00a0](?:Bratislava|Solymár)",
-   "2083 Solymár"
+   "02-757 Warszawa"
   ],
   [
    "Ibolya utca 2(?:/A)?\\.?(?=[\\s,<])",
-   "Ibolya utca 18."
+   "ul. Pory 78"
   ],
   [
    "Ružinov,?[\\s\\u00a0]?",
@@ -167,17 +167,17 @@
   [
    "<dd>Ibolya utca 18\\., 2083 Solymár – </dd>",
    {
-    "pl": "<dd>Petőfi utca 23., 4143 Vekerd, Węgry</dd>",
-    "en": "<dd>Petőfi utca 23., 4143 Vekerd, Hungary</dd>",
-    "de": "<dd>Petőfi utca 23., 4143 Vekerd, Ungarn</dd>"
+    "pl": "<dd>ul. Pory 78, 02-757 Warszawa, Polska</dd>",
+    "en": "<dd>ul. Pory 78, 02-757 Warszawa, Poland</dd>",
+    "de": "<dd>ul. Pory 78, 02-757 Warszawa, Polen</dd>"
    }
   ],
   [
    "(?:Nr identyfikacyjny|Company ID|Firmen-ID) 52 005 445 — [^<]*",
    {
-    "pl": "Cg. 09-10-000660 (węgierski rejestr firm)",
-    "en": "Cg. 09-10-000660 (Hungarian company register)",
-    "de": "Cg. 09-10-000660 (ungarisches Firmenregister)"
+    "pl": "REGON 368854599 · NIP 5213804274",
+    "en": "REGON 368854599 · NIP (tax no.) 5213804274",
+    "de": "REGON 368854599 · NIP (Steuernummer) 5213804274"
    }
   ],
   [
@@ -211,9 +211,9 @@
   [
    "<li\\b[^>]*>(?:(?!</li>)[\\s\\S])*?soi\\.sk/alternativne[\\s\\S]*?</li>",
    {
-    "pl": "<li>w sporze dotyczącym własnych usług Pośrednika (np. pomocy przy rejestracji pojazdu) możesz zwrócić się do komitetu polubownego właściwego dla siedziby Pośrednika — Hajdú-Bihar Vármegyei Békéltető Testület, Petőfi tér 10, 4025 Debreczyn, Węgry; postępowanie jest bezpłatne; szczegóły: <a href=\"https://bekeltetes.hu\" target=\"_blank\" rel=\"noopener\">bekeltetes.hu</a>;</li>",
-    "en": "<li>in a dispute concerning the Agent's own services (e.g. help with vehicle registration) you can turn to the conciliation board competent for the Agent's registered office — Hajdú-Bihar County Conciliation Board (Hajdú-Bihar Vármegyei Békéltető Testület), Petőfi tér 10, 4025 Debrecen, Hungary; the procedure is free of charge; details: <a href=\"https://bekeltetes.hu\" target=\"_blank\" rel=\"noopener\">bekeltetes.hu</a>;</li>",
-    "de": "<li>bei Streitigkeiten über die eigenen Leistungen des Vermittlers (z. B. Hilfe bei der Zulassung) können Sie sich an die für den Sitz des Vermittlers zuständige Schlichtungsstelle wenden — Schlichtungsstelle des Komitats Hajdú-Bihar (Hajdú-Bihar Vármegyei Békéltető Testület), Petőfi tér 10, 4025 Debrecen, Ungarn; das Verfahren ist kostenlos; Details: <a href=\"https://bekeltetes.hu\" target=\"_blank\" rel=\"noopener\">bekeltetes.hu</a>;</li>"
+    "pl": "<li>w sporze dotyczącym własnych usług Pośrednika (np. pomocy przy rejestracji pojazdu) możesz zwrócić się do stałego polubownego sądu konsumenckiego przy Wojewódzkim Inspektorze Inspekcji Handlowej właściwym dla siedziby Pośrednika (Warszawa) lub skorzystać z pomocy miejskiego lub powiatowego rzecznika konsumentów; szczegóły: <a href=\"https://uokik.gov.pl\" target=\"_blank\" rel=\"noopener\">uokik.gov.pl</a>;</li>",
+    "en": "<li>in a dispute concerning the Agent's own services (e.g. help with vehicle registration) you can turn to the permanent consumer arbitration court at the Voivodeship Inspector of Trade Inspection competent for the Agent's registered office (Warsaw), or ask a municipal or district consumer ombudsman for help; details: <a href=\"https://uokik.gov.pl\" target=\"_blank\" rel=\"noopener\">uokik.gov.pl</a>;</li>",
+    "de": "<li>bei Streitigkeiten über die eigenen Leistungen des Vermittlers (z. B. Hilfe bei der Zulassung) können Sie sich an das ständige Verbraucherschiedsgericht beim für den Sitz des Vermittlers zuständigen Woiwodschaftsinspektor der Handelsinspektion (Warschau) wenden oder die Hilfe eines städtischen bzw. Kreis-Verbraucherombudsmanns in Anspruch nehmen; Details: <a href=\"https://uokik.gov.pl\" target=\"_blank\" rel=\"noopener\">uokik.gov.pl</a>;</li>"
    }
   ],
   [
@@ -226,22 +226,22 @@
   ],
   [
    "węgierskie przepisy o ochronie danych osobowych \\(ustawa nr 18/2018\\), kodeks cywilny \\(ustawa nr 40/1964\\) oraz ustawa o rachunkowości \\(nr 431/2002\\)",
-   "węgierska ustawa o ochronie danych osobowych (ustawa CXII z 2011 r.), węgierski kodeks cywilny (ustawa V z 2013 r.) oraz węgierska ustawa o rachunkowości (ustawa C z 2000 r.)"
+   "polska ustawa z dnia 10 maja 2018 r. o ochronie danych osobowych, Kodeks cywilny (ustawa z dnia 23 kwietnia 1964 r.) oraz ustawa z dnia 29 września 1994 r. o rachunkowości"
   ],
   [
    "Hungarian legislation on the protection of personal data \\(Act No\\. 18/2018\\), the Civil Code \\(Act No\\. 40/1964\\) and the Accounting Act \\(No\\. 431/2002\\)",
-   "the Hungarian Data Protection Act (Act CXII of 2011), the Hungarian Civil Code (Act V of 2013) and the Hungarian Accounting Act (Act C of 2000)"
+   "the Polish Personal Data Protection Act of 10 May 2018, the Polish Civil Code (Act of 23 April 1964) and the Polish Accounting Act of 29 September 1994"
   ],
   [
    "die ungarischen Vorschriften zum Datenschutz \\(Gesetz Nr\\. 18/2018\\), das Zivilgesetzbuch \\(Gesetz Nr\\. 40/1964\\) und das Rechnungslegungsgesetz \\(Nr\\. 431/2002\\)",
-   "das ungarische Datenschutzgesetz (Gesetz CXII von 2011), das ungarische Zivilgesetzbuch (Gesetz V von 2013) und das ungarische Rechnungslegungsgesetz (Gesetz C von 2000)"
+   "das polnische Datenschutzgesetz vom 10. Mai 2018, das polnische Zivilgesetzbuch (Gesetz vom 23. April 1964) und das polnische Rechnungslegungsgesetz vom 29. September 1994"
   ],
   [
    "(?:nr|No\\.|Nr\\.) 431/2002, § 35",
    {
-    "pl": "(ustawa C z 2000 r.), § 169",
-    "en": "(Act C of 2000), § 169",
-    "de": "(Gesetz C von 2000), § 169"
+    "pl": "(ustawa z dnia 29 września 1994 r. o rachunkowości), art. 74",
+    "en": "(Accounting Act of 29 September 1994), Art. 74",
+    "de": "(Rechnungslegungsgesetz vom 29. September 1994), Art. 74"
    }
   ],
   [
@@ -258,11 +258,7 @@
   ],
   [
    "(www\\.lda\\.bayern\\.de</a></dd>)(?![\\s\\S]{0,200}naih)",
-   {
-    "pl": "$1<dt>Węgry (organ nadzorczy BH Group Zrt.)</dt><dd>Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH) — Falk Miksa utca 9–11, 1055 Budapeszt; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
-    "en": "$1<dt>Hungary (supervisory authority of BH Group Zrt.)</dt><dd>Hungarian National Authority for Data Protection and Freedom of Information (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>",
-    "de": "$1<dt>Ungarn (Aufsichtsbehörde der BH Group Zrt.)</dt><dd>Ungarische Behörde für Datenschutz und Informationsfreiheit (NAIH) — Falk Miksa utca 9–11, 1055 Budapest; <a href=\"https://naih.hu\" target=\"_blank\" rel=\"noopener\">www.naih.hu</a></dd>"
-   }
+   "$1"
   ],
   [
    "mniej więcej 14× większy niż polski",
@@ -302,11 +298,11 @@
   ],
   [
    "\"postalCode\":\"821 04\",\"addressLocality\":\"Bratislava\",\"addressRegion\":\"Bratislavský kraj\"",
-   "\"postalCode\":\"2083\",\"addressLocality\":\"Solymár\",\"addressRegion\":\"Pest\""
+   "\"postalCode\":\"02-757\",\"addressLocality\":\"Warszawa\",\"addressRegion\":\"mazowieckie\""
   ],
   [
    "\"addressCountry\":\"SK\"",
-   "\"addressCountry\":\"HU\""
+   "\"addressCountry\":\"PL\""
   ],
   [
    "\"areaServed\":\"SK\"",
@@ -394,15 +390,15 @@
   ],
   [
    "\\(3 lata zgodnie z § 101 kodeksu cywilnego, 4 lata zgodnie z § 397 kodeksu handlowego\\)",
-   "(5 lat zgodnie z § 6:22 węgierskiego kodeksu cywilnego)"
+   "(6 lat, a dla roszczeń związanych z prowadzeniem działalności gospodarczej 3 lata — art. 118 Kodeksu cywilnego)"
   ],
   [
    "\\(3 years under § 101 of the Civil Code, 4 years under § 397 of the Commercial Code\\)",
-   "(5 years under § 6:22 of the Hungarian Civil Code)"
+   "(6 years, or 3 years for claims connected with business activity — Art. 118 of the Polish Civil Code)"
   ],
   [
    "\\(3 Jahre nach § 101 des Zivilgesetzbuchs, 4 Jahre nach § 397 des Handelsgesetzbuchs\\)",
-   "(5 Jahre nach § 6:22 des ungarischen Zivilgesetzbuchs)"
+   "(6 Jahre, bei Ansprüchen aus gewerblicher Tätigkeit 3 Jahre — Art. 118 des polnischen Zivilgesetzbuchs)"
   ],
   [
    "const fuelPrice=\\{b:[0-9.]+,d:[0-9.]+,src:'[^']*'\\};",
@@ -645,5 +641,311 @@
    ]
   ]
  },
- "monRe": "['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december','styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień','january','february','march','april','may','june','july','august','september','october','november','december','januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember']"
+ "monRe": "['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december','styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień','january','february','march','april','may','june','july','august','september','october','november','december','januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember']",
+ "coFix": [
+  [
+   "\"taxID\":\"[^\"]*PL5213804274\"",
+   "\"taxID\":\"PL5213804274\""
+  ],
+  [
+   "\"streetAddress\":\"Petőfi utca 23\\.\",\"postalCode\":\"4143\",\"addressLocality\":\"Vekerd\",\"addressCountry\":\"HU\"",
+   "\"streetAddress\":\"ul. Pory 78\",\"postalCode\":\"02-757\",\"addressLocality\":\"Warszawa\",\"addressCountry\":\"PL\""
+  ],
+  [
+   "(Mr\\.JOB POLAND Sp\\. z o\\.o\\. · ul\\. Pory 78, 02-757 Warszawa) \\([^)]*\\) · [^<]*?2120860148",
+   {
+    "pl": "$1 (Polska) · REGON: 368854599 · NIP: 5213804274 · Nr VAT UE: PL5213804274",
+    "en": "$1 (Poland) · REGON: 368854599 · NIP: 5213804274 · EU VAT ID: PL5213804274",
+    "de": "$1 (Polen) · REGON: 368854599 · NIP: 5213804274 · USt-IdNr.: PL5213804274"
+   }
+  ],
+  [
+   "DIČ 2120860148 · (?:VAT ID|Numer VAT UE|USt-IdNr\\.) PL5213804274",
+   {
+    "pl": "NIP 5213804274 · Numer VAT UE PL5213804274",
+    "en": "NIP 5213804274 · EU VAT ID PL5213804274",
+    "de": "NIP 5213804274 · USt-IdNr. PL5213804274"
+   }
+  ],
+  [
+   "(\\b(?:w|in) )Warszawa(?: (?:pod Budapesztem|near Budapest|bei Budapest))? \\((?:Węgry|Hungary|Ungarn)\\)(?:,? (?:pod Budapesztem|near Budapest|bei Budapest))?",
+   {
+    "pl": "$1Warszawie (Polska)",
+    "en": "$1Warsaw (Poland)",
+    "de": "$1Warschau (Polen)"
+   }
+  ],
+  [
+   "02-757 Warszawa \\((?:Węgry|Hungary|Ungarn)\\)(?:,? (?:pod Budapesztem|near Budapest|bei Budapest))?",
+   {
+    "pl": "02-757 Warszawa (Polska)",
+    "en": "02-757 Warszawa (Poland)",
+    "de": "02-757 Warszawa (Polen)"
+   }
+  ],
+  [
+   "02-757 Warszawa, (?:Węgry|Hungary|Ungarn)",
+   {
+    "pl": "02-757 Warszawa, Polska",
+    "en": "02-757 Warszawa, Poland",
+    "de": "02-757 Warszawa, Polen"
+   }
+  ],
+  [
+   "Warszawa,? (?:pod Budapesztem|near Budapest|bei Budapest)",
+   "Warszawa"
+  ],
+  [
+   "Hungarian Accounting Act \\(Accounting Act of 29 September 1994\\)",
+   "Polish Accounting Act of 29 September 1994"
+  ],
+  [
+   "ungarisches Rechnungslegungsgesetz \\(Rechnungslegungsgesetz vom 29\\. September 1994\\)",
+   "polnisches Rechnungslegungsgesetz vom 29. September 1994"
+  ],
+  [
+   "2120860148",
+   "5213804274"
+  ],
+  [
+   "BH Group Zrt\\. · Ibolya utca 18\\., 2083 Solymár \\([^)]*\\) · [^<]*?2120860148",
+   {
+    "pl": "Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warszawa (Polska) · REGON: 368854599 · NIP: 5213804274 · Nr VAT UE: PL5213804274",
+    "en": "Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warszawa (Poland) · REGON: 368854599 · NIP: 5213804274 · EU VAT ID: PL5213804274",
+    "de": "Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warszawa (Polen) · REGON: 368854599 · NIP: 5213804274 · USt-IdNr.: PL5213804274"
+   }
+  ],
+  [
+   "Petőfi utca 23\\., 4143 Vekerd, (?:Węgry|Hungary|Ungarn)",
+   {
+    "pl": "ul. Pory 78, 02-757 Warszawa, Polska",
+    "en": "ul. Pory 78, 02-757 Warszawa, Poland",
+    "de": "ul. Pory 78, 02-757 Warszawa, Polen"
+   }
+  ],
+  [
+   "(Numer w rejestrze handlowym, numer podatkowy|Company registration number, tax number|Handelsregisternummer, Steuernummer)(</dt>\\s*<dd>)Cg\\. 09-10-000660[^<]*",
+   {
+    "pl": "REGON, NIP, numer VAT UE$2REGON 368854599 · NIP 5213804274 · VAT UE PL5213804274",
+    "en": "REGON, NIP (tax no.), EU VAT ID$2REGON 368854599 · NIP 5213804274 · EU VAT PL5213804274",
+    "de": "REGON, NIP (Steuernr.), USt-IdNr.$2REGON 368854599 · NIP 5213804274 · USt-IdNr. PL5213804274"
+   }
+  ],
+  [
+   "(Numer w rejestrze handlowym|Company registration number|Handelsregisternummer)(</dt>\\s*<dd>)(?:Cg\\. 09-10-000660|REGON 368854599)[^<]*",
+   "REGON$2368854599"
+  ],
+  [
+   "(<dt>)(?:NIP|Tax number|Steuernummer)(</dt>\\s*<dd>)(?:32488447-2-09|5213804274)(</dd>)",
+   {
+    "pl": "$1NIP$25213804274$3<dt>Numer VAT UE</dt><dd>PL5213804274$3",
+    "en": "$1NIP (tax number)$25213804274$3<dt>EU VAT ID</dt><dd>PL5213804274$3",
+    "de": "$1NIP (Steuernummer)$25213804274$3<dt>USt-IdNr.</dt><dd>PL5213804274$3"
+   }
+  ],
+  [
+   "Cg\\. 09-10-000660(?: \\([^)]*\\))?",
+   "REGON 368854599"
+  ],
+  [
+   "32488447-2-09",
+   "5213804274"
+  ],
+  [
+   "Ibolya utca 18\\.?,? 2083 Solymár, (?:Węgry|Hungary|Ungarn)",
+   {
+    "pl": "ul. Pory 78, 02-757 Warszawa, Polska",
+    "en": "ul. Pory 78, 02-757 Warszawa, Poland",
+    "de": "ul. Pory 78, 02-757 Warszawa, Polen"
+   }
+  ],
+  [
+   "Ibolya utca 18\\.?,? 2083 Solymár \\((?:Węgry|Hungary|Ungarn)\\)(?:,? (?:pod Budapesztem|near Budapest|bei Budapest))?",
+   {
+    "pl": "ul. Pory 78, 02-757 Warszawa (Polska)",
+    "en": "ul. Pory 78, 02-757 Warszawa (Poland)",
+    "de": "ul. Pory 78, 02-757 Warszawa (Polen)"
+   }
+  ],
+  [
+   "Ibolya utca 18\\.?,? 2083 Solymár",
+   "ul. Pory 78, 02-757 Warszawa"
+  ],
+  [
+   "\"streetAddress\":\"Ibolya utca 18\\.?\"",
+   "\"streetAddress\":\"ul. Pory 78\""
+  ],
+  [
+   "Ibolya utca 18\\.",
+   "ul. Pory 78"
+  ],
+  [
+   "(?:\\b(?:w|in) )Solymár(?: (?:near Budapest|bei Budapest|pod Budapesztem))? \\((?:Węgry|Hungary|Ungarn)\\)(?:,? (?:pod Budapesztem|near Budapest|bei Budapest))?",
+   {
+    "pl": "w Warszawie (Polska)",
+    "en": "in Warsaw (Poland)",
+    "de": "in Warschau (Polen)"
+   }
+  ],
+  [
+   "Solymár \\((?:Węgry|Hungary|Ungarn)\\)(?:,? (?:pod Budapesztem|near Budapest|bei Budapest))?",
+   {
+    "pl": "Warszawa (Polska)",
+    "en": "Warsaw (Poland)",
+    "de": "Warschau (Polen)"
+   }
+  ],
+  [
+   "Solymár, (?:Węgry|Hungary|Ungarn)",
+   {
+    "pl": "Warszawa, Polska",
+    "en": "Warsaw, Poland",
+    "de": "Warschau, Polen"
+   }
+  ],
+  [
+   "BH Group Zrt\\.? \\((?:Węgry|Hungary|Ungarn)\\)",
+   {
+    "pl": "Mr.JOB POLAND Sp. z o.o. (Polska)",
+    "en": "Mr.JOB POLAND Sp. z o.o. (Poland)",
+    "de": "Mr.JOB POLAND Sp. z o.o. (Polen)"
+   }
+  ],
+  [
+   "BH Group Zrt\\.?",
+   "Mr.JOB POLAND Sp. z o.o."
+  ],
+  [
+   "2083 Solymár",
+   "02-757 Warszawa"
+  ],
+  [
+   "Solymár",
+   {
+    "pl": "Warszawa",
+    "en": "Warsaw",
+    "de": "Warschau"
+   }
+  ],
+  [
+   "(Mr\\.JOB POLAND Sp\\. z o\\.o\\.[^<]{0,80}?)prawo węgierskie",
+   "$1prawo polskie"
+  ],
+  [
+   "(Mr\\.JOB POLAND Sp\\. z o\\.o\\.[^<]{0,80}?)Hungarian law",
+   "$1Polish law"
+  ],
+  [
+   "(Mr\\.JOB POLAND Sp\\. z o\\.o\\.[^<]{0,80}?)ungarisches Recht",
+   "$1polnisches Recht"
+  ],
+  [
+   "węgierska ustawa o rachunkowości \\((ustawa z dnia 29 września 1994 r\\. o rachunkowości)\\)",
+   "$1"
+  ],
+  [
+   "\"taxID\":\"[^\"]*PL5213804274\"",
+   "\"taxID\":\"PL5213804274\""
+  ],
+  [
+   "\"streetAddress\":\"Petőfi utca 23\\.\",\"postalCode\":\"4143\",\"addressLocality\":\"Vekerd\",\"addressCountry\":\"HU\"",
+   "\"streetAddress\":\"ul. Pory 78\",\"postalCode\":\"02-757\",\"addressLocality\":\"Warszawa\",\"addressCountry\":\"PL\""
+  ],
+  [
+   "(Mr\\.JOB POLAND Sp\\. z o\\.o\\. · ul\\. Pory 78, 02-757 Warszawa) \\([^)]*\\) · [^<]*?2120860148",
+   {
+    "pl": "$1 (Polska) · REGON: 368854599 · NIP: 5213804274 · Nr VAT UE: PL5213804274",
+    "en": "$1 (Poland) · REGON: 368854599 · NIP: 5213804274 · EU VAT ID: PL5213804274",
+    "de": "$1 (Polen) · REGON: 368854599 · NIP: 5213804274 · USt-IdNr.: PL5213804274"
+   }
+  ],
+  [
+   "DIČ 2120860148 · (?:VAT ID|Numer VAT UE|USt-IdNr\\.) PL5213804274",
+   {
+    "pl": "NIP 5213804274 · Numer VAT UE PL5213804274",
+    "en": "NIP 5213804274 · EU VAT ID PL5213804274",
+    "de": "NIP 5213804274 · USt-IdNr. PL5213804274"
+   }
+  ],
+  [
+   "(\\b(?:w|in) )Warszawa(?: (?:pod Budapesztem|near Budapest|bei Budapest))? \\((?:Węgry|Hungary|Ungarn)\\)(?:,? (?:pod Budapesztem|near Budapest|bei Budapest))?",
+   {
+    "pl": "$1Warszawie (Polska)",
+    "en": "$1Warsaw (Poland)",
+    "de": "$1Warschau (Polen)"
+   }
+  ],
+  [
+   "02-757 Warszawa \\((?:Węgry|Hungary|Ungarn)\\)(?:,? (?:pod Budapesztem|near Budapest|bei Budapest))?",
+   {
+    "pl": "02-757 Warszawa (Polska)",
+    "en": "02-757 Warszawa (Poland)",
+    "de": "02-757 Warszawa (Polen)"
+   }
+  ],
+  [
+   "02-757 Warszawa, (?:Węgry|Hungary|Ungarn)",
+   {
+    "pl": "02-757 Warszawa, Polska",
+    "en": "02-757 Warszawa, Poland",
+    "de": "02-757 Warszawa, Polen"
+   }
+  ],
+  [
+   "Warszawa,? (?:pod Budapesztem|near Budapest|bei Budapest)",
+   "Warszawa"
+  ],
+  [
+   "Hungarian Accounting Act \\(Accounting Act of 29 September 1994\\)",
+   "Polish Accounting Act of 29 September 1994"
+  ],
+  [
+   "ungarisches Rechnungslegungsgesetz \\(Rechnungslegungsgesetz vom 29\\. September 1994\\)",
+   "polnisches Rechnungslegungsgesetz vom 29. September 1994"
+  ],
+  [
+   "2120860148",
+   "5213804274"
+  ],
+  [
+   "Nr rej\\.: 368854599 · Nr VAT UE: 5213804274",
+   "REGON: 368854599 · NIP: 5213804274 · Nr VAT UE: PL5213804274"
+  ],
+  [
+   "Company reg\\. no\\.: 368854599 · EU VAT ID: 5213804274",
+   "REGON: 368854599 · NIP: 5213804274 · EU VAT ID: PL5213804274"
+  ],
+  [
+   "Firmenbuchnr\\.: 368854599 · USt-IdNr\\.: 5213804274",
+   "REGON: 368854599 · NIP: 5213804274 · USt-IdNr.: PL5213804274"
+  ],
+  [
+   "<dd>ul\\. Pory 78, 02-757 Warszawa – </dd>",
+   {
+    "pl": "<dd>ul. Pory 78, 02-757 Warszawa, Polska</dd>",
+    "en": "<dd>ul. Pory 78, 02-757 Warszawa, Poland</dd>",
+    "de": "<dd>ul. Pory 78, 02-757 Warszawa, Polen</dd>"
+   }
+  ],
+  [
+   "<dt>(?:NIP|Tax number|Steuernummer)</dt>(\\s*)<dd>NIP 5213804274 · (?:Numer VAT UE|EU VAT ID|USt-IdNr\\.) PL5213804274</dd>",
+   {
+    "pl": "<dt>NIP</dt>$1<dd>5213804274</dd><dt>Numer VAT UE</dt><dd>PL5213804274</dd>",
+    "en": "<dt>NIP (tax number)</dt>$1<dd>5213804274</dd><dt>EU VAT ID</dt><dd>PL5213804274</dd>",
+    "de": "<dt>NIP (Steuernummer)</dt>$1<dd>5213804274</dd><dt>USt-IdNr.</dt><dd>PL5213804274</dd>"
+   }
+  ],
+  [
+   "(Numer w rejestrze handlowym, numer podatkowy|Company registration number, tax number|Handelsregisternummer, Steuernummer)(</dt>\\s*<dd>)IČO 52 005 445 · [^<]*",
+   {
+    "pl": "REGON, NIP, numer VAT UE$2REGON 368854599 · NIP 5213804274 · Numer VAT UE PL5213804274",
+    "en": "REGON, NIP (tax no.), EU VAT ID$2REGON 368854599 · NIP 5213804274 · EU VAT ID PL5213804274",
+    "de": "REGON, NIP (Steuernr.), USt-IdNr.$2REGON 368854599 · NIP 5213804274 · USt-IdNr. PL5213804274"
+   }
+  ],
+  [
+   "IČO 52 005 445",
+   "REGON 368854599"
+  ]
+ ]
 }

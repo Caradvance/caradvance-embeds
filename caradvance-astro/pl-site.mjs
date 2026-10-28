@@ -136,6 +136,8 @@ function localize(h, l) {
   for (const [a, b] of PL.replace) h = h.split(a).join(b);
   for (const [re, b] of PL.replaceRe) h = h.replace(new RegExp(re, 'g'), b);
   for (const [re, b] of PL.fix || []) h = h.replace(new RegExp(re, 'g'), typeof b === 'string' ? b : b[l]);
+  // lengyel kereskedelmi képviselő (Mr.JOB POLAND Sp. z o.o.) — végső csere: a fordítások a korábbi képviselő adatait is tartalmazhatják
+  for (const [re, b] of PL.coFix || []) h = h.replace(new RegExp(re, 'g'), typeof b === 'string' ? b : b[l]);
   // csapat-kártyák: kép, zászlók
   for (const t of PL.team) {
     const img = t.from;
