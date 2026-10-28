@@ -87,17 +87,22 @@ export async function ensureFin(env) {
   ]);
   const n = await env.DB.prepare(`SELECT COUNT(*) AS n FROM fin_lines`).first();
   if (!n || !n.n) await seed(env);
+  await migrateLinesV2(env);
   READY = true;
 }
 
 /* ---- alap üzletágak ---- */
+/* A CarAdvance üzletágai (ugyanazok, mint a CRM-ben) + a közös, felosztandó költségek. */
 const SEED_LINES = [
-  ['CA', 'CarAdvance', '#E2001A', 0, 10],
-  ['CUKOR', 'Cukorkereskedelem', '#B45309', 0, 20],
-  ['EGYEB', 'Egyéb üzlet', '#2554B8', 0, 30],
-  ['KOZOS', 'Közös (felosztandó)', '#64748B', 1, 80],
-  ['MAGAN', 'Magán / nem üzleti', '#8A5A72', 0, 90]
+  ['ELADAS', 'Eladás', '#128A63', 0, 10],
+  ['IMPORT', 'Import', '#C07A1E', 0, 20],
+  ['BERLES', 'Bérlés', '#3A63B0', 0, 30],
+  ['BIZOMANYOS', 'Bizományos', '#7A3EA8', 0, 40],
+  ['KOZOS', 'Közös (felosztandó)', '#64748B', 1, 80]
 ];
+const LINE_CODES = ['ELADAS', 'IMPORT', 'BERLES', 'BIZOMANYOS'];
+/** A régi „CarAdvance” üzletágra sorolt tétel / szabály új helye a kategória alapján. */
+const OLD_CA_TARGET = { REV_BERLES: 'BERLES', VEH_BERLES: 'BERLES', COGS_REG: 'IMPORT', REV_JUTALEK: 'BIZOMANYOS', REV_AUTO: 'ELADAS', COGS_AUTO: 'ELADAS' };
 /* ---- alap kategóriák: [code, name, kind, grp, doc_mode, ÁFA%] ----
  * kind: rev = árbevétel, cogs = közvetlen költség, opex = működési, below = adó/pénzügyi, excl = nem eredményhatású
  * ÁFA% = a bruttó összegben lévő, LEVONHATÓ (költség) / FIZETENDŐ (bevétel) áfa kulcsa. 0 = a bruttó a költség
@@ -151,33 +156,32 @@ const SEED_RULES = [
   [12, 'Saját készpénz / valuta befizetés', '^(VALUTABEFIZETES|KESZPENZBEFIZETES|KESZPENZ BEFIZETES)', 'in', 'EX_TULAJ', null],
   [20, 'NAV – ÁFA', '\\| NAV \\|.*(01076868|\\bAFA\\b)', 'out', 'EX_AFA', null],
   [21, 'NAV – TAO előleg', '\\| NAV \\|.*(01076019|\\bTAO\\b)', 'out', 'TAX_TAO', 'KOZOS'],
-  [22, 'NAV – bérjárulékok (SZJA, TB, szocho)', '\\| NAV \\|.*(06055950|06055819|06055912|SZEMELYI JOV|TB JARUL|SZOCIALIS HOZZ|SZOCHO|JARULEK|SZJA)', 'out', 'PERS_JAR', 'CA'],
+  [22, 'NAV – bérjárulékok (SZJA, TB, szocho)', '\\| NAV \\|.*(06055950|06055819|06055912|SZEMELYI JOV|TB JARUL|SZOCIALIS HOZZ|SZOCHO|JARULEK|SZJA)', 'out', 'PERS_JAR', 'KOZOS'],
   [23, 'NAV – helyi iparűzési adó', '\\|.*(IPARUZESI|\\bHIPA\\b)', 'out', 'TAX_HIPA', 'KOZOS'],
   [29, 'NAV – egyéb (ellenőrizendő)', '\\| NAV \\|', 'out', 'TAX_EGYEB', 'KOZOS'],
   [30, 'Bank – díjak, jutalékok', '^(DIJ, JUTALEK|PENZTARI JUTALEK|SZAMLAVEZETESI)|FORGALMI JUTALEK|ZARLATI DIJ', 'out', 'OFF_BANK', 'KOZOS'],
   [31, 'Bank – kamat jóváírás', '^KAMAT\\b', 'in', 'FIN_KAMAT_BE', 'KOZOS'],
   [32, 'Bank – kamat terhelés', '^KAMAT\\b', 'out', 'FIN_KAMAT_KI', 'KOZOS'],
-  [40, 'Irodabérlet – Mátrai Tibor', 'MATRAI TIBOR', 'out', 'OFF_BERLET', 'CA'],
-  [41, 'Vadnai Zsombor – megbízási díj', 'VADNAI ZSOMBOR', 'out', 'PERS_MEGB', 'CA'],
-  [50, 'Matrica / útdíj (vintrica, e-matrica, HU-GO)', 'VINTRICA|E-MATRICA|NEMZETI UTDIJ|HU-GO|ASFINAG|AUTOBAHN|MAUT|PARKOL', 'out', 'VEH_UTDIJ', 'CA'],
-  [51, 'Üzemanyag', '\\b(SHELL|MOL|OMV|BP|JET|ARAL|ORLEN|LUKOIL|ESSO|AGIP|ENI|TOTAL)\\b|TANKSTELLE', 'out', 'VEH_UZEM', 'CA'],
-  [52, 'Autómosó, szerviz', 'AUTOMOSO|AUTOMOSAS|WASCH|CAR ?WASH|GUMI|SZERVIZ', 'out', 'VEH_SZERVIZ', 'CA'],
-  [53, 'Távolsági busz (autóátvételek)', '\\bFLIX', 'out', 'TRAVEL', 'CA'],
+  [40, 'Irodabérlet – Mátrai Tibor', 'MATRAI TIBOR', 'out', 'OFF_BERLET', 'KOZOS'],
+  [41, 'Vadnai Zsombor – megbízási díj', 'VADNAI ZSOMBOR', 'out', 'PERS_MEGB', 'KOZOS'],
+  [50, 'Matrica / útdíj (vintrica, e-matrica, HU-GO)', 'VINTRICA|E-MATRICA|NEMZETI UTDIJ|HU-GO|ASFINAG|AUTOBAHN|MAUT|PARKOL', 'out', 'VEH_UTDIJ', 'KOZOS'],
+  [51, 'Üzemanyag', '\\b(SHELL|MOL|OMV|BP|JET|ARAL|ORLEN|LUKOIL|ESSO|AGIP|ENI|TOTAL)\\b|TANKSTELLE', 'out', 'VEH_UZEM', 'KOZOS'],
+  [52, 'Autómosó, szerviz', 'AUTOMOSO|AUTOMOSAS|WASCH|CAR ?WASH|GUMI|SZERVIZ', 'out', 'VEH_SZERVIZ', 'KOZOS'],
+  [53, 'Távolsági busz (autóátvételek)', '\\bFLIX', 'out', 'TRAVEL', 'KOZOS'],
   [54, 'Utazás, szállás (üzletág ellenőrizendő)', 'BOOKING\\.COM|HOTEL|DFDS|\\bUBER\\b|RYANAIR|WIZZ|AIRBNB|LUFTHANSA|\\bMAV\\b|\\bDB\\b BAHN', 'out', 'TRAVEL', null],
-  [60, 'Hirdetési portálok', 'HASZNALTAUTO|MOBILE\\.DE|AUTOSCOUT|HEYCAR|JOFOGAS', 'out', 'MKT_PORTAL', 'CA'],
-  [61, 'Google Ads / Meta hirdetés', 'GOOGLE ?\\*?ADS|GOOGLE ADWORDS|FACEBK|META PLATFORMS|FACEBOOK|TIKTOK ADS', 'out', 'MKT_ADS', 'CA'],
-  [62, 'SEO / tartalom eszközök (Ahrefs, Higgsfield, HeyGen…)', 'AHREFS|HIGGSFIELD|HEYGEN|CANVA|CLOUDINARY', 'out', 'MKT_TART', 'CA'],
-  [63, 'Google Workspace – caradvance.hu', 'GOOGLE WORKSPACE CARAD', 'out', 'IT_SW', 'CA'],
+  [60, 'Hirdetési portálok', 'HASZNALTAUTO|MOBILE\\.DE|AUTOSCOUT|HEYCAR|JOFOGAS', 'out', 'MKT_PORTAL', 'KOZOS'],
+  [61, 'Google Ads / Meta hirdetés', 'GOOGLE ?\\*?ADS|GOOGLE ADWORDS|FACEBK|META PLATFORMS|FACEBOOK|TIKTOK ADS', 'out', 'MKT_ADS', 'KOZOS'],
+  [62, 'SEO / tartalom eszközök (Ahrefs, Higgsfield, HeyGen…)', 'AHREFS|HIGGSFIELD|HEYGEN|CANVA|CLOUDINARY', 'out', 'MKT_TART', 'KOZOS'],
+  [63, 'Google Workspace – caradvance.hu', 'GOOGLE WORKSPACE CARAD', 'out', 'IT_SW', 'KOZOS'],
   [64, 'Szoftver-előfizetések (közös)', 'ANTHROPIC|OPENAI|APPLE\\.COM|GOOGLE WORKSPACE|GOOGLE ?\\*?CLOUD|MICROSOFT|NOTION|CLOUDFLARE|GITHUB|ADOBE|ZOOM', 'out', 'IT_SW', 'KOZOS'],
   [65, 'Tárhely, domain (Rackhost)', 'RACKHOST|NETHELY|DOTROLL|GODADDY', 'out', 'IT_HOST', 'KOZOS'],
   [70, 'Kereskedelmi kamara tagdíj', 'IPARKAMAR', 'out', 'OFF_TAGDIJ', 'KOZOS'],
-  [80, 'Cukor beszerzés (Krajowa Grupa Spożywcza)', 'KRAJOWA GRUPA SPOZYWCZA|SUDZUCKER|SUEDZUCKER|NORDZUCKER|PFEIFER', 'out', 'COGS_ARU', 'CUKOR'],
   [13, 'Kizárva: Designyourdrink', 'DESIGNYOURDRINK', 'any', 'EX_KIZART', null],
   [14, 'Kizárva: UNR Sales GmbH', 'UNR SALES', 'any', 'EX_KIZART', null],
   [15, 'Kizárva: Brit-Magyar Oktatásért Alapítvány', 'BRIT-MAGYAR OKTATASERT', 'any', 'EX_KIZART', null],
-  [42, 'Stadler István EV – rendszám', 'STADLER ISTVAN', 'out', 'COGS_REG', 'CA'],
-  [43, 'Caradvance GmbH – autóbérlés (saját és továbbbérelt autók)', 'CARADVANCE GMBH', 'out', 'VEH_BERLES', 'CA'],
-  [44, 'Caradvance GmbH – jóváírás', 'CARADVANCE GMBH', 'in', 'REV_BERLES', 'CA']
+  [42, 'Stadler István EV – rendszám', 'STADLER ISTVAN', 'out', 'COGS_REG', 'IMPORT'],
+  [43, 'Caradvance GmbH – autóbérlés (saját és továbbbérelt autók)', 'CARADVANCE GMBH', 'out', 'VEH_BERLES', 'BERLES'],
+  [44, 'Caradvance GmbH – jóváírás', 'CARADVANCE GMBH', 'in', 'REV_BERLES', 'BERLES']
 ];
 
 async function seed(env) {
@@ -192,8 +196,51 @@ async function seed(env) {
   const C = Object.fromEntries(cats.map((r) => [r.code, r.id]));
   const rs = SEED_RULES.map(([prio, name, pat, dir, cat, line]) => env.DB.prepare(`INSERT INTO fin_rules (prio,name,pattern,dir,cat_id,split) VALUES (?,?,?,?,?,?)`)
     .bind(prio, name, pat, dir, cat ? C[cat] : null, line ? JSON.stringify([{ l: L[line], p: 100 }]) : null));
-  rs.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('alloc', ?)`).bind(JSON.stringify({ mode: 'fixed', key: { [L.CA]: 100 } })));
+  rs.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('alloc', ?)`).bind(JSON.stringify({ mode: 'fixed', key: Object.fromEntries(LINE_CODES.map((c) => [L[c], 25])) })));
+  rs.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('lines_v2', '1')`));
   await env.DB.batch(rs);
+}
+
+/**
+ * Egyszeri átállás a régi üzletágakról (CarAdvance / Cukorkereskedelem / Egyéb üzlet / Magán) a CarAdvance
+ * négy üzletágára: Eladás, Import, Bérlés, Bizományos (+ Közös). A régi „CarAdvance” szabályok és tételek
+ * a kategóriájuk szerint kerülnek át (bérlés → Bérlés, rendszám/forgalomba helyezés → Import, egyéb → Közös);
+ * a régi üzletágak inaktívak lesznek (nem törlődnek), a cukor-szabály kikapcsol.
+ */
+async function migrateLinesV2(env) {
+  if (await getSetting(env, 'lines_v2', null)) return;
+  const st = [];
+  for (const [code, name, color, shared, sort] of SEED_LINES) st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_lines (code,name,color,shared,sort) VALUES (?,?,?,?,?)`).bind(code, name, color, shared, sort));
+  await env.DB.batch(st);
+  const lines = (await env.DB.prepare(`SELECT id, code FROM fin_lines`).all()).results;
+  const cats = (await env.DB.prepare(`SELECT id, code FROM fin_cats`).all()).results;
+  const L = Object.fromEntries(lines.map((r) => [r.code, r.id]));
+  const catCode = Object.fromEntries(cats.map((r) => [r.id, r.code]));
+  const oldIds = new Set(['CA', 'CUKOR', 'EGYEB', 'MAGAN'].map((c) => L[c]).filter(Boolean));
+  const mapSplit = (split, catId) => {
+    const a = parseJ(split, null); if (!Array.isArray(a)) return { split, changed: false, dead: false };
+    let changed = false, dead = false; const out = [];
+    for (const x of a) {
+      if (x.l === L.CA) { out.push({ l: L[OLD_CA_TARGET[catCode[catId]] || 'KOZOS'], p: x.p }); changed = true; }
+      else if (oldIds.has(x.l)) { dead = true; out.push(x); }
+      else out.push(x);
+    }
+    return { split: JSON.stringify(out), changed, dead };
+  };
+  const up = [];
+  for (const r of (await env.DB.prepare(`SELECT id, split, cat_id FROM fin_rules WHERE split IS NOT NULL`).all()).results) {
+    const m = mapSplit(r.split, r.cat_id);
+    if (m.dead) up.push(env.DB.prepare(`UPDATE fin_rules SET active = 0 WHERE id = ?`).bind(r.id));
+    else if (m.changed) up.push(env.DB.prepare(`UPDATE fin_rules SET split = ? WHERE id = ?`).bind(m.split, r.id));
+  }
+  for (const t of (await env.DB.prepare(`SELECT id, split, cat_id FROM fin_tx WHERE split IS NOT NULL`).all()).results) {
+    const m = mapSplit(t.split, t.cat_id);
+    if (m.changed) up.push(env.DB.prepare(`UPDATE fin_tx SET split = ? WHERE id = ?`).bind(m.split, t.id));
+  }
+  up.push(env.DB.prepare(`UPDATE fin_lines SET active = 0 WHERE code IN ('CA', 'CUKOR', 'EGYEB', 'MAGAN')`));
+  up.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('alloc', ?)`).bind(JSON.stringify({ mode: 'fixed', key: Object.fromEntries(LINE_CODES.map((c) => [L[c], 25])) })));
+  up.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('lines_v2', '1')`));
+  for (let i = 0; i < up.length; i += 50) await env.DB.batch(up.slice(i, i + 50));
 }
 
 export async function getSetting(env, k, d) { const r = await env.DB.prepare(`SELECT v FROM fin_settings WHERE k = ?`).bind(k).first(); return r ? parseJ(r.v, d) : d; }
