@@ -127,6 +127,19 @@
   .doc a,.doc .del{font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;text-decoration:none}
   .doc .del:hover{color:var(--bad)}
   .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .rent{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fcfcfd}
+  .rent-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:800;font-size:13.5px;margin-bottom:10px}
+  .rb{font-weight:800;border-radius:999px;padding:1px 7px;font-size:10.5px;white-space:nowrap}
+  .rb.ok{background:#e7f6ef;color:var(--good)}.rb.warn{background:#fff3df;color:#a2660b}.rb.bad{background:#fdeceb;color:var(--bad)}
+  .rb.big{font-size:12px;padding:4px 10px;margin-left:auto}
+  .rem-list{display:grid;gap:6px}
+  .rem{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;background:#fff}
+  .rem span{color:var(--muted)}.rem .st{margin-left:auto;font-size:12px;font-weight:700}
+  .rem.due{border-color:#f3e2b3;background:#fff8e6}.rem.due .st{color:#a2660b}.rem.sent{opacity:.7}.rem.sent .st{color:var(--good)}
+  .rem .x{cursor:pointer;color:var(--faint);font-size:18px;line-height:1;margin-left:6px}.rem .x:hover{color:var(--bad)}
+  .rem-add{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .rem-add input{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:9px}
+  .rem-add .btn[disabled]{opacity:.45;cursor:not-allowed}
   .veh-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .vchip{display:flex;align-items:center;gap:9px;font:inherit;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:6px 12px 6px 6px;cursor:pointer;max-width:320px}
   .vchip:hover{border-color:#d3d8e0}.vchip.on{border-color:var(--red);box-shadow:0 0 0 3px var(--red-tint)}
@@ -271,7 +284,7 @@ function normData(d,deal,addr){
     company:Object.assign({name:'',address:'',tax:'',reg:''},d.company||{}),
     contact_differs:!!d.contact_differs,
     contact:Object.assign({name:'',role:'',phone:'',email:''},d.contact||{}),
-    vehicles:(d.vehicles||[]).map(function(v){return Object.assign({id:'',title:'',brand:'',model:'',year:'',vin:'',color:'',engine:'',fuel:'',km:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:''},v);}),
+    vehicles:(d.vehicles||[]).map(function(v){return Object.assign({id:'',title:'',brand:'',model:'',year:'',vin:'',color:'',engine:'',fuel:'',km:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);}),
     buyer:{kind:d.buyer&&d.buyer.kind==='ceg'?'ceg':'magan',person:Object.assign({name:'',address:'',phone:'',email:'',tax:''},(d.buyer&&d.buyer.person)||{}),company:Object.assign({name:'',address:'',tax:'',reg:''},(d.buyer&&d.buyer.company)||{})},
     notes:d.notes||''
   };
@@ -377,7 +390,7 @@ function renderVehicle(){
   if(!vehById(VSEL))VSEL=(L[0]||{}).id||'';
   var v=vehById(VSEL);
   var h='<div class="veh-chips">'+L.map(function(x,i){
-      return '<button class="vchip'+(x.id===VSEL?' on':'')+'" data-vid="'+esc(x.id)+'">'+(x.image?'<i style="background-image:url(\''+esc(x.image)+'\')"></i>':'<i class="ph">🚗</i>')+'<span><b>'+esc((i+1)+'. '+vehName(x,i))+'</b><small>'+esc(SRC_LBL[x.source]||'')+(x.price?' · '+fmtPrice(x.price,x.currency)+(x.period?'/'+esc(x.period):''):'')+'</small></span></button>';
+      return '<button class="vchip'+(x.id===VSEL?' on':'')+'" data-vid="'+esc(x.id)+'">'+(x.image?'<i style="background-image:url(\''+esc(x.image)+'\')"></i>':'<i class="ph">🚗</i>')+'<span><b>'+esc((i+1)+'. '+vehName(x,i))+'</b><small>'+esc(SRC_LBL[x.source]||'')+(x.price?' · '+fmtPrice(x.price,x.currency)+(x.period?'/'+esc(x.period):''):'')+rentBadge(x)+'</small></span></button>';
     }).join('')
     +'<button class="btn ghost sm" id="vehAddInv">+ Autó a készletből</button><button class="btn ghost sm" id="vehAddMan">+ Kézi felvitel</button></div>'
     +'<div id="vehPicker" class="vpick"'+(VPICK?'':' style="display:none"')+'><div class="inv-tools"><input type="search" id="vpQ" placeholder="Keresés a készletben — márka, modell…"><label class="chk" style="font-size:13px"><input type="checkbox" id="vpAct" checked> Csak aktív</label><button class="btn ghost sm" id="vpClose">Bezár</button></div><div class="inv" id="vpList"><div class="loading" style="padding:24px">Készlet betöltése…</div></div></div>';
@@ -391,7 +404,8 @@ function renderVehicle(){
       +vinp('price','Ár / díj',v.price||'')+'<div class="fld"><label>Pénznem</label><select data-vp="currency"><option value="HUF"'+(v.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(v.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-vp="period"><option value="">egyszeri (vételár)</option><option value="hó"'+(v.period==='hó'?' selected':'')+'>havi (bérleti díj)</option></select></div>'
       +'</div><label class="chk" style="margin-top:14px"><input type="checkbox" data-vp="hybrid"'+(v.hybrid?' checked':'')+'> Hibrid</label>'
-      +'<div class="hint" style="margin-top:8px">Az ár / díj a szerződésbe és a pénzügyhöz (bevétel) töltődik be. A szerződés és a pénzügy autónként külön kezelhető.</div></div>';
+      +'<div class="hint" style="margin-top:8px">Az ár / díj a szerződésbe és a pénzügyhöz (bevétel) töltődik be. A szerződés és a pénzügy autónként külön kezelhető.</div>'
+      +(hasRent()?rentBlock(v):'')+'</div>';
   }
   if(S.deal.car)h+='<div class="hint" style="margin-top:10px">Az érdeklődéskor megadott autó: <b>'+esc(S.deal.car)+'</b></div>';
   $('b2').innerHTML=h;
@@ -409,6 +423,7 @@ function renderVehicle(){
     if(FVID===v.id)FVID='';
     VSEL='';saveData().then(function(){renderVehicle();renderFin();});
   });
+  if(v&&hasRent())bindRent(v);
   $('b2').querySelectorAll('[data-vp]').forEach(function(el){
     var k=el.getAttribute('data-vp');
     var h2=function(){var val=el.type==='checkbox'?el.checked:el.value;if(k==='price')val=parseFloat(String(val).replace(/\s/g,'').replace(',','.'))||0;v[k]=val;
@@ -417,10 +432,58 @@ function renderVehicle(){
     el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',h2);
   });
 }
+/* ---- bérlet: kezdet / vég / figyelmeztetések (Eladás 1. üteme és Bérlés) ---- */
+function hasRent(){return S.deal.line==='Bérlés'||S.deal.line==='Eladás';}
+function todayIso(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dayDiff(a,b){return Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/864e5);}
+function addDaysIso(d,n){var t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);}
+function addMonthsIso(d,n){var p=d.split('-').map(Number),t=new Date(Date.UTC(p[0],p[1]-1+n,p[2]));if(t.getUTCDate()!==p[2])t=new Date(Date.UTC(p[0],p[1]-1+n+1,0));return t.toISOString().slice(0,10);}
+function huD(d){if(!d)return '—';var p=d.split('-');return p[0]+'. '+p[1]+'. '+p[2]+'.';}
+function rentState(v){
+  if(!v||!v.rent_end)return null;
+  var d=dayDiff(todayIso(),v.rent_end),due=(v.reminders||[]).some(function(r){return r.date&&r.date<=todayIso();});
+  return {days:d,due:due,cls:d<0?'bad':(due||d<=30)?'warn':'ok',txt:d<0?Math.abs(d)+' napja lejárt':d===0?'ma jár le':d+' nap van hátra'};
+}
+function rentBadge(v){var r=rentState(v);if(!r)return '';return ' · <span class="rb '+r.cls+'">⏰ '+esc(r.txt)+'</span>';}
+function rentBlock(v){
+  var r=rentState(v),rs=(v.reminders||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
+  var months=v.rent_start&&v.rent_end?Math.round(dayDiff(v.rent_start,v.rent_end)/30.44):'';
+  return '<div class="rent"><div class="rent-h">Bérlet'+(S.deal.line==='Eladás'?' <span class="hint">(1. ütem)</span>':'')+(r?'<span class="rb big '+r.cls+'">⏰ '+esc(r.txt)+' · lejárat: '+huD(v.rent_end)+'</span>':'')+'</div>'
+    +'<div class="grid g4"><div class="fld"><label>Bérlet kezdete</label><input type="date" id="rStart" value="'+esc(v.rent_start||'')+'"></div>'
+    +'<div class="fld"><label>Futamidő (hónap)</label><input id="rMonths" inputmode="numeric" value="'+esc(months)+'" placeholder="pl. 12"></div>'
+    +'<div class="fld"><label>Bérlet vége</label><input type="date" id="rEnd" value="'+esc(v.rent_end||'')+'"></div>'
+    +'<div class="fld"><label>&nbsp;</label><div class="hint" style="padding-top:10px">'+(v.rent_start&&v.rent_end?esc(dayDiff(v.rent_start,v.rent_end))+' nap':'A futamidőből a vége automatikusan számolódik.')+'</div></div></div>'
+    +'<div class="sub-h" style="margin-top:14px">Figyelmeztetések a lejárat előtt</div>'
+    +(rs.length?'<div class="rem-list">'+rs.map(function(x){
+        var past=x.date<=todayIso();
+        return '<div class="rem'+(x.sent_at?' sent':past?' due':'')+'"><b>'+huD(x.date)+'</b><span>'+(x.days!=null?x.days+' nappal a lejárat előtt':'egyedi időpont')+(x.note?' · '+esc(x.note):'')+'</span><span class="st">'+(x.sent_at?'✓ értesítés elment':past?'ma / esedékes':'')+'</span><span class="x" data-rdel="'+esc(x.id)+'" title="Törlés">×</span></div>';
+      }).join('')+'</div>':'<div class="hint">Még nincs figyelmeztetés.</div>')
+    +'<div class="rem-add">'+[90,60,30,14,7].map(function(n){return '<button class="btn ghost sm" data-rq="'+n+'"'+(v.rent_end?'':' disabled title="Előbb add meg a bérlet végét"')+'>'+n+' nappal előtte</button>';}).join('')
+    +'<span class="sp" style="flex:1"></span><input type="date" id="rDate"><input id="rNote" placeholder="megjegyzés (nem kötelező)"><button class="btn dark sm" id="rAdd">+ Időpont</button></div>'
+    +'<div class="hint" style="margin-top:6px">Az esedékes figyelmeztetésekről a rendszer minden reggel e-mailt küld a munkatársaknak, és az ügyféllistán is jelzi a lejáró bérletet. A bérlet végének módosításakor a „… nappal előtte” időpontok automatikusan igazodnak.</div></div>';
+}
+function rid(v){var ids={},i=(v.reminders||[]).length+1;(v.reminders||[]).forEach(function(r){ids[r.id]=1;});while(ids['r'+i])i++;return 'r'+i;}
+function bindRent(v){
+  var st=$('rStart'),en=$('rEnd'),mo=$('rMonths');
+  function syncRel(){(v.reminders||[]).forEach(function(r){if(r.days!=null&&!r.sent_at&&v.rent_end)r.date=addDaysIso(v.rent_end,-r.days);});}
+  st.addEventListener('change',function(){v.rent_start=st.value;var m=parseInt(mo.value,10);if(v.rent_start&&m>0&&!v.rent_end){v.rent_end=addMonthsIso(v.rent_start,m);syncRel();}saveData().then(renderVehicle);});
+  mo.addEventListener('change',function(){var m=parseInt(mo.value,10);if(v.rent_start&&m>0){v.rent_end=addMonthsIso(v.rent_start,m);syncRel();saveData().then(renderVehicle);}else if(!v.rent_start)toast('Előbb add meg a bérlet kezdetét.');});
+  en.addEventListener('change',function(){v.rent_end=en.value;syncRel();saveData().then(renderVehicle);});
+  $('b2').querySelectorAll('[data-rq]').forEach(function(b){b.addEventListener('click',function(){
+    var n=parseInt(b.getAttribute('data-rq'),10);if(!v.rent_end)return;
+    if((v.reminders||[]).some(function(r){return r.days===n;}))return toast('Ez a figyelmeztetés már szerepel.');
+    v.reminders=(v.reminders||[]).concat([{id:rid(v),date:addDaysIso(v.rent_end,-n),days:n,note:'',sent_at:''}]);saveData().then(renderVehicle);
+  });});
+  $('rAdd').addEventListener('click',function(){
+    var d=$('rDate').value;if(!d)return toast('Válassz dátumot.');
+    v.reminders=(v.reminders||[]).concat([{id:rid(v),date:d,days:null,note:$('rNote').value.trim(),sent_at:''}]);saveData().then(renderVehicle);
+  });
+  $('b2').querySelectorAll('[data-rdel]').forEach(function(x){x.addEventListener('click',function(){var id=x.getAttribute('data-rdel');v.reminders=(v.reminders||[]).filter(function(r){return r.id!==id;});saveData().then(renderVehicle);});});
+}
 function vinp(k,label,val,extra){return '<div class="fld'+(extra||'')+'"><label>'+esc(label)+'</label><input data-vp="'+k+'" value="'+esc(val==null?'':val)+'"'+(k==='price'?' inputmode="decimal"':'')+'></div>';}
 function newVid(){var L=vehs(),i=L.length+1,ids={};L.forEach(function(x){ids[x.id]=1;});while(ids['v'+i])i++;return 'v'+i;}
 function addVehicle(v){
-  v=Object.assign({id:newVid(),title:'',brand:'',model:'',year:'',vin:'',color:'',engine:'',fuel:'',km:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:''},v);
+  v=Object.assign({id:newVid(),title:'',brand:'',model:'',year:'',vin:'',color:'',engine:'',fuel:'',km:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);
   S.card.data.vehicles=vehs().concat([v]);VSEL=v.id;VPICK=false;
   if(!CVID){CVID=v.id;useCt();}
   renderVehicle();renderContract();saveData().then(function(){renderFin();toast('Autó hozzáadva: '+vehName(v));});
@@ -811,7 +874,7 @@ function saveFin(){
 }
 
 /* ---------------- 7. történésnapló ---------------- */
-var LOG_IC={status:'⇄',client:'★',opened:'👁',offer:'✉',contract:'📄',draft:'✎',checklist:'✓',file:'📎',data:'👤',buyer:'🤝',fin:'💰',vehicle:'🚗',create:'＋',start:'●'};
+var LOG_IC={status:'⇄',client:'★',opened:'👁',offer:'✉',contract:'📄',draft:'✎',checklist:'✓',file:'📎',data:'👤',buyer:'🤝',fin:'💰',rent:'⏰',vehicle:'🚗',create:'＋',start:'●'};
 var LOG_GROUP={'':'Mind',status:'Státusz',client:'Ügyfél',offer:'Ajánlat',contract:'Szerződés',checklist:'Checklist',fin:'Pénzügy'};
 var logFilter='';
 function renderLog(){
