@@ -535,9 +535,11 @@
       '.caf-oi{width:22px!important;height:22px!important}',
       '.caf-v2 #abAvBlock{position:relative}',
       '.caf-v2 #abAvBlock .ab-avtot{display:none!important}',
-      '.caf-v2 #abAvBlock:not(.caf-ddopen) #abAvPick{display:none!important}',
-      '.caf-v2 #abAvBlock.caf-ddopen #abAvPick{position:absolute;z-index:20;left:0;right:0;top:64px;background:#fff;border:1px solid #dfe4ec;border-radius:14px;box-shadow:0 16px 40px rgba(15,27,45,.16);padding:8px;display:flex!important;flex-direction:column;gap:6px!important}',
-      '.caf-v2 #abAvBlock.caf-ddopen #abAvPick .ab-opt{justify-content:space-between;width:100%;box-sizing:border-box}',
+      '.caf-v2 #abAvPick{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px!important}',
+      '.caf-v2 #abAvPick .ab-opt{justify-content:flex-start!important;gap:10px!important;min-height:56px;width:100%;box-sizing:border-box;font-size:15.5px;font-weight:600;cursor:pointer}',
+      '.caf-v2 #abAvPick .ab-opt .ab-cnt{margin-left:auto!important}',
+      '.caf-v2 #abAvPick .ab-opt .caf-oi{width:19px;height:19px;flex:0 0 auto;color:#5A6B82}',
+      '.caf-v2 #abAvPick .ab-opt.active .caf-oi{color:var(--r)}',
       '.caf-dd{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:0 16px;border:1.5px solid #dfe4ec;border-radius:14px;background:#fff;box-shadow:0 2px 8px rgba(15,27,45,.05);font-size:16px;font-weight:600;color:var(--ink)}',
       '.caf-dd .t{flex:1}',
       '.caf-dd .bdg,.caf-ar .bdg{background:#dff5e9;color:#0f8a4b;font-size:12.5px;font-weight:700;border-radius:8px;padding:3px 9px;white-space:nowrap}',
@@ -1199,18 +1201,11 @@
       });
       var num = parseInt(tx(l).replace(/[^\d]/g, ''), 10); if (!isNaN(num)) l.style.order = num;
     });
-    var blk = q('#abAvBlock', m), pick = q('#abAvPick', m);
-    if (blk && pick) {
-      if (!M.dd || M.dd.parentNode !== blk) {
-        M.dd = mk('button', 'caf-dd'); M.dd.type = 'button';
-        M.dd.addEventListener('click', function (e) { e.preventDefault(); blk.classList.toggle('caf-ddopen'); });
-        blk.insertBefore(M.dd, pick);
-        pick.addEventListener('click', function (e) { if (e.target.closest('.ab-opt')) setTimeout(function () { blk.classList.remove('caf-ddopen'); }, 0); });
-      }
-      var a = q('.ab-opt.active', pick), cn = a && q('.ab-cnt', a), lab = a ? tx(a).replace(tx(cn), '').trim() : TV.pick + '…';
-      var html = svg('cal') + '<span class="t">' + esc(lab) + '</span>' + (cn ? '<span class="bdg">' + esc(tx(cn).replace(/\s*db\s*$/, '') + ' ' + TV.avail1) + '</span>' : '') + svg('chev', 'caf-ic caf-chev');
-      if (M.dd.__h !== html) { M.dd.innerHTML = html; M.dd.__h = html; }
-    }
+    // elérhetőség: minden lehetőség azonnal látható, kattintható kártyaként (nincs lenyíló lista)
+    qa('#abAvPick .ab-opt:not([data-avic])', m).forEach(function (l) {
+      l.setAttribute('data-avic', '1');
+      l.insertAdjacentHTML('afterbegin', svg('cal', 'caf-ic caf-oi'));
+    });
   }
   function depParts(M) {
     var d = tx(q('#abDep', M.modal)) || tx(q('#abStickyDep', M.modal));
