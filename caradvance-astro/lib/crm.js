@@ -38,6 +38,12 @@ export const CHECKLISTS = {
       ['igazolvany', 'Igazolvány / cégadat másolatok'], ['berleti', 'Bérleti szerződés'], ['beszerzes_alatt', 'Beszerzés alatt'],
       ['szallitas_alatt', 'Szállítás alatt'], ['leszallitva', 'Leszállítva'], ['atadva', 'Átadva']] }]
   },
+  'Bizományos': {
+    close: 'eladva',
+    phases: [{ id: 'biz', title: '', items: [
+      ['igazolvany', 'Igazolvány másolatok'], ['bizomanyi', 'Bizományi szerződés'], ['forgalmi', 'Forgalmi másolatok'],
+      ['hirdetes', 'Hirdetés kirakva'], ['eladva', 'Eladva']] }]
+  },
   'Eladás': {
     close: 'all',
     phases: [
