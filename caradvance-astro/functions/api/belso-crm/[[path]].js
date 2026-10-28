@@ -117,7 +117,7 @@ async function handlePatchCard(request, env, user, id) {
     if (rule === 'all') {
       const allNow = items.every(([k]) => next[k] && next[k].done), allBefore = items.every(([k]) => prev[k] && prev[k].done);
       if (allNow && !allBefore) { f.status = 'Lezárva'; f._reason = 'minden checklist-feladat kész'; }
-    } else if (next[rule] && next[rule].done && !(prev[rule] && prev[rule].done)) { f.status = 'Lezárva'; f._reason = '„Átadva” kipipálva'; }
+    } else if (next[rule] && next[rule].done && !(prev[rule] && prev[rule].done)) { f.status = 'Lezárva'; f._reason = '„' + ((items.find(([k]) => k === rule) || [])[1] || rule) + '” kipipálva'; }
   }
   if (b.contract !== undefined) {
     const c = b.contract || {}; const vars = {};
