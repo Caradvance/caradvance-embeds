@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Caradvance Sourcing (TESZT)",
+  "name": "Caradvance Sourcing",
   "short_name": "Caradvance",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "mobile.de hirdetések küldése a Caradvance ajánlatmotorba egy kattintással.",
   "permissions": [
     "storage",

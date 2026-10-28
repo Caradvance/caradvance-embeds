@@ -14,6 +14,8 @@ export function getSource(env: Env): ListingSource {
       return searchApiSource(env);
     case "apify":
       return apifySource(env);
+    case "manual":
+      return { name: "manual", search: async () => [], getById: async () => null };
     default:
       return { name: "mock", search: async () => mockSearch(), getById: async (id) => mockGetById(id) };
   }

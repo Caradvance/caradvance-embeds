@@ -64,7 +64,7 @@ export const SALE_BMW: Record<string, SaleFacts> = {
     boot: '490–1495 liter',
     design: ['Magabiztos kompakt SUV', 'Függőleges veserács, keskeny LED fényszórók és kék elektromos díszítés — az iX1 X1-es formájában is egyedi.', ['Adaptív LED fényszórók', 'Kék BMW i díszítőelemek', '18–20" keréktárcsák']],
     interior: ['Tágas, digitális utastér', 'BMW Curved Display, lebegő könyöktámasz és 40:20:40 arányban dönthető hátsó ülés.', ['BMW Curved Display, iDrive 9', 'Hőszivattyú, előklimatizálás', 'Vezeték nélküli Apple CarPlay / Android Auto']],
-    press: 'bmw-x1', mainKey: 'main', rent: 'bmw-x1',
+    press: 'bmw-ix1', rent: 'bmw-x1', gal: [['g1', 'hátulról, menet közben'], ['g2', 'hegyi úton'], ['g3', 'töltés közben'], ['g4', 'garázs előtt'], ['g5', 'töltőcsatlakozó'], ['g6', 'középkonzol'], ['g7', 'csomagtér']],
     rel: ['bmw-x1', 'bmw-ix2', 'ix3-elektromos', 'bmw-i4'],
   },
 
@@ -131,7 +131,7 @@ export const SALE_BMW: Record<string, SaleFacts> = {
     boot: '470–1290 liter',
     design: ['Sportos négyajtós kupé', 'Hosszú motorháztető, lecsapott tetővonal, keret nélküli ajtóablakok és aerodinamikus keréktárcsák.', ['Keret nélküli ajtóablakok', 'Adaptív LED fényszórók', 'M Sport csomag (opció)']],
     interior: ['BMW Curved Display, sportos vezetőtér', 'Ívelt kijelző, sportülések és nagy csomagtérajtó — a hátsó ülésen is kényelmes.', ['BMW Curved Display, iDrive 8.5', 'Sportülések, M bőrkormány', 'Vezeték nélküli okostelefon-integráció']],
-    press: 'bmw-4-es-gran-coupe', rent: 'bmw-4-es-gran-coupe',
+    press: 'bmw-i4', rent: 'bmw-4-es-gran-coupe', gal: [['g1', 'tengerparton'], ['g2', 'elölnézet'], ['g3', 'töltőoszlopnál'], ['g4', 'garázs előtt'], ['g5', 'keréktárcsa'], ['g6', 'nyitott csomagtér'], ['g7', 'sportülések']],
     faq: [['Mekkora a BMW i4 hatótávja?', 'Az i4 eDrive40 WLTP szerint akár kb. 590 km-t tud megtenni egy töltéssel, az eDrive35 kb. 480 km-t; a valós érték a vezetési stílustól és az időjárástól függ.']],
     rel: ['bmw-4-es-gran-coupe', 'bmw-i5', 'bmw-ix1', 'bmw-3-as'],
   },

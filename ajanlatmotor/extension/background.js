@@ -10,8 +10,8 @@ function checkForUpdate() {
 }
 checkForUpdate();
 
-// TESZT build: preset to the test site; the belső login in this Chrome is enough (token optional).
-const DEFAULT_BASE = "https://ajanlatmotor-teszt.caradvance-astro.pages.dev";
+// Preset to the live site; the belső login in this Chrome is enough (token optional). Test site: set it in Options.
+const DEFAULT_BASE = "https://www.caradvance.hu";
 
 async function settings() {
   const { settings: s } = await chrome.storage.local.get("settings");

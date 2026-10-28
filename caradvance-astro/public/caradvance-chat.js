@@ -1,3 +1,5 @@
+/* Egységes, lépésenkénti autó-űrlapok (bérlés / vásárlás / rendelés) — /ca-forms.js */
+(function(){ if(window.__cafL) return; window.__cafL=1; var s=document.createElement("script"); s.src="/ca-forms.js?v=2"; s.defer=true; (document.head||document.documentElement).appendChild(s); })();
 /* ── /berelheto/ -> /autoink/#berelheto (Marc, 2026.08.30.) ──
    A ket berlés-lista eggye valik: a kulon /berelheto/ oldal atvezet a keszlet-oldal
    "Berelheto" fulere. Ugyanaz az adat, ugyanazok az arak, egy helyen. ── */
@@ -643,6 +645,8 @@
     modal.setAttribute("aria-hidden","false"); document.documentElement.style.overflow="hidden";
   }
   function closeModal(){ modal.setAttribute("aria-hidden","true"); document.documentElement.style.overflow=""; }
+  /* más oldalakról (pl. használtautó-adatlap) is megnyitható ugyanez az űrlap — ca-forms.js */
+  window.caInquiry=function(d){ injectCss(); openModal(d||{}); };
   function onSubmit(e){
     e.preventDefault();
     var fd=new FormData(mForm);

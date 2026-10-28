@@ -42,9 +42,11 @@ textarea.in{min-height:70px}
 .link{font-family:monospace;font-size:12px;background:#F1F4F9;border-radius:8px;padding:6px 8px;word-break:break-all}
 @media (max-width:900px){.cols{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}}
 </style>
+<link rel="stylesheet" href="/belso/belso-ui.css?v=4">
 </head>
 <body>
 <header><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><b>Bérleti szerződések</b><span class="sp"></span><span id="sys"></span><a href="/belso/">← Belső felület</a></header>
+<nav style="max-width:1180px;margin:0 auto;padding:18px 18px 0;display:flex;gap:6px;flex-wrap:wrap"><a href="/belso/szerzodesek/" style="text-decoration:none;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;background:#161922;color:#fff">Online bérleti szerződések</a><a href="/belso/dokumentumok/" style="text-decoration:none;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;background:#fff;border:1.5px solid #E6EAF1;color:#5A6B82">Dokumentumsablonok</a></nav>
 <main id="app"><div class="card">Betöltés…</div></main>
 <script>
 (function(){
@@ -151,5 +153,6 @@ function renderOne(){var j=CUR,c=j.contract,t=c.terms,cu=c.cust||{},st=c.status;
 boot();
 })();
 </script>
+<script src="/belso/belso-ui.js?v=4" defer></script>
 </body>
 </html>

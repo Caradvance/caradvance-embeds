@@ -337,6 +337,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <span class="cd-eyebrow">Galéria</span>
       <h2 class="cd-h2">{model.name} képek</h2>
       <div class="cd-gal">{gal.map((g) => (<img class="cd-shot" src={g.img} alt={g.alt} width="900" height="675" loading="lazy" />))}</div>
+      <p class="cd-gnote">Illusztrációs fotók – a tényleges változat és felszereltség eltérhet.</p>
     </div>
   </section>)}
 
@@ -705,6 +706,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   .cd-svc .go{color:var(--red);font-weight:700;font-size:14px;}
 
   .cd-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .cd-gnote{margin:12px 0 0;font-size:13px;color:#5A6B82;}
   @media(max-width:820px){.cd-gal{grid-template-columns:1fr 1fr;}}
 
   .cd-faqwrap{max-width:820px;}

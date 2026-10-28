@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 chrome.storage.local.get("settings").then(({ settings }) => {
-  $("base").value = settings?.base || "https://ajanlatmotor-teszt.caradvance-astro.pages.dev";
+  $("base").value = settings?.base || "https://www.caradvance.hu";
   $("token").value = settings?.token || "";
 });
 $("save").addEventListener("click", async () => {

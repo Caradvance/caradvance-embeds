@@ -524,7 +524,7 @@ const _rebuild='rebuild-nudge-3';
     {key:'ix1',name:'BMW iX1',body:'SUV',fuel:'Elektromos',from:49400,slug:'bmw-ix1'},
     {key:'i7',name:'BMW i7',body:'Limuzin',fuel:'Elektromos',from:121400,slug:'bmw-i7'},
     {key:'i7m',name:'BMW i7 M',body:'Limuzin',fuel:'Elektromos',from:182400,hide:true},
-    {key:'i5s',name:'BMW i5',body:'Limuzin',fuel:'Elektromos',from:70900,slug:'bmw-i5'},
+    {key:'i5s',name:'BMW i5',body:'Limuzin',fuel:'Elektromos',img:'/bmw/i5s.webp?v=7',from:70900,slug:'bmw-i5'},
     {key:'i5m',name:'BMW i5 M',body:'Limuzin',fuel:'Elektromos',from:100200,hide:true},
     {key:'i5ts',name:'BMW i5 Touring',body:'Touring',fuel:'Elektromos',from:72900,slug:'bmw-i5-touring'},
     {key:'i5tm',name:'BMW i5 Touring M',body:'Touring',fuel:'Elektromos',from:102200,hide:true},
@@ -789,9 +789,19 @@ const _rebuild='rebuild-nudge-3';
     'AUDI':{crumb:'Audi',title:'Egyedi Audi rendelés',intro:'Új Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'},
     '':{crumb:'Egyedi autó rendelés',title:'Egyedi autó rendelés',intro:'Új BMW, MINI, Mercedes-Benz és Audi modellek Németországból, egyedi konfigurációval, kulcsrakész behozatallal.'}
   };
+  // böngészőfül-cím márkánként (a statikus cím BMW-s marad a BMW / márka nélküli nézetnek)
+  var DT0=document.title;
+  var DTT={hu:'Új {b} rendelés Németországból – konfigurátor, árlista | CarAdvance',cs:'Konfigurátor nového vozu – {b} | CarAdvance',sk:'Konfigurátor nového vozidla – {b} | CarAdvance',en:'New {b} configurator – order from Germany | CarAdvance',de:'Neuwagen-Konfigurator – {b} | CarAdvance',pl:'Konfigurator nowego samochodu – {b} | CarAdvance',fr:'Configurateur de voiture neuve – {b} | CarAdvance',uk:'Конфігуратор нового авто – {b} | CarAdvance',zh:'{b} 新车配置器 | CarAdvance'};
+  function setDocTitle(br){
+    if(!br||br==='BMW'){ document.title=DT0; return; }
+    var L=String(document.documentElement.lang||'hu').slice(0,2).toLowerCase();
+    var b=(HERO[br]&&HERO[br].crumb)||br;
+    document.title=(DTT[L]||DTT.hu).replace('{b}',b);
+  }
   var PH={'AUDI':'Keresés (pl. Q5, A6)…','BMW':'Keresés (pl. X5, i4)…','MINI':'Keresés (pl. Cooper, Countryman)…','MB':'Keresés (pl. E-osztály, GLC)…','':'Keresés (pl. X5, Cooper)…'};
   function applyHero(br){
     var h=HERO[br]||HERO[''];
+    try{ setDocTitle(br); }catch(e){}
     var t=document.getElementById('eglTitle'); if(t) t.textContent=h.title;
     var c=document.getElementById('eglCrumbCur'); if(c) c.textContent=h.crumb;
     var fxEl=document.getElementById('eglFx'); var fx=fxEl?fxEl.textContent:'361';

@@ -3,8 +3,8 @@ const $ = (id) => document.getElementById(id);
 const P = self.CaradvanceParser;
 const CRIT = ["price_gross_eur", "km", "first_registration", "power_kw"];
 let settings = null;
-// TESZT build: works out of the box against the test site; the belső login in this Chrome is enough (token optional).
-const DEFAULT_BASE = "https://ajanlatmotor-teszt.caradvance-astro.pages.dev";
+// Preset to the live site; the belső login in this Chrome is enough (token optional). Test site: set it in Options.
+const DEFAULT_BASE = "https://www.caradvance.hu";
 let current = null;
 
 async function api(path, opts = {}) {
@@ -159,7 +159,7 @@ async function openSearch() {
 }
 
 // Unpacked installs don't pick up new background/content code until reloaded; the panel is served from disk, so it does it.
-const BUILD = "0.4.2";
+const BUILD = "0.5.0";
 if (chrome.runtime.getManifest().version !== BUILD) chrome.runtime.reload();
 
 async function init() {

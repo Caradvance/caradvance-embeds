@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import { debugPhoto, lastPhotoError, withCarPhotos } from "./photos";
 import type { Env, Lang, Requirements, Section } from "./types";
 import {
-  baseUrl, canSeeDeal, ensureAm, getSetting, isAdmin, isTest, logEvent, newId, nowIso, randomHex, sessionUser, setSetting, sha256Hex, type Staff,
+  baseUrl, canSeeDeal, ensureAm, sourceName, getSetting, isAdmin, isTest, logEvent, newId, nowIso, randomHex, sessionUser, setSetting, sha256Hex, type Staff,
   cachePut, cacheGet, cacheDel,
 } from "./am";
 import { addListing, getCandidates, getDeal, getRequest, moveToSlot, processRequest, publishBlockers, slotViews, type RequestRow } from "./engine";
@@ -156,7 +156,9 @@ staff.post("/igeny/:id/add", async (c) => {
   const target = f.target === "runner" ? "runner" : Number(f.target);
   let listing;
   try { listing = await getSource(c.env).getById(String(f.url || "")); } catch (e: any) { return back(c, reqPath(id), undefined, e.message); }
-  if (!listing) return back(c, reqPath(id), undefined, isTest(c.env)
+  if (!listing) return back(c, reqPath(id), undefined, sourceName(c.env) === "manual"
+    ? "Hirdetést a Chrome bővítménnyel küldj be: nyisd meg a mobile.de hirdetést, és kattints a „Küldés az ajánlatba” gombra."
+    : isTest(c.env)
     ? (/mobile\.de/i.test(String(f.url || ""))
       ? "Tesztben a szerver nem kérdezi le a mobile.de-t (mock forrás). Valódi hirdetést a Chrome bővítménnyel küldjön be („Küldés az ajánlatba”), vagy próbáljon tesztazonosítót: 1001–1007, 2001, 3001."
       : "A hirdetés nem található (tesztben: 1001–1007, 2001, 3001).")

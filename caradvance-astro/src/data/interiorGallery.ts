@@ -97,8 +97,7 @@ export const INTERIOR: Record<string, string[]> = {
   "/berles-press/audi-s5-limuzin-int4.webp"
  ],
  "audi-sq5-sportback": [
-  "/berles-press/audi-sq5-sportback-int1.webp",
-  "/berles-press/audi-sq5-sportback-int2.webp"
+  "/berles-press/audi-sq5-sportback-int1.webp"
  ],
  "bmw-3-as-touring": [
   "/berles-press/bmw-3-as-touring-int1.webp",
@@ -234,9 +233,7 @@ export const INTERIOR: Record<string, string[]> = {
   "/berles-press/mini-countryman-int3.webp",
   "/berles-press/mini-countryman-int4.webp"
  ],
- "volkswagen-golf": [
-  "/berles-press/volkswagen-golf-int1.webp"
- ],
+ "volkswagen-golf": [],
  "volkswagen-id-7-tourer": [
   "/berles-press/volkswagen-id-7-tourer-int1.webp",
   "/berles-press/volkswagen-id-7-tourer-int2.webp"
@@ -292,10 +289,10 @@ export const INTERIOR: Record<string, string[]> = {
   "/bmw/bmw-x5-studio-konzol.webp"
  ],
  "bmw-x6": [
-  "/bmw/bmw-x6-cockpit.webp",
-  "/bmw/bmw-x6-belso.webp",
-  "/bmw/bmw-x6-sportules.webp",
-  "/bmw/bmw-x6-konzol.webp"
+  "/bmw/bmw-x6n-cockpit.webp",
+  "/bmw/bmw-x6n-belso.webp",
+  "/bmw/bmw-x6n-sportules.webp",
+  "/bmw/bmw-x6n-konzol.webp"
  ],
  "bmw-m4-cabrio": [
   "/berles-press/bmw-m4-cabrio-interior.webp",
@@ -372,16 +369,14 @@ export const INTERIOR_PAGES: Record<string, string> = {
  "egyedi-auto-rendeles/mercedes-benz-cle-coupe": "mercedes-benz-cle-coupe",
  "egyedi-auto-rendeles/mercedes-benz-e-osztaly-t-modell": "mercedes-benz-e-osztaly-t-modell",
  "egyedi-auto-rendeles/mercedes-benz-gle-coupe": "mercedes-benz-gle-coupe",
+ "berelheto-auto/mercedes-benz-gle-coupe-berles": "mercedes-benz-gle-coupe",
  "berelheto-auto/mini-cooper-berles": "mini-cooper",
  "egyedi-auto-rendeles/mini-cooper": "mini-cooper",
  "egyedi-auto-rendeles/mini-cooper-5-ajtos": "mini-cooper",
- "egyedi-auto-rendeles/mini-john-cooper-works": "mini-cooper",
  "berelheto-auto/mini-cooper-cabrio-berles": "mini-cooper-cabrio",
  "egyedi-auto-rendeles/mini-cooper-cabrio": "mini-cooper-cabrio",
- "egyedi-auto-rendeles/mini-john-cooper-works-cabrio": "mini-cooper-cabrio",
  "berelheto-auto/mini-countryman-berles": "mini-countryman",
  "egyedi-auto-rendeles/mini-countryman": "mini-countryman",
- "egyedi-auto-rendeles/mini-john-cooper-works-countryman": "mini-countryman",
  "berelheto-auto/volkswagen-golf-berles": "volkswagen-golf",
  "berelheto-auto/volkswagen-id-7-tourer-berles": "volkswagen-id-7-tourer",
  "berelheto-auto/volkswagen-passat-variant-berles": "volkswagen-passat-variant",

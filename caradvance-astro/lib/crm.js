@@ -9,7 +9,7 @@
  *
  * Használja: functions/api/belso-crm/[[path]].js (munkatárs) és functions/api/crm-ajanlat/[[path]].js (ügyfél).
  */
-import { Pdf, PW, ML, MR } from './szerzodes.js';
+import { renderDocPdf } from './docpdf.js';
 import { LESSOR } from './szerzodes-tpl.js';
 
 export const SITE = 'https://www.caradvance.hu';
@@ -25,6 +25,45 @@ export const CHECKLIST = [
   ['ertekesitesi', 'Értékesítési szerződés'], ['tuv', 'TÜV papírok'], ['coc', 'COC papírok'], ['beszerzes_alatt', 'Beszerzés alatt'],
   ['szallitas_alatt', 'Szállítás alatt'], ['leszallitva', 'Leszállítva'], ['honositva', 'Honosítva'], ['atadva', 'Átadva']
 ];
+
+/**
+ * Üzletáganként eltérő checklist. Szakaszok (ütemek): { id, title, items:[[kulcs, felirat]] }.
+ *  close: melyik pipa állítja a státuszt „Lezárva”-ra ('all' = minden feladat kész).
+ *  Eladás: két ütem — előbb bérbe adjuk (bérlő), utána eladjuk (vevő, aki a bérlőtől eltérő személy/cég).
+ */
+export const CHECKLISTS = {
+  'Bérlés': {
+    close: 'atadva',
+    phases: [{ id: 'berles', title: '', items: [
+      ['igazolvany', 'Igazolvány / cégadat másolatok'], ['berleti', 'Bérleti szerződés'], ['beszerzes_alatt', 'Beszerzés alatt'],
+      ['szallitas_alatt', 'Szállítás alatt'], ['leszallitva', 'Leszállítva'], ['atadva', 'Átadva']] }]
+  },
+  'Bizományos': {
+    close: 'eladva',
+    phases: [{ id: 'biz', title: '', items: [
+      ['igazolvany', 'Igazolvány másolatok'], ['bizomanyi', 'Bizományi szerződés'], ['forgalmi', 'Forgalmi másolatok'],
+      ['hirdetes', 'Hirdetés kirakva'], ['eladva', 'Eladva']] }]
+  },
+  'Eladás': {
+    close: 'all',
+    phases: [
+      { id: 'e1', title: '1. ütem — Bérlés', items: [
+        ['e1_berleti', 'Bérleti szerződés'], ['e1_igazolvany', 'Igazolvány / cégadat másolatok'], ['e1_beszerzes', 'Beszerzés'],
+        ['e1_szallitas', 'Szállítás'], ['e1_leszallitva', 'Leszállítva'], ['e1_atadva', 'Átadva']] },
+      { id: 'e2', title: '2. ütem — Eladás', items: [
+        ['e2_adasveteli', 'Adásvételi szerződés'], ['e2_igazolvany', 'Igazolvány / cégadat másolatok'], ['e2_tuv', 'TÜV'],
+        ['e2_coc', 'COC'], ['e2_honositva', 'Honosítva'], ['e2_meghatalmazas', 'Meghatalmazások']] }
+    ]
+  }
+};
+const DEFAULT_CHECKLIST = { close: 'atadva', phases: [{ id: 'main', title: '', items: CHECKLIST }] };
+export function checklistFor(line) { return CHECKLISTS[line] || DEFAULT_CHECKLIST; }
+export function checklistItems(line) { return checklistFor(line).phases.reduce((a, p) => a.concat(p.items), []); }
+export function checklistProgress(line, cl) {
+  const items = checklistItems(line); cl = cl || {};
+  const done = items.filter(([k]) => cl[k] && cl[k].done).length;
+  return { done, total: items.length, progress: items.length ? Math.round(done / items.length * 100) : 0 };
+}
 
 export const MAX_FILE = 1400 * 1024;
 
@@ -45,7 +84,37 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_files (
       id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, name TEXT DEFAULT '', mime TEXT DEFAULT 'application/octet-stream',
       size INTEGER NOT NULL DEFAULT 0, data TEXT NOT NULL, created_by INTEGER, created_at TEXT DEFAULT (datetime('now')))`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_files_deal ON crm_files (deal_id)`)
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_files_deal ON crm_files (deal_id)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, at TEXT DEFAULT (datetime('now')),
+      actor TEXT DEFAULT '', kind TEXT DEFAULT '', text TEXT DEFAULT '')`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_events_deal ON crm_events (deal_id, id)`),
+    // ügyletenkénti pénzügy: bevételek (eladási / bérleti ár) és költségek, számlával (crm_files)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_fin (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, kind TEXT NOT NULL DEFAULT 'cost', title TEXT DEFAULT '',
+      amount REAL NOT NULL DEFAULT 0, currency TEXT NOT NULL DEFAULT 'HUF', fx REAL, amount_huf REAL NOT NULL DEFAULT 0,
+      fdate TEXT DEFAULT '', note TEXT DEFAULT '', file_id INTEGER, created_by INTEGER, created_name TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')), updated_at TEXT)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_fin_deal ON crm_fin (deal_id)`)
+  ]);
+  // több autó / ügyfél: a pénzügyi tétel autóhoz köthető (régi táblában az oszlop még hiányozhat)
+  try { await env.DB.prepare(`ALTER TABLE crm_fin ADD COLUMN vehicle_id TEXT DEFAULT ''`).run(); } catch (e) { /* már létezik */ }
+  // dokumentumsablonok (Szerződések menü), személyek (meghatalmazottak, tanúk), ügyfélhez kitöltött dokumentumok
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_templates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'szerzodes', lines TEXT NOT NULL DEFAULT '[]',
+      party TEXT NOT NULL DEFAULT 'client', client_type TEXT NOT NULL DEFAULT 'any', body TEXT NOT NULL DEFAULT '', note TEXT DEFAULT '',
+      active INTEGER NOT NULL DEFAULT 1, sort INTEGER NOT NULL DEFAULT 100, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT, updated_by TEXT)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_persons (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, address TEXT DEFAULT '', id_number TEXT DEFAULT '', mother_name TEXT DEFAULT '',
+      birth_place TEXT DEFAULT '', birth_date TEXT DEFAULT '', email TEXT DEFAULT '', phone TEXT DEFAULT '', note TEXT DEFAULT '',
+      active INTEGER NOT NULL DEFAULT 1, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_docs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, deal_id INTEGER NOT NULL, template_id INTEGER, name TEXT NOT NULL DEFAULT '', kind TEXT DEFAULT 'szerzodes',
+      vehicle_id TEXT DEFAULT '', persons TEXT DEFAULT '{}', text TEXT NOT NULL DEFAULT '', vars TEXT NOT NULL DEFAULT '{}',
+      created_by TEXT DEFAULT '', created_at TEXT DEFAULT (datetime('now')), updated_at TEXT, updated_by TEXT, sent_at TEXT, sent_to TEXT DEFAULT '')`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_docs_deal ON crm_docs (deal_id)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_settings (k TEXT PRIMARY KEY, v TEXT)`)
   ]);
   READY = true;
 }
@@ -74,13 +143,80 @@ export function bytesToB64(u) { let s = ''; const CH = 0x8000; for (let i = 0; i
 export async function sha256hex(u) { const b = await crypto.subtle.digest('SHA-256', typeof u === 'string' ? new TextEncoder().encode(u) : u); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join(''); }
 
 /** A kártya (crm_cards) sora — ha még nincs, alapértelmezett értékekkel. */
+/**
+ * Kiinduló státusz azoknál az ügyfeleknél, akiknek még nincs CRM-kártyájuk: a régi kanban-fázisból
+ * (deals.stage) képezzük, hogy a már folyamatban lévő ügyek ne „Kapcsolatfelvételre vár”-ként jelenjenek meg.
+ */
+const STAGE_TO_STATUS = {
+  'Új': 'Kapcsolatfelvételre vár', 'Érdeklődés': 'Kapcsolatfelvételre vár',
+  'Egyeztetés': 'Ajánlatra vár', 'Igény pontosítva': 'Ajánlatra vár', 'Autó keresése': 'Ajánlatra vár', 'Árazás': 'Ajánlatra vár',
+  'Ajánlat': 'Ajánlat kiküldve', 'Kiválasztva': 'Ajánlat elfogadva',
+  'Folyamatban': 'Megvalósítás', 'Megrendelve': 'Megvalósítás', 'Szállítás': 'Megvalósítás', 'Vám / forgalomba': 'Megvalósítás',
+  'Aktív bérlés': 'Megvalósítás', 'Bizományba véve': 'Megvalósítás', 'Hirdetve': 'Megvalósítás',
+  'Lezárva – sikeres': 'Lezárva', 'Lezárva': 'Lezárva', 'Átadva': 'Lezárva', 'Eladva': 'Lezárva'
+};
+export function statusFromDeal(d) {
+  if (!d) return DEFAULT_STATUS;
+  const st = STAGE_TO_STATUS[d.stage] || DEFAULT_STATUS;
+  // az ügyfél már választott autót a (régi) import-ajánlatból → legalább „Ajánlat elfogadva”
+  if (d.client_responded_at && STATUSES.indexOf(st) < STATUSES.indexOf('Ajánlat elfogadva')) return 'Ajánlat elfogadva';
+  return st;
+}
 export async function getCard(env, dealId) {
   const r = await env.DB.prepare(`SELECT * FROM crm_cards WHERE deal_id = ?`).bind(dealId).first();
-  if (!r) return { deal_id: dealId, status: DEFAULT_STATUS, address: '', data: {}, checklist: {}, contract: {}, status_at: null, updated_at: null, exists: false };
+  if (!r) {
+    const d = await env.DB.prepare(`SELECT stage, client_responded_at FROM deals WHERE id = ?`).bind(dealId).first();
+    return { deal_id: dealId, status: statusFromDeal(d), address: '', data: {}, checklist: {}, contract: {}, status_at: null, updated_at: null, exists: false };
+  }
   return { ...r, data: parseJ(r.data, {}), checklist: parseJ(r.checklist, {}), contract: parseJ(r.contract, {}), exists: true };
 }
 /** Részleges frissítés (upsert). fields: { status, address, data, checklist, contract } — az objektumokat egészben cseréli. */
-export async function saveCard(env, dealId, fields, userId) {
+/* ============================== árfolyam ============================== */
+/** EUR→HUF napi árfolyam (frankfurter.dev, 1 órás cache). Hiba esetén null. */
+export async function eurHuf() {
+  const cache = (typeof caches !== 'undefined') ? caches.default : null;
+  const key = 'https://internal.cache/crm-fx-eur-huf';
+  try {
+    if (cache) { const c = await cache.match(key); if (c) return (await c.json()).rate; }
+    const r = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF');
+    if (!r.ok) return null;
+    const j = await r.json(); const rate = j && j.rates && j.rates.HUF;
+    if (!rate) return null;
+    if (cache) await cache.put(key, new Response(JSON.stringify({ rate }), { headers: { 'content-type': 'application/json', 'Cache-Control': 'max-age=3600' } }));
+    return rate;
+  } catch (e) { return null; }
+}
+/** Egy ügylet pénzügyi összesítője (HUF). */
+export function finSummary(items) {
+  const inc = items.filter((x) => x.kind === 'income').reduce((a, x) => a + (Number(x.amount_huf) || 0), 0);
+  const cost = items.filter((x) => x.kind === 'cost').reduce((a, x) => a + (Number(x.amount_huf) || 0), 0);
+  return { income: Math.round(inc), cost: Math.round(cost), profit: Math.round(inc - cost), margin: inc ? Math.round((inc - cost) / inc * 1000) / 10 : null };
+}
+
+/* ============================== történésnapló ============================== */
+/**
+ * Egy bejegyzés az ügyfél történésnaplójába. mergeMin > 0: ha ugyanaz a szereplő ugyanilyen típusú
+ * bejegyzést írt az elmúlt mergeMin percben, azt frissíti (pl. az adatlap automatikus mentései ne töltsék tele a naplót).
+ */
+export async function addEvent(env, dealId, kind, text, actor, mergeMin) {
+  try {
+    if (mergeMin) {
+      const last = await env.DB.prepare(`SELECT id, kind, actor, at FROM crm_events WHERE deal_id = ? AND kind = ? AND actor = ? ORDER BY id DESC LIMIT 1`).bind(dealId, kind, actor || '').first();
+      if (last && Date.now() - new Date(String(last.at).replace(' ', 'T') + 'Z').getTime() < mergeMin * 60000) {
+        await env.DB.prepare(`UPDATE crm_events SET at = datetime('now'), text = ? WHERE id = ?`).bind(String(text).slice(0, 1000), last.id).run();
+        return;
+      }
+    }
+    await env.DB.prepare(`INSERT INTO crm_events (deal_id, actor, kind, text) VALUES (?, ?, ?, ?)`).bind(dealId, actor || '', kind || '', String(text).slice(0, 1000)).run();
+  } catch (e) { /* a napló hibája soha nem akadályozza a műveletet */ }
+}
+export async function listEvents(env, dealId) {
+  return ((await env.DB.prepare(`SELECT id, at, actor, kind, text FROM crm_events WHERE deal_id = ? ORDER BY at DESC, id DESC LIMIT 500`).bind(dealId).all()).results || [])
+    .map((e) => ({ ...e, kind: String(e.kind || '').split(':')[0] }));
+}
+
+/** actor: ki végezte (munkatárs neve / „Ügyfél”) — a státuszváltozás bekerül a naplóba. */
+export async function saveCard(env, dealId, fields, userId, actor, reason) {
   const cur = await getCard(env, dealId);
   const next = {
     status: fields.status !== undefined ? fields.status : cur.status,
@@ -97,6 +233,7 @@ export async function saveCard(env, dealId, fields, userId) {
         status_at = CASE WHEN crm_cards.status <> excluded.status THEN datetime('now') ELSE crm_cards.status_at END,
         updated_at = datetime('now'), updated_by = excluded.updated_by`)
     .bind(dealId, next.status, next.address || '', JSON.stringify(next.data || {}), JSON.stringify(next.checklist || {}), JSON.stringify(next.contract || {}), userId || null).run();
+  if (next.status !== cur.status) await addEvent(env, dealId, 'status', `Státusz: ${cur.status} → ${next.status}${reason ? ' (' + reason + ')' : ''}`, actor);
   return { ...next, statusChanged };
 }
 
@@ -199,8 +336,31 @@ export const VAR_LABELS = {
   ar: 'Vételár / díj', fizetesi_mod: 'Fizetési mód', atadas_datum: 'Átadás dátuma', atadas_hely: 'Átadás helye',
   havi_dij: 'Havi bérleti díj', kaucio: 'Kaució', futamido: 'Bérleti idő', km_keret: 'Km-keret',
   eloleg: 'Előleg', szallitasi_hatarido: 'Szállítási határidő', megbizasi_dij: 'Megbízási díj',
-  min_eladasi_ar: 'Minimális eladási ár', jutalek: 'Bizományi díj (jutalék)', bizomany_idotartam: 'Bizomány időtartama'
+  min_eladasi_ar: 'Minimális eladási ár', jutalek: 'Bizományi díj (jutalék)', bizomany_idotartam: 'Bizomány időtartama',
+  ugyfel_tartozkodasi_hely: 'Tartózkodási hely', ugyfel_bankszamla: 'Ügyfél bankszámla', ugyfel_szig: 'Személyi ig. / személyi szám', ugyfel_anyja_neve: 'Anyja neve',
+  ugyfel_szul_hely: 'Születési hely', ugyfel_szul_ido: 'Születési idő', ugyfel_szul_hely_ido: 'Születési hely, idő', ugyfel_jogositvany: 'Vezetői engedély száma',
+  vevo_nev: 'Vevő neve / cégnév', vevo_cim: 'Vevő címe', vevo_adoszam: 'Vevő adószáma', vevo_cegjegyzekszam: 'Vevő cégjegyzékszáma', vevo_kepviselo: 'Vevő képviselője',
+  vevo_telefon: 'Vevő telefon', vevo_email: 'Vevő e-mail', vevo_szig: 'Vevő szem. ig. száma', vevo_anyja_neve: 'Vevő anyja neve', vevo_szul_hely_ido: 'Vevő születési hely, idő',
+  auto_rendszam: 'Rendszám', auto_felszereltseg: 'Felszereltség',
+  ar_netto: 'Nettó ár', ar_afa: 'ÁFA', km_tulfutas_dij: 'Túlfutási díj (km)', berlet_kezdete: 'Bérlet kezdete', berlet_vege: 'Bérlet vége',
+  fizetesi_hatarido: 'Fizetési határidő', foglalo: 'Foglaló', foglalo_betuvel: 'Foglaló betűvel', szallitasi_dij: 'Szállítási díj',
+  jutalek_szazalek: 'Bizományi díj %', bizomany_vege: 'Bizomány vége',
+  meghatalmazott_nev: 'Meghatalmazott neve', meghatalmazott_cim: 'Meghatalmazott lakcíme', meghatalmazott_szig: 'Meghatalmazott szem. ig. száma',
+  meghatalmazott_anyja_neve: 'Meghatalmazott anyja neve', meghatalmazott_szul_hely_ido: 'Meghatalmazott szül. hely, idő',
+  tanu1_nev: '1. tanú neve', tanu1_cim: '1. tanú lakcíme', tanu1_szig: '1. tanú szem. ig. száma',
+  tanu2_nev: '2. tanú neve', tanu2_cim: '2. tanú lakcíme', tanu2_szig: '2. tanú szem. ig. száma'
 };
+/** A változók csoportjai a sablonszerkesztő „beszúrás” listájához. */
+export const VAR_GROUPS = [
+  ['Általános', ['szerzodes_szam', 'keltezes_hely', 'keltezes_datum']],
+  ['Ügyfél', ['ugyfel_nev', 'ugyfel_cim', 'ugyfel_tartozkodasi_hely', 'ugyfel_adoszam', 'ugyfel_cegjegyzekszam', 'ugyfel_kepviselo', 'ugyfel_telefon', 'ugyfel_email', 'ugyfel_bankszamla', 'ugyfel_szig', 'ugyfel_anyja_neve', 'ugyfel_szul_hely', 'ugyfel_szul_ido', 'ugyfel_szul_hely_ido', 'ugyfel_jogositvany']],
+  ['Vevő (Eladás 2. ütem)', ['vevo_nev', 'vevo_cim', 'vevo_adoszam', 'vevo_cegjegyzekszam', 'vevo_kepviselo', 'vevo_telefon', 'vevo_email', 'vevo_szig', 'vevo_anyja_neve', 'vevo_szul_hely_ido']],
+  ['Gépjármű', ['auto_megnevezes', 'auto_marka', 'auto_tipus', 'auto_evjarat', 'auto_alvazszam', 'auto_rendszam', 'auto_szin', 'auto_motor', 'auto_uzemanyag', 'auto_km', 'auto_hibrid', 'auto_felszereltseg']],
+  ['Ár, feltételek', ['ar', 'ar_netto', 'ar_afa', 'havi_dij', 'kaucio', 'futamido', 'km_keret', 'km_tulfutas_dij', 'berlet_kezdete', 'berlet_vege', 'atadas_datum', 'atadas_hely', 'fizetesi_mod', 'fizetesi_hatarido', 'eloleg', 'foglalo', 'foglalo_betuvel', 'megbizasi_dij', 'szallitasi_dij', 'szallitasi_hatarido', 'min_eladasi_ar', 'jutalek', 'jutalek_szazalek', 'bizomany_idotartam', 'bizomany_vege']],
+  ['Meghatalmazott', ['meghatalmazott_nev', 'meghatalmazott_cim', 'meghatalmazott_szig', 'meghatalmazott_anyja_neve', 'meghatalmazott_szul_hely_ido']],
+  ['Tanúk', ['tanu1_nev', 'tanu1_cim', 'tanu1_szig', 'tanu2_nev', 'tanu2_cim', 'tanu2_szig']]
+];
+export const PERSON_ROLES = { meghatalmazott: 'Meghatalmazott', tanu1: '1. tanú', tanu2: '2. tanú' };
 export const LINE_VARS = {
   'Eladás': ['ar', 'fizetesi_mod', 'atadas_datum', 'atadas_hely'],
   'Import': ['ar', 'eloleg', 'megbizasi_dij', 'szallitasi_hatarido', 'atadas_hely', 'fizetesi_mod'],
@@ -328,31 +488,58 @@ A Megbízó szavatol azért, hogy a gépjármű per-, teher- és igénymentes, �
 ${CLOSING('Bizományos', 'Megbízó')}`
 };
 
+/* ============================== autók (több autó / ügyfél) ============================== */
+export const VEH_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km'];
+/** Az adatlap autói: data.vehicles; a régi, egyetlen data.vehicle „v1” azonosítóval kerül át. */
+export function vehiclesOf(data) {
+  data = data || {};
+  if (Array.isArray(data.vehicles)) return data.vehicles;
+  const v = data.vehicle || {};
+  const has = VEH_KEYS.some((k) => v[k]) || v.hybrid;
+  return has ? [{ id: 'v1', source: 'manual', ...v }] : [];
+}
+/** Ajánlott / készletbeli autó → adatlap-autó. */
+export function itemToVehicle(it, id, source) {
+  const brand = it.brand || '';
+  return {
+    id, source: source || 'offer', key: it.key || '', title: it.title || '', brand,
+    model: brand && String(it.title || '').indexOf(brand) === 0 ? String(it.title).slice(brand.length).trim() : (it.title || ''),
+    year: it.year || '', vin: '', color: '', engine: it.power || '', fuel: it.fuel || '', km: it.km ? String(it.km) : '', hybrid: /hybrid|hibrid|PHEV/i.test(String(it.title || '') + ' ' + String(it.fuel || '')),
+    price: Number(it.price) || 0, currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: it.period || '', deposit: Number(it.deposit) || 0,
+    image: it.image || '', url: it.url || ''
+  };
+}
+export function newVehicleId(list) { let i = (list || []).length + 1; const ids = new Set((list || []).map((v) => v.id)); while (ids.has('v' + i)) i++; return 'v' + i; }
+
 /** A változók alapértékei az adatlapból + a kiválasztott (elfogadott) autóból. */
-export function defaultVars(deal, card, chosen) {
-  const d = card.data || {}; const p = d.person || {}; const co = d.company || {}; const v = d.vehicle || {};
+export function defaultVars(deal, card, chosen, opts) {
+  opts = opts || {};
+  const all = card.data || {}; const v = opts.vehicle || vehiclesOf(all)[0] || {};
+  // party: kinek a nevére szól a szerződés — alapból az ügyfél (Eladásnál a bérlő), az adásvételinél a vevő
+  const d = opts.party || all; const p = d.person || {}; const co = d.company || {};
+  const useDeal = !opts.party; // a vevőnél nem töltjük az érdeklődő adataival
   const isCo = d.kind === 'ceg';
   const ch = chosen || null;
   const priceTxt = ch ? priceLabel(ch) : (deal.price ? fmtPrice(deal.price, 'HUF') : '');
   const contactSep = isCo && d.contact_differs && d.contact ? d.contact : null;
   const vars = {
-    szerzodes_szam: `CA-${({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER', 'Bizományos': 'BIZ' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}`,
+    szerzodes_szam: `CA-${opts.code || ({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER', 'Bizományos': 'BIZ' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}${opts.suffix ? '-' + opts.suffix : ''}`,
     keltezes_hely: 'Solymár', keltezes_datum: huToday(),
     ceg_nev: LESSOR.name, ceg_szekhely: LESSOR.seat[0], ceg_cegjegyzek: LESSOR.reg, ceg_adoszam: LESSOR.vat, ceg_kepviselo: LESSOR.md,
-    ugyfel_nev: isCo ? (co.name || deal.name || '') : (p.name || deal.name || ''),
-    ugyfel_cim: isCo ? (co.address || '') : (p.address || card.address || ''),
+    ugyfel_nev: isCo ? (co.name || (useDeal ? deal.name : '') || '') : (p.name || (useDeal ? deal.name : '') || ''),
+    ugyfel_cim: isCo ? (co.address || '') : (p.address || (useDeal ? card.address : '') || ''),
     ugyfel_adoszam: isCo ? (co.tax || '') : (p.tax || ''),
     ugyfel_cegjegyzekszam: isCo ? (co.reg || '') : '—',
-    ugyfel_kepviselo: contactSep ? [contactSep.name, contactSep.phone, contactSep.email].filter(Boolean).join(', ') : (isCo ? (p.name || deal.name || '') : '—'),
-    ugyfel_telefon: (contactSep && contactSep.phone) || p.phone || deal.phone || '',
-    ugyfel_email: (contactSep && contactSep.email) || p.email || deal.email || '',
-    auto_megnevezes: ch ? ch.title : ([v.brand, v.model].filter(Boolean).join(' ') || deal.car || ''),
-    // ha az ügyfél elfogadott egy ajánlott autót, annak adatai az elsődlegesek; az alvázszám/szín az adatlapról jön
-    auto_marka: (ch && ch.brand) || v.brand || '',
-    auto_tipus: ch ? (ch.brand && ch.title.indexOf(ch.brand) === 0 ? ch.title.slice(ch.brand.length).trim() : ch.title) : (v.model || ''),
-    auto_evjarat: (ch && ch.year) || v.year || '',
-    auto_alvazszam: v.vin || '', auto_szin: v.color || '', auto_motor: (ch && ch.power) || v.engine || '',
-    auto_uzemanyag: (ch && ch.fuel) || v.fuel || '', auto_km: (ch && ch.km) || v.km || '', auto_hibrid: v.hybrid ? 'igen' : 'nem',
+    ugyfel_kepviselo: contactSep ? [contactSep.name, contactSep.phone, contactSep.email].filter(Boolean).join(', ') : (isCo ? (p.name || (useDeal ? deal.name : '') || '') : '—'),
+    ugyfel_telefon: (contactSep && contactSep.phone) || p.phone || (useDeal ? deal.phone : '') || '',
+    ugyfel_email: (contactSep && contactSep.email) || p.email || (useDeal ? deal.email : '') || '',
+    // autónkénti szerződésnél (opts.vehicle) az adatlap autójának adatai az elsődlegesek; egyébként az elfogadott ajánlaté
+    auto_megnevezes: opts.vehicle ? (v.title || [v.brand, v.model].filter(Boolean).join(' ') || (ch && ch.title) || '') : (ch ? ch.title : (v.title || [v.brand, v.model].filter(Boolean).join(' ') || deal.car || '')),
+    auto_marka: opts.vehicle ? (v.brand || '') : ((ch && ch.brand) || v.brand || ''),
+    auto_tipus: opts.vehicle ? (v.model || '') : (ch ? (ch.brand && ch.title.indexOf(ch.brand) === 0 ? ch.title.slice(ch.brand.length).trim() : ch.title) : (v.model || '')),
+    auto_evjarat: opts.vehicle ? (v.year || '') : ((ch && ch.year) || v.year || ''),
+    auto_alvazszam: v.vin || '', auto_szin: v.color || '', auto_motor: opts.vehicle ? (v.engine || '') : ((ch && ch.power) || v.engine || ''),
+    auto_uzemanyag: opts.vehicle ? (v.fuel || '') : ((ch && ch.fuel) || v.fuel || ''), auto_km: opts.vehicle ? (v.km || '') : ((ch && ch.km) || v.km || ''), auto_hibrid: v.hybrid ? 'igen' : 'nem',
     ar: priceTxt, fizetesi_mod: 'banki átutalás', atadas_datum: '', atadas_hely: 'Solymár, Ibolya utca 18',
     havi_dij: ch && ch.period ? fmtPrice(ch.price, ch.currency) : priceTxt, kaucio: ch && ch.deposit ? fmtPrice(ch.deposit, ch.currency) : '',
     futamido: '12 hónap', km_keret: '1 500 km/hó',
@@ -372,37 +559,8 @@ export function fillTemplate(text, vars) {
 /* ============================== PDF ============================== */
 /** Egyszerű, egyhasábos szerződés-PDF a kitöltött szövegből (ugyanaz a betűkészlet, mint az online bérleti szerződésé). */
 export function contractPdfFromText(filled, meta) {
-  meta = meta || {};
-  const p = new Pdf();
-  const head = () => {
-    p.rect(0, 841.89 - 58, PW, 58, '0.043 0.043 0.051'); p.rect(0, 841.89 - 61, PW, 3, '0.886 0 0.102');
-    p.draw('CarAdvance', ML, 841.89 - 36, 'B', 17, '1 1 1');
-    p.draw('Bérlés · Import · Eladás', ML, 841.89 - 49, 'R', 8, '0.75 0.77 0.82');
-    const t = meta.number || ''; p.draw(t, PW - MR - p.width(t, 'R', 8.5), 841.89 - 36, 'R', 8.5, '0.85 0.86 0.9');
-    p.y = 841.89 - 84;
-  };
-  head();
-  const lines = String(filled || '').split('\n');
-  let blank = false;
-  for (const raw of lines) {
-    const ln = raw.replace(/\t/g, '    ');
-    if (!ln.trim()) { if (!blank) p.y -= 5; blank = true; continue; }
-    blank = false;
-    if (/^Kelt:/.test(ln)) p.ensure(110); // a keltezés maradjon együtt az aláírásokkal
-    if (ln.startsWith('# ')) { p.ensure(30); p.y -= 4; p.para(ln.slice(2), { bold: true, size: 13.5, after: 6 }); continue; }
-    if (ln.startsWith('## ')) { p.ensure(34); p.y -= 6; p.para(ln.slice(3), { bold: true, size: 10.5, after: 3, color: '0.886 0 0.102' }); continue; }
-    const sg = ln.match(/^\[aláírás\]\s*(.*)$/i);
-    if (sg) { // aláírási blokk: két vonal, alatta a felek megnevezése
-      const parts = sg[1].split('|').map((x) => x.trim()); const colW = (PW - ML - MR - 40) / 2; const x2 = ML + colW + 40;
-      p.ensure(70); p.y -= 40;
-      p.cur.push(`0.5 0.52 0.6 RG 0.6 w ${ML} ${p.y.toFixed(2)} m ${(ML + colW).toFixed(2)} ${p.y.toFixed(2)} l S`);
-      p.cur.push(`0.5 0.52 0.6 RG 0.6 w ${x2.toFixed(2)} ${p.y.toFixed(2)} m ${(PW - MR).toFixed(2)} ${p.y.toFixed(2)} l S`);
-      p.y -= 13; p.draw(parts[0] || '', ML, p.y, 'B', 9); if (parts[1]) p.draw(parts[1], x2, p.y, 'B', 9);
-      p.y -= 8; continue;
-    }
-    p.para(ln, { size: 9.6, after: 2 });
-  }
-  return p.build({ title: meta.title || 'Szerződés', number: meta.number || '', hash: meta.hash || '' });
+  // a CarAdvance-arculatú dokumentummotor (lib/docpdf.js): logó, táblázatok, keretek, lábléc — a régi sablonokkal is működik
+  return renderDocPdf(filled, meta);
 }
 
 /* ============================== e-mail (Resend) ============================== */
@@ -429,3 +587,51 @@ export async function sendCrmMail(env, to, subject, inner, attachments) {
   return { ok: false, error: 'E-mail küldési hiba: ' + (await r.text().catch(() => r.status)).slice(0, 300) };
 }
 export function notifyTo(env) { return env.CRM_NOTIFY_TO || env.CONTRACT_NOTIFY_TO || 'info@caradvance.hu'; }
+
+/* ============================== dokumentumok (sablonból kitöltve) ============================== */
+export const DOC_KINDS = { szerzodes: 'Szerződés', meghatalmazas: 'Meghatalmazás', nyilatkozat: 'Nyilatkozat / jegyzőkönyv', melleklet: 'Melléklet / feltételek', egyeb: 'Egyéb' };
+export async function getSetting(env, k, d) { const r = await env.DB.prepare(`SELECT v FROM crm_settings WHERE k = ?`).bind(k).first(); return r ? parseJ(r.v, d) : d; }
+export async function setSetting(env, k, v) { await env.DB.prepare(`INSERT OR REPLACE INTO crm_settings (k, v) VALUES (?, ?)`).bind(k, JSON.stringify(v)).run(); }
+function huDate(iso) { if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return iso || ''; const [y, m, d] = iso.split('-'); return `${y}. ${m}. ${d}.`; }
+function personVars(prefix, p) {
+  p = p || {};
+  const bd = huDate(p.birth_date);
+  return {
+    [prefix + '_nev']: p.name || '', [prefix + '_cim']: p.address || '', [prefix + '_szig']: p.id_number || '',
+    [prefix + '_anyja_neve']: p.mother_name || '', [prefix + '_szul_hely_ido']: [p.birth_place, bd].filter(Boolean).join(', ')
+  };
+}
+/** Egy sablonból készülő dokumentum változói: ügyfél / vevő, autó (ár, bérlet), személyek (meghatalmazott, tanúk). */
+export function docVars(deal, card, vehicle, tpl, persons, seq) {
+  const data = card.data || {};
+  const buyer = data.buyer || {};
+  const isBuyer = tpl && tpl.party === 'buyer';
+  const chosen = vehicle && vehicle.price > 0 ? vehicle : null;
+  const vehs = vehiclesOf(data); const vi = vehicle ? Math.max(0, vehs.findIndex((x) => x.id === vehicle.id)) : 0;
+  const base = defaultVars(deal, card, chosen, { ...(vehicle ? { vehicle, suffix: vi > 0 ? String(vi + 1) : '' } : {}), ...(isBuyer ? { party: buyer } : {}) });
+  base.szerzodes_szam = base.szerzodes_szam + (seq ? '/' + seq : '');
+  const party = isBuyer ? buyer : data; const pp = party.person || {}; const isCo = party.kind === 'ceg';
+  const bd = huDate(pp.birth_date);
+  Object.assign(base, {
+    ugyfel_tartozkodasi_hely: pp.residence || '', ugyfel_bankszamla: pp.bank || '', ugyfel_szig: pp.id_number || '', ugyfel_anyja_neve: pp.mother_name || '',
+    ugyfel_szul_hely: pp.birth_place || '', ugyfel_szul_ido: bd, ugyfel_szul_hely_ido: [pp.birth_place, bd].filter(Boolean).join(', '), ugyfel_jogositvany: pp.licence || ''
+  });
+  if (isCo && pp.name && !base.ugyfel_kepviselo.replace(/—/g, '').trim()) base.ugyfel_kepviselo = pp.name;
+  // vevő (Eladás 2. üteme) — mindig elérhető külön kulcsokon is
+  const bp = buyer.person || {}; const bc = buyer.company || {}; const bCo = buyer.kind === 'ceg';
+  const bbd = huDate(bp.birth_date);
+  Object.assign(base, {
+    vevo_nev: bCo ? (bc.name || '') : (bp.name || ''), vevo_cim: bCo ? (bc.address || '') : (bp.address || ''), vevo_adoszam: bCo ? (bc.tax || '') : (bp.tax || ''),
+    vevo_cegjegyzekszam: bCo ? (bc.reg || '') : '', vevo_kepviselo: bCo ? (bp.name || '') : '', vevo_telefon: bp.phone || '', vevo_email: bp.email || '',
+    vevo_szig: bp.id_number || '', vevo_anyja_neve: bp.mother_name || '', vevo_szul_hely_ido: [bp.birth_place, bbd].filter(Boolean).join(', ')
+  });
+  const v = vehicle || {};
+  Object.assign(base, {
+    auto_rendszam: v.plate || '', auto_felszereltseg: '',
+    berlet_kezdete: huDate(v.rent_start), berlet_vege: huDate(v.rent_end),
+    futamido: v.rent_start && v.rent_end ? Math.round((Date.parse(v.rent_end) - Date.parse(v.rent_start)) / 864e5 / 30.44) + ' hónap' : base.futamido,
+    ar_netto: '', ar_afa: '', km_tulfutas_dij: '', fizetesi_hatarido: '', foglalo: '', foglalo_betuvel: '', szallitasi_dij: '', jutalek_szazalek: '', bizomany_vege: ''
+  });
+  for (const role of Object.keys(PERSON_ROLES)) Object.assign(base, personVars(role, (persons || {})[role]));
+  return base;
+}

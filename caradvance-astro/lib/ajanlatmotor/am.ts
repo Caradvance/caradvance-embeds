@@ -18,7 +18,8 @@
 import type { Env } from "./types";
 
 export const isTest = (env: Env) => env.AM_TEST_MODE === "1";
-export const sourceName = (env: Env) => env.AM_SOURCE || (isTest(env) ? "mock" : "searchapi");
+/** mock (test) · searchapi (mobile.de dealer API credentials present) · manual (staff search mobile.de + Chrome extension) */
+export const sourceName = (env: Env) => env.AM_SOURCE || (isTest(env) ? "mock" : env.MOBILE_DE_API_USERNAME ? "searchapi" : "manual");
 export const aiModel = (env: Env) => env.AM_AI_MODEL || "claude-sonnet-5-5";
 export const validDays = (env: Env) => Number(env.AM_OFFER_VALID_DAYS || 7);
 export const DEPOT = { lat: 47.4979, lon: 19.0402, label: "Budapest" };
