@@ -223,6 +223,9 @@
   .dm-ed{border-color:var(--red-tint2);background:#fff}
   .dm-edh{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
   .dm-send .rc{display:flex;gap:18px;flex-wrap:wrap}
+  .sgp{border-color:#d9d2f3;background:#fbfaff}
+  .sgb{font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 8px;white-space:nowrap}.sgb.wait{background:#fff3df;color:#a2660b}.sgb.ok{background:#e7f6ef;color:var(--good)}.sgb.off{background:var(--line2);color:#5b6472}.sgb.bad{background:#fdeceb;color:var(--bad)}
+  .sgl{display:grid;gap:8px}.sgr{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}.sgr .h{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;margin-bottom:3px}.sgr ul{margin:6px 0 0;padding-left:18px;font-size:12.5px}
   .tgrp{margin-top:6px}.tgh{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:800;color:var(--muted);margin:6px 0}
   .tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px}
   .tchk{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:#fff;cursor:pointer;font-size:13px}
@@ -977,7 +980,7 @@ function dmLoad(){
   return api('/card/'+ID+'/docs').then(function(j){
     DM.loaded=true;DM.docs=j.docs;DM.templates=j.templates;DM.persons=j.persons;DM.roles=j.roles;DM.kinds=j.kinds;DM.partner=j.partner||{};
     if(isSale()&&DM.to.client&&DM.to.buyer===undefined)DM.to.buyer=false;
-    renderDM();
+    return api('/card/'+ID+'/sign').then(function(k){DM.signs=k.requests||[];}).catch(function(){DM.signs=[];}).then(renderDM);
   }).catch(function(e){var el=$('dm');if(el)el.innerHTML='<div class="hint">'+esc(e.message)+'</div>';});
 }
 function partyKind(t){var d=S.card.data;return t.party==='buyer'?d.buyer.kind:d.kind;}
@@ -1005,8 +1008,11 @@ function renderDM(){
     var v=vehById(d.vehicle_id);
     return '<div class="dm-row'+(DM.edit&&DM.edit.id===d.id?' on':'')+'"><input type="checkbox" data-ds="'+d.id+'"'+(DM.sel[d.id]?' checked':'')+' title="Kijelölés küldéshez">'
       +'<span class="ic">'+(KIND_IC[d.kind]||'📑')+'</span><span class="nm"><b>'+esc(d.name)+'</b><small>'+esc(DM.kinds[d.kind]||'')+(d.number?' · '+esc(d.number):'')+' · '+esc(fmtDate(d.updated_at||d.created_at))+(d.updated_by?' · '+esc(d.updated_by):'')
-      +(d.sent_at?' · <span style="color:var(--good);font-weight:700">✓ elküldve '+esc(fmtDate(d.sent_at))+'</span>':'')+'</small></span>'
-      +'<span class="acts"><button class="lnk" data-de="'+d.id+'">Szerkesztés</button><button class="lnk" data-dp="'+d.id+'">PDF</button><button class="lnk del" data-dd="'+d.id+'">Törlés</button></span></div>';
+      +(d.sent_at?' · <span style="color:var(--good);font-weight:700">✓ elküldve '+esc(fmtDate(d.sent_at))+'</span>':'')
+      +(d.sign_status==='pending'?' · <span class="sgb wait">⏳ aláírásra vár</span>':d.sign_status==='signed'?' · <span class="sgb ok">✍ aláírva</span>':'')+'</small></span>'
+      +'<span class="acts">'+(d.sign_status?'':'<button class="lnk" data-de="'+d.id+'">Szerkesztés</button>')
+      +(d.signed_file_id?'<a class="lnk" href="'+API+'/card/'+ID+'/files/'+d.signed_file_id+'" target="_blank" rel="noopener">Aláírt PDF</a>':'<button class="lnk" data-dp="'+d.id+'">PDF</button>')
+      +(d.sign_status?'':'<button class="lnk del" data-dd="'+d.id+'">Törlés</button>')+'</span></div>';
   }).join('')+'</div>';
   // új dokumentum
   var T=selTpls(),roles=[];T.forEach(function(t){t.roles.forEach(function(r){if(roles.indexOf(r)<0)roles.push(r);});});
@@ -1036,7 +1042,8 @@ function renderDM(){
     +'</div><div class="grid g2" style="margin-top:10px"><div class="fld"><label>Egyéb címzett(ek) — vesszővel elválasztva</label><input id="dmEmails" type="text" value="'+esc(DM.emails||'')+'" placeholder="pl. ugyintezo@example.hu"></div>'
     +'<div class="fld"><label>Tárgy (nem kötelező)</label><input id="dmSubj" value="'+esc(DM.subj||'')+'" placeholder="CarAdvance — dokumentumok"></div>'
     +'<div class="fld wide"><label>Kísérő üzenet (nem kötelező)</label><textarea id="dmMsg" rows="2">'+esc(DM.msg||'')+'</textarea></div></div>'
-    +'<div class="actions"><button class="btn red" id="dmSend">Küldés ('+(nSel+fileSelCount())+' kijelölt)</button><span class="hint">A kijelölt dokumentumok PDF-ként, a bepipált feltöltött fájlokkal együtt egy e-mailben mennek ki.</span></div></div>';
+    +'<div class="actions"><button class="btn red" id="dmSend">Küldés ('+(nSel+fileSelCount())+' kijelölt)</button><span class="hint">A kijelölt dokumentumok PDF-ként, a bepipált feltöltött fájlokkal együtt egy e-mailben mennek ki.</span></div></div>'
+    +signPanel();
   el.innerHTML=h;
   el.querySelectorAll('[data-ds]').forEach(function(c){c.addEventListener('change',function(){DM.sel[c.getAttribute('data-ds')]=c.checked;updSendBtn();});});
   el.querySelectorAll('[data-de]').forEach(function(b){b.addEventListener('click',function(){dmOpen(+b.getAttribute('data-de'));});});
@@ -1053,10 +1060,59 @@ function renderDM(){
   $('dmSubj').addEventListener('input',function(){DM.subj=this.value;});
   $('dmMsg').addEventListener('input',function(){DM.msg=this.value;});
   $('dmSend').addEventListener('click',dmSend);
+  bindSign();
   renderDmEdit();
 }
+/* --- elektronikus aláírás --- */
+var SG_ST={pending:['wait','Aláírásra vár'],signing:['wait','Feldolgozás alatt'],signed:['ok','Aláírva'],revoked:['off','Visszavonva'],expired:['off','Lejárt'],locked:['bad','Zárolva (sok hibás kód)']};
+function signPanel(){
+  var cem=S.card.data.person.email||S.deal.email||'',bem=isSale()?(S.card.data.buyer.person.email||''):'';
+  var nSel=DM.docs.filter(function(d){return DM.sel[d.id]&&!d.sign_status;}).length;
+  var h='<div class="dm-send sgp"><div class="sub-h" style="margin-top:0">✍ Elektronikus aláírásra küldés</div>'
+    +'<div class="hint" style="margin-bottom:8px">A kijelölt (még alá nem írt) dokumentumok szövege a kiküldéskor rögzül. Az aláíró e-mailben kap egy személyes linket. Átolvassa a dokumentumokat, egyszeri kóddal azonosítja magát, majd aláír. Az aláírt PDF-ek aláírási tanúsítvánnyal együtt a feltöltött fájlok közé kerülnek, és mindkét fél e-mailben megkapja őket.</div>'
+    +'<div class="rc"><label class="chk"><input type="radio" name="sgr" value="client"'+(DM.sgr!=='buyer'?' checked':'')+'> Ügyfél'+(isSale()?' (bérlő)':'')+' <span class="hint">'+esc((S.card.data.person.name||S.deal.name||'')+' · '+(cem||'nincs e-mail'))+'</span></label>'
+    +(isSale()?'<label class="chk"><input type="radio" name="sgr" value="buyer"'+(DM.sgr==='buyer'?' checked':'')+'> Vevő <span class="hint">'+esc((S.card.data.buyer.person.name||'')+' · '+(bem||'nincs e-mail'))+'</span></label>':'')+'</div>'
+    +'<div class="fld" style="margin-top:8px"><label>Üzenet az aláírónak (nem kötelező)</label><input id="sgMsg" value="'+esc(DM.sgMsg||'')+'" placeholder="pl. Kérjük, írja alá a meghatalmazásokat a honosítás indításához."></div>'
+    +'<div class="actions"><button class="btn dark" id="sgSend"'+(nSel?'':' disabled')+'>Aláírásra küldés ('+nSel+' dokumentum)</button><span class="hint">A link 14 napig érvényes, és visszavonható.</span></div>';
+  if((DM.signs||[]).length){
+    h+='<div class="sub-h">Aláírási kérelmek</div><div class="sgl">'+DM.signs.map(function(r){
+      var st=SG_ST[r.status]||['off',r.status];
+      return '<div class="sgr"><div class="h"><span class="sgb '+st[0]+'">'+st[1]+'</span><b>#'+r.id+' · '+esc(r.signer)+'</b><span class="hint">'+esc(r.email)+'</span><span style="flex:1"></span>'
+        +(r.status==='pending'?'<button class="lnk del" data-sgrv="'+r.id+'">Visszavonás</button>':'')+'</div>'
+        +'<div class="hint">Kiküldve: '+esc(fmtDate(r.created_at))+' ('+esc(r.created_by||'')+')'+(r.opened_at?' · megnyitva: '+esc(fmtDate(r.opened_at)):'')
+        +(r.signed_at?' · <b style="color:var(--good)">aláírva: '+esc(fmtDate(r.signed_at))+' — '+esc(r.sign_name||'')+', IP: '+esc(r.sign_ip||'')+'</b>':r.status==='pending'?' · lejár: '+esc(fmtDate(r.expires.replace('T',' ').slice(0,19))):'')+(r.fails?' · hibás kód: '+r.fails:'')+'</div>'
+        +'<ul>'+r.docs.map(function(d,i){var res=(r.result||[])[i];return '<li>'+esc(d.name)+(res&&res.file_id?' — <a href="'+API+'/card/'+ID+'/files/'+res.file_id+'" target="_blank" rel="noopener">aláírt PDF</a> <span class="hint">PDF SHA-256: '+esc(res.pdf_sha.slice(0,16))+'…</span>':'')+'</li>';}).join('')+'</ul></div>';
+    }).join('')+'</div>';
+  }
+  return h+'</div>';
+}
+function bindSign(){
+  document.querySelectorAll('input[name=sgr]').forEach(function(r){r.addEventListener('change',function(){DM.sgr=r.value;});});
+  var m=$('sgMsg');if(m)m.addEventListener('input',function(){DM.sgMsg=this.value;});
+  var b=$('sgSend');if(b)b.addEventListener('click',signSend);
+  document.querySelectorAll('[data-sgrv]').forEach(function(x){x.addEventListener('click',function(){
+    if(!confirm('Visszavonod az aláírási kérelmet? A link azonnal érvénytelenné válik.'))return;
+    api('/card/'+ID+'/sign/'+x.getAttribute('data-sgrv')+'/revoke',{method:'POST',body:{}}).then(function(){toast('Kérelem visszavonva');refreshLog();return dmLoad();}).catch(function(e){toast(e.message,4500);});
+  });});
+}
+function signSend(){
+  var ids=DM.docs.filter(function(d){return DM.sel[d.id]&&!d.sign_status;}).map(function(d){return d.id;});
+  if(!ids.length)return toast('Jelölj ki legalább egy (még alá nem írt) dokumentumot.');
+  if(DM.edit&&DM.dirty&&ids.indexOf(DM.edit.id)>=0)return toast('Előbb mentsd a megnyitott dokumentumot.',4000);
+  var role=DM.sgr==='buyer'?'buyer':'client';
+  var P=role==='buyer'?S.card.data.buyer.person:S.card.data.person,em=P.email||(role==='client'?S.deal.email:'');
+  if(!em)return toast((role==='buyer'?'A vevőnek':'Az ügyfélnek')+' nincs e-mail címe (1. szekció).',4000);
+  if(!confirm('Aláírásra küldöd ('+ids.length+' dokumentum)?\n\nAláíró: '+(P.name||S.deal.name)+' — '+em+'\n\nA kiküldés után a dokumentumok nem szerkeszthetők (amíg vissza nem vonod).'))return;
+  var b=$('sgSend');b.disabled=true;b.textContent='Küldés…';
+  api('/card/'+ID+'/sign',{method:'POST',body:{doc_ids:ids,signer:role,message:DM.sgMsg||''}}).then(function(r){
+    toast((r.test?'Aláírásra kiküldve (TESZT: ':'Aláírásra kiküldve: ')+r.sentTo+')'+(r.mailError?' — e-mail hiba: '+r.mailError:''),5000);
+    if(r.mailError)prompt('Az e-mail nem ment ki. Az aláírási link (személyes — csak az aláírónak add át):',r.link);
+    ids.forEach(function(id){DM.sel[id]=false;});DM.sgMsg='';if(DM.edit&&ids.indexOf(DM.edit.id)>=0){DM.edit=null;DM.dirty=false;}
+    refreshLog();return dmLoad();
+  }).catch(function(e){toast(e.message,5000);b.disabled=false;b.textContent='Aláírásra küldés';});
+}
 function fileSelCount(){return document.querySelectorAll('#docs input[data-f]:checked').length;}
-function updSendBtn(){var b=$('dmSend');if(b)b.textContent='Küldés ('+(Object.keys(DM.sel).filter(function(k){return DM.sel[k];}).length+fileSelCount())+' kijelölt)';}
+function updSendBtn(){var b=$('dmSend');if(b)b.textContent='Küldés ('+(Object.keys(DM.sel).filter(function(k){return DM.sel[k];}).length+fileSelCount())+' kijelölt)';var g=$('sgSend');if(g){var n=DM.docs.filter(function(d){return DM.sel[d.id]&&!d.sign_status;}).length;g.disabled=!n;g.textContent='Aláírásra küldés ('+n+' dokumentum)';}}
 document.addEventListener('change',function(e){if(e.target&&e.target.matches&&e.target.matches('#docs input[data-f]'))updSendBtn();});
 function dmCreate(){
   var T=selTpls();if(!T.length)return toast('Jelölj ki legalább egy sablont.');
@@ -1271,7 +1327,7 @@ function saveFin(){
 }
 
 /* ---------------- 7. történésnapló ---------------- */
-var LOG_IC={status:'⇄',client:'★',opened:'👁',offer:'✉',contract:'📄',doc:'📑',draft:'✎',checklist:'✓',file:'📎',data:'👤',buyer:'🤝',fin:'💰',rent:'⏰',vehicle:'🚗',create:'＋',start:'●'};
+var LOG_IC={status:'⇄',client:'★',opened:'👁',offer:'✉',contract:'📄',doc:'📑',sign:'✍',draft:'✎',checklist:'✓',file:'📎',data:'👤',buyer:'🤝',fin:'💰',rent:'⏰',vehicle:'🚗',create:'＋',start:'●'};
 var LOG_GROUP={'':'Mind',status:'Státusz',client:'Ügyfél',offer:'Ajánlat',contract:'Szerződés',checklist:'Checklist',fin:'Pénzügy'};
 var logFilter='';
 function renderLog(){
@@ -1281,7 +1337,7 @@ function renderLog(){
   var shown=ev.filter(function(e){
     if(!logFilter)return true;
     if(logFilter==='client')return e.kind==='client'||e.kind==='opened';
-    if(logFilter==='contract')return e.kind==='contract'||e.kind==='draft'||e.kind==='file'||e.kind==='doc';
+    if(logFilter==='contract')return e.kind==='contract'||e.kind==='draft'||e.kind==='file'||e.kind==='doc'||e.kind==='sign';
     return e.kind===logFilter;
   });
   $('logCnt').textContent=ev.length+' bejegyzés';
