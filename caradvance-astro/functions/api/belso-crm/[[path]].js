@@ -3,7 +3,7 @@
 // Ugyanazt a munkamenetet (ca_session süti) és jogosultságot használja, mint az /api/belso/*:
 // admin mindent lát, a többi munkatárs csak a hozzá rendelt ügyfeleket.
 import {
-  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, MAX_FILE,
+  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE
 } from '../../../lib/crm.js';
@@ -47,11 +47,11 @@ async function handleList(env, user) {
   const clients = rows.map((r) => {
     const data = parseJ(r.data, {});
     const isCo = data.kind === 'ceg' && data.company && data.company.name;
-    const cl = parseJ(r.checklist, {}); const done = CHECKLIST.filter(([k]) => cl[k] && cl[k].done).length;
+    const pr = checklistProgress(r.line, parseJ(r.checklist, {}));
     return {
       id: r.id, line: r.line, ch: r.ch, name: (isCo && data.person && data.person.name) || r.name, company: isCo ? data.company.name : '', phone: r.phone, email: r.email, car: r.car,
       address: r.address || '', status: r.status || statusFromDeal(r), status_at: r.status_at,
-      progress: Math.round(done / CHECKLIST.length * 100), done, total: CHECKLIST.length, created_at: r.created_at, when_text: r.when_text, assigned_to: r.assigned_to
+      progress: pr.progress, done: pr.done, total: pr.total, created_at: r.created_at, when_text: r.when_text, assigned_to: r.assigned_to
     };
   });
   return json({ clients, statuses: STATUSES });
@@ -69,7 +69,7 @@ async function handleGetCard(env, user, id) {
   if (user.role === 'admin') users = (await env.DB.prepare(`SELECT id, name, email FROM users ORDER BY name`).all()).results || [];
   return json({
     deal, card: { status: card.status, address: card.address, data: card.data, checklist: card.checklist, contract: card.contract, status_at: card.status_at, updated_at: card.updated_at },
-    offers, files, events, statuses: STATUSES, checklist: CHECKLIST, me: user, users, testForward: testForward(env)
+    offers, files, events, statuses: STATUSES, checklist: checklistFor(deal.line), me: user, users, testForward: testForward(env)
   });
 }
 
@@ -87,6 +87,8 @@ function normData(b) {
     contact_differs: !!b.contact_differs,
     contact: pick(b.contact, CONTACT_KEYS),
     vehicle: { ...pick(b.vehicle, VEHICLE_KEYS), hybrid: !!(b.vehicle && b.vehicle.hybrid) },
+    // Eladás 2. üteme: a vevő (a bérlőtől eltérő személy / cég)
+    buyer: { kind: b.buyer && b.buyer.kind === 'ceg' ? 'ceg' : 'magan', person: pick(b.buyer && b.buyer.person, PERSON_KEYS), company: pick(b.buyer && b.buyer.company, COMPANY_KEYS) },
     notes: cleanMulti(b.notes, 4000)
   };
 }
@@ -101,31 +103,36 @@ async function handlePatchCard(request, env, user, id) {
   if (b.address !== undefined) f.address = clean(b.address, 300);
   else if (f.data) f.address = f.data.kind === 'ceg' ? (f.data.company.address || f.data.person.address) : f.data.person.address;
   if (b.checklist !== undefined) {
-    const prev = cur.checklist || {}; const next = {};
-    for (const [k] of CHECKLIST) {
+    const prev = cur.checklist || {}; const next = { ...prev }; const items = checklistItems(deal.line); const rule = checklistFor(deal.line).close;
+    for (const [k] of items) {
       const on = !!(b.checklist && b.checklist[k] && (b.checklist[k] === true || b.checklist[k].done));
       next[k] = on ? { done: true, at: (prev[k] && prev[k].done && prev[k].at) || new Date().toISOString().slice(0, 19), by: (prev[k] && prev[k].done && prev[k].by) || user.name } : { done: false };
     }
     f.checklist = next;
-    for (const [k, label] of CHECKLIST) {
+    for (const [k, label] of items) {
       const was = !!(prev[k] && prev[k].done);
       if (was !== next[k].done) f._log = (f._log || []).concat([['checklist', (next[k].done ? '✓ Kipipálva: ' : '✗ Pipa levéve: ') + label]]);
     }
-    // „Átadva” kipipálva → Lezárva
-    if (next.atadva.done && !(prev.atadva && prev.atadva.done)) { f.status = 'Lezárva'; f._reason = '„Átadva” kipipálva'; }
+    // lezárás: „Átadva” kipipálva, ill. Eladásnál mindkét ütem minden feladata kész → Lezárva
+    if (rule === 'all') {
+      const allNow = items.every(([k]) => next[k] && next[k].done), allBefore = items.every(([k]) => prev[k] && prev[k].done);
+      if (allNow && !allBefore) { f.status = 'Lezárva'; f._reason = 'minden checklist-feladat kész'; }
+    } else if (next[rule] && next[rule].done && !(prev[rule] && prev[rule].done)) { f.status = 'Lezárva'; f._reason = '„Átadva” kipipálva'; }
   }
   if (b.contract !== undefined) {
     const c = b.contract || {}; const vars = {};
     for (const [k, v] of Object.entries(c.vars || {})) if (/^[a-z0-9_]{1,40}$/.test(k)) vars[k] = clean(v, 400);
-    f.contract = { ...(cur.contract || {}), text: cleanMulti(c.text, 60000), vars, saved_at: new Date().toISOString().slice(0, 19), saved_by: user.name };
+    f.contract = draftSet(cur.contract || {}, tplOf(deal, c.tpl), { text: cleanMulti(c.text, 60000), vars, saved_at: new Date().toISOString().slice(0, 19), saved_by: user.name });
+    f._draftTitle = tplTitle(deal, c.tpl);
   }
-  const logs = f._log || []; const reason = f._reason; delete f._log; delete f._reason;
+  const logs = f._log || []; const reason = f._reason; const draftTitle = f._draftTitle; delete f._log; delete f._reason; delete f._draftTitle;
   if (f.data) {
     const o = normData(cur.data || {}); const n = f.data; const J = (x) => JSON.stringify(x || {});
     if (J([o.kind, o.person, o.company, o.contact_differs, o.contact]) !== J([n.kind, n.person, n.company, n.contact_differs, n.contact])) logs.push(['data', 'Ügyfél személyes / céges adatai módosítva', 15]);
     if (J(o.vehicle) !== J(n.vehicle)) logs.push(['vehicle', 'Gépjármű adatai módosítva', 15]);
+    if (J(o.buyer) !== J(n.buyer)) logs.push(['buyer', 'Vevő adatai módosítva (2. ütem)', 15]);
   }
-  if (f.contract) logs.push(['draft', 'Szerződés-piszkozat mentve', 15]);
+  if (f.contract) logs.push(['draft', `Szerződés-piszkozat mentve (${draftTitle})`, 15]);
   const res = await saveCard(env, id, f, user.id, user.name, reason);
   for (const [kind, text, merge] of logs) await addEvent(env, id, kind, text, user.name, merge);
   // a lista/kanban alapadatai (név, telefon, e-mail) kövessék az adatlapot
@@ -230,26 +237,40 @@ async function chosenItem(env, id) {
   const items = parseJ(o.items, []);
   return items[o.choice] || null;
 }
-async function handleTemplate(env, user, id) {
+/* Eladásnál két szerződés: 1. ütem bérleti (a bérlővel), 2. ütem adásvételi (a vevővel) — külön piszkozattal. */
+function tplOf(deal, t) { return deal.line === 'Eladás' ? (t === 'berles' ? 'berles' : 'eladas') : ''; }
+function tplTitle(deal, t) { const k = tplOf(deal, t); return k === 'berles' ? 'Bérleti szerződés' : (TITLES[deal.line] || 'Szerződés'); }
+function draftGet(contract, key) { contract = contract || {}; return key ? ((contract.drafts || {})[key] || {}) : contract; }
+function draftSet(contract, key, obj) {
+  contract = contract || {};
+  if (!key) return { ...contract, ...obj };
+  return { ...contract, drafts: { ...(contract.drafts || {}), [key]: { ...draftGet(contract, key), ...obj } } };
+}
+async function handleTemplate(env, user, id, url) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
   const card = await getCard(env, id);
   const chosen = await chosenItem(env, id);
-  const keys = varsFor(deal.line);
+  const keys = varsFor(tplOf(deal, url.searchParams.get('tpl')) === 'berles' ? 'Bérlés' : deal.line);
   return json({
-    line: deal.line, text: TEMPLATES[deal.line] || TEMPLATES['Eladás'], vars: defaultVars(deal, card, chosen),
+    line: deal.line, tpl: tplOf(deal, url.searchParams.get('tpl')), title: tplTitle(deal, url.searchParams.get('tpl')),
+    text: tplOf(deal, url.searchParams.get('tpl')) === 'berles' ? TEMPLATES['Bérlés'] : (TEMPLATES[deal.line] || TEMPLATES['Eladás']),
+    vars: tplOf(deal, url.searchParams.get('tpl')) === 'berles' ? defaultVars(deal, card, chosen, { code: 'ELA-B' })
+      : tplOf(deal, url.searchParams.get('tpl')) === 'eladas' ? defaultVars(deal, card, chosen, { party: card.data.buyer || {} })
+      : defaultVars(deal, card, chosen),
     fields: keys.map((k) => ({ key: k, label: VAR_LABELS[k] || k })), chosen
   });
 }
 function contractInput(b) {
   const vars = {}; for (const [k, v] of Object.entries((b && b.vars) || {})) if (/^[a-z0-9_]{1,40}$/.test(k)) vars[k] = clean(v, 400);
-  return { text: cleanMulti(b && b.text, 60000), vars };
+  return { text: cleanMulti(b && b.text, 60000), vars, tpl: b && b.tpl };
 }
 const TITLES = { 'Eladás': 'Adásvételi szerződés', 'Import': 'Import megbízási szerződés', 'Bérlés': 'Bérleti szerződés', 'Bizományos': 'Bizományi szerződés' };
 async function buildPdf(deal, input) {
+  const ttl = tplTitle(deal, input.tpl);
   const filled = fillTemplate(input.text, input.vars);
   const hash = await sha256hex(filled);
   const number = input.vars.szerzodes_szam || '';
-  return { pdf: contractPdfFromText(filled, { number, hash, title: (TITLES[deal.line] || 'Szerződés') + ' ' + number }), number, hash };
+  return { pdf: contractPdfFromText(filled, { number, hash, title: ttl + ' ' + number }), number, hash };
 }
 async function handleContractPdf(request, env, user, id) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
@@ -264,8 +285,10 @@ async function handleContractSend(request, env, user, id) {
   const input = contractInput(b);
   if (!input.text.trim()) return json({ error: 'Üres szerződésszöveg — töltsd be a tervezetet.' }, 400);
   const card = await getCard(env, id);
-  const to = clean((card.data.person && card.data.person.email) || deal.email, 160);
-  if (!to) return json({ error: 'Az ügyfélnek nincs e-mail címe.' }, 400);
+  const isSale = tplOf(deal, input.tpl) === 'eladas';
+  const buyer = (card.data && card.data.buyer) || {};
+  const to = isSale ? clean(buyer.person && buyer.person.email, 160) : clean((card.data.person && card.data.person.email) || deal.email, 160);
+  if (!to) return json({ error: isSale ? 'A vevőnek nincs e-mail címe — add meg az 1. szekcióban a Vevő adatainál.' : 'Az ügyfélnek nincs e-mail címe.' }, 400);
   const { pdf, number, hash } = await buildPdf(deal, input);
   const att = [{ filename: `${(number || 'szerzodes').replace(/[^A-Za-z0-9_-]/g, '_')}.pdf`, content: bytesToB64(pdf) }];
   const fileIds = (Array.isArray(b.files) ? b.files : []).map(Number).filter(Number.isInteger).slice(0, 10);
@@ -275,16 +298,17 @@ async function handleContractSend(request, env, user, id) {
     if (f) { total += f.size; att.push({ filename: f.name, content: f.data }); }
   }
   if (total > 30 * 1024 * 1024) return json({ error: 'A csatolmányok együtt túl nagyok (max. ~30 MB).' }, 400);
-  const name = (card.data.kind === 'ceg' && card.data.contact_differs && card.data.contact.name) || (card.data.person && card.data.person.name) || deal.name;
+  const name = isSale ? ((buyer.person && buyer.person.name) || (buyer.company && buyer.company.name) || '')
+    : ((card.data.kind === 'ceg' && card.data.contact_differs && card.data.contact.name) || (card.data.person && card.data.person.name) || deal.name);
   const msg = cleanMulti(b.message, 2000).trim();
-  const title = TITLES[deal.line] || 'Szerződés';
+  const title = tplTitle(deal, input.tpl);
   const fwd = testForward(env);
   const r = await sendCrmMail(env, fwd || to, `${fwd ? '[TESZT — ' + to + '] ' : ''}${title} — ${number}`,
     `<p>Kedves ${esc(name || 'Ügyfelünk')}!</p><p>Csatoltan küldjük a(z) <b>${esc(title.toLowerCase())}</b> végleges példányát (PDF)${att.length > 1 ? ', valamint a kapcsolódó dokumentumokat' : ''}.</p>${msg ? `<p style="white-space:pre-line">${esc(msg)}</p>` : ''}<p>Kérjük, nézze át; kérdés esetén keressen minket bizalommal.</p><p>Üdvözlettel:<br>CarAdvance</p>`, att);
   if (!r.ok) return json({ error: r.error }, 502);
-  const contract = { ...(card.contract || {}), text: input.text, vars: input.vars, sent_at: new Date().toISOString().slice(0, 19), sent_by: user.name, sent_to: fwd || to, sent_hash: hash, sent_files: fileIds };
+  const contract = draftSet(card.contract || {}, tplOf(deal, input.tpl), { text: input.text, vars: input.vars, sent_at: new Date().toISOString().slice(0, 19), sent_by: user.name, sent_to: fwd || to, sent_hash: hash, sent_files: fileIds });
   await saveCard(env, id, { contract }, user.id, user.name);
-  await addEvent(env, id, 'contract', `Végleges szerződés elküldve e-mailben (${number}, ${fwd ? 'TESZT → ' + fwd : to})${att.length > 1 ? ' + ' + (att.length - 1) + ' dokumentum' : ''}`, user.name);
+  await addEvent(env, id, 'contract', `${title} elküldve e-mailben (${number}, ${fwd ? 'TESZT → ' + fwd : to})${att.length > 1 ? ' + ' + (att.length - 1) + ' dokumentum' : ''}`, user.name);
   return json({ ok: true, sentTo: fwd || to, test: !!fwd, contract });
 }
 
@@ -314,7 +338,7 @@ export async function onRequest(context) {
     if (m && method === 'GET') return await handleDownload(env, user, Number(m[1]), Number(m[2]));
     if (m && method === 'DELETE') return await handleDeleteFile(env, user, Number(m[1]), Number(m[2]));
     m = path.match(/^\/card\/(\d+)\/contract\/template$/);
-    if (m && method === 'GET') return await handleTemplate(env, user, Number(m[1]));
+    if (m && method === 'GET') return await handleTemplate(env, user, Number(m[1]), url);
     m = path.match(/^\/card\/(\d+)\/contract\/pdf$/);
     if (m && method === 'POST') return await handleContractPdf(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/contract\/send$/);
