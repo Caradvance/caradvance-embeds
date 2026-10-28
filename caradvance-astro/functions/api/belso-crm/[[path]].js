@@ -6,7 +6,7 @@ import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
-  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT
 } from '../../../lib/crm.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
@@ -411,6 +411,7 @@ async function handleDownload(env, user, id, fid) {
 async function handleDeleteFile(env, user, id, fid) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const f = await env.DB.prepare(`SELECT name FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
+  if (await env.DB.prepare(`SELECT 1 FROM crm_docs WHERE deal_id = ? AND signed_file_id = ? LIMIT 1`).bind(id, fid).first()) return json({ error: 'Aláírt dokumentum PDF-je nem törölhető.' }, 409);
   await deleteFile(env, id, fid);
   if (f) await addEvent(env, id, 'file', `Dokumentum törölve: ${f.name}`, user.name);
   return json({ ok: true });
@@ -603,7 +604,7 @@ async function handleSettings(request, env, user) {
 
 /* --- ügyfélhez kitöltött dokumentumok --- */
 function docRow(r, full) {
-  const o = { id: r.id, template_id: r.template_id, name: r.name, kind: r.kind, vehicle_id: r.vehicle_id || '', persons: parseJ(r.persons, {}), created_by: r.created_by, created_at: r.created_at, updated_at: r.updated_at, updated_by: r.updated_by, sent_at: r.sent_at, sent_to: r.sent_to || '', number: parseJ(r.vars, {}).szerzodes_szam || '' };
+  const o = { id: r.id, template_id: r.template_id, name: r.name, kind: r.kind, vehicle_id: r.vehicle_id || '', persons: parseJ(r.persons, {}), created_by: r.created_by, created_at: r.created_at, updated_at: r.updated_at, updated_by: r.updated_by, sent_at: r.sent_at, sent_to: r.sent_to || '', number: parseJ(r.vars, {}).szerzodes_szam || '', sign_status: r.sign_status || '', sign_id: r.sign_id || null, signed_file_id: r.signed_file_id || null };
   if (full) { o.text = r.text; o.vars = parseJ(r.vars, {}); o.fields = usedKeys(r.text).map((k) => ({ key: k, label: VAR_LABELS[k] || k })); }
   return o;
 }
@@ -656,6 +657,8 @@ async function handleDocGet(env, user, id, did) {
 async function handleDocPatch(request, env, user, id, did) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
   const r = await getDoc(env, id, did); if (!r) return json({ error: 'Nem található.' }, 404);
+  if (r.sign_status === 'pending') return json({ error: 'A dokumentum aláírásra ki van küldve — módosítás előtt vond vissza az aláírási kérelmet.' }, 409);
+  if (r.sign_status === 'signed') return json({ error: 'Az aláírt dokumentum nem módosítható. Szükség esetén készíts újat a sablonból.' }, 409);
   const b = await request.json().catch(() => ({}));
   let text = b.text != null ? cleanMulti(b.text, TPL_MAX) : r.text;
   let vars = b.vars ? varsInput(b.vars) : parseJ(r.vars, {});
@@ -682,6 +685,7 @@ async function handleDocPatch(request, env, user, id, did) {
 async function handleDocDelete(env, user, id, did) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const r = await getDoc(env, id, did); if (!r) return json({ ok: true });
+  if (r.sign_status === 'pending' || r.sign_status === 'signed') return json({ error: r.sign_status === 'pending' ? 'Aláírásra kiküldött dokumentum — előbb vond vissza a kérelmet.' : 'Aláírt dokumentum nem törölhető.' }, 409);
   await env.DB.prepare(`DELETE FROM crm_docs WHERE id = ? AND deal_id = ?`).bind(did, id).run();
   await addEvent(env, id, 'doc', `Dokumentum törölve: ${r.name}`, user.name);
   return json({ ok: true });
@@ -723,6 +727,10 @@ async function handleDocsSend(request, env, user, id) {
   const att = []; let total = 0; const names = []; const sentDocs = [];
   for (const did of docIds) {
     const r = await getDoc(env, id, did); if (!r) continue;
+    if (r.signed_file_id) { // aláírt dokumentum: az aláírt PDF megy ki
+      const f = await env.DB.prepare(`SELECT id, name, data, size FROM crm_files WHERE id = ? AND deal_id = ?`).bind(r.signed_file_id, id).first();
+      if (f) { total += f.size; att.push({ filename: f.name, content: await fileData(env, f) }); names.push(r.name + ' (aláírt)'); sentDocs.push(r); continue; }
+    }
     const { pdf, fname } = await docPdf(r);
     total += pdf.length; att.push({ filename: fname, content: bytesToB64(pdf) }); names.push(r.name); sentDocs.push(r);
   }
@@ -747,6 +755,67 @@ async function handleDocsSend(request, env, user, id) {
   for (const r of sentDocs) await env.DB.prepare(`UPDATE crm_docs SET sent_at = datetime('now'), sent_to = ? WHERE id = ?`).bind(rcpt.join(', '), r.id).run();
   await addEvent(env, id, 'doc', `${att.length} dokumentum elküldve (${labels.join(', ')}: ${to}): ${names.join('; ')}`, user.name);
   return json({ ok: true, sentTo: fwd || rcpt.join(', '), test: !!fwd, count: att.length });
+}
+
+/* ---------------- elektronikus aláírás (kiküldés, lista, visszavonás) ---------------- */
+async function handleSignCreate(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  const ids = (Array.isArray(b.doc_ids) ? b.doc_ids : []).map(Number).filter(Number.isInteger).slice(0, 20);
+  if (!ids.length) return json({ error: 'Jelölj ki legalább egy dokumentumot.' }, 400);
+  const card = await getCard(env, id); const data = card.data || {};
+  const role = b.signer === 'buyer' ? 'buyer' : 'client';
+  const P = role === 'buyer' ? ((data.buyer || {}).person || {}) : (data.person || {});
+  const email = clean(P.email || (role === 'client' ? deal.email : ''), 160).toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: role === 'buyer' ? 'A vevőnek nincs érvényes e-mail címe (1. szekció).' : 'Az ügyfélnek nincs érvényes e-mail címe (1. szekció).' }, 400);
+  const signerName = clean(P.name || (role === 'client' ? deal.name : ''), 120);
+  if (!signerName) return json({ error: 'Add meg az aláíró nevét az 1. szekcióban.' }, 400);
+  const docs = [];
+  for (const did of ids) {
+    const r = await getDoc(env, id, did); if (!r) continue;
+    if (r.sign_status === 'pending') return json({ error: `Már aláírásra vár: ${r.name}` }, 409);
+    if (r.sign_status === 'signed') return json({ error: `Már aláírt dokumentum: ${r.name}` }, 409);
+    const vars = parseJ(r.vars, {}); const text = fillTemplate(r.text, vars);
+    docs.push({ doc_id: r.id, name: r.name, kind: r.kind, text, hash: await sha256hex(text), number: /\{\{\s*szerzodes_szam\s*\}\}/.test(r.text) ? (vars.szerzodes_szam || '') : '', match: vars.ugyfel_nev || '' });
+  }
+  if (!docs.length) return json({ error: 'A kijelölt dokumentumok nem találhatók.' }, 404);
+  const token = randomHex(32);
+  const exp = Math.floor(Date.now() / 1000) + 14 * 86400;
+  const msg = cleanMulti(b.message, 2000).trim();
+  const ins = await env.DB.prepare(`INSERT INTO crm_sign (token_hash, deal_id, signer_role, signer_name, email, docs, message, created_by, expires_at) VALUES (?,?,?,?,?,?,?,?,?)`)
+    .bind(await sha256hex('crmsign|' + token), id, role, signerName, email, JSON.stringify(docs), msg, user.name, exp).run();
+  const sid = ins.meta.last_row_id;
+  for (const d of docs) await env.DB.prepare(`UPDATE crm_docs SET sign_status = 'pending', sign_id = ? WHERE id = ?`).bind(sid, d.doc_id).run();
+  const link = `${SITE}/alairas/#${token}`;
+  const fwd = testForward(env);
+  const r = await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}Aláírásra váró dokumentumok — CarAdvance`,
+    `<p>Kedves ${esc(signerName)}!</p><p>Az alábbi dokumentumokat elektronikus aláírásra küldjük:</p><ul>${docs.map((d) => `<li>${esc(d.name)}</li>`).join('')}</ul>
+     ${msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : ''}
+     <p>A dokumentumokat a lenti gombbal tudja átolvasni és aláírni. Az aláíráshoz egy egyszeri kódot küldünk erre az e-mail címre.</p>
+     <p style="margin:18px 0"><a href="${esc(link)}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:999px;display:inline-block">Dokumentumok megtekintése és aláírása</a></p>
+     <p style="color:#6b7280;font-size:12px">A link személyes, ne továbbítsa. Érvényes: ${new Date(exp * 1000).toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest' })}-ig. Ha nem Ön az érintett, kérjük, jelezze nekünk.</p>`);
+  await addEvent(env, id, 'sign', `Aláírásra kiküldve (#${sid}) → ${signerName} (${fwd ? 'TESZT → ' + fwd : email}): ${docs.map((d) => d.name).join('; ')}${r.ok ? '' : ' — AZ E-MAIL NEM MENT KI: ' + r.error}`, user.name);
+  return json({ ok: true, id: sid, link, sentTo: fwd || email, test: !!fwd, mailError: r.ok ? null : r.error });
+}
+async function handleSignList(env, user, id) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const rows = (await env.DB.prepare(`SELECT id, signer_role, signer_name, email, docs, status, created_by, created_at, expires_at, opened_at, signed_at, sign_name, sign_ip, result, fails FROM crm_sign WHERE deal_id = ? ORDER BY id DESC`).bind(id).all()).results || [];
+  const t = Math.floor(Date.now() / 1000);
+  return json({ requests: rows.map((r) => ({
+    id: r.id, role: r.signer_role, signer: r.signer_name, email: r.email, status: r.status === 'pending' && r.expires_at < t ? 'expired' : r.status,
+    created_by: r.created_by, created_at: r.created_at, expires: new Date(r.expires_at * 1000).toISOString(), opened_at: r.opened_at, signed_at: r.signed_at, sign_name: r.sign_name, sign_ip: r.sign_ip, fails: r.fails,
+    docs: parseJ(r.docs, []).map((d) => ({ doc_id: d.doc_id, name: d.name, hash: d.hash })), result: parseJ(r.result, [])
+  })) });
+}
+async function handleSignRevoke(env, user, id, sid) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const r = await env.DB.prepare(`SELECT * FROM crm_sign WHERE id = ? AND deal_id = ?`).bind(sid, id).first();
+  if (!r) return json({ error: 'Nem található.' }, 404);
+  if (r.status === 'signed' || r.status === 'signing') return json({ error: 'Már aláírt kérelem nem vonható vissza.' }, 409);
+  await env.DB.prepare(`UPDATE crm_sign SET status = 'revoked', revoked_by = ?, code_hash = NULL WHERE id = ?`).bind(user.name, sid).run();
+  await env.DB.prepare(`UPDATE crm_docs SET sign_status = '', sign_id = NULL WHERE sign_id = ? AND deal_id = ? AND sign_status = 'pending'`).bind(sid, id).run();
+  await addEvent(env, id, 'sign', `Aláírási kérelem visszavonva (#${sid})`, user.name);
+  return json({ ok: true });
 }
 
 /* ---------------- router ---------------- */
@@ -780,6 +849,11 @@ export async function onRequest(context) {
     m = path.match(/^\/card\/(\d+)\/docs$/);
     if (m && method === 'GET') return await handleDocsList(env, user, Number(m[1]));
     if (m && method === 'POST') return await handleDocCreate(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/sign$/);
+    if (m && method === 'GET') return await handleSignList(env, user, Number(m[1]));
+    if (m && method === 'POST') return await handleSignCreate(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/sign\/(\d+)\/revoke$/);
+    if (m && method === 'POST') return await handleSignRevoke(env, user, Number(m[1]), Number(m[2]));
     m = path.match(/^\/card\/(\d+)\/docs\/send$/);
     if (m && method === 'POST') return await handleDocsSend(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/docs\/(\d+)$/);
