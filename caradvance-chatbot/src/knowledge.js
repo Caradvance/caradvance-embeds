@@ -39,7 +39,7 @@ export const SITES = {
     index: '/kereses-index-cs.json',
     prefix: '/cs',
     lang: 'cs',
-    phone: '+421 915 410 555',
+    phone: '+420 604 313 136',
     wa: '421915410555',
     email: 'info@caradvance.cz'
   }
@@ -85,7 +85,7 @@ const SK = `
 const PL = `
 # CarAdvance — caradvance.pl (Polska)
 - Usługodawca, sprzedawca i wynajmujący (strona umowy): Caradvance GmbH, Bgm-Graf-Ring 21, 82538 Geretsried, Niemcy (Amtsgericht München, HRB 151009, VAT UE DE232664616). Działa od 2003 roku, ponad 5000 sprzedanych samochodów premium.
-- Pośrednik handlowy dla Polski: BH Group Zrt., biuro: Ibolya utca 18., 2083 Solymár, Węgry (pod Budapesztem). Przyjmuje zapytania, doradza i pomaga w formalnościach; umowy zawiera i podpisuje wyłącznie Caradvance GmbH. BH Group Zrt. nie jest sprzedawcą ani wynajmującym.
+- Pośrednik handlowy dla Polski: Mr.JOB POLAND Sp. z o.o., ul. Pory 78, 02-757 Warszawa, Polska (REGON 368854599, NIP 5213804274, VAT UE PL5213804274). Przyjmuje zapytania, doradza i pomaga w formalnościach; umowy zawiera i podpisuje wyłącznie Caradvance GmbH. Mr.JOB POLAND Sp. z o.o. nie jest sprzedawcą ani wynajmującym.
 - Kontakt: info@caradvance.hu · +36 30 233 6060 (także WhatsApp) · pn–pt 9:00–17:00 · https://www.caradvance.pl/kontakt/
 - Zespół: Ferenc Csadi — odpowiedzialny za rynek polski, rozmawia po polsku i prowadzi klientów z Polski przez cały import, +36 30 233 6060 · Károly Tóth — dyrektor handlowy (kontakty z rynkiem niemieckim, cały proces importu), +36 30 214 6989 · Balázs Bajzáth — Sales Manager (oferty, dokumenty, pytania handlowe), +36 30 094 2081. Wszyscy dostępni także przez WhatsApp; e-mail info@caradvance.hu.
 
@@ -103,8 +103,8 @@ const CZ = `
 # CarAdvance — caradvance.cz (Česko)
 - Poskytovatel, prodávající a pronajímatel (smluvní strana): Caradvance GmbH, Bgm-Graf-Ring 21, 82538 Geretsried, Německo (Amtsgericht München, HRB 151009, DIČ DE232664616). Působí od roku 2003, 5000+ prodaných prémiových vozů.
 - Obchodní zprostředkovatel: Mr. Job SK s.r.o., Cesta na Senec 2/A, 821 04 Bratislava, Slovensko (IČO 52 005 445). Přijímá poptávky, radí česky, slovensky i anglicky a pomáhá s administrativou; smlouvy uzavírá a podepisuje výhradně Caradvance GmbH. Mr. Job SK není prodávajícím ani pronajímatelem.
-- Kontakt: info@caradvance.cz · +421 915 410 555 (i WhatsApp) · Po–Pá 9:00–17:00 · https://www.caradvance.cz/kontakt/
-- Tým: Pavel Horemuž — vedoucí CarAdvance pro Slovensko a Česko (i dovoz vozů z Německa), +421 915 410 555 · Veronika Diničová — pronájem a prodej, +421 918 700 722 · Andreas Horemuž — pronájem a prodej, +421 917 222 122. Všichni jsou dostupní i na WhatsApp.
+- Kontakt: info@caradvance.cz · +420 604 313 136 (WhatsApp: +421 915 410 555) · Po–Pá 9:00–17:00 · https://www.caradvance.cz/kontakt/
+- Tým: Pavel Horemuž — vedoucí CarAdvance pro Slovensko a Česko (i dovoz vozů z Německa), +420 604 313 136 · Veronika Diničová — pronájem a prodej, +421 918 700 722 · Andreas Horemuž — pronájem a prodej, +421 917 222 122. Všichni jsou dostupní i na WhatsApp.
 
 ## Služby
 1) Dlouhodobý pronájem prémiových vozů: minimálně 6 měsíců, poté pokračuje na dobu neurčitou s 30denní výpovědí. Limit kilometrů podle vozu 2 000–4 000 km/měsíc. Jednorázová vratná kauce 2 000–10 000 € podle modelu (jistota, ne nájemné; vrací se do 30 dnů po vrácení vozu a vyřízení otevřených věcí). V měsíčním nájemném: servis a údržba, daň, povinné ručení a havarijní pojištění, letní a zimní pneumatiky, asistenční služby. Spoluúčast u havarijního pojištění podle individuální dohody ve smlouvě. Ceny pronájmu jsou bez DPH a jsou určeny hlavně firmám s DIČ; soukromým osobám připravíme individuální nabídku. Pronajmout si vůz mohou zákazníci s bydlištěm nebo sídlem v Česku, na Slovensku, v Německu i v jiné zemi. Smlouvy se podepisují online (elektronicky), bez návštěvy kanceláře. Pronajaté vozy jezdí s německou registrační značkou. Krátkodobý pronájem nenabízíme. Podmínky: https://www.caradvance.cz/pronajem/podminky-a-kauce/ · vozy k pronájmu: https://www.caradvance.cz/vozy/#berelheto

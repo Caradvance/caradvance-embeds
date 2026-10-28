@@ -935,7 +935,7 @@
   var CLG=String(document.documentElement.lang||'').slice(0,2).toLowerCase();
   function R(o){return o[CLG]||o.x;}
   var SKCZ=[
-    {img:'/sk-team/pavel-horemuz.webp',name:'Pavel Horemu\u017e',role:R({x:CMK==='cs'?'Vedouc\u00ed pro Slovensko a \u010cesko':'Ved\u00faci pre Slovensko a \u010cesko',en:'Head of Slovakia & Czech Republic',de:'Leiter Slowakei & Tschechien',hu:'Szlov\u00e1kia \u00e9s Csehorsz\u00e1g vezet\u0151je'}),tel:'+421 915 410 555',telh:'tel:+421915410555',wah:W+'421915410555'},
+    {img:'/sk-team/pavel-horemuz.webp',name:'Pavel Horemu\u017e',role:R({x:CMK==='cs'?'Vedouc\u00ed pro Slovensko a \u010cesko':'Ved\u00faci pre Slovensko a \u010cesko',en:'Head of Slovakia & Czech Republic',de:'Leiter Slowakei & Tschechien',hu:'Szlov\u00e1kia \u00e9s Csehorsz\u00e1g vezet\u0151je'}),tel:CMK==='cs'?'+420 604 313 136':'+421 915 410 555',telh:CMK==='cs'?'tel:+420604313136':'tel:+421915410555',wah:W+'421915410555'},
     {img:'/sk-team/veronika-dinicova.webp',name:'Veronika Dini\u010dov\u00e1',role:R({x:CMK==='cs'?'Pron\u00e1jem a prodej':'Pren\u00e1jom a predaj',en:'Rental & sales',de:'Miete & Verkauf',hu:'B\u00e9rl\u00e9s \u00e9s \u00e9rt\u00e9kes\u00edt\u00e9s'}),tel:'+421 918 700 722',telh:'tel:+421918700722',wah:W+'421918700722'},
     {img:'/sk-team/andreas-horemuz.webp',name:'Andreas Horemu\u017e',role:R({x:CMK==='cs'?'Pron\u00e1jem a prodej':'Pren\u00e1jom a predaj',en:'Rental & sales',de:'Miete & Verkauf',hu:'B\u00e9rl\u00e9s \u00e9s \u00e9rt\u00e9kes\u00edt\u00e9s'}),tel:'+421 917 222 122',telh:'tel:+421917222122',wah:W+'421917222122'}
   ];
