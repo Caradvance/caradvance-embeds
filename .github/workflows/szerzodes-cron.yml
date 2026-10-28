@@ -1,5 +1,6 @@
 # CarAdvance — online bérleti szerződések napi futása
 # Havi díjak terhelése, emlékeztetők, újrapróbálkozás, elmaradt e-mailek, okmánytörlés.
+# + CRM: lejáró bérletek figyelmeztetései (ügyfél adatlap → Gépjárművek → Bérlet).
 # Beállítás: GitHub → Settings → Secrets and variables → Actions → New repository secret:
 #   CA_CRON_TOKEN = ugyanaz az érték, mint a Cloudflare Pages CRON_TOKEN változója (legalább 16 karakter)
 name: szerzodes-napi-futas
@@ -20,4 +21,14 @@ jobs:
           code=$(curl -s -o out.json -w '%{http_code}' -X POST https://www.caradvance.hu/api/szerzodes/cron \
             -H "X-Cron-Token: $TOKEN" -H 'User-Agent: caradvance-cron/1.0' -H 'Content-Type: application/json' -d '{}')
           cat out.json; echo; echo "HTTP $code"
+          test "$code" = "200"
+      - name: Lejáró bérletek figyelmeztetései (CRM)
+        if: always()
+        env:
+          TOKEN: ${{ secrets.CA_CRON_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "CA_CRON_TOKEN nincs beállítva – kihagyva."; exit 0; fi
+          code=$(curl -s -o crm.json -w '%{http_code}' -X POST https://www.caradvance.hu/api/belso-crm/cron \
+            -H "X-Cron-Token: $TOKEN" -H 'User-Agent: caradvance-cron/1.0' -H 'Content-Type: application/json' -d '{}')
+          cat crm.json; echo; echo "HTTP $code"
           test "$code" = "200"
