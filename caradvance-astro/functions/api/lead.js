@@ -419,7 +419,7 @@ async function sendCustomerConfirm(env, data, contact, page, region, origin) {
   // Szlovák / cseh oldal: szlovák / cseh visszaigazolás, a válaszcím az országos postafiók.
   if (REGIONS[region]) return sendIntlConfirm(env, data, contact, REGIONS[region].lang, region);
   // caradvance.pl: a magyar csapat kezeli (region üres), a visszaigazolás lengyelül (az angol / német oldalról angolul / németül)
-  { const pl = plLangOf(page, origin); if (pl) return sendIntlConfirm(env, data, contact, pl); }
+  { const pl = plLangOf(page, origin); if (pl) return sendIntlConfirm(env, data, contact, pl, undefined, 'pl'); }
   const L = String(data['Nyelv'] || (pm && pm[1]) || 'HU').toLowerCase();
   if (L !== 'hu') return sendIntlConfirm(env, data, contact, INTL_CONFIRM[L] ? L : 'en');
   const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'event_id', 'Choice link']);
@@ -462,7 +462,7 @@ async function sendCustomerConfirm(env, data, contact, page, region, origin) {
 
 const INTL_CONFIRM = {
   pl: { perMonth: '/mies.', months: 'mies.', subjs: { berles: 'Otrzymaliśmy Twoje zapytanie o wynajem', rendeles: 'Otrzymaliśmy Twoje zamówienie samochodu', eladas: 'Otrzymaliśmy dane Twojego samochodu', import: 'Otrzymaliśmy Twoją prośbę o wyszukanie samochodu' }, bodies: { berles: 'dziękujemy za zapytanie o wynajem. Członek naszego zespołu skontaktuje się z Tobą <b>jak najszybciej</b> ze szczegółami i indywidualną ofertą.', rendeles: 'dziękujemy za zamówienie samochodu. Członek naszego zespołu skontaktuje się z Tobą <b>jak najszybciej</b> ze szczegółami i indywidualną ofertą.', eladas: 'dziękujemy za przesłanie danych samochodu. <b>Jak najszybciej</b> odezwiemy się z realną wyceną.', import: 'dziękujemy za prośbę o wyszukanie samochodu. <b>Jak najszybciej</b> skontaktujemy się z Tobą z odpowiednimi ofertami z rynku niemieckiego.' }, subj: 'Otrzymaliśmy Twoje zapytanie', hello: (n) => n ? 'Dzień dobry, ' + n + ',' : 'Dzień dobry,', body: 'dziękujemy za wiadomość. Członek naszego zespołu skontaktuje się z Tobą <b>jak najszybciej</b> ze szczegółami i indywidualną ofertą.',
-        data: 'Twoje zapytanie', urgent: 'W pilnej sprawie zadzwoń do nas:', or: 'lub po prostu odpowiedz na tego e-maila.', bye: 'Z poważaniem', role: 'Dyrektor handlowy', country: 'Niemcy', rep: 'Pośrednik handlowy dla Polski: BH Group Zrt. · Ibolya utca 18., 2083 Solymár, Węgry',
+        data: 'Twoje zapytanie', urgent: 'W pilnej sprawie zadzwoń do nas:', or: 'lub po prostu odpowiedz na tego e-maila.', bye: 'Z poważaniem', role: 'Dyrektor handlowy', country: 'Niemcy', rep: 'Pośrednik handlowy dla Polski: Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warszawa, Polska · NIP 5213804274 · REGON 368854599',
         labels: { 'Név': 'Imię i nazwisko', 'E-mail': 'E-mail', 'Telefon': 'Telefon', 'Üzenet': 'Wiadomość', 'Nyelv': 'Język', 'Oldal': 'Strona', 'Típus': 'Zapytanie' } },
   en: { perMonth: '/month', months: 'months', subjs: { berles: 'We received your rental request', rendeles: 'We received your car order request', eladas: 'We received your car details', import: 'We received your car search request' }, bodies: { berles: 'thank you for your rental request. A member of our team will contact you <b>as soon as possible</b> with the details and a personal offer.', rendeles: 'thank you for your car order request. A member of our team will contact you <b>as soon as possible</b> with the details and a personal offer.', eladas: 'thank you for sending us your car details. We will get back to you <b>as soon as possible</b> with a realistic price estimate.', import: 'thank you for your car search request. We will contact you <b>as soon as possible</b> with suitable offers from the German market.' }, subj: 'We received your request', hello: (n) => n ? 'Dear ' + n + ',' : 'Hello,', body: 'thank you for your message. A member of our team will contact you <b>as soon as possible</b> with the details and a personal offer.',
         data: 'Your request', urgent: 'If it is urgent, call us on', or: 'or simply reply to this e-mail.', bye: 'Kind regards,', role: 'Head of Sales', country: 'Germany', rep: 'Hungarian representative: BH Group Zrt.',
@@ -533,7 +533,7 @@ function localizeVals(obj, lang) {
 /* ---------- országos postafiókok (SK / CZ) ---------- */
 const REGIONS = {
   sk: { tag: 'SK', lang: 'sk', to: 'info@caradvance.sk', reply: 'info@caradvance.sk', phone: '+421 915 410 555' },
-  cz: { tag: 'CZ', lang: 'cs', to: 'info@caradvance.cz', reply: 'info@caradvance.cz', phone: '+421 915 410 555' }
+  cz: { tag: 'CZ', lang: 'cs', to: 'info@caradvance.cz', reply: 'info@caradvance.cz', phone: '+420 604 313 136' }
 };
 /** Melyik országos csapathoz tartozik a lead: az oldal útvonala (/sk/, /cs/), a domain vagy a Nyelv mező alapján. */
 function regionOf(page, data) {
@@ -551,8 +551,14 @@ const INTERNAL_TXT = {
   cs: { kinds: { berles: 'Nová žádost o pronájem', rendeles: 'Nová objednávka vozu', eladas: 'Nová nabídka vozu k prodeji', import: 'Nová poptávka – dovoz vozu' }, sla: 'Doba odezvy: <b>1 hodina v pracovní době</b>.', choice: 'Otevřít ve Choice fleetshopu →', web: 'web',
         labels: { 'beerkezett': 'Přijato', 'forras_oldal': 'Stránka', 'Ország (IP alapján)': 'Země (podle IP)', 'Vezetéknév': 'Příjmení', 'Keresztnév': 'Křestní jméno', 'Adatkezelés': 'Souhlas se zpracováním údajů', 'consent': 'Souhlas', 'Csatolmány': 'Příloha', 'belepo_oldal': 'Vstupní stránka', 'hivatkozo': 'Odkazující stránka' } }
 };
-async function sendIntlConfirm(env, data, contact, lang, region) {
-  const T = INTL_CONFIRM[lang];
+/* caradvance.pl (angol / német oldal is): a lengyel kereskedelmi képviselő a levél láblécében */
+const PL_REP = {
+  pl: 'Pośrednik handlowy dla Polski: Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warszawa, Polska · NIP 5213804274 · REGON 368854599',
+  en: 'Commercial agent for Poland: Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warsaw, Poland · NIP 5213804274 · REGON 368854599',
+  de: 'Handelsvertreter für Polen: Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warschau, Polen · NIP 5213804274 · REGON 368854599'
+};
+async function sendIntlConfirm(env, data, contact, lang, region, mkt) {
+  const T = mkt === 'pl' ? Object.assign({}, INTL_CONFIRM[lang], { rep: PL_REP[lang] || PL_REP.en }) : INTL_CONFIRM[lang];
   const R = REGIONS[region];
   // A beküldött adatok összefoglalója — minden mező, a mezőnevek és a gyakori értékek a vevő nyelvén
   const skipI = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Adatkezelés', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'Nyelv', 'Choice link']);
