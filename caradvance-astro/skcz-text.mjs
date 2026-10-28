@@ -56,7 +56,7 @@ const XD = {
     fuelAdj: { 'benzin': 'benzín', 'dízel': 'diesel', 'diesel': 'diesel', 'elektromos': 'elektrický', 'hibrid': 'hybrid', 'plug-in hibrid': 'plug-in hybrid' },
     gear: { 'Automata': 'automat', 'Manuális': 'manuál' },
     drive: { 'Hátsókerék': 'zadný náhon', 'Hátsókerékhajtás': 'zadný náhon', 'Összkerék': 'pohon všetkých kolies', 'Összkerékhajtás': 'pohon všetkých kolies', 'Elsőkerék': 'predný náhon', 'Elsőkerékhajtás': 'predný náhon' },
-    body: { 'Cabrio': 'kabriolet', 'Kabrió': 'kabriolet', 'SUV': 'SUV', 'Sportautó': 'športové auto', 'Limuzin': 'limuzína', 'Kombi': 'kombi', 'Coupé': 'kupé', 'Egyterű': 'MPV', 'Kisautó': 'malé auto', 'Terepjáró': 'terénne auto' },
+    body: { 'Cabrio': 'kabriolet', 'Kabrió': 'kabriolet', 'SUV': 'SUV', 'Sportautó': 'športové auto', 'Limuzin': 'limuzína', 'Kombi': 'kombi', 'Coupé': 'kupé', 'Egyterű': 'MPV', 'Kisautó': 'malé auto', 'Terepjáró': 'terénne auto', 'prémium autó': 'prémiové auto' }, premCat: 'prémiových áut',
     cls: 'trieda $1', lim: 'Limuzína', door: 'dverová',
     rent: 'Prenájom $1', rentFrom: 'Prenájom $1 — dlhodobý prenájom od $2 €/mes.', ltNew: 'Dlhodobý prenájom $1 — úplne nové $2 za mesačný poplatok',
     rentNewLt: 'Prenájom $1 — úplne nové $2 v dlhodobom prenájme', how: 'Prenájom $1 — ako funguje dlhodobý prenájom', which: 'Ktoré $1 si môžem prenajať?',
@@ -72,7 +72,7 @@ const XD = {
     cheaper: 'Pri mesačnom nájazde $1 km je <g0>$2</g0> mesačne <g1>lacnejšie o $3</g1>.', suit: '$1 kabínových kufrov (odhad)',
     gPop: '<g0>$1</g0> je obľúbenou voľbou v kategórii $2. V <g1>dlhodobom prenájme</g1> ho môžete jazdiť bez toho, aby ste doň viazali veľkú sumu: platíte jeden <g2>mesačný poplatok</g2>, servis, daň a pneumatiky vybavíme my. To je podstata <g3>dlhodobého prenájmu auta</g3>: predvídateľné náklady, nové auto a žiadne starosti s ďalším predajom.',
     gVar: 'Momentálne si môžete prenajať verziu <g0>$1</g0> ($2) od $3 €/mes.',
-    gLease: 'Radšej lízing? Pozrite si možnosti <g0>lízingu $1</g0> a financovania v kalkulačke.',
+    gLease: 'Radšej lízing? Možnosti <g0>lízingu $1</g0> a financovania nájdete na stránke Financovanie – lízing.',
     gOrder: '$1 môžete mať aj <g0>na objednávku</g0> priamo z Nemecka — na kľúč.',
     gOrderPrice: '<g0>od <g2>$1 €</g2> <g1>bez DPH</g1></g0> <g3>Objednať</g3>',
     gRentPrice: '<g0><g1>bez DPH</g1> od <g2>$1 €</g2>/mes.</g0><g3>Požiadať o prenájom</g3>'
@@ -85,7 +85,7 @@ const XD = {
     fuelAdj: { 'benzin': 'benzín', 'dízel': 'diesel', 'diesel': 'diesel', 'elektromos': 'elektrický', 'hibrid': 'hybrid', 'plug-in hibrid': 'plug-in hybrid' },
     gear: { 'Automata': 'automat', 'Manuális': 'manuál' },
     drive: { 'Hátsókerék': 'zadní náhon', 'Hátsókerékhajtás': 'zadní náhon', 'Összkerék': 'pohon všech kol', 'Összkerékhajtás': 'pohon všech kol', 'Elsőkerék': 'přední náhon', 'Elsőkerékhajtás': 'přední náhon' },
-    body: { 'Cabrio': 'kabriolet', 'Kabrió': 'kabriolet', 'SUV': 'SUV', 'Sportautó': 'sportovní vůz', 'Limuzin': 'limuzína', 'Kombi': 'kombi', 'Coupé': 'kupé', 'Egyterű': 'MPV', 'Kisautó': 'malý vůz', 'Terepjáró': 'terénní vůz' },
+    body: { 'Cabrio': 'kabriolet', 'Kabrió': 'kabriolet', 'SUV': 'SUV', 'Sportautó': 'sportovní vůz', 'Limuzin': 'limuzína', 'Kombi': 'kombi', 'Coupé': 'kupé', 'Egyterű': 'MPV', 'Kisautó': 'malý vůz', 'Terepjáró': 'terénní vůz', 'prémium autó': 'prémiové auto' }, premCat: 'prémiových vozů',
     cls: 'třída $1', lim: 'Limuzína', door: 'dveřová',
     rent: 'Pronájem $1', rentFrom: 'Pronájem $1 — dlouhodobý pronájem od $2 €/měs.', ltNew: 'Dlouhodobý pronájem $1 — zcela nové $2 za měsíční poplatek',
     rentNewLt: 'Pronájem $1 — zcela nové $2 v dlouhodobém pronájmu', how: 'Pronájem $1 — jak funguje dlouhodobý pronájem', which: 'Které $1 si mohu pronajmout?',
@@ -101,7 +101,7 @@ const XD = {
     cheaper: 'Při měsíčním nájezdu $1 km je <g0>$2</g0> měsíčně <g1>levnější o $3</g1>.', suit: '$1 kabinových kufrů (odhad)',
     gPop: '<g0>$1</g0> je oblíbenou volbou v kategorii $2. V <g1>dlouhodobém pronájmu</g1> s ním můžete jezdit, aniž byste do něj vázali velkou částku: platíte jediný <g2>měsíční poplatek</g2>, servis, daň a pneumatiky zařídíme my. To je podstata <g3>dlouhodobého pronájmu auta</g3>: předvídatelné náklady, nový vůz a žádné starosti s dalším prodejem.',
     gVar: 'Momentálně si můžete pronajmout verzi <g0>$1</g0> ($2) od $3 €/měs.',
-    gLease: 'Raději leasing? Podívejte se na možnosti <g0>leasingu $1</g0> a financování v kalkulačce.',
+    gLease: 'Raději leasing? Možnosti <g0>leasingu $1</g0> a financování najdete na stránce Financování – leasing.',
     gOrder: '$1 můžete mít i <g0>na objednávku</g0> přímo z Německa — na klíč.',
     gOrderPrice: '<g0>od <g2>$1 €</g2> <g1>bez DPH</g1></g0> <g3>Objednat</g3>',
     gRentPrice: '<g0><g1>bez DPH</g1> od <g2>$1 €</g2>/měs.</g0><g3>Poptat pronájem</g3>'
@@ -115,7 +115,7 @@ var XMON='(január|február|március|április|május|június|július|augusztus|s
 var XMI={'január':1,'február':2,'március':3,'április':4,'május':5,'június':6,'július':7,'augusztus':8,'szeptember':9,'október':10,'november':11,'december':12};
 function XF(t,a){return t.replace(/\$(\d)/g,function(_,i){return a[+i]==null?'':a[+i]})}
 function XN(n){n=String(n).trim();var t=M[n];if(t!=null)return t;return n.replace(/(\d)-(as|es|os|ös|ás|és)(?=\s|$)/g,'$1').replace(/\b([A-Z])-osztály\b/g,XD.cls).replace(/\bLimuzin\b/g,XD.lim).replace(/\bajtós\b/g,XD.door);}
-function XOK(x){return !!x&&/^[A-Z0-9]/.test(x)&&!/[őűöüŐŰÖÜ]/.test(x)&&!/(^|\s)(és|vagy|az|a|egy|bérlés|bérlet|tartós|autó|autók)(\s|$)/i.test(x);}
+function XOK(x){return !!x&&/^[A-Z0-9]/.test(x)&&!/[őűöüŐŰÖÜ]/.test(x)&&!/(^|\s)(és|vagy|egy|bérlés|bérlet|tartós|autó|autók)(\s|$)/i.test(x)&&!/(^|\s)(az|a)(\s|$)/.test(x)&&!/^Az?\s/.test(x);}
 function XNN(n){var x=XN(n);return XOK(x)?x:null;}
 function XLIST(s){return s.replace(new RegExp(XMON,'g'),function(m){return XD.mon[m]}).replace(/(\d+) db\b/g,'$1 '+XD.pcs);}
 function XT(s){return s.replace(/\bLE\b/g,'k').replace(/\bplug-in hibrid\b/g,XD.fuelAdj['plug-in hibrid']).replace(/\bdízel\b/g,'diesel').replace(/\bbenzin\b/g,XD.fuelAdj.benzin).replace(/\bhibrid\b/g,'hybrid').replace(/\belektromos\b/g,XD.fuelAdj.elektromos).replace(/\bAutomata\b/g,XD.gear.Automata).replace(/\bManuális\b/g,XD.gear['Manuális']);}
@@ -132,8 +132,8 @@ var XRR=[
  [/^Eladó (.+)\. Ára ([^.]+?)\.?$/,function(m){return XF(XD.saleShort,[0,XT(m[1]),m[2]]);}],
  [/^(.+) bérlés és tartós bérlet (.+?) €\/hó-tól: (.+?) km\/hó futáskeret, (\d+) hónap, kaució (.+?) €-tól\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.meta,[0,n,m[2],m[3],m[4],m[5]]):null;}],
  [/^(.+) bérlés — tartós bérlet (.+?) €\/hó-tól$/,function(m){var n=XNN(m[1]);return n?XF(XD.rentFrom,[0,n,m[2]]):null;}],
- [/^(.+) tartós bérlet — vadonatúj (\S+) havidíjjal$/,function(m){var n=XNN(m[1]);return n?XF(XD.ltNew,[0,n,XD.body[m[2]]||m[2]]):null;}],
- [/^(.+) bérlés — vadonatúj (\S+) tartós bérletben$/,function(m){var n=XNN(m[1]);return n?XF(XD.rentNewLt,[0,n,XD.body[m[2]]||m[2]]):null;}],
+ [/^(.+) tartós bérlet — vadonatúj (prémium autó|\S+) havidíjjal$/,function(m){var n=XNN(m[1]);return n?XF(XD.ltNew,[0,n,XD.body[m[2]]||m[2]]):null;}],
+ [/^(.+) bérlés — vadonatúj (prémium autó|\S+) tartós bérletben$/,function(m){var n=XNN(m[1]);return n?XF(XD.rentNewLt,[0,n,XD.body[m[2]]||m[2]]):null;}],
  [/^(.+) bérlés — így működik a tartós bérlet$/,function(m){var n=XNN(m[1]);return n?XF(XD.how,[0,n]):null;}],
  [/^(.+) bérlés — kérj ajánlatot$/,function(m){var n=XNN(m[1]);return n?XF(XD.quote,[0,n]):null;}],
  [/^Melyik (.+) bérelhető\?$/,function(m){var n=XNN(m[1]);return n?XF(XD.which,[0,n]):null;}],
@@ -161,7 +161,7 @@ var XRR=[
 ];
 function XR(k){var kc=/Kč/.test(k);if(kc)k=k.replace(/Kč/g,'€');for(var i=0;i<XRR.length;i++){var m=k.match(XRR[i][0]);if(m){var r=XRR[i][1](m);if(r!=null)return kc?r.replace(/€/g,'Kč'):r;}}return null;}
 var XGR=[
- [/^A <g0>(.+?)<\/g0> (\S+) kategóriájában népszerű választás\. <g1>Tartós bérletben<\/g1> úgy vezetheted, hogy nem kötsz le benne nagy összeget: egyetlen <g2>havi díjat<\/g2> fizetsz, a szervizt, az adót és a gumikat mi intézzük\. Ez a <g3>hosszú távú autóbérlés<\/g3> lényege: kiszámítható költség, új autó, továbbeladási gond nélkül\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.gPop,[0,n,XD.body[m[2]]||m[2]]):null;}],
+ [/^A <g0>(.+?)<\/g0> (prémium autó|\S+) kategóriájában népszerű választás\. <g1>Tartós bérletben<\/g1> úgy vezetheted, hogy nem kötsz le benne nagy összeget: egyetlen <g2>havi díjat<\/g2> fizetsz, a szervizt, az adót és a gumikat mi intézzük\. Ez a <g3>hosszú távú autóbérlés<\/g3> lényege: kiszámítható költség, új autó, továbbeladási gond nélkül\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.gPop,[0,n,m[2]==='prémium autó'?XD.premCat:(XD.body[m[2]]||m[2])]):null;}],
  [/^Jelenleg a\(z\) <g0>(.+?)<\/g0> kivitel bérelhető \(([^)]+)\), (.+?) €\/hó-tól\.$/,function(m){return XF(XD.gVar,[0,m[1],XD.fuelAdj[m[2]]||m[2],m[3]]);}],
  [/^Inkább lízingelnéd\? Nézd meg a <g0>(.+?) lízing<\/g0> és finanszírozás lehetőségeit a kalkulátorral\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.gLease,[0,n]):null;}],
  [/^A (.+?) <g0>egyedi rendeléssel<\/g0> is a tiéd lehet Németországból — akár 19% német áfával, kulcsrakészen\.$/,function(m){var n=XNN(m[1]);return n?XF(XD.gOrder,[0,n]):null;}],
