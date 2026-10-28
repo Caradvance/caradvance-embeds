@@ -3,7 +3,7 @@
 // Ugyanazt a munkamenetet (ca_session süti) és jogosultságot használja, mint az /api/belso/*:
 // admin mindent lát, a többi munkatárs csak a hozzá rendelt ügyfeleket.
 import {
-  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary,
+  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE
 } from '../../../lib/crm.js';
@@ -69,7 +69,7 @@ async function handleGetCard(env, user, id) {
   let users = [];
   if (user.role === 'admin') users = (await env.DB.prepare(`SELECT id, name, email FROM users ORDER BY name`).all()).results || [];
   return json({
-    deal, card: { status: card.status, address: card.address, data: card.data, checklist: card.checklist, contract: card.contract, status_at: card.status_at, updated_at: card.updated_at },
+    deal, card: { status: card.status, address: card.address, data: { ...card.data, vehicles: vehiclesOf(card.data) }, checklist: card.checklist, contract: card.contract, status_at: card.status_at, updated_at: card.updated_at },
     offers, files, events, fin, statuses: STATUSES, checklist: checklistFor(deal.line), me: user, users, testForward: testForward(env)
   });
 }
@@ -79,6 +79,20 @@ const COMPANY_KEYS = ['name', 'address', 'tax', 'reg'];
 const CONTACT_KEYS = ['name', 'phone', 'email', 'role'];
 const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'color', 'engine', 'fuel', 'km'];
 function pick(src, keys, max) { const o = {}; src = src || {}; for (const k of keys) o[k] = clean(src[k], max || 200); return o; }
+function normVehicles(b) {
+  const list = Array.isArray(b.vehicles) ? b.vehicles : vehiclesOf(b);
+  const seen = new Set();
+  return list.slice(0, 30).map((v, i) => {
+    let id = /^[a-z0-9_-]{1,20}$/i.test(v && v.id || '') ? v.id : 'v' + (i + 1);
+    while (seen.has(id)) id += 'x'; seen.add(id);
+    return {
+      id, ...pick(v, VEHICLE_KEYS), hybrid: !!(v && v.hybrid), title: clean(v && v.title, 200),
+      source: ['inv', 'offer', 'manual'].includes(v && v.source) ? v.source : 'manual', key: clean(v && v.key, 120),
+      price: Math.max(0, Number(v && v.price) || 0), currency: v && v.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(v && v.period, 20), deposit: Math.max(0, Number(v && v.deposit) || 0),
+      image: /^https:\/\//.test((v && v.image) || '') ? clean(v.image, 600) : '', url: /^https:\/\//.test((v && v.url) || '') ? clean(v.url, 400) : ''
+    };
+  });
+}
 function normData(b) {
   b = b || {};
   return {
@@ -87,7 +101,9 @@ function normData(b) {
     company: pick(b.company, COMPANY_KEYS),
     contact_differs: !!b.contact_differs,
     contact: pick(b.contact, CONTACT_KEYS),
-    vehicle: { ...pick(b.vehicle, VEHICLE_KEYS), hybrid: !!(b.vehicle && b.vehicle.hybrid) },
+    // több autó / ügyfél (az első autó a régi „vehicle” mezőben is megmarad a visszafelé kompatibilitásért)
+    vehicles: normVehicles(b),
+    vehicle: (() => { const v0 = normVehicles(b)[0]; return v0 ? { ...pick(v0, VEHICLE_KEYS), hybrid: !!v0.hybrid } : { ...pick({}, VEHICLE_KEYS), hybrid: false }; })(),
     // Eladás 2. üteme: a vevő (a bérlőtől eltérő személy / cég)
     buyer: { kind: b.buyer && b.buyer.kind === 'ceg' ? 'ceg' : 'magan', person: pick(b.buyer && b.buyer.person, PERSON_KEYS), company: pick(b.buyer && b.buyer.company, COMPANY_KEYS) },
     notes: cleanMulti(b.notes, 4000)
@@ -123,14 +139,20 @@ async function handlePatchCard(request, env, user, id) {
   if (b.contract !== undefined) {
     const c = b.contract || {}; const vars = {};
     for (const [k, v] of Object.entries(c.vars || {})) if (/^[a-z0-9_]{1,40}$/.test(k)) vars[k] = clean(v, 400);
-    f.contract = draftSet(cur.contract || {}, tplOf(deal, c.tpl), { text: cleanMulti(c.text, 60000), vars, saved_at: new Date().toISOString().slice(0, 19), saved_by: user.name });
+    f.contract = draftSet(cur.contract || {}, ctKey(deal, c.vid, c.tpl), { text: cleanMulti(c.text, 60000), vars, saved_at: new Date().toISOString().slice(0, 19), saved_by: user.name });
     f._draftTitle = tplTitle(deal, c.tpl);
   }
   const logs = f._log || []; const reason = f._reason; const draftTitle = f._draftTitle; delete f._log; delete f._reason; delete f._draftTitle;
   if (f.data) {
     const o = normData(cur.data || {}); const n = f.data; const J = (x) => JSON.stringify(x || {});
     if (J([o.kind, o.person, o.company, o.contact_differs, o.contact]) !== J([n.kind, n.person, n.company, n.contact_differs, n.contact])) logs.push(['data', 'Ügyfél személyes / céges adatai módosítva', 15]);
-    if (J(o.vehicle) !== J(n.vehicle)) logs.push(['vehicle', 'Gépjármű adatai módosítva', 15]);
+    if (J(o.vehicles) !== J(n.vehicles)) {
+      const oi = new Set(o.vehicles.map((v) => v.id)), ni = new Set(n.vehicles.map((v) => v.id));
+      const vt = (v) => v.title || [v.brand, v.model].filter(Boolean).join(' ') || 'új autó';
+      n.vehicles.filter((v) => !oi.has(v.id)).forEach((v) => logs.push(['vehicle', 'Autó hozzáadva: ' + vt(v)]));
+      o.vehicles.filter((v) => !ni.has(v.id)).forEach((v) => logs.push(['vehicle', 'Autó eltávolítva: ' + vt(v)]));
+      if (n.vehicles.some((v) => oi.has(v.id) && J(v) !== J(o.vehicles.find((x) => x.id === v.id)))) logs.push(['vehicle:edit', 'Gépjármű adatai módosítva', 15]);
+    }
     if (J(o.buyer) !== J(n.buyer)) logs.push(['buyer', 'Vevő adatai módosítva (2. ütem)', 15]);
   }
   if (f.contract) logs.push(['draft', `Szerződés-piszkozat mentve (${draftTitle})`, 15]);
@@ -143,7 +165,7 @@ async function handlePatchCard(request, env, user, id) {
     if (name && name !== deal.name) { sets.push('name = ?'); vals.push(name); }
     if (p.phone !== (deal.phone || '')) { sets.push('phone = ?'); vals.push(p.phone); }
     if (p.email !== (deal.email || '')) { sets.push('email = ?'); vals.push(p.email); }
-    const car = [f.data.vehicle.brand, f.data.vehicle.model].filter(Boolean).join(' ');
+    const v0 = f.data.vehicles[0] || {}; const car = v0.title || [v0.brand, v0.model].filter(Boolean).join(' ');
     if (car && !deal.car) { sets.push('car = ?'); vals.push(car); }
     if (sets.length) { vals.push(id); await env.DB.prepare(`UPDATE deals SET ${sets.join(', ')} WHERE id = ?`).bind(...vals).run(); }
   }
@@ -204,7 +226,7 @@ async function handleSendOffer(request, env, user, id) {
 
 /* ---------------- pénzügy (ügyletenként) ---------------- */
 async function finList(env, id) {
-  const items = (await env.DB.prepare(`SELECT f.id, f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, f.file_id, f.created_name, f.created_at,
+  const items = (await env.DB.prepare(`SELECT f.id, f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, f.file_id, f.vehicle_id, f.created_name, f.created_at,
       fl.name AS file_name, fl.mime AS file_mime, fl.size AS file_size
     FROM crm_fin f LEFT JOIN crm_files fl ON fl.id = f.file_id WHERE f.deal_id = ? ORDER BY f.kind DESC, COALESCE(NULLIF(f.fdate, ''), f.created_at), f.id`).bind(id).all()).results || [];
   return { items, summary: finSummary(items) };
@@ -232,7 +254,8 @@ async function finFields(b) {
     if (!fx) throw new Error('Az EUR árfolyam most nem érhető el — add meg az árfolyamot, vagy rögzítsd forintban.');
   }
   const fdate = /^\d{4}-\d{2}-\d{2}$/.test(b.fdate || '') ? b.fdate : new Date().toISOString().slice(0, 10);
-  return { kind, title, amount, currency, fx, amount_huf: Math.round(currency === 'EUR' ? amount * fx : amount), fdate, note: cleanMulti(b.note, 1000) };
+  const vehicle_id = /^[a-z0-9_-]{1,20}$/i.test(b.vehicle_id || '') ? b.vehicle_id : '';
+  return { kind, title, amount, currency, fx, amount_huf: Math.round(currency === 'EUR' ? amount * fx : amount), fdate, note: cleanMulti(b.note, 1000), vehicle_id };
 }
 const fmtFt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' Ft';
 const finLabel = (f) => `${f.kind === 'income' ? 'Bevétel' : 'Költség'}: ${f.title} — ${f.currency === 'EUR' ? fmtFt(f.amount).replace(' Ft', ' €') + ' (' + fmtFt(f.amount_huf) + ')' : fmtFt(f.amount_huf)}`;
@@ -241,8 +264,8 @@ async function handleFinAdd(request, env, user, id) {
   const b = await request.json().catch(() => ({}));
   let f, fileId = null;
   try { f = await finFields(b); fileId = await storeFile(env, id, b.file, user.id); } catch (e) { return json({ error: e.message }, 400); }
-  await env.DB.prepare(`INSERT INTO crm_fin (deal_id, kind, title, amount, currency, fx, amount_huf, fdate, note, file_id, created_by, created_name) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
-    .bind(id, f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, fileId, user.id, user.name).run();
+  await env.DB.prepare(`INSERT INTO crm_fin (deal_id, kind, title, amount, currency, fx, amount_huf, fdate, note, file_id, vehicle_id, created_by, created_name) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+    .bind(id, f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, fileId, f.vehicle_id, user.id, user.name).run();
   await addEvent(env, id, 'fin', finLabel(f) + ' hozzáadva' + (fileId ? ' (számlával)' : ''), user.name);
   return json({ ok: true, fin: await finList(env, id) });
 }
@@ -253,12 +276,12 @@ async function handleFinPatch(request, env, user, id, fid) {
   const b = await request.json().catch(() => ({}));
   let f, fileId = cur.file_id;
   try {
-    f = await finFields({ kind: cur.kind, title: cur.title, amount: cur.amount, currency: cur.currency, fdate: cur.fdate, note: cur.note, fx: cur.currency === 'EUR' && b.currency !== 'HUF' && b.amount === undefined && b.fx === undefined ? cur.fx : undefined, ...b });
+    f = await finFields({ kind: cur.kind, title: cur.title, amount: cur.amount, currency: cur.currency, fdate: cur.fdate, note: cur.note, vehicle_id: cur.vehicle_id, fx: cur.currency === 'EUR' && b.currency !== 'HUF' && b.amount === undefined && b.fx === undefined ? cur.fx : undefined, ...b });
     if (b.file && b.file.data) { const nid = await storeFile(env, id, b.file, user.id); if (cur.file_id) await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(cur.file_id, id).run(); fileId = nid; }
     else if (b.removeFile && cur.file_id) { await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(cur.file_id, id).run(); fileId = null; }
   } catch (e) { return json({ error: e.message }, 400); }
-  await env.DB.prepare(`UPDATE crm_fin SET kind = ?, title = ?, amount = ?, currency = ?, fx = ?, amount_huf = ?, fdate = ?, note = ?, file_id = ?, updated_at = datetime('now') WHERE id = ?`)
-    .bind(f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, fileId, fid).run();
+  await env.DB.prepare(`UPDATE crm_fin SET kind = ?, title = ?, amount = ?, currency = ?, fx = ?, amount_huf = ?, fdate = ?, note = ?, file_id = ?, vehicle_id = ?, updated_at = datetime('now') WHERE id = ?`)
+    .bind(f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, fileId, f.vehicle_id, fid).run();
   await addEvent(env, id, 'fin:' + fid, finLabel(f) + ' módosítva', user.name, 10);
   return json({ ok: true, fin: await finList(env, id) });
 }
@@ -277,14 +300,14 @@ async function handleFinSummary(env, user) {
   const st = env.DB.prepare(`SELECT d.id, d.line, d.name, d.car, d.stage, d.client_responded_at, d.created_at, c.status, c.data FROM deals d LEFT JOIN crm_cards c ON c.deal_id = d.id ${where} ORDER BY d.id DESC`);
   const deals = ((user.role === 'admin' ? await st.all() : await st.bind(user.id).all()).results || []);
   const ids = new Set(deals.map((d) => d.id));
-  const rows = ((await env.DB.prepare(`SELECT id, deal_id, kind, title, amount, currency, amount_huf, fdate, created_at, file_id FROM crm_fin ORDER BY fdate`).all()).results || []).filter((r) => ids.has(r.deal_id));
+  const rows = ((await env.DB.prepare(`SELECT id, deal_id, kind, title, amount, currency, amount_huf, fdate, created_at, file_id, vehicle_id FROM crm_fin ORDER BY fdate`).all()).results || []).filter((r) => ids.has(r.deal_id));
   return json({
     deals: deals.map((d) => {
       const data = parseJ(d.data, {});
       const company = data.kind === 'ceg' && data.company && data.company.name ? data.company.name : '';
       return { id: d.id, line: d.line, name: company || d.name, car: d.car, created_at: d.created_at, status: d.status || statusFromDeal(d) };
     }),
-    items: rows.map((r) => ({ id: r.id, deal_id: r.deal_id, kind: r.kind, title: r.title, amount: r.amount, currency: r.currency, amount_huf: r.amount_huf, fdate: r.fdate || String(r.created_at).slice(0, 10), has_file: !!r.file_id }))
+    items: rows.map((r) => ({ id: r.id, deal_id: r.deal_id, kind: r.kind, title: r.title, amount: r.amount, currency: r.currency, amount_huf: r.amount_huf, fdate: r.fdate || String(r.created_at).slice(0, 10), has_file: !!r.file_id, vehicle_id: r.vehicle_id || '' }))
   });
 }
 
@@ -327,6 +350,8 @@ async function chosenItem(env, id) {
 /* Eladásnál két szerződés: 1. ütem bérleti (a bérlővel), 2. ütem adásvételi (a vevővel) — külön piszkozattal. */
 function tplOf(deal, t) { return deal.line === 'Eladás' ? (t === 'berles' ? 'berles' : 'eladas') : ''; }
 function tplTitle(deal, t) { const k = tplOf(deal, t); return k === 'berles' ? 'Bérleti szerződés' : (TITLES[deal.line] || 'Szerződés'); }
+/** Piszkozat-kulcs: autó (+ Eladásnál a sablon). Kulcs nélkül (régi adat) a szerződés gyökere / drafts[tpl]. */
+function ctKey(deal, vid, t) { const v = /^[a-z0-9_-]{1,20}$/i.test(vid || '') ? vid : ''; const tk = tplOf(deal, t); return v ? v + (tk ? ':' + tk : '') : tk; }
 function draftGet(contract, key) { contract = contract || {}; return key ? ((contract.drafts || {})[key] || {}) : contract; }
 function draftSet(contract, key, obj) {
   contract = contract || {};
@@ -336,20 +361,25 @@ function draftSet(contract, key, obj) {
 async function handleTemplate(env, user, id, url) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
   const card = await getCard(env, id);
-  const chosen = await chosenItem(env, id);
+  const vehicles = vehiclesOf(card.data); const vid = url.searchParams.get('vid');
+  const vi = Math.max(0, vehicles.findIndex((v) => v.id === vid)); const vehicle = vehicles[vi] || null;
+  // ár: az autóhoz rögzített (készlet / elfogadott ajánlat), régi adatnál az elfogadott ajánlat
+  const chosen = vehicle && vehicle.price > 0 ? vehicle : (vi === 0 ? await chosenItem(env, id) : null);
+  const vo = vehicle ? { vehicle, suffix: vi > 0 ? String(vi + 1) : '' } : {};
   const keys = varsFor(tplOf(deal, url.searchParams.get('tpl')) === 'berles' ? 'Bérlés' : deal.line);
   return json({
     line: deal.line, tpl: tplOf(deal, url.searchParams.get('tpl')), title: tplTitle(deal, url.searchParams.get('tpl')),
     text: tplOf(deal, url.searchParams.get('tpl')) === 'berles' ? TEMPLATES['Bérlés'] : (TEMPLATES[deal.line] || TEMPLATES['Eladás']),
-    vars: tplOf(deal, url.searchParams.get('tpl')) === 'berles' ? defaultVars(deal, card, chosen, { code: 'ELA-B' })
-      : tplOf(deal, url.searchParams.get('tpl')) === 'eladas' ? defaultVars(deal, card, chosen, { party: card.data.buyer || {} })
-      : defaultVars(deal, card, chosen),
+    vars: tplOf(deal, url.searchParams.get('tpl')) === 'berles' ? defaultVars(deal, card, chosen, { code: 'ELA-B', ...vo })
+      : tplOf(deal, url.searchParams.get('tpl')) === 'eladas' ? defaultVars(deal, card, chosen, { party: card.data.buyer || {}, ...vo })
+      : defaultVars(deal, card, chosen, vo),
+    vid: vehicle ? vehicle.id : '',
     fields: keys.map((k) => ({ key: k, label: VAR_LABELS[k] || k })), chosen
   });
 }
 function contractInput(b) {
   const vars = {}; for (const [k, v] of Object.entries((b && b.vars) || {})) if (/^[a-z0-9_]{1,40}$/.test(k)) vars[k] = clean(v, 400);
-  return { text: cleanMulti(b && b.text, 60000), vars, tpl: b && b.tpl };
+  return { text: cleanMulti(b && b.text, 60000), vars, tpl: b && b.tpl, vid: b && b.vid };
 }
 const TITLES = { 'Eladás': 'Adásvételi szerződés', 'Import': 'Import megbízási szerződés', 'Bérlés': 'Bérleti szerződés', 'Bizományos': 'Bizományi szerződés' };
 async function buildPdf(deal, input) {
@@ -393,9 +423,10 @@ async function handleContractSend(request, env, user, id) {
   const r = await sendCrmMail(env, fwd || to, `${fwd ? '[TESZT — ' + to + '] ' : ''}${title} — ${number}`,
     `<p>Kedves ${esc(name || 'Ügyfelünk')}!</p><p>Csatoltan küldjük a(z) <b>${esc(title.toLowerCase())}</b> végleges példányát (PDF)${att.length > 1 ? ', valamint a kapcsolódó dokumentumokat' : ''}.</p>${msg ? `<p style="white-space:pre-line">${esc(msg)}</p>` : ''}<p>Kérjük, nézze át; kérdés esetén keressen minket bizalommal.</p><p>Üdvözlettel:<br>CarAdvance</p>`, att);
   if (!r.ok) return json({ error: r.error }, 502);
-  const contract = draftSet(card.contract || {}, tplOf(deal, input.tpl), { text: input.text, vars: input.vars, sent_at: new Date().toISOString().slice(0, 19), sent_by: user.name, sent_to: fwd || to, sent_hash: hash, sent_files: fileIds });
+  const contract = draftSet(card.contract || {}, ctKey(deal, input.vid, input.tpl), { text: input.text, vars: input.vars, sent_at: new Date().toISOString().slice(0, 19), sent_by: user.name, sent_to: fwd || to, sent_hash: hash, sent_files: fileIds });
   await saveCard(env, id, { contract }, user.id, user.name);
-  await addEvent(env, id, 'contract', `${title} elküldve e-mailben (${number}, ${fwd ? 'TESZT → ' + fwd : to})${att.length > 1 ? ' + ' + (att.length - 1) + ' dokumentum' : ''}`, user.name);
+  const cv = vehiclesOf(card.data).find((v) => v.id === input.vid);
+  await addEvent(env, id, 'contract', `${title}${cv ? ' — ' + (cv.title || [cv.brand, cv.model].filter(Boolean).join(' ')) : ''} elküldve e-mailben (${number}, ${fwd ? 'TESZT → ' + fwd : to})${att.length > 1 ? ' + ' + (att.length - 1) + ' dokumentum' : ''}`, user.name);
   return json({ ok: true, sentTo: fwd || to, test: !!fwd, contract });
 }
 
