@@ -315,9 +315,9 @@
     /* Rólunk panel: a szlovák / cseh kapcsolattartó (Mr. Job SK s.r.o., Pozsony) a solymári iroda helyett */
     var _ab = P[P.length - 1];
     var _CT = { pl: ['Skontaktuj się z nami', 'od poniedziałku do piątku 9–17.'], sk: ['Kontaktujte nás', 'pondelok až piatok 9–17.'], cs: ['Kontaktujte nás', 'pondělí až pátek 9–17.'], en: ['Contact us', 'Monday to Friday 9–17.'], de: ['Kontaktieren Sie uns', 'Montag bis Freitag 9–17 Uhr.'], hu: ['Lépj kapcsolatba velünk', 'hétfőtől péntekig 9–17.'] }[LANG] || ['Contact us', 'Monday to Friday 9–17.'];
-    if (_ab && _ab.f) _ab.f = MKT_PL ? { img: '/bmw-m3-touring-premium-auto-eladas.webp', t: _CT[0], s: 'BH Group Zrt. · Ibolya utca 18., Solymár (HU) – ' + _CT[1], cta: 'Kapcsolat', href: '/kapcsolat/' } : { img: '/bmw-m3-touring-premium-auto-eladas.webp', t: _CT[0], s: 'Mr. Job SK s.r.o. · Cesta na Senec 2/A, ' + (LANG === 'hu' ? 'Pozsony' : 'Bratislava') + ' – ' + _CT[1], cta: 'Kapcsolat', href: '/kapcsolat/' };
+    if (_ab && _ab.f) _ab.f = MKT_PL ? { img: '/bmw-m3-touring-premium-auto-eladas.webp', t: _CT[0], s: 'Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, Warszawa (PL) – ' + _CT[1], cta: 'Kapcsolat', href: '/kapcsolat/' } : { img: '/bmw-m3-touring-premium-auto-eladas.webp', t: _CT[0], s: 'Mr. Job SK s.r.o. · Cesta na Senec 2/A, ' + (LANG === 'hu' ? 'Pozsony' : 'Bratislava') + ' – ' + _CT[1], cta: 'Kapcsolat', href: '/kapcsolat/' };
   }
-  var PIN = (MKT_SKCZ && !MKT_PL) ? 'Geretsried (DE) · Bratislava (SK)' : 'Geretsried (DE) · Solymár (HU)';
+  var PIN = MKT_PL ? 'Geretsried (DE) · Warszawa (PL)' : MKT_SKCZ ? 'Geretsried (DE) · Bratislava (SK)' : 'Geretsried (DE) · Solymár (HU)';
   /* közösségi ikonok – ugyanazok, mint a weboldal láblécében */
   var SOC = {
     fb: '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="mmFb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18ACFE"/><stop offset="1" stop-color="#0163E0"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#mmFb)"/><path fill="#fff" d="M26.6 40V26.4h4.6l.7-5.4h-5.3v-3.4c0-1.6.4-2.6 2.7-2.6H32v-4.8c-.5-.1-2.2-.2-4.1-.2-4.1 0-6.9 2.5-6.9 7.1V21h-4.6v5.4H21V40h5.6z"/></svg>',
