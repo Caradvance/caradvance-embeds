@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Dokumentumsablonok — CarAdvance belső</title>
+<link rel="icon" href="/favicon-32.png">
+<!-- ca-tracking:start --><!-- belső felület: nincs követés --><!-- ca-tracking:end -->
+<style>
+:root{--red:#E2001A;--navy:#22447d;--ink:#161922;--mut:#5A6B82;--line:#E6EAF1;--bg:#F4F5F7;--ok:#15803D;--okbg:#DCFCE7;--warn:#92400E;--warnbg:#FEF3C7;--errbg:#FDE8EB}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--navy)}
+header{background:#0B0B0D;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header img{height:30px}header .sp{flex:1}header a{color:#cbd2dc;text-decoration:none;font-size:13px}
+main{max-width:1240px;margin:0 auto;padding:18px}
+.card{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 20px rgba(15,23,42,.05);margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:17px}.card h3{margin:16px 0 8px;font-size:14px}
+.ctabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.ctabs a{text-decoration:none;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;background:#fff;border:1.5px solid var(--line);color:var(--mut)}
+.ctabs a.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:9px 16px;font:600 13.5px/1 inherit;font-family:inherit;cursor:pointer;background:#EEF2F7;color:var(--ink);text-decoration:none}
+.btn.red{background:var(--red);color:#fff}.btn.navy{background:var(--navy);color:#fff}.btn.dark{background:var(--ink);color:#fff}.btn.ghost{background:#fff;border:1.5px solid var(--line)}.btn.sm{padding:6px 11px;font-size:12.5px}.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.on{background:var(--ink);color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px}.grid .full{grid-column:1/-1}.grid .two{grid-column:span 2}
+label.f{display:block;font-size:12.5px;font-weight:600;color:#334155}
+.in{width:100%;margin-top:3px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:#F7F9FC;font:inherit}
+.in:focus{outline:none;border-color:var(--navy);background:#fff}
+table{width:100%;border-collapse:collapse}td,th{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--mut);font-weight:600}
+tr.click{cursor:pointer}tr.click:hover td{background:#F7F9FC}
+.badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:700;background:#EEF2F7;color:var(--mut);margin:0 3px 3px 0}
+.badge.eladas{background:#e3f4ec;color:#0d6b4c}.badge.import{background:#fbefdc;color:#8a5212}.badge.berles{background:#e7eef9;color:#22447d}.badge.bizomanyos{background:#f1e7f8;color:#6a2f96}.badge.off{background:#fde8eb;color:#9f1239}
+.muted{color:var(--mut)}.small{font-size:12.5px}
+.note{border-radius:12px;padding:10px 12px;margin:8px 0;font-size:13.5px}.note.info{background:#EEF4FF;color:#1e3a8a}.note.warn{background:var(--warnbg);color:var(--warn)}.note.ok{background:var(--okbg);color:var(--ok)}
+.chks{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}.chks label{display:flex;gap:6px;align-items:center;font-size:13.5px;font-weight:600}
+.chks input{width:17px;height:17px;accent-color:var(--red)}
+.ed{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.ed textarea{width:100%;min-height:560px;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:12px;border:1.5px solid var(--line);border-radius:10px;resize:vertical}
+.pv{border:1.5px solid var(--line);border-radius:10px;padding:16px 18px;min-height:560px;max-height:760px;overflow:auto;font-size:12.5px;line-height:1.55;background:#fff}
+.pal{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:12px;background:#fcfcfd}
+.pal summary{cursor:pointer;font-weight:700;font-size:13px}
+.pal .g{margin-top:8px}.pal .g b{display:block;font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.pal button{font:inherit;font-size:12px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;margin:0 4px 4px 0;cursor:pointer}.pal button:hover{border-color:var(--red);color:var(--red)}
+.help{font-size:12.5px;color:var(--mut);line-height:1.6}.help code{background:#F1F4F9;border-radius:5px;padding:1px 5px;color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#161922;color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.2s;z-index:99;max-width:92vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (max-width:900px){.ed{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.ed textarea,.pv{min-height:380px}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}.grid .two{grid-column:auto}main{padding:12px}.hide-m{display:none}}
+</style>
+<link rel="stylesheet" href="/belso/belso-ui.css?v=4">
+</head>
+<body>
+<header><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><b>Szerződések — dokumentumsablonok</b><span class="sp"></span><a href="/belso/">← Belső felület</a></header>
+<main>
+  <nav class="ctabs"><a href="/belso/szerzodesek/">Online bérleti szerződések</a><a href="/belso/dokumentumok/" class="on">Dokumentumsablonok</a></nav>
+  <div id="app"><div class="card">Betöltés…</div></div>
+</main>
+<div class="toast" id="toast"></div>
+<script src="/belso/doc-render.js?v=1"></script>
+<script>
+(function(){
+'use strict';
+var API='/api/belso-crm',app=document.getElementById('app');
+var META=null,TPLS=[],PERS=[],SET={},ME=null,TAB='sablonok',ED=null,DIRTY=false,FL='',Q='',SHOW_OFF=false,PE=null;
+var LCL={'Eladás':'eladas','Import':'import','Bérlés':'berles','Bizományos':'bizomanyos'};
+var CT={any:'Bármely ügyfél',magan:'Magánszemély',ceg:'Cég'};
+function $(id){return document.getElementById(id);}
+var esc=CADoc.esc;
+function toast(t,ms){var el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove('show');},ms||2600);}
+function api(p,o){o=o||{};var init={method:o.method||'GET',credentials:'same-origin',headers:{}};if(o.body!==undefined){init.headers['content-type']='application/json';init.body=JSON.stringify(o.body);}
+  return fetch(API+p,init).then(function(r){if(r.status===401){location.href='/belso/?next='+encodeURIComponent(location.pathname+location.hash);throw new Error('Nincs bejelentkezve.');}return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'Hiba');return j;});});}
+function hdt(s){if(!s)return '—';var d=new Date(String(s).replace(' ','T')+(/Z$/.test(s)?'':'Z'));return isNaN(d)?s:d.toLocaleString('hu-HU',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function labels(){var o={};(META.groups||[]).forEach(function(g){g.vars.forEach(function(v){o[v.key]=v.label;});});return o;}
+
+function load(){
+  Promise.all([api('/docmeta'),api('/templates?all=1'),api('/persons'),fetch('/api/belso/me',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};})]).then(function(a){
+    META=a[0];SET=META.settings||{};TPLS=a[1].templates;PERS=a[2].persons;ME=(a[3]&&a[3].user)||null;route();
+  }).catch(function(e){app.innerHTML='<div class="card">'+esc(e.message)+'</div>';});
+}
+function route(){var h=(location.hash||'').slice(1);TAB=['szemelyek','beallitasok'].indexOf(h)>=0?h:'sablonok';render();}
+window.addEventListener('hashchange',function(){if(DIRTY&&!confirm('A sablon nem mentett módosításai elvesznek. Folytatod?'))return;DIRTY=false;ED=null;route();});
+window.addEventListener('beforeunload',function(e){if(DIRTY){e.preventDefault();e.returnValue='';}});
+function tabs(){return '<div class="tabs">'+[['sablonok','Sablonok ('+TPLS.filter(function(t){return t.active;}).length+')'],['szemelyek','Személyek ('+PERS.length+')'],['beallitasok','Beállítások']].map(function(t){return '<a class="btn sm'+(TAB===t[0]?' on':'')+'" href="#'+t[0]+'">'+esc(t[1])+'</a>';}).join('')+'</div>';}
+function render(){
+  if(TAB==='szemelyek')return renderPersons();
+  if(TAB==='beallitasok')return renderSettings();
+  if(ED)return renderEditor();
+  renderList();
+}
+
+/* ---------- sablonlista ---------- */
+function renderList(){
+  var L=TPLS.filter(function(t){return (SHOW_OFF||t.active)&&(!FL||(FL==='-'?!t.lines.length:t.lines.indexOf(FL)>=0))&&(!Q||t.name.toLowerCase().indexOf(Q.toLowerCase())>=0);});
+  var h=tabs()+'<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Dokumentumsablonok</h2><div class="row">'
+    +'<button class="btn red" id="new">+ Új sablon</button><label class="btn ghost" style="cursor:pointer">Importálás (.json / .txt)<input type="file" id="imp" accept=".json,.txt,application/json,text/plain" multiple style="display:none"></label><button class="btn ghost" id="exp">Exportálás (.json)</button></div></div>'
+    +'<p class="muted small" style="margin:8px 0 12px">A sablonokat üzletágakhoz rendelheted — az Ügyfél adatlap „Szerződés és dokumentumok” részében az adott üzletág sablonjai jelennek meg, és egy gombnyomással kitölthetők az ügyfél, az autó és a kiválasztott személyek adataival.</p>'
+    +'<div class="row" style="margin-bottom:10px">'+[['','Mind'],['Eladás','Eladás'],['Import','Import'],['Bérlés','Bérlés'],['Bizományos','Bizományos'],['-','Nincs hozzárendelve']].map(function(f){return '<button class="btn sm'+(FL===f[0]?' on':'')+'" data-fl="'+f[0]+'">'+f[1]+'</button>';}).join('')
+    +'<input class="in" id="q" placeholder="Keresés név szerint…" value="'+esc(Q)+'" style="max-width:240px;margin:0 0 0 auto"><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="off"'+(SHOW_OFF?' checked':'')+'> archiváltak is</label></div>';
+  if(!TPLS.length)h+='<div class="note info">Még nincs sablon. Hozz létre egyet, vagy importáld a sablon-csomagot (.json).</div>';
+  else h+='<table><thead><tr><th>Név</th><th class="hide-m">Típus</th><th>Üzletág</th><th class="hide-m">Kinek</th><th class="hide-m">Módosítva</th></tr></thead><tbody>'
+    +L.map(function(t){return '<tr class="click" data-id="'+t.id+'"><td><b>'+esc(t.name)+'</b>'+(t.active?'':' <span class="badge off">archivált</span>')+(t.roles.length?'<div class="small muted">Személy: '+t.roles.map(function(r){return esc(META.roles[r]);}).join(', ')+'</div>':'')+(t.note?'<div class="small muted">'+esc(t.note)+'</div>':'')+'</td>'
+      +'<td class="hide-m">'+esc(META.kinds[t.kind]||t.kind)+'</td><td>'+(t.lines.length?t.lines.map(function(l){return '<span class="badge '+LCL[l]+'">'+esc(l)+'</span>';}).join(''):'<span class="muted small">—</span>')+'</td>'
+      +'<td class="hide-m small">'+esc(t.party==='buyer'?'Vevő (Eladás 2. ütem)':'Ügyfél')+'<br><span class="muted">'+esc(CT[t.client_type])+'</span></td><td class="hide-m small muted">'+esc(hdt(t.updated_at))+(t.updated_by?'<br>'+esc(t.updated_by):'')+'</td></tr>';}).join('')
+    +'</tbody></table>'+(L.length?'':'<p class="muted">Nincs találat.</p>');
+  h+='</div>';
+  app.innerHTML=h;
+  $('new').addEventListener('click',function(){ED={id:0,name:'',kind:'szerzodes',lines:FL&&FL!=='-'?[FL]:[],party:'client',client_type:'any',note:'',sort:100,active:true,body:'# Dokumentum címe\n\nSzerződésszám: {{szerzodes_szam}}\n\n## 1. Felek\nNév: {{ugyfel_nev}}\nCím: {{ugyfel_cim}}\n\nKelt: {{keltezes_hely}}, {{keltezes_datum}}\n\n[aláírás] CarAdvance | {{ugyfel_nev}}\n'};DIRTY=false;render();});
+  app.querySelectorAll('[data-fl]').forEach(function(b){b.addEventListener('click',function(){FL=b.getAttribute('data-fl');render();});});
+  $('q').addEventListener('input',function(){Q=this.value;var p=this.selectionStart;render();var q=$('q');q.focus();q.selectionStart=q.selectionEnd=p;});
+  $('off').addEventListener('change',function(){SHOW_OFF=this.checked;render();});
+  app.querySelectorAll('tr[data-id]').forEach(function(tr){tr.addEventListener('click',function(){openTpl(+tr.getAttribute('data-id'));});});
+  $('imp').addEventListener('change',importFiles);
+  $('exp').addEventListener('click',exportAll);
+}
+function openTpl(id){api('/templates/'+id).then(function(j){ED=j.template;DIRTY=false;render();window.scrollTo(0,0);}).catch(function(e){toast(e.message);});}
+function readFile(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=rej;r.readAsText(f,'utf-8');});}
+function importFiles(e){
+  var files=[].slice.call(e.target.files||[]);e.target.value='';if(!files.length)return;
+  Promise.all(files.map(function(f){return readFile(f).then(function(t){
+    if(/\.json$/i.test(f.name)||/^\s*[\[{]/.test(t)){var j=JSON.parse(t);return Array.isArray(j)?j:(j.items||j.templates||[]);}
+    return [{name:f.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' '),kind:'egyeb',lines:[],body:t}];
+  });})).then(function(arr){
+    var items=[].concat.apply([],arr);
+    if(!items.length)throw new Error('A fájlban nincs sablon.');
+    var ex=items.filter(function(it){return TPLS.some(function(t){return t.name===it.name;});}).length;
+    if(!confirm(items.length+' sablon importálása'+(ex?' ('+ex+' azonos nevű meglévő sablon felülíródik)':'')+'. Folytatod?'))return null;
+    return api('/templates/import',{method:'POST',body:{items:items}});
+  }).then(function(r){if(!r)return;toast('Import kész: '+r.created+' új, '+r.updated+' frissítve',4000);return api('/templates?all=1').then(function(j){TPLS=j.templates;render();});})
+  .catch(function(err){toast('Import hiba: '+err.message,5000);});
+}
+function exportAll(){
+  var L=TPLS.filter(function(t){return t.active;});
+  Promise.all(L.map(function(t){return api('/templates/'+t.id).then(function(j){var x=j.template;return {name:x.name,kind:x.kind,lines:x.lines,party:x.party,client_type:x.client_type,note:x.note,sort:x.sort,body:x.body};});})).then(function(items){
+    var b=new Blob([JSON.stringify({version:1,exported:new Date().toISOString(),items:items},null,1)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='caradvance-sablonok-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
+  }).catch(function(e){toast(e.message);});
+}
+
+/* ---------- sablonszerkesztő ---------- */
+function renderEditor(){
+  var t=ED,lab=labels();
+  var h=tabs()+'<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">'+(t.id?'Sablon szerkesztése':'Új sablon')+'</h2><div class="row"><span class="small muted" id="dirty">'+(DIRTY?'nem mentett módosítás':'')+'</span>'
+    +'<button class="btn ghost" id="back">← Vissza a listához</button></div></div>'
+    +'<div class="grid" style="margin-top:12px"><label class="f two">Név<input class="in" id="tName" value="'+esc(t.name)+'"></label>'
+    +'<label class="f">Típus<select class="in" id="tKind">'+Object.keys(META.kinds).map(function(k){return '<option value="'+k+'"'+(t.kind===k?' selected':'')+'>'+esc(META.kinds[k])+'</option>';}).join('')+'</select></label>'
+    +'<div class="f two"><label class="f">Melyik üzletágnál jelenjen meg (Ügyfél adatlap)</label><div class="chks">'+META.lines.map(function(l){return '<label><input type="checkbox" data-ln="'+esc(l)+'"'+(t.lines.indexOf(l)>=0?' checked':'')+'> '+esc(l)+'</label>';}).join('')+'</div></div>'
+    +'<label class="f">Kinek az adataival töltődik<select class="in" id="tParty"><option value="client">Ügyfél (Eladásnál a bérlő)</option><option value="buyer"'+(t.party==='buyer'?' selected':'')+'>Vevő (Eladás 2. ütem)</option></select></label>'
+    +'<label class="f">Ügyfél típusa<select class="in" id="tCt">'+Object.keys(CT).map(function(k){return '<option value="'+k+'"'+(t.client_type===k?' selected':'')+'>'+esc(CT[k])+'</option>';}).join('')+'</select></label>'
+    +'<label class="f">Megjegyzés (belső)<input class="in" id="tNote" value="'+esc(t.note||'')+'"></label>'
+    +'<label class="f">Sorrend<input class="in" id="tSort" type="number" value="'+esc(t.sort)+'"></label></div>'
+    +'<details class="pal" open><summary>Adat beszúrása a kurzor helyére (kattints)</summary>'+(META.groups||[]).map(function(g){return '<div class="g"><b>'+esc(g.title)+'</b>'+g.vars.map(function(v){return '<button type="button" data-ins="'+v.key+'" title="{{'+v.key+'}}">'+esc(v.label)+'</button>';}).join('')+'</div>';}).join('')
+    +'<div class="g"><b>Formázás</b><button type="button" data-raw="# ">Cím</button><button type="button" data-raw="## ">Fejezetcím</button><button type="button" data-raw=" || ">Két hasáb ( || )</button><button type="button" data-raw="[ ] ">Jelölőnégyzet</button><button type="button" data-raw="[x] ">Bejelölt négyzet</button><button type="button" data-raw="- ">Felsorolás</button><button type="button" data-raw="[aláírás] Bal fél | Jobb fél">Aláírás</button><button type="button" data-raw="[oldaltörés]">Oldaltörés</button><button type="button" data-raw="---">Vonal</button></div></details>'
+    +'<div class="help" style="margin-top:10px">Egy bekezdés = egy sor. <code># Cím</code>, <code>## Fejezet</code>, <code>német || magyar</code> két hasáb, <code>[ ]</code> / <code>[x]</code> jelölőnégyzet, <code>- </code> felsorolás, <code>[aláírás] Bal | Jobb</code>, <code>[oldaltörés]</code>, <code>---</code>. A <code>{{valtozo}}</code> helyére kitöltéskor az adatlap adata kerül (üresen kipontozott hely marad). A <code>meghatalmazott_…</code>, <code>tanu1_…</code>, <code>tanu2_…</code> adatok a Személyek listából választhatók.</div>'
+    +'<div class="ed"><div><textarea id="tBody" spellcheck="false"></textarea></div><div class="pv dpv" id="pv"></div></div>'
+    +'<div class="row" style="margin-top:14px"><button class="btn red" id="save">Mentés</button>'+(t.id?'<button class="btn ghost" id="dup">Másolat készítése</button>'+(t.active?'<button class="btn ghost" id="arch">Archiválás</button>':'<button class="btn ghost" id="restore">Visszaállítás</button>'):'')+'<span class="small muted" id="stat"></span></div></div>';
+  app.innerHTML=h;
+  var ta=$('tBody');ta.value=t.body;
+  var pv=function(){$('pv').innerHTML=CADoc.preview(t.body,null,lab);var k=CADoc.usedKeys(t.body);$('stat').textContent=k.length+' adatmező · '+t.body.length.toLocaleString('hu-HU')+' karakter';};pv();
+  var dirty=function(){DIRTY=true;$('dirty').textContent='nem mentett módosítás';};
+  var pt=null;ta.addEventListener('input',function(){t.body=ta.value;dirty();clearTimeout(pt);pt=setTimeout(pv,200);});
+  $('tName').addEventListener('input',function(){t.name=this.value;dirty();});
+  $('tKind').addEventListener('change',function(){t.kind=this.value;dirty();});
+  $('tParty').addEventListener('change',function(){t.party=this.value;dirty();});
+  $('tCt').addEventListener('change',function(){t.client_type=this.value;dirty();});
+  $('tNote').addEventListener('input',function(){t.note=this.value;dirty();});
+  $('tSort').addEventListener('input',function(){t.sort=parseInt(this.value,10)||100;dirty();});
+  app.querySelectorAll('[data-ln]').forEach(function(c){c.addEventListener('change',function(){var l=c.getAttribute('data-ln');t.lines=t.lines.filter(function(x){return x!==l;});if(c.checked)t.lines.push(l);dirty();});});
+  app.querySelectorAll('[data-ins],[data-raw]').forEach(function(b){b.addEventListener('click',function(){
+    var s=b.hasAttribute('data-ins')?'{{'+b.getAttribute('data-ins')+'}}':b.getAttribute('data-raw');
+    var a=ta.selectionStart,z=ta.selectionEnd;ta.value=ta.value.slice(0,a)+s+ta.value.slice(z);ta.focus();ta.selectionStart=ta.selectionEnd=a+s.length;t.body=ta.value;dirty();pv();
+  });});
+  $('back').addEventListener('click',function(){if(DIRTY&&!confirm('A nem mentett módosítások elvesznek. Visszalépsz?'))return;ED=null;DIRTY=false;render();});
+  $('save').addEventListener('click',function(){saveTpl(t);});
+  var d=$('dup');if(d)d.addEventListener('click',function(){if(DIRTY&&!confirm('A nem mentett módosítások is bekerülnek a másolatba. Folytatod?'))return;ED=Object.assign({},t,{id:0,name:t.name+' (másolat)',active:true});DIRTY=true;render();toast('Másolat — mentéssel jön létre');});
+  var ar=$('arch');if(ar)ar.addEventListener('click',function(){if(!confirm('Archiválod a sablont? Az ügyfél adatlapokon nem lesz választható (a már kitöltött dokumentumok megmaradnak).'))return;api('/templates/'+t.id,{method:'DELETE'}).then(reloadList).then(function(){ED=null;DIRTY=false;render();toast('Sablon archiválva');}).catch(function(e){toast(e.message);});});
+  var rs=$('restore');if(rs)rs.addEventListener('click',function(){t.active=true;saveTpl(t);});
+}
+function saveTpl(t){
+  if(!t.name.trim())return toast('Adj nevet a sablonnak.');
+  if(!t.lines.length&&!confirm('A sablon egyik üzletághoz sincs rendelve — csak a „Minden sablon mutatása” opcióval lesz elérhető az adatlapon. Így is mented?'))return;
+  var b=$('save');b.disabled=true;
+  api('/templates',{method:'POST',body:{id:t.id||undefined,name:t.name,kind:t.kind,lines:t.lines,party:t.party,client_type:t.client_type,note:t.note,sort:t.sort,active:t.active!==false,body:t.body}}).then(function(j){
+    ED=j.template;DIRTY=false;toast('Sablon mentve');return reloadList().then(render);
+  }).catch(function(e){toast(e.message,4500);b.disabled=false;});
+}
+function reloadList(){return api('/templates?all=1').then(function(j){TPLS=j.templates;});}
+
+/* ---------- személyek ---------- */
+var PF=[['name','Név *'],['address','Lakcím'],['id_number','Személyi ig. / személyi szám'],['mother_name','Anyja neve'],['birth_place','Születési hely'],['birth_date','Születési idő'],['phone','Telefon'],['email','E-mail'],['note','Megjegyzés (pl. munkatárs, beosztás)']];
+function hd(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return s||'';var p=s.split('-');return p[0]+'. '+p[1]+'. '+p[2]+'.';}
+function renderPersons(){
+  var p=PE||{};
+  var h=tabs()+'<div class="card"><h2>Személyek (meghatalmazottak, tanúk, kollégák)</h2><p class="muted small" style="margin-top:0">Az itt mentett személyek a meghatalmazásokhoz és nyilatkozatokhoz rendelhetők az Ügyfél adatlapon — az adataik automatikusan betöltődnek a dokumentumba.</p>'
+    +'<div class="grid">'+PF.map(function(f){return '<label class="f'+(f[0]==='address'||f[0]==='note'?' two':'')+'">'+f[1]+'<input class="in" data-pf="'+f[0]+'"'+(f[0]==='birth_date'?' type="date"':f[0]==='email'?' type="email"':'')+' value="'+esc(p[f[0]]||'')+'"></label>';}).join('')+'</div>'
+    +'<div class="row" style="margin-top:12px"><button class="btn red" id="psave">'+(p.id?'Módosítás mentése':'+ Személy hozzáadása')+'</button>'+(p.id?'<button class="btn ghost" id="pcancel">Mégse</button>':'')+'</div></div>'
+    +'<div class="card">'+(PERS.length?'<table><thead><tr><th>Név</th><th>Lakcím</th><th class="hide-m">Szem. ig.</th><th class="hide-m">Anyja neve</th><th class="hide-m">Szül. hely, idő</th><th></th></tr></thead><tbody>'
+      +PERS.map(function(x){return '<tr><td><b>'+esc(x.name)+'</b>'+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'')+'</td><td class="small">'+esc(x.address)+'</td><td class="hide-m small">'+esc(x.id_number)+'</td><td class="hide-m small">'+esc(x.mother_name)+'</td><td class="hide-m small">'+esc([x.birth_place,hd(x.birth_date)].filter(Boolean).join(', '))+'</td>'
+        +'<td style="white-space:nowrap"><button class="btn sm ghost" data-pe="'+x.id+'">Szerkesztés</button> <button class="btn sm ghost" data-pd="'+x.id+'">Törlés</button></td></tr>';}).join('')+'</tbody></table>':'<p class="muted" style="margin:0">Még nincs mentett személy.</p>')+'</div>';
+  app.innerHTML=h;
+  $('psave').addEventListener('click',function(){
+    var b={};app.querySelectorAll('[data-pf]').forEach(function(i){b[i.getAttribute('data-pf')]=i.value;});if(p.id)b.id=p.id;
+    if(!b.name.trim())return toast('Add meg a nevet.');
+    api('/persons',{method:'POST',body:b}).then(function(j){PERS=j.persons;PE=null;render();toast('Mentve');}).catch(function(e){toast(e.message);});
+  });
+  var c=$('pcancel');if(c)c.addEventListener('click',function(){PE=null;render();});
+  app.querySelectorAll('[data-pe]').forEach(function(b){b.addEventListener('click',function(){PE=PERS.filter(function(x){return String(x.id)===b.getAttribute('data-pe');})[0];render();window.scrollTo(0,0);});});
+  app.querySelectorAll('[data-pd]').forEach(function(b){b.addEventListener('click',function(){var x=PERS.filter(function(y){return String(y.id)===b.getAttribute('data-pd');})[0];if(!confirm('Törlöd: '+x.name+'? (A már kitöltött dokumentumok nem változnak.)'))return;api('/persons/'+x.id,{method:'DELETE'}).then(function(j){PERS=j.persons;render();}).catch(function(e){toast(e.message);});});});
+}
+
+/* ---------- beállítások ---------- */
+function renderSettings(){
+  var adm=ME&&ME.role==='admin';
+  app.innerHTML=tabs()+'<div class="card"><h2>Német partner (Caradvance)</h2><p class="muted small" style="margin-top:0">Az Ügyfél adatlapon a kijelölt dokumentumok egy gombnyomással elküldhetők erre a címre.</p>'
+    +'<div class="grid"><label class="f">Megnevezés<input class="in" id="pn" value="'+esc(SET.partner_name||'')+'"'+(adm?'':' disabled')+'></label><label class="f two">E-mail cím(ek) — vesszővel elválasztva<input class="in" id="pe" value="'+esc(SET.partner_email||'')+'"'+(adm?'':' disabled')+' placeholder="pl. info@caradvance.de"></label></div>'
+    +(adm?'<div class="row" style="margin-top:12px"><button class="btn red" id="ss">Mentés</button></div>':'<div class="note info">Csak admin módosíthatja.</div>')+'</div>';
+  var b=$('ss');if(b)b.addEventListener('click',function(){api('/settings',{method:'POST',body:{partner_name:$('pn').value,partner_email:$('pe').value}}).then(function(j){SET=j.settings;render();toast('Mentve');}).catch(function(e){toast(e.message);});});
+}
+load();
+})();
+</script>
+<script src="/belso/belso-ui.js?v=4" defer></script>
+</body>
+</html>
