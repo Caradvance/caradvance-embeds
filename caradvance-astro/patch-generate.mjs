@@ -458,7 +458,7 @@ rep(`        <div class="badge"><span class="cond">Használt</span><span class="
         <div class="taxnote">Nettó ár (áfa nélkül). Árfolyam: 1 € ≈ \${rate} Ft.</div>
         <a class="btn btn-primary" style="width:100%;margin-top:16px" href="mailto:\${CONTACT_EMAIL}?subject=\${encodeURIComponent("Ajánlatkérés: " + title)}">Ajánlatkérés</a>`,
 `        <div class="badge"><span class="cond">\${isSold(c) ? "Elkelt" : "Használt"}</span><span class="year">\${esc(c.evjarat || "")}</span></div>
-        <div class="ptitle">\${isSold(c) ? "" : ujBadge(c, false)}\${esc(title)}</div>
+        <div class="ptitle">\${isSold(c) ? "" : ujBadge(c, false).replace(">Új<", ">Újdonság<")}\${esc(title)}</div>
         \${isSold(c) ? \`<div data-eur="\${p.eur}" data-net="\${nEur(c.vetel_eur_netto)}">
           <div class="plabel">Eladási ár volt</div>
           <div class="price" data-main>\${fmtHUF(p.main)}</div>
