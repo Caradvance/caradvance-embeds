@@ -83,6 +83,7 @@ code{background:#F1F4F9;border-radius:6px;padding:1px 5px;font-size:12px}
 <header><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><b>Pénzügy</b><span class="sp"></span><span id="sys"></span><a href="/belso/">← Belső felület</a></header>
 <main id="app"><div class="card">Betöltés…</div></main>
 <script src="/belso/penzugy/kivonat.js?v=1"></script>
+<script src="/belso/penzugy/ugyletek.js?v=1"></script>
 <script>
 (function () {
 'use strict';
@@ -179,7 +180,7 @@ function render() {
     + '<span class="small muted">' + (S.meta.stats.n || 0) + ' tétel összesen · utolsó: ' + hd(S.meta.stats.max) + '</span></div>'
     + '<div class="tabs">'
     + tabBtn('pl', 'Eredménykimutatás') + tabBtn('tx', 'Tételek', unc + nol ? '<span class="cnt" title="besorolásra vár / üzletág nélkül">' + (unc + nol) + '</span>' : '')
-    + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
+    + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('crm', 'Ügyletek') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
   $$('.tabs button').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; render(); }; });
   $('#pFrom').onchange = $('#pTo').onchange = function () { S.from = $('#pFrom').value || S.from; S.to = $('#pTo').value || S.to; if (S.from > S.to) S.to = S.from; reload(); };
   $$('[data-pre]').forEach(function (b) {
@@ -191,7 +192,7 @@ function render() {
       reload();
     };
   });
-  ({ pl: renderPL, tx: renderTx, docs: renderDocs, imp: renderImp, set: renderSet })[S.tab]();
+  ({ pl: renderPL, tx: renderTx, docs: renderDocs, crm: function () { window.CA_renderUgyletek(document.getElementById('tab'), S.from, S.to); }, imp: renderImp, set: renderSet })[S.tab]();
 }
 function tabBtn(k, t, extra) { return '<button data-t="' + k + '" class="' + (S.tab === k ? 'on' : '') + '">' + t + (extra || '') + '</button>'; }
 
