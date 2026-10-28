@@ -71,25 +71,61 @@
     'scale ezüst metál': '#9ea2a4', 'sophisto szürke briliáns metál': '#3c3f42', 'storm bay metál': '#4f5a61', 'tavascan kék metál': '#2b3e5e',
     'tiszta fehér': '#f1f2f2', 'tiszta fehér uni': '#f1f2f2', 'tiszta kék metál': '#2e6aa8', 'wolf szürke': '#5e6266', 'wolf szürke metál': '#5e6266',
     'zafírfekete metál': '#101215', 'árnyékszürke': '#55585b', 'éjkék metál': '#1e2a44', 'élénkpiros': '#b5121b', 'éjfekete uni': '#0b0c0d',
-    'éjfélfekete': '#121418', 'éjfélfekete metál': '#121418'
+    'éjfélfekete': '#121418', 'éjfélfekete metál': '#121418',
+    'hegyiszürke metál': '#686d72', 'tanzanitkék metál': '#1d2442', 'ocean wave zöld': '#2e6b70', 'blazing kék': '#2a5db0',
+    'cape york zöld metál': '#3a4a3d', 'nyílszürke gyöngyház': '#6b6e70', 'chronosszürke metál': '#8a8d8f', 'elefántcsontezüst metál / fekete': '#c9c6bb',
+    'fekete': '#0e0f10', 'ascot szürke / fekete': '#9a9ea0', 'ultrakék metál': '#2b4e8c'
   };
+  var MBP = {
+    'graphitgrau metallic': '0c0e0d,131615,202222,303332,464847,5f6160,808281,747675,0c0e0e,030504,060807,181a19,414342,414342,393b3a,2e3030,242625,1a1c1b,101312,090a09',
+    'polarweiß uni': 'd3d5d6,d7d9db,dbddde,dddfe1,e1e3e5,e3e6e5,e5e8e7,e3e5e6,d9dbdd,d3d5d7,d4d6d8,dadcde,dee0e2,dddfe1,dcdee0,d8dadc,d3d5d7,cfd1d3,c9cbcd,c4c6c8',
+    'obsidianschwarz metallic': '010101,060606,0e0e0e,1b1b1b,2b2b2b,3f3f3f,616161,545454,020202,010101,010101,040404,2a2a2a,272727,202020,1b1a1a,111111,0b0a0a,050505,020202',
+    'schwarz uni': '090909,0e0e0e,161616,212121,303030,404040,5d5d5d,535353,0b0b0b,080808,080808,0c0c0c,2b2b2b,2a2a2a,242424,1f1f1f,171717,111111,0d0d0d,080808',
+    'manufaktur alpingrau uni': 'a0a0a2,a8a7aa,b2b1b5,b9b8bc,bfbfbf,c3c3c3,cacaca,c4c4c6,adadaf,a0a0a2,a2a2a4,afafb1,b7b7b9,b7b7b9,b3b3b4,acacac,a4a4a6,9c9b9e,909092,89888b',
+    'nachtschwarz uni': '0f1110,141615,1b1d1d,252726,333534,444646,606262,545756,111413,0c0f0e,0e100f,121413,313332,2e302f,282a2a,222424,1c1e1e,161817,0f1110,0b0d0c',
+    'kosmosschwarz metallic': '020202,040404,0c0c0c,181818,292929,3c3c3c,5f5f5f,525252,020202,000000,000000,030303,282828,252525,1f1f1f,191919,111111,0b0a0a,040404,020202',
+    'klarblau metallic': '0157a1,0064ac,0a70b7,2382c3,4094ca,57a4cf,78b2d8,61a8d5,015ca8,00418e,014796,045da8,377ebf,357fbd,2875b5,1b68aa,0d569a,044889,003b7b,003171',
+    'hightechsilber metallic': '5b646d,717982,8d949d,a6acb4,bcc1c7,ccd0d5,dbdfe4,d7dadf,6e7780,454f57,586168,8d969d,b8c1c8,b7c0c7,adb6be,9fa8b1,8b939c,757e87,5e666f,4a525a',
+    'manufaktur patagonienrot metallic': '490007,5a040f,70101a,862129,a03439,bc4b51,d76d72,cd5c66,570009,370001,440005,6d0411,a03137,9e3135,932830,801f28,6c151e,5a0d15,47040c,390006',
+    'aquamint uni': '9db4ae,a5bab5,aabfba,b3c6c2,bacbc7,bfcecb,c6d2d0,c1cecc,a2b9b4,92aba5,93aca8,9cb2ae,a9bcb9,a4b8b5,9eb3b0,95aaa7,869e9a,77908c,6c8580,647d79',
+    'lavender silver metallic': '484951,595a62,6e6f77,83848c,9b9ba3,adaeb4,c2c3c9,b9bac1,55565e,32333b,414249,6b6c74,97979f,9898a0,8d8e95,7c7d83,68696f,54555b,43444a,36353c',
+    'manufaktur opalithweiß bright': 'c4c6c8,caccce,d0d2d4,d6d8da,dadcde,dfe1e3,e5e4e7,e2e4e6,cdcfd0,c1c2c7,c4c4cd,d0d2d5,d7d9db,d7d9db,d4d6d8,d0d2d3,c8cacc,c1c3c7,b6babd,aeb2b5',
+    'manufaktur rubellitrot metallic': '0c0101,100404,1c0b0d,2c1919,402a29,543e3e,776160,705254,0f0102,050000,070101,140204,3d2729,3a2626,332021,29191a,201213,170a0b,0f0504,080101',
+    'manufaktur orange flame metallic': '722102,872e04,9f4210,ba571b,d2702d,e28a45,f0a663,ed9852,862701,5a1400,6e1d00,a33a02,d26b2a,d26d2b,c66122,b2511a,9d4112,83310c,6f2405,5a1703',
+    'manufaktur graphitgrau magno': '1f2121,262828,2c2e2d,313433,373c3a,3c3f3e,3c3f3e,2f3231,212121,181818,1a1c1b,252726,2a2c2b,2c2e2d,292b2b,232625,1e201f,191b1b,131615,0f1111',
+    'manufaktur siliziumgrau uni': '525858,5b6161,646a6a,707676,7c8282,888c8c,989b9c,8f9495,5f6565,535959,555b5b,5f6565,747a7a,737979,6d7373,636969,5b6161,525858,4a5050,424747',
+    'manufaktur nachtschwarz magno': '111111,131313,161817,191b1a,1d1f1e,1e2120,1e2120,171918,0f1110,0c0c0c,0e0e0e,131313,141615,161817,121514,101211,0f0f0f,0b0b0b,070707,050505',
+    'manufaktur miami silver magno': '484955,61616d,80808c,a0a0ac,b9bac6,cdcdd2,dfdee2,dbd9e1,5c5d6a,2e303d,464652,82838f,b8b8c4,b7b7c3,aaaab7,9897a5,838391,6a6977,50505e,3a3b46',
+    'manufaktur angel blue magno': '98b7bc,a5c0c7,b1c9ce,bdd1d6,c8dbdd,d1e0e3,dae7e8,d8e6e7,a1bfc6,84aab3,8bb2b9,a6c4ca,bdd4d8,bcd3d7,b4cdd3,a7c2c9,97b6bd,82a6ae,71989f,668c93',
+    'manufaktur opalithweiß magno': 'c7c9cb,ced0d1,d1d3d5,d5d7d9,dadcde,dcdee0,dee0e1,dadcdd,cfd1d2,c3c5c7,c7c9ca,d0d2d4,d5d7d8,d5d7d9,d2d4d5,cdcfd1,c8cacb,c0c2c5,b8bcbf,b0b4b8'
+  };
+  var MBA = {'grafitszürke metál': 'graphitgrau metallic', 'poláris fehér uni': 'polarweiß uni', 'obszidiánfekete metál': 'obsidianschwarz metallic', 'fekete uni': 'schwarz uni', 'manufaktur alpesi szürke uni': 'manufaktur alpingrau uni', 'éjfekete uni': 'nachtschwarz uni', 'kozmoszfekete metál': 'kosmosschwarz metallic', 'tiszta kék metál': 'klarblau metallic', 'hightech ezüst metál': 'hightechsilber metallic', 'polarweiss uni': 'polarweiß uni', 'polar white solid': 'polarweiß uni', 'obsidian black metallic': 'obsidianschwarz metallic', 'graphite grey metallic': 'graphitgrau metallic', 'night black solid': 'nachtschwarz uni', 'black solid': 'schwarz uni', 'manufaktur alpine grey solid': 'manufaktur alpingrau uni'};
   function hexRgb(h) { h = String(h || '').replace('#', ''); if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join(''); var n = parseInt(h, 16); if (isNaN(n)) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
   function cssRgb(c) { var m = c.slice(0, 3).map(function (v) { return Math.max(0, Math.min(255, Math.round(v))); }); return 'rgb(' + m.join(',') + ')'; }
   function mixC(c, t, a) { return c.map(function (v, i) { return v + (t[i] - v) * a; }); }
   function rgbOf(cssCol) { var m = /rgba?\((\d+)\D+(\d+)\D+(\d+)/.exec(cssCol || ''); return m ? [+m[1], +m[2], +m[3]] : hexRgb(cssCol); }
-  function finishOf(name) { var n = String(name || '').toLowerCase(); return /matt/.test(n) ? 'matt' : /gyöngyház|pearl|perleffekt/.test(n) ? 'pearl' : /metál|metal|briliáns|ezüst|silver/.test(n) ? 'metal' : 'uni'; }
+  function finishOf(name) { var n = String(name || '').toLowerCase(); return /matt|magno/.test(n) ? 'matt' : /gyöngyház|pearl|perl/.test(n) ? 'pearl' : /metál|metal|briliáns|ezüst|silver|silber|stříbr|strieb|srebr/.test(n) ? 'metal' : 'uni'; }
+  var CRV = {
+    metal: [-.36, -.22, -.02, .14, .28, .40, .53, .47, -.27, -.51, -.42, -.13, .24, .23, .17, .08, -.07, -.24, -.42, -.54],
+    uni: [-.08, -.03, .04, .12, .21, .26, .34, .27, -.01, -.09, -.08, -.02, .09, .07, .04, -.03, -.08, -.14, -.20, -.25]
+  };
+  function stops(rows) { return 'linear-gradient(180deg,' + rows.map(function (c, i) { return c + ' ' + (i * 100 / (rows.length - 1)).toFixed(1) + '%'; }).join(',') + ')'; }
   function swatch(name, fallback) {
     var n = String(name || '').toLowerCase().trim();
     if (/lásd a fotókon|see photos|siehe fotos/.test(n)) return 'conic-gradient(from 210deg,#e8ebef,#9aa3ad,#2b3442,#c6c9cd,#e8ebef)';
-    var b = hexRgb(PAINT[n]) || rgbOf(fallback) || [150, 155, 160];
-    var W = [255, 255, 255], K = [0, 0, 0], f = finishOf(n), lum = (0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2]) / 255;
-    var hi = f === 'matt' ? 0.14 : f === 'uni' ? 0.42 : 0.62, dk = lum < 0.15 ? 0.0 : 0.3;
-    var top = mixC(b, W, (lum < 0.15 ? 0.35 : 0.28)), mid = b, band = mixC(b, W, hi), pre = mixC(b, W, hi * 0.35), low = mixC(b, K, dk), refl = mixC(b, W, f === 'matt' ? 0.04 : 0.12);
-    var g = 'linear-gradient(180deg,' + cssRgb(top) + ' 0%,' + cssRgb(mid) + ' 30%,' + cssRgb(pre) + ' 39%,' + cssRgb(band) + ' 45%,' + cssRgb(mid) + ' 51.5%,' + cssRgb(mixC(b, K, dk * 0.6)) + ' 57%,' + cssRgb(refl) + ' 72%,' + cssRgb(low) + ' 100%)';
     var layers = [];
-    if (/\/\s*fekete|\/\s*black|\/\s*schwarz/.test(n)) layers.push('linear-gradient(135deg,transparent 70%,#111214 70.5%)');
-    if (f === 'metal' || f === 'pearl') layers.push('radial-gradient(120% 55% at 25% 8%,rgba(255,255,255,' + (f === 'pearl' ? '.4' : '.28') + '),transparent 60%)');
-    layers.push(g);
+    if (/\/\s*fekete|\/\s*black|\/\s*schwarz/.test(n)) layers.push('linear-gradient(135deg,transparent 64%,#141516 64.5%)');
+    var key = MBP[n] ? n : MBA[n];
+    if (key && MBP[key]) { layers.push(stops(MBP[key].split(',').map(function (h) { return '#' + h; }))); return layers.join(','); }
+    var b = hexRgb(PAINT[n] || PAINT[n.replace(/\s*\/.*$/, '')]) || rgbOf(fallback) || [150, 155, 160];
+    var f = finishOf(n), lum = (0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2]) / 255;
+    var cv = (f === 'metal' || f === 'pearl') ? CRV.metal : CRV.uni, amp = f === 'matt' ? 0.45 : f === 'pearl' ? 0.9 : 1;
+    var rows = cv.map(function (t) {
+      t *= amp; if (lum < 0.12 && t > 0) t *= 0.62;
+      return cssRgb(t >= 0 ? mixC(b, [255, 255, 255], t) : mixC(b, [0, 0, 0], -t));
+    });
+    if (f === 'pearl') layers.push('radial-gradient(90% 60% at 30% 22%,rgba(255,255,255,.16),transparent 70%)');
+    layers.push(stops(rows));
     return layers.join(',');
   }
   function svg(k, cls) { return '<svg class="' + (cls || 'caf-ic') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[k] || '') + '</svg>'; }
@@ -401,15 +437,27 @@
       '.caf .caf-hl{display:none!important}',
       '.caf .caf-body .ab-opt.dis{text-decoration:none!important;opacity:.5;cursor:pointer!important;border-style:dashed!important}',
       '.caf .caf-body .ab-opt.dis.caf-col{opacity:1}',
-      '.caf .caf-body .ab-opt.dis.caf-col .caf-sw{opacity:.8}',
+      '.caf .caf-body .ab-opt.dis.caf-col .caf-sw{opacity:.95}',
       '.caf .caf-body .ab-opt.dis.caf-col .caf-cn{color:#8c96a5}',
       '.caf .caf-body .ab-opt.dis:hover{opacity:.85;border-color:#b9c3d1!important}',
       '.caf .caf-body .ab-opt.dis *{text-decoration:none!important}',
-      '.caf .caf-body .ab-opt.caf-col{flex-direction:column!important;align-items:stretch!important;gap:8px!important;width:148px;padding:8px 8px 10px!important;min-height:0!important;text-align:left}',
-      '.caf .caf-body .ab-opt.caf-col .caf-sw{display:block;height:74px;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}',
-      '.caf .caf-body .ab-opt.caf-col .caf-cn{font-size:13.5px;line-height:1.3;font-weight:600;color:var(--ink);padding:0 2px}',
-      '.caf .caf-body .ab-opt.caf-col.active .caf-cn{color:var(--r)}',
-      '.caf .caf-body .ab-opt.caf-col.active .caf-sw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),0 0 0 2px #fff,0 0 0 4px rgba(226,0,26,.35)}',
+      '.caf #abColor .ab-pick{display:flex;flex-wrap:wrap;gap:8px 10px!important}',
+      '.caf .caf-body .ab-opt.caf-col{position:relative;flex:0 0 auto!important;width:auto!important;min-height:0!important;padding:5px!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;opacity:1!important}',
+      '.caf .caf-body .ab-opt.caf-col .caf-sw{display:block;width:52px;height:52px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:box-shadow .15s}',
+      '.caf .caf-body .ab-opt.caf-col:hover .caf-sw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 3px #fff,0 0 0 4px #b9c3d1}',
+      '.caf .caf-body .ab-opt.caf-col:focus-within .caf-sw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 3px #fff,0 0 0 5px #6b7686}',
+      '.caf .caf-body .ab-opt.caf-col.active .caf-sw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 3px #fff,0 0 0 5px #111}',
+      '.caf .caf-body .ab-opt.caf-col .caf-cn{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}',
+      '.caf .caf-body .ab-opt.caf-col.active::after{content:"";position:absolute;top:-1px;right:-1px;width:22px;height:22px;border-radius:50%;background:#111 url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23fff%27 stroke-width=%273%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M5 12.5l4.5 4.5L19 7.5%27/%3E%3C/svg%3E") center/13px no-repeat;box-shadow:0 0 0 2px #fff}',
+      '.caf .caf-body .ab-opt.caf-col.dis::after{content:"i";position:absolute;top:0;right:0;width:16px;height:16px;border-radius:50%;background:#fff;border:1.2px solid #6b7686;color:#4a5568;font:italic 700 10px/15px Georgia,serif;text-align:center;box-sizing:border-box}',
+      '.caf .caf-body .ab-opt.caf-col.dis.active::after{content:"";border:0;font-size:0}',
+      '.caf-chd{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:0 0 12px;border-radius:12px;background:#f5f7fa}',
+      '.caf-chd i{display:block;width:34px;height:34px;border-radius:50%;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}',
+      '.caf-chd b{display:block;font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.25}',
+      '.caf-chd small{display:block;font-size:12.5px;color:var(--mut);margin-top:1px}',
+      '.caf-chd small.o{color:#8a5a00}',
+      '.caf-cnote{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--mut);margin:10px 0 0}',
+      '.caf-cnote:before{content:"i";display:inline-block;width:15px;height:15px;border-radius:50%;border:1.2px solid #6b7686;color:#4a5568;font:italic 700 10px/14px Georgia,serif;text-align:center;box-sizing:border-box;flex:0 0 auto}',
       '.caf-pbox .e{font-size:14px;font-weight:700;opacity:.95}',
       '.caf-pbox:not(.on) .e{color:#3a4556}',
       '.caf-est .eu{font-size:15px;font-weight:800;color:#1f2a3a;margin-top:1px}',
@@ -435,7 +483,7 @@
       '.caf-rr .v{color:var(--ink);font-weight:700;display:flex;align-items:center;gap:8px;min-width:0}',
       '.caf-rr .v small{font-weight:500;color:var(--mut)}',
       '.caf-rr.tot .v{font-size:17px;font-weight:800}',
-      '.caf-rsw{display:inline-block;width:22px;height:22px;border-radius:6px;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}',
+      '.caf-rsw{display:inline-block;width:22px;height:22px;border-radius:50%;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}',
       '.caf-rch{all:unset;cursor:pointer;font-size:13px;font-weight:700;color:var(--r);padding:4px 6px;border-radius:8px}',
       '.caf-rch:hover{background:#fff0f2}',
       '.caf #abAvBlock>.ab-label,.caf #abFuel>.ab-label,.caf #abTerm>.ab-label,.caf #abKm>.ab-label,.caf .caf-body .egl-flabel{display:none!important}',
@@ -586,7 +634,7 @@
       '.caf-sb,.caf-step.on.hasinfo .caf-sb{padding:10px 0 12px;grid-template-columns:1fr}',
       '.caf .caf-body .ab-grid,.caf .caf-body .cain-grid,.caf .caf-body .egl-fgrid{grid-template-columns:1fr}',
       '.caf .caf-body .ab-opt,.caf .caf-body .egl-fuelopt{flex:1 1 calc(50% - 10px);justify-content:center}',
-      '.caf .caf-body .ab-opt.caf-col{width:auto;flex:1 1 calc(50% - 10px)}',
+      '.caf .caf-body .ab-opt.caf-col .caf-sw{width:46px;height:46px}',
       '.caf-rr{grid-template-columns:1fr auto;gap:2px 10px}.caf-rr .k{grid-column:1/-1;font-size:12.5px}',
       '.caf-foot{margin:10px -16px 0}',
       '.caf-est{grid-template-columns:1fr;gap:4px;padding:10px 16px}.caf-est .v{font-size:22px}.caf-est .d{display:none}',
@@ -608,7 +656,39 @@
       if (tn) { var sp = mk('span', 'caf-cn'); sp.textContent = tn.nodeValue.trim(); tn.replaceWith(sp); }
     });
     qa('.ab-opt.dis:not([title])', M.modal).forEach(function (l) { l.title = T.otherCfg; });
+    qa('#abColor .caf-col:not([data-tt])', M.modal).forEach(function (l) { l.setAttribute('data-tt', '1'); if (!l.title) l.title = tx(l); var i = q('input', l); if (i) i.setAttribute('aria-label', tx(l)); });
+    colorHead(M);
     if (M.v2) decorateV2(M);
+  }
+  var FIN = {
+    hu: { metal: 'Metálfényezés', pearl: 'Gyöngyházfényezés', uni: 'Uni fényezés', matt: 'Matt fényezés', pick: 'Válassz színt' },
+    en: { metal: 'Metallic paint', pearl: 'Pearl paint', uni: 'Solid paint', matt: 'Matte paint', pick: 'Choose a colour' },
+    de: { metal: 'Metallic-Lackierung', pearl: 'Perleffekt-Lackierung', uni: 'Uni-Lackierung', matt: 'Matt-Lackierung', pick: 'Farbe wählen' },
+    sk: { metal: 'Metalický lak', pearl: 'Perleťový lak', uni: 'Nemetalický lak', matt: 'Matný lak', pick: 'Vyberte farbu' },
+    cs: { metal: 'Metalický lak', pearl: 'Perleťový lak', uni: 'Nemetalický lak', matt: 'Matný lak', pick: 'Vyberte barvu' },
+    pl: { metal: 'Lakier metalik', pearl: 'Lakier perłowy', uni: 'Lakier niemetalizowany', matt: 'Lakier matowy', pick: 'Wybierz kolor' }
+  };
+  function colorHead(M, hov) {
+    var blk = q('#abColor', M.modal), pick = blk && q('.ab-pick', blk);
+    if (!pick || !q('.caf-col', pick)) return;
+    var F = FIN[LG] || FIN.hu, hd = q('.caf-chd', blk), nt = q('.caf-cnote', blk);
+    if (!hd) { hd = mk('div', 'caf-chd'); hd.setAttribute('aria-live', 'polite'); pick.parentNode.insertBefore(hd, pick); }
+    if (!pick.getAttribute('data-hv')) {
+      pick.setAttribute('data-hv', '1');
+      pick.addEventListener('mouseover', function (e) { var l = e.target.closest && e.target.closest('.caf-col'); if (l) colorHead(M, l); });
+      pick.addEventListener('mouseleave', function () { colorHead(M); });
+    }
+    var l = hov || q('.caf-col.active', pick), sw = l && q('.caf-sw', l), nm = l ? tx(l) : '';
+    var sub = l ? (F[finishOf(nm)] || '') : '', o = l && l.classList.contains('dis');
+    var key = nm + '|' + sub + '|' + (o ? 1 : 0);
+    if (hd.getAttribute('data-k') !== key) {
+      hd.setAttribute('data-k', key);
+      hd.innerHTML = (sw ? '<i style="background:' + esc(sw.style.background) + '"></i>' : '<i style="background:conic-gradient(from 210deg,#e8ebef,#9aa3ad,#2b3442,#c6c9cd,#e8ebef)"></i>') +
+        '<div><b>' + esc(nm || F.pick) + '</b>' + (o ? '<small class="o">' + esc(T.otherCfg) + '</small>' : sub ? '<small>' + esc(sub) + '</small>' : '') + '</div>';
+    }
+    var anyDis = !!q('.caf-col.dis', pick);
+    if (anyDis && !nt) { nt = mk('div', 'caf-cnote'); nt.textContent = T.otherCfg; pick.parentNode.insertBefore(nt, pick.nextSibling); }
+    else if (!anyDis && nt) nt.parentNode.removeChild(nt);
   }
   function activeVi(m, p) { var o = m.querySelector('.ab-opt.active[data-fp="' + p + '"]'); return o ? +o.getAttribute('data-vi') : null; }
   function forceSelect(M, fp, vi) {
