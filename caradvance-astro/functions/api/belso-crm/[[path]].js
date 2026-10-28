@@ -3,7 +3,7 @@
 // Ugyanazt a munkamenetet (ca_session süti) és jogosultságot használja, mint az /api/belso/*:
 // admin mindent lát, a többi munkatárs csak a hozzá rendelt ügyfeleket.
 import {
-  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE,
+  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE
 } from '../../../lib/crm.js';
@@ -63,13 +63,14 @@ async function handleGetCard(env, user, id) {
   const card = await getCard(env, id);
   const offers = ((await env.DB.prepare(`SELECT token, items, message, sent_to, sent, created_at, responded_at, action, choice, client_msg FROM crm_offers WHERE deal_id = ? ORDER BY created_at DESC`).bind(id).all()).results || [])
     .map((o) => ({ ...o, items: parseJ(o.items, []), link: `${SITE}/ajanlat/valasz/?t=${o.token}` }));
-  const files = (await env.DB.prepare(`SELECT id, name, mime, size, created_at FROM crm_files WHERE deal_id = ? ORDER BY id`).bind(id).all()).results || [];
+  const files = (await env.DB.prepare(`SELECT id, name, mime, size, created_at FROM crm_files WHERE deal_id = ? AND id NOT IN (SELECT file_id FROM crm_fin WHERE deal_id = ? AND file_id IS NOT NULL) ORDER BY id`).bind(id, id).all()).results || [];
+  const fin = await finList(env, id);
   const events = await listEvents(env, id);
   let users = [];
   if (user.role === 'admin') users = (await env.DB.prepare(`SELECT id, name, email FROM users ORDER BY name`).all()).results || [];
   return json({
     deal, card: { status: card.status, address: card.address, data: card.data, checklist: card.checklist, contract: card.contract, status_at: card.status_at, updated_at: card.updated_at },
-    offers, files, events, statuses: STATUSES, checklist: checklistFor(deal.line), me: user, users, testForward: testForward(env)
+    offers, files, events, fin, statuses: STATUSES, checklist: checklistFor(deal.line), me: user, users, testForward: testForward(env)
   });
 }
 
@@ -201,6 +202,92 @@ async function handleSendOffer(request, env, user, id) {
   return json({ ok: true, link, status: 'Ajánlat kiküldve', sentTo: fwd || to, test: !!fwd });
 }
 
+/* ---------------- pénzügy (ügyletenként) ---------------- */
+async function finList(env, id) {
+  const items = (await env.DB.prepare(`SELECT f.id, f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, f.file_id, f.created_name, f.created_at,
+      fl.name AS file_name, fl.mime AS file_mime, fl.size AS file_size
+    FROM crm_fin f LEFT JOIN crm_files fl ON fl.id = f.file_id WHERE f.deal_id = ? ORDER BY f.kind DESC, COALESCE(NULLIF(f.fdate, ''), f.created_at), f.id`).bind(id).all()).results || [];
+  return { items, summary: finSummary(items) };
+}
+async function storeFile(env, id, file, userId) {
+  if (!file || !file.data) return null;
+  const data = String(file.data).replace(/^data:[^,]*,/, '');
+  const size = Math.floor(data.length * 3 / 4);
+  if (size > MAX_FILE) throw new Error('A csatolmány legfeljebb 1,4 MB lehet (a fotót a böngésző tömöríti).');
+  const name = clean(file.name, 160).replace(/[\\/]/g, '_') || 'szamla';
+  const mime = /^[a-z]+\/[a-z0-9.+-]+$/i.test(file.mime || '') ? file.mime : 'application/octet-stream';
+  const r = await env.DB.prepare(`INSERT INTO crm_files (deal_id, name, mime, size, data, created_by) VALUES (?,?,?,?,?,?)`).bind(id, name, mime, size, data, userId).run();
+  return r.meta.last_row_id;
+}
+async function finFields(b) {
+  const kind = b.kind === 'income' ? 'income' : 'cost';
+  const title = clean(b.title, 200);
+  const amount = Math.round(Math.abs(Number(String(b.amount == null ? '' : b.amount).replace(/\s/g, '').replace(',', '.')) || 0) * 100) / 100;
+  const currency = b.currency === 'EUR' ? 'EUR' : 'HUF';
+  if (!title) throw new Error('Add meg a tétel megnevezését.');
+  if (!(amount > 0)) throw new Error('Add meg az összeget.');
+  let fx = null;
+  if (currency === 'EUR') {
+    fx = Number(b.fx) > 0 ? Number(b.fx) : await eurHuf();
+    if (!fx) throw new Error('Az EUR árfolyam most nem érhető el — add meg az árfolyamot, vagy rögzítsd forintban.');
+  }
+  const fdate = /^\d{4}-\d{2}-\d{2}$/.test(b.fdate || '') ? b.fdate : new Date().toISOString().slice(0, 10);
+  return { kind, title, amount, currency, fx, amount_huf: Math.round(currency === 'EUR' ? amount * fx : amount), fdate, note: cleanMulti(b.note, 1000) };
+}
+const fmtFt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' Ft';
+const finLabel = (f) => `${f.kind === 'income' ? 'Bevétel' : 'Költség'}: ${f.title} — ${f.currency === 'EUR' ? fmtFt(f.amount).replace(' Ft', ' €') + ' (' + fmtFt(f.amount_huf) + ')' : fmtFt(f.amount_huf)}`;
+async function handleFinAdd(request, env, user, id) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  let f, fileId = null;
+  try { f = await finFields(b); fileId = await storeFile(env, id, b.file, user.id); } catch (e) { return json({ error: e.message }, 400); }
+  await env.DB.prepare(`INSERT INTO crm_fin (deal_id, kind, title, amount, currency, fx, amount_huf, fdate, note, file_id, created_by, created_name) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
+    .bind(id, f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, fileId, user.id, user.name).run();
+  await addEvent(env, id, 'fin', finLabel(f) + ' hozzáadva' + (fileId ? ' (számlával)' : ''), user.name);
+  return json({ ok: true, fin: await finList(env, id) });
+}
+async function handleFinPatch(request, env, user, id, fid) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const cur = await env.DB.prepare(`SELECT * FROM crm_fin WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
+  if (!cur) return json({ error: 'Nem található.' }, 404);
+  const b = await request.json().catch(() => ({}));
+  let f, fileId = cur.file_id;
+  try {
+    f = await finFields({ kind: cur.kind, title: cur.title, amount: cur.amount, currency: cur.currency, fdate: cur.fdate, note: cur.note, fx: cur.currency === 'EUR' && b.currency !== 'HUF' && b.amount === undefined && b.fx === undefined ? cur.fx : undefined, ...b });
+    if (b.file && b.file.data) { const nid = await storeFile(env, id, b.file, user.id); if (cur.file_id) await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(cur.file_id, id).run(); fileId = nid; }
+    else if (b.removeFile && cur.file_id) { await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(cur.file_id, id).run(); fileId = null; }
+  } catch (e) { return json({ error: e.message }, 400); }
+  await env.DB.prepare(`UPDATE crm_fin SET kind = ?, title = ?, amount = ?, currency = ?, fx = ?, amount_huf = ?, fdate = ?, note = ?, file_id = ?, updated_at = datetime('now') WHERE id = ?`)
+    .bind(f.kind, f.title, f.amount, f.currency, f.fx, f.amount_huf, f.fdate, f.note, fileId, fid).run();
+  await addEvent(env, id, 'fin:' + fid, finLabel(f) + ' módosítva', user.name, 10);
+  return json({ ok: true, fin: await finList(env, id) });
+}
+async function handleFinDelete(env, user, id, fid) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const cur = await env.DB.prepare(`SELECT * FROM crm_fin WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
+  if (!cur) return json({ error: 'Nem található.' }, 404);
+  await env.DB.prepare(`DELETE FROM crm_fin WHERE id = ?`).bind(fid).run();
+  if (cur.file_id) await env.DB.prepare(`DELETE FROM crm_files WHERE id = ? AND deal_id = ?`).bind(cur.file_id, id).run();
+  await addEvent(env, id, 'fin', finLabel(cur) + ' törölve', user.name);
+  return json({ ok: true, fin: await finList(env, id) });
+}
+/** Gyűjtő: minden (látható) ügylet bevétele / költsége / haszna — a Pénzügy menü „Ügyletek” fülének. */
+async function handleFinSummary(env, user) {
+  const where = user.role === 'admin' ? '' : 'WHERE d.assigned_to = ?';
+  const st = env.DB.prepare(`SELECT d.id, d.line, d.name, d.car, d.stage, d.client_responded_at, d.created_at, c.status, c.data FROM deals d LEFT JOIN crm_cards c ON c.deal_id = d.id ${where} ORDER BY d.id DESC`);
+  const deals = ((user.role === 'admin' ? await st.all() : await st.bind(user.id).all()).results || []);
+  const ids = new Set(deals.map((d) => d.id));
+  const rows = ((await env.DB.prepare(`SELECT id, deal_id, kind, title, amount, currency, amount_huf, fdate, created_at, file_id FROM crm_fin ORDER BY fdate`).all()).results || []).filter((r) => ids.has(r.deal_id));
+  return json({
+    deals: deals.map((d) => {
+      const data = parseJ(d.data, {});
+      const company = data.kind === 'ceg' && data.company && data.company.name ? data.company.name : '';
+      return { id: d.id, line: d.line, name: company || d.name, car: d.car, created_at: d.created_at, status: d.status || statusFromDeal(d) };
+    }),
+    items: rows.map((r) => ({ id: r.id, deal_id: r.deal_id, kind: r.kind, title: r.title, amount: r.amount, currency: r.currency, amount_huf: r.amount_huf, fdate: r.fdate || String(r.created_at).slice(0, 10), has_file: !!r.file_id }))
+  });
+}
+
 /* ---------------- dokumentumok ---------------- */
 async function handleUpload(request, env, user, id) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
@@ -325,7 +412,14 @@ export async function onRequest(context) {
     if (path === '/list' && method === 'GET') return await handleList(env, user);
     if (path === '/clients' && method === 'POST') return await handleCreate(request, env, user);
     if (path === '/inventory' && method === 'GET') return await handleInventory(url);
-    let m = path.match(/^\/card\/(\d+)$/);
+    if (path === '/fin/summary' && method === 'GET') return await handleFinSummary(env, user);
+    if (path === '/fx' && method === 'GET') return json({ rate: await eurHuf() });
+    let m = path.match(/^\/card\/(\d+)\/fin$/);
+    if (m && method === 'POST') return await handleFinAdd(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/fin\/(\d+)$/);
+    if (m && method === 'PATCH') return await handleFinPatch(request, env, user, Number(m[1]), Number(m[2]));
+    if (m && method === 'DELETE') return await handleFinDelete(env, user, Number(m[1]), Number(m[2]));
+    m = path.match(/^\/card\/(\d+)$/);
     if (m && method === 'GET') return await handleGetCard(env, user, Number(m[1]));
     if (m && method === 'PATCH') return await handlePatchCard(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/events$/);
