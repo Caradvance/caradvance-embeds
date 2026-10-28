@@ -519,6 +519,7 @@
       '.caf-v2 .caf-spec{font-size:14.5px}',
       '.caf-v2 .caf-spec .caf-ic{width:36px;height:36px;padding:8px;box-sizing:border-box;background:#f3f5f8;border-radius:10px}',
       '.caf-gw{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr);gap:22px;align-items:start}',
+      '.caf-v2 .caf-gw>.caf-steps{margin-bottom:0!important}',
       '.caf-v2 .caf-steps{gap:14px}',
       '.caf-v2 .caf-step{background:#fff!important;opacity:1!important;box-shadow:0 1px 3px rgba(15,27,45,.05)}',
       '.caf-v2 .caf-step .caf-sb{display:grid!important;grid-template-columns:minmax(0,1fr)!important;padding:4px 20px 20px 70px!important}',
