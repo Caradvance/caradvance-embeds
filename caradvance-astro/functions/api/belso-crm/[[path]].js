@@ -5,7 +5,8 @@
 import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
-  bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE
+  bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars
 } from '../../../lib/crm.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
@@ -105,10 +106,10 @@ async function handleGetCard(env, user, id) {
   });
 }
 
-const PERSON_KEYS = ['name', 'address', 'phone', 'email', 'tax'];
+const PERSON_KEYS = ['name', 'address', 'phone', 'email', 'tax', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'residence', 'bank', 'licence'];
 const COMPANY_KEYS = ['name', 'address', 'tax', 'reg'];
 const CONTACT_KEYS = ['name', 'phone', 'email', 'role'];
-const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'color', 'engine', 'fuel', 'km'];
+const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km'];
 function pick(src, keys, max) { const o = {}; src = src || {}; for (const k of keys) o[k] = clean(src[k], max || 200); return o; }
 function normVehicles(b) {
   const list = Array.isArray(b.vehicles) ? b.vehicles : vehiclesOf(b);
@@ -493,6 +494,248 @@ async function handleContractSend(request, env, user, id) {
   return json({ ok: true, sentTo: fwd || to, test: !!fwd, contract });
 }
 
+/* ---------------- dokumentumsablonok, személyek, kitöltött dokumentumok ---------------- */
+const LINES = ['Eladás', 'Import', 'Bérlés', 'Bizományos'];
+const TPL_MAX = 250000;
+function usedKeys(text) { const o = []; String(text || '').replace(/\{\{\s*([a-z0-9_]+)\s*\}\}/g, (m, k) => { if (!o.includes(k)) o.push(k); return m; }); return o; }
+function rolesOf(text) { const keys = usedKeys(text); return Object.keys(PERSON_ROLES).filter((r) => keys.some((k) => k.indexOf(r + '_') === 0)); }
+function tplRow(r, withBody) {
+  const o = { id: r.id, name: r.name, kind: r.kind, lines: parseJ(r.lines, []), party: r.party, client_type: r.client_type, note: r.note || '', active: !!r.active, sort: r.sort, updated_at: r.updated_at || r.created_at, updated_by: r.updated_by || '', roles: rolesOf(r.body), size: (r.body || '').length };
+  if (withBody) o.body = r.body;
+  return o;
+}
+function tplInput(b) {
+  return {
+    name: clean(b.name, 160), kind: DOC_KINDS[b.kind] ? b.kind : 'egyeb',
+    lines: (Array.isArray(b.lines) ? b.lines : []).filter((l) => LINES.includes(l)),
+    party: b.party === 'buyer' ? 'buyer' : 'client', client_type: ['magan', 'ceg'].includes(b.client_type) ? b.client_type : 'any',
+    body: cleanMulti(b.body, TPL_MAX), note: clean(b.note, 400), sort: Number.isInteger(b.sort) ? b.sort : 100, active: b.active === false ? 0 : 1
+  };
+}
+async function handleDocMeta(env) {
+  return json({
+    kinds: DOC_KINDS, lines: LINES, roles: PERSON_ROLES,
+    groups: VAR_GROUPS.map(([t, keys]) => ({ title: t, vars: keys.map((k) => ({ key: k, label: VAR_LABELS[k] || k })) })),
+    settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH') }
+  });
+}
+async function handleTemplates(env, url) {
+  const all = url.searchParams.get('all') === '1';
+  const rows = (await env.DB.prepare(`SELECT * FROM crm_templates ${all ? '' : 'WHERE active = 1'} ORDER BY sort, name`).all()).results || [];
+  return json({ templates: rows.map((r) => tplRow(r, false)) });
+}
+async function handleTemplateGet(env, tid) {
+  const r = await env.DB.prepare(`SELECT * FROM crm_templates WHERE id = ?`).bind(tid).first();
+  if (!r) return json({ error: 'A sablon nem található.' }, 404);
+  return json({ template: tplRow(r, true) });
+}
+async function upsertTemplate(env, user, t, id) {
+  if (id) {
+    await env.DB.prepare(`UPDATE crm_templates SET name=?, kind=?, lines=?, party=?, client_type=?, body=?, note=?, sort=?, active=?, updated_at=datetime('now'), updated_by=? WHERE id=?`)
+      .bind(t.name, t.kind, JSON.stringify(t.lines), t.party, t.client_type, t.body, t.note, t.sort, t.active, user.name, id).run();
+    return id;
+  }
+  const r = await env.DB.prepare(`INSERT INTO crm_templates (name, kind, lines, party, client_type, body, note, sort, active, updated_at, updated_by) VALUES (?,?,?,?,?,?,?,?,?,datetime('now'),?)`)
+    .bind(t.name, t.kind, JSON.stringify(t.lines), t.party, t.client_type, t.body, t.note, t.sort, t.active, user.name).run();
+  return r.meta.last_row_id;
+}
+async function handleTemplateSave(request, env, user) {
+  const b = await request.json().catch(() => ({}));
+  const t = tplInput(b);
+  if (!t.name) return json({ error: 'Adj nevet a sablonnak.' }, 400);
+  if (!t.body.trim()) return json({ error: 'A sablon szövege üres.' }, 400);
+  const id = Number.isInteger(b.id) && b.id > 0 ? b.id : 0;
+  if (id && !(await env.DB.prepare(`SELECT id FROM crm_templates WHERE id = ?`).bind(id).first())) return json({ error: 'A sablon nem található.' }, 404);
+  const nid = await upsertTemplate(env, user, t, id);
+  return handleTemplateGet(env, nid);
+}
+async function handleTemplateImport(request, env, user) {
+  const b = await request.json().catch(() => ({}));
+  const items = Array.isArray(b) ? b : Array.isArray(b.items) ? b.items : Array.isArray(b.templates) ? b.templates : [];
+  if (!items.length) return json({ error: 'A fájlban nincs sablon.' }, 400);
+  let created = 0, updated = 0;
+  for (const it of items.slice(0, 100)) {
+    const t = tplInput(it || {}); if (!t.name || !t.body.trim()) continue;
+    const ex = await env.DB.prepare(`SELECT id FROM crm_templates WHERE name = ?`).bind(t.name).first();
+    await upsertTemplate(env, user, t, ex ? ex.id : 0); ex ? updated++ : created++;
+  }
+  return json({ ok: true, created, updated });
+}
+async function handleTemplateDelete(env, tid) {
+  await env.DB.prepare(`UPDATE crm_templates SET active = 0, updated_at = datetime('now') WHERE id = ?`).bind(tid).run();
+  return json({ ok: true });
+}
+
+const P_KEYS = ['name', 'address', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'email', 'phone', 'note'];
+async function personsList(env) { return (await env.DB.prepare(`SELECT id, ${P_KEYS.join(', ')} FROM crm_persons WHERE active = 1 ORDER BY name`).all()).results || []; }
+async function handlePersonSave(request, env) {
+  const b = await request.json().catch(() => ({}));
+  const p = {}; for (const k of P_KEYS) p[k] = clean(b[k], k === 'note' ? 400 : 200);
+  p.birth_date = isoDate(p.birth_date);
+  if (!p.name) return json({ error: 'Add meg a nevet.' }, 400);
+  const id = Number.isInteger(b.id) && b.id > 0 ? b.id : 0;
+  if (id) await env.DB.prepare(`UPDATE crm_persons SET ${P_KEYS.map((k) => k + '=?').join(', ')}, updated_at=datetime('now') WHERE id=?`).bind(...P_KEYS.map((k) => p[k]), id).run();
+  else await env.DB.prepare(`INSERT INTO crm_persons (${P_KEYS.join(', ')}) VALUES (${P_KEYS.map(() => '?').join(',')})`).bind(...P_KEYS.map((k) => p[k])).run();
+  return json({ ok: true, persons: await personsList(env) });
+}
+async function handleSettings(request, env, user) {
+  if (request.method === 'POST') {
+    if (user.role !== 'admin') return json({ error: 'Csak admin módosíthatja.' }, 403);
+    const b = await request.json().catch(() => ({}));
+    const em = clean(b.partner_email, 300).split(/[,;\s]+/).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)).join(', ');
+    await setSetting(env, 'partner_email', em); await setSetting(env, 'partner_name', clean(b.partner_name, 120) || 'Caradvance GmbH');
+  }
+  return json({ settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH') } });
+}
+
+/* --- ügyfélhez kitöltött dokumentumok --- */
+function docRow(r, full) {
+  const o = { id: r.id, template_id: r.template_id, name: r.name, kind: r.kind, vehicle_id: r.vehicle_id || '', persons: parseJ(r.persons, {}), created_by: r.created_by, created_at: r.created_at, updated_at: r.updated_at, updated_by: r.updated_by, sent_at: r.sent_at, sent_to: r.sent_to || '', number: parseJ(r.vars, {}).szerzodes_szam || '' };
+  if (full) { o.text = r.text; o.vars = parseJ(r.vars, {}); o.fields = usedKeys(r.text).map((k) => ({ key: k, label: VAR_LABELS[k] || k })); }
+  return o;
+}
+async function docPersons(env, sel) {
+  const out = {}; const ids = {};
+  for (const role of Object.keys(PERSON_ROLES)) {
+    const pid = Number(sel && sel[role]); if (!Number.isInteger(pid) || pid <= 0) continue;
+    const p = await env.DB.prepare(`SELECT * FROM crm_persons WHERE id = ?`).bind(pid).first();
+    if (p) { out[role] = p; ids[role] = pid; }
+  }
+  return { persons: out, ids };
+}
+const vehName = (v) => v ? (v.title || [v.brand, v.model].filter(Boolean).join(' ')) : '';
+async function handleDocsList(env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const docs = ((await env.DB.prepare(`SELECT * FROM crm_docs WHERE deal_id = ? ORDER BY id`).bind(id).all()).results || []).map((r) => docRow(r, false));
+  const tpls = ((await env.DB.prepare(`SELECT * FROM crm_templates WHERE active = 1 ORDER BY sort, name`).all()).results || []).map((r) => tplRow(r, false));
+  return json({
+    docs, templates: tpls.map((t) => ({ ...t, own: t.lines.includes(deal.line) })),
+    persons: await personsList(env), roles: PERSON_ROLES, kinds: DOC_KINDS,
+    partner: { email: await getSetting(env, 'partner_email', ''), name: await getSetting(env, 'partner_name', 'Caradvance GmbH') }
+  });
+}
+async function handleDocCreate(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  const tpl = await env.DB.prepare(`SELECT * FROM crm_templates WHERE id = ?`).bind(Number(b.template_id) || 0).first();
+  if (!tpl) return json({ error: 'Válassz sablont.' }, 400);
+  const card = await getCard(env, id);
+  const vehicles = vehiclesOf(card.data); const vehicle = vehicles.find((v) => v.id === b.vehicle_id) || (b.vehicle_id === '' ? null : vehicles[0]) || null;
+  const { persons, ids } = await docPersons(env, b.persons);
+  // a szerződésszám az ügyfélhez + autóhoz kötött (a mellékletek, meghatalmazások ugyanarra a számra hivatkoznak)
+  const vars = docVars(deal, card, vehicle, tpl, persons, 0);
+  const used = usedKeys(tpl.body); const keep = {}; for (const k of used) keep[k] = vars[k] != null ? String(vars[k]) : '';
+  if (!keep.szerzodes_szam) keep.szerzodes_szam = vars.szerzodes_szam; // fájlnévhez
+  const name = tpl.name + (vehicle ? ' — ' + vehName(vehicle) : '');
+  const r = await env.DB.prepare(`INSERT INTO crm_docs (deal_id, template_id, name, kind, vehicle_id, persons, text, vars, created_by, updated_at, updated_by) VALUES (?,?,?,?,?,?,?,?,?,datetime('now'),?)`)
+    .bind(id, tpl.id, name, tpl.kind, vehicle ? vehicle.id : '', JSON.stringify(ids), tpl.body, JSON.stringify(keep), user.name, user.name).run();
+  await addEvent(env, id, 'doc', `Dokumentum kitöltve: ${name}`, user.name);
+  const row = await env.DB.prepare(`SELECT * FROM crm_docs WHERE id = ?`).bind(r.meta.last_row_id).first();
+  return json({ ok: true, doc: docRow(row, true) });
+}
+async function getDoc(env, id, did) { return env.DB.prepare(`SELECT * FROM crm_docs WHERE id = ? AND deal_id = ?`).bind(did, id).first(); }
+function varsInput(o) { const vars = {}; for (const [k, v] of Object.entries(o || {})) if (/^[a-z0-9_]{1,40}$/.test(k)) vars[k] = clean(v, 600); return vars; }
+async function handleDocGet(env, user, id, did) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const r = await getDoc(env, id, did); if (!r) return json({ error: 'Nem található.' }, 404);
+  return json({ doc: docRow(r, true) });
+}
+async function handleDocPatch(request, env, user, id, did) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const r = await getDoc(env, id, did); if (!r) return json({ error: 'Nem található.' }, 404);
+  const b = await request.json().catch(() => ({}));
+  let text = b.text != null ? cleanMulti(b.text, TPL_MAX) : r.text;
+  let vars = b.vars ? varsInput(b.vars) : parseJ(r.vars, {});
+  let pids = parseJ(r.persons, {}); let vid = r.vehicle_id || '';
+  if (b.persons) pids = (await docPersons(env, b.persons)).ids;
+  if (b.vehicle_id != null) vid = clean(b.vehicle_id, 20);
+  if (b.refill) { // adatok újratöltése az adatlapból (a kézi szövegmódosítás megmarad, a változók frissülnek)
+    const card = await getCard(env, id);
+    const vehicle = vehiclesOf(card.data).find((v) => v.id === vid) || null;
+    const tpl = (r.template_id && await env.DB.prepare(`SELECT kind, party FROM crm_templates WHERE id = ?`).bind(r.template_id).first()) || { kind: r.kind, party: 'client' };
+    const { persons } = await docPersons(env, pids);
+    const fresh = docVars(deal, card, vehicle, tpl, persons, 0);
+    const keepNo = vars.szerzodes_szam;
+    const isRole = (k) => Object.keys(PERSON_ROLES).some((r) => k.indexOf(r + '_') === 0);
+    for (const k of usedKeys(text)) { const fv = fresh[k] != null ? String(fresh[k]) : ''; if (fv || isRole(k) || b.refill === 'all') vars[k] = fv; }
+    if (keepNo) vars.szerzodes_szam = keepNo;
+  }
+  const name = b.name != null ? (clean(b.name, 200) || r.name) : r.name;
+  await env.DB.prepare(`UPDATE crm_docs SET name=?, text=?, vars=?, persons=?, vehicle_id=?, updated_at=datetime('now'), updated_by=? WHERE id=?`)
+    .bind(name, text, JSON.stringify(vars), JSON.stringify(pids), vid, user.name, did).run();
+  await addEvent(env, id, 'doc:' + did, `Dokumentum módosítva: ${name}`, user.name, 30);
+  return json({ ok: true, doc: docRow(await getDoc(env, id, did), true) });
+}
+async function handleDocDelete(env, user, id, did) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const r = await getDoc(env, id, did); if (!r) return json({ ok: true });
+  await env.DB.prepare(`DELETE FROM crm_docs WHERE id = ? AND deal_id = ?`).bind(did, id).run();
+  await addEvent(env, id, 'doc', `Dokumentum törölve: ${r.name}`, user.name);
+  return json({ ok: true });
+}
+const KIND_SUB = { szerzodes: 'Szerződés', meghatalmazas: 'Meghatalmazás', nyilatkozat: 'Nyilatkozat', melleklet: 'Melléklet', egyeb: 'Dokumentum' };
+async function docPdf(r, override) {
+  const text = override && override.text != null ? cleanMulti(override.text, TPL_MAX) : r.text;
+  const vars = override && override.vars ? varsInput(override.vars) : parseJ(r.vars, {});
+  const filled = fillTemplate(text, vars);
+  const hash = await sha256hex(filled);
+  const number = vars.szerzodes_szam && /\{\{\s*szerzodes_szam\s*\}\}/.test(text) ? vars.szerzodes_szam : '';
+  const pdf = contractPdfFromText(filled, { number, hash, title: r.name, sub: KIND_SUB[r.kind] || 'Dokumentum' });
+  const fname = (r.name.split(' — ')[0] + (number ? ' ' + number : '')).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 90) + '.pdf';
+  return { pdf, hash, fname };
+}
+async function handleDocPdf(request, env, user, id, did) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const r = await getDoc(env, id, did); if (!r) return json({ error: 'Nem található.' }, 404);
+  const override = request.method === 'POST' ? await request.json().catch(() => null) : null;
+  const { pdf, fname } = await docPdf(r, override);
+  return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${fname}"`, 'cache-control': 'no-store' } });
+}
+const EMAIL_RE = /^[^@\s,;]+@[^@\s,;]+\.[^@\s,;]+$/;
+async function handleDocsSend(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  const docIds = (Array.isArray(b.doc_ids) ? b.doc_ids : []).map(Number).filter(Number.isInteger).slice(0, 30);
+  const fileIds = (Array.isArray(b.file_ids) ? b.file_ids : []).map(Number).filter(Number.isInteger).slice(0, 20);
+  if (!docIds.length && !fileIds.length) return json({ error: 'Jelölj ki legalább egy dokumentumot.' }, 400);
+  const card = await getCard(env, id); const data = card.data || {};
+  const targets = Array.isArray(b.to) ? b.to : [b.to];
+  const rcpt = []; const labels = [];
+  const add = (em, label) => { for (const e of String(em || '').split(/[,;\s]+/)) if (EMAIL_RE.test(e) && !rcpt.includes(e.toLowerCase())) { rcpt.push(e.toLowerCase()); } if (label) labels.push(label); };
+  if (targets.includes('client')) { const e = (data.person && data.person.email) || deal.email; if (!e) return json({ error: 'Az ügyfélnek nincs e-mail címe.' }, 400); add(e, 'ügyfél'); }
+  if (targets.includes('buyer')) { const e = data.buyer && data.buyer.person && data.buyer.person.email; if (!e) return json({ error: 'A vevőnek nincs e-mail címe (1. szekció, Vevő adatai).' }, 400); add(e, 'vevő'); }
+  if (targets.includes('partner')) { const e = await getSetting(env, 'partner_email', ''); if (!e) return json({ error: 'A német partner e-mail címe nincs beállítva (Szerződések → Dokumentumok → Beállítások).' }, 400); add(e, await getSetting(env, 'partner_name', 'partner')); }
+  if (b.emails) { const bad = String(b.emails).split(/[,;\s]+/).filter((e) => e && !EMAIL_RE.test(e)); if (bad.length) return json({ error: 'Hibás e-mail cím: ' + bad.join(', ') }, 400); add(b.emails, 'egyéb címzett'); }
+  if (!rcpt.length) return json({ error: 'Válassz címzettet.' }, 400);
+  const att = []; let total = 0; const names = []; const sentDocs = [];
+  for (const did of docIds) {
+    const r = await getDoc(env, id, did); if (!r) continue;
+    const { pdf, fname } = await docPdf(r);
+    total += pdf.length; att.push({ filename: fname, content: bytesToB64(pdf) }); names.push(r.name); sentDocs.push(r);
+  }
+  for (const fid of fileIds) {
+    const f = await env.DB.prepare(`SELECT name, data, size FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, id).first();
+    if (f) { total += f.size; att.push({ filename: f.name, content: f.data }); names.push(f.name); }
+  }
+  if (!att.length) return json({ error: 'A kijelölt dokumentumok nem találhatók.' }, 404);
+  if (total > 30 * 1024 * 1024) return json({ error: 'A csatolmányok együtt túl nagyok (max. ~30 MB).' }, 400);
+  const clientName = (data.kind === 'ceg' && data.company && data.company.name) || (data.person && data.person.name) || deal.name || '';
+  const partnerOnly = targets.length === 1 && targets[0] === 'partner' && !b.emails;
+  const subject = clean(b.subject, 200) || (partnerOnly ? `Dokumente / Dokumentumok — ${clientName}` : `CarAdvance — dokumentumok (${clientName})`);
+  const msg = cleanMulti(b.message, 4000).trim();
+  const list = `<ul style="padding-left:18px;margin:10px 0">${names.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>`;
+  const greet = partnerOnly ? '<p>Sehr geehrte Damen und Herren,<br>Tisztelt Partnerünk!</p><p>Anbei senden wir Ihnen die folgenden Dokumente / Csatoltan küldjük az alábbi dokumentumokat' + (clientName ? ` (${esc(clientName)})` : '') + ':</p>'
+    : `<p>Kedves ${esc(targets.includes('client') && !targets.includes('partner') ? (clientName || 'Ügyfelünk') : 'Címzett')}!</p><p>Csatoltan küldjük az alábbi dokumentumokat:</p>`;
+  const fwd = testForward(env);
+  const res = await sendCrmMail(env, fwd || rcpt, `${fwd ? '[TESZT — ' + rcpt.join(', ') + '] ' : ''}${subject}`,
+    `${greet}${list}${msg ? `<p style="white-space:pre-line">${esc(msg)}</p>` : ''}<p>${partnerOnly ? 'Mit freundlichen Grüßen / Üdvözlettel:' : 'Üdvözlettel:'}<br>CarAdvance${user.name ? ' — ' + esc(user.name) : ''}</p>`, att);
+  if (!res.ok) return json({ error: res.error }, 502);
+  const to = fwd ? 'TESZT → ' + fwd + ' (' + rcpt.join(', ') + ')' : rcpt.join(', ');
+  for (const r of sentDocs) await env.DB.prepare(`UPDATE crm_docs SET sent_at = datetime('now'), sent_to = ? WHERE id = ?`).bind(rcpt.join(', '), r.id).run();
+  await addEvent(env, id, 'doc', `${att.length} dokumentum elküldve (${labels.join(', ')}: ${to}): ${names.join('; ')}`, user.name);
+  return json({ ok: true, sentTo: fwd || rcpt.join(', '), test: !!fwd, count: att.length });
+}
+
 /* ---------------- router ---------------- */
 export async function onRequest(context) {
   const { request, env } = context;
@@ -509,7 +752,30 @@ export async function onRequest(context) {
     if (path === '/inventory' && method === 'GET') return await handleInventory(url);
     if (path === '/fin/summary' && method === 'GET') return await handleFinSummary(env, user);
     if (path === '/fx' && method === 'GET') return json({ rate: await eurHuf() });
-    let m = path.match(/^\/card\/(\d+)\/fin$/);
+    if (path === '/docmeta' && method === 'GET') return await handleDocMeta(env);
+    if (path === '/templates' && method === 'GET') return await handleTemplates(env, url);
+    if (path === '/templates' && method === 'POST') return await handleTemplateSave(request, env, user);
+    if (path === '/templates/import' && method === 'POST') return await handleTemplateImport(request, env, user);
+    if (path === '/persons' && method === 'GET') return json({ persons: await personsList(env) });
+    if (path === '/persons' && method === 'POST') return await handlePersonSave(request, env);
+    if (path === '/settings') return await handleSettings(request, env, user);
+    let m = path.match(/^\/templates\/(\d+)$/);
+    if (m && method === 'GET') return await handleTemplateGet(env, Number(m[1]));
+    if (m && method === 'DELETE') return await handleTemplateDelete(env, Number(m[1]));
+    m = path.match(/^\/persons\/(\d+)$/);
+    if (m && method === 'DELETE') { await env.DB.prepare(`UPDATE crm_persons SET active = 0 WHERE id = ?`).bind(Number(m[1])).run(); return json({ ok: true, persons: await personsList(env) }); }
+    m = path.match(/^\/card\/(\d+)\/docs$/);
+    if (m && method === 'GET') return await handleDocsList(env, user, Number(m[1]));
+    if (m && method === 'POST') return await handleDocCreate(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/docs\/send$/);
+    if (m && method === 'POST') return await handleDocsSend(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/docs\/(\d+)$/);
+    if (m && method === 'GET') return await handleDocGet(env, user, Number(m[1]), Number(m[2]));
+    if (m && method === 'PATCH') return await handleDocPatch(request, env, user, Number(m[1]), Number(m[2]));
+    if (m && method === 'DELETE') return await handleDocDelete(env, user, Number(m[1]), Number(m[2]));
+    m = path.match(/^\/card\/(\d+)\/docs\/(\d+)\/pdf$/);
+    if (m && (method === 'GET' || method === 'POST')) return await handleDocPdf(request, env, user, Number(m[1]), Number(m[2]));
+    m = path.match(/^\/card\/(\d+)\/fin$/);
     if (m && method === 'POST') return await handleFinAdd(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/fin\/(\d+)$/);
     if (m && method === 'PATCH') return await handleFinPatch(request, env, user, Number(m[1]), Number(m[2]));
