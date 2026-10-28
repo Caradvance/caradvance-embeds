@@ -26,6 +26,39 @@ export const CHECKLIST = [
   ['szallitas_alatt', 'Szállítás alatt'], ['leszallitva', 'Leszállítva'], ['honositva', 'Honosítva'], ['atadva', 'Átadva']
 ];
 
+/**
+ * Üzletáganként eltérő checklist. Szakaszok (ütemek): { id, title, items:[[kulcs, felirat]] }.
+ *  close: melyik pipa állítja a státuszt „Lezárva”-ra ('all' = minden feladat kész).
+ *  Eladás: két ütem — előbb bérbe adjuk (bérlő), utána eladjuk (vevő, aki a bérlőtől eltérő személy/cég).
+ */
+export const CHECKLISTS = {
+  'Bérlés': {
+    close: 'atadva',
+    phases: [{ id: 'berles', title: '', items: [
+      ['igazolvany', 'Igazolvány / cégadat másolatok'], ['berleti', 'Bérleti szerződés'], ['beszerzes_alatt', 'Beszerzés alatt'],
+      ['szallitas_alatt', 'Szállítás alatt'], ['leszallitva', 'Leszállítva'], ['atadva', 'Átadva']] }]
+  },
+  'Eladás': {
+    close: 'all',
+    phases: [
+      { id: 'e1', title: '1. ütem — Bérlés', items: [
+        ['e1_berleti', 'Bérleti szerződés'], ['e1_igazolvany', 'Igazolvány / cégadat másolatok'], ['e1_beszerzes', 'Beszerzés'],
+        ['e1_szallitas', 'Szállítás'], ['e1_leszallitva', 'Leszállítva'], ['e1_atadva', 'Átadva']] },
+      { id: 'e2', title: '2. ütem — Eladás', items: [
+        ['e2_adasveteli', 'Adásvételi szerződés'], ['e2_igazolvany', 'Igazolvány / cégadat másolatok'], ['e2_tuv', 'TÜV'],
+        ['e2_coc', 'COC'], ['e2_honositva', 'Honosítva'], ['e2_meghatalmazas', 'Meghatalmazások']] }
+    ]
+  }
+};
+const DEFAULT_CHECKLIST = { close: 'atadva', phases: [{ id: 'main', title: '', items: CHECKLIST }] };
+export function checklistFor(line) { return CHECKLISTS[line] || DEFAULT_CHECKLIST; }
+export function checklistItems(line) { return checklistFor(line).phases.reduce((a, p) => a.concat(p.items), []); }
+export function checklistProgress(line, cl) {
+  const items = checklistItems(line); cl = cl || {};
+  const done = items.filter(([k]) => cl[k] && cl[k].done).length;
+  return { done, total: items.length, progress: items.length ? Math.round(done / items.length * 100) : 0 };
+}
+
 export const MAX_FILE = 1400 * 1024;
 
 /* ============================== táblák ============================== */
@@ -379,23 +412,27 @@ ${CLOSING('Bizományos', 'Megbízó')}`
 };
 
 /** A változók alapértékei az adatlapból + a kiválasztott (elfogadott) autóból. */
-export function defaultVars(deal, card, chosen) {
-  const d = card.data || {}; const p = d.person || {}; const co = d.company || {}; const v = d.vehicle || {};
+export function defaultVars(deal, card, chosen, opts) {
+  opts = opts || {};
+  const all = card.data || {}; const v = all.vehicle || {};
+  // party: kinek a nevére szól a szerződés — alapból az ügyfél (Eladásnál a bérlő), az adásvételinél a vevő
+  const d = opts.party || all; const p = d.person || {}; const co = d.company || {};
+  const useDeal = !opts.party; // a vevőnél nem töltjük az érdeklődő adataival
   const isCo = d.kind === 'ceg';
   const ch = chosen || null;
   const priceTxt = ch ? priceLabel(ch) : (deal.price ? fmtPrice(deal.price, 'HUF') : '');
   const contactSep = isCo && d.contact_differs && d.contact ? d.contact : null;
   const vars = {
-    szerzodes_szam: `CA-${({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER', 'Bizományos': 'BIZ' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}`,
+    szerzodes_szam: `CA-${opts.code || ({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER', 'Bizományos': 'BIZ' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}`,
     keltezes_hely: 'Solymár', keltezes_datum: huToday(),
     ceg_nev: LESSOR.name, ceg_szekhely: LESSOR.seat[0], ceg_cegjegyzek: LESSOR.reg, ceg_adoszam: LESSOR.vat, ceg_kepviselo: LESSOR.md,
-    ugyfel_nev: isCo ? (co.name || deal.name || '') : (p.name || deal.name || ''),
-    ugyfel_cim: isCo ? (co.address || '') : (p.address || card.address || ''),
+    ugyfel_nev: isCo ? (co.name || (useDeal ? deal.name : '') || '') : (p.name || (useDeal ? deal.name : '') || ''),
+    ugyfel_cim: isCo ? (co.address || '') : (p.address || (useDeal ? card.address : '') || ''),
     ugyfel_adoszam: isCo ? (co.tax || '') : (p.tax || ''),
     ugyfel_cegjegyzekszam: isCo ? (co.reg || '') : '—',
-    ugyfel_kepviselo: contactSep ? [contactSep.name, contactSep.phone, contactSep.email].filter(Boolean).join(', ') : (isCo ? (p.name || deal.name || '') : '—'),
-    ugyfel_telefon: (contactSep && contactSep.phone) || p.phone || deal.phone || '',
-    ugyfel_email: (contactSep && contactSep.email) || p.email || deal.email || '',
+    ugyfel_kepviselo: contactSep ? [contactSep.name, contactSep.phone, contactSep.email].filter(Boolean).join(', ') : (isCo ? (p.name || (useDeal ? deal.name : '') || '') : '—'),
+    ugyfel_telefon: (contactSep && contactSep.phone) || p.phone || (useDeal ? deal.phone : '') || '',
+    ugyfel_email: (contactSep && contactSep.email) || p.email || (useDeal ? deal.email : '') || '',
     auto_megnevezes: ch ? ch.title : ([v.brand, v.model].filter(Boolean).join(' ') || deal.car || ''),
     // ha az ügyfél elfogadott egy ajánlott autót, annak adatai az elsődlegesek; az alvázszám/szín az adatlapról jön
     auto_marka: (ch && ch.brand) || v.brand || '',
