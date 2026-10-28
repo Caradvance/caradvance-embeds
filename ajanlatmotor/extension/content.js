@@ -56,7 +56,7 @@
         return;
       }
       const reqs = r.body.requests || [];
-      if (!reqs.length) { msg("Nincs nyitott ügyféligény."); return; }
+      if (!reqs.length) { msg(`Nincs nyitott ügyféligény. Indíts egyet a belső felületen: <a href="${r.base}/belso/ajanlatmotor/uj" target="_blank">Új igény ↗</a>, vagy egy Import ügy adatlapján „Ajánlatmotor megnyitása”.`); return; }
       const esc = (x) => String(x ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
       const l = parsed.listing;
       panel.innerHTML = `<h3>Küldés az Ajánlatmotorba</h3>
