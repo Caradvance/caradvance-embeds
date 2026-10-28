@@ -134,7 +134,7 @@ export const MERCEDES: Record<string, RentalContent> = {
     interior: I('mercedes-benz-e-osztaly-limuzin', 'Mercedes-Benz E-osztály', 'MBUX Superscreen és hangulatvilágítás', 'Az opcionális MBUX Superscreen (utas-kijelzővel), a műszerfalon végigfutó fénysáv, a kiváló ülések és a hangszigetelés az S-osztály közelébe emelik az E-osztály kényelmét.', ['MBUX Superscreen (felszereltségtől függően)', 'Aktív hangulatvilágítás', 'Burmester 4D hangrendszer (felszereltségtől függően)'], 'vezetőtér — MBUX Superscreen'),
     boot: '540 liter',
     specs: {
-      '200': { label: 'E 200', fuel: 'Benzin (mild-hybrid)', power: '204 LE (150 kW) + EQ Boost', drive: 'Hátsókerék / 9G-TRONIC', rec: 'Kifinomult, csendes', note: 'négyhengeres benzines, mild-hybrid', img: P('mercedes-benz-e-osztaly-limuzin', 'g2') },
+      '200': { label: 'E 200', fuel: 'Benzin (mild-hybrid)', power: '204 LE (150 kW) + EQ Boost', drive: 'Hátsókerék / 9G-TRONIC', rec: 'Kifinomult, csendes', note: 'négyhengeres benzines, mild-hybrid', img: P('mercedes-benz-e-osztaly-limuzin', 'g1') },
       '200d': { label: 'E 200 d', fuel: 'Dízel', drive: 'Hátsókerék / 9G-TRONIC', rec: 'Takarékos, hosszú utakra', note: 'takarékos négyhengeres dízel', img: P('mercedes-benz-e-osztaly-limuzin', 'g3') },
     },
     gallery: G('mercedes-benz-e-osztaly-limuzin', 'Mercedes-Benz E-osztály', [['g1', 'városi úton'], ['g3', 'hegyi úton'], ['g4', 'modern épület előtt'], ['g5', 'műszerfal'], ['g6', 'hangulatvilágítás'], ['g7', 'utas-kijelző']]),
