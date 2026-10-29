@@ -497,3 +497,78 @@ export function renderDocPdf(filled, meta) {
   signs.forEach(({ sg, img }, k) => certificatePage(L, sg, img, k + 1, signs.length));
   return d.build({ title: meta.title || plainT(t1), author: 'CarAdvance' }, decorate(L, meta2));
 }
+
+/* ============================== autó-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ============================== */
+/**
+ * o: { title, subtitle, brand, price (szöveg), priceNote, code, number, date, valid, client, note,
+ *      specs: [[címke, érték]…], equipment: [szöveg…], images: [Uint8Array JPEG…], contact: { name, email, phone } }
+ */
+export function renderOfferPdf(o) {
+  o = o || {};
+  const imgs = (o.images || []).map((b) => { const inf = b && jpegInfo(b); return inf ? { bytes: b, ...inf } : null; }).filter(Boolean);
+  const meta2 = {
+    header: ['Ajánlat / ' + (o.title || ''), 'CarAdvance · ' + (o.number || '')], bilingual: false, number: o.number || '', hash: '',
+    footer: { title: 'CarAdvance — BH Group Zrt.', cols: [['~Kapcsolat', 'E-mail:: ' + ((o.contact && o.contact.email) || 'sales@caradvance.hu'), 'Tel.:: ' + ((o.contact && o.contact.phone) || '+36 30 233 6060')],
+      ['~Web', 'www.caradvance.hu', 'Solymár, Ibolya utca 18.'], ['~Ajánlat', 'Szám:: ' + (o.number || '—'), 'Kelt:: ' + (o.date || '')], ['~Kapcsolattartó', (o.contact && o.contact.name) || 'CarAdvance', (o.contact && o.contact.email) || 'sales@caradvance.hu']] }
+  };
+  const L = new Layout(meta2); const d = L.d; L.bottom = 92;
+  // fej: logó + címke + cím
+  const lh = 34; const lw = lh * LOGO_W / LOGO_H; d.image(PW - MR - lw, L.y - lh + 6, lw, lh);
+  L.tag(o.brand ? 'Ajánlat · ' + o.brand : 'Ajánlat');
+  L.title(o.title || 'Autó ajánlat', [o.subtitle, o.client ? 'Készült: ' + o.client + ' részére' : ''].filter(Boolean).join(' · '));
+  // fő kép
+  const hero = imgs[0];
+  if (hero) {
+    const w = CW; let h = w * hero.h / hero.w; if (h > 300) h = 300; const iw = h * hero.w / hero.h;
+    L.ensure(h + 10); d.fill(ML, L.y - h, CW, h, C.note); d.image(ML + (CW - iw) / 2, L.y - h, iw, h, null, hero); L.y -= h + 14;
+  }
+  // ár-doboz
+  L.ensure(70);
+  const bh = o.priceNote ? 58 : 46;
+  d.fill(ML, L.y - bh, CW, bh, '0.08 0.09 0.11'); d.fill(ML, L.y - bh, 4, bh, C.red);
+  d.text('Ajánlati ár', ML + 16, L.y - 19, 'R', 9, '0.78 0.8 0.84');
+  if (o.code) { const ct = 'Konfigurációs kód: ' + o.code; d.text(ct, ML + 16, L.y - 33, 'L', 7.6, '0.62 0.65 0.7'); }
+  const pt = o.price || ''; const ps = 21; d.text(pt, PW - MR - 16 - d.width(pt, 'B', ps), L.y - 27, 'B', ps, '1 1 1');
+  if (o.priceNote) d.text(o.priceNote, PW - MR - 16 - d.width(o.priceNote, 'L', 7.4), L.y - 44, 'L', 7.4, '0.78 0.8 0.84');
+  L.y -= bh + 16;
+  // főbb adatok
+  const specs = (o.specs || []).filter((s) => s && s[1]);
+  if (specs.length) {
+    L.heading('Főbb adatok', null, 2);
+    for (let i = 0; i < specs.length; i += 2) L.row(specs.slice(i, i + 2).map((s) => [s[0], String(s[1])]));
+    L.y -= 8;
+  }
+  if (o.note) L.note(o.note);
+  // kisképek (2–3.)
+  const small = imgs.slice(1, 3);
+  if (small.length) {
+    const gap = 12; const w = small.length === 1 ? CW : (CW - gap) / 2; const h = Math.min(170, w * 0.62);
+    L.ensure(h + 8);
+    small.forEach((im, i) => { const x = ML + i * (w + gap); d.fill(x, L.y - h, w, h, C.note); let iw = w, ih = iw * im.h / im.w; if (ih > h) { ih = h; iw = ih * im.w / im.h; } d.image(x + (w - iw) / 2, L.y - h + (h - ih) / 2, iw, ih, null, im); });
+    L.y -= h + 14;
+  }
+  // felszereltség — két hasábban
+  const eq = (o.equipment || []).map((s) => String(s).trim()).filter(Boolean);
+  if (eq.length) {
+    L.heading('Felszereltség', null, 2);
+    const gap = 22; const cw = (CW - gap) / 2; const size = 7.9;
+    for (let i = 0; i < eq.length; i += 2) {
+      const A = L.measure('- ' + eq[i], { w: cw, size, f: 'L', num: false }); const B = eq[i + 1] ? L.measure('- ' + eq[i + 1], { w: cw, size, f: 'L', num: false }) : null;
+      const h = Math.max(A.lines.length * A.lh, B ? B.lines.length * B.lh : 0) + 2;
+      L.ensure(h); L.drawMeasured(A, ML, L.y, C.txt); if (B) L.drawMeasured(B, ML + cw + gap, L.y, C.txt); L.y -= h;
+    }
+    L.y -= 8;
+  }
+  // további képek
+  const rest = imgs.slice(3);
+  for (let i = 0; i < rest.length; i += 2) {
+    const pair = rest.slice(i, i + 2); const gap = 12; const w = (CW - gap) / 2; const h = Math.min(180, w * 0.66);
+    L.ensure(h + 10);
+    pair.forEach((im, k) => { const x = ML + k * (w + gap); d.fill(x, L.y - h, w, h, C.note); let iw = w, ih = iw * im.h / im.w; if (ih > h) { ih = h; iw = ih * im.w / im.h; } d.image(x + (w - iw) / 2, L.y - h + (h - ih) / 2, iw, ih, null, im); });
+    L.y -= h + 12;
+  }
+  L.ensure(60); L.y -= 4;
+  L.para('Az ajánlat a feltüntetett konfiguráció alapján készült; a képek illusztrációk. Az ajánlat elfogadásáról vagy módosításáról az e-mailben kapott gombokkal tud nekünk visszajelezni. Kérdés esetén keressen minket bizalommal.', { size: 7.4, color: C.mut });
+  if (o.contact && o.contact.name) L.para('Kapcsolattartó: **' + o.contact.name + '**' + (o.contact.email ? ' · ' + o.contact.email : '') + (o.contact.phone ? ' · ' + o.contact.phone : ''), { size: 8 });
+  return d.build({ title: 'Ajánlat — ' + (o.title || ''), author: 'CarAdvance' }, decorate(L, meta2));
+}
