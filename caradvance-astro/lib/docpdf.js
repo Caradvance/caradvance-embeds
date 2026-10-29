@@ -335,10 +335,14 @@ class Layout {
           yy -= 16; this.d.text(lb, x, yy, 'L', 7.4, C.mut); const lx = x + this.d.width(lb, 'L', 7.4) + 4; this.d.line(lx, yy - 1, Math.min(x + cw - 6, lx + 92), yy - 1, C.blank, 0.5);
         }
       }
-      if (this.meta.sig && q.nameRaw && normName(q.nameRaw) === normName(this.meta.sig.name)) {
-        const im = this.meta.sig.img; const ih = 34; const iw = Math.min(cw - 10, ih * im.w / im.h);
+      // elektronikus aláírás(ok): a hasáb neve (~~, akár „Name in Druckbuchstaben: X” formában) vagy címe alapján
+      const nN = normName(q.nameRaw), tN = normName(q.tRaw);
+      const es = (this.meta.sigs || []).find((g) => g.keys.some((k) => k && ((nN && (nN === k || nN.endsWith(k))) || (!nN && tN === k))));
+      if (es) {
+        const im = es.img; const ih = 34; const iw = Math.min(cw - 10, ih * im.w / im.h);
         this.d.image(x + 2, lineY + 1.5, iw, iw * im.h / im.w, null, im);
-        this.d.text('elektronikusan aláírva · ' + this.meta.sig.when, x + cw - 6 - this.d.width('elektronikusan aláírva · ' + this.meta.sig.when, 'L', 5.6), lineY + 2.5, 'L', 5.6, C.red);
+        const lb = (es.de ? 'elektronisch unterschrieben · ' : 'elektronikusan aláírva · ') + es.when;
+        this.d.text(lb, x + cw - 6 - this.d.width(lb, 'L', 5.6), lineY + 2.5, 'L', 5.6, C.red);
       } else if (this.meta.specimens && this.meta.specimens.length) {
         // tárolt aláírásminta (személyek / céges aláírók): a hasáb neve (~~) vagy címe alapján
         const keys = [q.nameRaw, q.tRaw].filter(Boolean).map(normName);
@@ -354,10 +358,10 @@ class Layout {
 }
 
 /** Az elektronikus aláírás tanúsítvány-oldala (audit-napló) a dokumentum végén. */
-function certificatePage(L, sg, img) {
+function certificatePage(L, sg, img, k, n) {
   const d = L.d; L.newPage();
-  L.tag('Elektronikus aláírás · Signaturprotokoll');
-  L.title('Aláírási tanúsítvány', 'Az elektronikus aláírás adatai és ellenőrző kódjai');
+  L.tag('Elektronikus aláírás · Signaturprotokoll' + (n > 1 ? ' · ' + k + '/' + n : ''));
+  L.title(sg.de ? 'Signaturprotokoll / Aláírási tanúsítvány' : 'Aláírási tanúsítvány', (sg.title ? sg.title + ' — ' : '') + (sg.de ? 'Daten und Prüfwerte der elektronischen Unterschrift' : 'Az elektronikus aláírás adatai és ellenőrző kódjai'));
   L.note('Ez a lap a dokumentum elválaszthatatlan része. A dokumentum tartalmának SHA-256 ellenőrzőkódja az aláíráskor rögzítésre került; bármilyen utólagos módosítás megváltoztatja a kódot. Egyszerű elektronikus aláírás (eIDAS-rendelet 3. cikk 10. pont), az aláíró azonosítása az e-mail címére küldött egyszeri kóddal (OTP) történt.');
   for (const [k, v] of sg.rows || []) L.row([[k, String(v == null ? '' : v)]]);
   if (img) {
@@ -365,7 +369,7 @@ function certificatePage(L, sg, img) {
     const h = 80; const w = Math.min(260, h * img.w / img.h);
     d.stroke(L.x0, L.y - h - 8, w + 16, h + 8, C.line, 0.6); d.image(L.x0 + 8, L.y - h - 4, w, w * img.h / img.w > h ? h : w * img.h / img.w, null, img); L.y -= h + 20;
   }
-  if (sg.statement) { L.y -= 6; L.para('Az aláíró nyilatkozata: „' + sg.statement + '”', { size: 7.6, color: C.mut }); }
+  if (sg.statement) { L.y -= 6; L.para((sg.de ? 'Erklärung des Unterzeichners: „' : 'Az aláíró nyilatkozata: „') + sg.statement + '”', { size: 7.6, color: C.mut }); }
 }
 
 /** A futó fejléc / címlap-fej / lábléc kirajzolása (minden oldalon, az oldalszám ismeretében). */
@@ -435,9 +439,12 @@ export function renderDocPdf(filled, meta) {
     header: M.header || [plainT([t1, t2].filter(Boolean).join(' / ')), meta.sub || ''],
     footer: M.footer, bilingual, number: meta.number || '', hash: meta.hash || ''
   };
-  let sigImg = null;
-  if (meta.sign && meta.sign.jpeg) { const inf = jpegInfo(meta.sign.jpeg); if (inf) sigImg = { bytes: meta.sign.jpeg, ...inf }; }
-  if (sigImg) meta2.sig = { img: sigImg, name: meta.sign.match || '', when: meta.sign.when || '' };
+  // elektronikus aláírás(ok): meta.sign = egy objektum vagy tömb (ügyfél + ellenjegyző); match = név vagy nevek listája
+  const signs = (Array.isArray(meta.sign) ? meta.sign : (meta.sign ? [meta.sign] : [])).map((sg) => {
+    const inf = sg.jpeg && jpegInfo(sg.jpeg);
+    return { sg, img: inf ? { bytes: sg.jpeg, ...inf } : null };
+  });
+  meta2.sigs = signs.filter((x) => x.img).map(({ sg, img }) => ({ img, de: !!sg.de, when: sg.when || '', keys: (Array.isArray(sg.match) ? sg.match : [sg.match]).map(normName).filter(Boolean) }));
   // tárolt aláírásminták: [{ names: [...], jpeg: Uint8Array }]
   meta2.specimens = (meta.specimens || []).map((z) => { const inf = z.jpeg && jpegInfo(z.jpeg); return inf ? { img: { bytes: z.jpeg, ...inf }, keys: (z.names || []).map(normName).filter(Boolean) } : null; }).filter(Boolean);
   const L = new Layout(meta2);
@@ -487,6 +494,6 @@ export function renderDocPdf(filled, meta) {
     L.para(t, { after: 3 });
   }
   while (L.frames.length) L.endFrame();
-  if (meta.sign) certificatePage(L, meta.sign, sigImg);
+  signs.forEach(({ sg, img }, k) => certificatePage(L, sg, img, k + 1, signs.length));
   return d.build({ title: meta.title || plainT(t1), author: 'CarAdvance' }, decorate(L, meta2));
 }

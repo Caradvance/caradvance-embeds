@@ -147,6 +147,8 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_crm_sign_deal ON crm_sign (deal_id)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)`)
   ]);
+  // ellenjegyzés (német partner): a kérelem szülője (az ügyfél aláírása) és a korábbi aláírások adatai
+  for (const col of [`parent_id INTEGER`, `prior TEXT`]) { try { await env.DB.prepare(`ALTER TABLE crm_sign ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   for (const q of [`ALTER TABLE crm_docs ADD COLUMN use_sigs INTEGER DEFAULT 1`, `ALTER TABLE crm_persons ADD COLUMN sign_as TEXT DEFAULT ''`, `ALTER TABLE crm_persons ADD COLUMN sig TEXT`, `ALTER TABLE crm_persons ADD COLUMN kind TEXT DEFAULT 'magan'`, `ALTER TABLE crm_persons ADD COLUMN rep TEXT DEFAULT ''`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
   READY = true;
@@ -809,3 +811,21 @@ export function randomDigits(n) { const a = new Uint32Array(n); crypto.getRandom
 export function maskEmail(e) { const [u, d] = String(e || '').split('@'); if (!d) return ''; return u.slice(0, 2) + '•••@' + d; }
 export function huDateTime(iso) { const d = iso ? new Date(String(iso).replace(' ', 'T') + (/Z$/.test(iso) ? '' : 'Z')) : new Date(); return d.toLocaleString('hu-HU', { timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 export const SIGN_STATEMENT = 'A fenti dokumentumo(ka)t elolvastam, tartalmukat megértettem, és elektronikus aláírásommal elfogadom. Tudomásul veszem, hogy az aláírás adatai (név, e-mail cím, időpont, IP-cím, eszköz) a hitelesség igazolására rögzítésre kerülnek.';
+export const SIGN_STATEMENT_DE = 'Ich habe das/die obige(n) Dokument(e) gelesen, den Inhalt verstanden und stimme ihm mit meiner elektronischen Unterschrift zu. Mir ist bekannt, dass die Daten der Unterschrift (Name, E-Mail-Adresse, Zeitpunkt, IP-Adresse, Gerät) zum Nachweis der Echtheit gespeichert werden.';
+/** Partner-ellenjegyzés: a kétnyelvű (DE/HU) dokumentumok aláírási hasábjai közül a partneré (pl. „Caradvance GmbH”, ill. cím szerint „Übernehmer”). */
+export function partnerSignKeys(text, partnerName) {
+  const t = String(text || ''); const keys = new Set();
+  const nn = (v) => String(v || '').replace(/\*\*/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+  const pn = nn(partnerName || 'Caradvance GmbH');
+  const bilingual = t.split('\n').some((l) => /^# /.test(l) && l.indexOf('||') >= 0) || /^@nyelv\s*:\s*.*\b(de)\b/im.test(t);
+  if (!bilingual) return [];
+  for (const ln of t.split('\n')) {
+    const m = ln.trim().match(/^\[aláírás\+?\]\s*(.*)$/i); if (!m) continue;
+    for (const col of m[1].split('|')) {
+      const [main, name] = col.split('~~').map((x) => (x || '').trim()); const title = (main || '').split(/\s+~\s+|~/)[0].trim();
+      if (name && nn(name) === pn) keys.add(partnerName || 'Caradvance GmbH');
+      else if (!name && /^übernehmer/i.test(title)) keys.add('Übernehmer');
+    }
+  }
+  return [...keys];
+}
