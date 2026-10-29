@@ -195,14 +195,17 @@ function saveTpl(t){
 function reloadList(){return api('/templates?all=1').then(function(j){TPLS=j.templates;});}
 
 /* ---------- személyek ---------- */
+var PF_CEG=[['name','Cégnév *'],['address','Székhely'],['id_number','Cégjegyzékszám'],['rep','Képviselő neve'],['phone','Telefon'],['email','E-mail'],['note','Megjegyzés']];
 var PF=[['name','Név *'],['address','Lakcím'],['id_number','Személyi ig. / személyi szám'],['mother_name','Anyja neve'],['birth_place','Születési hely'],['birth_date','Születési idő'],['phone','Telefon'],['email','E-mail'],['note','Megjegyzés (pl. munkatárs, beosztás)']];
 function hd(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return s||'';var p=s.split('-');return p[0]+'. '+p[1]+'. '+p[2]+'.';}
 var PSIG=null; // a szerkesztett személy új aláírásmintája (data URL), '' = törlés, null = változatlan
 function renderPersons(){
   var p=PE||{};
   var cur=PSIG!==null?PSIG:(p.sig||'');
+  var isCeg=p.kind==='ceg',F=isCeg?PF_CEG:PF;
   var h=tabs()+'<div class="card"><h2>Személyek (meghatalmazottak, tanúk, kollégák, céges aláírók)</h2><p class="muted small" style="margin-top:0">Az itt mentett személyek a meghatalmazásokhoz és nyilatkozatokhoz rendelhetők az Ügyfél adatlapon — az adataik automatikusan betöltődnek a dokumentumba. Ha van aláírásmintájuk, az kék színnel bekerül a dokumentum aláírási helyére.</p>'
-    +'<div class="grid">'+PF.map(function(f){return '<label class="f'+(f[0]==='address'||f[0]==='note'?' two':'')+'">'+f[1]+'<input class="in" data-pf="'+f[0]+'"'+(f[0]==='birth_date'?' type="date"':f[0]==='email'?' type="email"':'')+' value="'+esc(p[f[0]]||'')+'"></label>';}).join('')
+    +'<div class="row" style="margin-bottom:10px"><button class="btn sm'+(isCeg?'':' on')+'" data-pk="magan" type="button">Magánszemély</button><button class="btn sm'+(isCeg?' on':'')+'" data-pk="ceg" type="button">Cég (pl. meghatalmazott cég)</button><input type="hidden" data-pf="kind" value="'+(isCeg?'ceg':'magan')+'"></div>'
+    +'<div class="grid">'+F.map(function(f){return '<label class="f'+(f[0]==='address'||f[0]==='note'?' two':'')+'">'+f[1]+'<input class="in" data-pf="'+f[0]+'"'+(f[0]==='birth_date'?' type="date"':f[0]==='email'?' type="email"':'')+' value="'+esc(p[f[0]]||'')+'"></label>';}).join('')
     +'<label class="f full">Céges aláíróként — mely neveknél írjon alá automatikusan (vesszővel, pl. „Caradvance GmbH, BHGroup Zrt.”)<input class="in" data-pf="sign_as" value="'+esc(p.sign_as||'')+'" placeholder="üresen hagyva csak akkor kerül be, ha a dokumentumhoz személyként hozzárendeled"></label></div>'
     +'<h3>Aláírásminta</h3><div class="sigbox"><div class="sigcur">'+(cur?'<img src="'+esc(cur)+'" alt="aláírás">':'<span class="muted small">Nincs aláírásminta.</span>')+'</div>'
     +'<div><div class="pad"><canvas id="spad"></canvas><div class="ln"></div><div class="ph" id="sph">Írja alá itt (egérrel / ujjal)</div></div>'
@@ -212,10 +215,11 @@ function renderPersons(){
     +'<p class="muted small" style="margin:6px 0 0">A minta automatikusan kék tintára színeződik, a háttér átlátszó fehér lesz. Mentéskor kerül tárolásra.</p></div></div>'
     +'<div class="row" style="margin-top:14px"><button class="btn red" id="psave">'+(p.id?'Módosítás mentése':'+ Személy hozzáadása')+'</button>'+(p.id?'<button class="btn ghost" id="pcancel">Mégse</button>':'')+'</div></div>'
     +'<div class="card">'+(PERS.length?'<table><thead><tr><th>Név</th><th>Lakcím</th><th class="hide-m">Szem. ig.</th><th class="hide-m">Anyja neve</th><th class="hide-m">Szül. hely, idő</th><th>Aláírás</th><th></th></tr></thead><tbody>'
-      +PERS.map(function(x){return '<tr><td><b>'+esc(x.name)+'</b>'+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'')+(x.sign_as?'<div class="small" style="color:#22447d">céges aláíró: '+esc(x.sign_as)+'</div>':'')+'</td><td class="small">'+esc(x.address)+'</td><td class="hide-m small">'+esc(x.id_number)+'</td><td class="hide-m small">'+esc(x.mother_name)+'</td><td class="hide-m small">'+esc([x.birth_place,hd(x.birth_date)].filter(Boolean).join(', '))+'</td>'
+      +PERS.map(function(x){return '<tr><td><b>'+esc(x.name)+'</b>'+(x.kind==='ceg'?' <span class="badge">cég</span>'+(x.rep?'<div class="small muted">képviseli: '+esc(x.rep)+'</div>':''):'')+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'')+(x.sign_as?'<div class="small" style="color:#22447d">céges aláíró: '+esc(x.sign_as)+'</div>':'')+'</td><td class="small">'+esc(x.address)+'</td><td class="hide-m small">'+esc(x.id_number)+'</td><td class="hide-m small">'+esc(x.mother_name)+'</td><td class="hide-m small">'+esc([x.birth_place,hd(x.birth_date)].filter(Boolean).join(', '))+'</td>'
         +'<td>'+(x.sig?'<img src="'+esc(x.sig)+'" alt="" style="height:30px;max-width:120px">':'<span class="muted small">—</span>')+'</td>'
         +'<td style="white-space:nowrap"><button class="btn sm ghost" data-pe="'+x.id+'">Szerkesztés</button> <button class="btn sm ghost" data-pd="'+x.id+'">Törlés</button></td></tr>';}).join('')+'</tbody></table>':'<p class="muted" style="margin:0">Még nincs mentett személy.</p>')+'</div>';
   app.innerHTML=h;
+  app.querySelectorAll('[data-pk]').forEach(function(b){b.addEventListener('click',function(){keepForm();PE.kind=b.getAttribute('data-pk');render();});});
   var PAD=sigPad($('spad'),'sph');
   $('sClr').addEventListener('click',function(){PAD.clear();});
   $('sTake').addEventListener('click',function(){if(PAD.isEmpty())return toast('Előbb írjon alá a keretben.');keepForm();PSIG=blueJpeg(PAD.cv,true);render();toast('Aláírásminta beállítva — mentsd a személyt.');});
