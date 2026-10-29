@@ -226,7 +226,9 @@
   .sgp{border-color:#d9d2f3;background:#fbfaff}
   .sgb{font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 8px;white-space:nowrap}.sgb.wait{background:#fff3df;color:#a2660b}.sgb.ok{background:#e7f6ef;color:var(--good)}.sgb.off{background:var(--line2);color:#5b6472}.sgb.bad{background:#fdeceb;color:var(--bad)}
   .sgl{display:grid;gap:8px}.sgr{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}.sgr .h{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;margin-bottom:3px}.sgr ul{margin:6px 0 0;padding-left:18px;font-size:12.5px}
-  .tgrp{margin-top:6px}.tgh{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:800;color:var(--muted);margin:6px 0}
+  .tgrp{margin-top:6px}
+  .mdl{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+  .mdl-b{background:#fff;border-radius:16px;padding:20px;max-width:760px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}.mdl-b h3{margin:0 0 6px}.mdl-b small{display:block;margin-top:3px;font-size:11px}.tgh{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:800;color:var(--muted);margin:6px 0}
   .tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px}
   .tchk{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:#fff;cursor:pointer;font-size:13px}
   .tchk.on{border-color:var(--red-tint2);background:#fffafa}.tchk input{width:16px;height:16px;accent-color:var(--red);margin:1px 0 0;flex:0 0 auto}.tchk i{color:var(--muted)}.dm-send .rc .chk{font-size:13.5px}
@@ -1010,6 +1012,7 @@ function renderDM(){
     return '<div class="dm-row'+(DM.edit&&DM.edit.id===d.id?' on':'')+'"><input type="checkbox" data-ds="'+d.id+'"'+(DM.sel[d.id]?' checked':'')+' title="Kijelölés küldéshez">'
       +'<span class="ic">'+(KIND_IC[d.kind]||'📑')+'</span><span class="nm"><b>'+esc(d.name)+'</b><small>'+esc(DM.kinds[d.kind]||'')+(d.number?' · '+esc(d.number):'')+' · '+esc(fmtDate(d.updated_at||d.created_at))+(d.updated_by?' · '+esc(d.updated_by):'')
       +(d.sent_at?' · <span style="color:var(--good);font-weight:700">✓ elküldve '+esc(fmtDate(d.sent_at))+'</span>':'')
+      +(d.missing_n?' · <span class="sgb bad">⚠ '+d.missing_n+' hiányzó adat</span>':'')
       +(d.sign_status==='pending'?' · <span class="sgb wait">⏳ aláírásra vár</span>':d.sign_status==='signed'?' · <span class="sgb ok">✍ aláírva</span>':'')+'</small></span>'
       +'<span class="acts">'+(d.sign_status?'':'<button class="lnk" data-de="'+d.id+'">Szerkesztés</button>')
       +(d.signed_file_id?'<a class="lnk" href="'+API+'/card/'+ID+'/files/'+d.signed_file_id+'" target="_blank" rel="noopener">Aláírt PDF</a>':'<button class="lnk" data-dp="'+d.id+'">PDF</button>')
@@ -1119,9 +1122,33 @@ function dmCreate(){
   var T=selTpls();if(!T.length)return toast('Jelölj ki legalább egy sablont.');
   var roles=[];T.forEach(function(t){t.roles.forEach(function(r){if(roles.indexOf(r)<0)roles.push(r);});});
   var miss=roles.filter(function(r){return !DM.np[r];});
-  if(miss.length&&!confirm('Nincs kiválasztva: '+miss.map(function(r){return DM.roles[r];}).join(', ')+'. Így is kitöltöd? (Később is beállítható.)'))return;
+  if(miss.length)return toast('Válaszd ki: '+miss.map(function(r){return DM.roles[r];}).join(', ')+' — a dokumentum csak minden adattal generálható.',5000);
   if(!dmLeave())return;
   var vlist=!vehs().length?['']:DM.nv==='*'?vehs().map(function(v){return v.id;}):[DM.nv];
+  var npAll={};Object.keys(DM.np).forEach(function(r){if(DM.np[r])npAll[r]=+DM.np[r];});
+  // előzetes ellenőrzés: hiányzó adatok → bekérjük, és csak teljes adatokkal generálunk
+  api('/card/'+ID+'/docs/check',{method:'POST',body:{template_ids:T.map(function(t){return t.id;}),vehicle_ids:vlist,persons:npAll}}).then(function(c){
+    var rolesMiss=c.missing.filter(function(m){return c.roles.some(function(r){return m.key.indexOf(r+'_')===0;});});
+    if(rolesMiss.length)return toast('A kiválasztott személy(ek)nél hiányzó adat: '+rolesMiss.map(function(m){return m.label;}).join(', ')+' — pótold a Személyek listában.',6000);
+    if(!c.missing.length)return dmGenerate(T,vlist,{});
+    missingModal(c.missing,function(extra){dmGenerate(T,vlist,extra);});
+  }).catch(function(e){toast(e.message,4500);});
+}
+function missingModal(miss,done){
+  var ov=document.createElement('div');ov.className='mdl';
+  ov.innerHTML='<div class="mdl-b"><h3>Hiányzó adatok</h3><p class="hint">A dokumentum csak akkor generálható, ha minden szükséges adat ki van töltve. Az ügyfél / autó adatait az 1–2. szekcióban is pótolhatod — az itt megadott értékek csak ezekbe a dokumentumokba kerülnek.</p>'
+    +'<div class="vars" style="margin-top:10px">'+miss.map(function(m){return '<div class="fld"><label>'+esc(m.label)+'</label><input data-mk="'+esc(m.key)+'"><small class="hint">'+esc(m.templates.join(', '))+'</small></div>';}).join('')+'</div>'
+    +'<div class="actions"><button class="btn red" id="mdlOk">Generálás</button><button class="btn ghost" id="mdlNo">Mégse</button></div></div>';
+  document.body.appendChild(ov);
+  var f=ov.querySelector('input');if(f)f.focus();
+  ov.querySelector('#mdlNo').addEventListener('click',function(){ov.remove();});
+  ov.querySelector('#mdlOk').addEventListener('click',function(){
+    var extra={},empty=[];ov.querySelectorAll('[data-mk]').forEach(function(i){var v=i.value.trim();if(!v){empty.push(i);i.style.borderColor='var(--red)';}else{extra[i.getAttribute('data-mk')]=v;i.style.borderColor='';}});
+    if(empty.length)return toast('Minden mezőt ki kell tölteni ('+empty.length+' üres).');
+    ov.remove();done(extra);
+  });
+}
+function dmGenerate(T,vlist,extra){
   var jobs=[];vlist.forEach(function(vid){T.forEach(function(t){jobs.push({t:t,vid:vid});});});
   var b=$('dmFill');b.disabled=true;var made=[],fail=0;
   var chain=Promise.resolve();
@@ -1129,7 +1156,7 @@ function dmCreate(){
     chain=chain.then(function(){
       b.textContent='Kitöltés… ('+(k+1)+'/'+jobs.length+')';
       var np={};Object.keys(DM.np).forEach(function(r){if(jb.t.roles.indexOf(r)>=0&&DM.np[r])np[r]=+DM.np[r];});
-      return api('/card/'+ID+'/docs',{method:'POST',body:{template_id:jb.t.id,vehicle_id:jb.vid,persons:np}}).then(function(r){DM.docs.push(r.doc);DM.sel[r.doc.id]=true;made.push(r.doc);})
+      return api('/card/'+ID+'/docs',{method:'POST',body:{template_id:jb.t.id,vehicle_id:jb.vid,persons:np,extra:extra}}).then(function(r){DM.docs.push(r.doc);DM.sel[r.doc.id]=true;made.push(r.doc);})
         .catch(function(e){fail++;toast(jb.t.name+': '+e.message,4500);});
     });
   });
@@ -1157,6 +1184,8 @@ function renderDmEdit(){
     +'<div class="grid"><div class="fld wide"><label>Dokumentum neve</label><input id="dmName" value="'+esc(d.name)+'"></div>'
     +(vehs().length?'<div class="fld"><label>Autó</label><select id="dmEVeh">'+vehOpts(d.vehicle_id)+'</select></div>':'')
     +roles.map(function(r){return personSel(r,d.persons[r],'data-ep');}).join('')+'</div>'
+    +(missKeys(d).length?'<div class="note" style="background:#fdeceb;border-color:#f8c9c9;color:#b8000f;margin-top:10px">Hiányzó adatok: <b>'+missKeys(d).map(function(k){return esc(lab[k]||k);}).join(', ')+'</b> — amíg nincs kitöltve, a dokumentum nem küldhető ki, nem írható alá és nem tölthető le PDF-ként.</div>':'')
+    +'<label class="chk" style="margin-top:10px;font-size:13px"><input type="checkbox" id="dmUseSigs"'+(d.use_sigs===0?'':' checked')+'> Tárolt aláírásminták beillesztése (meghatalmazott, tanúk, céges aláírók — kék színnel)</label>'
     +'<div class="actions" style="margin-top:10px"><button class="btn ghost sm" id="dmRefill">↻ Adatok újratöltése az adatlapból</button><span class="hint">Az autó / személy cseréje és az adatlap módosítása után: frissíti a változókat (a kézzel írt szöveg megmarad).</span></div>'
     +'<details class="vbox" open style="margin-top:12px"><summary>Kitöltött adatok ('+keys.length+') — itt módosíthatók</summary><div class="vars" style="margin-top:12px">'
     +keys.map(function(k){return '<div class="fld"><label>'+esc(lab[k]||k)+'</label><input data-dv="'+k+'" value="'+esc(d.vars[k]||'')+'"></div>';}).join('')+'</div></details>'
@@ -1171,6 +1200,7 @@ function renderDmEdit(){
     var nk=CADoc.usedKeys(d.text);if(nk.join()!==keys.join()){var ss=$('dmText').selectionStart,sc=$('dmText').scrollTop;renderDmEdit();var ta=$('dmText');ta.focus();ta.selectionStart=ta.selectionEnd=ss;ta.scrollTop=sc;}else prev();},250);});
   el.querySelectorAll('[data-dv]').forEach(function(i){i.addEventListener('input',function(){d.vars[i.getAttribute('data-dv')]=i.value;dirty();prev();});});
   $('dmName').addEventListener('input',function(){d.name=this.value;dirty();});
+  var us=$('dmUseSigs');if(us)us.addEventListener('change',function(){d.use_sigs=this.checked?1:0;dirty();});
   var ev=$('dmEVeh');if(ev)ev.addEventListener('change',function(){d.vehicle_id=this.value;dirty();toast('Autó módosítva — a „↻ Adatok újratöltése” gombbal töltheted be az új autó adatait.',4000);});
   el.querySelectorAll('[data-ep]').forEach(function(s){s.addEventListener('change',function(){d.persons[s.getAttribute('data-ep')]=s.value?+s.value:'';dirty();toast('Személy módosítva — „↻ Adatok újratöltése” tölti be az adatait.',4000);});});
   $('dmClose').addEventListener('click',function(){if(!dmLeave())return;DM.edit=null;DM.dirty=false;renderDM();});
@@ -1178,7 +1208,8 @@ function renderDmEdit(){
   $('dmRefill').addEventListener('click',function(){dmSave(true);});
   $('dmPdfBtn').addEventListener('click',function(){dmPdf(d.id,true);});
 }
-function dmBody(refill){var d=DM.edit;var ps={};Object.keys(d.persons||{}).forEach(function(k){if(d.persons[k])ps[k]=+d.persons[k];});return {name:d.name,text:d.text,vars:d.vars,vehicle_id:d.vehicle_id,persons:ps,refill:refill||undefined};}
+function dmBody(refill){var d=DM.edit;var ps={};Object.keys(d.persons||{}).forEach(function(k){if(d.persons[k])ps[k]=+d.persons[k];});return {name:d.name,text:d.text,vars:d.vars,vehicle_id:d.vehicle_id,persons:ps,use_sigs:d.use_sigs===0?0:1,refill:refill||undefined};}
+function missKeys(d){return CADoc.usedKeys(d.text).filter(function(k){return !String(d.vars[k]==null?'':d.vars[k]).trim();});}
 function dmSave(refill){
   var d=DM.edit;if(!d)return;saving();
   return api('/card/'+ID+'/docs/'+d.id,{method:'PATCH',body:dmBody(refill)}).then(function(r){
@@ -1187,7 +1218,7 @@ function dmSave(refill){
 }
 function dmPdf(id,cur){
   var w=window.open('','_blank');
-  var o=cur&&DM.edit&&DM.edit.id===id?{method:'POST',body:{text:DM.edit.text,vars:DM.edit.vars},raw:true}:{raw:true};
+  var o=cur&&DM.edit&&DM.edit.id===id?{method:'POST',body:{text:DM.edit.text,vars:DM.edit.vars,use_sigs:DM.edit.use_sigs===0?0:1},raw:true}:{raw:true};
   api('/card/'+ID+'/docs/'+id+'/pdf',o).then(function(r){return r.blob();}).then(function(b){var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();toast(e.message,4500);});
 }
 function dmDelete(id){
