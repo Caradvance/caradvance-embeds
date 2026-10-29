@@ -6,7 +6,7 @@ import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
-  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
 } from '../../../lib/crm.js';
 import { jpegInfo } from '../../../lib/docpdf.js';
 
@@ -863,7 +863,9 @@ async function handleSignCreate(request, env, user, id) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: role === 'buyer' ? 'A vevőnek nincs érvényes e-mail címe (1. szekció).' : 'Az ügyfélnek nincs érvényes e-mail címe (1. szekció).' }, 400);
   const signerName = clean(P.name || (role === 'client' ? deal.name : ''), 120);
   if (!signerName) return json({ error: 'Add meg az aláíró nevét az 1. szekcióban.' }, 400);
-  const docs = []; const partners = ((await env.DB.prepare(`SELECT id, sign_keys FROM crm_partners WHERE active = 1 ORDER BY id`).all()).results || []);
+  // piac (ország) a domain alapján; csak az ezt a piacot kiszolgáló partnerek jegyezhetnek ellen
+  const market = marketOf(new URL(request.url).hostname);
+  const docs = []; const partners = ((await env.DB.prepare(`SELECT id, sign_keys, markets FROM crm_partners WHERE active = 1 ORDER BY id`).all()).results || []).filter((p) => partnerTakesMarket(p, market));
   for (const did of ids) {
     const r = await getDoc(env, id, did); if (!r) continue;
     if (r.sign_status === 'pending') return json({ error: `Már aláírásra vár: ${r.name}` }, 409);
@@ -878,8 +880,8 @@ async function handleSignCreate(request, env, user, id) {
   const token = randomHex(32);
   const exp = Math.floor(Date.now() / 1000) + 14 * 86400;
   const msg = cleanMulti(b.message, 2000).trim();
-  const ins = await env.DB.prepare(`INSERT INTO crm_sign (token_hash, deal_id, signer_role, signer_name, email, docs, message, created_by, expires_at) VALUES (?,?,?,?,?,?,?,?,?)`)
-    .bind(await sha256hex('crmsign|' + token), id, role, signerName, email, JSON.stringify(docs), msg, user.name, exp).run();
+  const ins = await env.DB.prepare(`INSERT INTO crm_sign (token_hash, deal_id, signer_role, signer_name, email, docs, message, created_by, expires_at, market) VALUES (?,?,?,?,?,?,?,?,?,?)`)
+    .bind(await sha256hex('crmsign|' + token), id, role, signerName, email, JSON.stringify(docs), msg, user.name, exp, market).run();
   const sid = ins.meta.last_row_id;
   for (const d of docs) await env.DB.prepare(`UPDATE crm_docs SET sign_status = 'pending', sign_id = ? WHERE id = ?`).bind(sid, d.doc_id).run();
   const link = `${SITE}/alairas/#${token}`;
@@ -899,7 +901,7 @@ function coFor(text, partners) {
   return { cosign: [] };
 }
 /* ---------- partnerek (országonkénti ellenjegyzők, partnerfelület) — csak admin módosíthatja ---------- */
-const PARTNER_OUT = (p) => ({ id: p.id, country: p.country, company: p.company, login: p.login, lang: p.lang, notify_email: p.notify_email || '', sign_keys: parseJ(p.sign_keys, []), active: !!p.active, must_change: !!p.must_change, has_sig: !!p.sig, sig_name: p.sig_name || '', last_login: p.last_login || '' });
+const PARTNER_OUT = (p) => ({ id: p.id, markets: parseJ(p.markets, []), country: p.country, company: p.company, login: p.login, lang: p.lang, notify_email: p.notify_email || '', sign_keys: parseJ(p.sign_keys, []), active: !!p.active, must_change: !!p.must_change, has_sig: !!p.sig, sig_name: p.sig_name || '', last_login: p.last_login || '' });
 async function handlePartners(request, env, user, pid) {
   if (request.method === 'GET') return json({ partners: ((await env.DB.prepare(`SELECT * FROM crm_partners ORDER BY country, id`).all()).results || []).map(PARTNER_OUT) });
   if (user.role !== 'admin') return json({ error: 'Csak admin módosíthatja.' }, 403);
@@ -913,11 +915,12 @@ async function handlePartners(request, env, user, pid) {
   const lang = ['de', 'en', 'hu'].includes(b.lang) ? b.lang : 'de';
   const keys = (Array.isArray(b.sign_keys) ? b.sign_keys : String(b.sign_keys || '').split(/[,;\n]/)).map((x) => clean(x, 80).trim()).filter(Boolean).slice(0, 10);
   if (!keys.length) return json({ error: 'Add meg legalább egy aláírási hasáb nevét (pl. „Caradvance GmbH”).' }, 400);
+  const markets = [...new Set((Array.isArray(b.markets) ? b.markets : String(b.markets || '').split(/[,;\s]+/)).map((x) => clean(x, 2).toUpperCase()).filter((x) => /^[A-Z]{2}$/.test(x)))].slice(0, 30);
   const pw = String(b.password || '');
   if (pw && pw.length < 6) return json({ error: 'A kezdő jelszó legalább 6 karakter legyen.' }, 400);
   try {
     if (pid) {
-      await env.DB.prepare(`UPDATE crm_partners SET country=?, company=?, login=?, lang=?, notify_email=?, sign_keys=?, active=? WHERE id=?`).bind(country, company, login, lang, notify, JSON.stringify(keys), b.active === false ? 0 : 1, pid).run();
+      await env.DB.prepare(`UPDATE crm_partners SET country=?, company=?, login=?, lang=?, notify_email=?, sign_keys=?, active=?, markets=? WHERE id=?`).bind(country, company, login, lang, notify, JSON.stringify(keys), b.active === false ? 0 : 1, JSON.stringify(markets), pid).run();
       if (pw) { // új kezdő jelszó: első belépéskor cserélni kell, a régi munkamenetek megszűnnek
         await env.DB.prepare(`UPDATE crm_partners SET pass_hash=?, must_change=1, fails=0, locked_until=0 WHERE id=?`).bind(await hashPass(pw), pid).run();
         await env.DB.prepare(`DELETE FROM crm_partner_sessions WHERE partner_id = ?`).bind(pid).run();
@@ -925,7 +928,7 @@ async function handlePartners(request, env, user, pid) {
       if (b.clear_sig) await env.DB.prepare(`UPDATE crm_partners SET sig=NULL, sig_name='', sig_at=NULL WHERE id=?`).bind(pid).run();
     } else {
       if (!pw) return json({ error: 'Új partnernél add meg a kezdő jelszót.' }, 400);
-      await env.DB.prepare(`INSERT INTO crm_partners (country, company, login, lang, notify_email, pass_hash, must_change, sign_keys, active) VALUES (?,?,?,?,?,?,1,?,?)`).bind(country, company, login, lang, notify, await hashPass(pw), JSON.stringify(keys), b.active === false ? 0 : 1).run();
+      await env.DB.prepare(`INSERT INTO crm_partners (country, company, login, lang, notify_email, pass_hash, must_change, sign_keys, active, markets) VALUES (?,?,?,?,?,?,1,?,?,?)`).bind(country, company, login, lang, notify, await hashPass(pw), JSON.stringify(keys), b.active === false ? 0 : 1, JSON.stringify(markets)).run();
     }
   } catch (e) { return json({ error: /UNIQUE/i.test(String(e)) ? 'Ez a bejelentkezési név már foglalt.' : 'Mentési hiba.' }, 400); }
   return handlePartners(new Request('https://x/'), env, user, 0);
