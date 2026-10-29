@@ -388,11 +388,40 @@ function renderPersonal(){
       +inp('buyer.person.address','Cím',bp.address,'text',' wide')+(B.kind==='magan'?inp('buyer.person.tax','Adószám / adóazonosító',bp.tax):'')+'</div>'
       +idBlock('buyer.person',bp,'A vevő okmányadatai');
   }
+  h+='<div class="drq" id="drq"></div>';
   $('b1').innerHTML=h;
+  renderDR();if(!DR.loaded)loadDR();
   var bs=$('buyerSeg');if(bs)bs.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;d.buyer.kind=b.getAttribute('data-k');renderPersonal();saveData();});
   $('kindSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;d.kind=b.getAttribute('data-k');renderPersonal();saveData();});
   var cd=$('cDiff');if(cd)cd.addEventListener('change',function(){d.contact_differs=this.checked;renderPersonal();saveData();});
   bindInputs($('b1'));
+}
+/* ---- adatbekérő e-mail: az ügyfél maga adja meg az adatait és tölti fel az okmánymásolatokat ---- */
+var DR={loaded:false,list:[]};
+function loadDR(){return api('/card/'+ID+'/datareq').then(function(j){
+  var wasPending=DR.list.filter(function(r){return r.status==='pending';}).map(function(r){return r.id;});
+  DR.loaded=true;DR.list=j.requests||[];renderDR();
+  // ha közben az ügyfél beküldte az adatait: az adatlap újratöltése (hogy a beérkezett adatokat ne írja felül az automatikus mentés)
+  if(DR.list.some(function(r){return r.status==='done'&&wasPending.indexOf(r.id)>=0;})){toast('Az ügyfél beküldte az adatait — az adatlap frissül…',3000);setTimeout(function(){location.reload();},1800);return;}
+  clearTimeout(DR.t);if(DR.list.some(function(r){return r.status==='pending';}))DR.t=setTimeout(loadDR,30000);
+}).catch(function(){DR.loaded=true;});}
+function renderDR(){
+  var el=$('drq');if(!el)return;
+  var ST={pending:['wait','⏳ kiküldve, kitöltésre vár'],done:['ok','✓ kitöltve, beküldve'],expired:['off','lejárt'],revoked:['off','visszavonva'],saving:['wait','feldolgozás…']};
+  var roles=isSale()?[['client','Bérlő'],['buyer','Vevő']]:[['client','Ügyfél']];
+  var h='<div class="sub-h">Adatbekérés az ügyféltől</div><div class="hint" style="margin-bottom:8px">Az ügyfél e-mailben kap egy biztonságos linket. Ott megadja a személyes (céges) adatait, és feltölti a személyi igazolvány és a lakcímkártya másolatát. Beküldés után az adatok ide kerülnek, a fájlok a feltöltött fájlok közé, és a checklisten kipipálódik az „Igazolvány másolatok” feladat. Ha nyitva van az adatlap, beküldés után frissítsd az oldalt, hogy ne írd felül a beérkezett adatokat.</div>'
+    +'<div class="row" style="display:flex;gap:8px;flex-wrap:wrap">'+roles.map(function(r){return '<button class="btn sm" data-drs="'+r[0]+'">✉ Adatbekérő e-mail'+(roles.length>1?' — '+r[1]:'')+'</button>';}).join('')+'</div>';
+  if(DR.list.length)h+='<div class="sgl" style="margin-top:8px">'+DR.list.slice(0,6).map(function(r){var st=ST[r.status]||['off',r.status];
+    return '<div class="sgr"><div class="h"><span class="sgb '+st[0]+'">'+st[1]+'</span><b>#'+r.id+' · '+esc(r.name||'')+(r.role==='buyer'?' (vevő)':'')+'</b><span class="hint">'+esc(r.email)+'</span><span style="flex:1"></span>'+(r.status==='pending'?'<button class="lnk del" data-drr="'+r.id+'">Visszavonás</button>':'')+'</div>'
+      +'<div class="hint">Kiküldve: '+esc(fmtDate(r.created_at))+' ('+esc(r.created_by||'')+')'+(r.opened_at?' · megnyitva: '+esc(fmtDate(r.opened_at)):'')+(r.submitted_at?' · <b style="color:var(--good)">beküldve: '+esc(fmtDate(r.submitted_at))+'</b>':'')+'</div>'
+      +(r.files&&r.files.length?'<ul>'+r.files.map(function(f){return '<li><a href="'+API+'/card/'+ID+'/files/'+f.id+'" target="_blank" rel="noopener">'+esc(f.name)+'</a></li>';}).join('')+'</ul>':'')+'</div>';}).join('')+'</div>';
+  el.innerHTML=h;
+  el.querySelectorAll('[data-drs]').forEach(function(b){b.addEventListener('click',function(){
+    var role=b.getAttribute('data-drs');if(!confirm('Kiküldjük az adatbekérő e-mailt '+(role==='buyer'?'a vevőnek':'az ügyfélnek')+'? (A korábbi, még nyitott link érvénytelenné válik.)'))return;
+    b.disabled=true;var go=function(){return api('/card/'+ID+'/datareq',{method:'POST',body:{role:role}});};
+    saveData().then(go).then(function(r){toast('Elküldve: '+r.sentTo+(r.mailError?' — HIBA: '+r.mailError:''),4500);b.disabled=false;loadDR();refreshLog&&refreshLog();}).catch(function(e){toast(e.message,4500);b.disabled=false;});
+  });});
+  el.querySelectorAll('[data-drr]').forEach(function(b){b.addEventListener('click',function(){if(!confirm('Visszavonod a linket?'))return;api('/card/'+ID+'/datareq/'+b.getAttribute('data-drr')+'/revoke',{method:'POST',body:{}}).then(loadDR).catch(function(e){toast(e.message);});});});
 }
 var ID_OPEN={};
 function idBlock(path,p,title){
@@ -579,7 +608,7 @@ function renderChecklist(){
       var closes=el.checked&&(rule==='all'?items.every(function(c){return next[c[0]];}):k===rule);
       if(closes&&!confirm((rule==='all'?'Ezzel minden checklist-feladat kész':'A(z) „'+((items.filter(function(c){return c[0]===rule;})[0]||[])[1]||rule)+'” kipipálásával')+' — az ügyfél státusza „Lezárva” lesz. Folytatod?')){el.checked=false;return;}
       saving();
-      api('/card/'+ID,{method:'PATCH',body:{checklist:next}}).then(function(r){
+      api('/card/'+ID,{method:'PATCH',body:{checklist:next,toggle:k}}).then(function(r){
         S.card.checklist=r.checklist;if(r.status&&r.status!==S.card.status){S.card.status=r.status;renderHead();toast('Státusz: '+r.status);}
         renderChecklist();saved();
       }).catch(function(e){el.checked=!el.checked;saveErr(e);});
