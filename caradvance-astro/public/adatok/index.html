@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Adatok megadása — CarAdvance</title>
+<link rel="icon" href="/favicon-32.png">
+<!-- ca-tracking:start --><!-- Ezen az oldalon szándékosan nincs követőkód (személyes adatok, okmányok). --><!-- ca-tracking:end -->
+<style>
+:root{--red:#E2001A;--red2:#B80015;--ink:#0F172A;--ink2:#334155;--mut:#5A6B82;--line:#E6EAF1;--bg:#F4F5F7;--ok:#15803D;--okbg:#DCFCE7}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+.top{background:#0B0B0D;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.top img{height:34px;display:block}.top span{color:#cbd2dc;font-size:12.5px;display:flex;align-items:center;gap:6px}
+.hero{background:radial-gradient(900px 300px at 85% -40%,rgba(226,0,26,.45),transparent 60%),linear-gradient(180deg,#0B0B0D,#151821);color:#fff;padding:26px 20px 70px}
+.hero h1{margin:0 0 4px;font-size:25px;line-height:1.2}.hero p{margin:0;color:#c9cfda}
+.wrap{max-width:860px;margin:-48px auto 40px;padding:0 14px}
+.card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(15,23,42,.06);margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:18px;display:flex;align-items:center;gap:10px}
+.card h2 .n{width:28px;height:28px;border-radius:9px;background:#fdeceb;color:var(--red);font-size:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.card.off{opacity:.55;pointer-events:none}
+.muted{color:var(--mut)}.small{font-size:13px}
+.doc{border:1.5px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.doc .h{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-wrap:wrap}
+.doc .h b{flex:1;min-width:180px;font-size:14.5px}
+.doc.ok{border-color:#bfe8cd;background:#f8fdf9}
+.pv{border-top:1px solid var(--line);padding:16px 18px;max-height:520px;overflow:auto;font-size:12.5px;line-height:1.55;background:#fff;display:none}
+.doc.open .pv{display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 22px;font:700 15px/1 inherit;font-family:inherit;cursor:pointer;text-decoration:none}
+.btn.red{background:var(--red);color:#fff}.btn.red:hover{background:var(--red2)}.btn.dark{background:#0F172A;color:#fff}
+.btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}.btn.sm{padding:8px 14px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:10px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:1px;accent-color:var(--red);flex:none}
+.in{width:100%;margin-top:4px;padding:12px;border:1.5px solid var(--line);border-radius:14px;background:#F7F9FC;font:inherit;color:var(--ink)}
+.in:focus{outline:none;border-color:#22447d;background:#fff}
+.code{font:700 26px/1 "Courier New",monospace;letter-spacing:8px;text-align:center;max-width:240px}
+label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-top:10px}
+.pad{position:relative;border:1.5px dashed #c8ced8;border-radius:16px;background:#fff;touch-action:none}
+.pad canvas{display:block;width:100%;height:200px;border-radius:16px;cursor:crosshair}
+.pad .ln{position:absolute;left:24px;right:24px;bottom:44px;border-top:1px solid #d6dae1;pointer-events:none}
+.pad .ph{position:absolute;left:0;right:0;top:44%;text-align:center;color:#a3abb8;pointer-events:none;font-size:14px}
+.note{border-radius:12px;padding:10px 12px;margin:10px 0;font-size:13.5px;background:#EEF4FF;color:#1e3a8a}
+.note.err{background:#FDE8EB;color:#9f1239}.note.ok{background:var(--okbg);color:var(--ok)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sec{font-size:12px;color:var(--mut);display:flex;gap:8px;align-items:flex-start;margin-top:14px}
+.big{font-size:44px;line-height:1;margin-bottom:6px}
+@media(max-width:560px){.card{padding:18px}.hero h1{font-size:21px}}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.grid .wide{grid-column:1/-1}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.req{color:var(--red)}.in.bad{border-color:var(--red);background:#fff5f6}
+.seg{display:inline-flex;background:#eef1f6;border-radius:999px;padding:4px;margin:8px 0 6px}.seg button{border:0;background:none;border-radius:999px;padding:8px 16px;font:600 14px inherit;font-family:inherit;cursor:pointer;color:var(--ink2)}.seg button.on{background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.08);color:var(--ink)}
+.sub{font-weight:700;margin:16px 0 0;font-size:14px}
+.upl{border:1.5px dashed #c8ced8;border-radius:14px;padding:12px 14px;margin:10px 0}.upl .h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.upl .h b{flex:1;min-width:200px;font-size:14px}
+.fl{margin-top:8px;display:flex;flex-direction:column;gap:6px}.fi{display:flex;align-items:center;gap:10px;font-size:13.5px}.fi img{width:54px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.fi .pdf{width:54px;height:40px;border-radius:6px;background:#fdeceb;color:var(--red);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+.lnk{background:none;border:0;color:#b91c1c;cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="top"><img src="/caradvance-logo-white.webp" alt="CarAdvance"><span>🔒 Biztonságos adatküldés</span></div>
+<div class="hero"><h1>Adatok és okmánymásolatok megadása</h1><p>A szerződések elkészítéséhez</p></div>
+<div class="wrap" id="app"><div class="card">Betöltés…</div></div>
+<script>
+(function(){
+'use strict';
+var A='/api/crm-adatok',T='',S=null,KIND='magan',FILES={id:[],addr:[],company:[]},app=document.getElementById('app');
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+var ERR={bad_link:'Érvénytelen link.',not_found:'Ez az adatbekérő link nem található.',locked:'Ezt az űrlapot már beküldték, vagy a link már nem érvényes.',missing:'Kérjük, töltse ki a pirossal jelölt mezőket.',bad_email:'Érvénytelen e-mail cím.',bad_date:'Érvénytelen születési dátum.',files_missing:'Kérjük, töltse fel a személyi igazolvány és a lakcímkártya másolatát is.',file_too_big:'Egy fájl túl nagy (max. 8 MB).',bad_type:'Csak JPG, PNG, WEBP vagy PDF fájl tölthető fel.',bad_file:'Hibás fájl.',too_many_files:'Legfeljebb 8 fájl tölthető fel.',rate:'Túl sok kérés — kérjük, várjon néhány percet.',server:'Váratlan hiba — kérjük, próbálja újra.'};
+function post(p,body){
+  body=Object.assign({t:T},body||{});
+  return fetch(A+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer'}).then(function(r){
+    return r.json().catch(function(){return {ok:false,error:'server'};}).then(function(j){if(!j.ok){var e=new Error(ERR[j.error]||j.error||'Hiba');e.code=j.error;e.fields=j.fields;throw e;}return j;});
+  });
+}
+(function(){
+  var h=(location.hash||'').replace(/^#/,'');
+  try{if(/^[a-f0-9]{64}$/.test(h))sessionStorage.setItem('ca_data_t',h);T=sessionStorage.getItem('ca_data_t')||'';}catch(e){T=h;}
+  if(!T&&/^[a-f0-9]{64}$/.test(h))T=h;
+  if(h)try{history.replaceState(null,'',location.pathname);}catch(e){}
+})();
+function fail(msg){app.innerHTML='<div class="card"><div class="big">⚠️</div><h2>'+esc(msg)+'</h2><p class="muted">Ha kérdése van, írjon nekünk (sales@caradvance.hu) vagy hívjon: +36 30 233 6060.</p></div>';}
+function fld(k,label,val,type,wide,req){return '<label class="f'+(wide?' wide':'')+'">'+esc(label)+(req?' <span class="req">*</span>':'')+'<input class="in" data-k="'+k+'" type="'+(type||'text')+'" value="'+esc(val||'')+'"'+(type==='date'?' max="'+new Date().toISOString().slice(0,10)+'"':'')+'></label>';}
+function render(){
+  var p=S.prefill||{},c=p.company||{};
+  var h='<div class="card"><h2><span class="n">1</span>Személyes adatok</h2>'+(S.message?'<div class="note" style="white-space:pre-line">'+esc(S.message)+'</div>':'')
+    +'<div class="seg"><button data-kind="magan" class="'+(KIND==='magan'?'on':'')+'">Magánszemély</button><button data-kind="ceg" class="'+(KIND==='ceg'?'on':'')+'">Cég nevében</button></div>'
+    +(KIND==='ceg'?'<div class="sub">Cég adatai</div><div class="grid">'+fld('company.name','Cégnév',c.name,'',1,1)+fld('company.address','Székhely',c.address,'',1,1)+fld('company.reg','Cégjegyzékszám',c.reg,'',0,1)+fld('company.tax','Adószám',c.tax,'',0,1)+'</div><div class="sub">A képviselő személyes adatai</div>':'')
+    +'<div class="grid">'+fld('name','Teljes név (ahogy az igazolványban szerepel)',p.name,'',1,1)+fld('address','Lakcím (irányítószám, település, utca, házszám)',p.address,'',1,1)
+    +fld('birth_place','Születési hely','','',0,1)+fld('birth_date','Születési idő','','date',0,1)+fld('mother_name','Anyja születési neve','','',1,1)
+    +fld('id_number','Személyi igazolvány száma','','',0,1)+fld('address_card','Lakcímkártya száma','','',0,1)+fld('licence','Vezetői engedély száma','','',0,0)
+    +fld('phone','Telefonszám',p.phone,'tel',0,1)+fld('email','E-mail cím',p.email,'email',0,1)+(KIND==='magan'?fld('tax','Adóazonosító jel','','',0,0):'')+fld('bank','Bankszámlaszám','','',0,0)+'</div></div>'
+    +'<div class="card"><h2><span class="n">2</span>Okmánymásolatok</h2><p class="muted small" style="margin:4px 0 10px">Fényképezze le (vagy szkennelje be) az okmányokat — a személyi igazolványnak mindkét oldalát. JPG, PNG vagy PDF, fájlonként max. 8 MB. A fényképeket feltöltés előtt automatikusan kisebbítjük.</p>'
+    +up('id','Személyi igazolvány (mindkét oldal)',1)+up('addr','Lakcímkártya (lakcímet tartalmazó oldal)',1)+(KIND==='ceg'?up('company','Cégkivonat / aláírási címpéldány (nem kötelező)',0):'')+'</div>'
+    +'<div class="card"><h2><span class="n">3</span>Beküldés</h2><label class="chk"><input type="checkbox" id="cons"> <span>Hozzájárulok, hogy a CarAdvance a megadott adataimat és okmánymásolataimat a szerződéskötéshez és a kapcsolódó hatósági ügyintézéshez kezelje. Az adatok valósak.</span></label>'
+    +'<div id="err"></div><div class="row" style="margin-top:10px"><button class="btn red" id="go">Adatok beküldése</button></div><div class="sec">🔒 <span>Az adatok titkosított kapcsolaton keresztül, közvetlenül a CarAdvance belső rendszerébe kerülnek. A link személyes és egyszer használható.</span></div></div>';
+  app.innerHTML=h;
+  app.querySelectorAll('[data-kind]').forEach(function(b){b.addEventListener('click',function(){keep();KIND=b.getAttribute('data-kind');render();restore();});});
+  app.querySelectorAll('input[type=file]').forEach(function(inpt){inpt.addEventListener('change',function(){addFiles(inpt.getAttribute('data-cat'),inpt.files);inpt.value='';});});
+  app.querySelectorAll('[data-k]').forEach(function(i){i.addEventListener('input',function(){i.classList.remove('bad');});});
+  $('go').addEventListener('click',send);
+  drawFiles();
+}
+var KEEP={};
+function keep(){app.querySelectorAll('[data-k]').forEach(function(i){KEEP[i.getAttribute('data-k')]=i.value;});}
+function restore(){app.querySelectorAll('[data-k]').forEach(function(i){var k=i.getAttribute('data-k');if(KEEP[k]!=null)i.value=KEEP[k];});}
+function up(cat,label,req){return '<div class="upl" id="u_'+cat+'"><div class="h"><b>'+esc(label)+(req?' <span class="req">*</span>':'')+'</b><label class="btn ghost sm">+ Fájl / fénykép<input type="file" data-cat="'+cat+'" accept="image/*,application/pdf" multiple hidden></label></div><div class="fl" id="fl_'+cat+'"></div></div>';}
+function drawFiles(){Object.keys(FILES).forEach(function(cat){var el=$('fl_'+cat);if(!el)return;el.innerHTML=FILES[cat].map(function(f,i){return '<div class="fi">'+(f.thumb?'<img src="'+f.thumb+'" alt="">':'<span class="pdf">PDF</span>')+'<span>'+esc(f.name)+' <small class="muted">('+Math.round(f.size/1024)+' KB)</small></span><button class="lnk" data-rm="'+cat+':'+i+'">törlés</button></div>';}).join('')||'<span class="muted small">Még nincs feltöltve.</span>';
+  el.querySelectorAll('[data-rm]').forEach(function(b){b.addEventListener('click',function(){var x=b.getAttribute('data-rm').split(':');FILES[x[0]].splice(+x[1],1);drawFiles();});});});}
+function total(){return FILES.id.length+FILES.addr.length+FILES.company.length;}
+function addFiles(cat,list){
+  [].slice.call(list).forEach(function(file){
+    if(total()>=8)return showErr(ERR.too_many_files);
+    if(/pdf/i.test(file.type)||/\.pdf$/i.test(file.name)){
+      if(file.size>8*1024*1024)return showErr(ERR.file_too_big);
+      var rd=new FileReader();rd.onload=function(){FILES[cat].push({name:file.name,data:rd.result,size:file.size});drawFiles();};rd.readAsDataURL(file);return;
+    }
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){var m=2200,w=img.naturalWidth,h=img.naturalHeight,s=Math.min(1,m/Math.max(w,h)),cv=document.createElement('canvas');cv.width=Math.round(w*s);cv.height=Math.round(h*s);var x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(img,0,0,cv.width,cv.height);
+      var d=cv.toDataURL('image/jpeg',0.85);URL.revokeObjectURL(url);FILES[cat].push({name:file.name.replace(/\.[^.]+$/,'')+'.jpg',data:d,size:Math.round(d.length*3/4),thumb:cv.toDataURL('image/jpeg',0.4)});drawFiles();};
+    img.onerror=function(){URL.revokeObjectURL(url);showErr('A kép nem olvasható ('+file.name+'). Kérjük, JPG vagy PNG formátumot töltsön fel.');};
+    img.src=url;
+  });
+}
+function showErr(m){var e=$('err');if(e)e.innerHTML=m?'<div class="note err">'+esc(m)+'</div>':'';}
+function send(){
+  showErr('');app.querySelectorAll('.bad').forEach(function(x){x.classList.remove('bad');});
+  var person={},company={};
+  app.querySelectorAll('[data-k]').forEach(function(i){var k=i.getAttribute('data-k'),v=i.value.trim();if(k.indexOf('company.')===0)company[k.slice(8)]=v;else person[k]=v;});
+  var req=['name','address','birth_place','birth_date','mother_name','id_number','address_card','phone','email'],miss=req.filter(function(k){return !person[k];});
+  if(KIND==='ceg')['name','address','reg','tax'].forEach(function(k){if(!company[k])miss.push('company.'+k);});
+  miss.forEach(function(k){var i=app.querySelector('[data-k="'+k+'"]');if(i)i.classList.add('bad');});
+  if(miss.length)return showErr(ERR.missing);
+  if(!FILES.id.length||!FILES.addr.length)return showErr(ERR.files_missing);
+  if(!$('cons').checked)return showErr('Kérjük, fogadja el a hozzájáruló nyilatkozatot.');
+  var files=[];Object.keys(FILES).forEach(function(cat){FILES[cat].forEach(function(f){files.push({cat:cat,name:f.name,data:f.data});});});
+  var b=$('go');b.disabled=true;b.textContent='Küldés…';
+  post('/submit',{kind:KIND,person:person,company:company,files:files,consent:true}).then(function(){
+    try{sessionStorage.removeItem('ca_data_t');}catch(e){}
+    app.innerHTML='<div class="card"><div class="big">✅</div><h2>Köszönjük, adatait megkaptuk!</h2><p class="muted">Kollégánk hamarosan felveszi Önnel a kapcsolatot a következő lépésekkel kapcsolatban.</p></div>';window.scrollTo(0,0);
+  }).catch(function(e){(e.fields||[]).forEach(function(k){var i=app.querySelector('[data-k="'+k+'"]');if(i)i.classList.add('bad');});showErr(e.message);b.disabled=false;b.textContent='Adatok beküldése';});
+}
+if(!T)fail('Hiányzó vagy érvénytelen link.');
+else post('/view').then(function(j){
+  if(j.status!=='pending')return fail(j.status==='done'?'Ezt az űrlapot már beküldte — köszönjük!':j.status==='expired'?'A link lejárt. Kérjük, kérjen újat kollégánktól.':'Ez a link már nem érvényes.');
+  S=j;KIND=j.kind||'magan';render();
+}).catch(function(e){fail(e.message);});
+})();
+
+</script>
+</body>
+</html>
