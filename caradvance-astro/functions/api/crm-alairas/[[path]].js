@@ -27,7 +27,8 @@ async function load(env, t) {
   return { r };
 }
 function pdfFor(doc, sign) {
-  return renderDocPdf(doc.text, { title: doc.name, number: doc.number || '', hash: doc.hash, sub: KIND_SUB[doc.kind] || 'Dokumentum', sign });
+  const specimens = (doc.sigs || []).map((z) => ({ names: z.names, jpeg: b64ToBytes(z.b64) }));
+  return renderDocPdf(doc.text, { title: doc.name, number: doc.number || '', hash: doc.hash, sub: KIND_SUB[doc.kind] || 'Dokumentum', sign, specimens });
 }
 
 async function view(env, r) {
