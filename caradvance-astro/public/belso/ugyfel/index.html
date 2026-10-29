@@ -635,7 +635,10 @@ function renderOTab(){
     loadInv();
   }else if(OTAB==='config'){
     el.innerHTML='<div class="drop" id="cfgDrop"><b>Gyári konfigurátoros ajánlat feltöltése</b><span>A BMW, Mercedes-Benz, Audi vagy Volkswagen online konfigurátorában összeállított autó PDF-je (vagy „Ajánlat / Zusammenfassung” letöltése). A rendszer kiolvassa a modellt, az árat és a konfigurációs kódot — ellenőrizd és áraz be. A PDF az ajánlat e-mailhez csatolva megy ki.</span>'
-      +'<label class="btn dark sm" style="cursor:pointer;margin-top:10px">PDF kiválasztása<input type="file" id="cfgFile" accept="application/pdf,.pdf" multiple style="display:none"></label><div class="hint" id="cfgSt" style="margin-top:8px"></div></div>';
+      +'<label class="btn dark sm" style="cursor:pointer;margin-top:10px">PDF kiválasztása<input type="file" id="cfgFile" accept="application/pdf,.pdf" multiple style="display:none"></label><div class="hint" id="cfgSt" style="margin-top:8px"></div></div>'
+      +'<div class="fld" style="margin-top:12px"><label>…vagy konfigurátor link(ek) — BMW / MINI / Mercedes-Benz / Audi / Volkswagen (soronként egy)</label><textarea id="cfgUrl" rows="2" placeholder="pl. https://www.audi.de/de/brand/de/neuwagen.html#audicode=AXYZ1234&#10;https://configure.bmw.de/de_DE/configid/…"></textarea></div>'
+      +'<div class="actions" style="margin-top:8px"><button class="btn dark sm" id="cfgUrlGo">Link(ek) hozzáadása</button><span class="hint" id="cfgUrlSt">A linkből kiolvassuk a márkát és a konfigurációs kódot (ha benne van); a modellt és az árat ellenőrizd / add meg. Az e-mailben az ügyfél a gyártó oldalán is megnyithatja a konfigurációt.</span></div>';
+    $('cfgUrlGo').addEventListener('click',cfgLinks);
     $('cfgFile').addEventListener('change',function(e){cfgFiles([].slice.call(e.target.files||[]));e.target.value='';});
     var dz=$('cfgDrop');
     dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('on');});
@@ -761,6 +764,33 @@ function parseConfig(text){
   if(o.title)o.title=o.title.replace(/^(Ihr|Ihre|Mein|Your)\s+/i,'');if(o.title&&o.brand&&o.title.indexOf(o.brand.split('-')[0])<0)o.title=o.brand+' '+o.title;
   return o;
 }
+var CFG_HOST_RE=/^https:\/\/([a-z0-9-]+\.)*(bmw|mini|mercedes-benz|mercedes|audi|volkswagen|vw)\.[a-z.]{2,12}(\/|$)/i;
+function cfgFromUrl(u){
+  var o={brand:'',code:''},h=(u.match(/^https:\/\/([^\/?#]+)/i)||[])[1]||'';
+  o.brand=/bmw/i.test(h)?'BMW':/mini/i.test(h)?'MINI':/mercedes/i.test(h)?'Mercedes-Benz':/audi/i.test(h)?'Audi':/volkswagen|(^|\.)vw\./i.test(h)?'Volkswagen':'';
+  var m=u.match(/[?&#](?:audicode|audi_code|code|configcode|configCode|configurationCode|configid|configId|configurationId|ccid|cc|konfigurationscode)=([A-Za-z0-9_-]{5,40})/i)
+    ||u.match(/\/(?:code|configid|configuration|konfiguration|cc)\/([A-Za-z0-9_-]{5,40})(?:[\/?#]|$)/i)
+    ||u.match(/#([A-Z0-9]{6,12})$/);
+  if(m)o.code=m[1].toUpperCase();
+  return o;
+}
+function cfgLinks(){
+  var links=($('cfgUrl').value||'').split(/\s+/).map(function(x){return x.trim();}).filter(Boolean);
+  if(!links.length)return toast('Illessz be legalább egy konfigurátor linket.');
+  var bad=links.filter(function(u){return !CFG_HOST_RE.test(u);});
+  if(bad.length)return toast('Nem BMW / MINI / Mercedes-Benz / Audi / VW link (https): '+bad[0],5000);
+  var b=$('cfgUrlGo');b.disabled=true;var chain=Promise.resolve(),n=0;
+  links.forEach(function(u){chain=chain.then(function(){
+    if(PICK.some(function(p){return p.config_url===u;}))return;
+    var c=cfgFromUrl(u);
+    var it={key:'cfgu-'+Date.now()+'-'+(n++),src:'config',title:'',brand:c.brand,config_code:c.code,config_url:u,price:0,src_price:0,currency:'EUR',period:'',note:''};
+    return api('/cfgmeta?url='+encodeURIComponent(u)).then(function(r){
+      if(r.title&&!/^(configurator|konfigurator|bmw|audi|volkswagen|mercedes-benz)\b.{0,12}$/i.test(r.title))it.title=r.title.replace(/\s*[|–-]\s*(BMW|Audi|Volkswagen|Mercedes-Benz|MINI)( Deutschland| Hungary)?\s*$/i,'');
+      if(r.image)it.image=r.image;
+    }).catch(function(){}).then(function(){if(!it.title&&c.brand)it.title=c.brand+' ';PICK.push(it);renderPicked();});
+  });});
+  chain.then(function(){b.disabled=false;$('cfgUrl').value='';$('cfgUrlSt').textContent=links.length+' link hozzáadva — add meg / ellenőrizd a modellt és az ajánlati árat lent.';});
+}
 function cfgFiles(files){
   if(!files.length)return;
   var st=$('cfgSt');var chain=Promise.resolve();
@@ -794,7 +824,7 @@ function renderPicked(){
     return '<div class="pk" data-i="'+i+'"><div class="t">'+(p.image?'<i class="pth" style="background-image:url(\''+esc(p.image)+'\')"></i>':'')+(i+1)+'. '+(editable?'<input data-f="title" placeholder="Autó megnevezése (márka, modell, kivitel)" value="'+esc(p.title)+'" style="flex:1;font:inherit;font-weight:800;padding:7px 9px;border:1px solid var(--line);border-radius:8px">':esc(p.title))
       +'<span class="sbadge '+src+'">'+SRC_BADGE[src]+'</span><span class="x" title="Eltávolítás" data-rm="1">×</span></div>'
       +(src==='mobile'?'<div class="idrow"><label>mobile.de hirdetés-azonosító</label><input data-f="ad_id" value="'+esc(p.ad_id||'')+'" inputmode="numeric" style="width:130px">'+(p.ad_url?'<a href="'+esc(p.ad_url)+'" target="_blank" rel="noopener">hirdetés megnyitása ↗</a>':'')+(p.src_price?'<span class="hint">mobile.de ár: <b>'+fmtPrice(p.src_price,'EUR')+'</b>'+(p.vat?' · '+esc(p.vat):'')+'</span>':'')+'</div>':'')
-      +(src==='config'?'<div class="idrow"><label>Márka</label><select data-f="brand"><option value="">—</option>'+['BMW','Mercedes-Benz','Audi','Volkswagen'].map(function(b){return '<option'+(p.brand===b?' selected':'')+'>'+b+'</option>';}).join('')+'</select><label>Konfigurációs kód</label><input data-f="config_code" value="'+esc(p.config_code||'')+'" style="width:130px">'+(p.file_id?'<a href="'+API+'/card/'+ID+'/files/'+p.file_id+'" target="_blank" rel="noopener">📄 '+esc(p.file_name||'PDF')+'</a>':'')+(p.src_price?'<span class="hint">PDF szerinti ár: <b>'+fmtPrice(p.src_price,'EUR')+'</b></span>':'')+'</div>':'')
+      +(src==='config'?'<div class="idrow"><label>Márka</label><select data-f="brand"><option value="">—</option>'+['BMW','MINI','Mercedes-Benz','Audi','Volkswagen'].map(function(b){return '<option'+(p.brand===b?' selected':'')+'>'+b+'</option>';}).join('')+'</select><label>Konfigurációs kód</label><input data-f="config_code" value="'+esc(p.config_code||'')+'" style="width:130px">'+(p.file_id?'<a href="'+API+'/card/'+ID+'/files/'+p.file_id+'" target="_blank" rel="noopener">📄 '+esc(p.file_name||'PDF')+'</a>':'')+(p.config_url?'<a href="'+esc(p.config_url)+'" target="_blank" rel="noopener noreferrer">🔗 konfiguráció ↗</a>':'')+(p.src_price?'<span class="hint">PDF szerinti ár: <b>'+fmtPrice(p.src_price,'EUR')+'</b></span>':'')+'</div>':'')
       +(src==='mobile'&&p.needPaste?'<div class="paste"><b>A mobile.de nem engedte az automatikus letöltést.</b> Nyisd meg a hirdetést'+(p.ad_url?' (<a href="'+esc(p.ad_url)+'" target="_blank" rel="noopener">link ↗</a>)':'')+', nyomj <b>Ctrl+A</b>, <b>Ctrl+C</b>, és illeszd be ide — a rendszer kiolvassa az adatokat:<textarea data-paste="'+i+'" rows="2" placeholder="Beillesztés ide (Ctrl+V)…"></textarea></div>':'')
       +(editable?'<div class="specg">'+[['year','Évjárat / első forg. hely.'],['km','Km'],['fuel','Üzemanyag'],['power','Teljesítmény'],['gearbox','Váltó'],['color','Szín']].map(function(f){return '<div class="fld"><label>'+f[1]+'</label><input data-f="'+f[0]+'" value="'+esc(p[f[0]]||'')+'"></div>';}).join('')+'</div>':'')
       +'<div class="prow"><div class="fld n"><label>Megjegyzés az ügyfélnek</label><input data-f="note" value="'+esc(p.note||'')+'" placeholder="'+(src==='mobile'?'pl. az ár tartalmazza a behozatalt, honosítást, regisztrációs adót':'pl. azonnal elérhető, 2 év garancia')+'"></div>'
