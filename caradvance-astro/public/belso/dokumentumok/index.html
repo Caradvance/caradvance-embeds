@@ -48,6 +48,11 @@ tr.click{cursor:pointer}tr.click:hover td{background:#F7F9FC}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media (max-width:900px){.ed{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.ed textarea,.pv{min-height:380px}}
 @media (max-width:560px){.grid{grid-template-columns:1fr}.grid .two{grid-column:auto}main{padding:12px}.hide-m{display:none}}
+.sigbox{display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:start}
+.sigcur{border:1.5px solid var(--line);border-radius:12px;min-height:110px;display:flex;align-items:center;justify-content:center;background:#fff;padding:8px}.sigcur img{max-width:100%;max-height:110px}
+.pad{position:relative;border:1.5px dashed #c8ced8;border-radius:14px;background:#fff;touch-action:none}.pad canvas{display:block;width:100%;height:150px;border-radius:14px;cursor:crosshair}
+.pad .ln{position:absolute;left:20px;right:20px;bottom:34px;border-top:1px solid #d6dae1;pointer-events:none}.pad .ph{position:absolute;left:0;right:0;top:42%;text-align:center;color:#a3abb8;pointer-events:none;font-size:13px}
+@media (max-width:700px){.sigbox{grid-template-columns:1fr}}
 </style>
 <link rel="stylesheet" href="/belso/belso-ui.css?v=4">
 </head>
@@ -192,23 +197,69 @@ function reloadList(){return api('/templates?all=1').then(function(j){TPLS=j.tem
 /* ---------- személyek ---------- */
 var PF=[['name','Név *'],['address','Lakcím'],['id_number','Személyi ig. / személyi szám'],['mother_name','Anyja neve'],['birth_place','Születési hely'],['birth_date','Születési idő'],['phone','Telefon'],['email','E-mail'],['note','Megjegyzés (pl. munkatárs, beosztás)']];
 function hd(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return s||'';var p=s.split('-');return p[0]+'. '+p[1]+'. '+p[2]+'.';}
+var PSIG=null; // a szerkesztett személy új aláírásmintája (data URL), '' = törlés, null = változatlan
 function renderPersons(){
   var p=PE||{};
-  var h=tabs()+'<div class="card"><h2>Személyek (meghatalmazottak, tanúk, kollégák)</h2><p class="muted small" style="margin-top:0">Az itt mentett személyek a meghatalmazásokhoz és nyilatkozatokhoz rendelhetők az Ügyfél adatlapon — az adataik automatikusan betöltődnek a dokumentumba.</p>'
-    +'<div class="grid">'+PF.map(function(f){return '<label class="f'+(f[0]==='address'||f[0]==='note'?' two':'')+'">'+f[1]+'<input class="in" data-pf="'+f[0]+'"'+(f[0]==='birth_date'?' type="date"':f[0]==='email'?' type="email"':'')+' value="'+esc(p[f[0]]||'')+'"></label>';}).join('')+'</div>'
-    +'<div class="row" style="margin-top:12px"><button class="btn red" id="psave">'+(p.id?'Módosítás mentése':'+ Személy hozzáadása')+'</button>'+(p.id?'<button class="btn ghost" id="pcancel">Mégse</button>':'')+'</div></div>'
-    +'<div class="card">'+(PERS.length?'<table><thead><tr><th>Név</th><th>Lakcím</th><th class="hide-m">Szem. ig.</th><th class="hide-m">Anyja neve</th><th class="hide-m">Szül. hely, idő</th><th></th></tr></thead><tbody>'
-      +PERS.map(function(x){return '<tr><td><b>'+esc(x.name)+'</b>'+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'')+'</td><td class="small">'+esc(x.address)+'</td><td class="hide-m small">'+esc(x.id_number)+'</td><td class="hide-m small">'+esc(x.mother_name)+'</td><td class="hide-m small">'+esc([x.birth_place,hd(x.birth_date)].filter(Boolean).join(', '))+'</td>'
+  var cur=PSIG!==null?PSIG:(p.sig||'');
+  var h=tabs()+'<div class="card"><h2>Személyek (meghatalmazottak, tanúk, kollégák, céges aláírók)</h2><p class="muted small" style="margin-top:0">Az itt mentett személyek a meghatalmazásokhoz és nyilatkozatokhoz rendelhetők az Ügyfél adatlapon — az adataik automatikusan betöltődnek a dokumentumba. Ha van aláírásmintájuk, az kék színnel bekerül a dokumentum aláírási helyére.</p>'
+    +'<div class="grid">'+PF.map(function(f){return '<label class="f'+(f[0]==='address'||f[0]==='note'?' two':'')+'">'+f[1]+'<input class="in" data-pf="'+f[0]+'"'+(f[0]==='birth_date'?' type="date"':f[0]==='email'?' type="email"':'')+' value="'+esc(p[f[0]]||'')+'"></label>';}).join('')
+    +'<label class="f full">Céges aláíróként — mely neveknél írjon alá automatikusan (vesszővel, pl. „Caradvance GmbH, BHGroup Zrt.”)<input class="in" data-pf="sign_as" value="'+esc(p.sign_as||'')+'" placeholder="üresen hagyva csak akkor kerül be, ha a dokumentumhoz személyként hozzárendeled"></label></div>'
+    +'<h3>Aláírásminta</h3><div class="sigbox"><div class="sigcur">'+(cur?'<img src="'+esc(cur)+'" alt="aláírás">':'<span class="muted small">Nincs aláírásminta.</span>')+'</div>'
+    +'<div><div class="pad"><canvas id="spad"></canvas><div class="ln"></div><div class="ph" id="sph">Írja alá itt (egérrel / ujjal)</div></div>'
+    +'<div class="row" style="margin-top:8px"><button class="btn sm dark" id="sTake" type="button">Rajzolt aláírás használata</button><button class="btn sm ghost" id="sClr" type="button">Rajz törlése</button>'
+    +'<label class="btn sm ghost" style="cursor:pointer">Kép feltöltése (szkennelt aláírás)<input type="file" id="sFile" accept="image/*" style="display:none"></label>'
+    +(cur?'<button class="btn sm ghost" id="sDel" type="button">Minta törlése</button>':'')+'</div>'
+    +'<p class="muted small" style="margin:6px 0 0">A minta automatikusan kék tintára színeződik, a háttér átlátszó fehér lesz. Mentéskor kerül tárolásra.</p></div></div>'
+    +'<div class="row" style="margin-top:14px"><button class="btn red" id="psave">'+(p.id?'Módosítás mentése':'+ Személy hozzáadása')+'</button>'+(p.id?'<button class="btn ghost" id="pcancel">Mégse</button>':'')+'</div></div>'
+    +'<div class="card">'+(PERS.length?'<table><thead><tr><th>Név</th><th>Lakcím</th><th class="hide-m">Szem. ig.</th><th class="hide-m">Anyja neve</th><th class="hide-m">Szül. hely, idő</th><th>Aláírás</th><th></th></tr></thead><tbody>'
+      +PERS.map(function(x){return '<tr><td><b>'+esc(x.name)+'</b>'+(x.note?'<div class="small muted">'+esc(x.note)+'</div>':'')+(x.sign_as?'<div class="small" style="color:#22447d">céges aláíró: '+esc(x.sign_as)+'</div>':'')+'</td><td class="small">'+esc(x.address)+'</td><td class="hide-m small">'+esc(x.id_number)+'</td><td class="hide-m small">'+esc(x.mother_name)+'</td><td class="hide-m small">'+esc([x.birth_place,hd(x.birth_date)].filter(Boolean).join(', '))+'</td>'
+        +'<td>'+(x.sig?'<img src="'+esc(x.sig)+'" alt="" style="height:30px;max-width:120px">':'<span class="muted small">—</span>')+'</td>'
         +'<td style="white-space:nowrap"><button class="btn sm ghost" data-pe="'+x.id+'">Szerkesztés</button> <button class="btn sm ghost" data-pd="'+x.id+'">Törlés</button></td></tr>';}).join('')+'</tbody></table>':'<p class="muted" style="margin:0">Még nincs mentett személy.</p>')+'</div>';
   app.innerHTML=h;
+  var PAD=sigPad($('spad'),'sph');
+  $('sClr').addEventListener('click',function(){PAD.clear();});
+  $('sTake').addEventListener('click',function(){if(PAD.isEmpty())return toast('Előbb írjon alá a keretben.');keepForm();PSIG=blueJpeg(PAD.cv,true);render();toast('Aláírásminta beállítva — mentsd a személyt.');});
+  $('sFile').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;var img=new Image();img.onload=function(){keepForm();var c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);PSIG=blueJpeg(c,false);URL.revokeObjectURL(img.src);render();toast('Aláírásminta beállítva — mentsd a személyt.');};img.onerror=function(){toast('A kép nem olvasható.');};img.src=URL.createObjectURL(f);});
+  var sd=$('sDel');if(sd)sd.addEventListener('click',function(){keepForm();PSIG='';render();});
   $('psave').addEventListener('click',function(){
     var b={};app.querySelectorAll('[data-pf]').forEach(function(i){b[i.getAttribute('data-pf')]=i.value;});if(p.id)b.id=p.id;
     if(!b.name.trim())return toast('Add meg a nevet.');
-    api('/persons',{method:'POST',body:b}).then(function(j){PERS=j.persons;PE=null;render();toast('Mentve');}).catch(function(e){toast(e.message);});
+    if(PSIG!==null)b.sig=PSIG;
+    api('/persons',{method:'POST',body:b}).then(function(j){PERS=j.persons;PE=null;PSIG=null;render();toast('Mentve');}).catch(function(e){toast(e.message);});
   });
-  var c=$('pcancel');if(c)c.addEventListener('click',function(){PE=null;render();});
-  app.querySelectorAll('[data-pe]').forEach(function(b){b.addEventListener('click',function(){PE=PERS.filter(function(x){return String(x.id)===b.getAttribute('data-pe');})[0];render();window.scrollTo(0,0);});});
+  var c=$('pcancel');if(c)c.addEventListener('click',function(){PE=null;PSIG=null;render();});
+  app.querySelectorAll('[data-pe]').forEach(function(b){b.addEventListener('click',function(){PE=PERS.filter(function(x){return String(x.id)===b.getAttribute('data-pe');})[0];PSIG=null;render();window.scrollTo(0,0);});});
   app.querySelectorAll('[data-pd]').forEach(function(b){b.addEventListener('click',function(){var x=PERS.filter(function(y){return String(y.id)===b.getAttribute('data-pd');})[0];if(!confirm('Törlöd: '+x.name+'? (A már kitöltött dokumentumok nem változnak.)'))return;api('/persons/'+x.id,{method:'DELETE'}).then(function(j){PERS=j.persons;render();}).catch(function(e){toast(e.message);});});});
+}
+/** a még nem mentett űrlap-mezők megtartása újrarajzoláskor */
+function keepForm(){var o=Object.assign({},PE||{});app.querySelectorAll('[data-pf]').forEach(function(i){o[i.getAttribute('data-pf')]=i.value;});PE=o;}
+function sigPad(cv,ph){
+  var ctx,drawing=false,last=null,dirty=false;
+  function size(){var r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=Math.max(1,r.width*dpr);cv.height=Math.max(1,r.height*dpr);ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#1d3fa6';dirty=false;$(ph).style.display='';}
+  size();
+  function pos(e){var r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
+  cv.addEventListener('pointerdown',function(e){drawing=true;last=pos(e);cv.setPointerCapture(e.pointerId);$(ph).style.display='none';e.preventDefault();});
+  cv.addEventListener('pointermove',function(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;dirty=true;e.preventDefault();});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){cv.addEventListener(ev,function(){drawing=false;});});
+  return {cv:cv,isEmpty:function(){return !dirty;},clear:size};
+}
+/** Kép → kék tintás aláírás fehér háttéren, a tinta köré vágva, JPEG data URL. */
+function blueJpeg(src,drawn){
+  var w=src.width,h=src.height,x=src.getContext('2d').getImageData(0,0,w,h).data;
+  var minX=w,minY=h,maxX=-1,maxY=-1,ink=new Uint8Array(w*h);
+  for(var i=0,p=0;p<w*h;p++,i+=4){
+    var a=x[i+3]/255,lum=(0.299*x[i]+0.587*x[i+1]+0.114*x[i+2])*a+255*(1-a);
+    var d=Math.max(0,Math.min(255,Math.round((drawn?235:200)-lum)));if(drawn&&a>0.05)d=Math.max(d,Math.round(a*255));
+    if(d>25){ink[p]=Math.min(255,d*(drawn?1:1.6));var px=p%w,py=(p/w)|0;if(px<minX)minX=px;if(px>maxX)maxX=px;if(py<minY)minY=py;if(py>maxY)maxY=py;}
+  }
+  if(maxX<0){toast('Nem található aláírás a képen.');return '';}
+  var pad=Math.round(Math.max(maxX-minX,maxY-minY)*0.04)+4;minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(w-1,maxX+pad);maxY=Math.min(h-1,maxY+pad);
+  var cw=maxX-minX+1,ch=maxY-minY+1,sc=Math.min(1,900/cw,360/ch),ow=Math.max(100,Math.round(cw*sc)),oh=Math.max(40,Math.round(ch*sc));
+  var t=document.createElement('canvas');t.width=cw;t.height=ch;var tc=t.getContext('2d'),im=tc.createImageData(cw,ch);
+  for(var yy=0;yy<ch;yy++)for(var xx=0;xx<cw;xx++){var k=(yy*cw+xx)*4,v=ink[(yy+minY)*w+xx+minX]/255;im.data[k]=Math.round(255-(255-29)*v);im.data[k+1]=Math.round(255-(255-63)*v);im.data[k+2]=Math.round(255-(255-166)*v);im.data[k+3]=255;}
+  tc.putImageData(im,0,0);
+  var o=document.createElement('canvas');o.width=ow;o.height=oh;var oc=o.getContext('2d');oc.fillStyle='#fff';oc.fillRect(0,0,ow,oh);oc.imageSmoothingQuality='high';oc.drawImage(t,0,0,ow,oh);
+  return o.toDataURL('image/jpeg',0.9);
 }
 
 /* ---------- beállítások ---------- */
