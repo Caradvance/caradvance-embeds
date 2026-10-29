@@ -40,9 +40,9 @@ function ujRedirect(url) {
 }
 
 // Saját domainek: caradvance.sk → dist/sk/… , caradvance.cz → dist/cs/… (a build i18n-mirror.mjs lépése készíti)
-const DOMAINS = { 'caradvance.sk': 'sk', 'www.caradvance.sk': 'sk', 'caradvance.cz': 'cs', 'www.caradvance.cz': 'cs', 'caradvance.pl': 'pl', 'www.caradvance.pl': 'pl' };
+const DOMAINS = { 'caradvance.sk': 'sk', 'www.caradvance.sk': 'sk', 'caradvance.cz': 'cs', 'www.caradvance.cz': 'cs', 'caradvance.pl': 'pl', 'www.caradvance.pl': 'pl', 'caradvance.ch': 'ch', 'www.caradvance.ch': 'ch' };
 const HU_SITE = 'https://www.caradvance.hu';
-const LANG_SITE = { sk: 'https://www.caradvance.sk', cs: 'https://www.caradvance.cz', pl: 'https://www.caradvance.pl' };
+const LANG_SITE = { sk: 'https://www.caradvance.sk', cs: 'https://www.caradvance.cz', pl: 'https://www.caradvance.pl', ch: 'https://www.caradvance.ch' };
 // true = a caradvance.hu/sk/… és /cs/… címek 301-gyel a saját domainre mennek (csak ha a domainek már élnek!)
 const SKCZ_REDIRECT = true;
 // true = a caradvance.hu/pl/… címek is 301-gyel a caradvance.pl-re mennek — csak ha a .pl domain már a Pages-projekthez van kötve!
@@ -65,11 +65,22 @@ async function slugMap(env, l, origin) {
 }
 function locOf(map, p) { const q = p.endsWith('/') ? p : p + '/'; return map[q] || null; }
 
+/* caradvance.ch: amíg a svájci oldal (dist/ch) nincs kész, egy rövid, nem indexelhető „hamarosan” oldal */
+const CH_HOLD = '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>CarAdvance Schweiz</title><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#0B0B0D;color:#fff;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center}main{padding:32px;max-width:640px}img{width:200px;height:auto;margin-bottom:28px}h1{font-size:26px;margin:0 0 14px}p{color:#c9ccd3;line-height:1.6;margin:6px 0}</style></head><body><main><img src="/caradvance-logo-email.png" alt="CarAdvance"><h1>CarAdvance Schweiz</h1><p>Unsere Website für die Schweiz ist in Kürze online.</p><p>Notre site pour la Suisse sera bientôt en ligne.</p><p>Il nostro sito per la Svizzera sarà presto online.</p><p>Our website for Switzerland will be online soon.</p></main></body></html>';
+async function chReady(env, origin) {
+  try { const r = await env.ASSETS.fetch(new Request(new URL('/ch/', origin).toString())); return r.status === 200; } catch (e) { return false; }
+}
+
 async function serveDomain(context, url, l) {
   const { request, env, next } = context;
   const p = url.pathname;
   if (!url.hostname.startsWith('www.')) { url.hostname = 'www.' + url.hostname; return Response.redirect(url.toString(), 301); }
   if (p.startsWith('/api/')) return next();
+  if (l === 'ch' && !(await chReady(env, url.origin))) {
+    if (p === '/robots.txt') return new Response('User-agent: *\nDisallow: /\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
+    if (/\.[a-z0-9]{1,5}$/i.test(p)) return next();
+    return new Response(CH_HOLD, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'X-Robots-Tag': 'noindex, nofollow', 'Cache-Control': 'no-store' } });
+  }
   { const ur = ujRedirect(url); if (ur) return ur; }
   const pre = '/' + l + '/';
   if (p === '/' + l || p.startsWith(pre)) {
