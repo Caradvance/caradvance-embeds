@@ -319,7 +319,7 @@ class Layout {
     const P = parts.map((p) => {
       const [main, name] = p.split('~~').map((s) => s.trim()); const [t, sub] = main.split(/\s+~\s+|~/).map((s) => (s || '').trim());
       return { T: this.measure(t || '', { w: cw, size: 8.4, f: 'S', num: false, bullets: false, lh: 1.4 }), S: sub ? this.measure(sub, { w: cw, size: 7.4, f: 'L', num: false, bullets: false, lh: 1.4 }) : null,
-        N: name && !isBlank(name) ? this.measure(name, { w: cw - 6, size: 7.6, f: 'R', num: false, bullets: false, lh: 1.35 }) : null, nameRaw: name || '' };
+        N: name && !isBlank(name) ? this.measure(name, { w: cw - 6, size: 7.6, f: 'R', num: false, bullets: false, lh: 1.35 }) : null, nameRaw: name || '', tRaw: t || '' };
     });
     const headH = Math.max(...P.map((q) => q.T.lines.length * q.T.lh + (q.S ? q.S.lines.length * q.S.lh : 0)));
     const nameH = Math.max(0, ...P.map((q) => (q.N ? q.N.lines.length * q.N.lh : 0)));
@@ -339,6 +339,11 @@ class Layout {
         const im = this.meta.sig.img; const ih = 34; const iw = Math.min(cw - 10, ih * im.w / im.h);
         this.d.image(x + 2, lineY + 1.5, iw, iw * im.h / im.w, null, im);
         this.d.text('elektronikusan aláírva · ' + this.meta.sig.when, x + cw - 6 - this.d.width('elektronikusan aláírva · ' + this.meta.sig.when, 'L', 5.6), lineY + 2.5, 'L', 5.6, C.red);
+      } else if (this.meta.specimens && this.meta.specimens.length) {
+        // tárolt aláírásminta (személyek / céges aláírók): a hasáb neve (~~) vagy címe alapján
+        const keys = [q.nameRaw, q.tRaw].filter(Boolean).map(normName);
+        const sp = this.meta.specimens.find((z) => z.keys.some((k) => k && keys.includes(k)));
+        if (sp) { const im = sp.img; let ih = 32; let iw = ih * im.w / im.h; if (iw > cw - 12) { iw = cw - 12; ih = iw * im.h / im.w; } this.d.image(x + 4, lineY + 1, iw, ih, null, im); }
       }
       this.d.line(x, lineY, x + cw - 6, lineY, '0.35 0.37 0.42', 0.6);
       let yb = lineY - 2; if (q.N) { this.drawMeasured(q.N, x, yb, C.ink); yb -= q.N.lines.length * q.N.lh; }
@@ -433,6 +438,8 @@ export function renderDocPdf(filled, meta) {
   let sigImg = null;
   if (meta.sign && meta.sign.jpeg) { const inf = jpegInfo(meta.sign.jpeg); if (inf) sigImg = { bytes: meta.sign.jpeg, ...inf }; }
   if (sigImg) meta2.sig = { img: sigImg, name: meta.sign.match || '', when: meta.sign.when || '' };
+  // tárolt aláírásminták: [{ names: [...], jpeg: Uint8Array }]
+  meta2.specimens = (meta.specimens || []).map((z) => { const inf = z.jpeg && jpegInfo(z.jpeg); return inf ? { img: { bytes: z.jpeg, ...inf }, keys: (z.names || []).map(normName).filter(Boolean) } : null; }).filter(Boolean);
   const L = new Layout(meta2);
   L.bottom = M.footer ? 92 : 46;
   const caption = M.caption || (bilingual ? 'Unterschrift / Aláírás' : 'aláírás');

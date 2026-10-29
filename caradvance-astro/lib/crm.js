@@ -148,6 +148,7 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)`)
   ]);
   for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
+  for (const q of [`ALTER TABLE crm_docs ADD COLUMN use_sigs INTEGER DEFAULT 1`, `ALTER TABLE crm_persons ADD COLUMN sign_as TEXT DEFAULT ''`, `ALTER TABLE crm_persons ADD COLUMN sig TEXT`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
   READY = true;
 }
 
