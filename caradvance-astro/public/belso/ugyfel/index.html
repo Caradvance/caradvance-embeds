@@ -315,12 +315,12 @@ function normData(d,deal,addr){
   var p=d.person||{};
   return {
     kind:d.kind==='ceg'?'ceg':'magan',
-    person:Object.assign({id_number:'',mother_name:'',birth_place:'',birth_date:'',residence:'',bank:'',licence:''},p,{name:p.name||deal.name||'',address:p.address||addr||'',phone:p.phone||deal.phone||'',email:p.email||deal.email||'',tax:p.tax||''}),
+    person:Object.assign({id_number:'',mother_name:'',birth_place:'',birth_date:'',residence:'',bank:'',licence:'',address_card:'',vpid:''},p,{name:p.name||deal.name||'',address:p.address||addr||'',phone:p.phone||deal.phone||'',email:p.email||deal.email||'',tax:p.tax||''}),
     company:Object.assign({name:'',address:'',tax:'',reg:''},d.company||{}),
     contact_differs:!!d.contact_differs,
     contact:Object.assign({name:'',role:'',phone:'',email:''},d.contact||{}),
-    vehicles:(d.vehicles||[]).map(function(v){return Object.assign({id:'',title:'',brand:'',model:'',year:'',vin:'',plate:'',ad_id:'',config_code:'',color:'',engine:'',fuel:'',km:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);}),
-    buyer:{kind:d.buyer&&d.buyer.kind==='ceg'?'ceg':'magan',person:Object.assign({name:'',address:'',phone:'',email:'',tax:'',id_number:'',mother_name:'',birth_place:'',birth_date:'',residence:'',bank:'',licence:''},(d.buyer&&d.buyer.person)||{}),company:Object.assign({name:'',address:'',tax:'',reg:''},(d.buyer&&d.buyer.company)||{})},
+    vehicles:(d.vehicles||[]).map(function(v){return Object.assign({id:'',title:'',brand:'',model:'',year:'',vin:'',plate:'',ad_id:'',config_code:'',color:'',engine:'',fuel:'',km:'',condition:'',body:'',gearbox:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);}),
+    buyer:{kind:d.buyer&&d.buyer.kind==='ceg'?'ceg':'magan',person:Object.assign({name:'',address:'',phone:'',email:'',tax:'',id_number:'',mother_name:'',birth_place:'',birth_date:'',residence:'',bank:'',licence:'',address_card:'',vpid:''},(d.buyer&&d.buyer.person)||{}),company:Object.assign({name:'',address:'',tax:'',reg:''},(d.buyer&&d.buyer.company)||{})},
     notes:d.notes||'',
     request:d.request||''
   };
@@ -396,10 +396,10 @@ function renderPersonal(){
 }
 var ID_OPEN={};
 function idBlock(path,p,title){
-  var filled=['id_number','mother_name','birth_place','birth_date','residence','bank','licence'].filter(function(k){return p[k];}).length;
+  var filled=['id_number','address_card','mother_name','birth_place','birth_date','residence','bank','licence','vpid'].filter(function(k){return p[k];}).length;
   return '<details class="vbox idb" data-idb="'+path+'"'+(ID_OPEN[path]||filled?' open':'')+' style="margin:14px 0 0"><summary>'+esc(title)+(filled?' <span class="hint">('+filled+' kitöltve)</span>':'')+'</summary><div class="grid" style="margin-top:12px">'
     +inp(path+'.id_number','Személyi ig. / személyi szám',p.id_number)+inp(path+'.mother_name','Anyja neve',p.mother_name)+inp(path+'.birth_place','Születési hely',p.birth_place)
-    +inp(path+'.birth_date','Születési idő',p.birth_date,'date')+inp(path+'.licence','Vezetői engedély száma',p.licence)+inp(path+'.bank','Bankszámlaszám',p.bank)
+    +inp(path+'.birth_date','Születési idő',p.birth_date,'date')+inp(path+'.licence','Vezetői engedély száma',p.licence)+inp(path+'.address_card','Lakcímkártya száma',p.address_card)+inp(path+'.bank','Bankszámlaszám',p.bank)+inp(path+'.vpid','VPID szám (vámügyintézéshez)',p.vpid)
     +inp(path+'.residence','Tartózkodási hely (ha eltér)',p.residence,'text',' wide')+'</div></details>';
 }
 function bindInputs(root){
@@ -447,7 +447,7 @@ function renderVehicle(){
     h+='<div class="veh-form"><div class="veh-h"><b>'+esc((i+1)+'. autó — '+vehName(v,i))+'</b><span class="hint">'+esc(SRC_LBL[v.source]||'')+'</span>'+(v.url?'<a class="hint" href="'+esc(v.url)+'" target="_blank" rel="noopener">weboldal ↗</a>':'')+'<span class="sp" style="flex:1"></span><button class="btn ghost sm" id="vehDel">Autó törlése</button></div>'
       +'<div class="grid g4">'+vinp('title','Megnevezés',v.title,' wide')
       +vinp('brand','Márka',v.brand)+vinp('model','Típus',v.model)+vinp('year','Évjárat',v.year)+vinp('vin','Alvázszám',v.vin)+vinp('plate','Rendszám',v.plate)
-      +vinp('color','Szín',v.color)+vinp('engine','Motor',v.engine)+vinp('fuel','Üzemanyag',v.fuel)+vinp('km','Km',v.km)+(v.ad_id?vinp('ad_id','mobile.de azonosító',v.ad_id):'')+(v.config_code||S.deal.line==='Eladás'?vinp('config_code','Konfigurációs kód',v.config_code):'')
+      +vinp('color','Szín',v.color)+vinp('engine','Motor',v.engine)+vinp('fuel','Üzemanyag',v.fuel)+vinp('km','Km',v.km)+vinp('body','Karosszéria',v.body)+vinp('gearbox','Váltó',v.gearbox)+vinp('condition','Állapot',v.condition)+(v.ad_id?vinp('ad_id','mobile.de azonosító',v.ad_id):'')+(v.config_code||S.deal.line==='Eladás'?vinp('config_code','Konfigurációs kód',v.config_code):'')
       +vinp('price','Ár / díj',v.price||'')+'<div class="fld"><label>Pénznem</label><select data-vp="currency"><option value="HUF"'+(v.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(v.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-vp="period"><option value="">egyszeri (vételár)</option><option value="hó"'+(v.period==='hó'?' selected':'')+'>havi (bérleti díj)</option></select></div>'
       +'</div><label class="chk" style="margin-top:14px"><input type="checkbox" data-vp="hybrid"'+(v.hybrid?' checked':'')+'> Hibrid</label>'
@@ -530,7 +530,7 @@ function bindRent(v){
 function vinp(k,label,val,extra){return '<div class="fld'+(extra||'')+'"><label>'+esc(label)+'</label><input data-vp="'+k+'" value="'+esc(val==null?'':val)+'"'+(k==='price'?' inputmode="decimal"':'')+'></div>';}
 function newVid(){var L=vehs(),i=L.length+1,ids={};L.forEach(function(x){ids[x.id]=1;});while(ids['v'+i])i++;return 'v'+i;}
 function addVehicle(v){
-  v=Object.assign({id:newVid(),title:'',brand:'',model:'',year:'',vin:'',plate:'',ad_id:'',config_code:'',color:'',engine:'',fuel:'',km:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);
+  v=Object.assign({id:newVid(),title:'',brand:'',model:'',year:'',vin:'',plate:'',ad_id:'',config_code:'',color:'',engine:'',fuel:'',km:'',condition:'',body:'',gearbox:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);
   S.card.data.vehicles=vehs().concat([v]);VSEL=v.id;VPICK=false;
   if(!CVID){CVID=v.id;useCt();}
   renderVehicle();renderContract();saveData().then(function(){renderFin();toast('Autó hozzáadva: '+vehName(v));});
@@ -1164,14 +1164,14 @@ function dmCreate(){
     missingModal(c.missing,function(extra){dmGenerate(T,vlist,extra);});
   }).catch(function(e){toast(e.message,4500);});
 }
-function missingModal(miss,done){
+function missingModal(miss,done,cancel){
   var ov=document.createElement('div');ov.className='mdl';
   ov.innerHTML='<div class="mdl-b"><h3>Hiányzó adatok</h3><p class="hint">A dokumentum csak akkor generálható, ha minden szükséges adat ki van töltve. Az ügyfél / autó adatait az 1–2. szekcióban is pótolhatod — az itt megadott értékek csak ezekbe a dokumentumokba kerülnek.</p>'
     +'<div class="vars" style="margin-top:10px">'+miss.map(function(m){return '<div class="fld"><label>'+esc(m.label)+'</label><input data-mk="'+esc(m.key)+'"><small class="hint">'+esc(m.templates.join(', '))+'</small></div>';}).join('')+'</div>'
     +'<div class="actions"><button class="btn red" id="mdlOk">Generálás</button><button class="btn ghost" id="mdlNo">Mégse</button></div></div>';
   document.body.appendChild(ov);
   var f=ov.querySelector('input');if(f)f.focus();
-  ov.querySelector('#mdlNo').addEventListener('click',function(){ov.remove();});
+  ov.querySelector('#mdlNo').addEventListener('click',function(){ov.remove();if(cancel)cancel();});
   ov.querySelector('#mdlOk').addEventListener('click',function(){
     var extra={},empty=[];ov.querySelectorAll('[data-mk]').forEach(function(i){var v=i.value.trim();if(!v){empty.push(i);i.style.borderColor='var(--red)';}else{extra[i.getAttribute('data-mk')]=v;i.style.borderColor='';}});
     if(empty.length)return toast('Minden mezőt ki kell tölteni ('+empty.length+' üres).');
@@ -1186,8 +1186,18 @@ function dmGenerate(T,vlist,extra){
     chain=chain.then(function(){
       b.textContent='Kitöltés… ('+(k+1)+'/'+jobs.length+')';
       var np={};Object.keys(DM.np).forEach(function(r){if(jb.t.roles.indexOf(r)>=0&&DM.np[r])np[r]=+DM.np[r];});
-      return api('/card/'+ID+'/docs',{method:'POST',body:{template_id:jb.t.id,vehicle_id:jb.vid,persons:np,extra:extra}}).then(function(r){DM.docs.push(r.doc);DM.sel[r.doc.id]=true;made.push(r.doc);})
-        .catch(function(e){fail++;toast(jb.t.name+': '+e.message,4500);});
+      var ok=function(r){DM.docs.push(r.doc);DM.sel[r.doc.id]=true;made.push(r.doc);};
+      var post=function(ex){return api('/card/'+ID+'/docs',{method:'POST',body:{template_id:jb.t.id,vehicle_id:jb.vid,persons:np,extra:ex}});};
+      return post(extra).then(ok).catch(function(e){
+        // a számított mezők (pl. betűvel, áfa) csak a megadott értékből derülnek ki — ha nem sikerült, itt kérjük be
+        var m=e.data&&e.data.missing;
+        if(!m||!m.length){fail++;toast(jb.t.name+': '+e.message,4500);return;}
+        return new Promise(function(res){
+          missingModal(m.map(function(x){return {key:x.key,label:x.label,templates:[jb.t.name]};}),function(ex){
+            Object.assign(extra,ex);post(extra).then(ok).catch(function(e2){fail++;toast(jb.t.name+': '+e2.message,4500);}).then(res);
+          },function(){fail++;res();});
+        });
+      });
     });
   });
   chain.then(function(){
@@ -1239,7 +1249,7 @@ function renderDmEdit(){
   $('dmPdfBtn').addEventListener('click',function(){dmPdf(d.id,true);});
 }
 function dmBody(refill){var d=DM.edit;var ps={};Object.keys(d.persons||{}).forEach(function(k){if(d.persons[k])ps[k]=+d.persons[k];});return {name:d.name,text:d.text,vars:d.vars,vehicle_id:d.vehicle_id,persons:ps,use_sigs:d.use_sigs===0?0:1,refill:refill||undefined};}
-var OPTIONAL_VARS={auto_rendszam:1};
+var OPTIONAL_VARS={auto_rendszam:1,fizetesi_munkanap:1,egyeb_okmany:1,kedvezmenyezett:1};
 function missKeys(d){return CADoc.usedKeys(d.text).filter(function(k){return !OPTIONAL_VARS[k]&&!String(d.vars[k]==null?'':d.vars[k]).trim();});}
 function dmSave(refill){
   var d=DM.edit;if(!d)return;saving();
