@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" translate="no">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<meta name="google" content="notranslate">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src blob: 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Partnerportal — CarAdvance</title>
@@ -62,6 +63,9 @@ label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-to
 .mdl{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}.mdl .card{max-width:520px;width:100%;margin:0}
 .topr{display:flex;gap:10px;align-items:center}.topr select{background:#1b1f2a;color:#cbd2dc;border:1px solid #333a48;border-radius:8px;padding:4px 6px;font:inherit;font-size:12.5px}
 .topr button{background:none;border:1px solid #333a48;color:#cbd2dc;border-radius:8px;padding:4px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+
+/* a buildfolyamat által beszúrt webhely-fejléc / -lábléc elrejtése: ez az oldal önálló */
+body>*:not(.top):not(.hero):not(.wrap):not(.mdl):not(script):not(style){display:none!important}
 </style>
 </head>
 <body>
@@ -188,9 +192,10 @@ function renderList(){
   // származási ország (piac) szerinti szűrés: HU, PL, SK, CZ, RO …
   var mks=[];REQ.forEach(function(r){if(mks.indexOf(r.market)<0)mks.push(r.market);});mks.sort();
   if(mks.length>1||MKT)h+='<div class="tabs" style="margin-top:-4px"><span class="small muted" style="align-self:center">'+esc(L().mk)+':</span><button data-mk="" class="'+(MKT?'':'on')+'">'+esc(L().allMk)+'</button>'+mks.map(function(m){var n=REQ.filter(function(r){return r.market===m&&r.status==='pending';}).length;return '<button data-mk="'+esc(m)+'" class="'+(MKT===m?'on':'')+'">'+(FLAG[m]||'')+' '+esc(m)+(n?' ('+n+')':'')+'</button>';}).join('')+'</div>';
-  if(TAB==='open'&&!ME.has_sig)h+='<div class="note">'+esc(L().needSig)+'</div>';
+  if(TAB!=='done'&&!ME.has_sig)h+='<div class="note">'+esc(L().needSig)+'</div>';
   if(!list.length)h+='<p class="muted">'+(TAB==='done'?L().noDone:L().noOpen)+'</p>';
-  if(TAB==='open'&&list.length)h+='<label class="chk"><input type="checkbox" id="sa"> '+L().selAll+'</label>';
+  var openN=list.filter(function(r){return r.status==='pending';}).length;
+  if(openN)h+='<label class="chk"><input type="checkbox" id="sa"> '+L().selAll+'</label>';
   h+=list.map(function(r){
     var open=r.status==='pending';
     return '<div class="req'+(SEL[r.id]?' sel':'')+'">'+(open?'<input type="checkbox" data-s="'+r.id+'"'+(SEL[r.id]?' checked':'')+' style="width:20px;height:20px;accent-color:var(--red);margin-top:2px">':'')
@@ -198,14 +203,14 @@ function renderList(){
       +'<div class="small muted">#'+r.id+' · '+L().received+': '+esc(r.received)+(r.client_signed?' · '+L().clientSigned+': '+esc(r.client_signed):'')+(r.signed_at?' · '+L().signedAt+': '+esc(r.signed_at)+(r.sign_name?' ('+esc(r.sign_name)+')':''):'')+'</div>'
       +'<ul>'+r.docs.map(function(d){return '<li>'+esc(d.name)+(d.number?' <span class="muted">('+esc(d.number)+')</span>':'')+' <button class="lnk" data-pdf="'+r.id+':'+d.i+'">'+L().pdf+'</button></li>';}).join('')+'</ul></div></div>';
   }).join('');
-  if(TAB==='open'&&list.length)h+='<div class="bar"><span id="selc">'+esc(L().selected(Object.keys(SEL).filter(function(k){return SEL[k];}).length))+'</span><span class="sp"></span><button class="btn red" id="sgo">'+L().signSel+'</button></div><div class="sec">🔒 <span>'+esc(L().sec)+'</span></div>';
+  if(openN)h+='<div class="bar"><span id="selc">'+esc(L().selected(Object.keys(SEL).filter(function(k){return SEL[k];}).length))+'</span><span class="sp"></span><button class="btn red" id="sgo">'+L().signSel+'</button></div><div class="sec">🔒 <span>'+esc(L().sec)+'</span></div>';
   $('pane').innerHTML=h;
   $('pane').querySelectorAll('[data-s]').forEach(function(c){c.addEventListener('change',function(){SEL[c.getAttribute('data-s')]=c.checked;c.closest('.req').classList.toggle('sel',c.checked);upd();});});
   var sa=$('sa');if(sa)sa.addEventListener('change',function(){var on=sa.checked;$('pane').querySelectorAll('[data-s]').forEach(function(c){c.checked=on;SEL[c.getAttribute('data-s')]=on;c.closest('.req').classList.toggle('sel',on);});upd();});
   $('pane').querySelectorAll('[data-mk]').forEach(function(b){b.addEventListener('click',function(){MKT=b.getAttribute('data-mk');SEL={};renderMain();});});
   $('pane').querySelectorAll('[data-pdf]').forEach(function(b){b.addEventListener('click',function(){var x=b.getAttribute('data-pdf').split(':');openPdf(+x[0],+x[1]);});});
   var g=$('sgo');if(g){g.addEventListener('click',startSign);upd();}
-  function upd(){var n=Object.keys(SEL).filter(function(k){return SEL[k];}).length;var s=$('selc');if(s)s.textContent=L().selected(n);if(g)g.disabled=!n||!ME.has_sig;}
+  function upd(){var n=Object.keys(SEL).filter(function(k){return SEL[k];}).length;var s=$('selc');if(s)s.textContent=L().selected(n);if(g)g.disabled=!n;}
 }
 function openPdf(id,i){
   var w=window.open('','_blank');
@@ -213,6 +218,7 @@ function openPdf(id,i){
 }
 function startSign(){
   var ids=Object.keys(SEL).filter(function(k){return SEL[k];}).map(Number);if(!ids.length)return;
+  if(!ME.has_sig){alert(L().needSig);TAB='sig';renderMain();return;}
   var g=$('sgo');g.disabled=true;
   post('/code',{ids:ids}).then(function(j){g.disabled=false;modal(ids,j.email);}).catch(function(e){g.disabled=false;alert(e.message);});
 }
