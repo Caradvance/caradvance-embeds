@@ -641,9 +641,18 @@ export async function sendCrmMail(env, to, subject, inner, attachments) {
     text: inner.replace(/<br\s*\/?>/g, '\n').replace(/<\/(p|tr|div)>/g, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\n{3,}/g, '\n\n').trim()
   };
   if (attachments && attachments.length) body.attachments = attachments;
-  const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const post = () => fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  let r = await post();
   if (r.ok) return { ok: true };
-  return { ok: false, error: 'E-mail küldési hiba: ' + (await r.text().catch(() => r.status)).slice(0, 300) };
+  let err = String(await r.text().catch(() => r.status));
+  // ha a caradvance.hu fődomain még nincs hitelesítve a Resendben: sales@ a már hitelesített küldő domainről (pl. send.caradvance.hu), a válasz így is a sales@caradvance.hu-ra megy
+  const fbDom = ((env.CUSTOMER_EMAIL_FROM || env.LEAD_EMAIL_FROM || '').match(/@([^>\s]+)/) || [])[1];
+  if (!env.CRM_EMAIL_FROM && fbDom && fbDom !== 'caradvance.hu' && /verif|domain/i.test(err)) {
+    body.from = 'CarAdvance <sales@' + fbDom + '>';
+    r = await post(); if (r.ok) return { ok: true };
+    err = String(await r.text().catch(() => r.status));
+  }
+  return { ok: false, error: 'E-mail küldési hiba: ' + err.slice(0, 300) };
 }
 export function notifyTo(env) { return env.CRM_NOTIFY_TO || env.CONTRACT_NOTIFY_TO || 'info@caradvance.hu'; }
 
