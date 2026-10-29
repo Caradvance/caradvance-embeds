@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src blob: 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Partnerportal — CarAdvance</title>
+<link rel="icon" href="/favicon-32.png">
+<!-- ca-tracking:start --><!-- Ezen az oldalon szándékosan nincs követőkód (partnerportál, aláírás). --><!-- ca-tracking:end -->
+<style>
+:root{--red:#E2001A;--red2:#B80015;--ink:#0F172A;--ink2:#334155;--mut:#5A6B82;--line:#E6EAF1;--bg:#F4F5F7;--ok:#15803D;--okbg:#DCFCE7}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+.top{background:#0B0B0D;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.top img{height:34px;display:block}.top span{color:#cbd2dc;font-size:12.5px;display:flex;align-items:center;gap:6px}
+.hero{background:radial-gradient(900px 300px at 85% -40%,rgba(226,0,26,.45),transparent 60%),linear-gradient(180deg,#0B0B0D,#151821);color:#fff;padding:26px 20px 70px}
+.hero h1{margin:0 0 4px;font-size:25px;line-height:1.2}.hero p{margin:0;color:#c9cfda}
+.wrap{max-width:1000px;margin:-48px auto 40px;padding:0 14px}
+.card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(15,23,42,.06);margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:18px;display:flex;align-items:center;gap:10px}
+.card h2 .n{width:28px;height:28px;border-radius:9px;background:#fdeceb;color:var(--red);font-size:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.card.off{opacity:.55;pointer-events:none}
+.muted{color:var(--mut)}.small{font-size:13px}
+.doc{border:1.5px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+.doc .h{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-wrap:wrap}
+.doc .h b{flex:1;min-width:180px;font-size:14.5px}
+.doc.ok{border-color:#bfe8cd;background:#f8fdf9}
+.pv{border-top:1px solid var(--line);padding:16px 18px;max-height:520px;overflow:auto;font-size:12.5px;line-height:1.55;background:#fff;display:none}
+.doc.open .pv{display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 22px;font:700 15px/1 inherit;font-family:inherit;cursor:pointer;text-decoration:none}
+.btn.red{background:var(--red);color:#fff}.btn.red:hover{background:var(--red2)}.btn.dark{background:#0F172A;color:#fff}
+.btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}.btn.sm{padding:8px 14px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:10px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:1px;accent-color:var(--red);flex:none}
+.in{width:100%;margin-top:4px;padding:12px;border:1.5px solid var(--line);border-radius:14px;background:#F7F9FC;font:inherit;color:var(--ink)}
+.in:focus{outline:none;border-color:#22447d;background:#fff}
+.code{font:700 26px/1 "Courier New",monospace;letter-spacing:8px;text-align:center;max-width:240px;display:block}
+label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-top:10px}
+.pad{position:relative;border:1.5px dashed #c8ced8;border-radius:16px;background:#fff;touch-action:none}
+.pad canvas{display:block;width:100%;height:200px;border-radius:16px;cursor:crosshair}
+.pad .ln{position:absolute;left:24px;right:24px;bottom:44px;border-top:1px solid #d6dae1;pointer-events:none}
+.pad .ph{position:absolute;left:0;right:0;top:44%;text-align:center;color:#a3abb8;pointer-events:none;font-size:14px}
+.note{border-radius:12px;padding:10px 12px;margin:10px 0;font-size:13.5px;background:#EEF4FF;color:#1e3a8a}
+.note.err{background:#FDE8EB;color:#9f1239}.note.ok{background:var(--okbg);color:var(--ok)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sec{font-size:12px;color:var(--mut);display:flex;gap:8px;align-items:flex-start;margin-top:14px}
+.big{font-size:44px;line-height:1;margin-bottom:6px}
+@media(max-width:560px){.card{padding:18px}.hero h1{font-size:21px}}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.tabs button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:600 13.5px inherit;font-family:inherit;cursor:pointer;color:var(--ink2)}
+.tabs button.on{background:#0F172A;color:#fff;border-color:#0F172A}
+.req{border:1.5px solid var(--line);border-radius:14px;margin:10px 0;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.req.sel{border-color:#f3a3ad;background:#fff7f8}.req .main{flex:1;min-width:0}.req .t{font-weight:700}
+.req ul{margin:6px 0 0;padding-left:18px;font-size:13.5px}.req li{margin:3px 0}
+.lnk{background:none;border:0;color:#1d4ed8;cursor:pointer;font:inherit;font-size:12.5px;padding:0 0 0 6px;text-decoration:underline}
+.bar{position:sticky;bottom:10px;background:#0F172A;color:#fff;border-radius:16px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 10px 30px rgba(15,23,42,.25)}
+.bar .sp{flex:1}.sigimg{max-width:320px;max-height:110px;border:1.5px solid var(--line);border-radius:12px;padding:6px;background:#fff;display:block}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 9px;background:#fff4e5;color:#9a5b00}.badge.ok{background:var(--okbg);color:var(--ok)}.badge.off{background:#eef0f4;color:var(--mut)}
+.mdl{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}.mdl .card{max-width:520px;width:100%;margin:0}
+.topr{display:flex;gap:10px;align-items:center}.topr select{background:#1b1f2a;color:#cbd2dc;border:1px solid #333a48;border-radius:8px;padding:4px 6px;font:inherit;font-size:12.5px}
+.topr button{background:none;border:1px solid #333a48;color:#cbd2dc;border-radius:8px;padding:4px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="top"><img src="/caradvance-logo-white.webp" alt="CarAdvance"><div class="topr"><select id="lang" aria-label="Sprache"><option value="de">Deutsch</option><option value="en">English</option><option value="hu">Magyar</option></select><button id="out" style="display:none"></button></div></div>
+<div class="hero"><h1 id="h1">Partnerportal</h1><p id="sub"></p></div>
+<div class="wrap" id="app"><div class="card">…</div></div>
+<script>
+(function(){
+'use strict';
+var A='/api/partner',app=document.getElementById('app'),ME=null,STMT='',REQ=[],TAB='open',SEL={},PAD=null,LANG='de';
+var I18N={
+ de:{portal:'Partnerportal',login:'Anmelden',user:'Benutzername (E-Mail)',pass:'Passwort',loginBtn:'Anmelden',logout:'Abmelden',
+  sub:function(m){return m.company+' · '+m.country;},
+  mustChange:'Bitte legen Sie ein neues Passwort fest',mustChangeTxt:'Aus Sicherheitsgründen muss das Startpasswort bei der ersten Anmeldung geändert werden. Mindestens 10 Zeichen.',
+  oldPw:'Aktuelles Passwort',newPw:'Neues Passwort (mind. 10 Zeichen)',newPw2:'Neues Passwort wiederholen',savePw:'Passwort speichern',pwMismatch:'Die Passwörter stimmen nicht überein.',
+  tOpen:'Zu unterschreiben',tDone:'Unterschrieben',tAll:'Alle',tSig:'Meine Unterschrift',tPw:'Passwort',
+  noOpen:'Derzeit liegen keine Dokumente zur Unterschrift vor.',noDone:'Noch keine unterschriebenen Dokumente.',
+  client:'Kunde',received:'Eingegangen',clientSigned:'vom Kunden unterschrieben',signedAt:'Unterschrieben',expires:'gültig bis',
+  st:{pending:'offen',signed:'unterschrieben',expired:'abgelaufen',revoked:'widerrufen',locked:'gesperrt',signing:'in Bearbeitung'},
+  pdf:'PDF',selAll:'Alle auswählen',selected:function(n){return n+' Vorgang/Vorgänge ausgewählt';},signSel:'Ausgewählte unterschreiben',
+  needSig:'Bitte speichern Sie zuerst Ihre Unterschrift (Reiter „Meine Unterschrift“).',
+  sigTitle:'Gespeicherte Unterschrift',sigTxt:'Diese Unterschrift wird bei der Gegenzeichnung in die Dokumente eingefügt. Sie können sie jederzeit ändern.',
+  sigName:'Name des Unterzeichners (z. B. Dr. Max Mustermann, Geschäftsführer)',sigDraw:'Unterschreiben Sie mit dem Finger oder der Maus im Feld:',sigHere:'Hier unterschreiben',clear:'Löschen',sigSave:'Unterschrift speichern',sigSaved:'Gespeichert am',sigNone:'Noch keine Unterschrift gespeichert.',
+  saved:'Gespeichert.',
+  mTitle:'Dokumente unterschreiben',mTxt:function(n,e){return n+' Vorgang/Vorgänge werden mit Ihrer gespeicherten Unterschrift unterschrieben. Zur Bestätigung haben wir einen 6-stelligen Code an '+e+' gesendet.';},
+  code:'Code aus der E-Mail',signNow:'Jetzt unterschreiben',cancel:'Abbrechen',working:'Wird unterschrieben…',
+  done:function(ok,f){return ok+' Vorgang/Vorgänge unterschrieben'+(f?' · '+f+' fehlgeschlagen':'')+'. Die beidseitig unterschriebenen Dokumente wurden an Sie, den Kunden und CarAdvance gesendet.';},
+  sec:'Einfache elektronische Signatur. Anmeldung, Einmalcode, Zeitpunkt, IP-Adresse und Gerät werden im Signaturprotokoll jedes Dokuments festgehalten.',
+  err:{bad_login:'Benutzername oder Passwort ist falsch.',locked:'Zu viele Fehlversuche — das Konto ist für 15 Minuten gesperrt.',rate:'Zu viele Anfragen — bitte warten Sie einige Minuten.',auth:'Bitte melden Sie sich erneut an.',bad_old:'Das aktuelle Passwort ist falsch.',weak:'Das neue Passwort ist zu schwach (mind. 10 Zeichen, nicht das Startpasswort).',bad_name:'Bitte geben Sie den Namen ein.',bad_signature:'Bitte unterschreiben Sie im Feld.',no_sig:'Bitte speichern Sie zuerst Ihre Unterschrift.',none:'Bitte wählen Sie mindestens einen Vorgang aus.',too_many_codes:'Zu viele Code-Anfragen — bitte in einer Stunde erneut versuchen.',mail_failed:'Der Code konnte nicht gesendet werden.',consent:'Bitte bestätigen Sie die Erklärung.',code_expired:'Der Code ist abgelaufen — bitte erneut anfordern.',too_many:'Zu viele Fehlversuche — bitte neuen Code anfordern.',wrong_code:'Falscher Code.',must_change:'Bitte ändern Sie zuerst Ihr Passwort.',server:'Unerwarteter Fehler — bitte erneut versuchen.'}},
+ en:{portal:'Partner portal',login:'Sign in',user:'Username (e-mail)',pass:'Password',loginBtn:'Sign in',logout:'Sign out',
+  sub:function(m){return m.company+' · '+m.country;},
+  mustChange:'Please set a new password',mustChangeTxt:'For security reasons the initial password must be changed at the first sign-in. At least 10 characters.',
+  oldPw:'Current password',newPw:'New password (min. 10 characters)',newPw2:'Repeat new password',savePw:'Save password',pwMismatch:'The passwords do not match.',
+  tOpen:'To sign',tDone:'Signed',tAll:'All',tSig:'My signature',tPw:'Password',
+  noOpen:'There are no documents to sign at the moment.',noDone:'No signed documents yet.',
+  client:'Client',received:'Received',clientSigned:'signed by the client',signedAt:'Signed',expires:'valid until',
+  st:{pending:'open',signed:'signed',expired:'expired',revoked:'revoked',locked:'locked',signing:'processing'},
+  pdf:'PDF',selAll:'Select all',selected:function(n){return n+' request(s) selected';},signSel:'Sign selected',
+  needSig:'Please save your signature first (tab “My signature”).',
+  sigTitle:'Saved signature',sigTxt:'This signature is inserted into the documents when you countersign. You can change it at any time.',
+  sigName:'Name of the signatory (e.g. Dr. Max Mustermann, Managing Director)',sigDraw:'Sign with your finger or the mouse in the box:',sigHere:'Sign here',clear:'Clear',sigSave:'Save signature',sigSaved:'Saved on',sigNone:'No signature saved yet.',
+  saved:'Saved.',
+  mTitle:'Sign documents',mTxt:function(n,e){return n+' request(s) will be signed with your saved signature. To confirm, we sent a 6-digit code to '+e+'.';},
+  code:'Code from the e-mail',signNow:'Sign now',cancel:'Cancel',working:'Signing…',
+  done:function(ok,f){return ok+' request(s) signed'+(f?' · '+f+' failed':'')+'. The documents signed by both parties were sent to you, the client and CarAdvance.';},
+  sec:'Simple electronic signature. Sign-in, one-time code, time, IP address and device are recorded in the signature certificate of each document.',
+  err:{bad_login:'Wrong username or password.',locked:'Too many failed attempts — the account is locked for 15 minutes.',rate:'Too many requests — please wait a few minutes.',auth:'Please sign in again.',bad_old:'The current password is wrong.',weak:'The new password is too weak (min. 10 characters, not the initial password).',bad_name:'Please enter the name.',bad_signature:'Please sign in the box.',no_sig:'Please save your signature first.',none:'Please select at least one request.',too_many_codes:'Too many code requests — try again in an hour.',mail_failed:'The code could not be sent.',consent:'Please confirm the statement.',code_expired:'The code has expired — please request a new one.',too_many:'Too many failed attempts — request a new code.',wrong_code:'Wrong code.',must_change:'Please change your password first.',server:'Unexpected error — please try again.'}},
+ hu:{portal:'Partnerfelület',login:'Bejelentkezés',user:'Felhasználónév (e-mail)',pass:'Jelszó',loginBtn:'Belépés',logout:'Kijelentkezés',
+  sub:function(m){return m.company+' · '+m.country;},
+  mustChange:'Adjon meg új jelszót',mustChangeTxt:'Biztonsági okból a kezdő jelszót az első belépéskor le kell cserélni. Legalább 10 karakter.',
+  oldPw:'Jelenlegi jelszó',newPw:'Új jelszó (min. 10 karakter)',newPw2:'Új jelszó újra',savePw:'Jelszó mentése',pwMismatch:'A két jelszó nem egyezik.',
+  tOpen:'Aláírandó',tDone:'Aláírt',tAll:'Összes',tSig:'Aláírásom',tPw:'Jelszó',
+  noOpen:'Jelenleg nincs aláírandó dokumentum.',noDone:'Még nincs aláírt dokumentum.',
+  client:'Ügyfél',received:'Beérkezett',clientSigned:'az ügyfél aláírta',signedAt:'Aláírva',expires:'érvényes',
+  st:{pending:'nyitott',signed:'aláírva',expired:'lejárt',revoked:'visszavonva',locked:'zárolva',signing:'folyamatban'},
+  pdf:'PDF',selAll:'Összes kijelölése',selected:function(n){return n+' kérelem kijelölve';},signSel:'Kijelöltek aláírása',
+  needSig:'Előbb mentse el az aláírását („Aláírásom” fül).',
+  sigTitle:'Mentett aláírás',sigTxt:'Ez az aláírás kerül a dokumentumokba ellenjegyzéskor. Bármikor módosítható.',
+  sigName:'Az aláíró neve (pl. Dr. Max Mustermann, ügyvezető)',sigDraw:'Írjon alá ujjal vagy egérrel a keretben:',sigHere:'Ide írjon alá',clear:'Törlés',sigSave:'Aláírás mentése',sigSaved:'Mentve',sigNone:'Még nincs mentett aláírás.',
+  saved:'Mentve.',
+  mTitle:'Dokumentumok aláírása',mTxt:function(n,e){return n+' kérelem kerül aláírásra a mentett aláírással. Megerősítéshez 6 jegyű kódot küldtünk ide: '+e+'.';},
+  code:'Az e-mailben kapott kód',signNow:'Aláírás most',cancel:'Mégse',working:'Aláírás folyamatban…',
+  done:function(ok,f){return ok+' kérelem aláírva'+(f?' · '+f+' sikertelen':'')+'. A mindkét fél által aláírt dokumentumokat elküldtük Önnek, az ügyfélnek és a CarAdvance-nek.';},
+  sec:'Egyszerű elektronikus aláírás. A bejelentkezés, az egyszeri kód, az időpont, az IP-cím és az eszköz minden dokumentum aláírási tanúsítványában rögzül.',
+  err:{bad_login:'Hibás felhasználónév vagy jelszó.',locked:'Túl sok hibás próbálkozás — a fiók 15 percre zárolva.',rate:'Túl sok kérés — várjon néhány percet.',auth:'Jelentkezzen be újra.',bad_old:'A jelenlegi jelszó hibás.',weak:'Az új jelszó túl gyenge (min. 10 karakter, nem a kezdő jelszó).',bad_name:'Adja meg a nevet.',bad_signature:'Írjon alá a keretben.',no_sig:'Előbb mentse el az aláírását.',none:'Jelöljön ki legalább egy kérelmet.',too_many_codes:'Túl sok kódkérés — próbálja újra egy óra múlva.',mail_failed:'A kódot nem sikerült elküldeni.',consent:'Fogadja el a nyilatkozatot.',code_expired:'A kód lejárt — kérjen újat.',too_many:'Túl sok hibás próbálkozás — kérjen új kódot.',wrong_code:'Hibás kód.',must_change:'Előbb változtassa meg a jelszavát.',server:'Váratlan hiba — próbálja újra.'}}
+};
+function L(){return I18N[LANG]||I18N.de;}
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function post(p,body,raw){
+  return fetch(A+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body||{}),credentials:'same-origin',cache:'no-store'}).then(function(r){
+    if(raw&&r.ok)return r;
+    return r.json().catch(function(){return {ok:false,error:'server'};}).then(function(j){if(!j.ok){var e=new Error(L().err[j.error]||j.error||'Error');e.code=j.error;e.left=j.left;if(j.error==='auth'){ME=null;renderLogin();}throw e;}return j;});
+  });
+}
+try{var sl=localStorage.getItem('ca_partner_lang');if(I18N[sl])LANG=sl;}catch(e){}
+$('lang').value=LANG;
+$('lang').addEventListener('change',function(){LANG=this.value;try{localStorage.setItem('ca_partner_lang',LANG);}catch(e){}render();});
+$('out').addEventListener('click',function(){post('/logout').catch(function(){}).then(function(){ME=null;renderLogin();});});
+function head(){document.documentElement.lang=LANG;$('h1').textContent=L().portal;document.title=L().portal+' — CarAdvance';$('sub').textContent=ME?L().sub(ME):'';$('out').style.display=ME?'':'none';$('out').textContent=L().logout;}
+function note(id,msg,kind){var el=$(id);if(el)el.innerHTML=msg?'<div class="note'+(kind?' '+kind:' err')+'">'+esc(msg)+'</div>':'';}
+function render(){head();if(!ME)return renderLogin();if(ME.must_change)return renderPw(true);renderMain();}
+
+function renderLogin(){
+  head();
+  app.innerHTML='<div class="card" style="max-width:440px;margin:0 auto"><h2>'+L().login+'</h2>'
+    +'<label class="f">'+L().user+'<input class="in" id="lu" autocomplete="username" inputmode="email"></label>'
+    +'<label class="f">'+L().pass+'<input class="in" id="lp" type="password" autocomplete="current-password"></label>'
+    +'<div id="lerr"></div><div class="row" style="margin-top:14px"><button class="btn red" id="lb">'+L().loginBtn+'</button></div></div>';
+  function go(){var b=$('lb');b.disabled=true;note('lerr','');post('/login',{login:$('lu').value,password:$('lp').value}).then(function(j){ME=j.me;return post('/me');}).then(function(j){ME=j.me;STMT=j.statement;render();if(!ME.must_change)loadList();}).catch(function(e){note('lerr',e.message);b.disabled=false;});}
+  $('lb').addEventListener('click',go);$('lp').addEventListener('keydown',function(e){if(e.key==='Enter')go();});$('lu').focus();
+}
+function renderPw(forced){
+  head();
+  var h='<div class="card" style="max-width:520px;'+(forced?'margin:0 auto':'')+'"><h2>'+(forced?L().mustChange:L().tPw)+'</h2>'+(forced?'<p class="muted small">'+L().mustChangeTxt+'</p>':'')
+    +'<label class="f">'+L().oldPw+'<input class="in" id="po" type="password" autocomplete="current-password"></label>'
+    +'<label class="f">'+L().newPw+'<input class="in" id="pn" type="password" autocomplete="new-password"></label>'
+    +'<label class="f">'+L().newPw2+'<input class="in" id="pn2" type="password" autocomplete="new-password"></label>'
+    +'<div id="perr"></div><div class="row" style="margin-top:14px"><button class="btn red" id="pb">'+L().savePw+'</button></div></div>';
+  if(forced)app.innerHTML=h;else $('pane').innerHTML=h;
+  $('pb').addEventListener('click',function(){
+    if($('pn').value!==$('pn2').value)return note('perr',L().pwMismatch);
+    var b=this;b.disabled=true;
+    post('/password',{old:$('po').value,new:$('pn').value}).then(function(){return post('/me');}).then(function(j){ME=j.me;STMT=j.statement;if(forced){render();loadList();}else note('perr',L().saved,'ok');b.disabled=false;}).catch(function(e){note('perr',e.message);b.disabled=false;});
+  });
+}
+function loadList(){return post('/list').then(function(j){REQ=j.requests||[];SEL={};if(ME&&!ME.must_change)renderMain();}).catch(function(){});}
+function count(st){return REQ.filter(function(r){return st==='open'?r.status==='pending':st==='done'?r.status==='signed':true;}).length;}
+function renderMain(){
+  head();
+  var tabs=[['open',L().tOpen+' ('+count('open')+')'],['done',L().tDone+' ('+count('done')+')'],['all',L().tAll],['sig',L().tSig+(ME.has_sig?' ✓':'')],['pw',L().tPw]];
+  app.innerHTML='<div class="card"><div class="tabs">'+tabs.map(function(t){return '<button data-tab="'+t[0]+'" class="'+(TAB===t[0]?'on':'')+'">'+esc(t[1])+'</button>';}).join('')+'</div><div id="pane"></div></div>';
+  app.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){TAB=b.getAttribute('data-tab');renderMain();});});
+  if(TAB==='sig')return renderSig();
+  if(TAB==='pw')return renderPw(false);
+  renderList();
+}
+function stBadge(s){var cls=s==='signed'?'ok':s==='pending'?'':'off';return '<span class="badge '+cls+'">'+esc(L().st[s]||s)+'</span>';}
+function renderList(){
+  var list=REQ.filter(function(r){return TAB==='open'?r.status==='pending':TAB==='done'?r.status==='signed':true;});
+  var h='';
+  if(TAB==='open'&&!ME.has_sig)h+='<div class="note">'+esc(L().needSig)+'</div>';
+  if(!list.length)h+='<p class="muted">'+(TAB==='done'?L().noDone:L().noOpen)+'</p>';
+  if(TAB==='open'&&list.length)h+='<label class="chk"><input type="checkbox" id="sa"> '+L().selAll+'</label>';
+  h+=list.map(function(r){
+    var open=r.status==='pending';
+    return '<div class="req'+(SEL[r.id]?' sel':'')+'">'+(open?'<input type="checkbox" data-s="'+r.id+'"'+(SEL[r.id]?' checked':'')+' style="width:20px;height:20px;accent-color:var(--red);margin-top:2px">':'')
+      +'<div class="main"><div class="t">'+esc(L().client)+': '+esc(r.client||'—')+' '+stBadge(r.status)+'</div>'
+      +'<div class="small muted">#'+r.id+' · '+L().received+': '+esc(r.received)+(r.client_signed?' · '+L().clientSigned+': '+esc(r.client_signed):'')+(r.signed_at?' · '+L().signedAt+': '+esc(r.signed_at)+(r.sign_name?' ('+esc(r.sign_name)+')':''):'')+'</div>'
+      +'<ul>'+r.docs.map(function(d){return '<li>'+esc(d.name)+(d.number?' <span class="muted">('+esc(d.number)+')</span>':'')+' <button class="lnk" data-pdf="'+r.id+':'+d.i+'">'+L().pdf+'</button></li>';}).join('')+'</ul></div></div>';
+  }).join('');
+  if(TAB==='open'&&list.length)h+='<div class="bar"><span id="selc">'+esc(L().selected(Object.keys(SEL).filter(function(k){return SEL[k];}).length))+'</span><span class="sp"></span><button class="btn red" id="sgo">'+L().signSel+'</button></div><div class="sec">🔒 <span>'+esc(L().sec)+'</span></div>';
+  $('pane').innerHTML=h;
+  $('pane').querySelectorAll('[data-s]').forEach(function(c){c.addEventListener('change',function(){SEL[c.getAttribute('data-s')]=c.checked;c.closest('.req').classList.toggle('sel',c.checked);upd();});});
+  var sa=$('sa');if(sa)sa.addEventListener('change',function(){var on=sa.checked;$('pane').querySelectorAll('[data-s]').forEach(function(c){c.checked=on;SEL[c.getAttribute('data-s')]=on;c.closest('.req').classList.toggle('sel',on);});upd();});
+  $('pane').querySelectorAll('[data-pdf]').forEach(function(b){b.addEventListener('click',function(){var x=b.getAttribute('data-pdf').split(':');openPdf(+x[0],+x[1]);});});
+  var g=$('sgo');if(g){g.addEventListener('click',startSign);upd();}
+  function upd(){var n=Object.keys(SEL).filter(function(k){return SEL[k];}).length;var s=$('selc');if(s)s.textContent=L().selected(n);if(g)g.disabled=!n||!ME.has_sig;}
+}
+function openPdf(id,i){
+  var w=window.open('','_blank');
+  post('/pdf',{id:id,i:i},true).then(function(r){return r.blob();}).then(function(b){var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();alert(e.message);});
+}
+function startSign(){
+  var ids=Object.keys(SEL).filter(function(k){return SEL[k];}).map(Number);if(!ids.length)return;
+  var g=$('sgo');g.disabled=true;
+  post('/code',{ids:ids}).then(function(j){g.disabled=false;modal(ids,j.email);}).catch(function(e){g.disabled=false;alert(e.message);});
+}
+function modal(ids,email){
+  var ov=document.createElement('div');ov.className='mdl';
+  ov.innerHTML='<div class="card"><h2>'+L().mTitle+'</h2><p class="small">'+esc(L().mTxt(ids.length,email))+'</p>'
+    +(ME.sig?'<img class="sigimg" src="'+esc(ME.sig)+'" alt=""><div class="small muted" style="margin-top:4px">'+esc(ME.sig_name)+'</div>':'')
+    +'<label class="f">'+L().code+'<input class="in code" id="mc" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></label>'
+    +'<label class="chk"><input type="checkbox" id="mcons"> <span class="small">'+esc(STMT)+'</span></label>'
+    +'<div id="merr"></div><div class="row" style="margin-top:10px"><button class="btn red" id="mok">'+L().signNow+'</button><button class="btn ghost" id="mno">'+L().cancel+'</button></div></div>';
+  document.body.appendChild(ov);$('mc').focus();
+  $('mno').addEventListener('click',function(){ov.remove();});
+  $('mok').addEventListener('click',function(){
+    var code=($('mc').value||'').replace(/\D/g,'');if(code.length!==6)return note('merr',L().err.wrong_code);
+    if(!$('mcons').checked)return note('merr',L().err.consent);
+    var b=this;b.disabled=true;b.textContent=L().working;note('merr','');
+    post('/sign',{ids:ids,code:code,consent:true}).then(function(j){
+      var ok=j.results.filter(function(x){return x.ok;}).length,f=j.results.length-ok;ov.remove();
+      return loadList().then(function(){$('pane').insertAdjacentHTML('afterbegin','<div class="note ok">'+esc(L().done(ok,f))+'</div>');});
+    }).catch(function(e){note('merr',e.message+(e.code==='wrong_code'&&e.left!=null?' ('+e.left+')':''));b.disabled=false;b.textContent=L().signNow;});
+  });
+}
+function renderSig(){
+  var h='<h2 style="font-size:17px;margin:4px 0">'+L().sigTitle+'</h2><p class="muted small">'+L().sigTxt+'</p>'
+    +(ME.has_sig?'<img class="sigimg" src="'+esc(ME.sig)+'" alt=""><p class="small muted">'+esc(ME.sig_name)+' · '+L().sigSaved+': '+esc(ME.sig_at)+'</p>':'<p class="muted small">'+L().sigNone+'</p>')
+    +'<label class="f">'+L().sigName+'<input class="in" id="sn" value="'+esc(ME.sig_name||'')+'"></label>'
+    +'<p class="small muted" style="margin:14px 0 6px">'+L().sigDraw+'</p><div class="pad"><canvas id="pad"></canvas><div class="ln"></div><div class="ph" id="ph">'+L().sigHere+'</div></div>'
+    +'<div class="row" style="margin:8px 0"><button class="btn ghost sm" id="clr" type="button">'+L().clear+'</button></div>'
+    +'<div id="serr"></div><div class="row"><button class="btn red" id="ssv">'+L().sigSave+'</button></div>';
+  $('pane').innerHTML=h;
+  PAD=pad($('pad'),'ph');$('clr').addEventListener('click',function(){PAD.clear();});
+  $('ssv').addEventListener('click',function(){
+    var nm=($('sn').value||'').trim();if(nm.length<3)return note('serr',L().err.bad_name);if(PAD.isEmpty())return note('serr',L().err.bad_signature);
+    var b=this;b.disabled=true;
+    post('/signature',{name:nm,sig:PAD.jpeg()}).then(function(){return post('/me');}).then(function(j){ME=j.me;renderMain();note('serr',L().saved,'ok');}).catch(function(e){note('serr',e.message);b.disabled=false;});
+  });
+}
+function pad(cv,ph){
+  var ctx,drawing=false,last=null,dirty=false;
+  function size(){var r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.lineWidth=2.4;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#14244a';dirty=false;$(ph).style.display='';}
+  size();
+  function pos(e){var r=cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
+  cv.addEventListener('pointerdown',function(e){drawing=true;last=pos(e);cv.setPointerCapture(e.pointerId);$(ph).style.display='none';e.preventDefault();});
+  cv.addEventListener('pointermove',function(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;dirty=true;e.preventDefault();});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){cv.addEventListener(ev,function(){drawing=false;});});
+  return {isEmpty:function(){return !dirty;},clear:function(){size();},jpeg:function(){var w=900,h=Math.round(cv.height/cv.width*900),o=document.createElement('canvas');o.width=w;o.height=h;var x=o.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(cv,0,0,w,h);return o.toDataURL('image/jpeg',0.85);}};
+}
+// indulás: van-e érvényes munkamenet
+post('/me').then(function(j){ME=j.me;STMT=j.statement;if(I18N[ME.lang]){try{if(!localStorage.getItem('ca_partner_lang'))LANG=ME.lang;}catch(e){LANG=ME.lang;}$('lang').value=LANG;}render();if(!ME.must_change)loadList();}).catch(function(){ME=null;renderLogin();});
+})();
+
+</script>
+</body>
+</html>
