@@ -3,7 +3,7 @@
 // Csak a véletlen, kitalálhatatlan token által címzett sort olvassa/írja.
 // A státusz CSAK a POST-ra változik (az e-mailes link megnyitása önmagában nem — a levelezők
 // biztonsági előtöltése így nem fogad el ajánlatot az ügyfél helyett).
-import { ensureCrm, addEvent, json, parseJ, clean, cleanMulti, saveCard, getCard, vehiclesOf, itemToVehicle, newVehicleId, VEH_KEYS, sendCrmMail, notifyTo, esc, priceLabel, specLine, idLine, SITE } from '../../../lib/crm.js';
+import { ensureCrm, addEvent, json, parseJ, clean, cleanMulti, saveCard, getCard, vehiclesOf, itemToVehicle, newVehicleId, VEH_KEYS, sendCrmMail, notifyTo, esc, priceLabel, specLine, idLine, SITE, b64ToBytes, fileData } from '../../../lib/crm.js';
 
 const TOKEN_RE = /^[a-f0-9]{40}$/;
 const PUBLIC_KEYS = ['title', 'brand', 'year', 'km', 'fuel', 'power', 'gearbox', 'color', 'image', 'url', 'note', 'price', 'currency', 'period', 'ad_id', 'config_code', 'config_url'];
@@ -78,6 +78,14 @@ async function handleRespond(request, env, token) {
   return json({ ok: true, action, choice });
 }
 
+/** Az ajánlatban szereplő konfigurátor-kép (e-mailben és a válaszoldalon) — csak az adott ajánlat képei érhetők el. */
+async function handleImage(env, token, fid) {
+  const row = await env.DB.prepare(`SELECT deal_id, items FROM crm_offers WHERE token = ?`).bind(token).first();
+  if (!row || !parseJ(row.items, []).some((it) => Array.isArray(it.images) && it.images.includes(fid))) return new Response('Not found', { status: 404 });
+  const f = await env.DB.prepare(`SELECT id, data, mime FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, row.deal_id).first();
+  if (!f) return new Response('Not found', { status: 404 });
+  return new Response(b64ToBytes(await fileData(env, f)), { headers: { 'content-type': 'image/jpeg', 'cache-control': 'public, max-age=2592000, immutable', 'x-content-type-options': 'nosniff' } });
+}
 export async function onRequest(context) {
   const { request, env } = context;
   const path = new URL(request.url).pathname.replace(/^\/api\/crm-ajanlat/, '') || '/';
@@ -85,6 +93,8 @@ export async function onRequest(context) {
     await ensureCrm(env);
     let m = path.match(/^\/([a-f0-9]{40})$/);
     if (m && request.method === 'GET') return await handleGet(env, m[1]);
+    m = path.match(/^\/([a-f0-9]{40})\/kep\/(\d+)$/);
+    if (m && request.method === 'GET') return await handleImage(env, m[1], Number(m[2]));
     m = path.match(/^\/([a-f0-9]{40})\/valasz$/);
     if (m && request.method === 'POST') return await handleRespond(request, env, m[1]);
     return json({ error: 'Not found' }, 404);
