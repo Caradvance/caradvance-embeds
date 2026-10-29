@@ -68,11 +68,11 @@ async function saveSig(env, p, b) {
 
 async function list(env, p) {
   const w = reqWhere(p);
-  const rows = (await env.DB.prepare(`SELECT id, status, docs, prior, result, created_at, expires_at, signed_at, sign_name FROM crm_sign WHERE ${w.sql} ORDER BY id DESC LIMIT 300`).bind(...w.args).all()).results || [];
+  const rows = (await env.DB.prepare(`SELECT id, status, docs, prior, result, created_at, expires_at, signed_at, sign_name, market FROM crm_sign WHERE ${w.sql} ORDER BY id DESC LIMIT 300`).bind(...w.args).all()).results || [];
   const t = nowSec();
   return J({ ok: true, requests: rows.map((r) => {
     const docs = parseJ(r.docs, []); const pr = parseJ(r.prior, {}); const res = parseJ(r.result, []);
-    return { id: r.id, status: r.status === 'pending' && r.expires_at < t ? 'expired' : r.status, client: pr.client || '', client_signed: docs[0] && docs[0].prior ? docs[0].prior.when : '',
+    return { id: r.id, market: r.market || 'HU', status: r.status === 'pending' && r.expires_at < t ? 'expired' : r.status, client: pr.client || '', client_signed: docs[0] && docs[0].prior ? docs[0].prior.when : '',
       received: huDateTime(r.created_at), expires: new Date(r.expires_at * 1000).toISOString(), signed_at: r.signed_at ? huDateTime(r.signed_at) : '', sign_name: r.sign_name || '',
       docs: docs.map((d, i) => ({ i, name: d.name, number: d.number || '', signed: !!(res[i] && res[i].file_id) })) };
   }) });
