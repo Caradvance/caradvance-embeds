@@ -22,6 +22,7 @@
     + '.dpv ul{margin:0 0 4px;padding-left:18px}.dpv hr{border:0;border-top:1px solid #d6dae1;margin:8px 0}'
     + '.dpv .pb{border-top:2px dashed #c8ced8;margin:16px 0;text-align:center;font-size:10px;color:#9aa2b0;line-height:0}.dpv .pb span{background:#fff;padding:0 8px}'
     + '.dpv .sig{display:flex;gap:22px;margin-top:22px}.dpv .sig>div{flex:1;min-width:0}.dpv .sig b{display:block;font-size:11.5px}.dpv .sig small{display:block;color:#80868f}.dpv .sig .ln{border-top:1px solid #555;margin-top:34px;padding-top:3px;font-size:11px}.dpv .sig .dt{font-size:10.5px;color:#80868f;margin-top:8px}'
+    + '.dpv .sgi{display:block;height:38px;max-width:90%;margin-top:6px;object-fit:contain;object-position:left bottom}'
     + '.dpv .ft{margin-top:18px;border-top:1px solid #cdd1d8;padding-top:5px;font-size:9.5px;color:#80868f}.dpv .ft b{color:#262a33}'
     + '.dpv mark{background:#fff3c4;padding:0 2px;border-radius:3px}.dpv mark.v{background:#e6f4ee;color:#0d6b4c}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
@@ -39,7 +40,8 @@
   }
   function split2(s) { var i = s.indexOf('||'); return i < 0 ? [s.trim(), null] : [s.slice(0, i).trim(), s.slice(i + 2).trim()]; }
   function cell(c) { var i = c.indexOf('|'); return i < 0 ? [c.trim(), ''] : [c.slice(0, i).trim(), c.slice(i + 1).trim()]; }
-  function preview(text, vars, labels) {
+  function nk(v) { return String(v || '').replace(/\*\*/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase(); }
+  function preview(text, vars, labels, sigs) {
     var out = [], ul = false, D = { fields: [] }, body = [];
     var I = function (s) { return inl(s, vars, labels); };
     String(text || '').split('\n').forEach(function (raw) {
@@ -74,7 +76,11 @@
         var plus = !!m[1];
         out.push('<div class="sig">' + m[2].split('|').map(function (part) {
           var nm = part.split('~~'), tt = nm[0].split('~');
-          return '<div><b>' + I((tt[0] || '').trim()) + '</b>' + (tt[1] ? '<small>' + I(tt[1].trim()) + '</small>' : '') + (plus ? '<div class="dt">Dátum <span class="bl"></span><br>Helység <span class="bl"></span></div>' : '') + '<div class="ln">' + (nm[1] ? I(nm[1].trim()) : '&nbsp;') + '</div></div>';
+          var nmVal = nm[1] ? nm[1].trim().replace(/\{\{\s*([a-z0-9_]+)\s*\}\}/g, function (m, k) { return vars && vars[k] ? vars[k] : ''; }) : '';
+          var keys = [nk(nmVal), nk((tt[0] || '').trim())];
+          var sp = (sigs || []).filter(function (z) { return (z.names || []).some(function (n) { var k = nk(n); return k && keys.indexOf(k) >= 0; }); })[0];
+          return '<div><b>' + I((tt[0] || '').trim()) + '</b>' + (tt[1] ? '<small>' + I(tt[1].trim()) + '</small>' : '') + (plus ? '<div class="dt">Dátum <span class="bl"></span><br>Helység <span class="bl"></span></div>' : '')
+            + (sp && /^data:image\/jpeg;base64,/.test(sp.src) ? '<img class="sgi" src="' + esc(sp.src) + '" alt="aláírás">' : '') + '<div class="ln"' + (sp ? ' style="margin-top:2px"' : '') + '>' + (nm[1] ? I(nm[1].trim()) : '&nbsp;') + '</div></div>';
         }).join('') + '</div>');
         return;
       }
