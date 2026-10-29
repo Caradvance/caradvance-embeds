@@ -260,8 +260,8 @@ class Layout {
     const lw = cw * (o.amount ? 0.6 : two ? 0.44 : 0.32); const vw = cw - lw - 8;
     const ms = cells.map(([l, v]) => ({
       L: this.measure(l, { w: lw - 6, size: o.amount ? 8.8 : 7.9, f: o.strong ? 'S' : 'L', bf: 'S', num: false, bullets: false, lh: 1.45 }),
-      V: this.measure(isBlank(v) ? '' : v, { w: vw, size: o.amount ? 9.2 : 8.4, f: o.strong ? 'S' : 'R', bf: 'S', num: false, bullets: false, lh: 1.45 }),
-      blank: isBlank(v), raw: v
+      V: this.measure(isBlank(v) && !/^\s*[—–-]\s*$/.test(v || '') ? '' : v, { w: vw, size: o.amount ? 9.2 : 8.4, f: o.strong ? 'S' : 'R', bf: 'S', num: false, bullets: false, lh: 1.45 }),
+      blank: isBlank(v) && !/^\s*[—–-]\s*$/.test(v || ''), raw: v
     }));
     const h = Math.max(...ms.map((m) => Math.max(m.L.lines.length * m.L.lh, m.blank ? 12 : m.V.lines.length * m.V.lh))) + (o.amount ? 12 : 8);
     this.ensure(h);

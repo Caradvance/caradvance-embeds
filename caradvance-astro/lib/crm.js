@@ -148,7 +148,7 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)`)
   ]);
   for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
-  for (const q of [`ALTER TABLE crm_docs ADD COLUMN use_sigs INTEGER DEFAULT 1`, `ALTER TABLE crm_persons ADD COLUMN sign_as TEXT DEFAULT ''`, `ALTER TABLE crm_persons ADD COLUMN sig TEXT`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
+  for (const q of [`ALTER TABLE crm_docs ADD COLUMN use_sigs INTEGER DEFAULT 1`, `ALTER TABLE crm_persons ADD COLUMN sign_as TEXT DEFAULT ''`, `ALTER TABLE crm_persons ADD COLUMN sig TEXT`, `ALTER TABLE crm_persons ADD COLUMN kind TEXT DEFAULT 'magan'`, `ALTER TABLE crm_persons ADD COLUMN rep TEXT DEFAULT ''`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
   READY = true;
 }
 
@@ -385,7 +385,7 @@ export const VAR_LABELS = {
   fizetesi_hatarido: 'Fizetési határidő', foglalo: 'Foglaló', foglalo_betuvel: 'Foglaló betűvel', szallitasi_dij: 'Szállítási díj',
   jutalek_szazalek: 'Bizományi díj %', bizomany_vege: 'Bizomány vége',
   meghatalmazott_nev: 'Meghatalmazott neve', meghatalmazott_cim: 'Meghatalmazott lakcíme', meghatalmazott_szig: 'Meghatalmazott szem. ig. száma',
-  meghatalmazott_anyja_neve: 'Meghatalmazott anyja neve', meghatalmazott_szul_hely_ido: 'Meghatalmazott szül. hely, idő',
+  meghatalmazott_anyja_neve: 'Meghatalmazott anyja neve', meghatalmazott_szul_hely_ido: 'Meghatalmazott szül. hely, idő', meghatalmazott_kepviselo: 'Meghatalmazott képviselője (cégnél)',
   tanu1_nev: '1. tanú neve', tanu1_cim: '1. tanú lakcíme', tanu1_szig: '1. tanú szem. ig. száma',
   tanu2_nev: '2. tanú neve', tanu2_cim: '2. tanú lakcíme', tanu2_szig: '2. tanú szem. ig. száma'
 };
@@ -396,7 +396,7 @@ export const VAR_GROUPS = [
   ['Vevő (Eladás 2. ütem)', ['vevo_nev', 'vevo_cim', 'vevo_adoszam', 'vevo_cegjegyzekszam', 'vevo_kepviselo', 'vevo_telefon', 'vevo_email', 'vevo_szig', 'vevo_anyja_neve', 'vevo_szul_hely_ido']],
   ['Gépjármű', ['auto_megnevezes', 'auto_marka', 'auto_tipus', 'auto_evjarat', 'auto_alvazszam', 'auto_rendszam', 'auto_szin', 'auto_motor', 'auto_uzemanyag', 'auto_km', 'auto_hibrid', 'auto_felszereltseg']],
   ['Ár, feltételek', ['ar', 'ar_netto', 'ar_afa', 'havi_dij', 'kaucio', 'futamido', 'km_keret', 'km_tulfutas_dij', 'berlet_kezdete', 'berlet_vege', 'atadas_datum', 'atadas_hely', 'fizetesi_mod', 'fizetesi_hatarido', 'eloleg', 'foglalo', 'foglalo_betuvel', 'megbizasi_dij', 'szallitasi_dij', 'szallitasi_hatarido', 'min_eladasi_ar', 'jutalek', 'jutalek_szazalek', 'bizomany_idotartam', 'bizomany_vege']],
-  ['Meghatalmazott', ['meghatalmazott_nev', 'meghatalmazott_cim', 'meghatalmazott_szig', 'meghatalmazott_anyja_neve', 'meghatalmazott_szul_hely_ido']],
+  ['Meghatalmazott', ['meghatalmazott_nev', 'meghatalmazott_cim', 'meghatalmazott_szig', 'meghatalmazott_anyja_neve', 'meghatalmazott_szul_hely_ido', 'meghatalmazott_kepviselo']],
   ['Tanúk', ['tanu1_nev', 'tanu1_cim', 'tanu1_szig', 'tanu2_nev', 'tanu2_cim', 'tanu2_szig']]
 ];
 export const PERSON_ROLES = { meghatalmazott: 'Meghatalmazott', tanu1: '1. tanú', tanu2: '2. tanú' };
@@ -635,9 +635,16 @@ function huDate(iso) { if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return iso ||
 function personVars(prefix, p) {
   p = p || {};
   const bd = huDate(p.birth_date);
+  if (p.kind === 'ceg') { // cég meghatalmazott: cégjegyzékszám az azonosító, a születési adatok nem értelmezhetők
+    return {
+      [prefix + '_nev']: p.name || '', [prefix + '_cim']: p.address || '', [prefix + '_szig']: p.id_number || '',
+      [prefix + '_anyja_neve']: '—', [prefix + '_szul_hely_ido']: '—', [prefix + '_kepviselo']: p.rep || ''
+    };
+  }
   return {
     [prefix + '_nev']: p.name || '', [prefix + '_cim']: p.address || '', [prefix + '_szig']: p.id_number || '',
-    [prefix + '_anyja_neve']: p.mother_name || '', [prefix + '_szul_hely_ido']: [p.birth_place, bd].filter(Boolean).join(', ')
+    [prefix + '_anyja_neve']: p.mother_name || '', [prefix + '_szul_hely_ido']: [p.birth_place, bd].filter(Boolean).join(', '),
+    [prefix + '_kepviselo']: p.name ? '—' : ''
   };
 }
 /** Egy sablonból készülő dokumentum változói: ügyfél / vevő, autó (ár, bérlet), személyek (meghatalmazott, tanúk). */
