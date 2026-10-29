@@ -276,7 +276,7 @@ async function handleSendOffer(request, env, user, id) {
     // forrás: készlet / mobile.de hirdetés (Import) / gyári konfigurátor (Eladás) / egyedi
     src: ['inv', 'mobile', 'config', 'manual'].includes(it.src) ? it.src : 'manual', color: clean(it.color, 60),
     ad_id: /^\d{6,12}$/.test(String(it.ad_id || '')) ? String(it.ad_id) : '', ad_url: /^https:\/\/([a-z0-9-]+\.)*mobile\.de\//i.test(it.ad_url || '') ? clean(it.ad_url, 400) : '',
-    src_price: Math.max(0, Number(it.src_price) || 0), config_code: clean(it.config_code, 60), file_id: Number.isInteger(it.file_id) ? it.file_id : null
+    src_price: Math.max(0, Number(it.src_price) || 0), config_code: clean(it.config_code, 60), config_url: /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|mercedes-benz|mercedes|audi|volkswagen|vw)\.[a-z.]{2,12}(\/|$)/i.test(it.config_url || '') ? clean(it.config_url, 1500) : '', file_id: Number.isInteger(it.file_id) ? it.file_id : null
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
   const message = cleanMulti(b.message, 2000).trim();
@@ -880,6 +880,28 @@ async function handleSignRevoke(env, user, id, sid) {
   return json({ ok: true });
 }
 
+/* ---------------- gyári konfigurátor link: cím / kép (csak a márkák saját domainjeiről) ---------------- */
+const CFG_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|mercedes-benz|mercedes|audi|volkswagen|vw)\.[a-z.]{2,12}(\/|$)/i;
+async function handleCfgMeta(url) {
+  const u = String(url.searchParams.get('url') || '').trim().slice(0, 1500);
+  if (!CFG_HOST_RE.test(u)) return json({ error: 'Csak BMW, MINI, Mercedes-Benz, Audi vagy Volkswagen konfigurátor link adható meg (https).' }, 400);
+  const out = { title: '', image: '', description: '' };
+  try {
+    const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 6000);
+    const r = await fetch(u, { signal: ctrl.signal, redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36', 'Accept-Language': 'de-DE,de;q=0.9,hu;q=0.8' } });
+    clearTimeout(tm);
+    if (r.ok && CFG_HOST_RE.test(r.url || u) && /html/i.test(r.headers.get('content-type') || '')) {
+      const html = (await r.text()).slice(0, 400000);
+      const meta = (n) => { const m = html.match(new RegExp('<meta[^>]+(?:property|name)=["\']' + n + '["\'][^>]+content=["\']([^"\']+)', 'i')) || html.match(new RegExp('<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']' + n + '["\']', 'i')); return m ? m[1] : ''; };
+      const dec = (t) => String(t || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
+      out.title = dec(meta('og:title') || (html.match(/<title[^>]*>([^<]{3,160})<\/title>/i) || [])[1] || '').slice(0, 160);
+      out.description = dec(meta('og:description') || meta('description')).slice(0, 300);
+      const img = meta('og:image'); if (/^https:\/\//.test(img)) out.image = img.slice(0, 600);
+    }
+  } catch (e) { /* nem kritikus — a link akkor is használható */ }
+  return json({ ok: true, ...out });
+}
+
 /* ---------------- router ---------------- */
 export async function onRequest(context) {
   const { request, env } = context;
@@ -897,6 +919,7 @@ export async function onRequest(context) {
     if (path === '/fin/summary' && method === 'GET') return await handleFinSummary(env, user);
     if (path === '/fx' && method === 'GET') return json({ rate: await eurHuf() });
     if (path === '/docmeta' && method === 'GET') return await handleDocMeta(env);
+    if (path === '/cfgmeta' && method === 'GET') return await handleCfgMeta(url);
     if (path === '/templates' && method === 'GET') return await handleTemplates(env, url);
     if (path === '/templates' && method === 'POST') return await handleTemplateSave(request, env, user);
     if (path === '/templates/import' && method === 'POST') return await handleTemplateImport(request, env, user);
