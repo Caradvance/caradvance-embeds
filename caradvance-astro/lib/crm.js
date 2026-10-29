@@ -185,7 +185,7 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)`)
   ]);
   // ellenjegyzés (német partner): a kérelem szülője (az ügyfél aláírása) és a korábbi aláírások adatai
-  for (const col of [`parent_id INTEGER`, `prior TEXT`, `partner_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_sign ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
+  for (const col of [`parent_id INTEGER`, `prior TEXT`, `partner_id INTEGER`, `market TEXT DEFAULT 'HU'`]) { try { await env.DB.prepare(`ALTER TABLE crm_sign ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   for (const q of [`ALTER TABLE crm_docs ADD COLUMN use_sigs INTEGER DEFAULT 1`, `ALTER TABLE crm_persons ADD COLUMN sign_as TEXT DEFAULT ''`, `ALTER TABLE crm_persons ADD COLUMN sig TEXT`, `ALTER TABLE crm_persons ADD COLUMN kind TEXT DEFAULT 'magan'`, `ALTER TABLE crm_persons ADD COLUMN rep TEXT DEFAULT ''`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
   await ensurePartners(env);
@@ -881,6 +881,7 @@ async function ensurePartners(env) {
       code_hash TEXT, code_exp INTEGER, code_attempts INTEGER NOT NULL DEFAULT 0, last_login TEXT, created_at TEXT DEFAULT (datetime('now')))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_partner_sessions (token_hash TEXT PRIMARY KEY, partner_id INTEGER NOT NULL, expires INTEGER NOT NULL, ip TEXT, ua TEXT, created_at TEXT DEFAULT (datetime('now')))`)
   ]);
+  try { await env.DB.prepare(`ALTER TABLE crm_partners ADD COLUMN markets TEXT DEFAULT '[]'`).run(); } catch (e) { /* már létezik */ }
   const n = await env.DB.prepare(`SELECT COUNT(*) AS n FROM crm_partners`).first();
   if (!n || !n.n) { // első partner: Németország — Caradvance GmbH (kezdő jelszó: 123456, első belépéskor kötelező csere)
     const notify = await getSetting(env, 'partner_sign_email', 'import@caradvance.de');
@@ -888,6 +889,13 @@ async function ensurePartners(env) {
       .bind(await getSetting(env, 'partner_name', 'Caradvance GmbH'), notify || 'import@caradvance.de', await hashPass('123456'), JSON.stringify(['Caradvance GmbH', 'Übernehmer']), notify === '' ? 0 : 1).run();
   }
 }
+/** Melyik ország (piac) CRM-jéből jön a kérés — a domain alapján (caradvance.hu → HU, .pl → PL, .sk → SK, .cz → CZ, .ro → RO …). */
+export function marketOf(host) {
+  const m = String(host || '').toLowerCase().match(/\.([a-z]{2})$/); const t = m ? m[1].toUpperCase() : 'HU';
+  return ['HU', 'PL', 'SK', 'CZ', 'RO', 'AT', 'SI', 'HR', 'RS', 'BG', 'DE'].includes(t) ? t : 'HU';
+}
+/** A partner ellenjegyzi-e az adott piac szerződéseit (üres lista = minden piac). */
+export function partnerTakesMarket(p, market) { const l = parseJ(p.markets, []); return !l.length || l.includes(market); }
 /** Partner-ellenjegyzés: a kétnyelvű (DE/HU) dokumentumok aláírási hasábjai közül a partneré (pl. „Caradvance GmbH”, ill. cím szerint „Übernehmer”). */
 export function partnerSignKeys(text, names) {
   const t = String(text || ''); const keys = new Set();

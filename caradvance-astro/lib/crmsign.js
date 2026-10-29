@@ -119,8 +119,8 @@ async function afterClientSign(env, r, result, att, cos, partners, name, when, f
     const mine = cos.filter((c) => c.pid === P.id).map((c) => c.doc); if (!mine.length) continue;
     const token = randomHex(32); const exp = nowSec() + 14 * 86400;
     const to = String(P.notify_email || P.login || '').toLowerCase();
-    const ins = await env.DB.prepare(`INSERT INTO crm_sign (token_hash, deal_id, signer_role, signer_name, email, docs, message, created_by, expires_at, parent_id, prior, partner_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
-      .bind(await sha256hex('crmsign|' + token), r.deal_id, 'partner', P.company, to, JSON.stringify(mine), '', 'Rendszer (ügyfél aláírása után)', exp, r.id, JSON.stringify({ jpeg: sigB64, client }), P.id).run();
+    const ins = await env.DB.prepare(`INSERT INTO crm_sign (token_hash, deal_id, signer_role, signer_name, email, docs, message, created_by, expires_at, parent_id, prior, partner_id, market) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+      .bind(await sha256hex('crmsign|' + token), r.deal_id, 'partner', P.company, to, JSON.stringify(mine), '', 'Rendszer (ügyfél aláírása után)', exp, r.id, JSON.stringify({ jpeg: sigB64, client }), P.id, r.market || 'HU').run();
     const pid = ins.meta.last_row_id;
     await env.DB.prepare(`UPDATE crm_docs SET sign_id = ? WHERE deal_id = ? AND sign_status = 'cosign' AND id IN (${mine.map(() => '?').join(',')})`).bind(pid, r.deal_id, ...mine.map((d) => d.doc_id)).run();
     const T = pT(P.lang); const link = `${SITE}/alairas/#${token}`; const portal = `${SITE}/partner/`;
@@ -129,7 +129,7 @@ async function afterClientSign(env, r, result, att, cos, partners, name, when, f
       `<p>${T.hello}</p><p>${T.reqBody(client, when)}</p>${li(mine)}<p>${T.reqAsk}</p><p style="margin:18px 0">${btn(portal, T.btnPortal, true)}${btn(link, T.btnLink)}</p><p>${T.after}</p>
        <p style="color:#6b7280;font-size:12px">${T.valid(new Date(exp * 1000).toLocaleDateString(P.lang === 'de' ? 'de-DE' : 'en-GB', { timeZone: 'Europe/Berlin' }))}</p><p>${T.regards}</p>`,
       att.filter((a) => a.pid === P.id).map(({ filename, content }) => ({ filename, content })), { noCopy: true });
-    await addEvent(env, r.deal_id, 'sign', `Ellenjegyzésre kiküldve: ${P.company} (${P.country}, #${pid}) → ${fwd ? 'TESZT → ' + fwd : to}: ${mine.map((d) => d.name).join('; ')}${m.ok ? '' : ' — AZ E-MAIL NEM MENT KI: ' + m.error}`, 'Rendszer');
+    await addEvent(env, r.deal_id, 'sign', `Ellenjegyzésre kiküldve: ${P.company} (${P.country}, piac: ${r.market || 'HU'}, #${pid}) → ${fwd ? 'TESZT → ' + fwd : to}: ${mine.map((d) => d.name).join('; ')}${m.ok ? '' : ' — AZ E-MAIL NEM MENT KI: ' + m.error}`, 'Rendszer');
   }
 }
 
