@@ -5,10 +5,10 @@
 import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
-  bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
+  bytesToB64, b64ToBytes, sha256hex, priceLabel, specLine, esc, SITE,
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
 } from '../../../lib/crm.js';
-import { jpegInfo } from '../../../lib/docpdf.js';
+import { jpegInfo, renderOfferPdf } from '../../../lib/docpdf.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
 // címre megy az ügyfél helyett (a tárgyban ott a valódi címzett). Éles üzemhez állítsd null-ra,
@@ -96,7 +96,7 @@ async function handleGetCard(env, user, id) {
   const card = await getCard(env, id);
   const offers = ((await env.DB.prepare(`SELECT token, items, message, sent_to, sent, created_at, responded_at, action, choice, client_msg FROM crm_offers WHERE deal_id = ? ORDER BY created_at DESC`).bind(id).all()).results || [])
     .map((o) => ({ ...o, items: parseJ(o.items, []), link: `${SITE}/ajanlat/valasz/?t=${o.token}` }));
-  const files = (await env.DB.prepare(`SELECT id, name, mime, size, created_at FROM crm_files WHERE deal_id = ? AND id NOT IN (SELECT file_id FROM crm_fin WHERE deal_id = ? AND file_id IS NOT NULL) ORDER BY id`).bind(id, id).all()).results || [];
+  const files = (await env.DB.prepare(`SELECT id, name, mime, size, created_at FROM crm_files WHERE deal_id = ? AND substr(name, 1, 8) <> '__media_' AND id NOT IN (SELECT file_id FROM crm_fin WHERE deal_id = ? AND file_id IS NOT NULL) ORDER BY id`).bind(id, id).all()).results || [];
   const fin = await finList(env, id);
   const events = await listEvents(env, id);
   let users = [];
@@ -281,7 +281,11 @@ async function handleSendOffer(request, env, user, id) {
     // forrás: készlet / mobile.de hirdetés (Import) / gyári konfigurátor (Eladás) / egyedi
     src: ['inv', 'mobile', 'config', 'manual'].includes(it.src) ? it.src : 'manual', color: clean(it.color, 60),
     ad_id: /^\d{6,12}$/.test(String(it.ad_id || '')) ? String(it.ad_id) : '', ad_url: /^https:\/\/([a-z0-9-]+\.)*mobile\.de\//i.test(it.ad_url || '') ? clean(it.ad_url, 400) : '',
-    src_price: Math.max(0, Number(it.src_price) || 0), config_code: clean(it.config_code, 60), config_url: /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|mercedes-benz|mercedes|audi|volkswagen|vw)\.[a-z.]{2,12}(\/|$)/i.test(it.config_url || '') ? clean(it.config_url, 1500) : '', file_id: Number.isInteger(it.file_id) ? it.file_id : null
+    src_price: Math.max(0, Number(it.src_price) || 0), config_code: clean(it.config_code, 60), config_url: /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|mercedes-benz|mercedes|audi|volkswagen|vw)\.[a-z.]{2,12}(\/|$)/i.test(it.config_url || '') ? clean(it.config_url, 1500) : '', file_id: Number.isInteger(it.file_id) ? it.file_id : null,
+    // gyári konfigurátorból kinyert képek (crm_files, „__media_” névvel) és felszereltség — ezekből készül a CarAdvance-ajánlat PDF
+    images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 8),
+    equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
+    attach_src: !!it.attach_src
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
   const message = cleanMulti(b.message, 2000).trim();
@@ -290,10 +294,18 @@ async function handleSendOffer(request, env, user, id) {
   const clientName = (card.data.kind === 'ceg' && card.data.contact_differs && card.data.contact && card.data.contact.name) || (card.data.person && card.data.person.name) || deal.name;
   const fwd = testForward(env);
   const subject = `${fwd ? '[TESZT — ' + to + '] ' : ''}Ajánlatunk — ${items.length > 1 ? items.length + ' autó' : items[0].title}`;
-  // a gyári konfigurátoros ajánlatok (PDF) csatolva
+  // gyári konfigurátoros autók: CarAdvance-arculatú ajánlat PDF (adatok + képek + felszereltség); a gyári PDF csak kérésre megy
   const att = [];
-  for (const it of items) {
-    if (!it.file_id) continue;
+  for (const [i, it] of items.entries()) {
+    if (it.src === 'config' && (it.images.length || it.equipment.length)) {
+      try {
+        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: offerNo(id, i, items.length), user });
+        att.push({ filename: offerFileName(it), content: bytesToB64(pdf) });
+        if (!it.image && it.images.length) it.image = `${SITE}/api/crm-ajanlat/${token}/kep/${it.images[0]}`;
+        it.offer_pdf = true;
+      } catch (e) { console.error('offer pdf', e); }
+    }
+    if (!it.file_id || (it.offer_pdf && !it.attach_src)) continue;
     const f = await env.DB.prepare(`SELECT id, name, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(it.file_id, id).first();
     if (f) att.push({ filename: f.name, content: await fileData(env, f) }); else it.file_id = null;
   }
@@ -305,6 +317,46 @@ async function handleSendOffer(request, env, user, id) {
   await addEvent(env, id, 'offer', `Ajánlat elküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${items.length} autó: ${carList}`, user.name);
   await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id, user.name, 'ajánlat elküldve');
   return json({ ok: true, link, status: 'Ajánlat kiküldve', sentTo: fwd || to, test: !!fwd });
+}
+
+/* ---------------- CarAdvance-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ---------------- */
+function offerNo(id, i, n) { const d = new Date(); return `AJ-${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}-${String(id).padStart(4, '0')}${n > 1 ? '-' + (i + 1) : ''}`; }
+function offerFileName(it) { return ('CarAdvance_ajanlat_' + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 80) + '.pdf'; }
+async function buildOfferPdf(env, dealId, it, o) {
+  const images = [];
+  for (const fid of (it.images || []).slice(0, 8)) {
+    const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, dealId).first();
+    if (f) { const b = b64ToBytes(await fileData(env, f)); if (jpegInfo(b)) images.push(b); }
+  }
+  const specs = [['Márka', it.brand], ['Évjárat', it.year], ['Üzemanyag', it.fuel], ['Teljesítmény', it.power], ['Váltó', it.gearbox], ['Szín', it.color], ['Km', it.km], ['Konfigurációs kód', it.config_code]];
+  const d = new Date();
+  return renderOfferPdf({
+    title: it.title, brand: it.brand, subtitle: specLine(it), price: priceLabel(it), priceNote: '',
+    code: it.config_code, number: o.number, date: d.toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest' }), 
+    client: o.client || '', note: it.note || '', specs, equipment: it.equipment || [], images,
+    contact: { name: o.user && o.user.name, email: 'sales@caradvance.hu', phone: '+36 30 233 6060' }
+  });
+}
+async function handleOfferPdfPreview(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({})); const it = b.item || {};
+  const item = { title: clean(it.title, 200), brand: clean(it.brand, 60), year: clean(it.year, 30), km: clean(it.km, 40), fuel: clean(it.fuel, 40), power: clean(it.power, 40), gearbox: clean(it.gearbox, 40), color: clean(it.color, 60),
+    price: Math.max(0, Number(it.price) || 0), currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(it.period, 20), note: clean(it.note, 400), config_code: clean(it.config_code, 60),
+    images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 8),
+    equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150) };
+  const card = await getCard(env, id);
+  const pdf = await buildOfferPdf(env, id, item, { client: (card.data.person && card.data.person.name) || deal.name, number: offerNo(id, 0, 1) + ' (előnézet)', user });
+  return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${offerFileName(item)}"`, 'cache-control': 'no-store' } });
+}
+/** Konfigurátor-kép mentése (JPEG, a böngészőben kicsinyítve) — rejtett fájlként, a feltöltött fájlok között nem látszik. */
+async function handleMediaUpload(request, env, user, id) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  const mm = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(b.data || ''));
+  if (!mm || mm[1].length > 2200000) return json({ error: 'A kép túl nagy vagy hibás (JPEG, max. ~1,6 MB).' }, 400);
+  if (!jpegInfo(b64ToBytes(mm[1]))) return json({ error: 'A kép nem olvasható.' }, 400);
+  const f = await putFile(env, id, '__media_' + Date.now() + '.jpg', 'image/jpeg', mm[1], user.id);
+  return json({ ok: true, id: f.id });
 }
 
 /* ---------------- pénzügy (ügyletenként) ---------------- */
@@ -1080,6 +1132,10 @@ export async function onRequest(context) {
     if (m && method === 'PATCH') return await handlePatchCard(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/events$/);
     if (m && method === 'GET') { const { error } = await loadDeal(env, user, Number(m[1])); if (error) return error; return json({ events: await listEvents(env, Number(m[1])) }); }
+    m = path.match(/^\/card\/(\d+)\/media$/);
+    if (m && method === 'POST') return await handleMediaUpload(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/offerpdf$/);
+    if (m && method === 'POST') return await handleOfferPdfPreview(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/offer$/);
     if (m && method === 'POST') return await handleSendOffer(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/files$/);
