@@ -54,7 +54,7 @@ async function sendCode(env, r) {
   const m = await sendCrmMail(env, fwd || r.email, `${fwd ? '[TESZT — ' + r.email + '] ' : ''}Aláírási kód: ${code}`,
     `<p>Kedves ${esc(r.signer_name || 'Ügyfelünk')}!</p><p>A CarAdvance által aláírásra küldött dokumentum(ok) aláírásához adja meg ezt a kódot:</p>
      <p style="font:bold 34px/1 'Courier New',monospace;letter-spacing:6px;margin:18px 0">${code}</p>
-     <p style="color:#6b7280;font-size:13px">A kód 10 percig érvényes, és csak egyszer használható. Ha nem Ön kérte, hagyja figyelmen kívül ezt az e-mailt, és kérjük, jelezze nekünk.</p>`);
+     <p style="color:#6b7280;font-size:13px">A kód 10 percig érvényes, és csak egyszer használható. Ha nem Ön kérte, hagyja figyelmen kívül ezt az e-mailt, és kérjük, jelezze nekünk.</p>`, null, { noCopy: true }); // az aláírási kódról nem megy másolat
   if (!m.ok) return J({ ok: false, error: 'mail_failed' }, 502);
   await addEvent(env, r.deal_id, 'sign', `Aláírási kód elküldve (#${r.id}) → ${fwd ? 'TESZT → ' + fwd : r.email}`, 'Ügyfél');
   return J({ ok: true, email: maskEmail(r.email) });
