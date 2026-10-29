@@ -71,7 +71,8 @@ label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-to
 <script>
 (function(){
 'use strict';
-var A='/api/partner',app=document.getElementById('app'),ME=null,STMT='',REQ=[],TAB='open',SEL={},PAD=null,LANG='de';
+var A='/api/partner',app=document.getElementById('app'),ME=null,STMT='',REQ=[],TAB='open',SEL={},PAD=null,LANG='de',MKT='';
+var FLAG={HU:'🇭🇺',PL:'🇵🇱',SK:'🇸🇰',CZ:'🇨🇿',RO:'🇷🇴',AT:'🇦🇹',SI:'🇸🇮',HR:'🇭🇷',RS:'🇷🇸',BG:'🇧🇬',DE:'🇩🇪'};
 var I18N={
  de:{portal:'Partnerportal',login:'Anmelden',user:'Benutzername (E-Mail)',pass:'Passwort',loginBtn:'Anmelden',logout:'Abmelden',
   sub:function(m){return m.company+' · '+m.country;},
@@ -81,7 +82,7 @@ var I18N={
   noOpen:'Derzeit liegen keine Dokumente zur Unterschrift vor.',noDone:'Noch keine unterschriebenen Dokumente.',
   client:'Kunde',received:'Eingegangen',clientSigned:'vom Kunden unterschrieben',signedAt:'Unterschrieben',expires:'gültig bis',
   st:{pending:'offen',signed:'unterschrieben',expired:'abgelaufen',revoked:'widerrufen',locked:'gesperrt',signing:'in Bearbeitung'},
-  pdf:'PDF',selAll:'Alle auswählen',selected:function(n){return n+' Vorgang/Vorgänge ausgewählt';},signSel:'Ausgewählte unterschreiben',
+  pdf:'PDF',allMk:'Alle Länder',mk:'Herkunftsland',selAll:'Alle auswählen',selected:function(n){return n+' Vorgang/Vorgänge ausgewählt';},signSel:'Ausgewählte unterschreiben',
   needSig:'Bitte speichern Sie zuerst Ihre Unterschrift (Reiter „Meine Unterschrift“).',
   sigTitle:'Gespeicherte Unterschrift',sigTxt:'Diese Unterschrift wird bei der Gegenzeichnung in die Dokumente eingefügt. Sie können sie jederzeit ändern.',
   sigName:'Name des Unterzeichners (z. B. Dr. Max Mustermann, Geschäftsführer)',sigDraw:'Unterschreiben Sie mit dem Finger oder der Maus im Feld:',sigHere:'Hier unterschreiben',clear:'Löschen',sigSave:'Unterschrift speichern',sigSaved:'Gespeichert am',sigNone:'Noch keine Unterschrift gespeichert.',
@@ -99,7 +100,7 @@ var I18N={
   noOpen:'There are no documents to sign at the moment.',noDone:'No signed documents yet.',
   client:'Client',received:'Received',clientSigned:'signed by the client',signedAt:'Signed',expires:'valid until',
   st:{pending:'open',signed:'signed',expired:'expired',revoked:'revoked',locked:'locked',signing:'processing'},
-  pdf:'PDF',selAll:'Select all',selected:function(n){return n+' request(s) selected';},signSel:'Sign selected',
+  pdf:'PDF',allMk:'All countries',mk:'Country of origin',selAll:'Select all',selected:function(n){return n+' request(s) selected';},signSel:'Sign selected',
   needSig:'Please save your signature first (tab “My signature”).',
   sigTitle:'Saved signature',sigTxt:'This signature is inserted into the documents when you countersign. You can change it at any time.',
   sigName:'Name of the signatory (e.g. Dr. Max Mustermann, Managing Director)',sigDraw:'Sign with your finger or the mouse in the box:',sigHere:'Sign here',clear:'Clear',sigSave:'Save signature',sigSaved:'Saved on',sigNone:'No signature saved yet.',
@@ -117,7 +118,7 @@ var I18N={
   noOpen:'Jelenleg nincs aláírandó dokumentum.',noDone:'Még nincs aláírt dokumentum.',
   client:'Ügyfél',received:'Beérkezett',clientSigned:'az ügyfél aláírta',signedAt:'Aláírva',expires:'érvényes',
   st:{pending:'nyitott',signed:'aláírva',expired:'lejárt',revoked:'visszavonva',locked:'zárolva',signing:'folyamatban'},
-  pdf:'PDF',selAll:'Összes kijelölése',selected:function(n){return n+' kérelem kijelölve';},signSel:'Kijelöltek aláírása',
+  pdf:'PDF',allMk:'Minden ország',mk:'Származási ország',selAll:'Összes kijelölése',selected:function(n){return n+' kérelem kijelölve';},signSel:'Kijelöltek aláírása',
   needSig:'Előbb mentse el az aláírását („Aláírásom” fül).',
   sigTitle:'Mentett aláírás',sigTxt:'Ez az aláírás kerül a dokumentumokba ellenjegyzéskor. Bármikor módosítható.',
   sigName:'Az aláíró neve (pl. Dr. Max Mustermann, ügyvezető)',sigDraw:'Írjon alá ujjal vagy egérrel a keretben:',sigHere:'Ide írjon alá',clear:'Törlés',sigSave:'Aláírás mentése',sigSaved:'Mentve',sigNone:'Még nincs mentett aláírás.',
@@ -169,7 +170,8 @@ function renderPw(forced){
   });
 }
 function loadList(){return post('/list').then(function(j){REQ=j.requests||[];SEL={};if(ME&&!ME.must_change)renderMain();}).catch(function(){});}
-function count(st){return REQ.filter(function(r){return st==='open'?r.status==='pending':st==='done'?r.status==='signed':true;}).length;}
+function inMk(r){return !MKT||r.market===MKT;}
+function count(st){return REQ.filter(function(r){return inMk(r)&&(st==='open'?r.status==='pending':st==='done'?r.status==='signed':true);}).length;}
 function renderMain(){
   head();
   var tabs=[['open',L().tOpen+' ('+count('open')+')'],['done',L().tDone+' ('+count('done')+')'],['all',L().tAll],['sig',L().tSig+(ME.has_sig?' ✓':'')],['pw',L().tPw]];
@@ -181,15 +183,18 @@ function renderMain(){
 }
 function stBadge(s){var cls=s==='signed'?'ok':s==='pending'?'':'off';return '<span class="badge '+cls+'">'+esc(L().st[s]||s)+'</span>';}
 function renderList(){
-  var list=REQ.filter(function(r){return TAB==='open'?r.status==='pending':TAB==='done'?r.status==='signed':true;});
+  var list=REQ.filter(function(r){return inMk(r)&&(TAB==='open'?r.status==='pending':TAB==='done'?r.status==='signed':true);});
   var h='';
+  // származási ország (piac) szerinti szűrés: HU, PL, SK, CZ, RO …
+  var mks=[];REQ.forEach(function(r){if(mks.indexOf(r.market)<0)mks.push(r.market);});mks.sort();
+  if(mks.length>1||MKT)h+='<div class="tabs" style="margin-top:-4px"><span class="small muted" style="align-self:center">'+esc(L().mk)+':</span><button data-mk="" class="'+(MKT?'':'on')+'">'+esc(L().allMk)+'</button>'+mks.map(function(m){var n=REQ.filter(function(r){return r.market===m&&r.status==='pending';}).length;return '<button data-mk="'+esc(m)+'" class="'+(MKT===m?'on':'')+'">'+(FLAG[m]||'')+' '+esc(m)+(n?' ('+n+')':'')+'</button>';}).join('')+'</div>';
   if(TAB==='open'&&!ME.has_sig)h+='<div class="note">'+esc(L().needSig)+'</div>';
   if(!list.length)h+='<p class="muted">'+(TAB==='done'?L().noDone:L().noOpen)+'</p>';
   if(TAB==='open'&&list.length)h+='<label class="chk"><input type="checkbox" id="sa"> '+L().selAll+'</label>';
   h+=list.map(function(r){
     var open=r.status==='pending';
     return '<div class="req'+(SEL[r.id]?' sel':'')+'">'+(open?'<input type="checkbox" data-s="'+r.id+'"'+(SEL[r.id]?' checked':'')+' style="width:20px;height:20px;accent-color:var(--red);margin-top:2px">':'')
-      +'<div class="main"><div class="t">'+esc(L().client)+': '+esc(r.client||'—')+' '+stBadge(r.status)+'</div>'
+      +'<div class="main"><div class="t"><span title="'+esc(L().mk)+'">'+(FLAG[r.market]||'')+' '+esc(r.market||'')+'</span> · '+esc(L().client)+': '+esc(r.client||'—')+' '+stBadge(r.status)+'</div>'
       +'<div class="small muted">#'+r.id+' · '+L().received+': '+esc(r.received)+(r.client_signed?' · '+L().clientSigned+': '+esc(r.client_signed):'')+(r.signed_at?' · '+L().signedAt+': '+esc(r.signed_at)+(r.sign_name?' ('+esc(r.sign_name)+')':''):'')+'</div>'
       +'<ul>'+r.docs.map(function(d){return '<li>'+esc(d.name)+(d.number?' <span class="muted">('+esc(d.number)+')</span>':'')+' <button class="lnk" data-pdf="'+r.id+':'+d.i+'">'+L().pdf+'</button></li>';}).join('')+'</ul></div></div>';
   }).join('');
@@ -197,6 +202,7 @@ function renderList(){
   $('pane').innerHTML=h;
   $('pane').querySelectorAll('[data-s]').forEach(function(c){c.addEventListener('change',function(){SEL[c.getAttribute('data-s')]=c.checked;c.closest('.req').classList.toggle('sel',c.checked);upd();});});
   var sa=$('sa');if(sa)sa.addEventListener('change',function(){var on=sa.checked;$('pane').querySelectorAll('[data-s]').forEach(function(c){c.checked=on;SEL[c.getAttribute('data-s')]=on;c.closest('.req').classList.toggle('sel',on);});upd();});
+  $('pane').querySelectorAll('[data-mk]').forEach(function(b){b.addEventListener('click',function(){MKT=b.getAttribute('data-mk');SEL={};renderMain();});});
   $('pane').querySelectorAll('[data-pdf]').forEach(function(b){b.addEventListener('click',function(){var x=b.getAttribute('data-pdf').split(':');openPdf(+x[0],+x[1]);});});
   var g=$('sgo');if(g){g.addEventListener('click',startSign);upd();}
   function upd(){var n=Object.keys(SEL).filter(function(k){return SEL[k];}).length;var s=$('selc');if(s)s.textContent=L().selected(n);if(g)g.disabled=!n||!ME.has_sig;}
