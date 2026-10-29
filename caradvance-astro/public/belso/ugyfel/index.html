@@ -244,7 +244,7 @@
 </div></div>
 <div class="wrap" id="root"><div class="loading">Betöltés…</div></div>
 <div class="toast" id="toast"></div>
-<script src="/belso/doc-render.js?v=3"></script>
+<script src="/belso/doc-render.js?v=4"></script>
 <script>
 var ID=parseInt(new URLSearchParams(location.search).get('id'),10);
 var API='/api/belso-crm';
@@ -1043,7 +1043,7 @@ function renderDM(){
       +'<span class="ic">'+(KIND_IC[d.kind]||'📑')+'</span><span class="nm"><b>'+esc(d.name)+'</b><small>'+esc(DM.kinds[d.kind]||'')+(d.number?' · '+esc(d.number):'')+' · '+esc(fmtDate(d.updated_at||d.created_at))+(d.updated_by?' · '+esc(d.updated_by):'')
       +(d.sent_at?' · <span style="color:var(--good);font-weight:700">✓ elküldve '+esc(fmtDate(d.sent_at))+'</span>':'')
       +(d.missing_n?' · <span class="sgb bad">⚠ '+d.missing_n+' hiányzó adat</span>':'')
-      +(d.sign_status==='pending'?' · <span class="sgb wait">⏳ aláírásra vár</span>':d.sign_status==='signed'?' · <span class="sgb ok">✍ aláírva</span>':'')+'</small></span>'
+      +(d.sign_status==='pending'?' · <span class="sgb wait">⏳ aláírásra vár</span>':d.sign_status==='signed'?' · <span class="sgb ok">✍ aláírva</span>':d.sign_status==='cosign'?' · <span class="sgb wait">✍ ügyfél aláírta · ⏳ partner ellenjegyzésére vár</span>':'')+'</small></span>'
       +'<span class="acts">'+(d.sign_status?'':'<button class="lnk" data-de="'+d.id+'">Szerkesztés</button>')
       +(d.signed_file_id?'<a class="lnk" href="'+API+'/card/'+ID+'/files/'+d.signed_file_id+'" target="_blank" rel="noopener">Aláírt PDF</a>':'<button class="lnk" data-dp="'+d.id+'">PDF</button>')
       +(d.sign_status?'':'<button class="lnk del" data-dd="'+d.id+'">Törlés</button>')+'</span></div>';
@@ -1103,7 +1103,7 @@ function signPanel(){
   var cem=S.card.data.person.email||S.deal.email||'',bem=isSale()?(S.card.data.buyer.person.email||''):'';
   var nSel=DM.docs.filter(function(d){return DM.sel[d.id]&&!d.sign_status;}).length;
   var h='<div class="dm-send sgp"><div class="sub-h" style="margin-top:0">✍ Elektronikus aláírásra küldés</div>'
-    +'<div class="hint" style="margin-bottom:8px">A kijelölt (még alá nem írt) dokumentumok szövege a kiküldéskor rögzül. Az aláíró e-mailben kap egy személyes linket. Átolvassa a dokumentumokat, egyszeri kóddal azonosítja magát, majd aláír. Az aláírt PDF-ek aláírási tanúsítvánnyal együtt a feltöltött fájlok közé kerülnek, és mindkét fél e-mailben megkapja őket.</div>'
+    +'<div class="hint" style="margin-bottom:8px">A kijelölt (még alá nem írt) dokumentumok szövege a kiküldéskor rögzül. Az aláíró e-mailben kap egy személyes linket. Átolvassa a dokumentumokat, egyszeri kóddal azonosítja magát, majd aláír. Az aláírt PDF-ek aláírási tanúsítvánnyal együtt a feltöltött fájlok közé kerülnek, és mindkét fél e-mailben megkapja őket. A kétnyelvű (DE/HU) szerződéseket az ügyfél aláírása után a német partner is aláírja (ellenjegyzés, a cím a Dokumentumsablonok → Beállítások alatt). A mindkét fél által aláírt PDF az ügyfélnek, a partnernek és a sales@ címre megy ki.</div>'
     +'<div class="rc"><label class="chk"><input type="radio" name="sgr" value="client"'+(DM.sgr!=='buyer'?' checked':'')+'> Ügyfél'+(isSale()?' (bérlő)':'')+' <span class="hint">'+esc((S.card.data.person.name||S.deal.name||'')+' · '+(cem||'nincs e-mail'))+'</span></label>'
     +(isSale()?'<label class="chk"><input type="radio" name="sgr" value="buyer"'+(DM.sgr==='buyer'?' checked':'')+'> Vevő <span class="hint">'+esc((S.card.data.buyer.person.name||'')+' · '+(bem||'nincs e-mail'))+'</span></label>':'')+'</div>'
     +'<div class="fld" style="margin-top:8px"><label>Üzenet az aláírónak (nem kötelező)</label><input id="sgMsg" value="'+esc(DM.sgMsg||'')+'" placeholder="pl. Kérjük, írja alá a meghatalmazásokat a honosítás indításához."></div>'
@@ -1111,11 +1111,11 @@ function signPanel(){
   if((DM.signs||[]).length){
     h+='<div class="sub-h">Aláírási kérelmek</div><div class="sgl">'+DM.signs.map(function(r){
       var st=SG_ST[r.status]||['off',r.status];
-      return '<div class="sgr"><div class="h"><span class="sgb '+st[0]+'">'+st[1]+'</span><b>#'+r.id+' · '+esc(r.signer)+'</b><span class="hint">'+esc(r.email)+'</span><span style="flex:1"></span>'
+      return '<div class="sgr"><div class="h"><span class="sgb '+st[0]+'">'+st[1]+'</span><b>#'+r.id+' · '+(r.role==='partner'?'Ellenjegyzés (partner): ':'')+esc(r.signer)+'</b><span class="hint">'+esc(r.email)+'</span><span style="flex:1"></span>'
         +(r.status==='pending'?'<button class="lnk del" data-sgrv="'+r.id+'">Visszavonás</button>':'')+'</div>'
         +'<div class="hint">Kiküldve: '+esc(fmtDate(r.created_at))+' ('+esc(r.created_by||'')+')'+(r.opened_at?' · megnyitva: '+esc(fmtDate(r.opened_at)):'')
         +(r.signed_at?' · <b style="color:var(--good)">aláírva: '+esc(fmtDate(r.signed_at))+' — '+esc(r.sign_name||'')+', IP: '+esc(r.sign_ip||'')+'</b>':r.status==='pending'?' · lejár: '+esc(fmtDate(r.expires.replace('T',' ').slice(0,19))):'')+(r.fails?' · hibás kód: '+r.fails:'')+'</div>'
-        +'<ul>'+r.docs.map(function(d,i){var res=(r.result||[])[i];return '<li>'+esc(d.name)+(res&&res.file_id?' — <a href="'+API+'/card/'+ID+'/files/'+res.file_id+'" target="_blank" rel="noopener">aláírt PDF</a> <span class="hint">PDF SHA-256: '+esc(res.pdf_sha.slice(0,16))+'…</span>':'')+'</li>';}).join('')+'</ul></div>';
+        +'<ul>'+r.docs.map(function(d,i){var res=(r.result||[])[i];return '<li>'+esc(d.name)+(res&&res.file_id?' — <a href="'+API+'/card/'+ID+'/files/'+res.file_id+'" target="_blank" rel="noopener">'+(res.cosign?'ügyfél által aláírt PDF':res.cosigned||r.role==='partner'?'mindkét fél által aláírt PDF':'aláírt PDF')+'</a> <span class="hint">PDF SHA-256: '+esc(res.pdf_sha.slice(0,16))+'…</span>':'')+'</li>';}).join('')+'</ul></div>';
     }).join('')+'</div>';
   }
   return h+'</div>';
