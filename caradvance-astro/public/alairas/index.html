@@ -55,19 +55,22 @@ label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-to
 <div class="top"><img src="/caradvance-logo-white.webp" alt="CarAdvance"><span>🔒 Biztonságos aláírás</span></div>
 <div class="hero"><h1>Dokumentumok elektronikus aláírása</h1><p id="sub">Betöltés…</p></div>
 <div class="wrap" id="app"><div class="card">Betöltés…</div></div>
-<script src="/belso/doc-render.js?v=3"></script>
+<script src="/belso/doc-render.js?v=4"></script>
 <script>
 (function(){
 'use strict';
 var A='/api/crm-alairas',T='',S=null,READ={},PAD=null,app=document.getElementById('app');
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+var DE=false;function tr(hu,de){return DE?de:hu;}
+var ERR_DE={bad_link:'Ungültiger Signaturlink.',not_found:'Diese Signaturanfrage wurde nicht gefunden.',locked:'Diese Signaturanfrage ist nicht mehr aktiv.',too_many_codes:'Zu viele Code-Anfragen — bitte versuchen Sie es in einer Stunde erneut.',mail_failed:'Der Code konnte nicht gesendet werden, bitte erneut versuchen.',bad_name:'Bitte geben Sie Ihren vollständigen Namen ein.',consent:'Bitte bestätigen Sie die Erklärung.',bad_signature:'Bitte unterschreiben Sie im Feld.',code_expired:'Der Code ist abgelaufen oder wurde noch nicht angefordert — bitte neuen Code anfordern.',too_many:'Zu viele Fehlversuche — bitte neuen Code anfordern.',wrong_code:'Falscher Code.',integrity:'Die Unversehrtheit des Dokuments kann nicht bestätigt werden — bitte kontaktieren Sie uns.',rate:'Zu viele Anfragen — bitte warten Sie einige Minuten.',server:'Unerwarteter Fehler — bitte erneut versuchen.'};
+function errMsg(c){return (DE?ERR_DE[c]:ERR[c])||c;}
 var ERR={bad_link:'Érvénytelen aláírási link.',not_found:'Ez az aláírási kérelem nem található.',locked:'Ez az aláírási kérelem már nem aktív.',too_many_codes:'Túl sok kódkérés — kérjük, próbálja újra egy óra múlva.',mail_failed:'A kódot most nem sikerült elküldeni, kérjük, próbálja újra.',bad_name:'Kérjük, írja be a teljes nevét.',consent:'Kérjük, fogadja el a nyilatkozatot.',bad_signature:'Kérjük, írja alá a dokumentumot a keretben.',code_expired:'A kód lejárt vagy még nem kért kódot — kérjen újat.',too_many:'Túl sok hibás próbálkozás — kérjen új kódot.',wrong_code:'Hibás kód.',integrity:'A dokumentum sértetlensége nem igazolható — kérjük, vegye fel velünk a kapcsolatot.',rate:'Túl sok kérés — kérjük, várjon néhány percet.',server:'Váratlan hiba — kérjük, próbálja újra.'};
 function post(p,body,raw){
   body=Object.assign({t:T},body||{});
   return fetch(A+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer'}).then(function(r){
     if(raw&&r.ok)return r;
-    return r.json().catch(function(){return {ok:false,error:'server'};}).then(function(j){if(!j.ok){var e=new Error(ERR[j.error]||j.error||'Hiba');e.code=j.error;e.left=j.left;throw e;}return j;});
+    return r.json().catch(function(){return {ok:false,error:'server'};}).then(function(j){if(!j.ok){var e=new Error(errMsg(j.error)||'Hiba');e.code=j.error;e.left=j.left;throw e;}return j;});
   });
 }
 // a token a # utáni részben érkezik — elmentjük a lapfülhöz, és eltüntetjük a címsorból
@@ -77,43 +80,50 @@ function post(p,body,raw){
   if(!T&&/^[a-f0-9]{64}$/.test(h))T=h;
   if(h)try{history.replaceState(null,'',location.pathname);}catch(e){}
 })();
-function fail(msg){$('sub').textContent='';app.innerHTML='<div class="card"><div class="big">⚠️</div><h2>'+esc(msg)+'</h2><p class="muted">Ha kérdése van, írjon nekünk (info@caradvance.hu) vagy hívjon: +36 30 233 6060.</p></div>';}
+function fail(msg){$('sub').textContent='';app.innerHTML='<div class="card"><div class="big">⚠️</div><h2>'+esc(msg)+'</h2><p class="muted">'+tr('Ha kérdése van, írjon nekünk (sales@caradvance.hu) vagy hívjon: +36 30 233 6060.','Bei Fragen schreiben Sie uns (sales@caradvance.hu) oder rufen Sie an: +36 30 233 6060.')+'</p></div>';}
 function load(){
   if(!T)return fail('Hiányzó vagy érvénytelen aláírási link.');
-  post('/view').then(function(j){S=j;render();}).catch(function(e){fail(e.message);});
+  post('/view').then(function(j){S=j;setLang();render();}).catch(function(e){fail(e.message);});
 }
 function openPdf(i){
   var w=window.open('','_blank');
   post('/pdf',{i:i},true).then(function(r){return r.blob();}).then(function(b){var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();alert(e.message);});
 }
+function setLang(){
+  DE=S.lang==='de';if(!DE)return;
+  document.documentElement.lang='de';document.title='Dokumente unterschreiben — CarAdvance';
+  var h=document.querySelector('.hero h1');if(h)h.textContent='Gegenzeichnung der Dokumente';
+  var t=document.querySelector('.top span');if(t)t.textContent='🔒 Sichere Unterschrift';
+}
 function render(){
   if(S.status==='signed')return renderSigned();
-  if(S.status!=='pending'){var m={expired:'Az aláírási link lejárt.',revoked:'Az aláírási kérelmet visszavonták.',locked:'Biztonsági okból ez az aláírási kérelem zárolva lett (túl sok hibás kód).',signing:'Az aláírás feldolgozása folyamatban — frissítse az oldalt egy perc múlva.'}[S.status]||'Ez az aláírási kérelem már nem aktív.';return fail(m);}
-  $('sub').textContent='Aláíró: '+S.signer+' · '+S.docs.length+' dokumentum';
+  if(S.status!=='pending'){var m=(DE?{expired:'Der Signaturlink ist abgelaufen.',revoked:'Die Signaturanfrage wurde widerrufen.',locked:'Aus Sicherheitsgründen wurde diese Anfrage gesperrt (zu viele falsche Codes).',signing:'Die Unterschrift wird verarbeitet — bitte laden Sie die Seite in einer Minute neu.'}:{expired:'Az aláírási link lejárt.',revoked:'Az aláírási kérelmet visszavonták.',locked:'Biztonsági okból ez az aláírási kérelem zárolva lett (túl sok hibás kód).',signing:'Az aláírás feldolgozása folyamatban — frissítse az oldalt egy perc múlva.'})[S.status]||tr('Ez az aláírási kérelem már nem aktív.','Diese Signaturanfrage ist nicht mehr aktiv.');return fail(m);}
+  $('sub').textContent=tr('Aláíró: ','Unterzeichner: ')+S.signer+' · '+S.docs.length+tr(' dokumentum',' Dokument(e)');
   var allRead=S.docs.every(function(d){return READ[d.i];});
-  var h='<div class="card"><h2><span class="n">1</span>Olvassa el a dokumentumokat</h2>'
+  var h='<div class="card"><h2><span class="n">1</span>'+tr('Olvassa el a dokumentumokat','Dokumente prüfen')+'</h2>'
+    +(DE&&S.prior?'<div class="note">Der Kunde <b>'+esc(S.prior.name)+'</b> hat diese Dokumente am '+esc(S.prior.when)+' bereits elektronisch unterschrieben. Seine Unterschrift ist in der PDF-Fassung sichtbar.</div>':'')
     +(S.message?'<div class="note" style="white-space:pre-line">'+esc(S.message)+'</div>':'')
-    +'<p class="muted small" style="margin:4px 0 0">Nyissa meg és olvassa el mindegyiket, majd jelölje be, hogy elolvasta. A PDF változat le is tölthető.</p>'
-    +S.docs.map(function(d){return '<div class="doc'+(READ[d.i]?' ok':'')+'" id="d'+d.i+'"><div class="h"><b>'+esc(d.name)+'</b><button class="btn ghost sm" data-v="'+d.i+'">Megnyitás</button><button class="btn ghost sm" data-p="'+d.i+'">PDF</button></div>'
-      +'<div class="pv dpv" id="pv'+d.i+'"></div><div style="padding:0 14px 6px"><label class="chk"><input type="checkbox" data-r="'+d.i+'"'+(READ[d.i]?' checked':'')+'> Elolvastam és megértettem</label></div></div>';}).join('')
+    +'<p class="muted small" style="margin:4px 0 0">'+tr('Nyissa meg és olvassa el mindegyiket, majd jelölje be, hogy elolvasta. A PDF változat le is tölthető.','Öffnen und lesen Sie jedes Dokument und bestätigen Sie es anschließend. Die PDF-Fassung kann heruntergeladen werden.')+'</p>'
+    +S.docs.map(function(d){return '<div class="doc'+(READ[d.i]?' ok':'')+'" id="d'+d.i+'"><div class="h"><b>'+esc(d.name)+'</b><button class="btn ghost sm" data-v="'+d.i+'">'+tr('Megnyitás','Öffnen')+'</button><button class="btn ghost sm" data-p="'+d.i+'">PDF</button></div>'
+      +'<div class="pv dpv" id="pv'+d.i+'"></div><div style="padding:0 14px 6px"><label class="chk"><input type="checkbox" data-r="'+d.i+'"'+(READ[d.i]?' checked':'')+'> '+tr('Elolvastam és megértettem','Gelesen und verstanden')+'</label></div></div>';}).join('')
     +'</div>'
-    +'<div class="card'+(allRead?'':' off')+'" id="c2"><h2><span class="n">2</span>Azonosítás egyszeri kóddal</h2><p class="muted small" style="margin:4px 0 10px">Az aláíráshoz egy 6 jegyű kódot küldünk a(z) <b>'+esc(S.email)+'</b> e-mail címre. A kód 10 percig érvényes.</p>'
-    +'<div class="row"><button class="btn dark" id="getCode">Kód küldése e-mailben</button><span class="small muted" id="codeSt"></span></div>'
-    +'<label class="f">A kapott kód<input class="in code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></label></div>'
-    +'<div class="card'+(allRead?'':' off')+'" id="c3"><h2><span class="n">3</span>Aláírás</h2>'
-    +'<label class="f">Teljes neve<input class="in" id="nm" autocomplete="name" value="'+esc(S.signer||'')+'"></label>'
-    +'<p class="small muted" style="margin:14px 0 6px">Írjon alá ujjal vagy egérrel a keretben:</p><div class="pad"><canvas id="pad"></canvas><div class="ln"></div><div class="ph" id="ph">Ide írjon alá</div></div>'
-    +'<div class="row" style="margin:8px 0"><button class="btn ghost sm" id="clr" type="button">Törlés</button></div>'
+    +'<div class="card'+(allRead?'':' off')+'" id="c2"><h2><span class="n">2</span>'+tr('Azonosítás egyszeri kóddal','Identifizierung mit Einmalcode')+'</h2><p class="muted small" style="margin:4px 0 10px">'+tr('Az aláíráshoz egy 6 jegyű kódot küldünk a(z) <b>'+esc(S.email)+'</b> e-mail címre. A kód 10 percig érvényes.','Für die Unterschrift senden wir einen 6-stelligen Code an <b>'+esc(S.email)+'</b>. Der Code ist 10 Minuten gültig.')+'</p>'
+    +'<div class="row"><button class="btn dark" id="getCode">'+tr('Kód küldése e-mailben','Code per E-Mail senden')+'</button><span class="small muted" id="codeSt"></span></div>'
+    +'<label class="f">'+tr('A kapott kód','Erhaltener Code')+'<input class="in code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></label></div>'
+    +'<div class="card'+(allRead?'':' off')+'" id="c3"><h2><span class="n">3</span>'+tr('Aláírás','Unterschrift')+'</h2>'
+    +'<label class="f">'+tr('Teljes neve','Vollständiger Name')+'<input class="in" id="nm" autocomplete="name" value="'+esc(DE?'':(S.signer||''))+'"></label>'
+    +'<p class="small muted" style="margin:14px 0 6px">'+tr('Írjon alá ujjal vagy egérrel a keretben:','Unterschreiben Sie mit dem Finger oder der Maus im Feld:')+'</p><div class="pad"><canvas id="pad"></canvas><div class="ln"></div><div class="ph" id="ph">'+tr('Ide írjon alá','Hier unterschreiben')+'</div></div>'
+    +'<div class="row" style="margin:8px 0"><button class="btn ghost sm" id="clr" type="button">'+tr('Törlés','Löschen')+'</button></div>'
     +'<label class="chk"><input type="checkbox" id="cons"> <span>'+esc(S.statement)+'</span></label>'
-    +'<div id="err"></div><div class="row" style="margin-top:10px"><button class="btn red" id="go">Aláírom a dokumentumokat</button></div>'
-    +'<div class="sec">🔒 <span>Egyszerű elektronikus aláírás. A dokumentumok tartalma a kiküldéskor rögzítve lett (SHA-256), az aláírás időpontja, az IP-cím és az eszköz adatai a hitelesség igazolására a dokumentumhoz csatolt tanúsítványban rögzülnek. Az aláírt példányt e-mailben megkapja.</span></div></div>';
+    +'<div id="err"></div><div class="row" style="margin-top:10px"><button class="btn red" id="go">'+tr('Aláírom a dokumentumokat','Dokumente unterschreiben')+'</button></div>'
+    +'<div class="sec">🔒 <span>'+tr('Egyszerű elektronikus aláírás. A dokumentumok tartalma a kiküldéskor rögzítve lett (SHA-256), az aláírás időpontja, az IP-cím és az eszköz adatai a hitelesség igazolására a dokumentumhoz csatolt tanúsítványban rögzülnek. Az aláírt példányt e-mailben megkapja.','Einfache elektronische Signatur. Der Inhalt der Dokumente wurde beim Versand festgeschrieben (SHA-256); Zeitpunkt, IP-Adresse und Gerätedaten werden zum Nachweis der Echtheit im beigefügten Signaturprotokoll erfasst. Die beidseitig unterschriebenen Exemplare erhalten Sie per E-Mail.')+'</span></div></div>';
   app.innerHTML=h;
-  app.querySelectorAll('[data-v]').forEach(function(b){b.addEventListener('click',function(){var i=b.getAttribute('data-v'),d=$('d'+i),pv=$('pv'+i);if(!pv.innerHTML)pv.innerHTML=window.CADoc?CADoc.preview(S.docs[i].text,{},null,S.docs[i].sigs||[]):'<pre>'+esc(S.docs[i].text)+'</pre>';d.classList.toggle('open');b.textContent=d.classList.contains('open')?'Bezárás':'Megnyitás';});});
+  app.querySelectorAll('[data-v]').forEach(function(b){b.addEventListener('click',function(){var i=b.getAttribute('data-v'),d=$('d'+i),pv=$('pv'+i);if(!pv.innerHTML)pv.innerHTML=window.CADoc?CADoc.preview(S.docs[i].text,{},null,S.docs[i].sigs||[]):'<pre>'+esc(S.docs[i].text)+'</pre>';d.classList.toggle('open');b.textContent=d.classList.contains('open')?tr('Bezárás','Schließen'):tr('Megnyitás','Öffnen');});});
   app.querySelectorAll('[data-p]').forEach(function(b){b.addEventListener('click',function(){openPdf(+b.getAttribute('data-p'));});});
   app.querySelectorAll('[data-r]').forEach(function(c){c.addEventListener('change',function(){READ[c.getAttribute('data-r')]=c.checked;var all=S.docs.every(function(d){return READ[d.i];});$('d'+c.getAttribute('data-r')).classList.toggle('ok',c.checked);$('c2').classList.toggle('off',!all);$('c3').classList.toggle('off',!all);});});
   $('getCode').addEventListener('click',function(){
-    var b=this;b.disabled=true;$('codeSt').textContent='Küldés…';
-    post('/code').then(function(j){$('codeSt').textContent='Elküldtük: '+j.email+' — nézze meg a postafiókját (a Spam mappát is).';$('code').focus();setTimeout(function(){b.disabled=false;b.textContent='Új kód kérése';},30000);})
+    var b=this;b.disabled=true;$('codeSt').textContent=tr('Küldés…','Wird gesendet…');
+    post('/code').then(function(j){$('codeSt').textContent=tr('Elküldtük: '+j.email+' — nézze meg a postafiókját (a Spam mappát is).','Gesendet an: '+j.email+' — bitte prüfen Sie Ihr Postfach (auch den Spam-Ordner).');$('code').focus();setTimeout(function(){b.disabled=false;b.textContent=tr('Új kód kérése','Neuen Code anfordern');},30000);})
       .catch(function(e){$('codeSt').textContent=e.message;b.disabled=false;});
   });
   PAD=pad($('pad'),'ph');$('clr').addEventListener('click',function(){PAD.clear();});
@@ -133,18 +143,18 @@ function showErr(m){$('err').innerHTML=m?'<div class="note err">'+esc(m)+'</div>
 function signNow(){
   showErr('');
   var code=($('code').value||'').replace(/\D/g,''),nm=($('nm').value||'').trim();
-  if(code.length!==6)return showErr('Adja meg az e-mailben kapott 6 jegyű kódot (2. lépés).');
-  if(nm.length<3)return showErr(ERR.bad_name);
-  if(PAD.isEmpty())return showErr(ERR.bad_signature);
-  if(!$('cons').checked)return showErr(ERR.consent);
-  var b=$('go');b.disabled=true;b.textContent='Aláírás folyamatban…';
+  if(code.length!==6)return showErr(tr('Adja meg az e-mailben kapott 6 jegyű kódot (2. lépés).','Bitte geben Sie den 6-stelligen Code aus der E-Mail ein (Schritt 2).'));
+  if(nm.length<3)return showErr(errMsg('bad_name'));
+  if(PAD.isEmpty())return showErr(errMsg('bad_signature'));
+  if(!$('cons').checked)return showErr(errMsg('consent'));
+  var b=$('go');b.disabled=true;b.textContent=tr('Aláírás folyamatban…','Unterschrift wird verarbeitet…');
   post('/sign',{code:code,name:nm,sig:PAD.jpeg(),consent:true}).then(function(){return post('/view');}).then(function(j){S=j;try{sessionStorage.setItem('ca_sign_t',T);}catch(e){}render();window.scrollTo(0,0);})
-    .catch(function(e){showErr(e.message+(e.code==='wrong_code'&&e.left!=null?' Még '+e.left+' próbálkozás.':''));b.disabled=false;b.textContent='Aláírom a dokumentumokat';});
+    .catch(function(e){showErr(e.message+(e.code==='wrong_code'&&e.left!=null?tr(' Még '+e.left+' próbálkozás.',' Noch '+e.left+' Versuche.'):''));b.disabled=false;b.textContent=tr('Aláírom a dokumentumokat','Dokumente unterschreiben');});
 }
 function renderSigned(){
-  $('sub').textContent='Aláírva: '+(S.sign_name||S.signer)+(S.signed_at?' · '+S.signed_at:'');
-  app.innerHTML='<div class="card"><div class="big">✅</div><h2>Köszönjük, a dokumentumokat aláírta.</h2><p class="muted">Az aláírt példányokat (aláírási tanúsítvánnyal) e-mailben is elküldtük. Itt le is töltheti őket:</p>'
-    +S.docs.map(function(d){return '<div class="doc ok"><div class="h"><b>'+esc(d.name)+'</b><button class="btn ghost sm" data-p="'+d.i+'">Aláírt PDF</button></div></div>';}).join('')+'</div>';
+  $('sub').textContent=tr('Aláírva: ','Unterschrieben: ')+(S.sign_name||S.signer)+(S.signed_at?' · '+S.signed_at:'');
+  app.innerHTML='<div class="card"><div class="big">✅</div><h2>'+tr('Köszönjük, a dokumentumokat aláírta.','Vielen Dank, die Dokumente wurden unterschrieben.')+'</h2><p class="muted">'+tr('Az aláírt példányokat (aláírási tanúsítvánnyal) e-mailben is elküldtük. Itt le is töltheti őket:','Die beidseitig unterschriebenen Exemplare (mit Signaturprotokoll) haben wir per E-Mail versandt. Hier können Sie sie herunterladen:')+'</p>'
+    +S.docs.map(function(d){return '<div class="doc ok"><div class="h"><b>'+esc(d.name)+'</b>'+(d.cosign?'<span class="small muted">A Caradvance GmbH ellenjegyzése után a mindkét fél által aláírt példányt e-mailben megküldjük.</span>':'')+'<button class="btn ghost sm" data-p="'+d.i+'">'+tr('Aláírt PDF','Unterschriebene PDF')+'</button></div></div>';}).join('')+'</div>';
   app.querySelectorAll('[data-p]').forEach(function(b){b.addEventListener('click',function(){openPdf(+b.getAttribute('data-p'));});});
 }
 load();
