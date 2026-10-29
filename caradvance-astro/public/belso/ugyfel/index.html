@@ -107,6 +107,12 @@
   .req{border:1px solid #f3dca8;background:#fffaf0;border-radius:12px;padding:12px 14px;margin-bottom:14px}.req-h{font-weight:800;font-size:13px;margin-bottom:8px}
   .req-g{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:13px}.req-g span{color:var(--muted)}
   .pk .t{font-weight:800;font-size:13px;grid-column:1/-1;display:flex;gap:8px;align-items:center}
+  .pk .cfgo{grid-column:1/-1;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;background:#fbfcfe}
+  .pk .cfgo-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px;font-size:13px}
+  .pk .cfgo-imgs{display:flex;gap:8px;flex-wrap:wrap}.pk .ci{position:relative;width:120px;height:80px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:#fff}
+  .pk .ci img{width:100%;height:100%;object-fit:cover;display:block}.pk .ci.main{outline:2px solid var(--red)}
+  .pk .ci .ca{position:absolute;right:3px;top:3px;display:flex;gap:3px}.pk .ci .ca button,.pk .ci .ca span{background:rgba(15,23,42,.75);color:#fff;border:0;border-radius:6px;font-size:11px;padding:2px 6px;cursor:pointer}
+  .pk .ci.add{display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:13px;cursor:pointer;border-style:dashed}
   .pk .t .x{margin-left:auto;cursor:pointer;color:var(--muted);font-size:18px;line-height:1}
   @media(max-width:700px){.pk .prow{grid-template-columns:1fr 1fr}.pk .fld.n{grid-column:1/-1}.pk .specg{grid-template-columns:1fr 1fr}}
   .offers{margin-top:18px;display:grid;gap:10px}
@@ -765,6 +771,49 @@ function pdfText(buf){
     });})).then(function(a){return a.join('\n');});
   });
 }
+/* képek kinyerése a konfigurátor PDF-ből (a beágyazott képek közül a nagyobbak, JPEG-re alakítva, max. 1600 px) */
+function pdfImages(buf){
+  return pdfjs().then(function(lib){return lib.getDocument({data:buf}).promise.then(function(doc){
+    var found=[],seen={},chain=Promise.resolve();
+    for(var p=1;p<=Math.min(doc.numPages,10);p++)(function(n){chain=chain.then(function(){return doc.getPage(n).then(function(pg){return pg.getOperatorList().then(function(ops){
+      var names=[];ops.fnArray.forEach(function(fn,i){if(fn===lib.OPS.paintImageXObject||fn===lib.OPS.paintJpegXObject){var a=ops.argsArray[i];if(a&&a[0]&&names.indexOf(a[0])<0)names.push(a[0]);}});
+      return Promise.all(names.map(function(nm){return new Promise(function(res){var to=setTimeout(function(){res(null);},4000);try{(String(nm).indexOf('g_')===0?pg.commonObjs:pg.objs).get(nm,function(o){clearTimeout(to);res(o);});}catch(e){clearTimeout(to);res(null);}});})).then(function(list){
+        list.forEach(function(im){
+          if(!im)return;var w=im.width,h=im.height;if(!w||!h||w<320||h<160||w/h>5||h/w>3)return;
+          var key=w+'x'+h;if(seen[key])return;seen[key]=1;
+          var cv=document.createElement('canvas'),sc=Math.min(1,1600/Math.max(w,h));cv.width=Math.round(w*sc);cv.height=Math.round(h*sc);var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);
+          try{
+            if(im.bitmap)cx.drawImage(im.bitmap,0,0,cv.width,cv.height);
+            else if(im.data){var t=document.createElement('canvas');t.width=w;t.height=h;var tc=t.getContext('2d'),id=tc.createImageData(w,h),src=im.data,dst=id.data;
+              if(im.kind===3||src.length===w*h*4)dst.set(src.subarray?src.subarray(0,dst.length):src);
+              else if(im.kind===2||src.length===w*h*3){for(var j=0,k=0;j<w*h;j++){dst[k++]=src[j*3];dst[k++]=src[j*3+1];dst[k++]=src[j*3+2];dst[k++]=255;}}
+              else return;
+              tc.putImageData(id,0,0);cx.drawImage(t,0,0,cv.width,cv.height);}
+            else return;
+          }catch(e){return;}
+          found.push({area:w*h,data:cv.toDataURL('image/jpeg',0.82)});
+        });
+      });
+    });});});})(p);
+    return chain.then(function(){return found.sort(function(a,b){return b.area-a.area;}).slice(0,8).map(function(x){return x.data;});});
+  });});
+}
+/* felszereltség-lista a konfigurátor szövegéből (a „Sonderausstattung / Ausstattung / Pakete …” blokkok sorai, árak és opciókódok nélkül) */
+function parseEquipment(text){
+  var lines=String(text).split('\n'),out=[],on=false,seen={};
+  var START=/^(Serienausstattung|Sonderausstattung(en)?|Ausstattung(smerkmale)?|Ihre Ausstattung|Gew(ä|a)hlte (Ausstattung|Optionen|Sonderausstattung)|Optionen|Pakete|Extras|Zubehör|Equipment|Options|Felszereltség|Extrák)\b/i;
+  var STOP=/^(Preis|Gesamt|Summe|Technische Daten|Verbrauch|Energie|Finanzierung|Leasing|Hinweis|Umwelt|CO2|WLTP|Händler|Kontakt|Ihr (Partner|Händler)|Seite \d|Fahrzeugpreis|Grundpreis|Basispreis|Überführung|Rechtliche)/i;
+  lines.forEach(function(l){
+    var t=l.trim();if(!t)return;
+    if(START.test(t)&&t.length<60){on=true;return;}
+    if(STOP.test(t)){on=false;return;}
+    if(!on)return;
+    t=t.replace(/\s*[-–]?\s*(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:,\d{2})?)\s*(€|EUR)\s*$/i,'').replace(/^(?:[A-Z0-9]{3,6}|S\d{3}[A-Z]?)\s+(?=[A-ZÄÖÜa-zäöü])/,'').replace(/\s{2,}/g,' ').replace(/\s+(inklusive|inkl\.?|serienmäßig|Serie)$/i,'').trim();
+    if(t.length<3||t.length>140||/^[\d\s.,€%-]+$/.test(t)||/^(inklusive|inkl\.|serienmäßig|Serie|Preis|Code)$/i.test(t))return;
+    var k=t.toLowerCase();if(seen[k])return;seen[k]=1;out.push(t);
+  });
+  return out.slice(0,150);
+}
 function eurNum(s){s=String(s).replace(/\s/g,'');if(/,\d{2}$/.test(s))s=s.slice(0,-3);else if(/\.\d{2}$/.test(s)&&!/\.\d{3}\.\d{2}$/.test(s))s=s.slice(0,-3);return parseInt(s.replace(/[^\d]/g,''),10)||0;}
 function parseConfig(text){
   var t=String(text),o={};
@@ -829,15 +878,20 @@ function cfgFiles(files){
       st.textContent='Feldolgozás: '+file.name+'…';
       return file.arrayBuffer().then(function(buf){
         var b64=new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(file);});
-        return Promise.all([pdfText(buf.slice(0)).catch(function(){return '';}),b64]);
+        return Promise.all([pdfText(buf.slice(0)).catch(function(){return '';}),b64,pdfImages(buf.slice(0)).catch(function(){return [];})]);
       }).then(function(a){
-        var d=parseConfig(a[0]);
+        var d=parseConfig(a[0]),eqp=parseEquipment(a[0]),imgs=a[2]||[];
         return api('/card/'+ID+'/files',{method:'POST',body:{name:file.name,mime:'application/pdf',data:a[1],silent:true}}).then(function(r){
           S.files.push(r.file);renderDocs();
+          // a kinyert képek feltöltése (rejtett fájlokként) — ezekből és az adatokból készül a CarAdvance-ajánlat PDF
+          var ids=[],ch=Promise.resolve();
+          imgs.forEach(function(data,k){ch=ch.then(function(){st.textContent='Képek mentése: '+(k+1)+' / '+imgs.length+'…';return api('/card/'+ID+'/media',{method:'POST',body:{data:data}}).then(function(x){ids.push(x.id);}).catch(function(){});});});
+          return ch.then(function(){
           PICK.push({key:'cfg-'+r.file.id,src:'config',title:d.title||file.name.replace(/\.pdf$/i,'').replace(/[_-]+/g,' '),brand:d.brand||'',price:d.price||0,src_price:d.price||0,currency:'EUR',period:'',
-            config_code:d.config_code||'',power:d.power||'',fuel:d.fuel||'',color:d.color||'',file_id:r.file.id,file_name:file.name,note:'',needCheck:true});
+            config_code:d.config_code||'',power:d.power||'',fuel:d.fuel||'',color:d.color||'',file_id:r.file.id,file_name:file.name,note:'',needCheck:true,images:ids,equipment:eqp,attach_src:false});
           renderPicked();
-          st.innerHTML='Beolvasva: <b>'+esc(file.name)+'</b>'+(d.brand?' — '+esc(d.brand):'')+(d.config_code?' · kód: '+esc(d.config_code):'')+(d.price?' · '+fmtPrice(d.price,'EUR'):'')+' — ellenőrizd lent az adatokat.';
+          st.innerHTML='Beolvasva: <b>'+esc(file.name)+'</b>'+(d.brand?' — '+esc(d.brand):'')+(d.config_code?' · kód: '+esc(d.config_code):'')+(d.price?' · '+fmtPrice(d.price,'EUR'):'')+' · '+ids.length+' kép · '+eqp.length+' felszereltségi tétel — ellenőrizd lent az adatokat.';
+          });
         });
       }).catch(function(e){toast(file.name+': '+e.message,5000);st.textContent='';});
     });
@@ -860,6 +914,7 @@ function renderPicked(){
       +'<div class="fld"><label>Ajánlati ár</label><input data-f="price" inputmode="numeric" value="'+esc(p.price?Math.round(p.price):'')+'"></div>'
       +'<div class="fld"><label>Pénznem</label><select data-f="currency"><option value="HUF"'+(p.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(p.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-f="period"><option value="">egyszeri</option><option value="hó"'+(p.period==='hó'?' selected':'')+'>/ hó</option></select></div></div>'
+      +(src==='config'?cfgOfferBlock(p,i):'')
       +(editable&&src!=='mobile'?'<div class="idrow"><label>Az autó adatlapja (link, nem kötelező)</label><input data-f="url" value="'+esc(p.url||'')+'" placeholder="https://www.caradvance.hu/auto/…" style="flex:1;min-width:220px">'+(/^https:\/\//.test(p.url||'')?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">megnyitás ↗</a>':'')+'</div>':'')
       +(!editable?'<div class="hint">'+esc(spec(p))+(p.url?' · <a href="'+esc(p.url)+'" target="_blank" rel="noopener">autó adatlapja ↗</a> <span class="hint">(az ajánlatban az ügyfél is megnyithatja)</span>':'')+'</div>':'')+'</div>';
   }).join('');
@@ -869,10 +924,39 @@ function renderPicked(){
       var set=function(){var k=f.getAttribute('data-f');PICK[i][k]=k==='price'?(parseFloat(String(f.value).replace(/\s/g,'').replace(',','.'))||0):f.value;};
       f.addEventListener('input',set);f.addEventListener('change',set);
     });
+    bindCfgOffer(box,i);
     var pa=box.querySelector('[data-paste]');if(pa)pa.addEventListener('paste',function(){setTimeout(function(){pasteMob(i,pa.value);},30);});
     box.querySelector('[data-rm]').addEventListener('click',function(){PICK.splice(i,1);renderPicked();renderInv();});
   });
 }
+/* --- CarAdvance-ajánlat (PDF) a konfigurátor adataiból és képeiből --- */
+function cfgOfferBlock(p,i){
+  var imgs=p.images||[];
+  return '<div class="cfgo"><div class="cfgo-h"><b>CarAdvance-ajánlat (PDF)</b><span class="hint">ez megy csatolva az ügyfélnek a gyári PDF helyett — képek, adatok, felszereltség, a te ajánlati áraddal</span></div>'
+    +'<div class="cfgo-imgs">'+imgs.map(function(fid,k){return '<div class="ci'+(k===0?' main':'')+'"><img src="'+API+'/card/'+ID+'/files/'+fid+'" alt=""><div class="ca">'+(k>0?'<button type="button" data-cmain="'+k+'" title="Legyen ez a fő kép">★</button>':'<span>fő kép</span>')+'<button type="button" data-cdel="'+k+'" title="Kép eltávolítása">×</button></div></div>';}).join('')
+    +'<label class="ci add" title="Kép hozzáadása">+ kép<input type="file" accept="image/*" multiple hidden data-cadd="1"></label></div>'
+    +(imgs.length?'':'<div class="hint">A PDF-ből nem sikerült képet kinyerni — tölts fel 1–3 képet az autóról (pl. képernyőkép a konfigurátorból).</div>')
+    +'<div class="fld" style="margin-top:8px"><label>Felszereltség (soronként egy tétel — szerkeszthető, fordítható)</label><textarea data-ceq="1" rows="6" style="width:100%;font:inherit;font-size:13px;padding:8px;border:1px solid var(--line);border-radius:8px">'+esc((p.equipment||[]).join('\n'))+'</textarea></div>'
+    +'<div class="row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn sm" data-cprev="1">👁 Ajánlat PDF előnézet</button><label class="chk" style="font-size:13px;margin:0"><input type="checkbox" data-csrc="1"'+(p.attach_src?' checked':'')+'> a gyári PDF-et is csatolja (a gyári árat is mutatja!)</label></div></div>';
+}
+function bindCfgOffer(box,i){
+  var p=PICK[i];if(!p||p.src!=='config')return;
+  box.querySelectorAll('[data-cdel]').forEach(function(b){b.addEventListener('click',function(){p.images.splice(+b.getAttribute('data-cdel'),1);renderPicked();});});
+  box.querySelectorAll('[data-cmain]').forEach(function(b){b.addEventListener('click',function(){var k=+b.getAttribute('data-cmain');var x=p.images.splice(k,1)[0];p.images.unshift(x);renderPicked();});});
+  var eq=box.querySelector('[data-ceq]');if(eq)eq.addEventListener('input',function(){p.equipment=eq.value.split('\n').map(function(x){return x.trim();}).filter(Boolean);});
+  var cs=box.querySelector('[data-csrc]');if(cs)cs.addEventListener('change',function(){p.attach_src=cs.checked;});
+  var ad=box.querySelector('[data-cadd]');if(ad)ad.addEventListener('change',function(){
+    var files=[].slice.call(ad.files);p.images=p.images||[];var ch=Promise.resolve();
+    files.forEach(function(f){ch=ch.then(function(){return imgToJpeg(f).then(function(d){return api('/card/'+ID+'/media',{method:'POST',body:{data:d}});}).then(function(x){p.images.push(x.id);}).catch(function(e){toast(f.name+': '+e.message);});});});
+    ch.then(renderPicked);
+  });
+  var pv=box.querySelector('[data-cprev]');if(pv)pv.addEventListener('click',function(){
+    var w=window.open('','_blank');
+    fetch(API+'/card/'+ID+'/offerpdf',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({item:p})}).then(function(r){if(!r.ok)throw new Error('Az előnézet nem készült el.');return r.blob();})
+      .then(function(b){var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();toast(e.message);});
+  });
+}
+function imgToJpeg(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){var sc=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(im.naturalWidth*sc);cv.height=Math.round(im.naturalHeight*sc);var c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);res(cv.toDataURL('image/jpeg',0.84));};im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('A kép nem olvasható.'));};im.src=u;});}
 function sendOffer(){
   var bad=PICK.filter(function(p){return !p.title||!(p.price>0);});
   if(!PICK.length)return toast('Válassz legalább egy autót.');
