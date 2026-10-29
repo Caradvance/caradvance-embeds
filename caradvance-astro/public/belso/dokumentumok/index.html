@@ -272,13 +272,13 @@ var PRT=[],PEDIT=null;
 function loadPartners(adm){api('/partners').then(function(j){PRT=j.partners||[];renderPartners(adm);}).catch(function(e){var el=$('prt');if(el)el.innerHTML='<div class="note err">'+esc(e.message)+'</div>';});}
 function renderPartners(adm){
   var el=$('prt');if(!el)return;
-  var h='<h2>Ellenjegyző partnerek (országonként)</h2><p class="muted small" style="margin-top:0">Az ügyfél aláírása után a kétnyelvű szerződéseket a partner is aláírja. A partner a hozzá tartozó aláírási hasábok neve alapján kapja meg őket (pl. „Caradvance GmbH”). E-mailben kap egy linket, vagy a <a href="/partner/" target="_blank">partnerfelületen</a> (/partner/) belépve a mentett aláírásával több szerződést is egyszerre aláírhat.</p>'
-    +'<table class="tbl" style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left"><th>Ország</th><th>Cég</th><th>Belépés / értesítés</th><th>Nyelv</th><th>Aláírási hasábok</th><th>Állapot</th><th></th></tr></thead><tbody>'
-    +PRT.map(function(p){return '<tr style="border-top:1px solid #e6eaf1"><td><b>'+esc(p.country)+'</b></td><td>'+esc(p.company)+'</td><td>'+esc(p.login)+(p.notify_email&&p.notify_email!==p.login?'<br><span class="muted small">→ '+esc(p.notify_email)+'</span>':'')+'</td><td>'+esc(p.lang)+'</td><td>'+p.sign_keys.map(esc).join(', ')+'</td><td>'+(p.active?'aktív':'<span class="muted">kikapcsolva</span>')+(p.must_change?'<br><span class="muted small">kezdő jelszó</span>':'')+(p.has_sig?'<br><span class="small">✍ '+esc(p.sig_name)+'</span>':'<br><span class="muted small">nincs mentett aláírás</span>')+(p.last_login?'<br><span class="muted small">belépett: '+esc(p.last_login)+'</span>':'')+'</td><td>'+(adm?'<button class="btn sm" data-pe="'+p.id+'">Szerkesztés</button>':'')+'</td></tr>';}).join('')
+  var h='<h2>Ellenjegyző partnerek (országonként)</h2><p class="muted small" style="margin-top:0">Az ügyfél aláírása után a kétnyelvű szerződéseket a partner is aláírja, minden piacról (caradvance.hu, .pl, .sk, .cz, .ro …), ahol a CRM-et használjátok. A piacot a domain dönti el, amelyen a szerződést aláírásra küldték. A partner a hozzá tartozó aláírási hasábok neve alapján kapja meg őket (pl. „Caradvance GmbH”). E-mailben kap egy linket, vagy a <a href="/partner/" target="_blank">partnerfelületen</a> (/partner/) belépve a mentett aláírásával több szerződést is egyszerre aláírhat.</p>'
+    +'<table class="tbl" style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left"><th>Ország</th><th>Cég</th><th>Belépés / értesítés</th><th>Nyelv</th><th>Aláírási hasábok</th><th>Piacok</th><th>Állapot</th><th></th></tr></thead><tbody>'
+    +PRT.map(function(p){return '<tr style="border-top:1px solid #e6eaf1"><td><b>'+esc(p.country)+'</b></td><td>'+esc(p.company)+'</td><td>'+esc(p.login)+(p.notify_email&&p.notify_email!==p.login?'<br><span class="muted small">→ '+esc(p.notify_email)+'</span>':'')+'</td><td>'+esc(p.lang)+'</td><td>'+p.sign_keys.map(esc).join(', ')+'</td><td>'+(p.markets&&p.markets.length?p.markets.map(esc).join(', '):'<span class="muted">mind</span>')+'</td><td>'+(p.active?'aktív':'<span class="muted">kikapcsolva</span>')+(p.must_change?'<br><span class="muted small">kezdő jelszó</span>':'')+(p.has_sig?'<br><span class="small">✍ '+esc(p.sig_name)+'</span>':'<br><span class="muted small">nincs mentett aláírás</span>')+(p.last_login?'<br><span class="muted small">belépett: '+esc(p.last_login)+'</span>':'')+'</td><td>'+(adm?'<button class="btn sm" data-pe="'+p.id+'">Szerkesztés</button>':'')+'</td></tr>';}).join('')
     +'</tbody></table>'+(adm?'<div class="row" style="margin-top:12px"><button class="btn" id="pnew">+ Új partner (ország)</button></div>':'')+'<div id="pform"></div>';
   el.innerHTML=h;
   el.querySelectorAll('[data-pe]').forEach(function(b){b.addEventListener('click',function(){PEDIT=PRT.filter(function(p){return p.id===+b.getAttribute('data-pe');})[0];partnerForm(adm);});});
-  var nb=$('pnew');if(nb)nb.addEventListener('click',function(){PEDIT={id:0,country:'',company:'',login:'',lang:'de',notify_email:'',sign_keys:[],active:true};partnerForm(adm);});
+  var nb=$('pnew');if(nb)nb.addEventListener('click',function(){PEDIT={id:0,country:'',company:'',login:'',lang:'de',notify_email:'',sign_keys:[],markets:[],active:true};partnerForm(adm);});
 }
 function partnerForm(adm){
   var p=PEDIT,f=$('pform');if(!f||!p)return;
@@ -289,6 +289,7 @@ function partnerForm(adm){
     +'<label class="f">Bejelentkezési név (e-mail)<input class="in" id="pf_u" value="'+esc(p.login)+'"></label>'
     +'<label class="f">Értesítési e-mail (ha eltér)<input class="in" id="pf_e" value="'+esc(p.notify_email&&p.notify_email!==p.login?p.notify_email:'')+'"></label>'
     +'<label class="f">'+(p.id?'Új kezdő jelszó (üresen: marad)':'Kezdő jelszó')+'<input class="in" id="pf_p" type="text" autocomplete="off" placeholder="az első belépéskor cserélni kell"></label>'
+    +'<label class="f two">Piacok (országok), ahonnan a szerződéseket kapja — pl. HU, PL, SK, CZ, RO; üresen: minden piac<input class="in" id="pf_m" value="'+esc((p.markets||[]).join(', '))+'" placeholder="minden piac"></label>'
     +'<label class="f two">Aláírási hasábok neve a sablonokban (vesszővel elválasztva)<input class="in" id="pf_k" value="'+esc(p.sign_keys.join(', '))+'" placeholder="Caradvance GmbH, Übernehmer"></label>'
     +'</div><label class="chk" style="margin-top:10px"><input type="checkbox" id="pf_a"'+(p.active?' checked':'')+'> Aktív (ellenjegyzésre kapja a dokumentumokat)</label>'
     +(p.id&&p.has_sig?'<label class="chk"><input type="checkbox" id="pf_cs"> Mentett aláírás törlése</label>':'')
@@ -296,7 +297,7 @@ function partnerForm(adm){
   $('pf_l').value=p.lang||'de';
   $('pf_no').addEventListener('click',function(){PEDIT=null;f.innerHTML='';});
   $('pf_ok').addEventListener('click',function(){
-    var body={country:$('pf_c').value,company:$('pf_n').value,lang:$('pf_l').value,login:$('pf_u').value,notify_email:$('pf_e').value,password:$('pf_p').value,sign_keys:$('pf_k').value,active:$('pf_a').checked,clear_sig:!!($('pf_cs')&&$('pf_cs').checked)};
+    var body={country:$('pf_c').value,company:$('pf_n').value,lang:$('pf_l').value,login:$('pf_u').value,notify_email:$('pf_e').value,password:$('pf_p').value,sign_keys:$('pf_k').value,markets:$('pf_m').value,active:$('pf_a').checked,clear_sig:!!($('pf_cs')&&$('pf_cs').checked)};
     api('/partners'+(p.id?'/'+p.id:''),{method:'POST',body:body}).then(function(j){PRT=j.partners||[];PEDIT=null;renderPartners(adm);toast('Mentve');}).catch(function(e){toast(e.message,4500);});
   });
 }
