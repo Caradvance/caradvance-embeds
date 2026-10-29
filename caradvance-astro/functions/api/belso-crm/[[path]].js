@@ -6,7 +6,7 @@ import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
-  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED
 } from '../../../lib/crm.js';
 import { jpegInfo } from '../../../lib/docpdf.js';
 
@@ -107,10 +107,10 @@ async function handleGetCard(env, user, id) {
   });
 }
 
-const PERSON_KEYS = ['name', 'address', 'phone', 'email', 'tax', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'residence', 'bank', 'licence'];
+const PERSON_KEYS = ['name', 'address', 'phone', 'email', 'tax', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'residence', 'bank', 'licence', 'address_card', 'vpid'];
 const COMPANY_KEYS = ['name', 'address', 'tax', 'reg'];
 const CONTACT_KEYS = ['name', 'phone', 'email', 'role'];
-const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km', 'ad_id', 'config_code'];
+const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km', 'ad_id', 'config_code', 'condition', 'body', 'gearbox'];
 function pick(src, keys, max) { const o = {}; src = src || {}; for (const k of keys) o[k] = clean(src[k], max || 200); return o; }
 function normVehicles(b) {
   const list = Array.isArray(b.vehicles) ? b.vehicles : vehiclesOf(b);
@@ -531,7 +531,7 @@ async function handleDocMeta(env) {
   return json({
     kinds: DOC_KINDS, lines: LINES, roles: PERSON_ROLES,
     groups: VAR_GROUPS.map(([t, keys]) => ({ title: t, vars: keys.map((k) => ({ key: k, label: VAR_LABELS[k] || k })) })),
-    settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH') }
+    settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH'), bh_bankszamla: await getSetting(env, 'bh_bankszamla', '') }
   });
 }
 async function handleTemplates(env, url) {
@@ -602,7 +602,18 @@ async function withSigs(env, r) {
 }
 /** A dokumentum kitöltetlen (üres) adatmezői. */
 // nem kötelező adatok: üresen is generálható (a PDF-ben kitöltendő vonal marad)
-const OPTIONAL_VARS = new Set(['auto_rendszam']);
+const OPTIONAL_VARS = new Set(['auto_rendszam', 'fizetesi_munkanap', 'egyeb_okmany', 'kedvezmenyezett']);
+/** docVars + állandó adatok a Beállításokból (pl. BH Group bankszámla). */
+async function docVarsEnv(env, ...a) {
+  const v = docVars(...a);
+  if (!String(v.bh_bankszamla || '').trim()) v.bh_bankszamla = await getSetting(env, 'bh_bankszamla', '');
+  return v;
+}
+/** Előzetes ellenőrzésnél a számított mezőt nem kérjük, ha a forrása is hiányzik (abból készül). */
+function checkMissing(text, vars) {
+  const m = missingVars(text, vars); const keys = new Set(m.map((x) => x.key));
+  return m.filter((x) => !(DERIVED[x.key] && (keys.has(DERIVED[x.key]) || !String(vars[DERIVED[x.key]] == null ? '' : vars[DERIVED[x.key]]).trim())));
+}
 function missingVars(text, vars) {
   return usedKeys(text).filter((k) => !OPTIONAL_VARS.has(k) && !String(vars[k] == null ? '' : vars[k]).trim()).map((k) => ({ key: k, label: VAR_LABELS[k] || k }));
 }
@@ -635,8 +646,9 @@ async function handleSettings(request, env, user) {
     const b = await request.json().catch(() => ({}));
     const em = clean(b.partner_email, 300).split(/[,;\s]+/).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)).join(', ');
     await setSetting(env, 'partner_email', em); await setSetting(env, 'partner_name', clean(b.partner_name, 120) || 'Caradvance GmbH');
+    if (b.bh_bankszamla != null) await setSetting(env, 'bh_bankszamla', clean(b.bh_bankszamla, 80));
   }
-  return json({ settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH') } });
+  return json({ settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH'), bh_bankszamla: await getSetting(env, 'bh_bankszamla', '') } });
 }
 
 /* --- ügyfélhez kitöltött dokumentumok --- */
@@ -676,11 +688,13 @@ async function handleDocCreate(request, env, user, id) {
   const vehicles = vehiclesOf(card.data); const vehicle = vehicles.find((v) => v.id === b.vehicle_id) || (b.vehicle_id === '' ? null : vehicles[0]) || null;
   const { persons, ids } = await docPersons(env, b.persons);
   // a szerződésszám az ügyfélhez + autóhoz kötött (a mellékletek, meghatalmazások ugyanarra a számra hivatkoznak)
-  const vars = docVars(deal, card, vehicle, tpl, persons, 0);
+  const vars = await docVarsEnv(env, deal, card, vehicle, tpl, persons, 0);
   const extra = varsInput(b.extra || {});
-  const used = usedKeys(tpl.body); const keep = {}; for (const k of used) keep[k] = String(vars[k] != null && String(vars[k]).trim() ? vars[k] : (extra[k] || ''));
+  for (const [k, x] of Object.entries(extra)) if (!String(vars[k] == null ? '' : vars[k]).trim()) vars[k] = x;
+  deriveVars(vars);
+  const used = usedKeys(tpl.body); const keep = {}; for (const k of used) keep[k] = String(vars[k] != null ? vars[k] : '');
   // csak akkor generálható, ha minden szükséges adat megvan
-  const miss = missingVars(tpl.body, keep);
+  const miss = missingVars(tpl.body, keep).map((m) => DERIVED[m.key] && String(vars[DERIVED[m.key]] || '').trim() ? { ...m, label: m.label + ' (nem számolható ki ebből: „' + vars[DERIVED[m.key]] + '”)' } : m);
   if (miss.length) return json({ error: `Hiányzó adatok (${tpl.name}): ${missTxt(miss)}`, missing: miss }, 422);
   if (!keep.szerzodes_szam) keep.szerzodes_szam = vars.szerzodes_szam; // fájlnévhez
   const name = tpl.name + (vehicle ? ' — ' + vehName(vehicle) : '');
@@ -702,8 +716,8 @@ async function handleDocCheck(request, env, user, id) {
     const tpl = await env.DB.prepare(`SELECT * FROM crm_templates WHERE id = ?`).bind(Number(tid) || 0).first(); if (!tpl) continue;
     for (const vid of vids) {
       const vehicle = vehicles.find((v) => v.id === vid) || null;
-      const vars = docVars(deal, card, vehicle, tpl, persons, 0);
-      for (const m of missingVars(tpl.body, vars)) { (out[m.key] = out[m.key] || { ...m, templates: [] }); if (!out[m.key].templates.includes(tpl.name)) out[m.key].templates.push(tpl.name); }
+      const vars = await docVarsEnv(env, deal, card, vehicle, tpl, persons, 0);
+      for (const m of checkMissing(tpl.body, vars)) { (out[m.key] = out[m.key] || { ...m, templates: [] }); if (!out[m.key].templates.includes(tpl.name)) out[m.key].templates.push(tpl.name); }
     }
   }
   return json({ missing: Object.values(out), roles: Object.keys(PERSON_ROLES) });
@@ -722,7 +736,13 @@ async function handleDocPatch(request, env, user, id, did) {
   if (r.sign_status === 'signed') return json({ error: 'Az aláírt dokumentum nem módosítható. Szükség esetén készíts újat a sablonból.' }, 409);
   const b = await request.json().catch(() => ({}));
   let text = b.text != null ? cleanMulti(b.text, TPL_MAX) : r.text;
-  let vars = b.vars ? varsInput(b.vars) : parseJ(r.vars, {});
+  const oldVars = parseJ(r.vars, {});
+  let vars = b.vars ? varsInput(b.vars) : oldVars;
+  if (b.vars) { // ha egy forrásérték (pl. havi díj, árfolyam) változott, a belőle számított mezők újraszámolódnak
+    const chg = (x) => String(vars[x] || '') !== String(oldVars[x] || '');
+    for (const [k, src] of Object.entries(DERIVED)) if ((chg(src) || (/^havi_dij_huf/.test(k) && chg('havi_dij'))) && !chg(k)) vars[k] = '';
+    const had = new Set(Object.keys(vars)); deriveVars(vars); for (const k of Object.keys(vars)) if (!had.has(k)) delete vars[k];
+  }
   let pids = parseJ(r.persons, {}); let vid = r.vehicle_id || '';
   if (b.persons) pids = (await docPersons(env, b.persons)).ids;
   if (b.vehicle_id != null) vid = clean(b.vehicle_id, 20);
@@ -731,7 +751,7 @@ async function handleDocPatch(request, env, user, id, did) {
     const vehicle = vehiclesOf(card.data).find((v) => v.id === vid) || null;
     const tpl = (r.template_id && await env.DB.prepare(`SELECT kind, party FROM crm_templates WHERE id = ?`).bind(r.template_id).first()) || { kind: r.kind, party: 'client' };
     const { persons } = await docPersons(env, pids);
-    const fresh = docVars(deal, card, vehicle, tpl, persons, 0);
+    const fresh = await docVarsEnv(env, deal, card, vehicle, tpl, persons, 0);
     const keepNo = vars.szerzodes_szam;
     const isRole = (k) => Object.keys(PERSON_ROLES).some((r) => k.indexOf(r + '_') === 0);
     for (const k of usedKeys(text)) { const fv = fresh[k] != null ? String(fresh[k]) : ''; if (fv || isRole(k) || b.refill === 'all') vars[k] = fv; }
