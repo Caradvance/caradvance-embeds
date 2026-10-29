@@ -380,7 +380,7 @@ export function offerEmailHtml({ clientName, items, message, link }) {
   const cards = items.map((it, i) => `
   <tr><td style="padding:0 0 14px">
     <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;overflow:hidden">
-      ${it.image ? `<tr><td><img src="${esc(it.image)}" alt="" width="472" style="display:block;width:100%;max-width:472px;height:auto;border:0"></td></tr>` : ''}
+      ${it.image ? `<tr><td>${it.url ? `<a href="${esc(it.url)}">` : ''}<img src="${esc(it.image)}" alt="" width="472" style="display:block;width:100%;max-width:472px;height:auto;border:0">${it.url ? '</a>' : ''}</td></tr>` : ''}
       <tr><td style="padding:14px 16px">
         <div style="font-size:16px;font-weight:bold;color:#141519">${esc(it.title)}</div>
         ${specLine(it) ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">${esc(specLine(it))}</div>` : ''}
@@ -389,7 +389,7 @@ export function offerEmailHtml({ clientName, items, message, link }) {
         ${it.config_url ? `<div style="margin-top:6px"><a href="${esc(it.config_url)}" style="font-size:13px;font-weight:bold;color:#22447d">A konfiguráció megtekintése a gyártó oldalán ↗</a></div>` : ''}
         ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
         <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it))}</div>
-        <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block">Ezt választom</a></div>
+        <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block;margin:0 6px 6px 0">Ezt választom</a>${it.url ? `<a href="${esc(it.url)}" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;font-size:13px;padding:9px 17px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 6px">Az autó adatlapja ↗</a>` : ''}</div>
       </td></tr>
     </table>
   </td></tr>`).join('');
