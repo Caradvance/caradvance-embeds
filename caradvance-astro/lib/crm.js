@@ -65,6 +65,43 @@ export function checklistProgress(line, cl) {
   return { done, total: items.length, progress: items.length ? Math.round(done / items.length * 100) : 0 };
 }
 
+/* ---------- checklist automatikus kipipálása (aláírt dokumentumok, beküldött okmánymásolatok) ---------- */
+/** A dokumentum melyik checklist-feladathoz tartozik (üzletág + típus + név alapján). */
+export function docChecklistKey(line, kind, name) {
+  const n = String(name || '').toLowerCase();
+  if (kind === 'meghatalmazas') return line === 'Eladás' ? 'e2_meghatalmazas' : (CHECKLISTS[line] ? null : 'meghatalmazas');
+  if (kind !== 'szerzodes') return null;
+  if (line === 'Bérlés') return /bérleti|mietvertrag/.test(n) ? 'berleti' : null;
+  if (line === 'Bizományos') return /bizományi/.test(n) ? 'bizomanyi' : null;
+  if (line === 'Eladás') return /bérleti|mietvertrag/.test(n) ? 'e1_berleti' : /adásvételi|kaufvertrag/.test(n) ? 'e2_adasveteli' : null;
+  if (/megrendel|bestellung|vorvertrag/.test(n)) return 'beszerzesi';
+  if (/adásvételi|kaufvertrag/.test(n)) return 'ertekesitesi';
+  return null;
+}
+/** Feladatok kipipálása a rendszer által (eseménynaplóval; Eladásnál, ha minden kész, a státusz Lezárva). */
+export async function autoTick(env, dealId, keys, why) {
+  const deal = await env.DB.prepare(`SELECT line FROM deals WHERE id = ?`).bind(dealId).first(); if (!deal) return [];
+  const items = checklistItems(deal.line); const labels = new Map(items);
+  const card = await getCard(env, dealId); const cl = { ...(card.checklist || {}) }; const added = [];
+  const at = new Date().toISOString().slice(0, 19);
+  for (const k of keys) if (labels.has(k) && !(cl[k] && cl[k].done)) { cl[k] = { done: true, at, by: 'Automatikus' }; added.push(labels.get(k)); }
+  if (!added.length) return [];
+  const rule = checklistFor(deal.line).close; const f = { checklist: cl };
+  if (rule === 'all' ? items.every(([k]) => cl[k] && cl[k].done) : (keys.includes(rule) && cl[rule] && cl[rule].done)) f.status = 'Lezárva';
+  await saveCard(env, dealId, f, null, 'Rendszer', f.status ? 'minden checklist-feladat kész' : '');
+  await addEvent(env, dealId, 'checklist', '✓ Automatikusan kipipálva: ' + added.join(', ') + (why ? ' (' + why + ')' : ''), 'Rendszer');
+  return added;
+}
+/** Aláírás után: ha egy feladathoz tartozó összes dokumentum (pl. szerződés, meghatalmazások) mindkét fél által alá van írva → pipa. */
+export async function syncDocChecklist(env, dealId) {
+  const deal = await env.DB.prepare(`SELECT line FROM deals WHERE id = ?`).bind(dealId).first(); if (!deal) return [];
+  const docs = (await env.DB.prepare(`SELECT name, kind, sign_status FROM crm_docs WHERE deal_id = ?`).bind(dealId).all()).results || [];
+  const groups = {};
+  for (const d of docs) { const k = docChecklistKey(deal.line, d.kind, d.name); if (k) (groups[k] = groups[k] || []).push(d); }
+  const keys = Object.keys(groups).filter((k) => groups[k].every((d) => d.sign_status === 'signed'));
+  return keys.length ? autoTick(env, dealId, keys, 'minden érintett dokumentum aláírva') : [];
+}
+
 export const MAX_FILE = 1400 * 1024;
 /** Az ügyfél-dokumentumok (pl. gyári konfigurátoros ajánlat PDF) nagyobbak is lehetnek: darabolva tároljuk (D1 sorlimit). */
 export const DOC_MAX = 9 * 1024 * 1024;
@@ -152,6 +189,11 @@ export async function ensureCrm(env) {
   for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   for (const q of [`ALTER TABLE crm_docs ADD COLUMN use_sigs INTEGER DEFAULT 1`, `ALTER TABLE crm_persons ADD COLUMN sign_as TEXT DEFAULT ''`, `ALTER TABLE crm_persons ADD COLUMN sig TEXT`, `ALTER TABLE crm_persons ADD COLUMN kind TEXT DEFAULT 'magan'`, `ALTER TABLE crm_persons ADD COLUMN rep TEXT DEFAULT ''`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
   await ensurePartners(env);
+  // ügyfél-adatbekérő: e-mailben küldött egyszeri link (/adatok/#token), az ügyfél kitölti az adatait és feltölti az okmánymásolatokat
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_datareq (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, deal_id INTEGER NOT NULL, role TEXT NOT NULL DEFAULT 'client', email TEXT NOT NULL DEFAULT '', name TEXT DEFAULT '',
+    message TEXT DEFAULT '', status TEXT NOT NULL DEFAULT 'pending', created_by TEXT DEFAULT '', created_at TEXT DEFAULT (datetime('now')), expires_at INTEGER NOT NULL,
+    opened_at TEXT, submitted_at TEXT, ip TEXT, files TEXT DEFAULT '[]')`).run();
   READY = true;
 }
 

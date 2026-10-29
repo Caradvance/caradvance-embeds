@@ -3,7 +3,7 @@
 // ügyfél aláírása után az ellenjegyzendő (kétnyelvű) dokumentumok továbbítása az illetékes partnernek (crm_partners).
 import {
   parseJ, addEvent, sendCrmMail, notifyTo, esc, sha256hex, bytesToB64, b64ToBytes, putFile, deleteFile,
-  huDateTime, SIGN_STATEMENT, SIGN_STATEMENT_DE, SITE
+  huDateTime, SIGN_STATEMENT, SIGN_STATEMENT_DE, SITE, syncDocChecklist
 } from './crm.js';
 import { renderDocPdf } from './docpdf.js';
 
@@ -79,6 +79,7 @@ export async function completeSign(env, r, o) {
     await sendCrmMail(env, notifyTo(env), `${de ? 'ELLENJEGYEZVE' : 'ALÁÍRVA'}: ${de ? (parseJ(r.prior, {}).client || '') + ' — ' + name + ' (' + r.signer_name + ')' : (r.signer_name || name)} — ${result.length} dokumentum`,
       `<p><b>${esc(name)}</b> (${esc(r.email)}) elektronikusan ${de ? 'ellenjegyezte (partner: ' + esc(r.signer_name) + ')' : 'aláírta'}:</p><ul>${result.map((x) => `<li>${esc(x.name)}${x.cosign ? ' — <i>a partner ellenjegyzésére vár</i>' : ''}</li>`).join('')}</ul><p>IP: ${esc(ip)} · ${esc(when)}</p><p><a href="${SITE}/belso/ugyfel/?id=${r.deal_id}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:11px 20px;border-radius:999px;display:inline-block">Ügyfél adatlap megnyitása</a></p>`);
   } catch (e) { /* nem kritikus */ }
+  try { await syncDocChecklist(env, r.deal_id); } catch (e) { console.error('checklist', e); } // szerződések / meghatalmazások pipái
   return { when, result };
 }
 
