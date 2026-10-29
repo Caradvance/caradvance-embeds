@@ -8,6 +8,7 @@ import {
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT
 } from '../../../lib/crm.js';
+import { jpegInfo } from '../../../lib/docpdf.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
 // címre megy az ügyfél helyett (a tárgyban ott a valódi címzett). Éles üzemhez állítsd null-ra,
@@ -581,15 +582,43 @@ async function handleTemplateDelete(env, tid) {
 }
 
 const P_KEYS = ['name', 'address', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'email', 'phone', 'note'];
-async function personsList(env) { return (await env.DB.prepare(`SELECT id, ${P_KEYS.join(', ')} FROM crm_persons WHERE active = 1 ORDER BY name`).all()).results || []; }
+async function personsList(env) {
+  return ((await env.DB.prepare(`SELECT id, ${P_KEYS.join(', ')}, sign_as, sig FROM crm_persons WHERE active = 1 ORDER BY name`).all()).results || [])
+    .map((p) => ({ ...p, sign_as: p.sign_as || '', sig: p.sig ? 'data:image/jpeg;base64,' + p.sig : '' }));
+}
+/** A dokumentumba illeszthető aláírásminták: a dokumentum személyei + a céges aláírók (aláírási megnevezéssel). */
+async function specimensFor(env, pids, use) {
+  if (use === 0) return [];
+  const rows = (await env.DB.prepare(`SELECT id, name, sign_as, sig FROM crm_persons WHERE active = 1 AND sig IS NOT NULL AND sig != ''`).all()).results || [];
+  const mine = new Set(Object.values(pids || {}).map(Number));
+  return rows.filter((p) => mine.has(p.id) || (p.sign_as || '').trim())
+    .map((p) => ({ names: (mine.has(p.id) ? [p.name] : []).concat(String(p.sign_as || '').split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)), b64: p.sig }));
+}
+/** A dokumentum kitöltetlen (üres) adatmezői. */
+function missingVars(text, vars) {
+  return usedKeys(text).filter((k) => !String(vars[k] == null ? '' : vars[k]).trim()).map((k) => ({ key: k, label: VAR_LABELS[k] || k }));
+}
+const missTxt = (m) => m.map((x) => x.label).join(', ');
 async function handlePersonSave(request, env) {
   const b = await request.json().catch(() => ({}));
   const p = {}; for (const k of P_KEYS) p[k] = clean(b[k], k === 'note' ? 400 : 200);
   p.birth_date = isoDate(p.birth_date);
   if (!p.name) return json({ error: 'Add meg a nevet.' }, 400);
+  const signAs = clean(b.sign_as, 300);
+  // aláírásminta: JPEG data URL (a böngésző kékre színezi és tömöríti), '' = törlés, undefined = változatlan
+  let sig;
+  if (b.sig === '') sig = '';
+  else if (b.sig != null) {
+    const mm = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(b.sig));
+    if (!mm || mm[1].length > 300000) return json({ error: 'Az aláírásminta túl nagy vagy hibás formátumú.' }, 400);
+    const inf = jpegInfo(b64ToBytes(mm[1])); if (!inf) return json({ error: 'Az aláírásminta nem olvasható.' }, 400);
+    sig = mm[1];
+  }
   const id = Number.isInteger(b.id) && b.id > 0 ? b.id : 0;
-  if (id) await env.DB.prepare(`UPDATE crm_persons SET ${P_KEYS.map((k) => k + '=?').join(', ')}, updated_at=datetime('now') WHERE id=?`).bind(...P_KEYS.map((k) => p[k]), id).run();
-  else await env.DB.prepare(`INSERT INTO crm_persons (${P_KEYS.join(', ')}) VALUES (${P_KEYS.map(() => '?').join(',')})`).bind(...P_KEYS.map((k) => p[k])).run();
+  let pid = id;
+  if (id) await env.DB.prepare(`UPDATE crm_persons SET ${P_KEYS.map((k) => k + '=?').join(', ')}, sign_as=?, updated_at=datetime('now') WHERE id=?`).bind(...P_KEYS.map((k) => p[k]), signAs, id).run();
+  else pid = (await env.DB.prepare(`INSERT INTO crm_persons (${P_KEYS.join(', ')}, sign_as) VALUES (${P_KEYS.map(() => '?').join(',')},?)`).bind(...P_KEYS.map((k) => p[k]), signAs).run()).meta.last_row_id;
+  if (sig !== undefined) await env.DB.prepare(`UPDATE crm_persons SET sig = ? WHERE id = ?`).bind(sig, pid).run();
   return json({ ok: true, persons: await personsList(env) });
 }
 async function handleSettings(request, env, user) {
@@ -604,7 +633,9 @@ async function handleSettings(request, env, user) {
 
 /* --- ügyfélhez kitöltött dokumentumok --- */
 function docRow(r, full) {
-  const o = { id: r.id, template_id: r.template_id, name: r.name, kind: r.kind, vehicle_id: r.vehicle_id || '', persons: parseJ(r.persons, {}), created_by: r.created_by, created_at: r.created_at, updated_at: r.updated_at, updated_by: r.updated_by, sent_at: r.sent_at, sent_to: r.sent_to || '', number: parseJ(r.vars, {}).szerzodes_szam || '', sign_status: r.sign_status || '', sign_id: r.sign_id || null, signed_file_id: r.signed_file_id || null };
+  const o = { id: r.id, template_id: r.template_id, name: r.name, kind: r.kind, vehicle_id: r.vehicle_id || '', persons: parseJ(r.persons, {}), created_by: r.created_by, created_at: r.created_at, updated_at: r.updated_at, updated_by: r.updated_by, sent_at: r.sent_at, sent_to: r.sent_to || '', number: parseJ(r.vars, {}).szerzodes_szam || '', sign_status: r.sign_status || '', sign_id: r.sign_id || null, signed_file_id: r.signed_file_id || null, use_sigs: r.use_sigs == null ? 1 : r.use_sigs };
+  o.missing_n = missingVars(r.text, parseJ(r.vars, {})).length;
+  if (full) o.missing = missingVars(r.text, parseJ(r.vars, {}));
   if (full) { o.text = r.text; o.vars = parseJ(r.vars, {}); o.fields = usedKeys(r.text).map((k) => ({ key: k, label: VAR_LABELS[k] || k })); }
   return o;
 }
@@ -638,7 +669,11 @@ async function handleDocCreate(request, env, user, id) {
   const { persons, ids } = await docPersons(env, b.persons);
   // a szerződésszám az ügyfélhez + autóhoz kötött (a mellékletek, meghatalmazások ugyanarra a számra hivatkoznak)
   const vars = docVars(deal, card, vehicle, tpl, persons, 0);
-  const used = usedKeys(tpl.body); const keep = {}; for (const k of used) keep[k] = vars[k] != null ? String(vars[k]) : '';
+  const extra = varsInput(b.extra || {});
+  const used = usedKeys(tpl.body); const keep = {}; for (const k of used) keep[k] = String(vars[k] != null && String(vars[k]).trim() ? vars[k] : (extra[k] || ''));
+  // csak akkor generálható, ha minden szükséges adat megvan
+  const miss = missingVars(tpl.body, keep);
+  if (miss.length) return json({ error: `Hiányzó adatok (${tpl.name}): ${missTxt(miss)}`, missing: miss }, 422);
   if (!keep.szerzodes_szam) keep.szerzodes_szam = vars.szerzodes_szam; // fájlnévhez
   const name = tpl.name + (vehicle ? ' — ' + vehName(vehicle) : '');
   const r = await env.DB.prepare(`INSERT INTO crm_docs (deal_id, template_id, name, kind, vehicle_id, persons, text, vars, created_by, updated_at, updated_by) VALUES (?,?,?,?,?,?,?,?,?,datetime('now'),?)`)
@@ -646,6 +681,24 @@ async function handleDocCreate(request, env, user, id) {
   await addEvent(env, id, 'doc', `Dokumentum kitöltve: ${name}`, user.name);
   const row = await env.DB.prepare(`SELECT * FROM crm_docs WHERE id = ?`).bind(r.meta.last_row_id).first();
   return json({ ok: true, doc: docRow(row, true) });
+}
+/** Előzetes ellenőrzés: a kijelölt sablonokhoz mely adatok hiányoznak (az ügyfél / autó / személyek adataiból). */
+async function handleDocCheck(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  const card = await getCard(env, id); const vehicles = vehiclesOf(card.data);
+  const vids = Array.isArray(b.vehicle_ids) ? b.vehicle_ids : [b.vehicle_id || ''];
+  const { persons } = await docPersons(env, b.persons);
+  const out = {};
+  for (const tid of (Array.isArray(b.template_ids) ? b.template_ids : []).slice(0, 30)) {
+    const tpl = await env.DB.prepare(`SELECT * FROM crm_templates WHERE id = ?`).bind(Number(tid) || 0).first(); if (!tpl) continue;
+    for (const vid of vids) {
+      const vehicle = vehicles.find((v) => v.id === vid) || null;
+      const vars = docVars(deal, card, vehicle, tpl, persons, 0);
+      for (const m of missingVars(tpl.body, vars)) { (out[m.key] = out[m.key] || { ...m, templates: [] }); if (!out[m.key].templates.includes(tpl.name)) out[m.key].templates.push(tpl.name); }
+    }
+  }
+  return json({ missing: Object.values(out), roles: Object.keys(PERSON_ROLES) });
 }
 async function getDoc(env, id, did) { return env.DB.prepare(`SELECT * FROM crm_docs WHERE id = ? AND deal_id = ?`).bind(did, id).first(); }
 function varsInput(o) { const vars = {}; for (const [k, v] of Object.entries(o || {})) if (/^[a-z0-9_]{1,40}$/.test(k)) vars[k] = clean(v, 600); return vars; }
@@ -677,8 +730,9 @@ async function handleDocPatch(request, env, user, id, did) {
     if (keepNo) vars.szerzodes_szam = keepNo;
   }
   const name = b.name != null ? (clean(b.name, 200) || r.name) : r.name;
-  await env.DB.prepare(`UPDATE crm_docs SET name=?, text=?, vars=?, persons=?, vehicle_id=?, updated_at=datetime('now'), updated_by=? WHERE id=?`)
-    .bind(name, text, JSON.stringify(vars), JSON.stringify(pids), vid, user.name, did).run();
+  const useSigs = b.use_sigs != null ? (b.use_sigs ? 1 : 0) : (r.use_sigs == null ? 1 : r.use_sigs);
+  await env.DB.prepare(`UPDATE crm_docs SET name=?, text=?, vars=?, persons=?, vehicle_id=?, use_sigs=?, updated_at=datetime('now'), updated_by=? WHERE id=?`)
+    .bind(name, text, JSON.stringify(vars), JSON.stringify(pids), vid, useSigs, user.name, did).run();
   await addEvent(env, id, 'doc:' + did, `Dokumentum módosítva: ${name}`, user.name, 30);
   return json({ ok: true, doc: docRow(await getDoc(env, id, did), true) });
 }
@@ -691,13 +745,15 @@ async function handleDocDelete(env, user, id, did) {
   return json({ ok: true });
 }
 const KIND_SUB = { szerzodes: 'Szerződés', meghatalmazas: 'Meghatalmazás', nyilatkozat: 'Nyilatkozat', melleklet: 'Melléklet', egyeb: 'Dokumentum' };
-async function docPdf(r, override) {
+async function docPdf(env, r, override) {
   const text = override && override.text != null ? cleanMulti(override.text, TPL_MAX) : r.text;
   const vars = override && override.vars ? varsInput(override.vars) : parseJ(r.vars, {});
   const filled = fillTemplate(text, vars);
   const hash = await sha256hex(filled);
   const number = vars.szerzodes_szam && /\{\{\s*szerzodes_szam\s*\}\}/.test(text) ? vars.szerzodes_szam : '';
-  const pdf = contractPdfFromText(filled, { number, hash, title: r.name, sub: KIND_SUB[r.kind] || 'Dokumentum' });
+  const use = override && override.use_sigs != null ? (override.use_sigs ? 1 : 0) : (r.use_sigs == null ? 1 : r.use_sigs);
+  const specimens = (await specimensFor(env, parseJ(r.persons, {}), use)).map((z) => ({ names: z.names, jpeg: b64ToBytes(z.b64) }));
+  const pdf = contractPdfFromText(filled, { number, hash, title: r.name, sub: KIND_SUB[r.kind] || 'Dokumentum', specimens });
   const fname = (r.name.split(' — ')[0] + (number ? ' ' + number : '')).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 90) + '.pdf';
   return { pdf, hash, fname };
 }
@@ -705,7 +761,8 @@ async function handleDocPdf(request, env, user, id, did) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const r = await getDoc(env, id, did); if (!r) return json({ error: 'Nem található.' }, 404);
   const override = request.method === 'POST' ? await request.json().catch(() => null) : null;
-  const { pdf, fname } = await docPdf(r, override);
+  if (!override) { const miss = missingVars(r.text, parseJ(r.vars, {})); if (miss.length) return json({ error: 'Hiányzó adatok: ' + missTxt(miss) + ' — töltsd ki a dokumentum szerkesztőjében.', missing: miss }, 422); }
+  const { pdf, fname } = await docPdf(env, r, override);
   return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${fname}"`, 'cache-control': 'no-store' } });
 }
 const EMAIL_RE = /^[^@\s,;]+@[^@\s,;]+\.[^@\s,;]+$/;
@@ -731,7 +788,9 @@ async function handleDocsSend(request, env, user, id) {
       const f = await env.DB.prepare(`SELECT id, name, data, size FROM crm_files WHERE id = ? AND deal_id = ?`).bind(r.signed_file_id, id).first();
       if (f) { total += f.size; att.push({ filename: f.name, content: await fileData(env, f) }); names.push(r.name + ' (aláírt)'); sentDocs.push(r); continue; }
     }
-    const { pdf, fname } = await docPdf(r);
+    const miss = missingVars(r.text, parseJ(r.vars, {}));
+    if (miss.length) return json({ error: `Hiányzó adatok (${r.name}): ${missTxt(miss)}` }, 422);
+    const { pdf, fname } = await docPdf(env, r);
     total += pdf.length; att.push({ filename: fname, content: bytesToB64(pdf) }); names.push(r.name); sentDocs.push(r);
   }
   for (const fid of fileIds) {
@@ -775,8 +834,11 @@ async function handleSignCreate(request, env, user, id) {
     const r = await getDoc(env, id, did); if (!r) continue;
     if (r.sign_status === 'pending') return json({ error: `Már aláírásra vár: ${r.name}` }, 409);
     if (r.sign_status === 'signed') return json({ error: `Már aláírt dokumentum: ${r.name}` }, 409);
-    const vars = parseJ(r.vars, {}); const text = fillTemplate(r.text, vars);
-    docs.push({ doc_id: r.id, name: r.name, kind: r.kind, text, hash: await sha256hex(text), number: /\{\{\s*szerzodes_szam\s*\}\}/.test(r.text) ? (vars.szerzodes_szam || '') : '', match: vars.ugyfel_nev || '' });
+    const vars = parseJ(r.vars, {});
+    const miss = missingVars(r.text, vars); if (miss.length) return json({ error: `Hiányzó adatok (${r.name}): ${missTxt(miss)}` }, 422);
+    const text = fillTemplate(r.text, vars);
+    const sigs = await specimensFor(env, parseJ(r.persons, {}), r.use_sigs == null ? 1 : r.use_sigs);
+    docs.push({ doc_id: r.id, name: r.name, kind: r.kind, text, hash: await sha256hex(text), number: /\{\{\s*szerzodes_szam\s*\}\}/.test(r.text) ? (vars.szerzodes_szam || '') : '', match: vars.ugyfel_nev || '', sigs });
   }
   if (!docs.length) return json({ error: 'A kijelölt dokumentumok nem találhatók.' }, 404);
   const token = randomHex(32);
@@ -854,6 +916,8 @@ export async function onRequest(context) {
     if (m && method === 'POST') return await handleSignCreate(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/sign\/(\d+)\/revoke$/);
     if (m && method === 'POST') return await handleSignRevoke(env, user, Number(m[1]), Number(m[2]));
+    m = path.match(/^\/card\/(\d+)\/docs\/check$/);
+    if (m && method === 'POST') return await handleDocCheck(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/docs\/send$/);
     if (m && method === 'POST') return await handleDocsSend(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/docs\/(\d+)$/);
