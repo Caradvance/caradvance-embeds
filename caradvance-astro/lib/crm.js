@@ -631,7 +631,7 @@ export function emailShell(inner) {
   </div></div>`;
 }
 /** to: string vagy tömb. attachments: [{ filename, content(base64) }]. Visszatér: { ok, error } */
-export async function sendCrmMail(env, to, subject, inner, attachments) {
+export async function sendCrmMail(env, to, subject, inner, attachments, opts) {
   if (!env.RESEND_API_KEY) return { ok: false, error: 'Az e-mail küldés nincs beállítva (hiányzó RESEND_API_KEY).' };
   const body = {
     // a CRM (ajánlatok, szerződések, aláírás) levelei a sales@ címről mennek; env-ben felülírható
@@ -641,6 +641,10 @@ export async function sendCrmMail(env, to, subject, inner, attachments) {
     text: inner.replace(/<br\s*\/?>/g, '\n').replace(/<\/(p|tr|div)>/g, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\n{3,}/g, '\n\n').trim()
   };
   if (attachments && attachments.length) body.attachments = attachments;
+  // másolat a sales@ postafiókba (Google Workspace), hogy a kiküldött ajánlatok / szerződések ott is meglegyenek — a belső értesítéseknél nem
+  const copy = env.CRM_BCC === 'off' ? '' : (env.CRM_BCC || 'sales@caradvance.hu');
+  const toList = body.to.map((x) => x.toLowerCase());
+  if (copy && !(opts && opts.noCopy) && !toList.includes(copy.toLowerCase()) && !toList.includes(notifyTo(env).toLowerCase())) body.bcc = [copy];
   const post = () => fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   let r = await post();
   if (r.ok) return { ok: true };
