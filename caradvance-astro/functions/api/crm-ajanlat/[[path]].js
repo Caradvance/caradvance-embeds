@@ -6,7 +6,7 @@
 import { ensureCrm, addEvent, json, parseJ, clean, cleanMulti, saveCard, getCard, vehiclesOf, itemToVehicle, newVehicleId, VEH_KEYS, sendCrmMail, notifyTo, esc, priceLabel, specLine, idLine, SITE } from '../../../lib/crm.js';
 
 const TOKEN_RE = /^[a-f0-9]{40}$/;
-const PUBLIC_KEYS = ['title', 'brand', 'year', 'km', 'fuel', 'power', 'gearbox', 'color', 'image', 'url', 'note', 'price', 'currency', 'period', 'ad_id', 'config_code'];
+const PUBLIC_KEYS = ['title', 'brand', 'year', 'km', 'fuel', 'power', 'gearbox', 'color', 'image', 'url', 'note', 'price', 'currency', 'period', 'ad_id', 'config_code', 'config_url'];
 
 async function getOffer(env, token) {
   if (!TOKEN_RE.test(token)) return { error: json({ error: 'Érvénytelen ajánlat-hivatkozás.' }, 400) };
