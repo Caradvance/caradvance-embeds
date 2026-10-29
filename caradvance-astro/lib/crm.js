@@ -341,6 +341,7 @@ export function offerEmailHtml({ clientName, items, message, link }) {
         ${specLine(it) ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">${esc(specLine(it))}</div>` : ''}
         ${idLine(it) ? `<div style="font-size:12px;color:#374151;margin-top:5px;background:#f4f7fb;border-radius:6px;padding:5px 8px;display:inline-block">${esc(idLine(it))}</div>` : ''}
         ${it.file_id ? `<div style="font-size:12px;color:#6b7280;margin-top:5px">A gyári konfigurátoros ajánlatot csatoltan küldjük (PDF).</div>` : ''}
+        ${it.config_url ? `<div style="margin-top:6px"><a href="${esc(it.config_url)}" style="font-size:13px;font-weight:bold;color:#22447d">A konfiguráció megtekintése a gyártó oldalán ↗</a></div>` : ''}
         ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
         <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it))}</div>
         <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block">Ezt választom</a></div>
@@ -545,7 +546,7 @@ export function itemToVehicle(it, id, source) {
     model: brand && String(it.title || '').indexOf(brand) === 0 ? String(it.title).slice(brand.length).trim() : (it.title || ''),
     year: it.year || '', vin: '', color: it.color || '', engine: it.power || '', ad_id: it.ad_id || '', config_code: it.config_code || '', fuel: it.fuel || '', km: it.km ? String(it.km) : '', hybrid: /hybrid|hibrid|PHEV/i.test(String(it.title || '') + ' ' + String(it.fuel || '')),
     price: Number(it.price) || 0, currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: it.period || '', deposit: Number(it.deposit) || 0,
-    image: it.image || '', url: it.ad_url || it.url || ''
+    image: it.image || '', url: it.ad_url || it.config_url || it.url || ''
   };
 }
 export function newVehicleId(list) { let i = (list || []).length + 1; const ids = new Set((list || []).map((v) => v.id)); while (ids.has('v' + i)) i++; return 'v' + i; }
