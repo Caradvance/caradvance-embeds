@@ -55,7 +55,7 @@ label.f{display:block;font-size:13px;color:var(--ink2);font-weight:600;margin-to
 <div class="top"><img src="/caradvance-logo-white.webp" alt="CarAdvance"><span>🔒 Biztonságos aláírás</span></div>
 <div class="hero"><h1>Dokumentumok elektronikus aláírása</h1><p id="sub">Betöltés…</p></div>
 <div class="wrap" id="app"><div class="card">Betöltés…</div></div>
-<script src="/belso/doc-render.js?v=2"></script>
+<script src="/belso/doc-render.js?v=3"></script>
 <script>
 (function(){
 'use strict';
@@ -108,7 +108,7 @@ function render(){
     +'<div id="err"></div><div class="row" style="margin-top:10px"><button class="btn red" id="go">Aláírom a dokumentumokat</button></div>'
     +'<div class="sec">🔒 <span>Egyszerű elektronikus aláírás. A dokumentumok tartalma a kiküldéskor rögzítve lett (SHA-256), az aláírás időpontja, az IP-cím és az eszköz adatai a hitelesség igazolására a dokumentumhoz csatolt tanúsítványban rögzülnek. Az aláírt példányt e-mailben megkapja.</span></div></div>';
   app.innerHTML=h;
-  app.querySelectorAll('[data-v]').forEach(function(b){b.addEventListener('click',function(){var i=b.getAttribute('data-v'),d=$('d'+i),pv=$('pv'+i);if(!pv.innerHTML)pv.innerHTML=window.CADoc?CADoc.preview(S.docs[i].text,{}):'<pre>'+esc(S.docs[i].text)+'</pre>';d.classList.toggle('open');b.textContent=d.classList.contains('open')?'Bezárás':'Megnyitás';});});
+  app.querySelectorAll('[data-v]').forEach(function(b){b.addEventListener('click',function(){var i=b.getAttribute('data-v'),d=$('d'+i),pv=$('pv'+i);if(!pv.innerHTML)pv.innerHTML=window.CADoc?CADoc.preview(S.docs[i].text,{},null,S.docs[i].sigs||[]):'<pre>'+esc(S.docs[i].text)+'</pre>';d.classList.toggle('open');b.textContent=d.classList.contains('open')?'Bezárás':'Megnyitás';});});
   app.querySelectorAll('[data-p]').forEach(function(b){b.addEventListener('click',function(){openPdf(+b.getAttribute('data-p'));});});
   app.querySelectorAll('[data-r]').forEach(function(c){c.addEventListener('change',function(){READ[c.getAttribute('data-r')]=c.checked;var all=S.docs.every(function(d){return READ[d.i];});$('d'+c.getAttribute('data-r')).classList.toggle('ok',c.checked);$('c2').classList.toggle('off',!all);$('c3').classList.toggle('off',!all);});});
   $('getCode').addEventListener('click',function(){
