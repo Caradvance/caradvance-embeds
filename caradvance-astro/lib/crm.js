@@ -388,15 +388,33 @@ export const VAR_LABELS = {
   meghatalmazott_nev: 'Meghatalmazott neve', meghatalmazott_cim: 'Meghatalmazott lakcíme', meghatalmazott_szig: 'Meghatalmazott szem. ig. száma',
   meghatalmazott_anyja_neve: 'Meghatalmazott anyja neve', meghatalmazott_szul_hely_ido: 'Meghatalmazott szül. hely, idő', meghatalmazott_kepviselo: 'Meghatalmazott képviselője (cégnél)',
   tanu1_nev: '1. tanú neve', tanu1_cim: '1. tanú lakcíme', tanu1_szig: '1. tanú szem. ig. száma',
-  tanu2_nev: '2. tanú neve', tanu2_cim: '2. tanú lakcíme', tanu2_szig: '2. tanú szem. ig. száma'
+  tanu2_nev: '2. tanú neve', tanu2_cim: '2. tanú lakcíme', tanu2_szig: '2. tanú szem. ig. száma',
+  ugyfel_lakcimkartya: 'Lakcímkártya száma', vevo_lakcimkartya: 'Vevő lakcímkártya száma', ugyfel_irsz: 'Ügyfél irányítószáma',
+  ugyfel_orszag: 'Ügyfél országa (magyarul)', ugyfel_orszag_de: 'Ügyfél országa (németül)', ugyfel_vpid: 'Ügyfél VPID száma',
+  auto_allapot: 'Állapot (pl. új / használt, kifogástalan)', auto_karosszeria: 'Karosszéria (pl. kombi, SUV)', auto_valto: 'Váltó (pl. automata)',
+  auto_szarmazasi_orszag: 'Származási ország', auto_atvetel_hely: 'A jármű átvételének helye',
+  ajanlat_szam: 'Ajánlat száma', ajanlat_datum: 'Ajánlat dátuma',
+  havi_dij_betuvel: 'Havi díj betűvel (magyarul)', havi_dij_betuvel_de: 'Havi díj betűvel (németül)', havi_dij_netto: 'Havi díj nettó (19% áfa nélkül)', havi_dij_afa: 'Havi díj áfa (19%)',
+  arfolyam: 'Ajánlat szerinti árfolyam (Ft/EUR, csak a szám)', havi_dij_huf: 'Havi díj forintban (tájékoztató)', havi_dij_huf_netto: 'Havi díj forintban, nettó', havi_dij_huf_afa: 'Havi díj forintban, áfa',
+  ugyszam: 'Ügyszám (Vorgangs-Nr.)', eloszerzodes_szam: 'Előszerződés száma', eloszerzodes_datum: 'Előszerződés kelte',
+  hatralek: 'Fennmaradó összeg (EUR, csak a szám)', hatralek_betuvel: 'Fennmaradó összeg betűvel (magyarul)', hatralek_betuvel_de: 'Fennmaradó összeg betűvel (németül)',
+  visszaszallitas_koltseg: 'Visszaszállítás várható költsége (EUR, csak a szám)', foglalo_szazalek: 'Foglaló a vételár %-ában (csak a szám)', fizetesi_munkanap: 'Fizetési határidő (munkanap)',
+  atvevo_nev: 'Foglaló átvevőjének neve',
+  bh_bankszamla: 'BH Group Zrt. bankszámlaszáma', kulcsok_szama: 'Kulcsok száma', tarolasi_hely: 'Tárolási és megtekintési hely',
+  egyeb_okmany: 'Egyéb átadott dokumentum', kedvezmenyezett: 'Kedvezményezett szervezet',
+  megbizasi_dij_afa: 'Megbízási díj ÁFA (27%)', megbizasi_dij_brutto: 'Megbízási díj (bruttó)', hatosagi_dijak: 'Hatósági díjak és közterhek (Ft, becsült, csak a szám)',
+  ugyintezes_munkanap: 'Ügyintézés várható időtartama (munkanap)', telefon_rogzites: 'Telefonszám rögzítése (kérem / nem kérem)'
 };
 /** A változók csoportjai a sablonszerkesztő „beszúrás” listájához. */
 export const VAR_GROUPS = [
   ['Általános', ['szerzodes_szam', 'keltezes_hely', 'keltezes_datum']],
-  ['Ügyfél', ['ugyfel_nev', 'ugyfel_cim', 'ugyfel_tartozkodasi_hely', 'ugyfel_adoszam', 'ugyfel_cegjegyzekszam', 'ugyfel_kepviselo', 'ugyfel_telefon', 'ugyfel_email', 'ugyfel_bankszamla', 'ugyfel_szig', 'ugyfel_anyja_neve', 'ugyfel_szul_hely', 'ugyfel_szul_ido', 'ugyfel_szul_hely_ido', 'ugyfel_jogositvany']],
+  ['Ügyfél', ['ugyfel_nev', 'ugyfel_cim', 'ugyfel_irsz', 'ugyfel_orszag', 'ugyfel_orszag_de', 'ugyfel_lakcimkartya', 'ugyfel_vpid', 'ugyfel_tartozkodasi_hely', 'ugyfel_adoszam', 'ugyfel_cegjegyzekszam', 'ugyfel_kepviselo', 'ugyfel_telefon', 'ugyfel_email', 'ugyfel_bankszamla', 'ugyfel_szig', 'ugyfel_anyja_neve', 'ugyfel_szul_hely', 'ugyfel_szul_ido', 'ugyfel_szul_hely_ido', 'ugyfel_jogositvany']],
   ['Vevő (Eladás 2. ütem)', ['vevo_nev', 'vevo_cim', 'vevo_adoszam', 'vevo_cegjegyzekszam', 'vevo_kepviselo', 'vevo_telefon', 'vevo_email', 'vevo_szig', 'vevo_anyja_neve', 'vevo_szul_hely_ido']],
-  ['Gépjármű', ['auto_megnevezes', 'auto_marka', 'auto_tipus', 'auto_evjarat', 'auto_alvazszam', 'auto_rendszam', 'auto_szin', 'auto_motor', 'auto_uzemanyag', 'auto_km', 'auto_hibrid', 'auto_felszereltseg']],
-  ['Ár, feltételek', ['ar', 'ar_netto', 'ar_afa', 'havi_dij', 'kaucio', 'futamido', 'km_keret', 'km_tulfutas_dij', 'berlet_kezdete', 'berlet_vege', 'atadas_datum', 'atadas_hely', 'fizetesi_mod', 'fizetesi_hatarido', 'eloleg', 'foglalo', 'foglalo_betuvel', 'megbizasi_dij', 'szallitasi_dij', 'szallitasi_hatarido', 'min_eladasi_ar', 'jutalek', 'jutalek_szazalek', 'bizomany_idotartam', 'bizomany_vege']],
+  ['Gépjármű', ['auto_megnevezes', 'auto_marka', 'auto_tipus', 'auto_evjarat', 'auto_alvazszam', 'auto_rendszam', 'auto_szin', 'auto_motor', 'auto_uzemanyag', 'auto_km', 'auto_hibrid', 'auto_felszereltseg', 'auto_allapot', 'auto_karosszeria', 'auto_valto', 'auto_szarmazasi_orszag', 'auto_atvetel_hely', 'kulcsok_szama', 'tarolasi_hely']],
+  ['Ár, feltételek', ['ar', 'ar_netto', 'ar_afa', 'havi_dij', 'kaucio', 'futamido', 'km_keret', 'km_tulfutas_dij', 'berlet_kezdete', 'berlet_vege', 'atadas_datum', 'atadas_hely', 'fizetesi_mod', 'fizetesi_hatarido', 'eloleg', 'foglalo', 'foglalo_betuvel', 'megbizasi_dij', 'szallitasi_dij', 'szallitasi_hatarido', 'min_eladasi_ar', 'jutalek', 'jutalek_szazalek', 'bizomany_idotartam', 'bizomany_vege',
+    'ajanlat_szam', 'ajanlat_datum', 'havi_dij_betuvel', 'havi_dij_betuvel_de', 'havi_dij_netto', 'havi_dij_afa', 'arfolyam', 'havi_dij_huf', 'havi_dij_huf_netto', 'havi_dij_huf_afa',
+    'ugyszam', 'eloszerzodes_szam', 'eloszerzodes_datum', 'hatralek', 'hatralek_betuvel', 'hatralek_betuvel_de', 'visszaszallitas_koltseg', 'foglalo_szazalek', 'fizetesi_munkanap', 'atvevo_nev',
+    'megbizasi_dij_afa', 'megbizasi_dij_brutto', 'hatosagi_dijak', 'ugyintezes_munkanap', 'telefon_rogzites', 'bh_bankszamla', 'egyeb_okmany', 'kedvezmenyezett']],
   ['Meghatalmazott', ['meghatalmazott_nev', 'meghatalmazott_cim', 'meghatalmazott_szig', 'meghatalmazott_anyja_neve', 'meghatalmazott_szul_hely_ido', 'meghatalmazott_kepviselo']],
   ['Tanúk', ['tanu1_nev', 'tanu1_cim', 'tanu1_szig', 'tanu2_nev', 'tanu2_cim', 'tanu2_szig']]
 ];
@@ -529,7 +547,7 @@ ${CLOSING('Bizományos', 'Megbízó')}`
 };
 
 /* ============================== autók (több autó / ügyfél) ============================== */
-export const VEH_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km', 'ad_id', 'config_code'];
+export const VEH_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km', 'ad_id', 'config_code', 'condition', 'body', 'gearbox'];
 /** Az adatlap autói: data.vehicles; a régi, egyetlen data.vehicle „v1” azonosítóval kerül át. */
 export function vehiclesOf(data) {
   data = data || {};
@@ -616,9 +634,10 @@ export function emailShell(inner) {
 export async function sendCrmMail(env, to, subject, inner, attachments) {
   if (!env.RESEND_API_KEY) return { ok: false, error: 'Az e-mail küldés nincs beállítva (hiányzó RESEND_API_KEY).' };
   const body = {
-    from: env.CUSTOMER_EMAIL_FROM || env.LEAD_EMAIL_FROM || 'CarAdvance <lead@caradvance.hu>',
+    // a CRM (ajánlatok, szerződések, aláírás) levelei a sales@ címről mennek; env-ben felülírható
+    from: env.CRM_EMAIL_FROM || 'CarAdvance <sales@caradvance.hu>',
     to: (Array.isArray(to) ? to : String(to).split(',')).map((s) => s.trim()).filter(Boolean),
-    reply_to: env.CUSTOMER_REPLY_TO || 'info@caradvance.hu', subject, html: emailShell(inner),
+    reply_to: env.CRM_REPLY_TO || 'sales@caradvance.hu', subject, html: emailShell(inner),
     text: inner.replace(/<br\s*\/?>/g, '\n').replace(/<\/(p|tr|div)>/g, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\n{3,}/g, '\n\n').trim()
   };
   if (attachments && attachments.length) body.attachments = attachments;
@@ -661,7 +680,8 @@ export function docVars(deal, card, vehicle, tpl, persons, seq) {
   const bd = huDate(pp.birth_date);
   Object.assign(base, {
     ugyfel_tartozkodasi_hely: pp.residence || '', ugyfel_bankszamla: pp.bank || '', ugyfel_szig: pp.id_number || '', ugyfel_anyja_neve: pp.mother_name || '',
-    ugyfel_szul_hely: pp.birth_place || '', ugyfel_szul_ido: bd, ugyfel_szul_hely_ido: [pp.birth_place, bd].filter(Boolean).join(', '), ugyfel_jogositvany: pp.licence || ''
+    ugyfel_szul_hely: pp.birth_place || '', ugyfel_szul_ido: bd, ugyfel_szul_hely_ido: [pp.birth_place, bd].filter(Boolean).join(', '), ugyfel_jogositvany: pp.licence || '',
+    ugyfel_lakcimkartya: pp.address_card || '', ugyfel_orszag: 'Magyarország', ugyfel_vpid: pp.vpid || ''
   });
   if (isCo && pp.name && !base.ugyfel_kepviselo.replace(/—/g, '').trim()) base.ugyfel_kepviselo = pp.name;
   // vevő (Eladás 2. üteme) — mindig elérhető külön kulcsokon is
@@ -670,17 +690,96 @@ export function docVars(deal, card, vehicle, tpl, persons, seq) {
   Object.assign(base, {
     vevo_nev: bCo ? (bc.name || '') : (bp.name || ''), vevo_cim: bCo ? (bc.address || '') : (bp.address || ''), vevo_adoszam: bCo ? (bc.tax || '') : (bp.tax || ''),
     vevo_cegjegyzekszam: bCo ? (bc.reg || '') : '', vevo_kepviselo: bCo ? (bp.name || '') : '', vevo_telefon: bp.phone || '', vevo_email: bp.email || '',
-    vevo_szig: bp.id_number || '', vevo_anyja_neve: bp.mother_name || '', vevo_szul_hely_ido: [bp.birth_place, bbd].filter(Boolean).join(', ')
+    vevo_szig: bp.id_number || '', vevo_anyja_neve: bp.mother_name || '', vevo_szul_hely_ido: [bp.birth_place, bbd].filter(Boolean).join(', '), vevo_lakcimkartya: bp.address_card || ''
   });
   const v = vehicle || {};
   Object.assign(base, {
     auto_rendszam: v.plate || '', auto_felszereltseg: '',
     berlet_kezdete: huDate(v.rent_start), berlet_vege: huDate(v.rent_end),
     futamido: v.rent_start && v.rent_end ? Math.round((Date.parse(v.rent_end) - Date.parse(v.rent_start)) / 864e5 / 30.44) + ' hónap' : base.futamido,
-    ar_netto: '', ar_afa: '', km_tulfutas_dij: '', fizetesi_hatarido: '', foglalo: '', foglalo_betuvel: '', szallitasi_dij: '', jutalek_szazalek: '', bizomany_vege: ''
+    ar_netto: '', ar_afa: '', km_tulfutas_dij: '', fizetesi_hatarido: '', foglalo: '', foglalo_betuvel: '', szallitasi_dij: '', jutalek_szazalek: '', bizomany_vege: '',
+    auto_allapot: v.condition || '', auto_karosszeria: v.body || '', auto_valto: v.gearbox || ''
   });
   for (const role of Object.keys(PERSON_ROLES)) Object.assign(base, personVars(role, (persons || {})[role]));
-  return base;
+  return deriveVars(base);
+}
+
+/* ---------- számított változók (betűvel, nettó/áfa, forint) ---------- */
+/** Számított kulcs → a forrásváltozó. Ha a forrás hiányzik, a számított kulcsot nem kérjük külön (a forrásból készül). */
+export const DERIVED = {
+  havi_dij_netto: 'havi_dij', havi_dij_afa: 'havi_dij', havi_dij_betuvel: 'havi_dij', havi_dij_betuvel_de: 'havi_dij',
+  havi_dij_huf: 'arfolyam', havi_dij_huf_netto: 'arfolyam', havi_dij_huf_afa: 'arfolyam',
+  hatralek_betuvel: 'hatralek', hatralek_betuvel_de: 'hatralek', megbizasi_dij_afa: 'megbizasi_dij', megbizasi_dij_brutto: 'megbizasi_dij',
+  ugyfel_orszag_de: 'ugyfel_orszag', ugyfel_irsz: 'ugyfel_cim'
+};
+export function parseAmt(s) {
+  let t = String(s == null ? '' : s).replace(/[\s\u00a0]/g, '').replace(/(€|eur|euro|ft|huf|forint)\.?$/i, '');
+  if (!t || !/^\d[\d.,]*$/.test(t)) return null;
+  if (/,\d{1,2}$/.test(t)) t = t.replace(/\./g, '').replace(',', '.'); else if (/\.\d{1,2}$/.test(t) && !/\.\d{3}/.test(t)) t = t.replace(/,/g, ''); else t = t.replace(/[.,]/g, '');
+  const n = Number(t); return isFinite(n) ? n : null;
+}
+export function fmtNum(n, dec) { const f = Math.abs(n - Math.round(n)) < 0.005 && !dec ? Math.round(n).toString() : n.toFixed(2); const [i, d] = f.split('.'); return i.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (d && d !== '00' ? ',' + d : ''); }
+const HU1 = ['', 'egy', 'kettő', 'három', 'négy', 'öt', 'hat', 'hét', 'nyolc', 'kilenc'];
+const HU10 = ['', 'tíz', 'húsz', 'harminc', 'negyven', 'ötven', 'hatvan', 'hetven', 'nyolcvan', 'kilencven'];
+const HU10P = ['', 'tizen', 'huszon', 'harminc', 'negyven', 'ötven', 'hatvan', 'hetven', 'nyolcvan', 'kilencven'];
+function hu999(n, comp) {
+  const h = Math.floor(n / 100), t = Math.floor(n % 100 / 10), o = n % 10; let s = '';
+  if (h) s += (h === 1 ? '' : h === 2 ? 'két' : HU1[h]) + 'száz';
+  if (t && !o) s += HU10[t]; else if (t) s += HU10P[t]; 
+  if (o) s += o === 2 && comp ? 'két' : HU1[o];
+  return s;
+}
+/** Egész szám magyarul betűvel (2000 fölött kötőjellel tagolva). */
+export function numHu(n) {
+  if (!Number.isInteger(n) || n < 0 || n >= 1e9) return '';
+  if (n === 0) return 'nulla';
+  const g = [Math.floor(n / 1e6), Math.floor(n % 1e6 / 1e3), n % 1e3]; const parts = [];
+  if (g[0]) parts.push(hu999(g[0], true) + 'millió');
+  if (g[1]) parts.push((g[1] === 1 && !g[0] ? '' : hu999(g[1], true)) + 'ezer');
+  if (g[2]) parts.push(hu999(g[2], false));
+  return n > 2000 ? parts.join('-') : parts.join('');
+}
+const DE1 = ['', 'ein', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf', 'dreizehn', 'vierzehn', 'fünfzehn', 'sechzehn', 'siebzehn', 'achtzehn', 'neunzehn'];
+const DE10 = ['', '', 'zwanzig', 'dreißig', 'vierzig', 'fünfzig', 'sechzig', 'siebzig', 'achtzig', 'neunzig'];
+function de99(n) { if (n < 20) return DE1[n]; const o = n % 10, t = Math.floor(n / 10); return (o ? DE1[o] + 'und' : '') + DE10[t]; }
+function de999(n) { const h = Math.floor(n / 100), r = n % 100; return (h ? DE1[h] + 'hundert' : '') + de99(r); }
+/** Egész szám németül betűvel (1 000 000 alatt). */
+export function numDe(n) {
+  if (!Number.isInteger(n) || n < 0 || n >= 1e6) return '';
+  if (n === 0) return 'null';
+  const th = Math.floor(n / 1000), r = n % 1000;
+  let s = (th ? de999(th) + 'tausend' : '') + de999(r);
+  if (r % 100 === 1) s += 's'; // …eins
+  return s;
+}
+const COUNTRY_DE = { 'magyarország': 'Ungarn', 'németország': 'Deutschland', 'ausztria': 'Österreich', 'szlovákia': 'Slowakei', 'románia': 'Rumänien', 'szerbia': 'Serbien', 'horvátország': 'Kroatien', 'szlovénia': 'Slowenien', 'ukrajna': 'Ukraine', 'csehország': 'Tschechien', 'lengyelország': 'Polen', 'olaszország': 'Italien', 'svájc': 'Schweiz' };
+/** Az üres számított változók kitöltése a forrásaikból (a kézzel megadott érték mindig elsőbbséget élvez). */
+export function deriveVars(v) {
+  const empty = (k) => !String(v[k] == null ? '' : v[k]).trim();
+  const set = (k, val) => { if (empty(k) && val) v[k] = val; };
+  const rent = String(v.havi_dij || '');
+  const eur = /€|eur/i.test(rent) ? parseAmt(rent) : null;
+  if (eur != null && eur > 0) {
+    const net = Math.round(eur / 1.19 * 100) / 100;
+    set('havi_dij_netto', fmtNum(net, true) + ' €'); set('havi_dij_afa', fmtNum(Math.round((eur - net) * 100) / 100, true) + ' €');
+    if (Number.isInteger(eur)) { set('havi_dij_betuvel', numHu(eur)); set('havi_dij_betuvel_de', numDe(eur)); }
+    if (!empty('arfolyam')) {
+      const rate = parseAmt(String(v.arfolyam).replace(/\s*(ft|huf).*$/i, ''));
+      if (rate) {
+        v.arfolyam = fmtNum(rate);
+        const huf = Math.round(eur * rate), hn = Math.round(net * rate);
+        set('havi_dij_huf', fmtNum(huf) + ' Ft'); set('havi_dij_huf_netto', fmtNum(hn) + ' Ft'); set('havi_dij_huf_afa', fmtNum(huf - hn) + ' Ft');
+      }
+    }
+  }
+  const rest = parseAmt(v.hatralek);
+  if (rest != null && Number.isInteger(rest)) { v.hatralek = fmtNum(rest); set('hatralek_betuvel', numHu(rest)); set('hatralek_betuvel_de', numDe(rest)); }
+  const fee = /€|eur/i.test(String(v.megbizasi_dij || '')) ? null : parseAmt(v.megbizasi_dij);
+  if (fee != null && fee > 0) { const vat = Math.round(fee * 0.27); set('megbizasi_dij_afa', fmtNum(vat)); set('megbizasi_dij_brutto', fmtNum(fee + vat)); }
+  if (!empty('ugyfel_orszag')) set('ugyfel_orszag_de', COUNTRY_DE[String(v.ugyfel_orszag).trim().toLowerCase()] || String(v.ugyfel_orszag).trim());
+  const zip = String(v.ugyfel_cim || '').match(/(?:^|\D)(\d{4})(?!\d)/); if (zip) set('ugyfel_irsz', zip[1]);
+  for (const k of ['hatosagi_dijak', 'visszaszallitas_koltseg']) { const a = parseAmt(v[k]); if (a != null) v[k] = fmtNum(a); }
+  return v;
 }
 
 /* ============================== elektronikus aláírás — segédfüggvények ============================== */
