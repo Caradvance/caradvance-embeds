@@ -6,7 +6,7 @@ import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
-  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass
 } from '../../../lib/crm.js';
 import { jpegInfo } from '../../../lib/docpdf.js';
 
@@ -858,7 +858,7 @@ async function handleSignCreate(request, env, user, id) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: role === 'buyer' ? 'A vevőnek nincs érvényes e-mail címe (1. szekció).' : 'Az ügyfélnek nincs érvényes e-mail címe (1. szekció).' }, 400);
   const signerName = clean(P.name || (role === 'client' ? deal.name : ''), 120);
   if (!signerName) return json({ error: 'Add meg az aláíró nevét az 1. szekcióban.' }, 400);
-  const docs = []; const partnerName = await getSetting(env, 'partner_name', 'Caradvance GmbH');
+  const docs = []; const partners = ((await env.DB.prepare(`SELECT id, sign_keys FROM crm_partners WHERE active = 1 ORDER BY id`).all()).results || []);
   for (const did of ids) {
     const r = await getDoc(env, id, did); if (!r) continue;
     if (r.sign_status === 'pending') return json({ error: `Már aláírásra vár: ${r.name}` }, 409);
@@ -867,7 +867,7 @@ async function handleSignCreate(request, env, user, id) {
     const miss = missingVars(r.text, vars); if (miss.length) return json({ error: `Hiányzó adatok (${r.name}): ${missTxt(miss)}` }, 422);
     const text = fillTemplate(r.text, vars);
     const sigs = await specimensFor(env, parseJ(r.persons, {}), r.use_sigs == null ? 1 : r.use_sigs);
-    docs.push({ doc_id: r.id, name: r.name, kind: r.kind, text, hash: await sha256hex(text), number: /\{\{\s*szerzodes_szam\s*\}\}/.test(r.text) ? (vars.szerzodes_szam || '') : '', match: vars.ugyfel_nev || '', sigs, cosign: partnerSignKeys(text, partnerName) });
+    docs.push({ doc_id: r.id, name: r.name, kind: r.kind, text, hash: await sha256hex(text), number: /\{\{\s*szerzodes_szam\s*\}\}/.test(r.text) ? (vars.szerzodes_szam || '') : '', match: vars.ugyfel_nev || '', sigs, ...coFor(text, partners) });
   }
   if (!docs.length) return json({ error: 'A kijelölt dokumentumok nem találhatók.' }, 404);
   const token = randomHex(32);
@@ -887,6 +887,43 @@ async function handleSignCreate(request, env, user, id) {
      <p style="color:#6b7280;font-size:12px">A link személyes, ne továbbítsa. Érvényes: ${new Date(exp * 1000).toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest' })}-ig. Ha nem Ön az érintett, kérjük, jelezze nekünk.</p>`);
   await addEvent(env, id, 'sign', `Aláírásra kiküldve (#${sid}) → ${signerName} (${fwd ? 'TESZT → ' + fwd : email}): ${docs.map((d) => d.name).join('; ')}${r.ok ? '' : ' — AZ E-MAIL NEM MENT KI: ' + r.error}`, user.name);
   return json({ ok: true, id: sid, link, sentTo: fwd || email, test: !!fwd, mailError: r.ok ? null : r.error });
+}
+/** Melyik partner jegyzi ellen a dokumentumot (a hasábnevek alapján) — { cosign: [nevek], cosign_pid }. */
+function coFor(text, partners) {
+  for (const p of partners) { const k = partnerSignKeys(text, parseJ(p.sign_keys, [])); if (k.length) return { cosign: k, cosign_pid: p.id }; }
+  return { cosign: [] };
+}
+/* ---------- partnerek (országonkénti ellenjegyzők, partnerfelület) — csak admin módosíthatja ---------- */
+const PARTNER_OUT = (p) => ({ id: p.id, country: p.country, company: p.company, login: p.login, lang: p.lang, notify_email: p.notify_email || '', sign_keys: parseJ(p.sign_keys, []), active: !!p.active, must_change: !!p.must_change, has_sig: !!p.sig, sig_name: p.sig_name || '', last_login: p.last_login || '' });
+async function handlePartners(request, env, user, pid) {
+  if (request.method === 'GET') return json({ partners: ((await env.DB.prepare(`SELECT * FROM crm_partners ORDER BY country, id`).all()).results || []).map(PARTNER_OUT) });
+  if (user.role !== 'admin') return json({ error: 'Csak admin módosíthatja.' }, 403);
+  const b = await request.json().catch(() => ({}));
+  const em = (v) => clean(v, 160).trim().toLowerCase();
+  const login = em(b.login); const notify = em(b.notify_email);
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(login)) return json({ error: 'A bejelentkezési név egy e-mail cím legyen.' }, 400);
+  if (notify && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(notify)) return json({ error: 'Az értesítési e-mail cím érvénytelen.' }, 400);
+  const country = clean(b.country, 2).toUpperCase(); if (!/^[A-Z]{2}$/.test(country)) return json({ error: 'Az ország kétbetűs kód legyen (pl. DE, AT, CZ).' }, 400);
+  const company = clean(b.company, 120); if (!company) return json({ error: 'Add meg a partnercég nevét.' }, 400);
+  const lang = ['de', 'en', 'hu'].includes(b.lang) ? b.lang : 'de';
+  const keys = (Array.isArray(b.sign_keys) ? b.sign_keys : String(b.sign_keys || '').split(/[,;\n]/)).map((x) => clean(x, 80).trim()).filter(Boolean).slice(0, 10);
+  if (!keys.length) return json({ error: 'Add meg legalább egy aláírási hasáb nevét (pl. „Caradvance GmbH”).' }, 400);
+  const pw = String(b.password || '');
+  if (pw && pw.length < 6) return json({ error: 'A kezdő jelszó legalább 6 karakter legyen.' }, 400);
+  try {
+    if (pid) {
+      await env.DB.prepare(`UPDATE crm_partners SET country=?, company=?, login=?, lang=?, notify_email=?, sign_keys=?, active=? WHERE id=?`).bind(country, company, login, lang, notify, JSON.stringify(keys), b.active === false ? 0 : 1, pid).run();
+      if (pw) { // új kezdő jelszó: első belépéskor cserélni kell, a régi munkamenetek megszűnnek
+        await env.DB.prepare(`UPDATE crm_partners SET pass_hash=?, must_change=1, fails=0, locked_until=0 WHERE id=?`).bind(await hashPass(pw), pid).run();
+        await env.DB.prepare(`DELETE FROM crm_partner_sessions WHERE partner_id = ?`).bind(pid).run();
+      }
+      if (b.clear_sig) await env.DB.prepare(`UPDATE crm_partners SET sig=NULL, sig_name='', sig_at=NULL WHERE id=?`).bind(pid).run();
+    } else {
+      if (!pw) return json({ error: 'Új partnernél add meg a kezdő jelszót.' }, 400);
+      await env.DB.prepare(`INSERT INTO crm_partners (country, company, login, lang, notify_email, pass_hash, must_change, sign_keys, active) VALUES (?,?,?,?,?,?,1,?,?)`).bind(country, company, login, lang, notify, await hashPass(pw), JSON.stringify(keys), b.active === false ? 0 : 1).run();
+    }
+  } catch (e) { return json({ error: /UNIQUE/i.test(String(e)) ? 'Ez a bejelentkezési név már foglalt.' : 'Mentési hiba.' }, 400); }
+  return handlePartners(new Request('https://x/'), env, user, 0);
 }
 async function handleSignList(env, user, id) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
@@ -957,6 +994,8 @@ export async function onRequest(context) {
     if (path === '/persons' && method === 'GET') return json({ persons: await personsList(env) });
     if (path === '/persons' && method === 'POST') return await handlePersonSave(request, env);
     if (path === '/settings') return await handleSettings(request, env, user);
+    if (path === '/partners') return await handlePartners(request, env, user, 0);
+    const pm = path.match(/^\/partners\/(\d+)$/); if (pm) return await handlePartners(request, env, user, Number(pm[1]));
     let m = path.match(/^\/templates\/(\d+)$/);
     if (m && method === 'GET') return await handleTemplateGet(env, Number(m[1]));
     if (m && method === 'DELETE') return await handleTemplateDelete(env, Number(m[1]));
