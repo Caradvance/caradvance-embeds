@@ -41,7 +41,7 @@ async function view(env, r) {
     ok: true, id: r.id, status: r.status, signer: r.signer_name, email: maskEmail(r.email), message: r.message || '',
     expires: new Date(r.expires_at * 1000).toISOString(), statement: SIGN_STATEMENT,
     signed_at: r.signed_at ? huDateTime(r.signed_at) : null, sign_name: r.sign_name || null,
-    docs: docs.map((d, i) => ({ i, name: d.name, kind: d.kind, text: r.status === 'pending' || r.status === 'signed' ? d.text : '', hash: d.hash, signed: !!(res[i] && res[i].file_id) }))
+    docs: docs.map((d, i) => ({ i, name: d.name, kind: d.kind, text: r.status === 'pending' || r.status === 'signed' ? d.text : '', hash: d.hash, signed: !!(res[i] && res[i].file_id), sigs: r.status === 'pending' ? (d.sigs || []).map((z) => ({ names: z.names, src: 'data:image/jpeg;base64,' + z.b64 })) : [] }))
   });
 }
 
