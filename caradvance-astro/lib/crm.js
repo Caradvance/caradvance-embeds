@@ -148,9 +148,10 @@ export async function ensureCrm(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)`)
   ]);
   // ellenjegyzés (német partner): a kérelem szülője (az ügyfél aláírása) és a korábbi aláírások adatai
-  for (const col of [`parent_id INTEGER`, `prior TEXT`]) { try { await env.DB.prepare(`ALTER TABLE crm_sign ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
+  for (const col of [`parent_id INTEGER`, `prior TEXT`, `partner_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_sign ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   for (const col of [`sign_status TEXT DEFAULT ''`, `sign_id INTEGER`, `signed_file_id INTEGER`]) { try { await env.DB.prepare(`ALTER TABLE crm_docs ADD COLUMN ${col}`).run(); } catch (e) { /* már létezik */ } }
   for (const q of [`ALTER TABLE crm_docs ADD COLUMN use_sigs INTEGER DEFAULT 1`, `ALTER TABLE crm_persons ADD COLUMN sign_as TEXT DEFAULT ''`, `ALTER TABLE crm_persons ADD COLUMN sig TEXT`, `ALTER TABLE crm_persons ADD COLUMN kind TEXT DEFAULT 'magan'`, `ALTER TABLE crm_persons ADD COLUMN rep TEXT DEFAULT ''`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
+  await ensurePartners(env);
   READY = true;
 }
 
@@ -812,19 +813,53 @@ export function maskEmail(e) { const [u, d] = String(e || '').split('@'); if (!d
 export function huDateTime(iso) { const d = iso ? new Date(String(iso).replace(' ', 'T') + (/Z$/.test(iso) ? '' : 'Z')) : new Date(); return d.toLocaleString('hu-HU', { timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 export const SIGN_STATEMENT = 'A fenti dokumentumo(ka)t elolvastam, tartalmukat megértettem, és elektronikus aláírásommal elfogadom. Tudomásul veszem, hogy az aláírás adatai (név, e-mail cím, időpont, IP-cím, eszköz) a hitelesség igazolására rögzítésre kerülnek.';
 export const SIGN_STATEMENT_DE = 'Ich habe das/die obige(n) Dokument(e) gelesen, den Inhalt verstanden und stimme ihm mit meiner elektronischen Unterschrift zu. Mir ist bekannt, dass die Daten der Unterschrift (Name, E-Mail-Adresse, Zeitpunkt, IP-Adresse, Gerät) zum Nachweis der Echtheit gespeichert werden.';
+/* ============================== partnerek (ellenjegyzők országonként) + partnerfelület ============================== */
+// crm_partners: országonkénti partnercég (pl. DE — Caradvance GmbH), bejelentkezés (login + PBKDF2 jelszó), mentett aláírás,
+// az aláírási hasábok nevei (sign_keys), amelyek alapján a kétnyelvű dokumentumok ellenjegyzésre hozzá kerülnek.
+const PBKDF2_IT = 100000;
+const hexOf = (u) => [...u].map((x) => x.toString(16).padStart(2, '0')).join('');
+export async function hashPass(pw, saltHex) {
+  const salt = saltHex ? new Uint8Array(saltHex.match(/../g).map((h) => parseInt(h, 16))) : crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(String(pw)), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: PBKDF2_IT }, key, 256);
+  return `pbkdf2$${PBKDF2_IT}$${hexOf(salt)}$${hexOf(new Uint8Array(bits))}`;
+}
+export async function verifyPass(pw, stored) {
+  const [alg, , salt, h] = String(stored || '').split('$'); if (alg !== 'pbkdf2' || !salt || !h) return false;
+  const x = (await hashPass(pw, salt)).split('$')[3];
+  let d = 0; for (let i = 0; i < Math.max(x.length, h.length); i++) d |= (x.charCodeAt(i) || 0) ^ (h.charCodeAt(i) || 0);
+  return d === 0 && x.length === h.length;
+}
+async function ensurePartners(env) {
+  await env.DB.batch([
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_partners (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, country TEXT NOT NULL DEFAULT 'DE', company TEXT NOT NULL DEFAULT '', login TEXT NOT NULL UNIQUE, lang TEXT NOT NULL DEFAULT 'de',
+      notify_email TEXT DEFAULT '', pass_hash TEXT NOT NULL, must_change INTEGER NOT NULL DEFAULT 1, sig TEXT, sig_name TEXT DEFAULT '', sig_at TEXT,
+      sign_keys TEXT NOT NULL DEFAULT '[]', active INTEGER NOT NULL DEFAULT 1, fails INTEGER NOT NULL DEFAULT 0, locked_until INTEGER DEFAULT 0,
+      code_hash TEXT, code_exp INTEGER, code_attempts INTEGER NOT NULL DEFAULT 0, last_login TEXT, created_at TEXT DEFAULT (datetime('now')))`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS crm_partner_sessions (token_hash TEXT PRIMARY KEY, partner_id INTEGER NOT NULL, expires INTEGER NOT NULL, ip TEXT, ua TEXT, created_at TEXT DEFAULT (datetime('now')))`)
+  ]);
+  const n = await env.DB.prepare(`SELECT COUNT(*) AS n FROM crm_partners`).first();
+  if (!n || !n.n) { // első partner: Németország — Caradvance GmbH (kezdő jelszó: 123456, első belépéskor kötelező csere)
+    const notify = await getSetting(env, 'partner_sign_email', 'import@caradvance.de');
+    await env.DB.prepare(`INSERT OR IGNORE INTO crm_partners (country, company, login, lang, notify_email, pass_hash, must_change, sign_keys, active) VALUES ('DE', ?, 'import@caradvance.de', 'de', ?, ?, 1, ?, ?)`)
+      .bind(await getSetting(env, 'partner_name', 'Caradvance GmbH'), notify || 'import@caradvance.de', await hashPass('123456'), JSON.stringify(['Caradvance GmbH', 'Übernehmer']), notify === '' ? 0 : 1).run();
+  }
+}
 /** Partner-ellenjegyzés: a kétnyelvű (DE/HU) dokumentumok aláírási hasábjai közül a partneré (pl. „Caradvance GmbH”, ill. cím szerint „Übernehmer”). */
-export function partnerSignKeys(text, partnerName) {
+export function partnerSignKeys(text, names) {
   const t = String(text || ''); const keys = new Set();
   const nn = (v) => String(v || '').replace(/\*\*/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase();
-  const pn = nn(partnerName || 'Caradvance GmbH');
+  const list = (Array.isArray(names) ? names : [names || 'Caradvance GmbH']).filter(Boolean);
   const bilingual = t.split('\n').some((l) => /^# /.test(l) && l.indexOf('||') >= 0) || /^@nyelv\s*:\s*.*\b(de)\b/im.test(t);
   if (!bilingual) return [];
   for (const ln of t.split('\n')) {
     const m = ln.trim().match(/^\[aláírás\+?\]\s*(.*)$/i); if (!m) continue;
     for (const col of m[1].split('|')) {
       const [main, name] = col.split('~~').map((x) => (x || '').trim()); const title = (main || '').split(/\s+~\s+|~/)[0].trim();
-      if (name && nn(name) === pn) keys.add(partnerName || 'Caradvance GmbH');
-      else if (!name && /^übernehmer/i.test(title)) keys.add('Übernehmer');
+      // a hasáb neve (~~) egyezik egy partnernévvel — vagy név nélküli hasábnál a címe (pl. „Übernehmer”)
+      const hit = list.find((k) => (name ? nn(name) === nn(k) : nn(title) === nn(k)));
+      if (hit) keys.add(hit);
     }
   }
   return [...keys];
