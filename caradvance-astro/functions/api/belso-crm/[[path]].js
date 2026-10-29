@@ -188,6 +188,11 @@ async function handlePatchCard(request, env, user, id) {
   else if (f.data) f.address = f.data.kind === 'ceg' ? (f.data.company.address || f.data.person.address) : f.data.person.address;
   if (b.checklist !== undefined) {
     const prev = cur.checklist || {}; const next = { ...prev }; const items = checklistItems(deal.line); const rule = checklistFor(deal.line).close;
+    // egyetlen feladat átkapcsolása a szerver aktuális állapotán (a közben automatikusan kipipált feladatok nem vesznek el)
+    if (b.toggle && items.some(([k]) => k === b.toggle)) {
+      const t = b.toggle; const on = !!(b.checklist && b.checklist[t] && (b.checklist[t] === true || b.checklist[t].done));
+      b.checklist = {}; for (const [k] of items) b.checklist[k] = k === t ? on : !!(prev[k] && prev[k].done);
+    }
     for (const [k] of items) {
       const on = !!(b.checklist && b.checklist[k] && (b.checklist[k] === true || b.checklist[k].done));
       next[k] = on ? { done: true, at: (prev[k] && prev[k].done && prev[k].at) || new Date().toISOString().slice(0, 19), by: (prev[k] && prev[k].done && prev[k].by) || user.name } : { done: false };
@@ -925,6 +930,44 @@ async function handlePartners(request, env, user, pid) {
   } catch (e) { return json({ error: /UNIQUE/i.test(String(e)) ? 'Ez a bejelentkezési név már foglalt.' : 'Mentési hiba.' }, 400); }
   return handlePartners(new Request('https://x/'), env, user, 0);
 }
+/* ---------------- ügyfél-adatbekérő (személyes adatok + okmánymásolatok, link: /adatok/#token) ---------------- */
+async function handleDataReqList(env, user, id) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  const t = Math.floor(Date.now() / 1000);
+  const rows = (await env.DB.prepare(`SELECT id, role, email, name, status, created_by, created_at, expires_at, opened_at, submitted_at, files FROM crm_datareq WHERE deal_id = ? ORDER BY id DESC`).bind(id).all()).results || [];
+  return json({ requests: rows.map((r) => ({ ...r, status: r.status === 'pending' && r.expires_at < t ? 'expired' : r.status, files: parseJ(r.files, []) })) });
+}
+async function handleDataReqCreate(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  const card = await getCard(env, id); const data = card.data || {};
+  const role = b.role === 'buyer' ? 'buyer' : 'client';
+  const P = role === 'buyer' ? ((data.buyer || {}).person || {}) : (data.person || {});
+  const email = clean(P.email || (role === 'client' ? deal.email : ''), 160).toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: role === 'buyer' ? 'A vevőnek nincs érvényes e-mail címe.' : 'Az ügyfélnek nincs érvényes e-mail címe (1. szekció).' }, 400);
+  const name = clean(P.name || (role === 'client' ? deal.name : ''), 120);
+  // a korábbi, még nyitott kérelmek érvénytelenítése (mindig csak az utolsó link él)
+  await env.DB.prepare(`UPDATE crm_datareq SET status = 'revoked' WHERE deal_id = ? AND role = ? AND status = 'pending'`).bind(id, role).run();
+  const token = randomHex(32); const exp = Math.floor(Date.now() / 1000) + 14 * 86400;
+  const msg = cleanMulti(b.message, 2000).trim();
+  const ins = await env.DB.prepare(`INSERT INTO crm_datareq (token_hash, deal_id, role, email, name, message, created_by, expires_at) VALUES (?,?,?,?,?,?,?,?)`)
+    .bind(await sha256hex('crmdata|' + token), id, role, email, name, msg, user.name, exp).run();
+  const link = `${SITE}/adatok/#${token}`; const fwd = testForward(env);
+  const r = await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}Kérjük, adja meg adatait — CarAdvance`,
+    `<p>Kedves ${esc(name || 'Ügyfelünk')}!</p><p>A szerződések elkészítéséhez kérjük, adja meg személyes adatait, és töltse fel a <b>személyazonosító igazolványa</b> és a <b>lakcímkártyája</b> másolatát (fénykép vagy PDF).</p>
+     ${msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : ''}
+     <p style="margin:18px 0"><a href="${esc(link)}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:999px;display:inline-block">Adatok megadása és feltöltés</a></p>
+     <p>Az adatok titkosított kapcsolaton keresztül, közvetlenül hozzánk kerülnek; kizárólag a szerződéskötéshez és a hatósági ügyintézéshez használjuk fel őket.</p>
+     <p style="color:#6b7280;font-size:12px">A link személyes, ne továbbítsa. Érvényes: ${new Date(exp * 1000).toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest' })}-ig.</p><p>Üdvözlettel:<br>CarAdvance</p>`);
+  await addEvent(env, id, 'datareq', `Adatbekérő e-mail kiküldve (#${ins.meta.last_row_id}) → ${name} (${fwd ? 'TESZT → ' + fwd : email})${r.ok ? '' : ' — AZ E-MAIL NEM MENT KI: ' + r.error}`, user.name);
+  return json({ ok: true, sentTo: fwd || email, test: !!fwd, mailError: r.ok ? null : r.error });
+}
+async function handleDataReqRevoke(env, user, id, rid) {
+  const { error } = await loadDeal(env, user, id); if (error) return error;
+  await env.DB.prepare(`UPDATE crm_datareq SET status = 'revoked' WHERE id = ? AND deal_id = ? AND status = 'pending'`).bind(rid, id).run();
+  await addEvent(env, id, 'datareq', `Adatbekérő link visszavonva (#${rid})`, user.name);
+  return json({ ok: true });
+}
 async function handleSignList(env, user, id) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const rows = (await env.DB.prepare(`SELECT id, signer_role, signer_name, email, docs, status, created_by, created_at, expires_at, opened_at, signed_at, sign_name, sign_ip, result, fails, parent_id FROM crm_sign WHERE deal_id = ? ORDER BY id DESC`).bind(id).all()).results || [];
@@ -1007,6 +1050,11 @@ export async function onRequest(context) {
     m = path.match(/^\/card\/(\d+)\/sign$/);
     if (m && method === 'GET') return await handleSignList(env, user, Number(m[1]));
     if (m && method === 'POST') return await handleSignCreate(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/datareq$/);
+    if (m && method === 'GET') return await handleDataReqList(env, user, Number(m[1]));
+    if (m && method === 'POST') return await handleDataReqCreate(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/datareq\/(\d+)\/revoke$/);
+    if (m && method === 'POST') return await handleDataReqRevoke(env, user, Number(m[1]), Number(m[2]));
     m = path.match(/^\/card\/(\d+)\/sign\/(\d+)\/revoke$/);
     if (m && method === 'POST') return await handleSignRevoke(env, user, Number(m[1]), Number(m[2]));
     m = path.match(/^\/card\/(\d+)\/docs\/check$/);
