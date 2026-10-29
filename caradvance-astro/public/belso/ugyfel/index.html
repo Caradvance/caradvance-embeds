@@ -244,7 +244,7 @@
 </div></div>
 <div class="wrap" id="root"><div class="loading">Betöltés…</div></div>
 <div class="toast" id="toast"></div>
-<script src="/belso/doc-render.js?v=2"></script>
+<script src="/belso/doc-render.js?v=3"></script>
 <script>
 var ID=parseInt(new URLSearchParams(location.search).get('id'),10);
 var API='/api/belso-crm';
@@ -1223,7 +1223,7 @@ function renderDmEdit(){
     +'<div><div class="hint" style="margin-bottom:6px">Előnézet (sárga = üres mező)</div><div class="preview dpv" id="dmPrev"></div></div></div>'
     +'<div class="actions"><button class="btn dark" id="dmSave">Mentés</button><button class="btn ghost" id="dmPdfBtn">PDF előnézet</button></div></div>';
   $('dmText').value=d.text;
-  var prev=function(){$('dmPrev').innerHTML=CADoc.preview(d.text,d.vars,lab);};prev();
+  var prev=function(){$('dmPrev').innerHTML=CADoc.preview(d.text,d.vars,lab,d.use_sigs===0?[]:(d.sigs||[]));};prev();
   var dirty=function(){DM.dirty=true;$('dmDirty').textContent='nem mentett módosítás';};
   var pt=null;
   $('dmText').addEventListener('input',function(){d.text=this.value;dirty();clearTimeout(pt);pt=setTimeout(function(){
@@ -1239,7 +1239,8 @@ function renderDmEdit(){
   $('dmPdfBtn').addEventListener('click',function(){dmPdf(d.id,true);});
 }
 function dmBody(refill){var d=DM.edit;var ps={};Object.keys(d.persons||{}).forEach(function(k){if(d.persons[k])ps[k]=+d.persons[k];});return {name:d.name,text:d.text,vars:d.vars,vehicle_id:d.vehicle_id,persons:ps,use_sigs:d.use_sigs===0?0:1,refill:refill||undefined};}
-function missKeys(d){return CADoc.usedKeys(d.text).filter(function(k){return !String(d.vars[k]==null?'':d.vars[k]).trim();});}
+var OPTIONAL_VARS={auto_rendszam:1};
+function missKeys(d){return CADoc.usedKeys(d.text).filter(function(k){return !OPTIONAL_VARS[k]&&!String(d.vars[k]==null?'':d.vars[k]).trim();});}
 function dmSave(refill){
   var d=DM.edit;if(!d)return;saving();
   return api('/card/'+ID+'/docs/'+d.id,{method:'PATCH',body:dmBody(refill)}).then(function(r){
