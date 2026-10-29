@@ -6,7 +6,7 @@ import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, esc, SITE,
-  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys
 } from '../../../lib/crm.js';
 import { jpegInfo } from '../../../lib/docpdf.js';
 
@@ -531,7 +531,7 @@ async function handleDocMeta(env) {
   return json({
     kinds: DOC_KINDS, lines: LINES, roles: PERSON_ROLES,
     groups: VAR_GROUPS.map(([t, keys]) => ({ title: t, vars: keys.map((k) => ({ key: k, label: VAR_LABELS[k] || k })) })),
-    settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH'), bh_bankszamla: await getSetting(env, 'bh_bankszamla', '') }
+    settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH'), bh_bankszamla: await getSetting(env, 'bh_bankszamla', ''), partner_sign_email: await getSetting(env, 'partner_sign_email', 'import@caradvance.de') }
   });
 }
 async function handleTemplates(env, url) {
@@ -647,8 +647,9 @@ async function handleSettings(request, env, user) {
     const em = clean(b.partner_email, 300).split(/[,;\s]+/).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)).join(', ');
     await setSetting(env, 'partner_email', em); await setSetting(env, 'partner_name', clean(b.partner_name, 120) || 'Caradvance GmbH');
     if (b.bh_bankszamla != null) await setSetting(env, 'bh_bankszamla', clean(b.bh_bankszamla, 80));
+    if (b.partner_sign_email != null) { const e = clean(b.partner_sign_email, 160).trim().toLowerCase(); if (e && !/^[^@\s,;]+@[^@\s,;]+\.[^@\s,;]+$/.test(e)) return json({ error: 'Az ellenjegyző e-mail címe érvénytelen (egy cím adható meg).' }, 400); await setSetting(env, 'partner_sign_email', e); }
   }
-  return json({ settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH'), bh_bankszamla: await getSetting(env, 'bh_bankszamla', '') } });
+  return json({ settings: { partner_email: await getSetting(env, 'partner_email', ''), partner_name: await getSetting(env, 'partner_name', 'Caradvance GmbH'), bh_bankszamla: await getSetting(env, 'bh_bankszamla', ''), partner_sign_email: await getSetting(env, 'partner_sign_email', 'import@caradvance.de') } });
 }
 
 /* --- ügyfélhez kitöltött dokumentumok --- */
@@ -733,7 +734,7 @@ async function handleDocPatch(request, env, user, id, did) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
   const r = await getDoc(env, id, did); if (!r) return json({ error: 'Nem található.' }, 404);
   if (r.sign_status === 'pending') return json({ error: 'A dokumentum aláírásra ki van küldve — módosítás előtt vond vissza az aláírási kérelmet.' }, 409);
-  if (r.sign_status === 'signed') return json({ error: 'Az aláírt dokumentum nem módosítható. Szükség esetén készíts újat a sablonból.' }, 409);
+  if (r.sign_status === 'signed' || r.sign_status === 'cosign') return json({ error: 'Az aláírt dokumentum nem módosítható. Szükség esetén készíts újat a sablonból.' }, 409);
   const b = await request.json().catch(() => ({}));
   let text = b.text != null ? cleanMulti(b.text, TPL_MAX) : r.text;
   const oldVars = parseJ(r.vars, {});
@@ -767,7 +768,7 @@ async function handleDocPatch(request, env, user, id, did) {
 async function handleDocDelete(env, user, id, did) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const r = await getDoc(env, id, did); if (!r) return json({ ok: true });
-  if (r.sign_status === 'pending' || r.sign_status === 'signed') return json({ error: r.sign_status === 'pending' ? 'Aláírásra kiküldött dokumentum — előbb vond vissza a kérelmet.' : 'Aláírt dokumentum nem törölhető.' }, 409);
+  if (r.sign_status === 'pending' || r.sign_status === 'signed' || r.sign_status === 'cosign') return json({ error: r.sign_status === 'pending' ? 'Aláírásra kiküldött dokumentum — előbb vond vissza a kérelmet.' : 'Aláírt dokumentum nem törölhető.' }, 409);
   await env.DB.prepare(`DELETE FROM crm_docs WHERE id = ? AND deal_id = ?`).bind(did, id).run();
   await addEvent(env, id, 'doc', `Dokumentum törölve: ${r.name}`, user.name);
   return json({ ok: true });
@@ -857,16 +858,16 @@ async function handleSignCreate(request, env, user, id) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: role === 'buyer' ? 'A vevőnek nincs érvényes e-mail címe (1. szekció).' : 'Az ügyfélnek nincs érvényes e-mail címe (1. szekció).' }, 400);
   const signerName = clean(P.name || (role === 'client' ? deal.name : ''), 120);
   if (!signerName) return json({ error: 'Add meg az aláíró nevét az 1. szekcióban.' }, 400);
-  const docs = [];
+  const docs = []; const partnerName = await getSetting(env, 'partner_name', 'Caradvance GmbH');
   for (const did of ids) {
     const r = await getDoc(env, id, did); if (!r) continue;
     if (r.sign_status === 'pending') return json({ error: `Már aláírásra vár: ${r.name}` }, 409);
-    if (r.sign_status === 'signed') return json({ error: `Már aláírt dokumentum: ${r.name}` }, 409);
+    if (r.sign_status === 'signed' || r.sign_status === 'cosign') return json({ error: `Már aláírt dokumentum: ${r.name}` }, 409);
     const vars = parseJ(r.vars, {});
     const miss = missingVars(r.text, vars); if (miss.length) return json({ error: `Hiányzó adatok (${r.name}): ${missTxt(miss)}` }, 422);
     const text = fillTemplate(r.text, vars);
     const sigs = await specimensFor(env, parseJ(r.persons, {}), r.use_sigs == null ? 1 : r.use_sigs);
-    docs.push({ doc_id: r.id, name: r.name, kind: r.kind, text, hash: await sha256hex(text), number: /\{\{\s*szerzodes_szam\s*\}\}/.test(r.text) ? (vars.szerzodes_szam || '') : '', match: vars.ugyfel_nev || '', sigs });
+    docs.push({ doc_id: r.id, name: r.name, kind: r.kind, text, hash: await sha256hex(text), number: /\{\{\s*szerzodes_szam\s*\}\}/.test(r.text) ? (vars.szerzodes_szam || '') : '', match: vars.ugyfel_nev || '', sigs, cosign: partnerSignKeys(text, partnerName) });
   }
   if (!docs.length) return json({ error: 'A kijelölt dokumentumok nem találhatók.' }, 404);
   const token = randomHex(32);
@@ -889,11 +890,11 @@ async function handleSignCreate(request, env, user, id) {
 }
 async function handleSignList(env, user, id) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
-  const rows = (await env.DB.prepare(`SELECT id, signer_role, signer_name, email, docs, status, created_by, created_at, expires_at, opened_at, signed_at, sign_name, sign_ip, result, fails FROM crm_sign WHERE deal_id = ? ORDER BY id DESC`).bind(id).all()).results || [];
+  const rows = (await env.DB.prepare(`SELECT id, signer_role, signer_name, email, docs, status, created_by, created_at, expires_at, opened_at, signed_at, sign_name, sign_ip, result, fails, parent_id FROM crm_sign WHERE deal_id = ? ORDER BY id DESC`).bind(id).all()).results || [];
   const t = Math.floor(Date.now() / 1000);
   return json({ requests: rows.map((r) => ({
     id: r.id, role: r.signer_role, signer: r.signer_name, email: r.email, status: r.status === 'pending' && r.expires_at < t ? 'expired' : r.status,
-    created_by: r.created_by, created_at: r.created_at, expires: new Date(r.expires_at * 1000).toISOString(), opened_at: r.opened_at, signed_at: r.signed_at, sign_name: r.sign_name, sign_ip: r.sign_ip, fails: r.fails,
+    created_by: r.created_by, created_at: r.created_at, expires: new Date(r.expires_at * 1000).toISOString(), opened_at: r.opened_at, signed_at: r.signed_at, sign_name: r.sign_name, sign_ip: r.sign_ip, fails: r.fails, parent_id: r.parent_id || null,
     docs: parseJ(r.docs, []).map((d) => ({ doc_id: d.doc_id, name: d.name, hash: d.hash })), result: parseJ(r.result, [])
   })) });
 }
@@ -904,6 +905,8 @@ async function handleSignRevoke(env, user, id, sid) {
   if (r.status === 'signed' || r.status === 'signing') return json({ error: 'Már aláírt kérelem nem vonható vissza.' }, 409);
   await env.DB.prepare(`UPDATE crm_sign SET status = 'revoked', revoked_by = ?, code_hash = NULL WHERE id = ?`).bind(user.name, sid).run();
   await env.DB.prepare(`UPDATE crm_docs SET sign_status = '', sign_id = NULL WHERE sign_id = ? AND deal_id = ? AND sign_status = 'pending'`).bind(sid, id).run();
+  // a partner ellenjegyzésének visszavonása: a dokumentumok az ügyfél aláírásával maradnak
+  if (r.signer_role === 'partner') await env.DB.prepare(`UPDATE crm_docs SET sign_status = 'signed' WHERE sign_id = ? AND deal_id = ? AND sign_status = 'cosign'`).bind(r.parent_id || 0, id).run();
   await addEvent(env, id, 'sign', `Aláírási kérelem visszavonva (#${sid})`, user.name);
   return json({ ok: true });
 }
