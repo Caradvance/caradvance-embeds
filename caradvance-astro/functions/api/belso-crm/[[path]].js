@@ -581,7 +581,7 @@ async function handleTemplateDelete(env, tid) {
   return json({ ok: true });
 }
 
-const P_KEYS = ['name', 'address', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'email', 'phone', 'note'];
+const P_KEYS = ['name', 'address', 'id_number', 'mother_name', 'birth_place', 'birth_date', 'email', 'phone', 'note', 'kind', 'rep'];
 async function personsList(env) {
   return ((await env.DB.prepare(`SELECT id, ${P_KEYS.join(', ')}, sign_as, sig FROM crm_persons WHERE active = 1 ORDER BY name`).all()).results || [])
     .map((p) => ({ ...p, sign_as: p.sign_as || '', sig: p.sig ? 'data:image/jpeg;base64,' + p.sig : '' }));
@@ -602,7 +602,7 @@ const missTxt = (m) => m.map((x) => x.label).join(', ');
 async function handlePersonSave(request, env) {
   const b = await request.json().catch(() => ({}));
   const p = {}; for (const k of P_KEYS) p[k] = clean(b[k], k === 'note' ? 400 : 200);
-  p.birth_date = isoDate(p.birth_date);
+  p.birth_date = isoDate(p.birth_date); p.kind = p.kind === 'ceg' ? 'ceg' : 'magan';
   if (!p.name) return json({ error: 'Add meg a nevet.' }, 400);
   const signAs = clean(b.sign_as, 300);
   // aláírásminta: JPEG data URL (a böngésző kékre színezi és tömöríti), '' = törlés, undefined = változatlan
