@@ -860,7 +860,8 @@ function renderPicked(){
       +'<div class="fld"><label>Ajánlati ár</label><input data-f="price" inputmode="numeric" value="'+esc(p.price?Math.round(p.price):'')+'"></div>'
       +'<div class="fld"><label>Pénznem</label><select data-f="currency"><option value="HUF"'+(p.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(p.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-f="period"><option value="">egyszeri</option><option value="hó"'+(p.period==='hó'?' selected':'')+'>/ hó</option></select></div></div>'
-      +(!editable?'<div class="hint">'+esc(spec(p))+'</div>':'')+'</div>';
+      +(editable&&src!=='mobile'?'<div class="idrow"><label>Az autó adatlapja (link, nem kötelező)</label><input data-f="url" value="'+esc(p.url||'')+'" placeholder="https://www.caradvance.hu/auto/…" style="flex:1;min-width:220px">'+(/^https:\/\//.test(p.url||'')?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">megnyitás ↗</a>':'')+'</div>':'')
+      +(!editable?'<div class="hint">'+esc(spec(p))+(p.url?' · <a href="'+esc(p.url)+'" target="_blank" rel="noopener">autó adatlapja ↗</a> <span class="hint">(az ajánlatban az ügyfél is megnyithatja)</span>':'')+'</div>':'')+'</div>';
   }).join('');
   el.querySelectorAll('.pk').forEach(function(box){
     var i=parseInt(box.getAttribute('data-i'),10);
