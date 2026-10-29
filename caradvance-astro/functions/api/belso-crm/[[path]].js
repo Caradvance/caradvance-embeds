@@ -594,9 +594,17 @@ async function specimensFor(env, pids, use) {
   return rows.filter((p) => mine.has(p.id) || (p.sign_as || '').trim())
     .map((p) => ({ names: (mine.has(p.id) ? [p.name] : []).concat(String(p.sign_as || '').split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)), b64: p.sig }));
 }
+/** Teljes dokumentum + a beilleszthető aláírásminták (a szerkesztő előnézetéhez). */
+async function withSigs(env, r) {
+  const o = docRow(r, true);
+  o.sigs = (await specimensFor(env, parseJ(r.persons, {}), 1)).map((z) => ({ names: z.names, src: 'data:image/jpeg;base64,' + z.b64 }));
+  return o;
+}
 /** A dokumentum kitöltetlen (üres) adatmezői. */
+// nem kötelező adatok: üresen is generálható (a PDF-ben kitöltendő vonal marad)
+const OPTIONAL_VARS = new Set(['auto_rendszam']);
 function missingVars(text, vars) {
-  return usedKeys(text).filter((k) => !String(vars[k] == null ? '' : vars[k]).trim()).map((k) => ({ key: k, label: VAR_LABELS[k] || k }));
+  return usedKeys(text).filter((k) => !OPTIONAL_VARS.has(k) && !String(vars[k] == null ? '' : vars[k]).trim()).map((k) => ({ key: k, label: VAR_LABELS[k] || k }));
 }
 const missTxt = (m) => m.map((x) => x.label).join(', ');
 async function handlePersonSave(request, env) {
@@ -680,7 +688,7 @@ async function handleDocCreate(request, env, user, id) {
     .bind(id, tpl.id, name, tpl.kind, vehicle ? vehicle.id : '', JSON.stringify(ids), tpl.body, JSON.stringify(keep), user.name, user.name).run();
   await addEvent(env, id, 'doc', `Dokumentum kitöltve: ${name}`, user.name);
   const row = await env.DB.prepare(`SELECT * FROM crm_docs WHERE id = ?`).bind(r.meta.last_row_id).first();
-  return json({ ok: true, doc: docRow(row, true) });
+  return json({ ok: true, doc: await withSigs(env, row) });
 }
 /** Előzetes ellenőrzés: a kijelölt sablonokhoz mely adatok hiányoznak (az ügyfél / autó / személyek adataiból). */
 async function handleDocCheck(request, env, user, id) {
@@ -705,7 +713,7 @@ function varsInput(o) { const vars = {}; for (const [k, v] of Object.entries(o |
 async function handleDocGet(env, user, id, did) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
   const r = await getDoc(env, id, did); if (!r) return json({ error: 'Nem található.' }, 404);
-  return json({ doc: docRow(r, true) });
+  return json({ doc: await withSigs(env, r) });
 }
 async function handleDocPatch(request, env, user, id, did) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
@@ -734,7 +742,7 @@ async function handleDocPatch(request, env, user, id, did) {
   await env.DB.prepare(`UPDATE crm_docs SET name=?, text=?, vars=?, persons=?, vehicle_id=?, use_sigs=?, updated_at=datetime('now'), updated_by=? WHERE id=?`)
     .bind(name, text, JSON.stringify(vars), JSON.stringify(pids), vid, useSigs, user.name, did).run();
   await addEvent(env, id, 'doc:' + did, `Dokumentum módosítva: ${name}`, user.name, 30);
-  return json({ ok: true, doc: docRow(await getDoc(env, id, did), true) });
+  return json({ ok: true, doc: await withSigs(env, await getDoc(env, id, did)) });
 }
 async function handleDocDelete(env, user, id, did) {
   const { error } = await loadDeal(env, user, id); if (error) return error;
