@@ -283,7 +283,7 @@ async function handleSendOffer(request, env, user, id) {
     ad_id: /^\d{6,12}$/.test(String(it.ad_id || '')) ? String(it.ad_id) : '', ad_url: /^https:\/\/([a-z0-9-]+\.)*mobile\.de\//i.test(it.ad_url || '') ? clean(it.ad_url, 400) : '',
     src_price: Math.max(0, Number(it.src_price) || 0), config_code: clean(it.config_code, 60), config_url: /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|mercedes-benz|mercedes|audi|volkswagen|vw)\.[a-z.]{2,12}(\/|$)/i.test(it.config_url || '') ? clean(it.config_url, 1500) : '', file_id: Number.isInteger(it.file_id) ? it.file_id : null,
     // gyári konfigurátorból kinyert képek (crm_files, „__media_” névvel) és felszereltség — ezekből készül a CarAdvance-ajánlat PDF
-    images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 8),
+    images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 12),
     equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
     eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '',
     attach_src: !!it.attach_src
@@ -321,17 +321,17 @@ async function handleSendOffer(request, env, user, id) {
 }
 
 /* ---------------- CarAdvance-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ---------------- */
-function eqImgs(a) { return (Array.isArray(a) ? a : []).filter((z) => z && Number.isInteger(z.id) && z.id > 0).slice(0, 16).map((z) => ({ id: z.id, idx: Number.isInteger(z.idx) ? z.idx : -1, label: clean(z.label, 160) })); }
+function eqImgs(a) { return (Array.isArray(a) ? a : []).filter((z) => z && Number.isInteger(z.id) && z.id > 0).slice(0, 40).map((z) => ({ id: z.id, idx: Number.isInteger(z.idx) ? z.idx : -1, label: clean(z.label, 160) })); }
 function offerNo(id, i, n) { const d = new Date(); return `AJ-${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}-${String(id).padStart(4, '0')}${n > 1 ? '-' + (i + 1) : ''}`; }
 function offerFileName(it) { return ('CarAdvance_ajanlat_' + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 80) + '.pdf'; }
 async function buildOfferPdf(env, dealId, it, o) {
   const images = [];
-  for (const fid of (it.images || []).slice(0, 8)) {
+  for (const fid of (it.images || []).slice(0, 12)) {
     const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, dealId).first();
     if (f) { const b = b64ToBytes(await fileData(env, f)); if (jpegInfo(b)) images.push(b); }
   }
   const eqImages = [];
-  for (const z of (it.eq_images || []).slice(0, 16)) {
+  for (const z of (it.eq_images || []).slice(0, 40)) {
     const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(z.id, dealId).first();
     if (f) { const b = b64ToBytes(await fileData(env, f)); if (jpegInfo(b)) eqImages.push({ jpeg: b, caption: (it.equipment || [])[z.idx] || z.label || '' }); }
   }
@@ -353,7 +353,7 @@ async function handleOfferPdfPreview(request, env, user, id) {
   const b = await request.json().catch(() => ({})); const it = b.item || {};
   const item = { title: clean(it.title, 200), brand: clean(it.brand, 60), year: clean(it.year, 30), km: clean(it.km, 40), fuel: clean(it.fuel, 40), power: clean(it.power, 40), gearbox: clean(it.gearbox, 40), color: clean(it.color, 60),
     price: Math.max(0, Number(it.price) || 0), currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(it.period, 20), note: clean(it.note, 400), config_code: clean(it.config_code, 60),
-    images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 8),
+    images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 12),
     equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
     eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '' };
   const card = await getCard(env, id);
