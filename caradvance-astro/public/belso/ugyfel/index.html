@@ -1023,7 +1023,7 @@ function bindCfgOffer(box,i){
 /* a felszereltség (német gyári szöveg) fordítása magyarra — a szerveren (Workers AI); az eredmény szerkeszthető marad */
 function translateEq(p){
   var L=(p.equipment||[]).filter(Boolean);if(!L.length)return Promise.resolve();
-  return api('/translate',{method:'POST',body:{lines:L}}).then(function(r){if(r.lines&&r.lines.length===L.length){p.equipment=r.lines;p.eq_hu=true;toast(r.translated?'Felszereltség lefordítva — ellenőrizd.':'Nem volt mit fordítani.',3500);}});
+  return api('/translate',{method:'POST',body:{lines:L}}).then(function(r){if(r.lines&&r.lines.length===L.length){p.equipment=r.lines;p.eq_hu=true;toast(r.translated?'Felszereltség lefordítva — ellenőrizd.':(r.errors&&r.errors.length?'A fordítás nem sikerült: '+r.errors[0]:'Nem volt mit fordítani.'),r.translated?3500:7000);}});
 }
 function imgToJpeg(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){var sc=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(im.naturalWidth*sc);cv.height=Math.round(im.naturalHeight*sc);var c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);res(cv.toDataURL('image/jpeg',0.84));};im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('A kép nem olvasható.'));};im.src=u;});}
 function sendOffer(){
