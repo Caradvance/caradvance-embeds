@@ -5,7 +5,7 @@
 import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
-  bytesToB64, b64ToBytes, sha256hex, priceLabel, specLine, esc, SITE,
+  bytesToB64, b64ToBytes, sha256hex, priceLabel, priceVatLabel, VAT_MODES, specLine, esc, SITE,
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
 } from '../../../lib/crm.js';
 import { jpegInfo, renderOfferPdf } from '../../../lib/docpdf.js';
@@ -285,6 +285,7 @@ async function handleSendOffer(request, env, user, id) {
     // gyári konfigurátorból kinyert képek (crm_files, „__media_” névvel) és felszereltség — ezekből készül a CarAdvance-ajánlat PDF
     images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 8),
     equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
+    eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '',
     attach_src: !!it.attach_src
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
@@ -309,10 +310,10 @@ async function handleSendOffer(request, env, user, id) {
     const f = await env.DB.prepare(`SELECT id, name, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(it.file_id, id).first();
     if (f) att.push({ filename: f.name, content: await fileData(env, f) }); else it.file_id = null;
   }
-  const r = await sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link }), att);
+  const r = await sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link, attached: att.length > 0 }), att);
   await env.DB.prepare(`INSERT INTO crm_offers (token, deal_id, line, client_name, items, message, sent_to, sent, created_by) VALUES (?,?,?,?,?,?,?,?,?)`)
     .bind(token, id, deal.line || '', clientName || '', JSON.stringify(items), message, fwd || to, r.ok ? 1 : 0, user.id).run();
-  const carList = items.map((it) => `${it.title} (${priceLabel(it)}${it.ad_id ? ', mobile.de: ' + it.ad_id : ''}${it.config_code ? ', konfig.: ' + it.config_code : ''})`).join('; ');
+  const carList = items.map((it) => `${it.title} (${priceVatLabel(it)}${it.ad_id ? ', mobile.de: ' + it.ad_id : ''}${it.config_code ? ', konfig.: ' + it.config_code : ''})`).join('; ');
   if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat küldése sikertelen — ${items.length} autó: ${carList}`, user.name); return json({ ok: false, error: r.error + ' — az ajánlat-link elkészült, kézzel is elküldheted.', link }, 502); }
   await addEvent(env, id, 'offer', `Ajánlat elküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${items.length} autó: ${carList}`, user.name);
   await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id, user.name, 'ajánlat elküldve');
@@ -320,6 +321,7 @@ async function handleSendOffer(request, env, user, id) {
 }
 
 /* ---------------- CarAdvance-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ---------------- */
+function eqImgs(a) { return (Array.isArray(a) ? a : []).filter((z) => z && Number.isInteger(z.id) && z.id > 0).slice(0, 16).map((z) => ({ id: z.id, idx: Number.isInteger(z.idx) ? z.idx : -1, label: clean(z.label, 160) })); }
 function offerNo(id, i, n) { const d = new Date(); return `AJ-${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}-${String(id).padStart(4, '0')}${n > 1 ? '-' + (i + 1) : ''}`; }
 function offerFileName(it) { return ('CarAdvance_ajanlat_' + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 80) + '.pdf'; }
 async function buildOfferPdf(env, dealId, it, o) {
@@ -328,11 +330,20 @@ async function buildOfferPdf(env, dealId, it, o) {
     const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, dealId).first();
     if (f) { const b = b64ToBytes(await fileData(env, f)); if (jpegInfo(b)) images.push(b); }
   }
+  const eqImages = [];
+  for (const z of (it.eq_images || []).slice(0, 16)) {
+    const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(z.id, dealId).first();
+    if (f) { const b = b64ToBytes(await fileData(env, f)); if (jpegInfo(b)) eqImages.push({ jpeg: b, caption: (it.equipment || [])[z.idx] || z.label || '' }); }
+  }
+  // ár + ÁFA: nettó / bruttó (27% magyar vagy 19% német ÁFA) — bruttónál a nettó összeg is
+  const V = VAT_MODES[it.vat_mode]; const sym = it.currency === 'EUR' ? ' €' : ' Ft';
+  const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + sym;
+  const priceNote = !V ? '' : V.rate ? V.long + ' · nettó: ' + fmt(it.price / (1 + V.rate)) + (it.period ? ' / ' + it.period : '') : V.long;
   const specs = [['Márka', it.brand], ['Évjárat', it.year], ['Üzemanyag', it.fuel], ['Teljesítmény', it.power], ['Váltó', it.gearbox], ['Szín', it.color], ['Km', it.km], ['Konfigurációs kód', it.config_code]];
   const d = new Date();
   return renderOfferPdf({
-    title: it.title, brand: it.brand, subtitle: specLine(it), price: priceLabel(it), priceNote: '',
-    code: it.config_code, number: o.number, date: d.toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest' }), 
+    title: it.title, brand: it.brand, subtitle: specLine(it), price: priceLabel(it), priceNote,
+    eqImages, code: it.config_code, number: o.number, date: d.toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest' }), 
     client: o.client || '', note: it.note || '', specs, equipment: it.equipment || [], images,
     contact: { name: o.user && o.user.name, email: 'sales@caradvance.hu', phone: '+36 30 233 6060' }
   });
@@ -343,7 +354,8 @@ async function handleOfferPdfPreview(request, env, user, id) {
   const item = { title: clean(it.title, 200), brand: clean(it.brand, 60), year: clean(it.year, 30), km: clean(it.km, 40), fuel: clean(it.fuel, 40), power: clean(it.power, 40), gearbox: clean(it.gearbox, 40), color: clean(it.color, 60),
     price: Math.max(0, Number(it.price) || 0), currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(it.period, 20), note: clean(it.note, 400), config_code: clean(it.config_code, 60),
     images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 8),
-    equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150) };
+    equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
+    eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '' };
   const card = await getCard(env, id);
   const pdf = await buildOfferPdf(env, id, item, { client: (card.data.person && card.data.person.name) || deal.name, number: offerNo(id, 0, 1) + ' (előnézet)', user });
   return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${offerFileName(item)}"`, 'cache-control': 'no-store' } });
