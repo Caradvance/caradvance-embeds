@@ -1046,6 +1046,31 @@ async function handleSignRevoke(env, user, id, sid) {
   return json({ ok: true });
 }
 
+/* ---------------- felszereltség-lista fordítása németről magyarra (Cloudflare Workers AI) ---------------- */
+const TR_MODELS = ['@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/meta/llama-3.1-8b-instruct'];
+async function handleTranslate(request, env) {
+  const b = await request.json().catch(() => ({}));
+  const lines = (Array.isArray(b.lines) ? b.lines : []).map((x) => clean(x, 200)).filter(Boolean).slice(0, 150);
+  if (!lines.length) return json({ lines: [] });
+  if (!env.AI) return json({ error: 'A fordítás nincs beállítva (Workers AI).' }, 501);
+  const out = [];
+  for (let i = 0; i < lines.length; i += 40) {
+    const chunk = lines.slice(i, i + 40);
+    const prompt = 'Fordítsd le magyarra az alábbi autó-felszereltségi tételeket (német gyári konfigurátorból). Szabályok: a márka- és termékneveket (pl. BMW Live Cockpit, Driving Assistant Plus, M Sportpaket, Harman Kardon, xDrive, AMG, S line, R-Line, Matrix LED) hagyd eredeti formában; a többit tömör, magyar autós szaknyelven add vissza (pl. Sitzheizung vorn → Ülésfűtés elöl, Anhängerkupplung → Vonóhorog, Metallic-Lackierung → Metálfényezés). Pontosan ugyanannyi tételt adj vissza, ugyanabban a sorrendben, kizárólag egy JSON tömbként (stringek), magyarázat nélkül.\n\n' + JSON.stringify(chunk);
+    let res = null;
+    for (const m of TR_MODELS) {
+      try {
+        const r = await env.AI.run(m, { messages: [{ role: 'system', content: 'Precíz német–magyar autóipari fordító vagy. Csak JSON tömböt adsz vissza.' }, { role: 'user', content: prompt }], max_tokens: 3000, temperature: 0.1 });
+        const txt = String((r && (r.response ?? r.result?.response)) || '');
+        const mm = txt.match(/\[[\s\S]*\]/); const arr = mm ? JSON.parse(mm[0]) : null;
+        if (Array.isArray(arr) && arr.length === chunk.length) { res = arr.map((x, k) => clean(String(x || ''), 200) || chunk[k]); break; }
+      } catch (e) { /* következő modell */ }
+    }
+    out.push(...(res || chunk));
+  }
+  return json({ lines: out, translated: out.some((x, k) => x !== lines[k]) });
+}
+
 /* ---------------- konfigurátor-képek átvétele (csak a gyártók képszervereiről; a böngésző JPEG-re alakítja) ---------------- */
 const IMG_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|bmwgroup|mercedes-benz|mercedes|daimler|mbusa|audi|audi-cdn|volkswagen|vw|vwgroup|vwg-connect|cosy)[a-z0-9-]*\.[a-z.]{2,12}(\/|$)/i;
 async function handleImgProxy(url) {
@@ -1102,6 +1127,7 @@ export async function onRequest(context) {
     if (path === '/docmeta' && method === 'GET') return await handleDocMeta(env);
     if (path === '/cfgmeta' && method === 'GET') return await handleCfgMeta(url);
     if (path === '/imgproxy' && method === 'GET') return await handleImgProxy(url);
+    if (path === '/translate' && method === 'POST') return await handleTranslate(request, env);
     if (path === '/templates' && method === 'GET') return await handleTemplates(env, url);
     if (path === '/templates' && method === 'POST') return await handleTemplateSave(request, env, user);
     if (path === '/templates/import' && method === 'POST') return await handleTemplateImport(request, env, user);
