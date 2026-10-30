@@ -538,25 +538,47 @@ export function renderOfferPdf(o) {
   if (specs.length) { L.heading('Főbb adatok', null, 3); for (let i = 0; i < specs.length; i += 2) L.row(specs.slice(i, i + 2).map((s) => [s[0], String(s[1])])); L.y -= 6; }
   if (o.note) L.note(o.note);
   // további képek: egy sorban max. 3, a hely kitöltésével; ha az oldalon kevés a hely, kisebb képekkel még ide fér
-  const rest = imgs.slice(1, 7);
-  // kiegyensúlyozott sorok (4 → 2+2, 5 → 3+2); ha az oldalon kevés a hely, a sor összenyomódik; ha már csak képek
-  // maradnának egy új oldalra, a maradék képek kimaradnak (nincs „üres” oldal egyetlen képpel)
-  const rowsOf = (a) => { const n = a.length; const sizes = n <= 3 ? [n] : n === 4 ? [2, 2] : n === 5 ? [3, 2] : [3, 3]; const r = []; let k = 0; for (const z of sizes) { r.push(a.slice(k, k + z)); k += z; } return r.filter((x) => x.length); };
-  const imageRows = (list, last) => {
-    for (const row of rowsOf(list)) {
-      const gap = 8; const w = (CW - gap * (row.length - 1)) / row.length; let h = Math.min(row.length === 1 ? 190 : row.length === 2 ? 140 : 105, w * 0.62);
-      if (room() < h + reserve) { if (room() - reserve >= 70) h = room() - reserve; else if (last) break; else L.newPage(); }
-      row.forEach((im, k) => cover(im, ML + k * (w + gap), L.y - h, w, h)); L.y -= h + 8;
-    }
-  };
-  // felszereltség — két hasábban, oldaltöréssel
+  const rest = imgs.slice(1, 12);
+  // kiegyensúlyozott sorok (soronként max. 3; 4 → 2+2, 5 → 3+2, 7 → 3+2+2 …); ha az oldalon kevés a hely, a sor összenyomódik,
+  // különben új oldalra kerül — csak az utolsó, magányos sor marad ki (nincs „üres” oldal egyetlen képpel)
+  const rowsOf = (a) => { const n = a.length; if (!n) return []; const nr = Math.ceil(n / 3); const base = Math.floor(n / nr); let extra = n % nr; const r = []; let k = 0;
+    for (let i = 0; i < nr; i++) { const z = base + (extra > 0 ? 1 : 0); extra--; r.push(a.slice(k, k + z)); k += z; } return r; };
+  // felszereltség: képes tételek (kép balra, név jobbra — mint a gyári összesítőn), két hasábban; utána a többi tétel szövegesen
   const eq = (o.equipment || []).map((s) => String(s).trim()).filter(Boolean);
+  const eqi = (o.eqImages || []).map((z) => { const inf = z && z.jpeg && jpegInfo(z.jpeg); return inf ? { im: { bytes: z.jpeg, ...inf }, cap: String(z.caption || '').trim() } : null; }).filter((z) => z && z.cap);
+  const withImg = new Set(eqi.map((z) => z.cap));
+  const eqTxt = eq.filter((s) => !withImg.has(s));
+  const imageRows = (list) => {
+    const rows = rowsOf(list);
+    rows.forEach((row, ri) => {
+      const gap = 8; const w = (CW - gap * (row.length - 1)) / row.length; let h = Math.min(row.length === 1 ? 190 : row.length === 2 ? 140 : 105, w * 0.62);
+      if (room() < h + reserve) { if (room() - reserve >= 70) h = room() - reserve; else if (ri === rows.length - 1 && row.length < 3 && rows.length > 1) return; else L.newPage(); }
+      row.forEach((im, k) => cover(im, ML + k * (w + gap), L.y - h, w, h)); L.y -= h + 8;
+    });
+  };
+  const eqImgBlock = () => {
+    if (!eqi.length) return;
+    const gap = 16; const cw = (CW - gap) / 2; const tw = 74, th = 42; const size = 7.9;
+    L.ensure(th + 40); L.heading(eqTxt.length ? 'Felszereltség — kiemelt tételek' : 'Felszereltség', null, 3);
+    for (let i = 0; i < eqi.length; i += 2) {
+      const pair = eqi.slice(i, i + 2);
+      const ms = pair.map((z) => L.measure(z.cap, { w: cw - tw - 10, size, f: 'R', num: false, bullets: false, lh: 1.32 }));
+      const h = Math.max(th, ...ms.map((m) => Math.min(4, m.lines.length) * m.lh)) + 7;
+      L.ensure(h);
+      pair.forEach((z, k) => {
+        const x = ML + k * (cw + gap); d.fill(x, L.y - th, tw, th, C.note); cover(z.im, x, L.y - th, tw, th);
+        const m = { ...ms[k], lines: ms[k].lines.slice(0, 4) }; const tH = m.lines.length * m.lh;
+        L.drawMeasured(m, x + tw + 10, L.y - Math.max(0, (th - tH) / 2) + 1, C.txt);
+      });
+      L.y -= h;
+    }
+    L.y -= 6;
+  };
   const eqBlock = () => {
-    if (!eq.length) return;
-    L.heading('Felszereltség', null, 3);
+    if (!eqTxt.length) return;
+    L.heading(eqi.length ? 'További felszereltség' : 'Felszereltség', null, 3);
     const gap = 20; const cw = (CW - gap) / 2; const size = 7.8;
-    // hasábonként (bal: első fele, jobb: második fele), hogy oldaltöréskor is rendezett maradjon
-    const rows = []; for (let i = 0; i < eq.length; i += 2) rows.push([eq[i], eq[i + 1]]);
+    const rows = []; for (let i = 0; i < eqTxt.length; i += 2) rows.push([eqTxt[i], eqTxt[i + 1]]);
     for (const [a, b] of rows) {
       const A = L.measure('- ' + a, { w: cw, size, f: 'L', num: false, lh: 1.42 }); const B = b ? L.measure('- ' + b, { w: cw, size, f: 'L', num: false, lh: 1.42 }) : null;
       const h = Math.max(A.lines.length * A.lh, B ? B.lines.length * B.lh : 0) + 1.5;
@@ -564,26 +586,11 @@ export function renderOfferPdf(o) {
     }
     L.y -= 8;
   };
-  // ha a felszereltség hosszú, a képek előtte jönnek (így az első oldal alja is kitöltődik); röviden utána
-  // a képek közvetlenül az adatok után (az első oldalt töltik ki); ami nem fér el, kimarad — utána a felszereltség folyik tovább
-  // rövid felszereltségnél a képek annyira kisebbek, hogy a lista és a záró szöveg is az oldalon maradjon
-  const eqEst = eq.length ? Math.ceil(eq.length / 2) * 11.4 + 40 : 0;
-  let reserve = eqEst && eqEst < 230 && !(o.eqImages || []).length ? eqEst + 48 : 36;
-  imageRows(rest, true); eqBlock();
-  // felszereltség képekben: 4 kép soronként, alattuk a tétel neve
-  const eqi = (o.eqImages || []).map((z) => { const inf = z && z.jpeg && jpegInfo(z.jpeg); return inf ? { im: { bytes: z.jpeg, ...inf }, cap: String(z.caption || '') } : null; }).filter(Boolean);
-  if (eqi.length) {
-    const per = 4; const gap = 8; const w = (CW - gap * (per - 1)) / per; const ih = Math.round(w * 0.62); const capS = 6.9;
-    L.ensure(ih + 60); L.heading('Felszereltség képekben', null, 3);
-    for (let i = 0; i < eqi.length; i += per) {
-      const row = eqi.slice(i, i + per);
-      const caps = row.map((z) => L.measure(z.cap, { w: w - 2, size: capS, f: 'R', num: false, bullets: false, lh: 1.3 }));
-      const ch = Math.min(3, Math.max(...caps.map((m) => m.lines.length))) * capS * 1.3;
-      L.ensure(ih + ch + 10);
-      row.forEach((z, k) => { const x = ML + k * (w + gap); d.fill(x, L.y - ih, w, ih, C.note); cover(z.im, x, L.y - ih, w, ih); const m = { ...caps[k], lines: caps[k].lines.slice(0, 3) }; L.drawMeasured(m, x, L.y - ih - 2, C.txt); });
-      L.y -= ih + ch + 10;
-    }
-  }
+  // a képek közvetlenül az adatok után (az első oldalt töltik ki); rövid, kép nélküli felszereltségnél a képek kisebbek,
+  // hogy a lista és a záró szöveg is az oldalon maradjon
+  const eqEst = eqTxt.length ? Math.ceil(eqTxt.length / 2) * 11.4 + 40 : 0;
+  const reserve = eqEst && eqEst < 230 && !eqi.length ? eqEst + 48 : 36;
+  imageRows(rest); eqImgBlock(); eqBlock();
   L.ensure(24); L.y -= 2;
   L.para('Az ajánlat a feltüntetett konfiguráció alapján készült; a képek illusztrációk. Az ajánlat elfogadásáról vagy módosításáról az e-mailben kapott gombokkal tud visszajelezni.' + (o.contact && o.contact.name ? ' Kapcsolattartó: **' + o.contact.name + '**' + (o.contact.email ? ' · ' + o.contact.email : '') + (o.contact.phone ? ' · ' + o.contact.phone : '') : ''), { size: 7.2, color: C.mut });
   return d.build({ title: 'Ajánlat — ' + (o.title || ''), author: 'CarAdvance' }, decorate(L, meta2));
