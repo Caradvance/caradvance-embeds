@@ -884,7 +884,7 @@ function cfgImport(o){
     return fetch(API+'/imgproxy?url='+encodeURIComponent(x.u),{credentials:'same-origin'}).then(function(r){if(!r.ok)throw 0;return r.blob();}).then(function(b){return imgToJpeg(b);}).then(function(data){
       return api('/card/'+ID+'/media',{method:'POST',body:{data:data}});}).then(function(r){PICK[idx].images.push(r.id);ok++;}).catch(function(){});
   });});
-  ch.then(function(){renderPicked();if(st)st.textContent='Átvéve: '+(it.title||'autó')+' · '+eqp.length+' felszereltségi tétel · '+ok+' kép — ellenőrizd lent, add meg az ajánlati árat.';toast('Konfiguráció átvéve: '+(it.title||''),4000);});
+  ch.then(function(){return eqp.length?translateEq(PICK[idx]).catch(function(){}):null;}).then(function(){renderPicked();if(st)st.textContent='Átvéve: '+(it.title||'autó')+' · '+eqp.length+' felszereltségi tétel · '+ok+' kép — ellenőrizd lent, add meg az ajánlati árat.';toast('Konfiguráció átvéve: '+(it.title||''),4000);});
 }
 function cfgImportCheck(){
   var raw=null;try{raw=localStorage.getItem('ca_cfg_import');}catch(e){}
@@ -933,6 +933,7 @@ function cfgFiles(files){
           PICK.push({key:'cfg-'+r.file.id,src:'config',title:d.title||file.name.replace(/\.pdf$/i,'').replace(/[_-]+/g,' '),brand:d.brand||'',price:d.price||0,src_price:d.price||0,currency:'EUR',period:'',
             config_code:d.config_code||'',power:d.power||'',fuel:d.fuel||'',color:d.color||'',file_id:r.file.id,file_name:file.name,note:'',needCheck:true,images:ids,equipment:eqp,attach_src:false});
           renderPicked();
+          if(eqp.length){var pk=PICK[PICK.length-1];st.textContent='Felszereltség fordítása magyarra…';translateEq(pk).then(renderPicked).catch(function(){});}
           st.innerHTML='Beolvasva: <b>'+esc(file.name)+'</b>'+(d.brand?' — '+esc(d.brand):'')+(d.config_code?' · kód: '+esc(d.config_code):'')+(d.price?' · '+fmtPrice(d.price,'EUR'):'')+' · '+ids.length+' kép · '+eqp.length+' felszereltségi tétel — ellenőrizd lent az adatokat.';
           });
         });
@@ -982,7 +983,7 @@ function cfgOfferBlock(p,i){
     +'<div class="hint" style="margin-top:8px">📋 <b>Konfigurátor linkből:</b> nyisd meg a linket, a gyártó oldalán menj az összesítőre / felszereltségre (Zusammenfassung, Ausstattung), nyomj <b>Ctrl+A</b>, <b>Ctrl+C</b>, és illeszd be ide — a felszereltség bekerül a listába. Képet (képernyőkép, Win+Shift+S) a <b>Ctrl+V</b>-vel közvetlenül a képek közé is beilleszthetsz, vagy ráhúzhatod.</div>'
     +'<textarea data-cpaste="1" rows="2" placeholder="Beillesztés ide: szöveg a konfigurátor oldaláról (Ctrl+V) — vagy kép" style="width:100%;font:inherit;font-size:13px;padding:8px;border:1px dashed var(--line);border-radius:8px;margin-top:6px"></textarea>'
     +'<div class="fld" style="margin-top:8px"><label>Felszereltség (soronként egy tétel — szerkeszthető, fordítható)</label><textarea data-ceq="1" rows="6" style="width:100%;font:inherit;font-size:13px;padding:8px;border:1px solid var(--line);border-radius:8px">'+esc((p.equipment||[]).join('\n'))+'</textarea></div>'
-    +'<div class="row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn sm" data-cprev="1">👁 Ajánlat PDF előnézet</button><label class="chk" style="font-size:13px;margin:0"><input type="checkbox" data-csrc="1"'+(p.attach_src?' checked':'')+'> a gyári PDF-et is csatolja (a gyári árat is mutatja!)</label></div></div>';
+    +'<div class="row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn sm" data-ctr="1">🇭🇺 Felszereltség fordítása magyarra</button><button type="button" class="btn sm" data-cprev="1">👁 Ajánlat PDF előnézet</button><label class="chk" style="font-size:13px;margin:0"><input type="checkbox" data-csrc="1"'+(p.attach_src?' checked':'')+'> a gyári PDF-et is csatolja (a gyári árat is mutatja!)</label></div></div>';
 }
 function bindCfgOffer(box,i){
   var p=PICK[i];if(!p||p.src!=='config')return;
@@ -1010,13 +1011,19 @@ function bindCfgOffer(box,i){
     var add=eqp.filter(function(x){return !have[x.toLowerCase()];});p.equipment=(p.equipment||[]).concat(add).slice(0,150);
     // ha a beillesztett szövegből kiderül a modell / kód / teljesítmény, és még üres
     var d=parseConfig(txt);['brand','config_code','power','fuel','color'].forEach(function(k){if(d[k]&&!p[k])p[k]=d[k];});if(d.title&&(!p.title||/^\S+\s*$/.test(p.title)))p.title=d.title;
-    renderPicked();toast(add.length+' felszereltségi tétel hozzáadva — ellenőrizd, a felesleges sorokat töröld.',4500);
+    renderPicked();toast(add.length+' felszereltségi tétel hozzáadva — fordítás magyarra…',4000);translateEq(p).then(renderPicked).catch(function(){});
   });
+  var tb=box.querySelector('[data-ctr]');if(tb)tb.addEventListener('click',function(){tb.disabled=true;tb.textContent='Fordítás…';translateEq(p).then(function(){renderPicked();}).catch(function(e){toast(e.message,4500);tb.disabled=false;tb.textContent='🇭🇺 Felszereltség fordítása magyarra';});});
   var pv=box.querySelector('[data-cprev]');if(pv)pv.addEventListener('click',function(){
     var w=window.open('','_blank');
     fetch(API+'/card/'+ID+'/offerpdf',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({item:p})}).then(function(r){if(!r.ok)throw new Error('Az előnézet nem készült el.');return r.blob();})
       .then(function(b){var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();toast(e.message);});
   });
+}
+/* a felszereltség (német gyári szöveg) fordítása magyarra — a szerveren (Workers AI); az eredmény szerkeszthető marad */
+function translateEq(p){
+  var L=(p.equipment||[]).filter(Boolean);if(!L.length)return Promise.resolve();
+  return api('/translate',{method:'POST',body:{lines:L}}).then(function(r){if(r.lines&&r.lines.length===L.length){p.equipment=r.lines;p.eq_hu=true;toast(r.translated?'Felszereltség lefordítva — ellenőrizd.':'Nem volt mit fordítani.',3500);}});
 }
 function imgToJpeg(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){var sc=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(im.naturalWidth*sc);cv.height=Math.round(im.naturalHeight*sc);var c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);res(cv.toDataURL('image/jpeg',0.84));};im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('A kép nem olvasható.'));};im.src=u;});}
 function sendOffer(){
