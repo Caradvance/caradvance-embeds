@@ -568,8 +568,22 @@ export function renderOfferPdf(o) {
   // a képek közvetlenül az adatok után (az első oldalt töltik ki); ami nem fér el, kimarad — utána a felszereltség folyik tovább
   // rövid felszereltségnél a képek annyira kisebbek, hogy a lista és a záró szöveg is az oldalon maradjon
   const eqEst = eq.length ? Math.ceil(eq.length / 2) * 11.4 + 40 : 0;
-  let reserve = eqEst && eqEst < 230 ? eqEst + 48 : 36;
+  let reserve = eqEst && eqEst < 230 && !(o.eqImages || []).length ? eqEst + 48 : 36;
   imageRows(rest, true); eqBlock();
+  // felszereltség képekben: 4 kép soronként, alattuk a tétel neve
+  const eqi = (o.eqImages || []).map((z) => { const inf = z && z.jpeg && jpegInfo(z.jpeg); return inf ? { im: { bytes: z.jpeg, ...inf }, cap: String(z.caption || '') } : null; }).filter(Boolean);
+  if (eqi.length) {
+    const per = 4; const gap = 8; const w = (CW - gap * (per - 1)) / per; const ih = Math.round(w * 0.62); const capS = 6.9;
+    L.ensure(ih + 60); L.heading('Felszereltség képekben', null, 3);
+    for (let i = 0; i < eqi.length; i += per) {
+      const row = eqi.slice(i, i + per);
+      const caps = row.map((z) => L.measure(z.cap, { w: w - 2, size: capS, f: 'R', num: false, bullets: false, lh: 1.3 }));
+      const ch = Math.min(3, Math.max(...caps.map((m) => m.lines.length))) * capS * 1.3;
+      L.ensure(ih + ch + 10);
+      row.forEach((z, k) => { const x = ML + k * (w + gap); d.fill(x, L.y - ih, w, ih, C.note); cover(z.im, x, L.y - ih, w, ih); const m = { ...caps[k], lines: caps[k].lines.slice(0, 3) }; L.drawMeasured(m, x, L.y - ih - 2, C.txt); });
+      L.y -= ih + ch + 10;
+    }
+  }
   L.ensure(24); L.y -= 2;
   L.para('Az ajánlat a feltüntetett konfiguráció alapján készült; a képek illusztrációk. Az ajánlat elfogadásáról vagy módosításáról az e-mailben kapott gombokkal tud visszajelezni.' + (o.contact && o.contact.name ? ' Kapcsolattartó: **' + o.contact.name + '**' + (o.contact.email ? ' · ' + o.contact.email : '') + (o.contact.phone ? ' · ' + o.contact.phone : '') : ''), { size: 7.2, color: C.mut });
   return d.build({ title: 'Ajánlat — ' + (o.title || ''), author: 'CarAdvance' }, decorate(L, meta2));

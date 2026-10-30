@@ -375,8 +375,12 @@ export function idLine(it) {
   return [it.ad_id ? 'mobile.de hirdetés-azonosító: ' + it.ad_id : '', it.config_code ? (it.brand ? it.brand + ' ' : '') + 'konfigurációs kód: ' + it.config_code : ''].filter(Boolean).join(' · ');
 }
 export function priceLabel(it) { return fmtPrice(it.price, it.currency) + (it.period ? ' / ' + it.period : ''); }
+/** Az ajánlati ár ÁFA-típusa: nettó / bruttó 27% magyar ÁFA / bruttó 19% német ÁFA. */
+export const VAT_MODES = { net: { short: 'nettó', long: 'nettó ár (ÁFA nélkül)', rate: 0 }, hu27: { short: 'bruttó, 27% ÁFA', long: 'bruttó ár, 27% magyar ÁFA-val', rate: 0.27 }, de19: { short: 'bruttó, 19% német ÁFA', long: 'bruttó ár, 19% német ÁFA-val', rate: 0.19 } };
+export function vatText(it) { const v = VAT_MODES[it && it.vat_mode]; return v ? v.short : ''; }
+export function priceVatLabel(it) { const v = vatText(it); return priceLabel(it) + (v ? ' (' + v + ')' : ''); }
 
-export function offerEmailHtml({ clientName, items, message, link }) {
+export function offerEmailHtml({ clientName, items, message, link, attached }) {
   const cards = items.map((it, i) => `
   <tr><td style="padding:0 0 14px">
     <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;overflow:hidden">
@@ -388,13 +392,13 @@ export function offerEmailHtml({ clientName, items, message, link }) {
         ${it.file_id ? `<div style="font-size:12px;color:#6b7280;margin-top:5px">A gyári konfigurátoros ajánlatot csatoltan küldjük (PDF).</div>` : ''}
         ${it.config_url ? `<div style="margin-top:6px"><a href="${esc(it.config_url)}" style="font-size:13px;font-weight:bold;color:#22447d">A konfiguráció megtekintése a gyártó oldalán ↗</a></div>` : ''}
         ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
-        <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it))}</div>
+        <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it))}${vatText(it) ? `<span style="font-size:12px;font-weight:normal;color:#6b7280"> · ${esc(VAT_MODES[it.vat_mode].long)}</span>` : ''}</div>
         <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block;margin:0 6px 6px 0">Ezt választom</a>${it.url ? `<a href="${esc(it.url)}" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;font-size:13px;padding:9px 17px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 6px">Az autó adatlapja ↗</a>` : ''}</div>
       </td></tr>
     </table>
   </td></tr>`).join('');
   return `<p>Kedves ${esc(clientName || 'Ügyfelünk')}!</p>
-<p>Köszönjük megkeresését! Az Ön igényei alapján az alábbi ${items.length > 1 ? 'ajánlatokat' : 'ajánlatot'} állítottuk össze.${items.length > 1 ? ' Válassza ki, melyik autó érdekli – mindegyiknél látja, mennyibe kerül.' : ''}</p>
+<p>Köszönjük megkeresését! Az Ön igényei alapján az alábbi ${items.length > 1 ? 'ajánlatokat' : 'ajánlatot'} állítottuk össze.${attached ? ` A részletes ${items.length > 1 ? 'ajánlatokat' : 'ajánlatot'} (felszereltséggel, képekkel) a <b>mellékletben</b> találja.` : ''}${items.length > 1 ? ' Válassza ki, melyik autó érdekli – mindegyiknél látja, mennyibe kerül.' : ''}</p>
 ${message ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(message)}</p>` : ''}
 <table width="100%" cellpadding="0" cellspacing="0">${cards}</table>
 <p style="margin:18px 0 8px">A kiválasztott autóra vonatkozó ajánlatot egy kattintással elfogadhatja, vagy módosítást kérhet:</p>
