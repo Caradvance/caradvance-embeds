@@ -1046,6 +1046,21 @@ async function handleSignRevoke(env, user, id, sid) {
   return json({ ok: true });
 }
 
+/* ---------------- konfigurátor-képek átvétele (csak a gyártók képszervereiről; a böngésző JPEG-re alakítja) ---------------- */
+const IMG_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|bmwgroup|mercedes-benz|mercedes|daimler|mbusa|audi|audi-cdn|volkswagen|vw|vwgroup|vwg-connect|cosy)[a-z0-9-]*\.[a-z.]{2,12}(\/|$)/i;
+async function handleImgProxy(url) {
+  const u = String(url.searchParams.get('url') || '').slice(0, 3000);
+  if (!IMG_HOST_RE.test(u)) return json({ error: 'Nem gyártói képcím.' }, 400);
+  try {
+    const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 12000);
+    const r = await fetch(u, { signal: ctrl.signal, redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36', Accept: 'image/avif,image/webp,image/png,image/jpeg,*/*' } });
+    clearTimeout(tm);
+    const ct = r.headers.get('content-type') || '';
+    if (!r.ok || !/^image\//i.test(ct)) return json({ error: 'A kép nem tölthető le (' + r.status + ').' }, 502);
+    const buf = await r.arrayBuffer(); if (buf.byteLength > 12 * 1024 * 1024) return json({ error: 'A kép túl nagy.' }, 413);
+    return new Response(buf, { headers: { 'content-type': ct, 'cache-control': 'private, max-age=600', 'x-content-type-options': 'nosniff' } });
+  } catch (e) { return json({ error: 'A kép nem tölthető le.' }, 502); }
+}
 /* ---------------- gyári konfigurátor link: cím / kép (csak a márkák saját domainjeiről) ---------------- */
 const CFG_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*(bmw|mini|mercedes-benz|mercedes|audi|volkswagen|vw)\.[a-z.]{2,12}(\/|$)/i;
 async function handleCfgMeta(url) {
@@ -1086,6 +1101,7 @@ export async function onRequest(context) {
     if (path === '/fx' && method === 'GET') return json({ rate: await eurHuf() });
     if (path === '/docmeta' && method === 'GET') return await handleDocMeta(env);
     if (path === '/cfgmeta' && method === 'GET') return await handleCfgMeta(url);
+    if (path === '/imgproxy' && method === 'GET') return await handleImgProxy(url);
     if (path === '/templates' && method === 'GET') return await handleTemplates(env, url);
     if (path === '/templates' && method === 'POST') return await handleTemplateSave(request, env, user);
     if (path === '/templates/import' && method === 'POST') return await handleTemplateImport(request, env, user);
