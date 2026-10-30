@@ -1053,7 +1053,7 @@ async function handleTranslate(request, env) {
   const lines = (Array.isArray(b.lines) ? b.lines : []).map((x) => clean(x, 200)).filter(Boolean).slice(0, 150);
   if (!lines.length) return json({ lines: [] });
   if (!env.AI) return json({ error: 'A fordítás nincs beállítva (Workers AI).' }, 501);
-  const out = [];
+  const out = []; const errs = [];
   for (let i = 0; i < lines.length; i += 40) {
     const chunk = lines.slice(i, i + 40);
     const prompt = 'Fordítsd le magyarra az alábbi autó-felszereltségi tételeket (német gyári konfigurátorból). Szabályok: a márka- és termékneveket (pl. BMW Live Cockpit, Driving Assistant Plus, M Sportpaket, Harman Kardon, xDrive, AMG, S line, R-Line, Matrix LED) hagyd eredeti formában; a többit tömör, magyar autós szaknyelven add vissza (pl. Sitzheizung vorn → Ülésfűtés elöl, Anhängerkupplung → Vonóhorog, Metallic-Lackierung → Metálfényezés). Pontosan ugyanannyi tételt adj vissza, ugyanabban a sorrendben, kizárólag egy JSON tömbként (stringek), magyarázat nélkül.\n\n' + JSON.stringify(chunk);
@@ -1061,14 +1061,18 @@ async function handleTranslate(request, env) {
     for (const m of TR_MODELS) {
       try {
         const r = await env.AI.run(m, { messages: [{ role: 'system', content: 'Precíz német–magyar autóipari fordító vagy. Csak JSON tömböt adsz vissza.' }, { role: 'user', content: prompt }], max_tokens: 3000, temperature: 0.1 });
-        const txt = String((r && (r.response ?? r.result?.response)) || '');
-        const mm = txt.match(/\[[\s\S]*\]/); const arr = mm ? JSON.parse(mm[0]) : null;
+        // a Workers AI a JSON-nak látszó választ már objektumként (tömbként) is visszaadhatja
+        let resp = r && (r.response ?? (r.result && r.result.response));
+        let arr = Array.isArray(resp) ? resp : null;
+        if (!arr && resp && typeof resp === 'object') arr = Object.values(resp).find(Array.isArray) || null;
+        if (!arr) { const txt = String(resp || ''); const mm = txt.match(/\[[\s\S]*\]/); try { arr = mm ? JSON.parse(mm[0]) : null; } catch (e) { arr = null; } if (!arr) errs.push(m + ': nem JSON válasz: ' + txt.slice(0, 120)); }
         if (Array.isArray(arr) && arr.length === chunk.length) { res = arr.map((x, k) => clean(String(x || ''), 200) || chunk[k]); break; }
-      } catch (e) { /* következő modell */ }
+        if (Array.isArray(arr)) errs.push(m + ': ' + arr.length + ' tétel jött ' + chunk.length + ' helyett');
+      } catch (e) { errs.push(m + ': ' + String(e && e.message || e).slice(0, 160)); }
     }
     out.push(...(res || chunk));
   }
-  return json({ lines: out, translated: out.some((x, k) => x !== lines[k]) });
+  return json({ lines: out, translated: out.some((x, k) => x !== lines[k]), errors: errs.slice(0, 6) });
 }
 
 /* ---------------- konfigurátor-képek átvétele (csak a gyártók képszervereiről; a böngésző JPEG-re alakítja) ---------------- */
