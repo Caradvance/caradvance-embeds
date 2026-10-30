@@ -219,6 +219,50 @@
     .stbox{width:100%}.stbox select{flex:1}
     .sec>.sb{padding:14px}
   }
+  /* fülek + áttekintés */
+  .tabs{position:sticky;top:var(--tabs-top,64px);z-index:20;display:flex;gap:4px;overflow-x:auto;background:var(--bg);padding:6px 0 10px;margin:-4px 0 10px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{font:inherit;font-size:13px;font-weight:700;color:#5b6472;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+  .tabs button:hover{color:var(--ink);border-color:#d3d8e0}
+  .tabs button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .tabs .bd{font-size:10.5px;font-weight:800;border-radius:999px;padding:1px 7px;background:var(--line2);color:#5b6472}
+  .tabs button.on .bd{background:rgba(255,255,255,.18);color:#fff}
+  .tabs .bd.warn{background:#fff3df;color:#a2660b}.tabs .bd.ok{background:#e7f6ef;color:var(--good)}.tabs .bd.bad{background:#fdeceb;color:var(--bad)}
+  .sec[hidden]{display:none}
+  .steps{display:flex;gap:0;margin:0 0 4px;overflow-x:auto;scrollbar-width:none}
+  .steps .st{flex:1;min-width:110px;position:relative;padding:22px 6px 0;text-align:center;font-size:11.5px;font-weight:700;color:var(--faint);cursor:pointer;background:none;border:0;font-family:inherit}
+  .steps .st::before{content:"";position:absolute;top:8px;left:0;right:0;height:3px;background:var(--line)}
+  .steps .st:first-child::before{left:50%}.steps .st:last-child::before{right:50%}
+  .steps .st i{position:absolute;top:2px;left:50%;transform:translateX(-50%);width:15px;height:15px;border-radius:50%;background:#fff;border:3px solid var(--line);font-style:normal}
+  .steps .st.done{color:var(--muted)}.steps .st.done::before{background:var(--good)}.steps .st.done i{border-color:var(--good);background:var(--good)}
+  .steps .st.cur{color:var(--ink)}.steps .st.cur::before{background:linear-gradient(90deg,var(--good) 50%,var(--line) 50%)}.steps .st.cur i{border-color:var(--red);background:#fff;box-shadow:0 0 0 4px var(--red-tint)}
+  .steps .st.cur.warn i{border-color:#d08a1a;box-shadow:0 0 0 4px #fff3df}.steps .st.cur.bad i{border-color:var(--bad);box-shadow:0 0 0 4px #fdeceb}
+  .steps .st:first-child.cur::before{background:var(--line)}
+  .steps .st small{display:block;font-weight:600;font-size:10.5px;margin-top:2px}
+  .ov-g{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start}
+  @media(max-width:900px){.ov-g{grid-template-columns:1fr}}
+  .todo{display:grid;gap:7px}
+  .todo .td{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;font-size:13px}
+  .todo .td .ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:var(--line2);font-size:13px}
+  .todo .td.warn .ic{background:#fff3df}.todo .td.bad .ic{background:#fdeceb}.todo .td.wait .ic{background:#e8eefb}.todo .td.ok .ic{background:#e7f6ef}
+  .todo .td .tx{flex:1;min-width:0}.todo .td .tx b{display:block;font-size:13px}.todo .td .tx span{font-size:12px;color:var(--muted)}
+  .todo .td .go{font:inherit;font-size:12px;font-weight:700;color:var(--ink);background:var(--line2);border:0;border-radius:8px;padding:6px 10px;cursor:pointer;white-space:nowrap}.todo .td .go:hover{background:#e6e9ee}
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:560px){.cards{grid-template-columns:1fr}}
+  .card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;cursor:pointer;text-align:left;font:inherit;color:inherit;display:flex;flex-direction:column;justify-content:flex-start;width:100%}
+  .card:hover{border-color:#d3d8e0;box-shadow:var(--shadow)}
+  .card .ch{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .card .ch .sp{flex:1}.card .ch .ar{color:var(--faint);font-size:13px;text-transform:none}
+  .card .cv{font-size:14px;font-weight:800;line-height:1.3}
+  .card .cs{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .card .bar{height:5px;border-radius:999px;background:var(--line2);overflow:hidden;margin-top:8px}.card .bar i{display:block;height:100%}
+  .card .vimg{width:100%;height:84px;border-radius:8px;background:var(--line2) center/cover no-repeat;margin-bottom:8px}
+  .recent{list-style:none;margin:0;padding:0}
+  .recent li{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line2);font-size:12.5px}.recent li:last-child{border-bottom:0}
+  .recent .t{color:var(--faint);white-space:nowrap;font-size:11.5px;min-width:86px}
+  .acts-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 12px}
+  .acts-bar .btn.on{border-color:var(--red)!important;color:var(--red)!important;background:var(--red-tint)!important}
+  details.how{font-size:12px;color:var(--muted);margin-bottom:8px}details.how summary{cursor:pointer;font-weight:700}
   .dm-list{display:grid;gap:8px;margin-bottom:14px}
   .dm-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff}
   .dm-row.on{border-color:var(--red-tint2);background:#fffafa}
@@ -302,7 +346,7 @@ function fmtSize(n){return n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Mat
 
 /* ---------------- mentés állapotjelző ---------------- */
 function saving(){var el=$('saveSt');el.className='savest';el.textContent='Mentés…';}
-function saved(){refreshLog();var el=$('saveSt');el.className='savest ok';el.textContent='✓ Mentve';clearTimeout(saved._t);saved._t=setTimeout(function(){el.textContent='';},2500);}
+function saved(){refreshLog();ovSoon();var el=$('saveSt');el.className='savest ok';el.textContent='✓ Mentve';clearTimeout(saved._t);saved._t=setTimeout(function(){el.textContent='';},2500);}
 function saveErr(e){var el=$('saveSt');el.className='savest err';el.textContent='Hiba!';toast('Mentési hiba: '+(e&&e.message||e),4500);}
 
 /* ---------------- betöltés ---------------- */
@@ -343,6 +387,7 @@ function renderHead(){
     +(em?'<a href="mailto:'+esc(em)+'">✉ '+esc(em)+'</a>':'')
     +'<span>Jelentkezett: '+esc(fmtDate(d.created_at))+'</span>'
     +(d.ch?'<span>Csatorna: '+esc(d.ch)+'</span>':'');
+  if(window.ovSoon&&$('b0'))ovSoon();
   $('statusSel').innerHTML=S.statuses.map(function(s,i){return '<option'+(s===S.card.status?' selected':'')+'>'+esc(s)+'</option>';}).join('');
 }
 $('statusSel').addEventListener('change',function(){
@@ -350,17 +395,128 @@ $('statusSel').addEventListener('change',function(){
   api('/card/'+ID,{method:'PATCH',body:{status:v}}).then(function(){S.card.status=v;saved();}).catch(saveErr);
 });
 
+var TABS=[['ov','Áttekintés'],['s1','Ügyfél'],['s2','Autók'],['s4','Ajánlat'],['s5','Dokumentumok'],['s6','Pénzügy'],['s7','Napló']];
+var TAB_SECS={ov:['s0','s3'],s1:['s1'],s2:['s2'],s4:['s4'],s5:['s5'],s6:['s6'],s7:['s7']};
+var TAB=(function(){var h=(location.hash||'').replace('#','');if(h==='s3'||h==='s0')return 'ov';return TAB_SECS[h]?h:'ov';})();
 function renderAll(){
   $('root').innerHTML=
-    '<div class="jump"><a href="#s1">1. Ügyfél adatai</a><a href="#s2">2. Gépjárművek</a><a href="#s3">3. Checklist</a><a href="#s4">4. Ajánlat</a><a href="#s5">5. Szerződés és dokumentumok</a><a href="#s6">6. Pénzügy</a><a href="#s7">7. Történésnapló</a></div>'
-    +'<section class="sec" id="s1"><div class="sh"><span class="num">1</span><h2>Ügyfél személyes adatai</h2></div><div class="sb" id="b1"></div></section>'
-    +'<section class="sec" id="s2"><div class="sh"><span class="num">2</span><h2>Gépjárművek</h2></div><div class="sb" id="b2"></div></section>'
-    +'<section class="sec" id="s3"><div class="sh"><span class="num">3</span><h2>Checklist</h2><span class="sp"></span><div class="prog"><i id="clProg"></i></div><span class="hint" id="clCnt"></span></div><div class="sb" id="b3"></div></section>'
-    +'<section class="sec" id="s4"><div class="sh"><span class="num">4</span><h2>Ajánlat készítő</h2><span class="sp"></span><span class="hint">'+esc(S.deal.line)+' készlet</span></div><div class="sb" id="b4"></div></section>'
-    +'<section class="sec" id="s5"><div class="sh"><span class="num">5</span><h2>Szerződés és dokumentumok</h2></div><div class="sb" id="b5"></div></section>'
-    +'<section class="sec" id="s6"><div class="sh"><span class="num">6</span><h2>Pénzügy</h2><span class="sp"></span><span class="hint" id="finHead"></span></div><div class="sb" id="bFin"></div></section>'
-    +'<section class="sec" id="s7"><div class="sh"><span class="num">7</span><h2>Történésnapló</h2><span class="sp"></span><span class="hint" id="logCnt"></span></div><div class="sb" id="b7"></div></section>';
-  renderPersonal();renderVehicle();renderChecklist();renderOffer();renderContract();renderFin();renderLog();
+    '<nav class="tabs" id="tabs">'+TABS.map(function(t){return '<button data-tab="'+t[0]+'"'+(t[0]===TAB?' class="on"':'')+'>'+t[1]+'<span class="bd" id="bd_'+t[0]+'" hidden></span></button>';}).join('')+'</nav>'
+    +'<section class="sec" id="s0"><div class="sh"><h2>Áttekintés</h2><span class="sp"></span><span class="hint" id="ovSt"></span></div><div class="sb" id="b0"></div></section>'
+    +'<section class="sec" id="s3"><div class="sh"><h2>Checklist</h2><span class="sp"></span><div class="prog"><i id="clProg"></i></div><span class="hint" id="clCnt"></span></div><div class="sb" id="b3"></div></section>'
+    +'<section class="sec" id="s1"><div class="sh"><h2>Ügyfél adatai</h2><span class="sp"></span><span class="hint">A mezők automatikusan mentődnek.</span></div><div class="sb" id="b1"></div></section>'
+    +'<section class="sec" id="s2"><div class="sh"><h2>Autók</h2></div><div class="sb" id="b2"></div></section>'
+    +'<section class="sec" id="s4"><div class="sh"><h2>Ajánlat készítő</h2><span class="sp"></span><span class="hint">'+esc(S.deal.line)+' készlet</span></div><div class="sb" id="b4"></div></section>'
+    +'<section class="sec" id="s5"><div class="sh"><h2>Dokumentumok és aláírás</h2></div><div class="sb" id="b5"></div></section>'
+    +'<section class="sec" id="s6"><div class="sh"><h2>Pénzügy</h2><span class="sp"></span><span class="hint" id="finHead"></span></div><div class="sb" id="bFin"></div></section>'
+    +'<section class="sec" id="s7"><div class="sh"><h2>Történésnapló</h2><span class="sp"></span><span class="hint" id="logCnt"></span></div><div class="sb" id="b7"></div></section>';
+  $('tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(b)setTab(b.getAttribute('data-tab'));});
+  showTab();
+  renderPersonal();renderVehicle();renderChecklist();renderOffer();renderContract();renderFin();renderLog();renderOverview();
+}
+function showTab(){
+  var on=TAB_SECS[TAB]||TAB_SECS.ov;
+  document.querySelectorAll('#root>section.sec').forEach(function(x){x.hidden=on.indexOf(x.id)<0;});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===TAB);});
+  var top=document.querySelector('.top');if(top)document.documentElement.style.setProperty('--tabs-top',(top.getBoundingClientRect().bottom>0?top.offsetHeight+(parseInt(getComputedStyle(top).top)||0):0)+'px');
+}
+function setTab(t){if(!TAB_SECS[t])t='ov';TAB=t;showTab();try{history.replaceState(null,'','#'+t);}catch(e){}if(t==='ov')renderOverview();var tb=$('tabs');if(tb&&window.scrollY>tb.offsetTop)window.scrollTo(0,Math.max(0,$('root').offsetTop-80));}
+window.addEventListener('hashchange',function(){var h=(location.hash||'').replace('#','');if(h==='s3')h='ov';if(TAB_SECS[h]&&h!==TAB)setTab(h);});
+
+/* ---------------- áttekintés: státusz-folyamat, teendők, összefoglaló kártyák, legutóbbi események ---------------- */
+var STEP_MAIN=['Kapcsolatfelvételre vár','Ajánlatra vár','Ajánlat kiküldve','Ajánlat elfogadva','Megvalósítás','Lezárva'];
+var STEP_LBL=['Kapcsolatfelvétel','Ajánlatra vár','Ajánlat kiküldve','Elfogadva','Megvalósítás','Lezárva'];
+var __ov=null;
+function ovSoon(){clearTimeout(__ov);__ov=setTimeout(renderOverview,60);}
+function personMissing(P,kind){
+  var req=[['name','név'],['phone','telefonszám'],['email','e-mail'],['address','cím'],['id_number','személyi ig. szám'],['birth_place','születési hely'],['birth_date','születési idő'],['mother_name','anyja neve'],['address_card','lakcímkártya szám']];
+  return req.filter(function(r){return !String(P[r[0]]||'').trim();}).map(function(r){return r[1];});
+}
+function ovTodos(){
+  var T=[],d=S.card.data,cl=S.card.checklist||{};
+  var go=function(tab,lbl){return {tab:tab,lbl:lbl||'Megnyitás'};};
+  // ügyfél adatai
+  var miss=personMissing(d.person);
+  if(d.kind==='ceg'&&(!d.company.name||!d.company.tax))miss.unshift('cégadatok');
+  var drp=(DR.list||[]).filter(function(r){return r.status==='pending';})[0];
+  if(drp)T.push({c:'wait',i:'✉',t:'Adatbekérés kiküldve — kitöltésre vár',s:'Kiküldve: '+fmtDate(drp.created_at)+(drp.opened_at?' · megnyitotta: '+fmtDate(drp.opened_at):' · még nem nyitotta meg'),a:go('s1')});
+  else if(miss.length)T.push({c:'warn',i:'👤',t:'Hiányzó ügyféladatok ('+miss.length+')',s:miss.slice(0,5).join(', ')+(miss.length>5?' …':'')+' — küldj adatbekérő e-mailt, vagy töltsd ki',a:go('s1','Kitöltés')});
+  if(isSale()){var bm=personMissing(d.buyer.person);if(bm.length&&bm.length<9)T.push({c:'warn',i:'🤝',t:'Hiányzó vevő-adatok ('+bm.length+')',s:bm.slice(0,5).join(', '),a:go('s1','Kitöltés')});}
+  // autó
+  if(!vehs().length)T.push({c:'warn',i:'🚗',t:'Még nincs autó az ügyfélnél',s:'Válassz a készletből, vagy küldj ajánlatot — az elfogadott autó automatikusan bekerül',a:go('s2','Autó hozzáadása')});
+  vehs().forEach(function(v){var r=rentState(v);if(r&&r.cls!=='ok')T.push({c:r.cls==='bad'?'bad':'warn',i:'⏰',t:'Bérlet: '+r.txt,s:vehName(v)+' · lejárat: '+huD(v.rent_end),a:go('s2')});});
+  // ajánlat
+  var O=S.offers||[],lo=O[0];
+  if(!O.length){if(STEP_MAIN.indexOf(S.card.status)<3)T.push({c:'',i:'✉',t:'Még nem ment ki ajánlat',s:'Állíts össze ajánlatot a készletből vagy gyári konfigurátorból',a:go('s4','Ajánlat készítése')});}
+  else if(lo.sent&&!lo.responded_at)T.push({c:'wait',i:'⏳',t:'Az ajánlat válaszra vár',s:'Kiküldve: '+fmtDate(lo.created_at)+' · '+lo.items.length+' autó',a:go('s4')});
+  else if(lo.responded_at&&lo.action!=='elfogad')T.push({c:'warn',i:'✎',t:'Az ügyfél módosítást kért',s:(lo.client_msg||'').slice(0,120)||'Válasz: '+fmtDate(lo.responded_at),a:go('s4','Új ajánlat')});
+  // dokumentumok
+  if(DM.loaded){
+    var mi=DM.docs.filter(function(x){return x.missing_n&&!x.sign_status;});
+    if(mi.length)T.push({c:'bad',i:'⚠',t:mi.length+' dokumentumban hiányzó adat',s:mi.map(function(x){return x.name;}).slice(0,3).join(', '),a:go('s5')});
+    var pend=(DM.signs||[]).filter(function(r){return r.status==='pending';});
+    pend.forEach(function(r){T.push({c:'wait',i:'✍',t:(r.role==='partner'?'Partner ellenjegyzésére vár':'Aláírásra vár')+': '+r.signer,s:r.docs.length+' dokumentum · kiküldve: '+fmtDate(r.created_at)+(r.opened_at?' · megnyitva':' · még nem nyitotta meg'),a:go('s5')});});
+    var drafts=DM.docs.filter(function(x){return !x.sign_status&&!x.sent_at&&!x.missing_n;});
+    if(drafts.length&&!pend.length)T.push({c:'',i:'📄',t:drafts.length+' dokumentum még nincs kiküldve',s:drafts.map(function(x){return x.name;}).slice(0,3).join(', '),a:go('s5','Küldés / aláírás')});
+    if(!DM.docs.length&&STEP_MAIN.indexOf(S.card.status)>=3)T.push({c:'',i:'📄',t:'Szerződés / meghatalmazás még nem készült',s:'Töltsd ki sablonból az ügyfél és az autó adataival',a:go('s5','Dokumentum készítése')});
+  }
+  // pénzügy
+  var F=S.fin&&S.fin.items||[];
+  if(STEP_MAIN.indexOf(S.card.status)>=3&&vehs().some(function(v){return v.price>0;})&&!F.some(function(x){return x.kind==='income';}))T.push({c:'',i:'💰',t:'Bevétel még nincs rögzítve',s:'Az autó ára egy kattintással felvehető',a:go('s6')});
+  // következő checklist-feladat
+  var ph=S.checklist.phases.filter(function(p){return p.items.some(function(c){return !(cl[c[0]]&&cl[c[0]].done);});})[0];
+  if(ph){var nx=ph.items.filter(function(c){return !(cl[c[0]]&&cl[c[0]].done);});T.push({c:'',i:'✓',t:'Következő feladat: '+nx[0][1],s:(ph.title?ph.title+' · ':'')+'még '+nx.length+' nyitott tétel',a:{scroll:'s3',lbl:'Checklist'}});}
+  return T;
+}
+function renderOverview(){
+  var el=$('b0');if(!el||!S.card)return;
+  var d=S.card.data,P=d.person,st=S.card.status,si=STEP_MAIN.indexOf(st),cls='';
+  if(st==='Ajánlat módosítva'){si=2;cls=' warn';}else if(st==='Ajánlat elutasítva'){si=3;cls=' bad';}
+  var steps='<div class="steps">'+STEP_MAIN.map(function(x,i){return '<button class="st'+(i<si?' done':i===si?' cur'+cls:'')+'" data-step="'+esc(x)+'" title="Státusz: '+esc(x)+'"><i></i>'+esc(STEP_LBL[i])+(i===si&&cls?'<small>'+esc(st)+'</small>':'')+'</button>';}).join('')+'</div>';
+  var T=ovTodos();
+  var todo='<div class="sub-h" style="margin-top:18px">Teendők'+(T.length?' ('+T.length+')':'')+'</div>'+(T.length?'<div class="todo">'+T.map(function(t,k){return '<div class="td '+t.c+'"><span class="ic">'+t.i+'</span><span class="tx"><b>'+esc(t.t)+'</b><span>'+esc(t.s||'')+'</span></span><button class="go" data-todo="'+k+'">'+esc(t.a.lbl)+' →</button></div>';}).join('')+'</div>':'<div class="hint">Nincs nyitott teendő. 👍</div>');
+  // kártyák
+  var miss=personMissing(P),pct=Math.round((9-miss.length)/9*100);
+  var who=d.kind==='ceg'&&d.company.name?d.company.name:(P.name||S.deal.name||'—');
+  var c1='<button class="card" data-go="s1"><div class="ch">Ügyfél<span class="sp"></span><span class="ar">→</span></div><div class="cv">'+esc(who)+'</div><div class="cs">'+esc([d.kind==='ceg'?'Cég'+(P.name?' · '+P.name:''):'Magánszemély',P.phone,P.email].filter(Boolean).join(' · '))+'<br>'+esc(P.address||'cím nincs megadva')+'</div>'
+    +'<div class="bar"><i style="width:'+pct+'%;background:'+(pct===100?'var(--good)':'var(--red)')+'"></i></div><div class="cs">Adatok: '+pct+'%'+(miss.length?' · hiányzik: '+esc(miss.slice(0,3).join(', '))+(miss.length>3?' …':''):' — teljes')+'</div></button>';
+  var V=vehs(),v0=V[0];
+  var c2='<button class="card" data-go="s2"><div class="ch">Autó'+(V.length>1?' ('+V.length+')':'')+'<span class="sp"></span><span class="ar">→</span></div>'+(v0?(v0.image?'<div class="vimg" style="background-image:url(\''+esc(v0.image)+'\')"></div>':'')+'<div class="cv">'+esc(vehName(v0,0))+'</div><div class="cs">'+esc([v0.year,v0.fuel,v0.km?v0.km+' km':'',v0.plate].filter(Boolean).join(' · '))+(v0.price?'<br><b style="color:var(--ink)">'+fmtPrice(v0.price,v0.currency)+(v0.period?' / '+esc(v0.period):'')+'</b>':'')+(V.length>1?'<br>+ '+(V.length-1)+' további autó':'')+'</div>':'<div class="cv" style="color:var(--faint)">Nincs még autó</div>'+(S.deal.car?'<div class="cs">Érdeklődött: '+esc(S.deal.car)+'</div>':''))+'</button>';
+  var O=S.offers||[],lo=O[0];
+  var opill=!lo?'':!lo.sent?'<span class="pill bad">Nem ment ki</span>':!lo.responded_at?'<span class="pill wait">Válaszra vár</span>':lo.action==='elfogad'?'<span class="pill ok">Elfogadva</span>':'<span class="pill mod">Módosítást kért</span>';
+  var ch=lo&&lo.responded_at&&lo.choice!=null?lo.items[lo.choice]:null;
+  var c3='<button class="card" data-go="s4"><div class="ch">Ajánlat'+(O.length?' ('+O.length+')':'')+'<span class="sp"></span>'+opill+'</div>'+(lo?'<div class="cv">'+esc(ch?ch.title:lo.items.length+' autó')+'</div><div class="cs">'+(ch?fmtPrice(ch.price,ch.currency)+(ch.period?' / '+esc(ch.period):'')+' · ':'')+'kiküldve: '+esc(fmtDate(lo.created_at))+'</div>':'<div class="cv" style="color:var(--faint)">Még nem ment ki ajánlat</div>')+'</button>';
+  var Ds=DM.docs||[],sg=Ds.filter(function(x){return x.sign_status==='signed';}).length,pw=Ds.filter(function(x){return x.sign_status==='pending'||x.sign_status==='cosign';}).length;
+  var c4='<button class="card" data-go="s5"><div class="ch">Dokumentumok<span class="sp"></span><span class="ar">→</span></div><div class="cv">'+(Ds.length?Ds.length+' dokumentum':'<span style="color:var(--faint)">Még nincs dokumentum</span>')+'</div><div class="cs">'+(Ds.length?'<span style="color:var(--good);font-weight:700">'+sg+' aláírva</span>'+(pw?' · <span style="color:#a2660b;font-weight:700">'+pw+' aláírásra vár</span>':'')+' · ':'')+(S.files||[]).length+' feltöltött fájl</div>'
+    +(Ds.length?'<div class="bar"><i style="width:'+Math.round(sg/Ds.length*100)+'%;background:var(--good)"></i></div>':'')+'</button>';
+  var fs=finSum();
+  var c5='<button class="card" data-go="s6"><div class="ch">Pénzügy<span class="sp"></span><span class="ar">→</span></div><div class="cv" style="color:'+(fs.profit>=0?'var(--good)':'var(--bad)')+'">'+ft(fs.profit)+' <span class="hint" style="font-weight:600">haszon</span></div><div class="cs">Bevétel: '+ft(fs.income)+' · Költség: '+ft(fs.cost)+(fs.margin!=null?' · árrés: '+String(fs.margin).replace('.',',')+'%':'')+'</div></button>';
+  var cl=S.card.checklist||{},it=clItems(),dn=it.filter(function(c){return cl[c[0]]&&cl[c[0]].done;}).length,cp=it.length?Math.round(dn/it.length*100):0;
+  var c6='<button class="card" data-scroll="s3"><div class="ch">Checklist<span class="sp"></span><span class="ar">↓</span></div><div class="cv">'+cp+'% kész</div><div class="cs">'+dn+' / '+it.length+' feladat</div><div class="bar"><i style="width:'+cp+'%;background:'+(cp===100?'var(--good)':'var(--red)')+'"></i></div></button>';
+  // legutóbbi események
+  var ev=(S.events||[]).slice(0,6);
+  var rec='<div class="sub-h" style="display:flex;align-items:center">Legutóbbi események<span style="flex:1"></span><button class="lnk" data-go="s7">Teljes napló →</button></div>'+(ev.length?'<ul class="recent">'+ev.map(function(e){return '<li><span class="t">'+esc(fmtDate(e.at))+'</span><span>'+(LOG_IC[e.kind]||'•')+' '+esc(e.text)+(e.actor?' <span class="hint">· '+esc(e.actor)+'</span>':'')+'</span></li>';}).join('')+'</ul>':'<div class="hint">Még nincs esemény.</div>');
+  var notes='<div class="fld" style="margin-top:16px"><label>Belső jegyzet</label><textarea id="ovNotes" rows="3" placeholder="Bármi, amit a kollégáknak tudni kell az ügyfélről…">'+esc(d.notes||'')+'</textarea></div>';
+  var keepFocus=document.activeElement&&document.activeElement.id==='ovNotes';
+  if(keepFocus){var cur=$('ovNotes');var sel=[cur.selectionStart,cur.selectionEnd];}
+  el.innerHTML=steps+'<div class="ov-g"><div>'+todo+notes+'</div><div><div class="sub-h" style="margin-top:18px">Összefoglaló</div><div class="cards">'+c1+c2+c3+c4+c5+c6+'</div>'+rec+'</div></div>';
+  $('ovSt').innerHTML='Státusz: <b style="color:var(--ink)">'+esc(st)+'</b>';
+  if(keepFocus){var n=$('ovNotes');n.focus();try{n.setSelectionRange(sel[0],sel[1]);}catch(e){}}
+  $('ovNotes').addEventListener('input',function(){S.card.data.notes=this.value;saveDataSoon();});
+  el.querySelectorAll('[data-step]').forEach(function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-step');if(v===S.card.status)return;if(!confirm('Státusz módosítása: '+v+'?'))return;$('statusSel').value=v;$('statusSel').dispatchEvent(new Event('change'));});});
+  el.querySelectorAll('[data-todo]').forEach(function(b){b.addEventListener('click',function(){var a=T[+b.getAttribute('data-todo')].a;if(a.scroll){var x=$(a.scroll);if(x)x.scrollIntoView({behavior:'smooth',block:'start'});}else setTab(a.tab);});});
+  el.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){setTab(b.getAttribute('data-go'));});});
+  el.querySelectorAll('[data-scroll]').forEach(function(b){b.addEventListener('click',function(){var x=$(b.getAttribute('data-scroll'));if(x)x.scrollIntoView({behavior:'smooth',block:'start'});});});
+  tabBadges(T);
+}
+function tabBadges(T){
+  var set=function(t,txt,c){var b=$('bd_'+t);if(!b)return;b.hidden=!txt;b.textContent=txt||'';b.className='bd'+(c?' '+c:'');};
+  set('ov',T&&T.length?String(T.length):'',T&&T.some(function(x){return x.c==='bad';})?'bad':'warn');
+  var miss=personMissing(S.card.data.person);set('s1',miss.length?'!':'',miss.length?'warn':'');
+  set('s2',vehs().length?String(vehs().length):'');
+  var lo=(S.offers||[])[0];set('s4',lo?(!lo.responded_at?'vár':lo.action==='elfogad'?'✓':'módosít'):'',lo?(!lo.responded_at?'':lo.action==='elfogad'?'ok':'warn'):'');
+  var Ds=DM.docs||[],pw=Ds.filter(function(x){return x.sign_status==='pending'||x.sign_status==='cosign';}).length;
+  set('s5',Ds.length?(pw?pw+' vár':String(Ds.length)):'',pw?'warn':'');
+  set('s7',(S.events||[]).length?String((S.events||[]).length+1):'');
 }
 
 /* ---------------- 1. személyes adatok ---------------- */
@@ -396,7 +552,7 @@ function renderPersonal(){
       +inp('buyer.person.address','Cím',bp.address,'text',' wide')+(B.kind==='magan'?inp('buyer.person.tax','Adószám / adóazonosító',bp.tax):'')+'</div>'
       +idBlock('buyer.person',bp,'A vevő okmányadatai');
   }
-  h+='<div class="drq" id="drq"></div>';
+  h='<div class="drq" id="drq"></div>'+h;
   $('b1').innerHTML=h;
   renderDR();if(!DR.loaded)loadDR();
   var bs=$('buyerSeg');if(bs)bs.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;d.buyer.kind=b.getAttribute('data-k');renderPersonal();saveData();});
@@ -414,16 +570,16 @@ function loadDR(){return api('/card/'+ID+'/datareq').then(function(j){
   clearTimeout(DR.t);if(DR.list.some(function(r){return r.status==='pending';}))DR.t=setTimeout(loadDR,30000);
 }).catch(function(){DR.loaded=true;});}
 function renderDR(){
-  var el=$('drq');if(!el)return;
+  var el=$('drq');if(!el)return;ovSoon();
   var ST={pending:['wait','⏳ kiküldve, kitöltésre vár'],done:['ok','✓ kitöltve, beküldve'],expired:['off','lejárt'],revoked:['off','visszavonva'],saving:['wait','feldolgozás…']};
   var roles=isSale()?[['client','Bérlő'],['buyer','Vevő']]:[['client','Ügyfél']];
-  var h='<div class="sub-h">Adatbekérés az ügyféltől</div><div class="hint" style="margin-bottom:8px">Az ügyfél e-mailben kap egy biztonságos linket. Ott megadja a személyes (céges) adatait, és feltölti a személyi igazolvány és a lakcímkártya másolatát. Beküldés után az adatok ide kerülnek, a fájlok a feltöltött fájlok közé, és a checklisten kipipálódik az „Igazolvány másolatok” feladat. Ha nyitva van az adatlap, beküldés után frissítsd az oldalt, hogy ne írd felül a beérkezett adatokat.</div>'
-    +'<div class="row" style="display:flex;gap:8px;flex-wrap:wrap">'+roles.map(function(r){return '<button class="btn sm" data-drs="'+r[0]+'">✉ Adatbekérő e-mail'+(roles.length>1?' — '+r[1]:'')+'</button>';}).join('')+'</div>';
-  if(DR.list.length)h+='<div class="sgl" style="margin-top:8px">'+DR.list.slice(0,6).map(function(r){var st=ST[r.status]||['off',r.status];
+  var h='<div class="req" style="background:#f7f9fc;border-color:var(--line)"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>Adatbekérés az ügyféltől</b><br><span class="hint">Az ügyfél e-mailben kap egy linket: megadja az adatait és feltölti a személyi igazolvány és a lakcímkártya másolatát. Beküldés után az adatok ide kerülnek, és a checklist kipipálódik.</span></span>'
+    +roles.map(function(r){return '<button class="btn dark sm" data-drs="'+r[0]+'">✉ Adatbekérő e-mail'+(roles.length>1?' — '+r[1]:'')+'</button>';}).join('')+'</div>';
+  if(DR.list.length)h+='<div class="sgl" style="margin-top:8px">'+DR.list.slice(0,3).map(function(r){var st=ST[r.status]||['off',r.status];
     return '<div class="sgr"><div class="h"><span class="sgb '+st[0]+'">'+st[1]+'</span><b>#'+r.id+' · '+esc(r.name||'')+(r.role==='buyer'?' (vevő)':'')+'</b><span class="hint">'+esc(r.email)+'</span><span style="flex:1"></span>'+(r.status==='pending'?'<button class="lnk del" data-drr="'+r.id+'">Visszavonás</button>':'')+'</div>'
       +'<div class="hint">Kiküldve: '+esc(fmtDate(r.created_at))+' ('+esc(r.created_by||'')+')'+(r.opened_at?' · megnyitva: '+esc(fmtDate(r.opened_at)):'')+(r.submitted_at?' · <b style="color:var(--good)">beküldve: '+esc(fmtDate(r.submitted_at))+'</b>':'')+'</div>'
       +(r.files&&r.files.length?'<ul>'+r.files.map(function(f){return '<li><a href="'+API+'/card/'+ID+'/files/'+f.id+'" target="_blank" rel="noopener">'+esc(f.name)+'</a></li>';}).join('')+'</ul>':'')+'</div>';}).join('')+'</div>';
-  el.innerHTML=h;
+  el.innerHTML=h+'</div>';
   el.querySelectorAll('[data-drs]').forEach(function(b){b.addEventListener('click',function(){
     var role=b.getAttribute('data-drs');if(!confirm('Kiküldjük az adatbekérő e-mailt '+(role==='buyer'?'a vevőnek':'az ügyfélnek')+'? (A korábbi, még nyitott link érvénytelenné válik.)'))return;
     b.disabled=true;var go=function(){return api('/card/'+ID+'/datareq',{method:'POST',body:{role:role}});};
@@ -607,7 +763,7 @@ function renderChecklist(){
   }).join('')+(rule==='all'?'<div class="hint" style="margin-top:12px">Ha mindkét ütem minden feladata kész, a státusz „Lezárva” lesz.</div>':'');
   var pct=Math.round(done/items.length*100);
   $('clProg').style.width=pct+'%';$('clProg').style.background=done===items.length?'var(--good)':'var(--red)';
-  $('clCnt').innerHTML='<b style="color:var(--ink);font-size:14px">'+pct+'% kész</b> · '+done+' / '+items.length;
+  $('clCnt').innerHTML='<b style="color:var(--ink);font-size:14px">'+pct+'% kész</b> · '+done+' / '+items.length;ovSoon();
   $('b3').querySelectorAll('input[data-k]').forEach(function(el){
     el.addEventListener('change',function(){
       var k=el.getAttribute('data-k');
@@ -644,7 +800,7 @@ function renderOffer(){
     +'<div id="oTab"></div>'
     +'<div class="sub-h">Az ajánlatban szereplő autók</div><div class="picked" id="picked"></div>'
     +'<div class="fld" style="margin-top:14px"><label>Kísérő üzenet az ügyfélnek (nem kötelező)</label><textarea id="offMsg" rows="3" placeholder="Pl. Az árak bruttó árak, az ajánlat 7 napig érvényes."></textarea></div>'
-    +'<div class="actions"><button class="btn red" id="sendOffer">Ajánlat küldése e-mailben</button><span class="hint">Címzett: <b>'+esc(em||'— nincs e-mail cím —')+'</b> · küldés után a státusz: <b>Ajánlat kiküldve</b> · az ügyfél által választott autó adatai a 2. pontba töltődnek</span></div>'
+    +'<div class="actions"><button class="btn red" id="sendOffer">Ajánlat küldése e-mailben</button><span class="hint">Címzett: <b>'+esc(em||'— nincs e-mail cím —')+'</b> · küldés után a státusz: <b>Ajánlat kiküldve</b> · az ügyfél által választott autó az Autók fülre kerül</span></div>'
     +'<div class="sub-h">Kiküldött ajánlatok</div><div class="offers" id="offers"></div>';
   $('b4').innerHTML=h;
   $('oTabs').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;OTAB=b.getAttribute('data-t');[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});renderOTab();});
@@ -1051,7 +1207,7 @@ function sendOffer(){
   var noId=PICK.filter(function(p){return p.src==='mobile'&&!/^\d{6,12}$/.test(p.ad_id||'');});
   if(noId.length)return toast('A mobile.de autóknál add meg a hirdetés-azonosítót.',4000);
   var em=S.card.data.person.email||S.deal.email;
-  if(!em)return toast('Az ügyfélnek nincs e-mail címe (1. szekció).',4000);
+  if(!em)return toast('Az ügyfélnek nincs e-mail címe (Ügyfél fül).',4000);
   var nPdf=PICK.filter(function(p){return p.file_id;}).length;
   if(!confirm('Elküldöd az ajánlatot ('+PICK.length+' autó'+(nPdf?', '+nPdf+' konfigurátoros PDF csatolva':'')+') erre a címre: '+em+'?'))return;
   var b=$('sendOffer');b.disabled=true;b.textContent='Küldés…';
@@ -1066,7 +1222,7 @@ function sendOffer(){
   }).then(function(){b.disabled=false;b.textContent='Ajánlat küldése e-mailben';});
 }
 function renderOffers(){
-  var el=$('offers');if(!el)return;
+  var el=$('offers');if(!el)return;ovSoon();
   if(!S.offers.length){el.innerHTML='<div class="hint">Még nem ment ki ajánlat.</div>';return;}
   el.innerHTML=S.offers.map(function(o){
     var pill=!o.sent?'<span class="pill bad">Nem ment ki</span>':!o.responded_at?'<span class="pill wait">Válaszra vár</span>':o.action==='elfogad'?'<span class="pill ok">Elfogadva</span>':'<span class="pill mod">Módosítást kért</span>';
@@ -1088,11 +1244,11 @@ function renderContract(){
   var c=draftOf(ckey());
   var L=vehs();
   var h='<div id="dm"><div class="loading" style="padding:18px">Dokumentumok betöltése…</div></div>'
-    +'<div class="sub-h">Feltöltött fájlok</div>'
+    +'<div class="sub-h" style="margin-top:22px">Feltöltött fájlok <span class="hint" id="filesCnt" style="text-transform:none;letter-spacing:0"></span></div>'
     +'<div class="docs" id="docs"></div>'
     +'<div class="actions"><label class="btn ghost sm" style="cursor:pointer">+ Fájl feltöltése<input type="file" id="docUp" multiple style="display:none"></label><span class="hint">PDF / kép, max. 9 MB fájlonként. A bepipált fájlok a dokumentumokkal együtt küldhetők.</span></div>'
     +'<details class="vbox" id="legacyCt" style="margin-top:22px"'+(LEGACY_OPEN?' open':'')+'><summary>Beépített szerződés-tervezet (régi szerkesztő)</summary><div style="margin-top:12px">'
-    +(L.length?'<div class="ctr-veh"><label>Szerződés autója</label><select id="ctrVeh">'+L.map(function(v,i){var d=(S.card.contract&&S.card.contract.drafts)||{};var sent=Object.keys(d).some(function(k){return k.split(':')[0]===v.id&&d[k].sent_at;});return '<option value="'+esc(v.id)+'"'+(v.id===CVID?' selected':'')+'>'+esc((i+1)+'. '+vehName(v,i))+(sent?' ✓ elküldve':'')+'</option>';}).join('')+'</select><span class="hint">Minden autóhoz külön szerződés (és piszkozat) tartozik.</span></div>':'<div class="hint" style="margin-bottom:10px">Tipp: a 2. szekcióban adj hozzá autót — több autónál autónként külön szerződés készíthető.</div>')
+    +(L.length?'<div class="ctr-veh"><label>Szerződés autója</label><select id="ctrVeh">'+L.map(function(v,i){var d=(S.card.contract&&S.card.contract.drafts)||{};var sent=Object.keys(d).some(function(k){return k.split(':')[0]===v.id&&d[k].sent_at;});return '<option value="'+esc(v.id)+'"'+(v.id===CVID?' selected':'')+'>'+esc((i+1)+'. '+vehName(v,i))+(sent?' ✓ elküldve':'')+'</option>';}).join('')+'</select><span class="hint">Minden autóhoz külön szerződés (és piszkozat) tartozik.</span></div>':'<div class="hint" style="margin-bottom:10px">Tipp: az Autók fülön adj hozzá autót — több autónál autónként külön szerződés készíthető.</div>')
     +(isSale()?'<div class="seg" id="tplSeg"><button data-t="berles" class="'+(CTPL==='berles'?'on':'')+'">1. ütem — Bérleti szerződés (bérlő)</button><button data-t="eladas" class="'+(CTPL==='eladas'?'on':'')+'">2. ütem — Adásvételi szerződés (vevő)</button></div>':'')
     +'<div class="actions" style="margin-top:0"><button class="btn dark" id="loadTpl">'+(CT.text?'Tervezet újratöltése (alapértékekkel)':'Szerződéstervezet betöltése ('+esc(tplName())+')')+'</button>'
     +'<span class="hint" id="draftInfo">'+(c.saved_at?'Piszkozat mentve: '+esc(fmtDate(c.saved_at))+(c.saved_by?' · '+esc(c.saved_by):''):'Még nincs mentett piszkozat.')
@@ -1170,7 +1326,7 @@ function pdfPreview(){
 }
 function sendContract(){
   var em=ctrRecipient();
-  if(!em)return toast(CTPL==='eladas'?'A vevőnek nincs e-mail címe (1. szekció, Vevő).':'Az ügyfélnek nincs e-mail címe.',4000);
+  if(!em)return toast(CTPL==='eladas'?'A vevőnek nincs e-mail címe (Ügyfél fül, Vevő).':'Az ügyfélnek nincs e-mail címe.',4000);
   var files=[].slice.call(document.querySelectorAll('#docs input[data-f]:checked')).map(function(i){return parseInt(i.getAttribute('data-f'),10);});
   var empty=CT.fields.filter(function(f){return CT.text.indexOf('{{'+f.key)>=0&&!(CT.vars[f.key]&&String(CT.vars[f.key]).trim());}).map(function(f){return f.label;});
   if(empty.length&&!confirm('Üres mezők a szerződésben: '+empty.join(', ')+'.\nÍgy is elküldöd?'))return;
@@ -1237,7 +1393,13 @@ function renderDM(){
   if(!DM.loaded){dmLoad();return;}
   var h='';
   // lista
-  if(!DM.docs.length)h+='<div class="hint" style="margin-bottom:10px">Még nincs kitöltött dokumentum. Válassz lent egy sablont, és a rendszer kitölti az ügyfél és az autó adataival.</div>';
+  if(DM.panel===undefined)DM.panel=DM.docs.length?'':'new';
+  var nSel0=DM.docs.filter(function(d){return DM.sel[d.id];}).length;
+  h+='<div class="acts-bar"><b style="font-size:13.5px;margin-right:auto">Dokumentumok'+(DM.docs.length?' ('+DM.docs.length+')':'')+(nSel0?' <span class="hint">· '+nSel0+' kijelölve</span>':'')+'</b>'
+    +'<button class="btn ghost sm'+(DM.panel==='new'?' on':'')+'" data-pn="new">＋ Új sablonból</button>'
+    +'<button class="btn ghost sm'+(DM.panel==='sign'?' on':'')+'" data-pn="sign">✍ Aláírásra küldés</button>'
+    +'<button class="btn ghost sm'+(DM.panel==='mail'?' on':'')+'" data-pn="mail">✉ Küldés e-mailben</button></div>';
+  if(!DM.docs.length)h+='<div class="hint" style="margin-bottom:10px">Még nincs kitöltött dokumentum. Válassz egy sablont („＋ Új sablonból”), és a rendszer kitölti az ügyfél és az autó adataival.</div>';
   else h+='<div class="dm-list">'+DM.docs.map(function(d){
     var v=vehById(d.vehicle_id);
     return '<div class="dm-row'+(DM.edit&&DM.edit.id===d.id?' on':'')+'"><input type="checkbox" data-ds="'+d.id+'"'+(DM.sel[d.id]?' checked':'')+' title="Kijelölés küldéshez">'
@@ -1253,7 +1415,8 @@ function renderDM(){
   var T=selTpls(),roles=[];T.forEach(function(t){t.roles.forEach(function(r){if(roles.indexOf(r)<0)roles.push(r);});});
   var misfit=T.filter(function(t){return !tplFits(t);});
   if(DM.nv===''&&vehs().length&&DM.nvInit!==true){DM.nv=CVID||vehs()[0].id;DM.nvInit=true;}
-  h+='<div class="dm-new"><div class="sub-h" style="margin-top:0">Új dokumentumok sablonból <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:600">— több is kijelölhető, egyszerre töltődnek ki</span></div>'
+  var H={};
+  H.new='<div class="dm-new"><div class="sub-h" style="margin-top:0">Új dokumentumok sablonból <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:600">— több is kijelölhető, egyszerre töltődnek ki</span></div>'
     +(DM.templates.length?tplChecks()+'<div class="grid" style="margin-top:12px">'
       +(vehs().length?'<div class="fld"><label>Autó</label><select id="dmVeh">'+vehOpts(DM.nv)+(vehs().length>1?'<option value="*"'+(DM.nv==='*'?' selected':'')+'>Minden autóra külön</option>':'')+'</select></div>':'')
       +roles.map(function(r){return personSel(r,DM.np[r],'data-np');}).join('')
@@ -1269,7 +1432,7 @@ function renderDM(){
   // küldés
   var nSel=Object.keys(DM.sel).filter(function(k){return DM.sel[k];}).length;
   var cem=S.card.data.person.email||S.deal.email||'',bem=isSale()?(S.card.data.buyer.person.email||''):'';
-  h+='<div class="dm-send"><div class="sub-h" style="margin-top:0">Kijelölt dokumentumok küldése egy e-mailben</div>'
+  H.mail='<div class="dm-send"><div class="sub-h" style="margin-top:0">Kijelölt dokumentumok küldése egy e-mailben</div>'
     +'<div class="rc">'
     +'<label class="chk"><input type="checkbox" data-to="client"'+(DM.to.client?' checked':'')+'> Ügyfél'+(isSale()?' (bérlő)':'')+' <span class="hint">'+esc(cem||'nincs e-mail')+'</span></label>'
     +(isSale()?'<label class="chk"><input type="checkbox" data-to="buyer"'+(DM.to.buyer?' checked':'')+'> Vevő <span class="hint">'+esc(bem||'nincs e-mail')+'</span></label>':'')
@@ -1277,10 +1440,12 @@ function renderDM(){
     +'</div><div class="grid g2" style="margin-top:10px"><div class="fld"><label>Egyéb címzett(ek) — vesszővel elválasztva</label><input id="dmEmails" type="text" value="'+esc(DM.emails||'')+'" placeholder="pl. ugyintezo@example.hu"></div>'
     +'<div class="fld"><label>Tárgy (nem kötelező)</label><input id="dmSubj" value="'+esc(DM.subj||'')+'" placeholder="CarAdvance — dokumentumok"></div>'
     +'<div class="fld wide"><label>Kísérő üzenet (nem kötelező)</label><textarea id="dmMsg" rows="2">'+esc(DM.msg||'')+'</textarea></div></div>'
-    +'<div class="actions"><button class="btn red" id="dmSend">Küldés ('+(nSel+fileSelCount())+' kijelölt)</button><span class="hint">A kijelölt dokumentumok PDF-ként, a bepipált feltöltött fájlokkal együtt egy e-mailben mennek ki.</span></div></div>'
-    +signPanel();
+    +'<div class="actions"><button class="btn red" id="dmSend">Küldés ('+(nSel+fileSelCount())+' kijelölt)</button><span class="hint">A kijelölt dokumentumok PDF-ként, a bepipált feltöltött fájlokkal együtt egy e-mailben mennek ki.</span></div></div>';
+  H.sign=signPanel();
+  h+=(H[DM.panel]||'')+signList();
   el.innerHTML=h;
-  el.querySelectorAll('[data-ds]').forEach(function(c){c.addEventListener('change',function(){DM.sel[c.getAttribute('data-ds')]=c.checked;updSendBtn();});});
+  el.querySelectorAll('[data-pn]').forEach(function(b){b.addEventListener('click',function(){var k=b.getAttribute('data-pn');DM.panel=DM.panel===k?'':k;renderDM();});});
+  el.querySelectorAll('[data-ds]').forEach(function(c){c.addEventListener('change',function(){DM.sel[c.getAttribute('data-ds')]=c.checked;updSendBtn();var n=DM.docs.filter(function(d){return DM.sel[d.id];}).length;var bb=el.querySelector('.acts-bar b');if(bb)bb.innerHTML='Dokumentumok ('+DM.docs.length+')'+(n?' <span class="hint">· '+n+' kijelölve</span>':'');});});
   el.querySelectorAll('[data-de]').forEach(function(b){b.addEventListener('click',function(){dmOpen(+b.getAttribute('data-de'));});});
   el.querySelectorAll('[data-dp]').forEach(function(b){b.addEventListener('click',function(){dmPdf(+b.getAttribute('data-dp'));});});
   el.querySelectorAll('[data-dd]').forEach(function(b){b.addEventListener('click',function(){dmDelete(+b.getAttribute('data-dd'));});});
@@ -1291,12 +1456,14 @@ function renderDM(){
   var al=$('dmAll');if(al)al.addEventListener('change',function(){DM.all=this.checked;renderDM();});
   var fb=$('dmFill');if(fb)fb.addEventListener('click',dmCreate);
   el.querySelectorAll('[data-to]').forEach(function(c){c.addEventListener('change',function(){DM.to[c.getAttribute('data-to')]=c.checked;});});
-  $('dmEmails').addEventListener('input',function(){DM.emails=this.value;});
+  if($('dmEmails')){$('dmEmails').addEventListener('input',function(){DM.emails=this.value;});
   $('dmSubj').addEventListener('input',function(){DM.subj=this.value;});
   $('dmMsg').addEventListener('input',function(){DM.msg=this.value;});
-  $('dmSend').addEventListener('click',dmSend);
+  $('dmSend').addEventListener('click',dmSend);}
+  var sa=$('sgAll');if(sa)sa.addEventListener('click',function(){DM.SGALL=!DM.SGALL;renderDM();});
   bindSign();
   renderDmEdit();
+  ovSoon();
 }
 /* --- elektronikus aláírás --- */
 var SG_ST={pending:['wait','Aláírásra vár'],signing:['wait','Feldolgozás alatt'],signed:['ok','Aláírva'],revoked:['off','Visszavonva'],expired:['off','Lejárt'],locked:['bad','Zárolva (sok hibás kód)']};
@@ -1304,22 +1471,27 @@ function signPanel(){
   var cem=S.card.data.person.email||S.deal.email||'',bem=isSale()?(S.card.data.buyer.person.email||''):'';
   var nSel=DM.docs.filter(function(d){return DM.sel[d.id]&&!d.sign_status;}).length;
   var h='<div class="dm-send sgp"><div class="sub-h" style="margin-top:0">✍ Elektronikus aláírásra küldés</div>'
-    +'<div class="hint" style="margin-bottom:8px">A kijelölt (még alá nem írt) dokumentumok szövege a kiküldéskor rögzül. Az aláíró e-mailben kap egy személyes linket. Átolvassa a dokumentumokat, egyszeri kóddal azonosítja magát, majd aláír. Az aláírt PDF-ek aláírási tanúsítvánnyal együtt a feltöltött fájlok közé kerülnek, és mindkét fél e-mailben megkapja őket. A kétnyelvű (DE/HU) szerződéseket az ügyfél aláírása után a német partner is aláírja (ellenjegyzés, a cím a Dokumentumsablonok → Beállítások alatt). A mindkét fél által aláírt PDF az ügyfélnek, a partnernek és a sales@ címre megy ki.</div>'
+    +'<details class="how"><summary>Hogyan működik?</summary><div style="margin-top:6px">A kijelölt (még alá nem írt) dokumentumok szövege a kiküldéskor rögzül. Az aláíró e-mailben kap egy személyes linket. Átolvassa a dokumentumokat, egyszeri kóddal azonosítja magát, majd aláír. Az aláírt PDF-ek aláírási tanúsítvánnyal együtt a feltöltött fájlok közé kerülnek, és mindkét fél e-mailben megkapja őket. A kétnyelvű (DE/HU) szerződéseket az ügyfél aláírása után a német partner is aláírja (ellenjegyzés, a cím a Dokumentumsablonok → Beállítások alatt). A mindkét fél által aláírt PDF az ügyfélnek, a partnernek és a sales@ címre megy ki.</div></details><div class="hint" style="margin-bottom:8px">Jelöld ki fent a dokumentumokat, válaszd ki az aláírót, és küldd ki — az aláíró e-mailben kap egy személyes linket.</div>'
     +'<div class="rc"><label class="chk"><input type="radio" name="sgr" value="client"'+(DM.sgr!=='buyer'?' checked':'')+'> Ügyfél'+(isSale()?' (bérlő)':'')+' <span class="hint">'+esc((S.card.data.person.name||S.deal.name||'')+' · '+(cem||'nincs e-mail'))+'</span></label>'
     +(isSale()?'<label class="chk"><input type="radio" name="sgr" value="buyer"'+(DM.sgr==='buyer'?' checked':'')+'> Vevő <span class="hint">'+esc((S.card.data.buyer.person.name||'')+' · '+(bem||'nincs e-mail'))+'</span></label>':'')+'</div>'
     +'<div class="fld" style="margin-top:8px"><label>Üzenet az aláírónak (nem kötelező)</label><input id="sgMsg" value="'+esc(DM.sgMsg||'')+'" placeholder="pl. Kérjük, írja alá a meghatalmazásokat a honosítás indításához."></div>'
     +'<div class="actions"><button class="btn dark" id="sgSend"'+(nSel?'':' disabled')+'>Aláírásra küldés ('+nSel+' dokumentum)</button><span class="hint">A link 14 napig érvényes, és visszavonható.</span></div>';
+  return h+'</div>';
+}
+function signList(){
+  var h='';
   if((DM.signs||[]).length){
-    h+='<div class="sub-h">Aláírási kérelmek</div><div class="sgl">'+DM.signs.map(function(r){
+    var L=DM.SGALL?DM.signs:DM.signs.slice(0,4);
+    h+='<div class="sub-h">Aláírási kérelmek ('+DM.signs.length+')</div><div class="sgl">'+L.map(function(r){
       var st=SG_ST[r.status]||['off',r.status];
       return '<div class="sgr"><div class="h"><span class="sgb '+st[0]+'">'+st[1]+'</span><b>#'+r.id+' · '+(r.role==='partner'?'Ellenjegyzés (partner): ':'')+esc(r.signer)+'</b><span class="hint">'+esc(r.email)+'</span><span style="flex:1"></span>'
         +(r.status==='pending'?'<button class="lnk del" data-sgrv="'+r.id+'">Visszavonás</button>':'')+'</div>'
         +'<div class="hint">Kiküldve: '+esc(fmtDate(r.created_at))+' ('+esc(r.created_by||'')+')'+(r.opened_at?' · megnyitva: '+esc(fmtDate(r.opened_at)):'')
         +(r.signed_at?' · <b style="color:var(--good)">aláírva: '+esc(fmtDate(r.signed_at))+' — '+esc(r.sign_name||'')+', IP: '+esc(r.sign_ip||'')+'</b>':r.status==='pending'?' · lejár: '+esc(fmtDate(r.expires.replace('T',' ').slice(0,19))):'')+(r.fails?' · hibás kód: '+r.fails:'')+'</div>'
         +'<ul>'+r.docs.map(function(d,i){var res=(r.result||[])[i];return '<li>'+esc(d.name)+(res&&res.file_id?' — <a href="'+API+'/card/'+ID+'/files/'+res.file_id+'" target="_blank" rel="noopener">'+(res.cosign?'ügyfél által aláírt PDF':res.cosigned||r.role==='partner'?'mindkét fél által aláírt PDF':'aláírt PDF')+'</a> <span class="hint">PDF SHA-256: '+esc(res.pdf_sha.slice(0,16))+'…</span>':'')+'</li>';}).join('')+'</ul></div>';
-    }).join('')+'</div>';
+    }).join('')+'</div>'+(DM.signs.length>4?'<button class="lnk" id="sgAll" style="margin-top:8px">'+(DM.SGALL?'Kevesebb':'Mind a '+DM.signs.length+' kérelem')+'</button>':'');
   }
-  return h+'</div>';
+  return h;
 }
 function bindSign(){
   document.querySelectorAll('input[name=sgr]').forEach(function(r){r.addEventListener('change',function(){DM.sgr=r.value;});});
@@ -1336,7 +1508,7 @@ function signSend(){
   if(DM.edit&&DM.dirty&&ids.indexOf(DM.edit.id)>=0)return toast('Előbb mentsd a megnyitott dokumentumot.',4000);
   var role=DM.sgr==='buyer'?'buyer':'client';
   var P=role==='buyer'?S.card.data.buyer.person:S.card.data.person,em=P.email||(role==='client'?S.deal.email:'');
-  if(!em)return toast((role==='buyer'?'A vevőnek':'Az ügyfélnek')+' nincs e-mail címe (1. szekció).',4000);
+  if(!em)return toast((role==='buyer'?'A vevőnek':'Az ügyfélnek')+' nincs e-mail címe (Ügyfél fül).',4000);
   if(!confirm('Aláírásra küldöd ('+ids.length+' dokumentum)?\n\nAláíró: '+(P.name||S.deal.name)+' — '+em+'\n\nA kiküldés után a dokumentumok nem szerkeszthetők (amíg vissza nem vonod).'))return;
   var b=$('sgSend');b.disabled=true;b.textContent='Küldés…';
   api('/card/'+ID+'/sign',{method:'POST',body:{doc_ids:ids,signer:role,message:DM.sgMsg||''}}).then(function(r){
@@ -1367,7 +1539,7 @@ function dmCreate(){
 }
 function missingModal(miss,done,cancel){
   var ov=document.createElement('div');ov.className='mdl';
-  ov.innerHTML='<div class="mdl-b"><h3>Hiányzó adatok</h3><p class="hint">A dokumentum csak akkor generálható, ha minden szükséges adat ki van töltve. Az ügyfél / autó adatait az 1–2. szekcióban is pótolhatod — az itt megadott értékek csak ezekbe a dokumentumokba kerülnek.</p>'
+  ov.innerHTML='<div class="mdl-b"><h3>Hiányzó adatok</h3><p class="hint">A dokumentum csak akkor generálható, ha minden szükséges adat ki van töltve. Az ügyfél / autó adatait az Ügyfél és Autók fülön is pótolhatod — az itt megadott értékek csak ezekbe a dokumentumokba kerülnek.</p>'
     +'<div class="vars" style="margin-top:10px">'+miss.map(function(m){return '<div class="fld"><label>'+esc(m.label)+'</label><input data-mk="'+esc(m.key)+'"><small class="hint">'+esc(m.templates.join(', '))+'</small></div>';}).join('')+'</div>'
     +'<div class="actions"><button class="btn red" id="mdlOk">Generálás</button><button class="btn ghost" id="mdlNo">Mégse</button></div></div>';
   document.body.appendChild(ov);
@@ -1402,7 +1574,7 @@ function dmGenerate(T,vlist,extra){
     });
   });
   chain.then(function(){
-    DM.nts={};refreshLog();
+    DM.nts={};DM.panel='';refreshLog();
     if(made.length===1){DM.edit=made[0];DM.dirty=false;}
     renderDM();
     toast(made.length+' dokumentum kitöltve'+(fail?' · '+fail+' hiba':'')+' — kijelölve küldéshez',4000);
@@ -1498,7 +1670,7 @@ function finPriceBtns(all){
 }
 function sumOf(items){var i=0,c=0;items.forEach(function(x){if(x.kind==='income')i+=Number(x.amount_huf)||0;else c+=Number(x.amount_huf)||0;});return {income:Math.round(i),cost:Math.round(c),profit:Math.round(i-c),margin:i?Math.round((i-c)/i*1000)/10:null};}
 function renderFin(){
-  var el=$('bFin');if(!el)return;
+  var el=$('bFin');if(!el)return;ovSoon();
   var F=S.fin||{items:[],summary:finSum()},L=vehs();
   if(FVID&&FVID!=='-'&&!vehById(FVID))FVID='';
   var all=F.items,items=all.filter(function(x){return !FVID||(FVID==='-'?!vehById(x.vehicle_id):x.vehicle_id===FVID);});
@@ -1603,9 +1775,9 @@ function saveFin(){
 /* ---------------- 7. történésnapló ---------------- */
 var LOG_IC={status:'⇄',client:'★',opened:'👁',offer:'✉',contract:'📄',doc:'📑',sign:'✍',draft:'✎',checklist:'✓',file:'📎',data:'👤',buyer:'🤝',fin:'💰',rent:'⏰',vehicle:'🚗',create:'＋',start:'●'};
 var LOG_GROUP={'':'Mind',status:'Státusz',client:'Ügyfél',offer:'Ajánlat',contract:'Szerződés',checklist:'Checklist',fin:'Pénzügy'};
-var logFilter='';
+var logFilter='',LOGN=30;
 function renderLog(){
-  var el=$('b7');if(!el)return;
+  var el=$('b7');if(!el)return;ovSoon();
   var ev=(S.events||[]).slice();
   ev.push({at:S.deal.created_at,actor:'',kind:'start',text:'Ügyfél jelentkezett'+(S.deal.ch?' ('+S.deal.ch+')':'')+(S.deal.car?' — '+S.deal.car:'')});
   var shown=ev.filter(function(e){
@@ -1616,12 +1788,13 @@ function renderLog(){
   });
   $('logCnt').textContent=ev.length+' bejegyzés';
   el.innerHTML='<div class="log-tools">'+Object.keys(LOG_GROUP).map(function(k){return '<button data-k="'+k+'" class="'+(k===logFilter?'on':'')+'">'+LOG_GROUP[k]+'</button>';}).join('')+'</div>'
-    +(shown.length?'<ul class="log">'+shown.map(function(e){
+    +(shown.length?'<ul class="log">'+shown.slice(0,LOGN).map(function(e){
       var d=new Date(String(e.at).replace(' ','T')+(/Z$/.test(e.at)?'':'Z')),ok=!isNaN(d);
       return '<li><div class="t"><b>'+(ok?d.toLocaleDateString('hu-HU',{year:'numeric',month:'2-digit',day:'2-digit'}):esc(e.at))+'</b>'+(ok?d.toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'}):'')+'</div>'
         +'<div class="ic '+esc(e.kind)+'">'+(LOG_IC[e.kind]||'•')+'</div>'
         +'<div class="x">'+esc(e.text)+(e.actor?'<small>'+esc(e.actor)+'</small>':'')+'</div></li>';
-    }).join('')+'</ul>':'<div class="hint">Nincs ilyen bejegyzés.</div>');
+    }).join('')+'</ul>'+(shown.length>LOGN?'<button class="btn ghost sm" id="logMore" style="margin-top:10px">Továbbiak ('+(shown.length-LOGN)+')</button>':''):'<div class="hint">Nincs ilyen bejegyzés.</div>');
+  var lm=$('logMore');if(lm)lm.addEventListener('click',function(){LOGN+=50;renderLog();});
   el.querySelectorAll('.log-tools button').forEach(function(b){b.addEventListener('click',function(){logFilter=b.getAttribute('data-k');renderLog();});});
 }
 var __lt=null;
