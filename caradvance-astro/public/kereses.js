@@ -458,8 +458,8 @@
       Object.keys(P.fuel).forEach(function (k) { c.push(L.fac[k]); });
       Object.keys(P.body).forEach(function (k) { c.push(L.fac[k]); });
       if (P.seats) c.push(P.seats + '+ ' + L.seats);
-      if (!NP && P.pmax) c.push('≤ ' + fmt(P.pmax) + ' Ft');
-      if (!NP && P.pmin) c.push('≥ ' + fmt(P.pmin) + ' Ft');
+      if (!NP && !CHX && P.pmax) c.push('≤ ' + fmt(P.pmax) + ' Ft');
+      if (!NP && !CHX && P.pmin) c.push('≥ ' + fmt(P.pmin) + ' Ft');
       if (P.kmmax) c.push('≤ ' + fmt(P.kmmax) + ' km');
       if (P.kwmin) c.push('≥ ' + Math.round(P.kwmin / 0.7355) + ' ' + L.le);
       if (P.kwmax) c.push('≤ ' + Math.round(P.kwmax / 0.7355) + ' ' + L.le);

@@ -94,6 +94,12 @@
       'Nécessaires', '— toujours actifs. Indispensables aux formulaires et à la sécurité.',
       'Mesure d’audience', '— combien de visiteurs viennent et quelles pages fonctionnent. Google Analytics.',
       'Publicité', '— mesure et personnalisation des annonces. Google Ads, Meta.', 'Enregistrer'],
+    it: ['Impostazioni dei cookie', 'Utilizziamo i cookie',
+      'Oltre ai cookie necessari al funzionamento del sito, vorremmo utilizzare cookie di analisi e pubblicitari per capire che cosa la aiuta davvero a trovare l’auto giusta. Per questo le chiediamo il consenso.',
+      'Informativa sulla privacy', 'Impostazioni', 'Solo necessari', 'Accetto',
+      'Necessari', '— sempre attivi. Indispensabili per i moduli e la sicurezza.',
+      'Analisi', '— quanti visitatori arrivano e quali pagine funzionano. Google Analytics.',
+      'Pubblicità', '— misurazione e personalizzazione degli annunci. Google Ads, Meta.', 'Salva'],
     uk: ['Налаштування cookie', 'Ми використовуємо файли cookie',
       'Окрім файлів cookie, необхідних для роботи сайту, ми хотіли б використовувати аналітичні та рекламні cookie, щоб бачити, що справді допомагає вам знайти потрібне авто. Для цього просимо вашої згоди.',
       'Політика конфіденційності', 'Налаштування', 'Лише необхідні', 'Прийняти',
@@ -129,6 +135,7 @@
   function lang() {
     var h = String(location.hostname || '');
     var hl = String(document.documentElement.getAttribute('lang') || '').slice(0, 2).toLowerCase();
+    if (/(^|\.)caradvance\.ch$/.test(h)) return /^(fr|it|en)$/.test(hl) ? hl : 'de';
     if (/(^|\.)caradvance\.sk$/.test(h)) return /^(en|de|hu)$/.test(hl) ? hl : 'sk';
     if (/(^|\.)caradvance\.cz$/.test(h)) return /^(en|de)$/.test(hl) ? hl : 'cs';     if (/(^|\.)caradvance\.pl$/.test(h)) return /^(en|de)$/.test(hl) ? hl : 'pl';
     var m = String(location.pathname || '').match(/^\/(?:_np\/)?(en|de|fr|uk|zh|sk|cs)(\/|$)/);
@@ -139,6 +146,7 @@
 
   function policyUrl(l) {
     var h = String(location.hostname || '');
+    if (/caradvance\.ch$/.test(h)) return (l === 'de' ? '' : '/' + l) + '/datenschutz/#cookie';
     if (l === 'sk' && /caradvance\.sk$/.test(h)) return '/ochrana-osobnych-udajov/#cookie';
     if (l === 'cs' && /caradvance\.cz$/.test(h)) return '/ochrana-osobnich-udaju/#cookie';     if (l === 'pl' && /caradvance\.pl$/.test(h)) return '/polityka-prywatnosci/#cookie';     if (/caradvance\.pl$/.test(h)) return '/' + l + '/polityka-prywatnosci/#cookie';
     if (/caradvance\.sk$/.test(h)) return '/' + l + '/ochrana-osobnych-udajov/#cookie';
