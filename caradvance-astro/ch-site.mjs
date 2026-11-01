@@ -158,6 +158,9 @@ function chVat(h, l, R) {
   const fc = (e) => { let c = e * R; c = c >= 10000 ? Math.round(c / 10) * 10 : Math.round(c); return 'CHF ' + String(c).replace(/\B(?=(\d{3})+(?!\d))/g, '’'); };
   const both = (e) => fc(e) + ' (≈ ' + fe(e) + ' €)';
   const vs = 'style="margin-top:8px;font-size:14px;line-height:1.45"';
+  // autólista-kártyák (statikus): nettó ár CHF-ben, a szlovák 23 %-os bruttó helyett
+  const LBC = { de: 'ohne MWST · zzgl. Einfuhrabgaben', fr: 'hors TVA · plus taxes d’importation', it: 'IVA esclusa · più tributi d’importazione', en: 'excl. VAT · plus import charges' };
+  h = h.replace(/<div class="pricerow" data-eur="(\d+)"([^>]*)>[\s\S]*?<\/div>/g, (m, eur, rest) => (+eur ? `<div class="pricerow" data-eur="${eur}"${rest}><span class="price">${both(+eur)}</span><span class="peur">${LBC[l] || LBC.de}</span></div>` : m));
   return h.replace(/<div class="ca-vat( ca-new)?" data-eur="(\d+)"([^>]*)>[\s\S]*?(?=<div class="taxnote">)/g, (m, nw, eur, rest) => {
     const n = +eur; if (!n) return m;
     const tot = n * 1.04 * 1.081;
