@@ -102,7 +102,7 @@ function lookup(D, l, k, st) {
   const t = look1(D, l, k);
   if (t != null) return t;
   if (st) st.miss++;
-  return l === 'fr' || l === 'it' ? look1(D, 'en', k) : null;
+  return l === 'fr' || l === 'it' ? (look1(D, 'en', k) ?? look1(D, 'de', k)) : l === 'de' ? look1(D, 'en', k) : look1(D, 'de', k);
 }
 
 /* ---------- útvonalak ---------- */
@@ -144,6 +144,29 @@ function chfHtml(h, R) {
     .replace(/(<title>)([^<]*)(<\/title>)/, (m, a, t, c) => a + CHFADD(t, R).replace(/ \(≈ [^)]*\)/g, '') + c) + body;
 }
 
+
+/* ---------- autó-adatlap: svájci árblokk (a szlovák 23 %-os bruttó helyett) ---------- */
+const VATL = {
+  de: { deliv: 'Preis bei Lieferung in die Schweiz', net: 'ohne deutsche MWST', imp: 'Bei der Einfuhr kommen 4 % Automobilsteuer und 8,1 % Einfuhr-MWST hinzu – Gesamtpreis inkl. Einfuhrabgaben ca.', pick: 'bei Abholung in Deutschland, inkl. 19 % deutscher MWST (wird nach Ausfuhrnachweis erstattet)', co: 'für MWST-pflichtige Firmen: die Einfuhr-MWST ist als Vorsteuer abziehbar', newl: 'Neuwagen' },
+  fr: { deliv: 'Prix avec livraison en Suisse', net: 'sans TVA allemande', imp: 'À l’importation s’ajoutent 4 % d’impôt sur les véhicules automobiles et 8,1 % de TVA à l’importation – prix total avec taxes d’importation env.', pick: 'en cas de retrait en Allemagne, TVA allemande de 19 % incluse (remboursée sur preuve d’exportation)', co: 'entreprises assujetties à la TVA : la TVA à l’importation est déductible', newl: 'Voiture neuve' },
+  it: { deliv: 'Prezzo con consegna in Svizzera', net: 'senza IVA tedesca', imp: 'All’importazione si aggiungono il 4 % di imposta sugli autoveicoli e l’8,1 % di IVA all’importazione – prezzo totale con tributi d’importazione ca.', pick: 'con ritiro in Germania, IVA tedesca del 19 % inclusa (rimborsata con la prova d’esportazione)', co: 'aziende assoggettate all’IVA: l’IVA all’importazione è deducibile', newl: 'Auto nuova' },
+  en: { deliv: 'Price with delivery to Switzerland', net: 'without German VAT', imp: 'On import, 4 % automobile tax and 8.1 % import VAT are added – total incl. import charges approx.', pick: 'with pick-up in Germany, incl. 19 % German VAT (refunded after proof of export)', co: 'VAT-registered companies: the import VAT is deductible as input tax', newl: 'New car' }
+};
+function chVat(h, l, R) {
+  const L = VATL[l] || VATL.de;
+  const fe = (e) => String(Math.round(e)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const fc = (e) => { let c = e * R; c = c >= 10000 ? Math.round(c / 10) * 10 : Math.round(c); return 'CHF ' + String(c).replace(/\B(?=(\d{3})+(?!\d))/g, '’'); };
+  const both = (e) => fc(e) + ' (≈ ' + fe(e) + ' €)';
+  const vs = 'style="margin-top:8px;font-size:14px;line-height:1.45"';
+  return h.replace(/<div class="ca-vat( ca-new)?" data-eur="(\d+)"([^>]*)>[\s\S]*?(?=<div class="taxnote">)/g, (m, nw, eur, rest) => {
+    const n = +eur; if (!n) return m;
+    const tot = n * 1.04 * 1.081;
+    return `<div class="ca-vat${nw || ''}" data-eur="${eur}"${rest}><div class="plabel">${nw ? L.newl + ' · ' : ''}${L.deliv}</div><div class="price ca-pv">${both(n)}</div><div class="peur" style="font-size:14px">${L.net}</div>` +
+      `<div class="ca-vatv" style="margin-top:12px;font-size:14px;line-height:1.45">${L.imp} <b>${both(tot)}</b>.</div>` +
+      (nw ? '' : `<div class="ca-vatv" ${vs}><b>${both(n * 1.19)}</b> ${L.pick}</div>`) +
+      `<div class="ca-vatv" ${vs}>${L.co}.</div></div>`;
+  });
+}
 /* ---------- kapcsolat, cégadatok, csapat ---------- */
 function localize(h, l) {
   for (const [a, b] of PL.replace) h = h.split(a).join(b);
@@ -198,7 +221,7 @@ function translate(src, l, D, rel, miss) {
     return a + txt.match(/^\s*/)[0] + t + txt.match(/\s*$/)[0] + b;
   }))).join('');
   // beágyazott szkriptek: HTML-sablonok és szöveg-literálok (csak ha van fordítás)
-  const look0 = (txt) => { const { k, nums } = maskNums(txt.trim().replace(/\s+/g, ' ')); if (!k) return null; const t = look1(D, l, k) ?? (l === 'fr' || l === 'it' ? look1(D, 'en', k) : null); return t == null || t === k ? null : unmaskNums(t, nums); };
+  const look0 = (txt) => { const { k, nums } = maskNums(txt.trim().replace(/\s+/g, ' ')); if (!k) return null; const t = look1(D, l, k) ?? (l === 'fr' || l === 'it' ? (look1(D, 'en', k) ?? look1(D, 'de', k)) : l === 'de' ? look1(D, 'en', k) : look1(D, 'de', k)); return t == null || t === k ? null : unmaskNums(t, nums); };
   h = h.replace(/(<script\b(?![^>]*\bsrc=)(?![^>]*ld\+json)[^>]*>)([\s\S]*?)(<\/script>)/gi, (all, a, js, b) => a + js.replace(/>([^<>\n'"`\\{}]*\p{L}[^<>\n'"`\\{}]*)</gu, (mm, txt) => {
     if (!/ /.test(txt.trim())) return mm;
     const t = look0(txt); if (t == null) return mm;
@@ -269,6 +292,7 @@ function run() {
       // a svájci oldalról kihagyott oldalakra mutató linkek: menüpont (class-szal) törölve, szövegközi link feloldva
       h = h.replace(/<a\b([^>]*)\shref="#ca-x"([^>]*)>([\s\S]*?)<\/a>/g, (m, x, y, t, off, all) => (/\bclass=/.test(x + y) || (all[off - 1] === '>' && all[off + m.length] === '<') ? '' : t));
       h = chfHtml(h, R);
+      h = chVat(h, l, R);
       if (l === 'de') h = h.replace(/ß/g, 'ss');
       h = h.replace(/[^.<>"]*CO₂[^.<>"]*/g, (m) => m.replace(/6(?:[\s\u00a0’'.]|&nbsp;)?000(?=(?:\s|&nbsp;|\u00a0)?km)/g, '5000'));
       // robots: élesítésig noindex

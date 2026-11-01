@@ -354,10 +354,10 @@
   [
    "pel\\.textContent=\"nettó\\ \"\\+\"≈\\ \"\\+_pf\\(pp\\[0\\]\\)\\+\"\\ Ft/hó\"\\+\\(pp\\[0\\]===pp\\[1\\]\\?\"\":\"\\-tól\"\\)\\+\"\\ \\+\\ áfa\";",
    {
-    "de": "pel.textContent=(pp[0]===pp[1]?\"\":\"ab \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0])+\"/Monat (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0])+\" €)\";",
-    "fr": "pel.textContent=(pp[0]===pp[1]?\"\":\"dès \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0])+\"/mois (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0])+\" €)\";",
-    "it": "pel.textContent=(pp[0]===pp[1]?\"\":\"da \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0])+\"/mese (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0])+\" €)\";",
-    "en": "pel.textContent=(pp[0]===pp[1]?\"\":\"from \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0])+\"/month (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0])+\" €)\";"
+    "de": "pel.textContent=(pp[0]===pp[1]?\"\":\"ab \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/Monat (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";",
+    "fr": "pel.textContent=(pp[0]===pp[1]?\"\":\"dès \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/mois (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";",
+    "it": "pel.textContent=(pp[0]===pp[1]?\"\":\"da \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/mese (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";",
+    "en": "pel.textContent=(pp[0]===pp[1]?\"\":\"from \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/month (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";"
    }
   ],
   [
@@ -367,10 +367,28 @@
   [
    "(var T=\\{hu:\\{lbl:'7\\. Mikortól bérelnéd\\?'[\\s\\S]*?\\}\\[LG\\];)",
    {
-    "de": "$1T={\"lbl\": \"7. Ab wann möchten Sie mieten?\", \"tip\": \"Wir bringen das Auto aus Deutschland: Ab Bestellung dauert es mindestens 10 Tage bis zur Übergabe. Bei später verfügbaren Autos ist der früheste Termin der erste Tag des jeweiligen Monats.\", \"note\": \"Frühestmögliche Übergabe: \", \"err\": \"Bitte wählen Sie, ab wann Sie das Auto mieten möchten.\", \"errMin\": \"Frühestmöglicher Beginn: \"};",
-    "fr": "$1T={\"lbl\": \"7. À partir de quand souhaitez-vous louer ?\", \"tip\": \"Nous amenons la voiture d’Allemagne : il faut au moins 10 jours entre la commande et la remise. Pour les voitures disponibles plus tard, la date la plus proche est le premier jour du mois concerné.\", \"note\": \"Remise au plus tôt : \", \"err\": \"Veuillez choisir à partir de quand vous souhaitez louer la voiture.\", \"errMin\": \"Début au plus tôt : \"};",
-    "it": "$1T={\"lbl\": \"7. Da quando desidera noleggiare?\", \"tip\": \"Portiamo l’auto dalla Germania: dall’ordine alla consegna servono almeno 10 giorni. Per le auto disponibili più tardi, la data più vicina è il primo giorno del mese di disponibilità.\", \"note\": \"Consegna al più presto: \", \"err\": \"Scelga da quando desidera noleggiare l’auto.\", \"errMin\": \"Inizio al più presto: \"};",
-    "en": "$1T={\"lbl\": \"7. When would you like the rental to start?\", \"tip\": \"We bring the car from Germany: it takes at least 10 days from your order until handover. For cars available later, the earliest date is the first day of that month.\", \"note\": \"Earliest handover: \", \"err\": \"Please choose when you would like the rental to start.\", \"errMin\": \"The earliest possible start is \"};"
+    "de": "$1T={\"lbl\": \"7. Ab wann möchten Sie mieten?\", \"tip\": \"Wir bringen das Auto aus Deutschland: Ab Bestellung dauert es mindestens 10 Tage bis zur Übergabe. Bei später verfügbaren Autos ist der früheste Termin der erste Tag des jeweiligen Monats.\", \"note\": \"Frühestmögliche Übergabe: \", \"err\": \"Bitte wählen Sie, ab wann Sie das Auto mieten möchten.\", \"errMin\": \"Frühestmöglicher Beginn: \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString((document.querySelector('html').getAttribute('lang')||'de')+'-CH',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};",
+    "fr": "$1T={\"lbl\": \"7. À partir de quand souhaitez-vous louer ?\", \"tip\": \"Nous amenons la voiture d’Allemagne : il faut au moins 10 jours entre la commande et la remise. Pour les voitures disponibles plus tard, la date la plus proche est le premier jour du mois concerné.\", \"note\": \"Remise au plus tôt : \", \"err\": \"Veuillez choisir à partir de quand vous souhaitez louer la voiture.\", \"errMin\": \"Début au plus tôt : \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString((document.querySelector('html').getAttribute('lang')||'de')+'-CH',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};",
+    "it": "$1T={\"lbl\": \"7. Da quando desidera noleggiare?\", \"tip\": \"Portiamo l’auto dalla Germania: dall’ordine alla consegna servono almeno 10 giorni. Per le auto disponibili più tardi, la data più vicina è il primo giorno del mese di disponibilità.\", \"note\": \"Consegna al più presto: \", \"err\": \"Scelga da quando desidera noleggiare l’auto.\", \"errMin\": \"Inizio al più presto: \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString((document.querySelector('html').getAttribute('lang')||'de')+'-CH',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};",
+    "en": "$1T={\"lbl\": \"7. When would you like the rental to start?\", \"tip\": \"We bring the car from Germany: it takes at least 10 days from your order until handover. For cars available later, the earliest date is the first day of that month.\", \"note\": \"Earliest handover: \", \"err\": \"Please choose when you would like the rental to start.\", \"errMin\": \"The earliest possible start is \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString((document.querySelector('html').getAttribute('lang')||'de')+'-CH',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};"
+   }
+  ],
+  [
+   "'<div\\ class=\"pricerow\"><span\\ class=\"price\">'\\+esc\\(Math\\.round\\(car\\.eurNet\\*1\\.23\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €'\\)\\+'</span><span\\ class=\"peur\">'\\+esc\\('s\\ DPH\\ ·\\ '\\+Math\\.round\\(car\\.eurNet\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €\\ bez\\ DPH'\\)\\+'</span></div>'",
+   {
+    "de": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet).toLocaleString('sk-SK')+' €')+'</span><span class=\"peur\">'+esc('ohne MWST · zzgl. Einfuhrabgaben')+'</span></div>'",
+    "fr": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet).toLocaleString('sk-SK')+' €')+'</span><span class=\"peur\">'+esc('hors TVA · plus taxes d’importation')+'</span></div>'",
+    "it": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet).toLocaleString('sk-SK')+' €')+'</span><span class=\"peur\">'+esc('IVA esclusa · più tributi d’importazione')+'</span></div>'",
+    "en": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet).toLocaleString('sk-SK')+' €')+'</span><span class=\"peur\">'+esc('excl. VAT · plus import charges')+'</span></div>'"
+   }
+  ],
+  [
+   "'<div\\ class=\"pricerow\"><span\\ class=\"price\">'\\+Math\\.round\\(c\\.eur/1\\.19\\*1\\.23\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €'\\+'</span><span\\ class=\"peur\">s\\ DPH\\ ·\\ '\\+Math\\.round\\(c\\.eur/1\\.19\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €\\ bez\\ DPH</span></div>'",
+   {
+    "de": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19).toLocaleString('sk-SK')+' €'+'</span><span class=\"peur\">ohne MWST · zzgl. Einfuhrabgaben</span></div>'",
+    "fr": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19).toLocaleString('sk-SK')+' €'+'</span><span class=\"peur\">hors TVA · plus taxes d’importation</span></div>'",
+    "it": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19).toLocaleString('sk-SK')+' €'+'</span><span class=\"peur\">IVA esclusa · più tributi d’importazione</span></div>'",
+    "en": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19).toLocaleString('sk-SK')+' €'+'</span><span class=\"peur\">excl. VAT · plus import charges</span></div>'"
    }
   ]
  ],
