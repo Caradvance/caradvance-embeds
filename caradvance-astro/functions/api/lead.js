@@ -336,7 +336,7 @@ async function sendEmail(env, record, contact, attachment, region) {
     .join('');
   const kindKey = leadKind(record).key;
   const car = pick(record, ['Autó', 'car']) || [pick(record, ['Márka']), pick(record, ['Modell'])].filter(Boolean).join(' ');
-  const heading = I ? I.kinds[kindKey] + (car ? ' · ' + car : '') : leadKind(record).internal;
+  const heading = (/caradvance\.ch\b/.test(String(record.forras_oldal || '')) ? '[CH] ' : '') + (I ? I.kinds[kindKey] + (car ? ' · ' + car : '') : leadKind(record).internal);
   const title = [contact.name || contact.company, contact.phone, contact.email].filter(Boolean).join(' · ');
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -410,6 +410,13 @@ function plLangOf(page, origin) {
   const m = String(page || '').match(/^(?:https?:\/\/[^/]+)?(?:\/pl)?\/(en|de)\//);
   return m ? m[1] : 'pl';
 }
+/** caradvance.ch (vagy a /ch/ előnézet) → 'de' / 'fr' / 'it' / 'en', különben null */
+function chLangOf(page, origin) {
+  const s = String(page || '') + ' ' + String(origin || '');
+  if (!/caradvance\.ch\b|(?:^|\s|https?:\/\/[^/\s]+)\/ch(?:\/|$)/.test(s)) return null;
+  const m = String(page || '').match(/^(?:https?:\/\/[^/]+)?(?:\/ch)?\/(fr|it|en)(?:[/?#]|$)/);
+  return m ? m[1] : 'de';
+}
 async function sendCustomerConfirm(env, data, contact, page, region, origin) {
   if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
   const k = leadKind(data);
@@ -420,6 +427,8 @@ async function sendCustomerConfirm(env, data, contact, page, region, origin) {
   if (REGIONS[region]) return sendIntlConfirm(env, data, contact, REGIONS[region].lang, region);
   // caradvance.pl: a magyar csapat kezeli (region üres), a visszaigazolás lengyelül (az angol / német oldalról angolul / németül)
   { const pl = plLangOf(page, origin); if (pl) return sendIntlConfirm(env, data, contact, pl, undefined, 'pl'); }
+  // caradvance.ch: a magyar csapat kezeli, a visszaigazolás az oldal nyelvén (de / fr / it / en)
+  { const ch = chLangOf(page, origin); if (ch) return sendIntlConfirm(env, data, contact, ch, undefined, 'ch'); }
   const L = String(data['Nyelv'] || (pm && pm[1]) || 'HU').toLowerCase();
   if (L !== 'hu') return sendIntlConfirm(env, data, contact, INTL_CONFIRM[L] ? L : 'en');
   const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'event_id', 'Choice link']);
@@ -553,6 +562,33 @@ const INTERNAL_TXT = {
   cs: { kinds: { berles: 'Nová žádost o pronájem', rendeles: 'Nová objednávka vozu', eladas: 'Nová nabídka vozu k prodeji', import: 'Nová poptávka – dovoz vozu' }, sla: 'Doba odezvy: <b>1 hodina v pracovní době</b>.', choice: 'Otevřít ve Choice fleetshopu →', web: 'web',
         labels: { 'beerkezett': 'Přijato', 'forras_oldal': 'Stránka', 'Ország (IP alapján)': 'Země (podle IP)', 'Vezetéknév': 'Příjmení', 'Keresztnév': 'Křestní jméno', 'Adatkezelés': 'Souhlas se zpracováním údajů', 'consent': 'Souhlas', 'Csatolmány': 'Příloha', 'belepo_oldal': 'Vstupní stránka', 'hivatkozo': 'Odkazující stránka' } }
 };
+/* ---------- caradvance.ch: olasz szövegek + svájci lábléc ---------- */
+INTL_CONFIRM.it = { perMonth: '/mese', months: 'mesi', hello: (n) => n ? 'Gentile ' + n + ',' : 'Buongiorno,',
+  subjs: { berles: 'Abbiamo ricevuto la sua richiesta di noleggio', rendeles: 'Abbiamo ricevuto la sua richiesta d’ordine', eladas: 'Abbiamo ricevuto i dati della sua auto', import: 'Abbiamo ricevuto la sua richiesta di ricerca auto' },
+  bodies: { berles: 'grazie per la sua richiesta di noleggio. Un membro del nostro team la contatterà <b>il prima possibile</b> con i dettagli e un’offerta personalizzata.',
+    rendeles: 'grazie per la sua richiesta d’ordine. Un membro del nostro team la contatterà <b>il prima possibile</b> con i dettagli e un’offerta personalizzata.',
+    eladas: 'grazie per i dati della sua auto. La contatteremo <b>il prima possibile</b> con una valutazione realistica del prezzo.',
+    import: 'grazie per la sua richiesta di ricerca. La contatteremo <b>il prima possibile</b> con offerte adatte dal mercato tedesco.' },
+  subj: 'Abbiamo ricevuto la sua richiesta', body: 'grazie per il suo messaggio. Un membro del nostro team la contatterà <b>il prima possibile</b> con i dettagli e un’offerta personalizzata.',
+  data: 'La sua richiesta', urgent: 'Se è urgente, ci chiami:', or: 'oppure risponda semplicemente a questa e-mail.', bye: 'Cordiali saluti', role: 'Direttore commerciale', country: 'Germania', rep: '',
+  labels: { 'Név': 'Nome', 'E-mail': 'E-mail', 'Telefon': 'Telefono', 'Üzenet': 'Messaggio', 'Nyelv': 'Lingua', 'Oldal': 'Pagina', 'Típus': 'Richiesta' } };
+INTL_LABELS.it = { 'Kívánt átvétel': 'Inizio desiderato', 'Autó': 'Auto', 'Becsült havidíj': 'Canone mensile stimato', 'Német rendszám': 'Targa tedesca', 'Elérhetőség': 'Disponibilità', 'Felszereltség': 'Equipaggiamento', 'Futamidő': 'Durata', 'Kaució': 'Cauzione', 'Km-keret': 'Chilometraggio', 'Konstrukció': 'Tipo di contratto', 'Megjegyzés': 'Nota', 'Szín': 'Colore', 'Üzemanyag': 'Alimentazione', 'Vásárló': 'Tipo di cliente', 'Cégnév': 'Azienda', 'Adószám': 'Numero IVA', 'Finanszírozás': 'Finanziamento', 'Fizetés': 'Pagamento', 'Vásárlás módja': 'Modalità d’acquisto', 'Kapcsolattartó': 'Contatto', 'Márka': 'Marca', 'Modell': 'Modello', 'Évjárat': 'Anno', 'Kilométer': 'Chilometraggio', 'Futás': 'Chilometraggio', 'Ár': 'Prezzo', 'Kért ár': 'Prezzo richiesto', 'Költségkeret': 'Budget', 'Város': 'Città', 'Székhely': 'Sede' };
+INTL_VALUES.it = { 'Magánszemély': 'Privato', 'Magánszemélyként': 'Privato', 'Cég': 'Azienda', 'Cégként': 'Azienda', 'Benzin': 'Benzina', 'Dízel': 'Diesel', 'Elektromos': 'Elettrica', 'Hibrid': 'Ibrida', 'Plug-in hibrid': 'Ibrida plug-in', 'Bérlés': 'Noleggio', 'Bérlés-vétel': 'Noleggio con riscatto', 'Azonnal': 'Subito', 'Azonnal elérhető': 'Disponibile subito', 'Készpénz': 'Contanti', 'Lízing': 'Leasing', 'Hitel': 'Credito', 'Igen': 'Sì', 'Nem': 'No' };
+const CH_REP = {
+  de: 'Kunden in der Schweiz betreuen wir direkt sowie über unseren Vertriebspartner in der Schweiz. Verträge schliesst ausschliesslich die Caradvance GmbH ab.',
+  fr: 'Nous suivons nos clients en Suisse directement ainsi que par l’intermédiaire de notre partenaire commercial en Suisse. Les contrats sont conclus exclusivement par Caradvance GmbH.',
+  it: 'Seguiamo i clienti in Svizzera direttamente e tramite il nostro partner commerciale in Svizzera. I contratti sono conclusi esclusivamente da Caradvance GmbH.',
+  en: 'We serve customers in Switzerland directly and through our sales partner in Switzerland. Contracts are concluded exclusively by Caradvance GmbH.'
+};
+/** svájci szöveg: a nyelvi alap + svájci lábléc; németül ß nélkül (svájci helyesírás) */
+function chT(lang) {
+  const base = INTL_CONFIRM[lang] || INTL_CONFIRM.de;
+  const fix = (v) => typeof v === 'string' ? v.replace(/ß/g, 'ss') : (v && typeof v === 'object' && !Array.isArray(v)) ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fix(x)])) : v;
+  const o = lang === 'de' ? fix(Object.assign({}, base)) : Object.assign({}, base);
+  if (lang === 'de') o.hello = base.hello;
+  o.rep = CH_REP[lang] || CH_REP.de;
+  return o;
+}
 /* caradvance.pl (angol / német oldal is): a lengyel kereskedelmi képviselő a levél láblécében */
 const PL_REP = {
   pl: 'Pośrednik handlowy dla Polski: Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warszawa, Polska · NIP 5213804274 · REGON 368854599',
@@ -560,7 +596,8 @@ const PL_REP = {
   de: 'Handelsvertreter für Polen: Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warschau, Polen · NIP 5213804274 · REGON 368854599'
 };
 async function sendIntlConfirm(env, data, contact, lang, region, mkt) {
-  const T = mkt === 'pl' ? Object.assign({}, INTL_CONFIRM[lang], { rep: PL_REP[lang] || PL_REP.en }) : INTL_CONFIRM[lang];
+  const T = mkt === 'pl' ? Object.assign({}, INTL_CONFIRM[lang], { rep: PL_REP[lang] || PL_REP.en })
+    : mkt === 'ch' ? chT(lang) : INTL_CONFIRM[lang];
   const R = REGIONS[region];
   // A beküldött adatok összefoglalója — minden mező, a mezőnevek és a gyakori értékek a vevő nyelvén
   const skipI = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Adatkezelés', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'Nyelv', 'Choice link']);
