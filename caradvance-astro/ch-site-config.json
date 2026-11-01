@@ -1,0 +1,331 @@
+{
+ "_doc": "caradvance.ch — beállítások a ch-site.mjs build-lépéshez. live=false: minden oldal noindex, robots.txt tilt. Élesítéskor live=true.",
+ "site": "https://www.caradvance.ch",
+ "live": false,
+ "fxCHF": 0.9247,
+ "phone": "+36 30 233 6060",
+ "wa": "36302336060",
+ "email": "info@caradvance.hu",
+ "exclude": "^(adatok|alairas|partner|dovoz/kalkulacka-prepisu|predaj/operativny-lizing|blog/(lizing-auta-pre-fyzicke-osoby-2026|podmienky-lizingu-ojazdeneho-auta-pre-fyzicke-osoby|firemne-auto-operativny-lizing-alebo-dlhodoby-prenajom-zdanovanie-dph|prenajom-auta-v-bratislave-a-v-zahranici))/",
+ "slugSeg": {
+  "auta": "fahrzeuge",
+  "auto-na-mieru": "neuwagen-nach-mass",
+  "caste-otazky": "haeufige-fragen",
+  "ceny-dlhodobeho-prenajmu-aut-2026": "preise-langzeitmiete-2026",
+  "dlhodoby-prenajom-auta": "langzeitmiete-auto",
+  "dovoz": "import",
+  "dovoz-auta-z-nemecka": "auto-import-aus-deutschland",
+  "dovoz-mercedesu-z-nemecka": "mercedes-import-aus-deutschland",
+  "financovanie-lizing": "finanzierung-leasing",
+  "hladam-auto": "auto-suche",
+  "kalkulacka-poplatkov": "importkosten-rechner",
+  "nakup-a-dovoz-bmw-x5-z-nemecka": "bmw-x5-kauf-und-import-aus-deutschland",
+  "nakup-ojazdeneho-auta-z-nemecka": "gebrauchtwagen-aus-deutschland",
+  "nakup-ojazdeneho-premioveho-auta": "premium-gebrauchtwagen-kaufen",
+  "obchodne-podmienky": "agb",
+  "ochrana-osobnych-udajov": "datenschutz",
+  "podmienky-a-kaucia": "bedingungen-und-kaution",
+  "porovnanie-aut": "fahrzeugvergleich",
+  "preco-caradvance": "warum-caradvance",
+  "predaj": "kaufen",
+  "prenajom": "mieten",
+  "referencie": "referenzen",
+  "sami-alebo-s-nami": "selbst-oder-mit-uns",
+  "transparentnost": "transparenz",
+  "ucet": "konto",
+  "vyhody": "vorteile",
+  "zabezpecenie-kvality": "qualitaetssicherung",
+  "audi-bmw-alebo-mercedes": "audi-bmw-oder-mercedes",
+  "o-nas": "ueber-uns",
+  "proces": "ablauf",
+  "media": "medien"
+ },
+ "slugWord": {
+  "t-modell": "t-modell",
+  "trieda": "klasse",
+  "limuzina": "limousine",
+  "dverova": "tuerer",
+  "elektricke": "elektrisch",
+  "benzin": "benzin",
+  "hybrid": "hybrid"
+ },
+ "replace": [
+  [
+   "info@caradvance.sk",
+   "info@caradvance.hu"
+  ],
+  [
+   "info@caradvance.cz",
+   "info@caradvance.hu"
+  ],
+  [
+   "421915410555",
+   "36302336060"
+  ],
+  [
+   "421918700722",
+   "36300942081"
+  ],
+  [
+   "421917222122",
+   "36300942105"
+  ],
+  [
+   "/sk-team/pavel-horemuz.webp",
+   "https://www.caradvance.hu/toth-karoly.webp"
+  ],
+  [
+   "/sk-team/veronika-dinicova.webp",
+   "https://www.caradvance.hu/bajzath-balazs.webp?v=4"
+  ],
+  [
+   "/sk-team/andreas-horemuz.webp",
+   "https://www.caradvance.hu/vadnai-zsombor.webp"
+  ],
+  [
+   "Pavel Horemuž",
+   "Károly Tóth"
+  ],
+  [
+   "Veronika Diničová",
+   "Balázs Bajzáth"
+  ],
+  [
+   "Andreas Horemuž",
+   "Zsombor Vadnai"
+  ],
+  [
+   "HRB 52005445",
+   "HRB 151009"
+  ],
+  [
+   "DE2120860148",
+   "DE232664616"
+  ]
+ ],
+ "replaceRe": [
+  [
+   "\\+421[\\s\\u00a0]?915[\\s\\u00a0]?410[\\s\\u00a0]?555",
+   "+36 30 233 6060"
+  ],
+  [
+   "\\+421[\\s\\u00a0]?918[\\s\\u00a0]?700[\\s\\u00a0]?722",
+   "+36 30 094 2081"
+  ],
+  [
+   "\\+421[\\s\\u00a0]?917[\\s\\u00a0]?222[\\s\\u00a0]?122",
+   "+36 30 094 2105"
+  ],
+  [
+   "(?<![/\\w.-])(www\\.)?caradvance\\.sk\\b",
+   "$1caradvance.ch"
+  ],
+  [
+   "Bgm\\.?-Graf-Ring[\\s\\u00a0]\\d+,[\\s\\u00a0]\\d{3}[\\s\\u00a0]?\\d{2}[\\s\\u00a0]Geretsried",
+   "Bgm.-Graf-Ring 21, 82538 Geretsried"
+  ],
+  [
+   "\"streetAddress\":\"Cesta na Senec 2/A\"",
+   "\"streetAddress\":\"Bgm.-Graf-Ring 21\""
+  ],
+  [
+   "\"postalCode\":\"821 04\",\"addressLocality\":\"Bratislava\",\"addressRegion\":\"Bratislavský kraj\"",
+   "\"postalCode\":\"82538\",\"addressLocality\":\"Geretsried\",\"addressRegion\":\"Bayern\""
+  ],
+  [
+   "\"addressCountry\":\"SK\"",
+   "\"addressCountry\":\"DE\""
+  ],
+  [
+   "\"areaServed\":\"SK\"",
+   "\"areaServed\":\"CH\""
+  ]
+ ],
+ "team": [
+  {
+   "from": "https://www.caradvance.hu/toth-karoly.webp",
+   "img": "https://www.caradvance.hu/toth-karoly.webp",
+   "flags": [
+    "de",
+    "fr",
+    "gb",
+    "hu"
+   ]
+  },
+  {
+   "from": "https://www.caradvance.hu/bajzath-balazs.webp?v=4",
+   "img": "https://www.caradvance.hu/bajzath-balazs.webp?v=4",
+   "flags": [
+    "de",
+    "gb",
+    "hu"
+   ]
+  },
+  {
+   "from": "https://www.caradvance.hu/vadnai-zsombor.webp",
+   "img": "https://www.caradvance.hu/vadnai-zsombor.webp",
+   "flags": [
+    "gb",
+    "hu"
+   ]
+  }
+ ],
+ "fix": [
+  [
+   "/caradvance-logo-white-sk\\.webp",
+   {
+    "de": "/caradvance-logo-white-ch-de.webp",
+    "fr": "/caradvance-logo-white-ch-fr.webp",
+    "it": "/caradvance-logo-white-ch-it.webp",
+    "en": "/caradvance-logo-white-ch-en.webp"
+   }
+  ],
+  [
+   "/caradvance-logo-sk\\.webp",
+   {
+    "de": "/caradvance-logo-ch-de.webp",
+    "fr": "/caradvance-logo-ch-fr.webp",
+    "it": "/caradvance-logo-ch-it.webp",
+    "en": "/caradvance-logo-ch-en.webp"
+   }
+  ],
+  [
+   "(?<![\\d,.])23(?:[,.]0)?((?:\\s|&nbsp;|\\u00a0)?)%",
+   {
+    "de": "8,1$1%",
+    "fr": "8,1$1%",
+    "it": "8,1$1%",
+    "en": "8.1$1%"
+   }
+  ],
+  [
+   "\\s*\\((?:rund|etwa|ca\\.|environ|env\\.|circa|ca|roughly|about|approx\\.)?\\s*≈?\\s*1[0-9][\\s\\u00a0]?×\\s*\\)",
+   ""
+  ],
+  [
+   "\\(\\s*(?:rund|etwa|environ|circa|roughly|about)?\\s*≈?\\s*1[0-9][\\s\\u00a0]?×\\s*;\\s*",
+   "("
+  ],
+  [
+   "const fuelPrice=\\{b:[0-9.]+,d:[0-9.]+,src:'[^']*'\\};",
+   {
+    "de": "const fuelPrice={b:803.89,d:903.38,src:'Orientierungswert: durchschnittlicher Treibstoffpreis in der Schweiz (BFS/TCS, Herbst 2026); Sie können den Preis anpassen'};",
+    "fr": "const fuelPrice={b:803.89,d:903.38,src:'Valeur indicative : prix moyen du carburant en Suisse (OFS/TCS, automne 2026) ; vous pouvez modifier le prix'};",
+    "it": "const fuelPrice={b:803.89,d:903.38,src:'Valore indicativo: prezzo medio del carburante in Svizzera (UST/TCS, autunno 2026); può modificare il prezzo'};",
+    "en": "const fuelPrice={b:803.89,d:903.38,src:'Indicative value: average fuel price in Switzerland (FSO/TCS, autumn 2026); you can adjust the price'};"
+   }
+  ],
+  [
+   "let pe=[0-9.]+;",
+   "let pe=179.09;"
+  ],
+  [
+   "\\*368\\|\\|",
+   "*397.9669||"
+  ],
+  [
+   "\\(x/368\\)\\.toFixed\\(3\\)\\.replace\\(/0\\$/,''\\)",
+   "(x/397.9669).toFixed(2)"
+  ],
+  [
+   "\\+' €/l'",
+   "+' CHF/l'"
+  ],
+  [
+   "\\+' €/kWh'",
+   "+' CHF/kWh'"
+  ],
+  [
+   "id=\"pb\" value=\"[0-9.]+\" step=\"0\\.01\"> €/l",
+   "id=\"pb\" value=\"2.02\" step=\"0.01\"> CHF/l"
+  ],
+  [
+   "id=\"pd\" value=\"[0-9.]+\" step=\"0\\.01\"> €/l",
+   "id=\"pd\" value=\"2.27\" step=\"0.01\"> CHF/l"
+  ],
+  [
+   "<b id=\"fb\">[^<]*</b>",
+   "<b id=\"fb\" class=\"ca-pv\">2,02 CHF/l</b>"
+  ],
+  [
+   "<b id=\"fd\">[^<]*</b>",
+   "<b id=\"fd\" class=\"ca-pv\">2,27 CHF/l</b>"
+  ],
+  [
+   "<b id=\"fe\">[^<]*</b>",
+   "<b id=\"fe\" class=\"ca-pv\">0,45 CHF/kWh</b>"
+  ],
+  [
+   "<button data-p=\"73\\.6\">",
+   "<button data-p=\"119.39\">"
+  ],
+  [
+   "<button class=\"on\" data-p=\"128\\.8\">",
+   "<button class=\"on\" data-p=\"179.09\">"
+  ],
+  [
+   "<button data-p=\"202\\.4\">",
+   "<button data-p=\"278.58\">"
+  ],
+  [
+   "\\((?:\\s|&nbsp;|\\u00a0)*(?:rund|etwa|environ|circa|roughly|about)(?:\\s|&nbsp;|\\u00a0)*1[0-9](?:\\s|&nbsp;|\\u00a0)?×(?:\\s|&nbsp;|\\u00a0)*;(?:\\s|&nbsp;|\\u00a0)*",
+   "("
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)grösser\\)",
+   "(um ein Vielfaches grösser)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)größer\\)",
+   "(um ein Vielfaches grösser)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)larger\\)",
+   "(many times larger)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)plus grand\\)",
+   "(bien plus grand)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)più grande\\)",
+   "(molto più grande)"
+  ],
+  [
+   "1[0-9]×(?:\\s|&nbsp;|\\u00a0)grössere Auswahl",
+   "Ein Vielfaches an Auswahl"
+  ],
+  [
+   "1[0-9]×(?:\\s|&nbsp;|\\u00a0)größere Auswahl",
+   "Ein Vielfaches an Auswahl"
+  ],
+  [
+   "1[0-9]×(?:\\s|&nbsp;|\\u00a0)wider choice",
+   "Far wider choice"
+  ],
+  [
+   "Un choix 1[0-9]×(?:\\s|&nbsp;|\\u00a0)plus large",
+   "Un choix bien plus large"
+  ],
+  [
+   "Scelta 1[0-9]×(?:\\s|&nbsp;|\\u00a0)più ampia",
+   "Scelta molto più ampia"
+  ],
+  [
+   "(?:\\s|&nbsp;)?\\(<strong>(?:rund|etwa|environ|circa|roughly|about)(?:\\s|&nbsp;|\\u00a0)*1[0-9](?:\\s|&nbsp;|\\u00a0)?×</strong>;(?:\\s|&nbsp;)*",
+   " ("
+  ],
+  [
+   "\\(1 € = <span id=\"cdFx\"[^>]*>[^<]*</span> €\\)",
+   {
+    "de": "(1 € ≈ CHF 0,92)",
+    "fr": "(1 € ≈ CHF 0,92)",
+    "it": "(1 € ≈ CHF 0,92)",
+    "en": "(1 € ≈ CHF 0.92)"
+   }
+  ]
+ ],
+ "jsfix": {},
+ "coFix": [],
+ "monRe": "['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december','januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember','janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre','january','february','march','april','may','june','july','august','september','october','november','december']"
+}
