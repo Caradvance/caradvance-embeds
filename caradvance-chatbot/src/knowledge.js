@@ -41,9 +41,9 @@ export const SITES = {
     indexL: { de: '/kereses-index-ch-de.json', fr: '/kereses-index-ch-fr.json', it: '/kereses-index-ch-it.json', en: '/kereses-index-ch-en.json' },
     prefix: '/ch',
     lang: 'de',
-    phone: '+36 30 233 6060',
-    wa: '36302336060',
-    email: 'info@caradvance.hu'
+    phone: '+41 79 715 85 80',
+    wa: '41797158580',
+    email: 'info@caradvance.ch'
   },
   cz: {
     base: 'https://www.caradvance.cz',
@@ -129,8 +129,8 @@ const CZ = `
 
 const CH = `
 # CarAdvance — caradvance.ch (Schweiz / Suisse / Svizzera) — website in German, French, Italian and English
-- Anbieter, Verkäufer, Vermieter und einziger Vertragspartner: Caradvance GmbH, Bgm.-Graf-Ring 21, 82538 Geretsried, Deutschland (Amtsgericht München, HRB 151009, USt-IdNr. DE232664616). Seit 2003, über 5000 verkaufte Premium-Autos. Kunden in der Schweiz betreuen wir direkt sowie über unseren Vertriebspartner in der Schweiz; Verträge schliesst ausschliesslich die Caradvance GmbH ab. Nenne keinen Namen eines Schweizer Partners.
-- Kontakt: info@caradvance.hu · +36 30 233 6060 (auch WhatsApp) · Mo–Fr 9–17 Uhr · https://www.caradvance.ch/kontakt/ (fr: https://www.caradvance.ch/fr/kontakt/, it: https://www.caradvance.ch/it/kontakt/, en: https://www.caradvance.ch/en/kontakt/)
+- Anbieter, Verkäufer, Vermieter und einziger Vertragspartner: Caradvance GmbH, Bgm.-Graf-Ring 21, 82538 Geretsried, Deutschland (Amtsgericht München, HRB 151009, USt-IdNr. DE232664616). Seit 2003, über 5000 verkaufte Premium-Autos. Kunden in der Schweiz betreuen wir direkt sowie über unseren Vertriebspartner Red Pro Switzerland GmbH, Champ-de-la-Croix 66, 1720 Corminboeuf (Handelsregister Kanton Freiburg CH-217.3.581.328-1, UID CHE-277.402.073); Verträge schliesst ausschliesslich die Caradvance GmbH ab, der Vertriebspartner ist weder Verkäufer noch Vermieter.
+- Kontakt Schweiz: info@caradvance.ch · +41 79 715 85 80 (auch WhatsApp) · Mo–Fr 9–17 Uhr · https://www.caradvance.ch/kontakt/ (fr: https://www.caradvance.ch/fr/kontakt/, it: https://www.caradvance.ch/it/kontakt/, en: https://www.caradvance.ch/en/kontakt/)
 - Team: Károly Tóth — Verkaufsleiter (Kontakte zum deutschen Markt, gesamter Importprozess), +36 30 214 6989 · Balázs Bajzáth — Sales Manager (Angebote, Dokumente, kaufmännische Fragen), +36 30 094 2081 · Zsombor Vadnai — Verkauf, +36 30 094 2105. Alle auch per WhatsApp erreichbar.
 - Sprachversionen: Deutsch https://www.caradvance.ch/ · Français https://www.caradvance.ch/fr/ · Italiano https://www.caradvance.ch/it/ · English https://www.caradvance.ch/en/ (gleiche Pfade mit Sprachpräfix, z. B. /fr/mieten/).
 
