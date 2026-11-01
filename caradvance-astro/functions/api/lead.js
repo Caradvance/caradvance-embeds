@@ -324,6 +324,7 @@ async function sendEmail(env, record, contact, attachment, region) {
   const R = REGIONS[region];
   if (!env.RESEND_API_KEY || (!R && !env.LEAD_EMAIL_TO)) return { status: 'skipped' };
   const to = String(R ? (env['LEAD_EMAIL_TO_' + R.tag] || R.to) : env.LEAD_EMAIL_TO).split(',').map((s) => s.trim()).filter(Boolean);
+  if (/caradvance\.ch\b/.test(String(record.forras_oldal || '')) && !to.includes('info@caradvance.ch')) to.push('info@caradvance.ch');   // svájci lead: a svájci postafiók is megkapja
   // Az országos csapat a saját nyelvén kapja a mezőneveket és a gyakori értékeket.
   const I = R ? INTERNAL_TXT[R.lang] : null;
   const LBL = R ? Object.assign({}, INTL_CONFIRM[R.lang].labels, INTL_LABELS[R.lang], I.labels) : {};
@@ -575,10 +576,10 @@ INTL_CONFIRM.it = { perMonth: '/mese', months: 'mesi', hello: (n) => n ? 'Gentil
 INTL_LABELS.it = { 'Kívánt átvétel': 'Inizio desiderato', 'Autó': 'Auto', 'Becsült havidíj': 'Canone mensile stimato', 'Német rendszám': 'Targa tedesca', 'Elérhetőség': 'Disponibilità', 'Felszereltség': 'Equipaggiamento', 'Futamidő': 'Durata', 'Kaució': 'Cauzione', 'Km-keret': 'Chilometraggio', 'Konstrukció': 'Tipo di contratto', 'Megjegyzés': 'Nota', 'Szín': 'Colore', 'Üzemanyag': 'Alimentazione', 'Vásárló': 'Tipo di cliente', 'Cégnév': 'Azienda', 'Adószám': 'Numero IVA', 'Finanszírozás': 'Finanziamento', 'Fizetés': 'Pagamento', 'Vásárlás módja': 'Modalità d’acquisto', 'Kapcsolattartó': 'Contatto', 'Márka': 'Marca', 'Modell': 'Modello', 'Évjárat': 'Anno', 'Kilométer': 'Chilometraggio', 'Futás': 'Chilometraggio', 'Ár': 'Prezzo', 'Kért ár': 'Prezzo richiesto', 'Költségkeret': 'Budget', 'Város': 'Città', 'Székhely': 'Sede' };
 INTL_VALUES.it = { 'Magánszemély': 'Privato', 'Magánszemélyként': 'Privato', 'Cég': 'Azienda', 'Cégként': 'Azienda', 'Benzin': 'Benzina', 'Dízel': 'Diesel', 'Elektromos': 'Elettrica', 'Hibrid': 'Ibrida', 'Plug-in hibrid': 'Ibrida plug-in', 'Bérlés': 'Noleggio', 'Bérlés-vétel': 'Noleggio con riscatto', 'Azonnal': 'Subito', 'Azonnal elérhető': 'Disponibile subito', 'Készpénz': 'Contanti', 'Lízing': 'Leasing', 'Hitel': 'Credito', 'Igen': 'Sì', 'Nem': 'No' };
 const CH_REP = {
-  de: 'Kunden in der Schweiz betreuen wir direkt sowie über unseren Vertriebspartner in der Schweiz. Verträge schliesst ausschliesslich die Caradvance GmbH ab.',
-  fr: 'Nous suivons nos clients en Suisse directement ainsi que par l’intermédiaire de notre partenaire commercial en Suisse. Les contrats sont conclus exclusivement par Caradvance GmbH.',
-  it: 'Seguiamo i clienti in Svizzera direttamente e tramite il nostro partner commerciale in Svizzera. I contratti sono conclusi esclusivamente da Caradvance GmbH.',
-  en: 'We serve customers in Switzerland directly and through our sales partner in Switzerland. Contracts are concluded exclusively by Caradvance GmbH.'
+  de: 'Kunden in der Schweiz betreuen wir direkt sowie über unseren Vertriebspartner Red Pro Switzerland GmbH, Champ-de-la-Croix 66, 1720 Corminboeuf (UID CHE-277.402.073). Verträge schliesst ausschliesslich die Caradvance GmbH ab.',
+  fr: 'Nous suivons nos clients en Suisse directement ainsi que par l’intermédiaire de notre partenaire commercial Red Pro Switzerland GmbH, Champ-de-la-Croix 66, 1720 Corminboeuf (IDE CHE-277.402.073). Les contrats sont conclus exclusivement par Caradvance GmbH.',
+  it: 'Seguiamo i clienti in Svizzera direttamente e tramite il nostro partner commerciale Red Pro Switzerland GmbH, Champ-de-la-Croix 66, 1720 Corminboeuf (IDI CHE-277.402.073). I contratti sono conclusi esclusivamente da Caradvance GmbH.',
+  en: 'We serve customers in Switzerland directly and through our sales partner Red Pro Switzerland GmbH, Champ-de-la-Croix 66, 1720 Corminboeuf (UID CHE-277.402.073). Contracts are concluded exclusively by Caradvance GmbH.'
 };
 /** svájci szöveg: a nyelvi alap + svájci lábléc; németül ß nélkül (svájci helyesírás) */
 function chT(lang) {
@@ -612,10 +613,11 @@ async function sendIntlConfirm(env, data, contact, lang, region, mkt) {
   const body = (T.bodies && T.bodies[kind]) || T.body;
   const subj = (T.subjs && T.subjs[kind]) || T.subj;
   const first = String(contact.name || '').trim().split(' ')[0] || '';
-  const phone = R ? R.phone : (env.CONTACT_PHONE || '+36 30 233 6060');
-  const sigPhone = R ? R.phone : '+36 30 214 6989';
-  const sigMail = R ? R.reply : 'info@caradvance.hu';
-  const replyTo = R ? (env['CUSTOMER_REPLY_TO_' + R.tag] || R.reply) : (env.CUSTOMER_REPLY_TO || 'info@caradvance.hu');
+  const CHC = mkt === 'ch';   // caradvance.ch: svájci telefonszám és e-mail
+  const phone = R ? R.phone : CHC ? '+41 79 715 85 80' : (env.CONTACT_PHONE || '+36 30 233 6060');
+  const sigPhone = R ? R.phone : CHC ? '+41 79 715 85 80' : '+36 30 214 6989';
+  const sigMail = R ? R.reply : CHC ? 'info@caradvance.ch' : 'info@caradvance.hu';
+  const replyTo = R ? (env['CUSTOMER_REPLY_TO_' + R.tag] || R.reply) : CHC ? 'info@caradvance.ch' : (env.CUSTOMER_REPLY_TO || 'info@caradvance.hu');
   const html = `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
     <div style="background:#0b0b0d;padding:18px 24px"><img src="https://www.caradvance.hu/caradvance-logo-email.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
