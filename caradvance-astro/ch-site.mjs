@@ -372,7 +372,7 @@ function run() {
   try {
     const rp = path.join(DIST, '_routes.json'); const r = JSON.parse(fs.readFileSync(rp, 'utf8'));
     // a /ch/ előnézet a caradvance.hu-n statikus (noindex + canonical), nem kell rá szabály
-    const tops = new Set(); for (const p of map.values()) { const t = p.split('/')[0]; if (t) tops.add('/' + t + '/*'); }
+    const tops = new Set(LANGS.filter((x) => x !== BASE).map((x) => '/' + x + '/*')); for (const p of map.values()) { const t = p.split('/')[0]; if (t) tops.add('/' + t + '/*'); }
     for (const x of tops) if (!r.include.includes(x) && !r.include.includes('/' + x.split('/')[1] + '/*')) r.include.push(x);
     // 2 helyet meghagyunk az am-routes.mjs-nek (/belso/ajanlatmotor/*, /ajanlat/auto/*), különben a build megállna
     const res = ['/belso/ajanlatmotor/*', '/ajanlat/auto/*'].filter((w) => !r.include.includes(w) && !r.include.includes('/' + w.split('/')[1] + '/*')).length;
