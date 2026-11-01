@@ -170,6 +170,32 @@ function chVat(h, l, R) {
       `<div class="ca-vatv" ${vs}>${L.co}.</div></div>`;
   });
 }
+
+/* ---------- svájci értékesítési partner: Red Pro Switzerland GmbH (Zefix / SHAB) ---------- */
+function chPartner(h, l) {
+  const P = PL.partner; if (!P) return h;
+  const CTRY = { de: 'Schweiz', fr: 'Suisse', it: 'Svizzera', en: 'Switzerland' }[l];
+  const REG = { de: 'Handelsregister des Kantons Freiburg', fr: 'Registre du commerce du canton de Fribourg', it: 'Registro di commercio del Cantone di Friborgo', en: 'Commercial Register of the Canton of Fribourg' }[l];
+  const PH = '(?:Angaben folgen|Informations à venir|Informazioni in arrivo|Details to follow)';
+  const addr = `${P.street}, ${P.zip} ${P.city}, ${CTRY}`;
+  const contact = `<a href="tel:${PL.phone.replace(/[^\d+]/g, '')}">${PL.phone}</a> · <a href="mailto:${PL.email}">${PL.email}</a>`;
+  const row = (labels, val) => { h = h.replace(new RegExp(`(<dt>(?:${labels})</dt><dd>)${PH}(</dd>)`, 'g'), `$1${val}$2`); };
+  row('Sitz|Siège|Sede|Registered office', addr);
+  row('Kontaktstelle|Point de contact|Punto di contatto|Contact point', contact);
+  row('Handelsregisternummer, Steuernummer|Numéro au registre du commerce, numéro fiscal|Numero di registro di commercio, numero fiscale|Company registration number, tax number|Company registration number, tax ID', `${P.reg} (${REG}) · UID ${P.uid}`);
+  row('Handelsregisternummer|Numéro au registre du commerce|Numero di registro di commercio|Company registration number|Commercial register number', `${P.reg} (${REG})`);
+  row('UID-Nummer|Numéro IDE|Numero IDI|Company ID number \\(UID\\)|UID number', P.uid);
+  // „Kontaktstelle: Kontakt über die Caradvance GmbH …” (Transparenz) → a partner címe
+  h = h.replace(/(<dt>(?:Kontaktstelle|Point de contact|Punto di contatto|Contact point)<\/dt><dd>)[^<]*Bgm\.-Graf-Ring[^<]*(<\/dd>)/g, `$1${addr}$2`);
+  // név-sorok és kártyacímek
+  const PN = '(?:Unser |Notre |Il nostro |Our )?(?:Vertriebspartner in der Schweiz|[Pp]artenaire commercial en Suisse|[Pp]artner commerciale in Svizzera|[Ss]ales partner in Switzerland)';
+  h = h.replace(new RegExp(`(<dt>(?:Firmenname|Name|Raison sociale|Nom|Ragione sociale|Nome|Company name)</dt><dd>)${PN}`, 'g'), `$1${P.name}`);
+  h = h.replace(new RegExp(`(<h3>)${PN}(</h3>)`, 'g'), `$1${P.name}$2`);
+  // maradék „(Angaben folgen)” → a partner neve és székhelye
+  h = h.replace(new RegExp(`\\(${PH}\\)`, 'g'), `(${P.name}, ${P.city})`);
+  h = h.replace(new RegExp(PH, 'g'), `${P.name}, ${P.city}`);
+  return h;
+}
 /* ---------- kapcsolat, cégadatok, csapat ---------- */
 function localize(h, l) {
   for (const [a, b] of PL.replace) h = h.split(a).join(b);
@@ -296,6 +322,7 @@ function run() {
       h = h.replace(/<a\b([^>]*)\shref="#ca-x"([^>]*)>([\s\S]*?)<\/a>/g, (m, x, y, t, off, all) => (/\bclass=/.test(x + y) || (all[off - 1] === '>' && all[off + m.length] === '<') ? '' : t));
       h = chfHtml(h, R);
       h = chVat(h, l, R);
+      h = chPartner(h, l);
       if (l === 'de') h = h.replace(/ß/g, 'ss');
       h = h.replace(/[^.<>"]*CO₂[^.<>"]*/g, (m) => m.replace(/6(?:[\s\u00a0’'.]|&nbsp;)?000(?=(?:\s|&nbsp;|\u00a0)?km)/g, '5000'));
       // robots: élesítésig noindex

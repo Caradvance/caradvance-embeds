@@ -54,7 +54,7 @@ const MKT = {
   cs: { mail: 'info@caradvance.cz', PHONE: '+420 604 313 136', WHATSAPP: 'https://wa.me/421915410555', priv: '/ochrana-osobnich-udaju/#cookie' },
   sk: { mail: 'info@caradvance.sk', PHONE: '+421 915 410 555', WHATSAPP: 'https://wa.me/421915410555' },
   pl: { mail: 'info@caradvance.hu', PHONE: '+36 30 233 6060', WHATSAPP: 'https://wa.me/36302336060' },
-  ch: { mail: 'info@caradvance.hu', PHONE: '+36 30 233 6060', WHATSAPP: 'https://wa.me/36302336060', priv: '/datenschutz/#cookie', base: 'de', subs: ['fr', 'it', 'en'] }
+  ch: { mail: 'info@caradvance.ch', PHONE: '+41 79 715 85 80', WHATSAPP: 'https://wa.me/41797158580', priv: '/datenschutz/#cookie', base: 'de', subs: ['fr', 'it', 'en'] }
 };
 const MSG = {
   cs: (m) => ({ THANKS_TITLE: 'Děkujeme za váš zájem!', THANKS_TEXT: 'Vaši poptávku jsme přijali a brzy se vám ozveme s nabídkou na míru.', THANKS_NOTE: 'Pokud spěcháte, klidně nám zavolejte.',

@@ -3,9 +3,9 @@
  "site": "https://www.caradvance.ch",
  "live": false,
  "fxCHF": 0.9247,
- "phone": "+36 30 233 6060",
- "wa": "36302336060",
- "email": "info@caradvance.hu",
+ "phone": "+41 79 715 85 80",
+ "wa": "41797158580",
+ "email": "info@caradvance.ch",
  "exclude": "^(adatok|alairas|partner|dovoz/kalkulacka-prepisu|predaj/operativny-lizing|blog/(lizing-auta-pre-fyzicke-osoby-2026|podmienky-lizingu-ojazdeneho-auta-pre-fyzicke-osoby|firemne-auto-operativny-lizing-alebo-dlhodoby-prenajom-zdanovanie-dph|prenajom-auta-v-bratislave-a-v-zahranici))/",
  "slugSeg": {
   "auta": "fahrzeuge",
@@ -390,9 +390,37 @@
     "it": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19).toLocaleString('sk-SK')+' €'+'</span><span class=\"peur\">IVA esclusa · più tributi d’importazione</span></div>'",
     "en": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19).toLocaleString('sk-SK')+' €'+'</span><span class=\"peur\">excl. VAT · plus import charges</span></div>'"
    }
+  ],
+  [
+   "info@caradvance\\.hu",
+   "info@caradvance.ch"
+  ],
+  [
+   "\\+36(?:\\s|&nbsp;|\\u00a0)?30(?:\\s|&nbsp;|\\u00a0)?233(?:\\s|&nbsp;|\\u00a0)?6060",
+   "+41 79 715 85 80"
+  ],
+  [
+   "\\+36302336060",
+   "+41797158580"
+  ],
+  [
+   "wa\\.me/36302336060",
+   "wa.me/41797158580"
+  ],
+  [
+   "<img class=\"bhg-logo\" src=\"/bh-group-zrt\\.webp\"[^>]*>",
+   ""
   ]
  ],
  "jsfix": {},
  "coFix": [],
- "monRe": "['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december','januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember','janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre','january','february','march','april','may','june','july','august','september','october','november','december']"
+ "monRe": "['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december','januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember','janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre','january','february','march','april','may','june','july','august','september','october','november','december']",
+ "partner": {
+  "name": "Red Pro Switzerland GmbH",
+  "street": "Champ-de-la-Croix 66",
+  "zip": "1720",
+  "city": "Corminboeuf",
+  "reg": "CH-217.3.581.328-1",
+  "uid": "CHE-277.402.073"
+ }
 }
