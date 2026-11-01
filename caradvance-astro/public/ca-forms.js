@@ -148,7 +148,7 @@
   function huN(s) { var m = String(s || '').replace(/ /g, ' ').match(/(\d{1,3}(?:[ .]\d{3})+|\d+)\s*Ft/); return m ? +m[1].replace(/[ .]/g, '') : 0; }
   function fmtFt(n) { return Math.round(n).toLocaleString('hu-HU').replace(/ /g, ' ') + ' Ft'; }
   function cleanP(s) {
-    s = String(s || '').trim(); var sub = (s.match(/\(([^)]*)\)\s*$/) || [])[1] || '';
+    s = String(s || '').trim(); if (MK === 'ch') s = s.replace(/\s*\(≈[^)]*\)/g, ''); var sub = (s.match(/\(([^)]*)\)\s*$/) || [])[1] || '';
     if (s.indexOf('≈') > -1) s = '≈ ' + s.split('≈').slice(1).join('≈').trim();
     else s = s.replace(/^(bruttó|nettó|brutto|netto|gross|net|bez DPH|s DPH)\s*/i, '');
     var plus = /\+\s*(áfa|VAT|MwSt\.?|DPH)\s*$/i.exec(s); if (plus) { s = s.slice(0, plus.index).trim(); if (!sub) sub = plus[0].trim(); }
@@ -237,7 +237,7 @@
       var av = tx(q('#abAvail', m)).replace(/^●\s*/, '');
       if (av) out.push(['cal', av]);
       var cfg = abCfg(M), fo = q('#abFuel .ab-opt.active', m);
-      var fl = fo ? tx(fo) : (cfg && cfg.F ? cfg.F.map(function (f) { return f === 'PHEV' ? 'Hibrid' : f; }).join(' / ') : (c && c.ds && c.ds.fuels) || '');
+      var fl = fo ? tx(fo) : (cfg && cfg.F ? cfg.F.map(function (f) { var g = f === 'PHEV' ? 'Hibrid' : f; return MK === 'ch' ? (({ de: { 'Benzin': 'Benzin', 'Dízel': 'Diesel', 'Hibrid': 'Hybrid', 'Elektromos': 'Elektro' }, fr: { 'Benzin': 'Essence', 'Dízel': 'Diesel', 'Hibrid': 'Hybride', 'Elektromos': 'Électrique' }, it: { 'Benzin': 'Benzina', 'Dízel': 'Diesel', 'Hibrid': 'Ibrida', 'Elektromos': 'Elettrica' }, en: { 'Benzin': 'Petrol', 'Dízel': 'Diesel', 'Hibrid': 'Hybrid', 'Elektromos': 'Electric' } }[LG] || {})[g] || g) : g; }).join(' / ') : (c && c.ds && c.ds.fuels) || '');
       if (fl) out.push(['fuel', fl]);
       if (!card) {
         qa('.r').forEach(function (r) {
@@ -1250,6 +1250,7 @@
   }
   function depParts(M) {
     var d = tx(q('#abDep', M.modal)) || tx(q('#abStickyDep', M.modal));
+    if (MK === 'ch') { var cm = /:\s*([^(·]+?)\s*(?:\([^)]*\))?\s*(?:·\s*(.*))?$/.exec(d); if (cm) return { v: cm[1].trim(), s: cm[2] || '' }; }
     if (MK !== 'hu') {   // SK/CZ/PL: a kaució euróban (a forintos rész a fordításnál keveredhet)
       var re = /\(([^)]*€[^)]*)\)\s*·?\s*(.*)$/.exec(d);
       if (re) return { v: re[1].replace(/(\d)(\d{3})(?!\d)/g, '$1 $2').replace(/\s*[–-]\s*/g, '–'), s: re[2] || '' };
