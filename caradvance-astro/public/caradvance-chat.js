@@ -75,8 +75,8 @@
   var CLG = String(document.documentElement.lang || "hu").slice(0, 2).toLowerCase();
   /* piac a domain alapján (caradvance.sk/.cz — az angol, német, magyar nyelvű változaton is), különben a nyelv szerint */
   var MKT = (function () { var m = /(^|\.)caradvance\.(sk|cz|pl|ch)$/.exec(location.hostname); if (m) return m[2] === "cz" ? "cs" : m[2]; var p = /^\/(sk|cs|pl)\//.exec(location.pathname); if (p) return p[1]; return (CLG === "sk" || CLG === "cs" || CLG === "pl") ? CLG : ""; })();
-  if (MKT) WA = MKT === "ch" ? "36302336060" : "421915410555";
-  var WAH = MKT && MKT !== "ch" ? "+421 915 410 555" : "+36 30 233 6060";
+  if (MKT) WA = MKT === "ch" ? "41797158580" : "421915410555";
+  var WAH = MKT === "ch" ? "+41 79 715 85 80" : MKT ? "+421 915 410 555" : "+36 30 233 6060";
   var SESSION = null;                      // Phase 2: bejelentkezett ügyfél tokenje
   var LOGO = "/caradvance-logo.webp";      // tedd a public mappába
 
@@ -445,7 +445,7 @@
     buyer: { "Magánszemély": "Soukromá osoba", "Cég": "Firma" },
     vals: [[/ hónap$/, " měsíců"], [/ km \/ hó/, " km / měs."], [/^Egy összegben$/, "Jednorázově"], [/^Finanszírozással$/, "S financováním"], [/^Még nem tudom$/, "Ještě nevím"]]
   } : IMK === "ch" ? {
-    email: "info@caradvance.hu",
+    email: "info@caradvance.ch",
     priv: ["Lieferung in die Schweiz — Rechnung ohne deutsche MwSt.; 4 % Automobilsteuer und 8,1 % Einfuhr-MWST bei der Einfuhr (Caradvance GmbH)", "Abholung in Deutschland — mit 19 % deutscher MwSt., Rückerstattung nach Ausfuhrnachweis"],
     co: ["Firma — Lieferung in die Schweiz, Rechnung ohne deutsche MwSt. (Einfuhr-MWST als Vorsteuer abziehbar)", "Firma — Abholung in Deutschland"],
     fin: ["Bitte um Hilfe bei der Finanzierung (Leasing über einen Partner)", "Ich habe eine eigene Finanzierung"],
@@ -968,7 +968,7 @@
     {img:'/bajzath-balazs.webp',name:'Bajz\u00e1th Bal\u00e1zs',role:'Sales Manager',tel:'+36 30 094 2081',telh:'tel:+36300942081',wah:W+'36300942081'}
   ];
   var CHT=[
-    {img:'/toth-karoly.webp',name:'K\u00e1roly T\u00f3th',role:R({x:'Vertriebsleiter',fr:'Directeur commercial',it:'Direttore commerciale',en:'Sales Director'}),tel:'+36 30 233 6060',telh:'tel:+36302336060',wah:W+'36302336060'},
+    {img:'/toth-karoly.webp',name:'K\u00e1roly T\u00f3th',role:R({x:'Vertriebsleiter',fr:'Directeur commercial',it:'Direttore commerciale',en:'Sales Director'}),tel:'+41 79 715 85 80',telh:'tel:+41797158580',wah:W+'41797158580'},
     {img:'/bajzath-balazs.webp',name:'Bal\u00e1zs Bajz\u00e1th',role:'Sales Manager',tel:'+36 30 094 2081',telh:'tel:+36300942081',wah:W+'36300942081'},
     {img:'/vadnai-zsombor.webp',name:'Zsombor Vadnai',role:'Sales Manager',tel:'+36 30 094 2105',telh:'tel:+36300942105',wah:W+'36300942105'}
   ];
