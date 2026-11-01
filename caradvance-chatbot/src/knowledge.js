@@ -34,6 +34,17 @@ export const SITES = {
     wa: '36302336060',
     email: 'info@caradvance.hu'
   },
+  ch: {
+    base: 'https://www.caradvance.ch',
+    indexBase: 'https://www.caradvance.hu',   // a keresőindex a közös Pages-projektben van
+    index: '/kereses-index-ch-de.json',
+    indexL: { de: '/kereses-index-ch-de.json', fr: '/kereses-index-ch-fr.json', it: '/kereses-index-ch-it.json', en: '/kereses-index-ch-en.json' },
+    prefix: '/ch',
+    lang: 'de',
+    phone: '+36 30 233 6060',
+    wa: '36302336060',
+    email: 'info@caradvance.hu'
+  },
   cz: {
     base: 'https://www.caradvance.cz',
     index: '/kereses-index-cs.json',
@@ -46,7 +57,7 @@ export const SITES = {
 };
 
 export const LANG_NAME = {
-  hu: 'Hungarian', sk: 'Slovak', cs: 'Czech', pl: 'Polish', en: 'English', de: 'German', fr: 'French', uk: 'Ukrainian', zh: 'Simplified Chinese'
+  hu: 'Hungarian', sk: 'Slovak', cs: 'Czech', pl: 'Polish', it: 'Italian', en: 'English', de: 'German', fr: 'French', uk: 'Ukrainian', zh: 'Simplified Chinese'
 };
 
 const HU = `
@@ -116,4 +127,21 @@ const CZ = `
 - V Česku nenabízíme komisní prodej ani charitativní program — nezmiňuj je.
 `;
 
-export const KB = { hu: HU, sk: SK, cz: CZ, pl: PL };
+const CH = `
+# CarAdvance — caradvance.ch (Schweiz / Suisse / Svizzera) — website in German, French, Italian and English
+- Anbieter, Verkäufer, Vermieter und einziger Vertragspartner: Caradvance GmbH, Bgm.-Graf-Ring 21, 82538 Geretsried, Deutschland (Amtsgericht München, HRB 151009, USt-IdNr. DE232664616). Seit 2003, über 5000 verkaufte Premium-Autos. Kunden in der Schweiz betreuen wir direkt sowie über unseren Vertriebspartner in der Schweiz; Verträge schliesst ausschliesslich die Caradvance GmbH ab. Nenne keinen Namen eines Schweizer Partners.
+- Kontakt: info@caradvance.hu · +36 30 233 6060 (auch WhatsApp) · Mo–Fr 9–17 Uhr · https://www.caradvance.ch/kontakt/ (fr: https://www.caradvance.ch/fr/kontakt/, it: https://www.caradvance.ch/it/kontakt/, en: https://www.caradvance.ch/en/kontakt/)
+- Team: Károly Tóth — Verkaufsleiter (Kontakte zum deutschen Markt, gesamter Importprozess), +36 30 214 6989 · Balázs Bajzáth — Sales Manager (Angebote, Dokumente, kaufmännische Fragen), +36 30 094 2081 · Zsombor Vadnai — Verkauf, +36 30 094 2105. Alle auch per WhatsApp erreichbar.
+- Sprachversionen: Deutsch https://www.caradvance.ch/ · Français https://www.caradvance.ch/fr/ · Italiano https://www.caradvance.ch/it/ · English https://www.caradvance.ch/en/ (gleiche Pfade mit Sprachpräfix, z. B. /fr/mieten/).
+
+## Leistungen
+1) Langzeitmiete von Premium-Neuwagen (keine Tagesmiete): mindestens 6 Monate, danach unbefristet mit 30 Tagen Kündigungsfrist. Kilometerpaket je nach Auto 2 000–4 000 km/Monat. Einmalige, rückzahlbare Kaution je nach Modell (Sicherheit, keine Miete; Rückzahlung innert 30 Tagen nach Rückgabe und Erledigung offener Punkte). In der Monatsmiete enthalten: Service und Wartung, Fahrzeugsteuer, Haftpflicht- und Vollkaskoversicherung (deutsche Versicherung, Selbstbehalt laut Vertrag), Sommer- und Winterreifen, Pannenhilfe. Die Autos sind in Deutschland auf die Caradvance GmbH zugelassen und fahren mit deutschen Kennzeichen. Die Miete richtet sich vor allem an Personen mit Wohnsitz im Ausland, die in der Schweiz arbeiten (z. B. Grenzgänger, Entsandte, die ihren Wohnsitz im Ausland behalten), sowie an Firmen. Personen mit Wohnsitz in der Schweiz dürfen ein im Ausland zugelassenes Auto in der Schweiz grundsätzlich nicht verwenden. Wird das Auto mehr als 6 Monate pro Jahr in der Schweiz genutzt, braucht es eine Zollbewilligung (Formular 15.30) — wir helfen dabei; ob Schweizer Kennzeichen nötig sind, entscheidet das kantonale Strassenverkehrsamt. Mietpreise sind netto, zuzüglich der gesetzlichen MWST nach den für den Mieter geltenden Regeln. Verträge werden online unterschrieben. Bedingungen: https://www.caradvance.ch/mieten/bedingungen-und-kaution/ · Mietautos: https://www.caradvance.ch/mieten/ · FAQ: https://www.caradvance.ch/mieten/haeufige-fragen/
+2) Premium-Autos zum Kauf aus Deutschland (geprüft, meist mit Werksgarantie): https://www.caradvance.ch/fahrzeuge/ — und Neuwagen nach Mass (BMW, MINI, Mercedes, Audi) mit Konfigurator: https://www.caradvance.ch/kaufen/neuwagen-nach-mass/ · Finanzierung/Leasing über Partner-Leasinggesellschaften nach Bonitätsprüfung, Konditionen legt die Leasinggesellschaft fest (Konsumkreditgesetz): https://www.caradvance.ch/kaufen/finanzierung-leasing/
+3) Autoimport aus Deutschland in die Schweiz: Suche, Prüfung und Besichtigung vor Ort, Transport, Verzollung, Hilfe bei MFK und Zulassung. https://www.caradvance.ch/import/ · Auto-Suchauftrag: https://www.caradvance.ch/auto-suche/
+- Steuern beim Import: Bei Lieferung in die Schweiz stellt die Caradvance GmbH ohne deutsche MWST in Rechnung (steuerfreie Ausfuhr). Bei der Einfuhr zahlt der Kunde 4 % Automobilsteuer und 8,1 % Einfuhr-MWST; seit 1.1.2024 kein Zoll auf Personenwagen. Die Verzollung organisieren wir. Bei Abholung in Deutschland: Rechnung mit 19 % deutscher MWST, die nach Ausfuhrnachweis erstattet wird. MWST-pflichtige Schweizer Firmen können die Einfuhr-MWST als Vorsteuer abziehen. Zulassung: Prüfbericht Formular 13.20 A vom Zoll (CHF 20), technische Prüfung (MFK) und Zulassung beim kantonalen Strassenverkehrsamt; Gebühren je Kanton; Schweizer Haftpflichtversicherung nötig (Versicherungsnachweis). Autos, die weniger als 12 Monate im Ausland zugelassen waren (oder weniger als 6 Monate und höchstens 5000 km), können vor der ersten Zulassung einer CO₂-Sanktion unterliegen — wir prüfen das vorab. Importdauer für ein Auto ab Lager: 5–14 Tage.
+- Importkosten-Rechner: https://www.caradvance.ch/import/importkosten-rechner/
+- Preise: Die Website zeigt Preise in CHF mit dem Euro-Betrag in Klammern; abgerechnet wird in Euro, die CHF-Beträge sind Richtwerte zum aktuellen Kurs. Den Endpreis enthält das schriftliche Angebot.
+- In der Schweiz bieten wir keinen Kommissionsverkauf, kein Operating Leasing für Privatpersonen und kein Charity-Programm an — erwähne sie nicht. Keine Kurzzeitmiete.
+`;
+
+export const KB = { hu: HU, sk: SK, cz: CZ, pl: PL, ch: CH };
