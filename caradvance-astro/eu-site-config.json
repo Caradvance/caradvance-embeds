@@ -442,10 +442,10 @@
   [
    "pel\\.textContent=\"nettó\\ \"\\+\"≈\\ \"\\+_pf\\(pp\\[0\\]\\)\\+\"\\ Ft/hó\"\\+\\(pp\\[0\\]===pp\\[1\\]\\?\"\":\"\\-tól\"\\)\\+\"\\ \\+\\ áfa\";",
    {
-    "de": "pel.textContent=(pp[0]===pp[1]?\"\":\"ab \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/Monat zzgl. MwSt.\";",
-    "fr": "pel.textContent=(pp[0]===pp[1]?\"\":\"dès \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/mois HT\";",
-    "it": "pel.textContent=(pp[0]===pp[1]?\"\":\"da \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/mese + IVA\";",
-    "es": "pel.textContent=(pp[0]===pp[1]?\"\":\"desde \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/mes + IVA\";"
+    "de": "pel.textContent=(pp[0]===pp[1]?\"\":\"ab \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+750)+\"/Monat zzgl. MwSt.\";",
+    "fr": "pel.textContent=(pp[0]===pp[1]?\"\":\"dès \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+750)+\"/mois HT\";",
+    "it": "pel.textContent=(pp[0]===pp[1]?\"\":\"da \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+750)+\"/mese + IVA\";",
+    "es": "pel.textContent=(pp[0]===pp[1]?\"\":\"desde \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+750)+\"/mes + IVA\";"
    }
   ],
   [

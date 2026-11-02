@@ -354,10 +354,10 @@
   [
    "pel\\.textContent=\"nettó\\ \"\\+\"≈\\ \"\\+_pf\\(pp\\[0\\]\\)\\+\"\\ Ft/hó\"\\+\\(pp\\[0\\]===pp\\[1\\]\\?\"\":\"\\-tól\"\\)\\+\"\\ \\+\\ áfa\";",
    {
-    "de": "pel.textContent=(pp[0]===pp[1]?\"\":\"ab \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/Monat (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";",
-    "fr": "pel.textContent=(pp[0]===pp[1]?\"\":\"dès \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/mois (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";",
-    "it": "pel.textContent=(pp[0]===pp[1]?\"\":\"da \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/mese (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";",
-    "en": "pel.textContent=(pp[0]===pp[1]?\"\":\"from \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+650)+\"/month (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+650)+\" €)\";"
+    "de": "pel.textContent=(pp[0]===pp[1]?\"\":\"ab \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+750)+\"/Monat (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+750)+\" €)\";",
+    "fr": "pel.textContent=(pp[0]===pp[1]?\"\":\"dès \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+750)+\"/mois (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+750)+\" €)\";",
+    "it": "pel.textContent=(pp[0]===pp[1]?\"\":\"da \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+750)+\"/mese (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+750)+\" €)\";",
+    "en": "pel.textContent=(pp[0]===pp[1]?\"\":\"from \")+(function(e){var c=e*0.9247;c=c>=10000?Math.round(c/10)*10:Math.round(c);return \"CHF \"+String(c).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"’\");})(pp[0]+750)+\"/month (≈ \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\" \");})(pp[0]+750)+\" €)\";"
    }
   ],
   [

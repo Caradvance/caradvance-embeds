@@ -310,6 +310,8 @@ function shortTitle(t, lang) {
   let best = -1;
   for (const sp of seps) { let i = s.lastIndexOf(sp, TMAX); while (i > TMAX) i = s.lastIndexOf(sp, i - 1); if (i >= 25 && i > best) best = i; }
   if (best > 0) return s.slice(0, best).trim();
+  // szlovák / cseh bérlési cím: a végén álló ár („… od 1029 €/mesiac”) ne vágódjon el szóhatáron — néhány karakter túllépés belefér
+  if (/^(sk|cs)$/.test(lang) && s.length <= TMAX + 8 && /\sod\s[\d\s\u00a0]+(?:€|Kč)\/(?:mes\.|mesiac|měs\.|měsíc)$/.test(s)) return s;
   // szóhatár
   let w = s.slice(0, TMAX + 1).lastIndexOf(' ');
   let out = (w > 30 ? s.slice(0, w) : s.slice(0, TMAX)).replace(/[\s,;:–—\-/|&(+]+$/, '');
