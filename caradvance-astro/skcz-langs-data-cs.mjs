@@ -6963,5 +6963,9 @@ export const CSL = {
 "U ojetého vozu zpravidla {1}–{2} dní; u nového vozu na objednávku záleží na výrobě. Přesnou dobu s vámi předem upřesníme a po celou dobu vás budeme informovat o stavu procesu.": [
 "For a used car usually {1}–{2} days; for a new car ordered from the factory it depends on production. We agree the exact timing with you in advance and keep you informed throughout the process.",
 "Bei einem Gebrauchtwagen in der Regel {1}–{2} Tage; bei einem bestellten Neuwagen hängt es von der Produktion ab. Den genauen Zeitpunkt vereinbaren wir vorab mit Ihnen und informieren Sie während des gesamten Ablaufs."
+],
+"<g0><g1>⟨M1⟩</g1><g2>od {1} Kč/měs.</g2></g0><g3><g4>⟨M2⟩</g4><g5>od {2} Kč/měs.</g5></g3><g6><g7>⟨M3⟩</g7><g8>od {4} Kč/měs.</g8></g6><g9><g10>⟨M4⟩.{5} Tourer</g10><g11>od {6} Kč/měs.</g11></g9><g12><g13>⟨M5⟩</g13><g14>od {8} Kč/měs.</g14></g12><g15><g16>⟨M6⟩</g16><g17>od {10} Kč/měs.</g17></g15>": [
+"<g0><g1>⟨M1⟩</g1><g2>from {1} CZK/month</g2></g0><g3><g4>⟨M2⟩</g4><g5>from {2} CZK/month</g5></g3><g6><g7>⟨M3⟩</g7><g8>from {4} CZK/month</g8></g6><g9><g10>⟨M4⟩.{5} Tourer</g10><g11>from {6} CZK/month</g11></g9><g12><g13>⟨M5⟩</g13><g14>from {8} CZK/month</g14></g12><g15><g16>⟨M6⟩</g16><g17>from {10} CZK/month</g17></g15>",
+"<g0><g1>⟨M1⟩</g1><g2>ab {1} CZK/Monat</g2></g0><g3><g4>⟨M2⟩</g4><g5>ab {2} CZK/Monat</g5></g3><g6><g7>⟨M3⟩</g7><g8>ab {4} CZK/Monat</g8></g6><g9><g10>⟨M4⟩.{5} Tourer</g10><g11>ab {6} CZK/Monat</g11></g9><g12><g13>⟨M5⟩</g13><g14>ab {8} CZK/Monat</g14></g12><g15><g16>⟨M6⟩</g16><g17>ab {10} CZK/Monat</g17></g15>"
 ]
 };

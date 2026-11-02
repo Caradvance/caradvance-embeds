@@ -8394,5 +8394,10 @@ export const SKL = {
 "For a used car usually {1}–{2} days; for a new car ordered from the factory it depends on production. We agree the exact timing with you in advance and keep you informed throughout the process.",
 "Bei einem Gebrauchtwagen in der Regel {1}–{2} Tage; bei einem bestellten Neuwagen hängt es von der Produktion ab. Den genauen Zeitpunkt vereinbaren wir vorab mit Ihnen und informieren Sie während des gesamten Ablaufs.",
 "Használt autónál általában {1}–{2} nap; rendelésre gyártott új autónál a gyártástól függ. A pontos időt előre egyeztetjük, és a folyamat során végig tájékoztatjuk Önt."
+],
+"<g0><g1>⟨M1⟩</g1><g2>od {1} €/mes.</g2></g0><g3><g4>⟨M2⟩</g4><g5>od {2} €/mes.</g5></g3><g6><g7>⟨M3⟩</g7><g8>od {4} €/mes.</g8></g6><g9><g10>⟨M4⟩.{5} Tourer</g10><g11>od {6} €/mes.</g11></g9><g12><g13>⟨M5⟩</g13><g14>od {8} €/mes.</g14></g12><g15><g16>⟨M6⟩</g16><g17>od {10} €/mes.</g17></g15>": [
+"<g0><g1>⟨M1⟩</g1><g2>from {1} €/month</g2></g0><g3><g4>⟨M2⟩</g4><g5>from {2} €/month</g5></g3><g6><g7>⟨M3⟩</g7><g8>from {4} €/month</g8></g6><g9><g10>⟨M4⟩.{5} Tourer</g10><g11>from {6} €/month</g11></g9><g12><g13>⟨M5⟩</g13><g14>from {8} €/month</g14></g12><g15><g16>⟨M6⟩</g16><g17>from {10} €/month</g17></g15>",
+"<g0><g1>⟨M1⟩</g1><g2>ab {1} €/Monat</g2></g0><g3><g4>⟨M2⟩</g4><g5>ab {2} €/Monat</g5></g3><g6><g7>⟨M3⟩</g7><g8>ab {4} €/Monat</g8></g6><g9><g10>⟨M4⟩.{5} Tourer</g10><g11>ab {6} €/Monat</g11></g9><g12><g13>⟨M5⟩</g13><g14>ab {8} €/Monat</g14></g12><g15><g16>⟨M6⟩</g16><g17>ab {10} €/Monat</g17></g15>",
+"<g0><g1>⟨M1⟩</g1><g2>{1} €/hó-tól</g2></g0><g3><g4>⟨M2⟩</g4><g5>{2} €/hó-tól</g5></g3><g6><g7>⟨M3⟩</g7><g8>{4} €/hó-tól</g8></g6><g9><g10>⟨M4⟩.{5} Tourer</g10><g11>{6} €/hó-tól</g11></g9><g12><g13>⟨M5⟩</g13><g14>{8} €/hó-tól</g14></g12><g15><g16>⟨M6⟩</g16><g17>{10} €/hó-tól</g17></g15>"
 ]
 };
