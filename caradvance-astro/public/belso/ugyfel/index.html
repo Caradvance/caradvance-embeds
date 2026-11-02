@@ -360,7 +360,8 @@ function load(){
     VSEL=CVID=(vehs()[0]||{}).id||'';
     useTpl(isSale()?'berles':'');
     // weboldali bérlési igény: a kiválasztott autó előre bekerül az ajánlatkészítőbe (még nem az Autók fülre)
-    var wp=S.card.data.web_pick;if(wp&&wp.title&&!(S.offers||[]).length&&!PICK.length){PICK.push(Object.assign({},wp,{src:'inv',fromWeb:true,vat_mode:wp.vat_mode||'net'}));if(TAB==='ov'&&!location.hash)TAB='s4';}
+    var wp=S.card.data.web_pick;if(wp&&wp.title&&!(S.offers||[]).length&&!PICK.length){var wpi=Object.assign({},wp,{src:'inv',fromWeb:true,vat_mode:wp.vat_mode||'net'});PICK.push(wpi);if(TAB==='ov'&&!location.hash)TAB='s4';
+      if(/^abo-/.test(wp.key||'')&&S.deal.line==='Bérlés')invP().then(function(){var f=(INV||[]).filter(function(x){return x.key===wp.key;})[0];if(f&&f.abo&&f.abo.cfg){wpi.abo=f.abo;if(!wpi.image)wpi.image=f.image;aboSelFromWeb(wpi,wp);renderPicked();}}).catch(function(){});}
     renderHead();renderAll();
     if(CT.text)loadTemplateFields(false);
   }).catch(function(e){$('root').innerHTML='<div class="loading">'+esc(e.message)+'</div>';});
@@ -886,7 +887,7 @@ function renderInv(){
     el.addEventListener('click',function(){
       var key=el.getAttribute('data-key'),i=PICK.findIndex(function(p){return p.key===key;});
       if(i>=0)PICK.splice(i,1);
-      else{var it=INV.find(function(x){return x.key===key;});PICK.push(Object.assign({},it,{note:'',src:'inv'}));}
+      else{var it=INV.find(function(x){return x.key===key;});var np=Object.assign({},it,{note:'',src:'inv'});if(np.abo&&np.abo.cfg)aboApply(np);PICK.push(np);}
       renderInv();renderPicked();
     });
   });
@@ -1139,6 +1140,7 @@ function renderPicked(){
       +'<div class="fld"><label>Ár típusa</label><select data-f="vat_mode"><option value="">—</option><option value="net"'+(p.vat_mode==='net'?' selected':'')+'>nettó</option><option value="hu27"'+(p.vat_mode==='hu27'?' selected':'')+'>bruttó, 27% magyar ÁFA</option><option value="de19"'+(p.vat_mode==='de19'?' selected':'')+'>bruttó, 19% német ÁFA</option></select></div>'
       +'<div class="fld"><label>Pénznem</label><select data-f="currency"><option value="HUF"'+(p.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(p.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-f="period"><option value="">egyszeri</option><option value="hó"'+(p.period==='hó'?' selected':'')+'>/ hó</option></select></div></div>'
+      +(p.abo&&p.abo.cfg?aboBlock(p,i):'')
       +(src==='config'?cfgOfferBlock(p,i):'')
       +(editable&&src!=='mobile'?'<div class="idrow"><label>Az autó adatlapja (link, nem kötelező)</label><input data-f="url" value="'+esc(p.url||'')+'" placeholder="https://www.caradvance.hu/auto/…" style="flex:1;min-width:220px">'+(/^https:\/\//.test(p.url||'')?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">megnyitás ↗</a>':'')+'</div>':'')
       +(!editable?'<div class="hint">'+esc(spec(p))+(p.url?' · <a href="'+esc(p.url)+'" target="_blank" rel="noopener">autó adatlapja ↗</a> <span class="hint">(az ajánlatban az ügyfél is megnyithatja)</span>':'')+'</div>':'')+'</div>';
@@ -1149,10 +1151,50 @@ function renderPicked(){
       var set=function(){var k=f.getAttribute('data-f');PICK[i][k]=k==='price'?(parseFloat(String(f.value).replace(/\s/g,'').replace(',','.'))||0):f.value;};
       f.addEventListener('input',set);f.addEventListener('change',set);
     });
-    bindCfgOffer(box,i);
+    bindCfgOffer(box,i);bindAbo(box,i);
     var pa=box.querySelector('[data-paste]');if(pa)pa.addEventListener('paste',function(){setTimeout(function(){pasteMob(i,pa.value);},30);});
     box.querySelector('[data-rm]').addEventListener('click',function(){PICK.splice(i,1);renderPicked();renderInv();});
   });
+}
+/* --- bérelhető (Auto-Abo) autó: a konkrét változat kiválasztása (mint a weboldal konfigurátorában) --- */
+var ABO_DIM=[['A','Elérhetőség',5],['F','Üzemanyag',0],['T','Futamidő',1],['K','Km-keret / hó',2],['C','Szín',3],['TR','Kivitel',4]];
+function aboNorm(x){return String(x==null?'':x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
+function aboLbl(d,v){return d==='T'?v+' hónap':d==='K'?Number(v).toLocaleString('hu-HU')+' km/hó':(d==='F'&&v==='PHEV'?'Hibrid (PHEV)':String(v));}
+function aboRows(p,skip){var c=p.abo.cfg,sel=p.aboSel||{};return (c.X||[]).filter(function(x){return ABO_DIM.every(function(d){return d[0]===skip||sel[d[0]]==null||x[d[2]]===sel[d[0]];});});}
+function aboApply(p){
+  var c=p.abo.cfg,sel=p.aboSel=p.aboSel||{},rows=aboRows(p),mark=Number(p.abo.mark)||0;
+  p.aboMatch=rows.length;if(!rows.length)return;
+  var lo=rows.reduce(function(a,x){return !a||x[7]<a[7]?x:a;},null),hi=rows.reduce(function(a,x){return !a||x[7]>a[7]?x:a;},null);
+  p.price=Math.round((lo[7]+mark)*1.19);p.currency='EUR';p.period='hó';p.vat_mode='de19';p.deposit=lo[6]||0;p.aboFrom=lo[7]!==hi[7];
+  var v=function(d){var di=ABO_DIM.filter(function(x){return x[0]===d;})[0];return sel[d]!=null?(c[d]||[])[sel[d]]:(rows.every(function(x){return x[di[2]]===lo[di[2]];})?(c[d]||[])[lo[di[2]]]:null);};
+  var F=v('F'),T=v('T'),K=v('K'),C=v('C'),TR=v('TR'),A=v('A');
+  p.fuel=F?aboLbl('F',F):(c.F||[]).join(' / ');p.color=C||'';p.equipment=TR?[TR]:[];p.months=T||0;p.km_keret=K?aboLbl('K',K):'';
+  p.note=[A?'Elérhetőség: '+A:'',T?'Futamidő: '+T+' hónap':'',K?'Km-keret: '+aboLbl('K',K):'',C?'Szín: '+C:'',TR?'Kivitel: '+TR:''].filter(Boolean).join(' · ')+(p.aboFrom?' · ár: -tól':'');
+}
+function aboBlock(p,i){
+  var c=p.abo.cfg,sel=p.aboSel||{};
+  var h='<div class="cfgo" style="border-color:#c9d8f3;background:#f7faff"><div class="cfgo-h"><b>Változat (a weboldal bérlési konfigurátora szerint)</b><span class="hint">'+(p.aboMatch?(p.aboMatch===1?'pontos változat':p.aboMatch+' változat egyezik — a legolcsóbb ára látszik'):'<b style="color:var(--bad)">nincs ilyen kombináció</b>')+'</span></div><div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">';
+  ABO_DIM.forEach(function(d){
+    var vals=c[d[0]]||[];if(!vals.length)return;
+    var ok={};aboRows(p,d[0]).forEach(function(x){ok[x[d[2]]]=1;});
+    h+='<div class="fld"><label>'+d[1]+'</label><select data-abo="'+d[0]+'"><option value="">— bármelyik —</option>'+vals.map(function(v,k){return '<option value="'+k+'"'+(sel[d[0]]===k?' selected':'')+(ok[k]?'':' disabled')+'>'+esc(aboLbl(d[0],v))+(ok[k]?'':' (nem elérhető)')+'</option>';}).join('')+'</select></div>';
+  });
+  return h+'</div><div class="hint" style="margin-top:6px">Ár: '+fmtPrice(p.price,'EUR')+'/hó bruttó (19% német ÁFA)'+(p.aboFrom?'-tól':'')+(p.deposit?' · kaució: '+fmtPrice(p.deposit,'EUR'):'')+' — a kiválasztott változat adatai (szín, kivitel, futamidő, km-keret) az ajánlatba és elfogadás után az autó adataiba / a szerződésbe kerülnek.</div></div>';
+}
+function bindAbo(box,i){
+  var p=PICK[i];if(!p||!p.abo||!p.abo.cfg)return;
+  box.querySelectorAll('[data-abo]').forEach(function(s){s.addEventListener('change',function(){p.aboSel=p.aboSel||{};p.aboSel[s.getAttribute('data-abo')]=s.value===''?null:+s.value;aboApply(p);renderPicked();});});
+}
+/* a weboldalon választott változat → kijelölés (név szerint) */
+function aboSelFromWeb(p,wp){
+  var c=p.abo.cfg,sel={},n=aboNorm,raw=(wp.note||'');
+  var pick=function(d,val){var vals=c[d]||[];var k=vals.findIndex(function(v){return n(v)===n(val)||(d==='F'&&n(val)==='hibrid'&&n(v)==='phev');});if(k>=0)sel[d]=k;};
+  if(wp.fuel)pick('F',wp.fuel);if(wp.color)pick('C',wp.color);
+  if(wp.equipment&&wp.equipment[0])pick('TR',wp.equipment[0]);
+  var m=Number(wp.months)||0;if(m){var t=(c.T||[]).indexOf(m);if(t>=0)sel.T=t;}
+  var km=parseInt(String(wp.km_keret||'').replace(/\D/g,''),10);if(km){var kk=(c.K||[]).indexOf(km);if(kk>=0)sel.K=kk;}
+  var av=(raw.match(/Elérhetőség: ([^·]+)/)||[])[1]||wp.avail||'';if(av)pick('A',av.trim());
+  p.aboSel=sel;aboApply(p);
 }
 /* --- CarAdvance-ajánlat (PDF) a konfigurátor adataiból és képeiből --- */
 function cfgOfferBlock(p,i){
