@@ -79,6 +79,8 @@
   .note{background:#fff8e6;border:1px solid #f3e2b3;color:#7a5a0d;border-radius:10px;padding:10px 12px;font-size:12.5px;margin-bottom:12px}
   /* ajánlat */
   .inv-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .invf{display:inline-flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .invsel{font:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;max-width:200px}
   .inv-tools input[type=search]{flex:1;min-width:180px;font:inherit;font-size:13.5px;padding:9px 12px;border:1px solid var(--line);border-radius:9px}
   .inv{max-height:430px;overflow:auto;border:1px solid var(--line);border-radius:12px}
   .inv .row{display:flex;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line2);cursor:pointer}
@@ -648,7 +650,7 @@ function renderVehicle(){
       return '<button class="vchip'+(x.id===VSEL?' on':'')+'" data-vid="'+esc(x.id)+'">'+(x.image?'<i style="background-image:url(\''+esc(x.image)+'\')"></i>':'<i class="ph">🚗</i>')+'<span><b>'+esc((i+1)+'. '+vehName(x,i))+'</b><small>'+esc(SRC_LBL[x.source]||'')+(x.price?' · '+fmtPrice(x.price,x.currency)+(x.period?'/'+esc(x.period):''):'')+rentBadge(x)+'</small></span></button>';
     }).join('')
     +'<button class="btn ghost sm" id="vehAddInv">+ Autó a készletből</button><button class="btn ghost sm" id="vehAddMan">+ Kézi felvitel</button></div>'
-    +'<div id="vehPicker" class="vpick"'+(VPICK?'':' style="display:none"')+'><div class="inv-tools"><input type="search" id="vpQ" placeholder="Keresés a készletben — márka, modell…"><label class="chk" style="font-size:13px"><input type="checkbox" id="vpAct" checked> Csak aktív</label><button class="btn ghost sm" id="vpClose">Bezár</button></div><div class="inv" id="vpList"><div class="loading" style="padding:24px">Készlet betöltése…</div></div></div>';
+    +'<div id="vehPicker" class="vpick"'+(VPICK?'':' style="display:none"')+'><div class="inv-tools"><input type="search" id="vpQ" placeholder="Keresés a készletben — márka, modell…">'+invFilterTools('vp')+'<label class="chk" style="font-size:13px"><input type="checkbox" id="vpAct" checked> Csak aktív</label><button class="btn ghost sm" id="vpClose">Bezár</button></div><div class="inv" id="vpList"><div class="loading" style="padding:24px">Készlet betöltése…</div></div></div>';
   var wpk=S.card.data.web_pick;
   if(!L.length&&wpk&&wpk.title)h+='<div class="note" style="margin-top:12px">Az ügyfél a weboldalon ezt választotta: <b>'+esc(wpk.title)+'</b>'+(wpk.price?' · '+fmtPrice(wpk.price,wpk.currency)+'/hó':'')+(wpk.note?' · '+esc(wpk.note):'')+'. Előbb ajánlat megy ki (Ajánlat fül) — ha az ügyfél elfogadja, az autó ide kerül.</div>';
   else if(!L.length)h+='<div class="hint" style="margin-top:12px">Még nincs autó ennél az ügyfélnél. Válassz a készletből, add meg kézzel — vagy ha az ügyfél egy kiküldött ajánlatban kiválaszt egy autót, az automatikusan ide kerül.</div>';
@@ -675,7 +677,7 @@ function renderVehicle(){
   $('vehAddMan').addEventListener('click',function(){addVehicle({source:'manual'});});
   $('vehAddInv').addEventListener('click',function(){VPICK=true;renderVehicle();$('vpQ').focus();});
   $('vpClose').addEventListener('click',function(){VPICK=false;$('vehPicker').style.display='none';});
-  if(VPICK){$('vpQ').addEventListener('input',renderVehPick);$('vpAct').addEventListener('change',renderVehPick);invP().then(renderVehPick).catch(function(e){$('vpList').innerHTML='<div class="loading" style="padding:24px">'+esc(e.message)+'</div>';});}
+  if(VPICK){$('vpQ').addEventListener('input',renderVehPick);$('vpAct').addEventListener('change',renderVehPick);invP().then(function(){invFillFilters('vp',renderVehPick);renderVehPick();}).catch(function(e){$('vpList').innerHTML='<div class="loading" style="padding:24px">'+esc(e.message)+'</div>';});}
   if($('vehDel'))$('vehDel').addEventListener('click',function(){
     var used=(S.fin&&S.fin.items||[]).filter(function(x){return x.vehicle_id===v.id;}).length;
     if(!confirm('Törlöd ezt az autót az ügyfél adatlapjáról? ('+vehName(v)+')'+(used?'\n'+used+' pénzügyi tétel ehhez az autóhoz van rendelve — ezek „autóhoz nem rendelt” tételek lesznek.':'')))return;
@@ -758,7 +760,7 @@ function invToVehicle(it){
 function renderVehPick(){
   var el=$('vpList');if(!el||!INV)return;
   var q=($('vpQ').value||'').toLowerCase().trim(),act=$('vpAct').checked,have={};vehs().forEach(function(v){if(v.key)have[v.key]=1;});
-  var rows=INV.filter(function(it){return (!act||it.active)&&(!q||(it.title+' '+it.brand+' '+it.year+' '+it.fuel).toLowerCase().indexOf(q)>=0);});
+  var rows=INV.filter(function(it){return (!act||it.active)&&invPass(it)&&(!q||(it.title+' '+it.brand+' '+it.year+' '+it.fuel).toLowerCase().indexOf(q)>=0);});
   el.innerHTML=rows.map(function(it){
     return '<div class="row'+(have[it.key]?' on':'')+'" data-key="'+esc(it.key)+'"><div class="th"'+(it.image?' style="background-image:url(\''+esc(it.image)+'\')"':'')+'></div>'
       +'<div class="tt"><b>'+esc(it.title)+(it.active?'':'<span class="off">inaktív</span>')+(it.abo?'<span class="off" style="color:#2a5aa8;border-color:#c9d8f3" title="A weboldal /autoink/#berelheto flottájából">Auto-Abo'+(it.abo.now?' · azonnal '+it.abo.now+' db':'')+'</span>':'')+'</b><span>'+esc(spec(it))+(it.abo&&it.abo.months&&it.abo.months.length?' · '+esc(it.abo.months.join('/'))+' hó':'')+'</span></div>'
@@ -767,6 +769,34 @@ function renderVehPick(){
   el.querySelectorAll('.row').forEach(function(r){r.addEventListener('click',function(){var k=r.getAttribute('data-key');if(have[k])return toast('Ez az autó már szerepel az ügyfélnél.');var it=INV.filter(function(x){return x.key===k;})[0];if(it)addVehicle(invToVehicle(it));});});
 }
 var __invP=null;
+/* készlet szűrők: márka + típus */
+function invBrand(it){return String(it.brand||String(it.title||'').split(/\s+/)[0]||'').trim();}
+function invType(it){
+  var b=invBrand(it),t=String(it.title||'').trim();
+  if(b&&t.toLowerCase().indexOf(b.toLowerCase())===0)t=t.slice(b.length);
+  var w=t.replace(/[\/,*"']/g,' ').trim().split(/\s+/).filter(Boolean);if(!w.length)return '';
+  var x=w[0];
+  if(/^bmw$/i.test(b)&&/^\d{3}[a-z]{0,2}$/i.test(x))x=x[0];
+  if(/^bmw$/i.test(b)&&/^[1-8]$/.test(x))x+='-'+{1:'es',2:'es',3:'as',4:'es',5:'ös',6:'os',7:'es',8:'as'}[x]+' sorozat';
+  else if(/^[A-Za-z]{1,3}$/.test(x)&&w[1]&&/^\d{1,3}$/.test(w[1]))x=x+' '+w[1];
+  else if(/^range$/i.test(x)&&/^rover$/i.test(w[1]||''))x='Range Rover'+(w[2]&&/^(sport|evoque|velar)$/i.test(w[2])?' '+w[2]:'');
+  return x;
+}
+function invSel(id,lbl,opts,val){return '<select id="'+id+'" class="invsel"><option value="">'+esc(lbl)+'</option>'+opts.map(function(o){return '<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>';}
+var INVF={b:'',t:''};
+function invFilterTools(pre){return '<span id="'+pre+'F" class="invf"></span>';}
+function invFillFilters(pre,onChange){
+  var el=$(pre+'F');if(!el||!INV)return;
+  var uniq=function(a){return a.filter(function(x,i){return x&&a.indexOf(x)===i;}).sort(function(a,b){return a.localeCompare(b,'hu',{numeric:true});});};
+  var brands=uniq(INV.map(invBrand));if(INVF.b&&brands.indexOf(INVF.b)<0)INVF.b='';
+  var types=uniq(INV.filter(function(it){return !INVF.b||invBrand(it)===INVF.b;}).map(invType));if(INVF.t&&types.indexOf(INVF.t)<0)INVF.t='';
+  el.innerHTML=invSel(pre+'B','Minden márka',brands,INVF.b)+invSel(pre+'T',INVF.b?'Minden '+INVF.b+' típus':'Minden típus',types,INVF.t)
+    +((INVF.b||INVF.t)?'<button class="btn ghost sm" id="'+pre+'X" title="Szűrők törlése">✕</button>':'');
+  $(pre+'B').addEventListener('change',function(){INVF.b=this.value;INVF.t='';invFillFilters(pre,onChange);onChange();});
+  $(pre+'T').addEventListener('change',function(){INVF.t=this.value;invFillFilters(pre,onChange);onChange();});
+  if($(pre+'X'))$(pre+'X').addEventListener('click',function(){INVF.b='';INVF.t='';invFillFilters(pre,onChange);onChange();});
+}
+function invPass(it){return (!INVF.b||invBrand(it)===INVF.b)&&(!INVF.t||invType(it)===INVF.t);}
 function invP(){if(!__invP)__invP=api('/inventory?line='+encodeURIComponent(S.deal.line)).then(function(j){INV=j.items;return INV;}).catch(function(e){__invP=null;throw e;});return __invP;}
 
 /* ---------------- 3. checklist ---------------- */
@@ -844,7 +874,7 @@ function requestPanel(){
 function renderOTab(){
   var el=$('oTab');if(!el)return;
   if(OTAB==='inv'){
-    el.innerHTML='<div class="inv-tools"><input type="search" id="invQ" placeholder="Keresés a készletben — márka, modell…"><label class="chk" style="font-size:13px"><input type="checkbox" id="invAct" checked> Csak aktív</label><button class="btn ghost sm" id="invReload">Frissítés</button></div>'
+    el.innerHTML='<div class="inv-tools"><input type="search" id="invQ" placeholder="Keresés a készletben — márka, modell…">'+invFilterTools('inv')+'<label class="chk" style="font-size:13px"><input type="checkbox" id="invAct" checked> Csak aktív</label><button class="btn ghost sm" id="invReload">Frissítés</button></div>'
       +'<div class="inv" id="inv"><div class="loading" style="padding:30px">Készlet betöltése…</div></div>';
     $('invQ').addEventListener('input',renderInv);$('invAct').addEventListener('change',renderInv);
     $('invReload').addEventListener('click',function(){INV=null;__invP=null;loadInv();});
@@ -878,14 +908,14 @@ function renderOTab(){
 function loadInv(){
   if(!$('inv'))return;
   $('inv').innerHTML='<div class="loading" style="padding:30px">Készlet betöltése…</div>';
-  invP().then(function(){renderInv();})
+  invP().then(function(){invFillFilters('inv',renderInv);renderInv();})
     .catch(function(e){if($('inv'))$('inv').innerHTML='<div class="loading" style="padding:30px">'+esc(e.message)+'</div>';});
 }
 function spec(it){return [it.year,it.km?(/km/i.test(it.km)?it.km:it.km+' km'):'',it.fuel,it.power,it.gearbox,it.color].filter(Boolean).join(' · ');}
 function renderInv(){
   if(!INV||!$('inv'))return;
   var q=($('invQ').value||'').toLowerCase().trim(),act=$('invAct').checked;
-  var rows=INV.filter(function(it){return (!act||it.active)&&(!q||(it.title+' '+it.brand+' '+it.year+' '+it.fuel).toLowerCase().indexOf(q)>=0);});
+  var rows=INV.filter(function(it){return (!act||it.active)&&invPass(it)&&(!q||(it.title+' '+it.brand+' '+it.year+' '+it.fuel).toLowerCase().indexOf(q)>=0);});
   var picked={};PICK.forEach(function(p){picked[p.key]=1;});
   $('inv').innerHTML=rows.map(function(it){
     return '<div class="row'+(picked[it.key]?' on':'')+'" data-key="'+esc(it.key)+'"><input type="checkbox"'+(picked[it.key]?' checked':'')+' tabindex="-1">'
