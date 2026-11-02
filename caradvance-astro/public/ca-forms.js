@@ -196,8 +196,8 @@
       if (lo === null || v < lo) lo = v; if (hi === null || v > hi) hi = v;
     });
     if (lo === null) return null;
-    var r = window.__ABRATE || 364, f = function (vm) { return Math.ceil((lo + 650) * vm * r / 10000) * 10000; };
-    return { co: f(1), priv: f(1.19), coE: lo + 650, privE: Math.round((lo + 650) * 1.19), from: lo !== hi };
+    var r = window.__ABRATE || 364, f = function (vm) { return Math.ceil((lo + 750) * vm * r / 10000) * 10000; };
+    return { co: f(1), priv: f(1.19), coE: lo + 750, privE: Math.round((lo + 750) * 1.19), from: lo !== hi };
   }
 
   var AB = {
