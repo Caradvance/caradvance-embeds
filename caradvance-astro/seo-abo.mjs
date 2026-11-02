@@ -194,3 +194,39 @@ console.log('[abo] kesz (' + done + ' fajl modositva)');
   }
   console.log('[abo] berlesi modal a modell-oldalakon: ' + n + ' fajl');
 }
+
+// ---- Bérelhető (Auto-Abo) flotta gépi kivonata a belső CRM-nek: /abo-fleet.json ----
+// A belső ügyfél-adatlap ajánlatkészítője (Bérlés → Készlet) ebből mutatja a weboldal /autoink/#berelheto autóit.
+try {
+  const ah = fs.readFileSync('dist/autoink/index.html', 'utf8');
+  const si = ah.indexOf('window.SUB=');
+  if (si > -1) {
+    const s0 = ah.slice(si + 11); let d = 0, j = 0, q = false;
+    for (; j < s0.length; j++) { const c = s0[j]; if (q) { if (c === '\\') { j++; continue; } if (c === '"') q = false; continue; } if (c === '"') { q = true; continue; } if (c === '{') d++; else if (c === '}') { d--; if (!d) break; } }
+    const S = JSON.parse(s0.slice(0, j + 1));
+    // a fotók és a modell-oldal linkje ugyanabból a kódból, amiből a kártyák készülnek
+    const pm = SEC.match(/var PHOTO=(\{[^;]*?\});/);
+    const PHOTO = pm ? JSON.parse(pm[1]) : {};
+    const ri = SEC.indexOf('function rhref(');
+    let rhref = null;
+    if (ri > -1) { let k = SEC.indexOf('{', ri), dd = 0; for (; k < SEC.length; k++) { if (SEC[k] === '{') dd++; else if (SEC[k] === '}') { dd--; if (!dd) break; } } try { rhref = new Function('return ' + SEC.slice(ri, k + 1))(); } catch (e) { rhref = null; } }
+    const MARK = +((SEC.match(/effNet = m\.net \? \(m\.net \+ (\d+)\)/) || [])[1] || 0); // a kártyán mutatott (nettó) havidíj = flotta-ár + felár
+    const dn = (x) => String(x).replace(/\b(\d)er\b/g, '$1');
+    const slug = (x) => String(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const site = 'https://www.caradvance.hu';
+    const abs = (u) => !u ? '' : /^https?:/.test(u) ? u : site + (u.startsWith('/') ? '' : '/') + u;
+    const cars = (S.models || []).filter((m) => m && m.brand && m.model).map((m) => {
+      const name = m.brand + ' ' + m.model;
+      let url = ''; try { url = rhref ? abs(rhref(m.brand, m.model)) : ''; if (url && !/[/#?]/.test(url.slice(-1)) && !/\.[a-z]+$/.test(url)) url += '/'; } catch (e) { url = ''; }
+      return {
+        key: 'abo-' + slug(name), brand: m.brand === 'VW' ? 'Volkswagen' : m.brand, title: (m.brand === 'VW' ? 'Volkswagen' : m.brand) + ' ' + dn(m.model),
+        body: m.cat || '', fuels: m.fuels || [], gears: m.gears || [], psMin: m.psMin || 0, psMax: m.psMax || 0,
+        net: m.net || 0, price: m.net ? m.net + MARK : 0, months: m.months || [], km: m.km || [], colors: (m.colors || []).map((c) => c.n).filter(Boolean),
+        variants: m.variants || [], now: m.now || 0, count: m.count || 0, later: (m.later || []).map((l) => ({ d: l.d, c: l.c })),
+        image: abs(PHOTO[name] || m.img || ''), url: url || site + '/autoink/#berelheto'
+      };
+    });
+    fs.writeFileSync('dist/abo-fleet.json', JSON.stringify({ updated: new Date().toISOString(), rate: S.rate_fallback || 0, cars }));
+    console.log('[abo] abo-fleet.json: ' + cars.length + ' modell');
+  }
+} catch (e) { console.log('[abo] abo-fleet.json hiba: ' + e.message); }
