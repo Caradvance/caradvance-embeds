@@ -182,7 +182,7 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
     g(d, "Felszereltség") && "Kivitel: " + g(d, "Felszereltség"), start && "Kezdés: " + start].filter(Boolean).join(" · ");
   const webPick = car ? { key: vehicle.key || "web-" + dealId, src: "inv", title: car, brand, year: "2026", km: "0 km", fuel: vehicle.fuel, power: "", gearbox: "", color: vehicle.color,
     image: img, url: vehicle.url, price, currency: cur, period: "hó", deposit: vehicle.deposit, note: s(pickNote, 400), months, rent_start: start, rent_end: vehicle.rent_end,
-    vat_mode: cur === "EUR" ? "de19" : "", km_keret: kmKeret, equipment: equipment ? [equipment] : [], fx: fx || undefined, at: nowIso() } : null;
+    vat_mode: cur === "EUR" ? "de19" : "", km_keret: kmKeret, avail: s(g(d, "Elérhetőség"), 80), equipment: equipment ? [equipment] : [], fx: fx || undefined, at: nowIso() } : null;
   await saveCard(env, dealId, {
     status: car ? "Ajánlatra vár" : "Kapcsolatfelvételre vár",
     data: {
