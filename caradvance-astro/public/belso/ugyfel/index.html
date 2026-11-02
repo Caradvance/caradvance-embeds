@@ -358,7 +358,10 @@ function load(){
     S.card.data=normData(S.card.data,S.deal,S.card.address);
     $('backLink').href='/belso/#'+(LTAB[S.deal.line]||'');
     VSEL=CVID=(vehs()[0]||{}).id||'';
-    useTpl(isSale()?'berles':'');renderHead();renderAll();
+    useTpl(isSale()?'berles':'');
+    // weboldali bérlési igény: a kiválasztott autó előre bekerül az ajánlatkészítőbe (még nem az Autók fülre)
+    var wp=S.card.data.web_pick;if(wp&&wp.title&&!(S.offers||[]).length&&!PICK.length){PICK.push(Object.assign({},wp,{src:'inv',fromWeb:true,vat_mode:wp.vat_mode||'net'}));if(TAB==='ov'&&!location.hash)TAB='s4';}
+    renderHead();renderAll();
     if(CT.text)loadTemplateFields(false);
   }).catch(function(e){$('root').innerHTML='<div class="loading">'+esc(e.message)+'</div>';});
 }
@@ -374,6 +377,7 @@ function normData(d,deal,addr){
     vehicles:(d.vehicles||[]).map(function(v){return Object.assign({id:'',title:'',brand:'',model:'',year:'',vin:'',plate:'',ad_id:'',config_code:'',color:'',engine:'',fuel:'',km:'',condition:'',body:'',gearbox:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);}),
     buyer:{kind:d.buyer&&d.buyer.kind==='ceg'?'ceg':'magan',person:Object.assign({name:'',address:'',phone:'',email:'',tax:'',id_number:'',mother_name:'',birth_place:'',birth_date:'',residence:'',bank:'',licence:'',address_card:'',vpid:''},(d.buyer&&d.buyer.person)||{}),company:Object.assign({name:'',address:'',tax:'',reg:''},(d.buyer&&d.buyer.company)||{})},
     notes:d.notes||'',
+    web_pick:d.web_pick||null,
     request:d.request||''
   };
 }
@@ -442,11 +446,13 @@ function ovTodos(){
   else if(miss.length)T.push({c:'warn',i:'👤',t:'Hiányzó ügyféladatok ('+miss.length+')',s:miss.slice(0,5).join(', ')+(miss.length>5?' …':'')+' — küldj adatbekérő e-mailt, vagy töltsd ki',a:go('s1','Kitöltés')});
   if(isSale()){var bm=personMissing(d.buyer.person);if(bm.length&&bm.length<9)T.push({c:'warn',i:'🤝',t:'Hiányzó vevő-adatok ('+bm.length+')',s:bm.slice(0,5).join(', '),a:go('s1','Kitöltés')});}
   // autó
-  if(!vehs().length)T.push({c:'warn',i:'🚗',t:'Még nincs autó az ügyfélnél',s:'Válassz a készletből, vagy küldj ajánlatot — az elfogadott autó automatikusan bekerül',a:go('s2','Autó hozzáadása')});
+  if(!vehs().length&&!(d.web_pick&&d.web_pick.title))T.push({c:'warn',i:'🚗',t:'Még nincs autó az ügyfélnél',s:'Válassz a készletből, vagy küldj ajánlatot — az elfogadott autó automatikusan bekerül',a:go('s2','Autó hozzáadása')});
   vehs().forEach(function(v){var r=rentState(v);if(r&&r.cls!=='ok')T.push({c:r.cls==='bad'?'bad':'warn',i:'⏰',t:'Bérlet: '+r.txt,s:vehName(v)+' · lejárat: '+huD(v.rent_end),a:go('s2')});});
   // ajánlat
   var O=S.offers||[],lo=O[0];
-  if(!O.length){if(STEP_MAIN.indexOf(S.card.status)<3)T.push({c:'',i:'✉',t:'Még nem ment ki ajánlat',s:'Állíts össze ajánlatot a készletből vagy gyári konfigurátorból',a:go('s4','Ajánlat készítése')});}
+  var wp=d.web_pick;
+  if(!O.length&&wp&&wp.title)T.push({c:'warn',i:'✉',t:'Ajánlat küldése: '+wp.title,s:'Az ügyfél a weboldalon ezt az autót választotta'+(wp.price?' ('+fmtPrice(wp.price,wp.currency)+'/hó)':'')+' — az ajánlatkészítőben már be van töltve',a:go('s4','Ajánlat küldése')});
+  else if(!O.length){if(STEP_MAIN.indexOf(S.card.status)<3)T.push({c:'',i:'✉',t:'Még nem ment ki ajánlat',s:'Állíts össze ajánlatot a készletből vagy gyári konfigurátorból',a:go('s4','Ajánlat készítése')});}
   else if(lo.sent&&!lo.responded_at)T.push({c:'wait',i:'⏳',t:'Az ajánlat válaszra vár',s:'Kiküldve: '+fmtDate(lo.created_at)+' · '+lo.items.length+' autó',a:go('s4')});
   else if(lo.responded_at&&lo.action!=='elfogad')T.push({c:'warn',i:'✎',t:'Az ügyfél módosítást kért',s:(lo.client_msg||'').slice(0,120)||'Válasz: '+fmtDate(lo.responded_at),a:go('s4','Új ajánlat')});
   // dokumentumok
@@ -634,7 +640,9 @@ function renderVehicle(){
     }).join('')
     +'<button class="btn ghost sm" id="vehAddInv">+ Autó a készletből</button><button class="btn ghost sm" id="vehAddMan">+ Kézi felvitel</button></div>'
     +'<div id="vehPicker" class="vpick"'+(VPICK?'':' style="display:none"')+'><div class="inv-tools"><input type="search" id="vpQ" placeholder="Keresés a készletben — márka, modell…"><label class="chk" style="font-size:13px"><input type="checkbox" id="vpAct" checked> Csak aktív</label><button class="btn ghost sm" id="vpClose">Bezár</button></div><div class="inv" id="vpList"><div class="loading" style="padding:24px">Készlet betöltése…</div></div></div>';
-  if(!L.length)h+='<div class="hint" style="margin-top:12px">Még nincs autó ennél az ügyfélnél. Válassz a készletből, add meg kézzel — vagy ha az ügyfél egy kiküldött ajánlatban kiválaszt egy autót, az automatikusan ide kerül.</div>';
+  var wpk=S.card.data.web_pick;
+  if(!L.length&&wpk&&wpk.title)h+='<div class="note" style="margin-top:12px">Az ügyfél a weboldalon ezt választotta: <b>'+esc(wpk.title)+'</b>'+(wpk.price?' · '+fmtPrice(wpk.price,wpk.currency)+'/hó':'')+(wpk.note?' · '+esc(wpk.note):'')+'. Előbb ajánlat megy ki (Ajánlat fül) — ha az ügyfél elfogadja, az autó ide kerül.</div>';
+  else if(!L.length)h+='<div class="hint" style="margin-top:12px">Még nincs autó ennél az ügyfélnél. Válassz a készletből, add meg kézzel — vagy ha az ügyfél egy kiküldött ajánlatban kiválaszt egy autót, az automatikusan ide kerül.</div>';
   if(v){
     var i=L.indexOf(v);
     h+='<div class="veh-form"><div class="veh-h"><b>'+esc((i+1)+'. autó — '+vehName(v,i))+'</b><span class="hint">'+esc(SRC_LBL[v.source]||'')+'</span>'+(v.url?'<a class="hint" href="'+esc(v.url)+'" target="_blank" rel="noopener">weboldal ↗</a>':'')+'<span class="sp" style="flex:1"></span><button class="btn ghost sm" id="vehDel">Autó törlése</button></div>'
@@ -1117,7 +1125,7 @@ function renderPicked(){
     var src=p.src||(p.manual?'manual':'inv');
     var editable=src!=='inv';
     return '<div class="pk" data-i="'+i+'"><div class="t">'+(p.image?'<i class="pth" style="background-image:url(\''+esc(p.image)+'\')"></i>':'')+(i+1)+'. '+(editable?'<input data-f="title" placeholder="Autó megnevezése (márka, modell, kivitel)" value="'+esc(p.title)+'" style="flex:1;font:inherit;font-weight:800;padding:7px 9px;border:1px solid var(--line);border-radius:8px">':esc(p.title))
-      +'<span class="sbadge '+src+'">'+SRC_BADGE[src]+'</span><span class="x" title="Eltávolítás" data-rm="1">×</span></div>'
+      +'<span class="sbadge '+src+'">'+SRC_BADGE[src]+'</span>'+(p.fromWeb?'<span class="sbadge" style="background:#fff3df;color:#a2660b">az ügyfél a weboldalon ezt választotta</span>':'')+'<span class="x" title="Eltávolítás" data-rm="1">×</span></div>'
       +(src==='mobile'?'<div class="idrow"><label>mobile.de hirdetés-azonosító</label><input data-f="ad_id" value="'+esc(p.ad_id||'')+'" inputmode="numeric" style="width:130px">'+(p.ad_url?'<a href="'+esc(p.ad_url)+'" target="_blank" rel="noopener">hirdetés megnyitása ↗</a>':'')+(p.src_price?'<span class="hint">mobile.de ár: <b>'+fmtPrice(p.src_price,'EUR')+'</b>'+(p.vat?' · '+esc(p.vat):'')+'</span>':'')+'</div>':'')
       +(src==='config'?'<div class="idrow"><label>Márka</label><select data-f="brand"><option value="">—</option>'+['BMW','MINI','Mercedes-Benz','Audi','Volkswagen'].map(function(b){return '<option'+(p.brand===b?' selected':'')+'>'+b+'</option>';}).join('')+'</select><label>Konfigurációs kód</label><input data-f="config_code" value="'+esc(p.config_code||'')+'" style="width:130px">'+(p.file_id?'<a href="'+API+'/card/'+ID+'/files/'+p.file_id+'" target="_blank" rel="noopener">📄 '+esc(p.file_name||'PDF')+'</a>':'')+(p.config_url?'<a href="'+esc(p.config_url)+'" target="_blank" rel="noopener noreferrer">🔗 konfiguráció ↗</a>':'')+(p.src_price?'<span class="hint">PDF szerinti ár: <b>'+fmtPrice(p.src_price,'EUR')+'</b></span>':'')+'</div>':'')
       +(src==='mobile'&&p.needPaste?'<div class="paste"><b>A mobile.de nem engedte az automatikus letöltést.</b> Nyisd meg a hirdetést'+(p.ad_url?' (<a href="'+esc(p.ad_url)+'" target="_blank" rel="noopener">link ↗</a>)':'')+', nyomj <b>Ctrl+A</b>, <b>Ctrl+C</b>, és illeszd be ide — a rendszer kiolvassa az adatokat:<textarea data-paste="'+i+'" rows="2" placeholder="Beillesztés ide (Ctrl+V)…"></textarea></div>':'')
