@@ -12,7 +12,7 @@ import {
 import { addListing, getCandidates, getDeal, getRequest, moveToSlot, processRequest, publishBlockers, slotViews, type RequestRow } from "./engine";
 import { createRequest, startForDeal } from "./intake";
 import { describe } from "./describe";
-import { buildSearchUrl, getSource } from "./sources";
+import { buildSearchUrl, getSource, FEATURE_CODE } from "./sources";
 import { buildPublicOffer, DEFAULT_CONTACT, publishOffer } from "./offers";
 import { loadRates, saveRates, setVerified, unverifiedPaths, type RateConfig } from "./rates";
 import { transition } from "./status";
@@ -104,9 +104,10 @@ staff.get("/igeny/:id", async (c) => {
   const events = (await c.env.DB.prepare("SELECT actor, type, from_status, to_status, at, data_json FROM am_events WHERE deal_id = ? ORDER BY id DESC LIMIT 60").bind(id).all<any>()).results;
   // vehicle-price ceiling for the search: budget minus ~2.5 M Ft import costs, at the cached EUR/HUF rate
   const fx = (await cacheGet<{ rate: number }>(c.env, "fx:EURHUF"))?.rate || 395;
-  const searchUrl = req ? buildSearchUrl(req, req.vehicle.budget_huf_max ? (req.vehicle.budget_huf_max - 2_500_000) / fx : req.vehicle.budget_eur_max) : null;
+  const searchMaxEur = req ? (req.vehicle.search_price_max_eur || (req.vehicle.budget_huf_max ? Math.max(0, Math.round((req.vehicle.budget_huf_max - 2_500_000) / fx / 1000) * 1000) : req.vehicle.budget_eur_max)) : undefined;
+  const searchUrl = req ? buildSearchUrl(req, searchMaxEur) : null;
   return page(c, deal.name || "Igény", requestPage({
-    row, deal, cardStatus: card?.status || "", req, cars, searchUrl, runners: all.filter((x) => !x.slot && x.pool === "runner"), rejected: all.filter((x) => x.pool === "rejected"),
+    row, deal, cardStatus: card?.status || "", req, cars, searchUrl, searchMaxEur, runners: all.filter((x) => !x.slot && x.pool === "runner"), rejected: all.filter((x) => x.pool === "rejected"),
     blockers: publishBlockers(cars), offers, events, baseUrl: baseUrl(c.env, c.req.raw), extraction: row.meta_json ? JSON.parse(row.meta_json) : null,
     hasEmail: !!(card?.data?.person?.email || deal.email),
   }), "igenyek");
@@ -138,6 +139,33 @@ staff.post("/igeny/:id/requirements", async (c) => {
   if (row && ["REJECTED", "READY", "EXPIRED"].includes(row.status)) await transition(c.env, id, "NEEDS_REVIEW", c.get("user").name);
   await processRequest(c.env, id, c.get("user").name, baseUrl(c.env, c.req.raw));
   return back(c, reqPath(id), "Mentve, keresés újrafuttatva.");
+});
+
+/* the editable mobile.de search (igény oldal): the fields are saved into the request's requirements */
+staff.post("/igeny/:id/kereses", async (c) => {
+  const id = Number(c.req.param("id"));
+  const g = await guardDeal(c, id); if (g) return g;
+  const row = await getRequest(c.env, id);
+  if (!row?.requirements_json) return back(c, reqPath(id), undefined, "Nincs igény.");
+  const f = await c.req.parseBody({ all: true });
+  const one = (k: string) => String(Array.isArray(f[k]) ? (f[k] as any[])[0] : f[k] ?? "").trim().slice(0, 120);
+  const many = (k: string) => (Array.isArray(f[k]) ? (f[k] as any[]) : f[k] != null ? [f[k]] : []).map((x) => String(x).trim()).filter(Boolean).slice(0, 20);
+  const num = (k: string) => { const n = parseInt(one(k).replace(/\D/g, ""), 10); return n > 0 ? n : undefined; };
+  const req: Requirements = JSON.parse(row.requirements_json);
+  const v = req.vehicle;
+  v.makes = one("make") ? [one("make")] : [];
+  v.models = one("model") ? [one("model")] : [];
+  v.year_min = num("year_min"); v.year_max = num("year_max"); v.km_min = num("km_min"); v.km_max = num("km_max");
+  v.fuel = many("fuel").filter((x) => ["petrol", "diesel", "hybrid", "phev", "electric"].includes(x)) as any;
+  v.body_types = many("body").filter((x) => ["estate", "suv", "sedan", "hatchback", "coupe", "convertible", "van", "pickup"].includes(x));
+  const gb = one("gearbox"); v.gearbox = gb === "automatic" || gb === "manual" ? gb : undefined;
+  v.search_price_max_eur = num("price_max");
+  const eq = many("equip");
+  v.must_have_equipment = [...eq, ...(v.must_have_equipment || []).filter((e) => !eq.includes(e) && !Object.keys(FEATURE_CODE).some((k) => e.toLowerCase().startsWith(k.toLowerCase())) && !/^anhängerkupplung/i.test(e))];
+  if ((v.makes.length || v.body_types.length) && (v.budget_huf_max || v.budget_eur_max || v.search_price_max_eur)) req.missing_critical_fields = [];
+  await c.env.DB.prepare("UPDATE am_requests SET requirements_json = ?, updated_at = ? WHERE deal_id = ?").bind(JSON.stringify(req), nowIso(), id).run();
+  await logEvent(c.env, id, c.get("user").name, "search_edited", { url: buildSearchUrl(req, v.search_price_max_eur) });
+  return back(c, reqPath(id), "Keresési adatok mentve.");
 });
 
 staff.post("/igeny/:id/search", async (c) => {

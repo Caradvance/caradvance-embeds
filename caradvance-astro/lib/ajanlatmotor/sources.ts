@@ -33,15 +33,16 @@ const MAKE_IDS: Record<string, number> = {
   "land rover": 14800, "tesla": 135, "skoda": 22900, "mini": 17500, "lexus": 15200, "toyota": 24100, "cupra": 3,
 };
 
-const FUEL_CODE: Record<Fuel, string> = {
+export const FUEL_CODE: Record<Fuel, string> = {
   electric: "ELECTRICITY", petrol: "PETROL", diesel: "DIESEL", hybrid: "HYBRID", phev: "HYBRID_PLUGIN",
 };
 /** mobile.de vehicle categories (c=) for our body types */
-const BODY_CODE: Record<string, string[]> = {
+export const BODY_CODE: Record<string, string[]> = {
   estate: ["EstateCar"], suv: ["OffRoad"], sedan: ["Limousine"], hatchback: ["Limousine", "SmallCar"], coupe: ["SportsCar"], convertible: ["Cabrio"], van: ["Van"], pickup: ["OffRoad"],
 };
 /** full make / model ID list (same as the /auto-rendeles/ form's comparison links) */
 import MOBILE_IDS from "./mobile-ids.json";
+export { MOBILE_IDS };
 const norm = (x: string) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 function mobileIds(make?: string, model?: string): { make?: string; model?: string } {
   if (!make) return {};
@@ -54,7 +55,7 @@ function mobileIds(make?: string, model?: string): { make?: string; model?: stri
 }
 
 /** mobile.de feature codes (fe=) for must-have equipment; Panorama, HUD and Standheizung checked in a live search 2026-10. Tow bar is its own parameter (tct). */
-const FEATURE_CODE: Record<string, string> = {
+export const FEATURE_CODE: Record<string, string> = {
   "Panorama-Dach": "PANORAMIC_GLASS_ROOF",
   "Head-Up Display": "HEAD_UP_DISPLAY",
   "Standheizung": "AUXILIARY_HEATING",

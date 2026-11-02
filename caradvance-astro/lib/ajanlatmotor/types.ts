@@ -85,6 +85,8 @@ export interface Requirements {
     year_max?: number;
     km_min?: number;
     km_max?: number;
+    /** staff-set ceiling for the mobile.de search (vehicle price, EUR) */
+    search_price_max_eur?: number;
     power_kw_min?: number;
     budget_huf_max?: number;
     budget_eur_max?: number;

@@ -6,6 +6,7 @@ import type { Listing, Requirements } from "./types";
 import { equipHu } from "./describe";
 import { sectionLabel } from "./offer-view";
 import { unverifiedPaths, type RateConfig } from "./rates";
+import { MOBILE_IDS, FUEL_CODE, BODY_CODE, FEATURE_CODE } from "./sources";
 
 const CSS = `
 :root{--navy:#161922;--red:#E2001A;--bg:#F6F7FB;--line:#ECEEF2;--muted:#6b7280;--ok:#128a63;--warn:#fff3b0;--warnline:#e6c200}
@@ -162,7 +163,7 @@ export function requestPage(o: {
   row: RequestRow; deal: DealRow; cardStatus: string; req: Requirements | null; cars: CarView[]; runners: CandidateRow[]; rejected: CandidateRow[];
   blockers: string[]; offers: { token: string; offer_no: string; published_at: string; expires_at: string; first_viewed_at: string | null; responded_at: string | null; action: string | null; choice: number | null; sent_to: string | null; sent: number }[];
   events: { actor: string; type: string; from_status: string | null; to_status: string | null; at: string; data_json: string | null }[];
-  baseUrl: string; extraction: any; hasEmail: boolean; searchUrl?: string | null;
+  baseUrl: string; extraction: any; hasEmail: boolean; searchUrl?: string | null; searchMaxEur?: number;
 }) {
   const { row, req } = o;
   const published = ["PUBLISHED", "VIEWED", "CHOSEN", "CLOSED"].includes(row.status);
@@ -188,11 +189,12 @@ export function requestPage(o: {
   <div><h1>${esc(d.name || req?.customer.name || row.from_email || "Ismeretlen ügyfél")} <span class="chip ${row.status}">${STATUS_LABEL[row.status as Status] || row.status}</span></h1>
   <div class="muted">${esc(d.email || row.from_email || "")}${d.phone ? " · " + esc(d.phone) : ""} · adatlap: <b>${esc(o.cardStatus)}</b> · <a href="/belso/ugyfel/?id=${row.deal_id}" target="_blank">Ügyfél adatlap ↗</a> · forrás: ${esc(row.source)} · ${new Date(row.created_at).toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })} · kinyerés: ${esc(o.extraction?.engine || "–")}</div></div>
   <div class="row">
-   ${o.searchUrl && !published ? `<a class="btn red" href="${esc(o.searchUrl)}" target="_blank" rel="noopener" title="Az igény alapján előre kitöltött mobile.de keresés. A jó hirdetést a Chrome bővítménnyel küldd be („Küldés az ajánlatba”).">mobile.de keresés ↗</a>` : ""}
+   ${o.searchUrl && !published ? `<a class="btn red" href="#mdSearch" title="A keresési adatok ellenőrzése / módosítása, majd a mobile.de keresés megnyitása.">mobile.de keresés ↓</a>` : ""}
    <form method="post" action="${B}/search"><button class="btn" ${published ? "disabled" : ""}>Keresés újrafuttatása</button></form>
    <form method="post" action="${B}/describe"><button class="btn" ${published ? "disabled" : ""}>Mindhárom leírás generálása</button></form>
    <a class="btn" href="${B}/preview" target="_blank">Előnézet ↗</a>
   </div></div>
+  ${req && !published ? searchEditor(req, row.deal_id, o.searchMaxEur) : ""}
   ${o.blockers.length && !published ? `<div class="flag"><strong>Közzététel előtt:</strong> ${o.blockers.map(esc).join(" · ")}</div>` : ""}
   ${!published ? `<form method="post" action="${B}/publish" class="card row" style="margin-top:14px;align-items:flex-start">
     <div style="flex:1;min-width:280px"><label class="small"><b>Kísérő üzenet az ügyfélnek</b> (nem kötelező)</label><textarea name="message" rows="2" style="font-family:inherit;font-size:13.5px"></textarea></div>
@@ -274,3 +276,75 @@ export function startPage(deal: DealRow) {
 }
 
 export function equipLabel(e: string) { return equipHu(e).hu; }
+
+
+/* ---------------- szerkeszthető mobile.de keresés (az igény adataiból, kiküldés előtt módosítható) ---------------- */
+const FUEL_HU: [string, string][] = [["petrol", "Benzin"], ["diesel", "Dízel"], ["hybrid", "Hibrid"], ["phev", "Plug-in hibrid"], ["electric", "Elektromos"]];
+const BODY_HU: [string, string][] = [["suv", "SUV / terepjáró"], ["estate", "Kombi"], ["sedan", "Limuzin"], ["hatchback", "Ferdehátú"], ["coupe", "Coupé"], ["convertible", "Kabrió"], ["van", "Egyterű / van"], ["pickup", "Pickup"]];
+const EQUIP_HU: [string, string][] = [["Anhängerkupplung", "Vonóhorog"], ["Panorama-Dach", "Panorámatető"], ["Head-Up Display", "Head-up display"], ["Standheizung", "Állófűtés"], ["Navigationssystem", "Navigáció"], ["Sitzheizung", "Ülésfűtés"], ["Schiebedach", "Napfénytető"], ["Allradantrieb", "Összkerékhajtás"]];
+export function searchEditor(req: Requirements, dealId: number, maxEur?: number) {
+  const v = req.vehicle;
+  const ids = MOBILE_IDS as { makes: Record<string, string>; models: Record<string, Record<string, string>> };
+  const norm = (x: string) => String(x || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  const make0 = v.makes[0] || "";
+  const mk = Object.keys(ids.makes).find((k) => norm(k) === norm(make0)) || make0;
+  const makes = Object.keys(ids.makes).sort((a, b) => a.localeCompare(b));
+  if (mk && !ids.makes[mk]) makes.unshift(mk);
+  const eqOn = (k: string) => (v.must_have_equipment || []).some((e) => e.toLowerCase().startsWith(k.toLowerCase()));
+  const chk = (name: string, val: string, lbl: string, on: boolean) => `<label class="mds-c"><input type="checkbox" name="${name}" value="${esc(val)}"${on ? " checked" : ""}> ${esc(lbl)}</label>`;
+  const inp = (name: string, lbl: string, val: unknown, ph = "") => `<label class="mds-f"><span>${lbl}</span><input name="${name}" value="${val == null ? "" : esc(String(val))}" placeholder="${esc(ph)}" inputmode="numeric"></label>`;
+  const cfg = { ids, fuel: FUEL_CODE, body: BODY_CODE, feat: FEATURE_CODE };
+  return `<style>
+  .mds{margin-top:14px}.mds h2{margin:0 0 4px}.mds-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+  @media(max-width:900px){.mds-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .mds-f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#5b6472}.mds-f input,.mds-f select{font:inherit;font-size:14px;font-weight:500;color:#161922;padding:9px 10px;border:1px solid #dfe3ea;border-radius:9px;background:#fff}
+  .mds-row{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:13px}.mds-row>b{min-width:110px;font-size:12px;color:#5b6472}
+  .mds-c{display:inline-flex;gap:6px;align-items:center;border:1px solid #e6e9ef;border-radius:999px;padding:5px 11px;cursor:pointer;background:#fff}.mds-c input{width:auto;margin:0;accent-color:#e2001a}
+  .mds-url{font:12px ui-monospace,Menlo,monospace;color:#6b7280;word-break:break-all;margin-top:10px;background:#f6f7fb;border-radius:8px;padding:8px 10px}
+  </style>
+  <form class="card mds" id="mdSearch" method="post" action="/belso/ajanlatmotor/igeny/${dealId}/kereses">
+   <h2>mobile.de keresés</h2><div class="small muted">Az igényből kitöltve — módosítsd, ha kell, majd nyisd meg. A „Mentés” az igénybe is beírja a változtatásokat.</div>
+   <div class="mds-g">
+    <label class="mds-f"><span>Márka</span><select name="make" id="mdsMake"><option value="">— bármely —</option>${makes.map((m) => `<option${m === mk ? " selected" : ""}>${esc(m)}</option>`).join("")}</select></label>
+    <label class="mds-f"><span>Modell</span><input name="model" id="mdsModel" list="mdsModels" value="${esc(v.models[0] || "")}" placeholder="pl. X5"><datalist id="mdsModels"></datalist></label>
+    ${inp("price_max", "Max. ár (€, autó)", maxEur || "", "pl. 45000")}
+    <label class="mds-f"><span>Váltó</span><select name="gearbox"><option value="">— mindegy —</option><option value="automatic"${v.gearbox === "automatic" ? " selected" : ""}>Automata</option><option value="manual"${v.gearbox === "manual" ? " selected" : ""}>Manuális</option></select></label>
+    ${inp("year_min", "Évjárat -tól", v.year_min, "pl. 2020")}${inp("year_max", "Évjárat -ig", v.year_max, "")}
+    ${inp("km_min", "Km -tól", v.km_min, "")}${inp("km_max", "Km -ig", v.km_max, "pl. 100000")}
+   </div>
+   <div class="mds-row"><b>Üzemanyag</b>${FUEL_HU.map(([k, l]) => chk("fuel", k, l, (v.fuel || []).includes(k as any))).join("")}</div>
+   <div class="mds-row"><b>Karosszéria</b>${BODY_HU.map(([k, l]) => chk("body", k, l, (v.body_types || []).includes(k))).join("")}</div>
+   <div class="mds-row"><b>Felszereltség</b>${EQUIP_HU.map(([k, l]) => chk("equip", k, l, eqOn(k) || (k === "Allradantrieb" && v.drivetrain === "awd"))).join("")}</div>
+   <div class="mds-url" id="mdsUrl"></div>
+   <div class="row" style="margin-top:10px"><a class="btn red" id="mdsGo" href="#" target="_blank" rel="noopener">Keresés a mobile.de-n ↗</a><button class="btn dark">Mentés az igénybe</button>
+    <span class="small muted">A jó hirdetést a Chrome bővítménnyel küldd be („Küldés az ajánlatba”).</span></div>
+  </form>
+  <script>(function(){
+  var C=${JSON.stringify(cfg).replace(/</g, "\\u003c")};
+  var f=document.getElementById('mdSearch');if(!f)return;
+  var nm=function(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();};
+  var all=function(n){return [].slice.call(f.querySelectorAll('[name="'+n+'"]:checked')).map(function(x){return x.value;});};
+  var val=function(n){var e=f.elements[n];return e?String(e.value||'').trim():'';};
+  var dig=function(n){return val(n).replace(/\\D/g,'');};
+  function models(){var mk=val('make'),m=C.ids.models[mk]||{};document.getElementById('mdsModels').innerHTML=Object.keys(m).map(function(k){return '<option value="'+k.replace(/"/g,'&quot;')+'">';}).join('');}
+  function build(){
+    var p=new URLSearchParams({dam:'false',isSearchRequest:'true',s:'Car',vc:'Car',sb:'p',od:'up',ref:'srp'});
+    var mk=val('make'),md=val('model'),mid=C.ids.makes[mk];
+    if(mid){var mm=C.ids.models[mk]||{},key=Object.keys(mm).filter(function(k){return nm(k)===nm(md);})[0]||Object.keys(mm).filter(function(k){return nm(k)===nm(md.replace(/\\b(touring|avant|kombi|sportback|limousine|limuzin)\\b/gi,''));})[0];
+      if(key)p.set('ms',mid+';'+mm[key]+';;');else p.set('ms',mid+';;;'+md.replace(/\\b(touring|avant|kombi|sportback|limousine|limuzin)\\b/gi,'').trim());}
+    else if(mk||md)p.set('q',(mk+' '+md).trim());
+    var cs=[];all('body').forEach(function(b){(C.body[b]||[]).forEach(function(c){if(cs.indexOf(c)<0)cs.push(c);});});cs.forEach(function(c){p.append('c',c);});
+    var fs=[];all('fuel').forEach(function(x){var c=C.fuel[x];if(c&&fs.indexOf(c)<0)fs.push(c);});fs.forEach(function(c){p.append('ft',c);});
+    if(dig('year_min')||dig('year_max'))p.set('fr',dig('year_min')+':'+dig('year_max'));
+    if(dig('km_min')||dig('km_max'))p.set('ml',dig('km_min')+':'+dig('km_max'));
+    var pm=+dig('price_max');if(pm>1000)p.set('p',':'+Math.round(pm/1000)*1000);
+    var gb=val('gearbox');if(gb==='automatic')p.set('tr','AUTOMATIC_GEAR');else if(gb==='manual')p.set('tr','MANUAL_GEAR');
+    var eq=all('equip');if(eq.indexOf('Anhängerkupplung')>=0)p.set('tct','TRAILER_COUPLING_FIX');
+    eq.forEach(function(e){var c=C.feat[e];if(c)p.append('fe',c);});
+    var u='https://suchen.mobile.de/fahrzeuge/search.html?'+p.toString();
+    document.getElementById('mdsGo').href=u;document.getElementById('mdsUrl').textContent=u;
+  }
+  f.addEventListener('input',build);f.addEventListener('change',function(e){if(e.target&&e.target.name==='make'){f.elements.model.value='';models();}build();});
+  models();build();
+  })();</script>`;
+}
