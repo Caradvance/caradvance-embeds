@@ -635,6 +635,7 @@ var VPICK=false;
 function renderVehicle(){
   var L=vehs();
   if(!vehById(VSEL))VSEL=(L[0]||{}).id||'';
+  var rentL=S.deal.line==='Bérlés';
   var v=vehById(VSEL);
   var h='<div class="veh-chips">'+L.map(function(x,i){
       return '<button class="vchip'+(x.id===VSEL?' on':'')+'" data-vid="'+esc(x.id)+'">'+(x.image?'<i style="background-image:url(\''+esc(x.image)+'\')"></i>':'<i class="ph">🚗</i>')+'<span><b>'+esc((i+1)+'. '+vehName(x,i))+'</b><small>'+esc(SRC_LBL[x.source]||'')+(x.price?' · '+fmtPrice(x.price,x.currency)+(x.period?'/'+esc(x.period):''):'')+rentBadge(x)+'</small></span></button>';
@@ -648,8 +649,9 @@ function renderVehicle(){
     var i=L.indexOf(v);
     h+='<div class="veh-form"><div class="veh-h"><b>'+esc((i+1)+'. autó — '+vehName(v,i))+'</b><span class="hint">'+esc(SRC_LBL[v.source]||'')+'</span>'+(v.url?'<a class="hint" href="'+esc(v.url)+'" target="_blank" rel="noopener">weboldal ↗</a>':'')+'<span class="sp" style="flex:1"></span><button class="btn ghost sm" id="vehDel">Autó törlése</button></div>'
       +'<div class="grid g4">'+vinp('title','Megnevezés',v.title,' wide')
-      +vinp('brand','Márka',v.brand)+vinp('model','Típus',v.model)+vinp('year','Évjárat',v.year)+vinp('vin','Alvázszám',v.vin)+vinp('plate','Rendszám',v.plate)
-      +vinp('color','Szín',v.color)+vinp('engine','Motor',v.engine)+vinp('fuel','Üzemanyag',v.fuel)+vinp('km','Km',v.km)+vinp('body','Karosszéria',v.body)+vinp('gearbox','Váltó',v.gearbox)+vinp('condition','Állapot',v.condition)+(v.ad_id?vinp('ad_id','mobile.de azonosító',v.ad_id):'')+(v.config_code||S.deal.line==='Eladás'?vinp('config_code','Konfigurációs kód',v.config_code):'')
+      +vinp('brand','Márka',v.brand)+vinp('model','Típus',v.model)+vinp('year','Évjárat',v.year)+(rentL?'':vinp('vin','Alvázszám',v.vin)+vinp('plate','Rendszám',v.plate))
+      +vinp('color','Szín',v.color)+vinp('engine','Motor',v.engine)+vinp('fuel','Üzemanyag',v.fuel)+vinp('km','Km',v.km)+(rentL?'':vinp('body','Karosszéria',v.body))
+      +vsel('gearbox','Váltó',v.gearbox,['Automata','Manuális'])+vsel('condition','Állapot',v.condition,['Új','Használt'])+(v.ad_id?vinp('ad_id','mobile.de azonosító',v.ad_id):'')+(v.config_code||S.deal.line==='Eladás'?vinp('config_code','Konfigurációs kód',v.config_code):'')
       +vinp('price','Ár / díj',v.price||'')+'<div class="fld"><label>Pénznem</label><select data-vp="currency"><option value="HUF"'+(v.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(v.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-vp="period"><option value="">egyszeri (vételár)</option><option value="hó"'+(v.period==='hó'?' selected':'')+'>havi (bérleti díj)</option></select></div>'
       +(v.period?'<div class="fld"><label>Ár típusa</label><select data-vp="vat_mode"><option value=""'+(!v.vat_mode?' selected':'')+'>bruttó (alap)</option><option value="de19"'+(v.vat_mode==='de19'?' selected':'')+'>bruttó, 19% német áfa</option><option value="hu27"'+(v.vat_mode==='hu27'?' selected':'')+'>bruttó, 27% magyar áfa</option><option value="net"'+(v.vat_mode==='net'?' selected':'')+'>nettó</option></select></div>':'')
@@ -733,6 +735,7 @@ function bindRent(v){
   });
   $('b2').querySelectorAll('[data-rdel]').forEach(function(x){x.addEventListener('click',function(){var id=x.getAttribute('data-rdel');v.reminders=(v.reminders||[]).filter(function(r){return r.id!==id;});saveData().then(renderVehicle);});});
 }
+function vsel(k,label,val,opts){var cur=String(val||'');var has=!cur||opts.some(function(o){return o.toLowerCase()===cur.toLowerCase();});return '<div class="fld"><label>'+esc(label)+'</label><select data-vp="'+k+'"><option value="">—</option>'+opts.map(function(o){return '<option'+(o.toLowerCase()===cur.toLowerCase()?' selected':'')+'>'+esc(o)+'</option>';}).join('')+(has?'':'<option selected>'+esc(cur)+'</option>')+'</select></div>';}
 function vinp(k,label,val,extra){return '<div class="fld'+(extra||'')+'"><label>'+esc(label)+'</label><input data-vp="'+k+'" value="'+esc(val==null?'':val)+'"'+(k==='price'?' inputmode="decimal"':'')+'></div>';}
 function newVid(){var L=vehs(),i=L.length+1,ids={};L.forEach(function(x){ids[x.id]=1;});while(ids['v'+i])i++;return 'v'+i;}
 function addVehicle(v){
@@ -1168,7 +1171,7 @@ function aboApply(p){
   p.price=Math.round((lo[7]+mark)*1.19);p.currency='EUR';p.period='hó';p.vat_mode='de19';p.deposit=lo[6]||0;p.aboFrom=lo[7]!==hi[7];
   var v=function(d){var di=ABO_DIM.filter(function(x){return x[0]===d;})[0];return sel[d]!=null?(c[d]||[])[sel[d]]:(rows.every(function(x){return x[di[2]]===lo[di[2]];})?(c[d]||[])[lo[di[2]]]:null);};
   var F=v('F'),T=v('T'),K=v('K'),C=v('C'),TR=v('TR'),A=v('A');
-  p.fuel=F?aboLbl('F',F):(c.F||[]).join(' / ');p.color=C||'';p.equipment=TR?[TR]:[];p.months=T||0;p.km_keret=K?aboLbl('K',K):'';
+  p.fuel=F?aboLbl('F',F):(c.F||[]).join(' / ');p.color=C||'';p.equipment=TR?[TR]:[];p.power=TR||'';p.condition='Új';p.months=T||0;p.km_keret=K?aboLbl('K',K):'';
   p.note=[A?'Elérhetőség: '+A:'',T?'Futamidő: '+T+' hónap':'',K?'Km-keret: '+aboLbl('K',K):'',C?'Szín: '+C:'',TR?'Kivitel: '+TR:''].filter(Boolean).join(' · ')+(p.aboFrom?' · ár: -tól':'');
 }
 function aboBlock(p,i){
