@@ -337,7 +337,7 @@ async function sendEmail(env, record, contact, attachment, region) {
     .join('');
   const kindKey = leadKind(record).key;
   const car = pick(record, ['Autó', 'car']) || [pick(record, ['Márka']), pick(record, ['Modell'])].filter(Boolean).join(' ');
-  const heading = (/caradvance\.ch\b/.test(String(record.forras_oldal || '')) ? '[CH] ' : '') + (I ? I.kinds[kindKey] + (car ? ' · ' + car : '') : leadKind(record).internal);
+  const heading = (/caradvance\.ch\b/.test(String(record.forras_oldal || '')) ? '[CH] ' : /caradvance\.eu\b/.test(String(record.forras_oldal || '')) ? '[EU] ' : '') + (I ? I.kinds[kindKey] + (car ? ' · ' + car : '') : leadKind(record).internal);
   const title = [contact.name || contact.company, contact.phone, contact.email].filter(Boolean).join(' · ');
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -418,6 +418,13 @@ function chLangOf(page, origin) {
   const m = String(page || '').match(/^(?:https?:\/\/[^/]+)?(?:\/ch)?\/(fr|it|en)(?:[/?#]|$)/);
   return m ? m[1] : 'de';
 }
+/** caradvance.eu (vagy a /eu/ előnézet) → 'de' / 'fr' / 'it' / 'es', különben null */
+function euLangOf(page, origin) {
+  const s = String(page || '') + ' ' + String(origin || '');
+  if (!/caradvance\.eu\b|(?:^|\s|https?:\/\/[^/\s]+)\/eu(?:\/|$)/.test(s)) return null;
+  const m = String(page || '').match(/^(?:https?:\/\/[^/]+)?(?:\/eu)?\/(de|fr|it|es)(?:[/?#]|$)/);
+  return m ? m[1] : 'de';
+}
 async function sendCustomerConfirm(env, data, contact, page, region, origin) {
   if (!env.RESEND_API_KEY || env.CUSTOMER_CONFIRM === 'off') return { status: 'skipped' };
   const k = leadKind(data);
@@ -430,6 +437,8 @@ async function sendCustomerConfirm(env, data, contact, page, region, origin) {
   { const pl = plLangOf(page, origin); if (pl) return sendIntlConfirm(env, data, contact, pl, undefined, 'pl'); }
   // caradvance.ch: a magyar csapat kezeli, a visszaigazolás az oldal nyelvén (de / fr / it / en)
   { const ch = chLangOf(page, origin); if (ch) return sendIntlConfirm(env, data, contact, ch, undefined, 'ch'); }
+  // caradvance.eu (DE / FR / IT / ES): visszaigazolás az oldal nyelvén, válaszcím: import@caradvance.de
+  { const eu = euLangOf(page, origin); if (eu) return sendIntlConfirm(env, data, contact, eu, undefined, 'eu'); }
   const L = String(data['Nyelv'] || (pm && pm[1]) || 'HU').toLowerCase();
   if (L !== 'hu') return sendIntlConfirm(env, data, contact, INTL_CONFIRM[L] ? L : 'en');
   const skip = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'event_id', 'Choice link']);
@@ -590,6 +599,24 @@ function chT(lang) {
   o.rep = CH_REP[lang] || CH_REP.de;
   return o;
 }
+/* ---------- caradvance.eu: spanyol szövegek + lábléc ---------- */
+INTL_CONFIRM.es = { perMonth: '/mes', months: 'meses', hello: (n) => n ? 'Estimado/a ' + n + ':' : 'Buenos días:',
+  subjs: { berles: 'Hemos recibido su solicitud de renting', rendeles: 'Hemos recibido su solicitud de pedido', eladas: 'Hemos recibido los datos de su coche', import: 'Hemos recibido su solicitud' },
+  bodies: { berles: 'gracias por su solicitud de renting. Un miembro de nuestro equipo se pondrá en contacto con usted <b>lo antes posible</b> con los detalles y una oferta personalizada.',
+    rendeles: 'gracias por su solicitud de pedido. Un miembro de nuestro equipo se pondrá en contacto con usted <b>lo antes posible</b> con los detalles y una oferta personalizada.',
+    eladas: 'gracias por enviarnos los datos de su coche. Nos pondremos en contacto con usted <b>lo antes posible</b>.',
+    import: 'gracias por su solicitud. Nos pondremos en contacto con usted <b>lo antes posible</b> con una oferta personalizada.' },
+  subj: 'Hemos recibido su solicitud', body: 'gracias por su mensaje. Un miembro de nuestro equipo se pondrá en contacto con usted <b>lo antes posible</b> con los detalles y una oferta personalizada.',
+  data: 'Su solicitud', urgent: 'Si es urgente, llámenos:', or: 'o simplemente responda a este e-mail.', bye: 'Atentamente,', role: 'Director comercial', country: 'Alemania', rep: '',
+  labels: { 'Név': 'Nombre', 'E-mail': 'E-mail', 'Telefon': 'Teléfono', 'Üzenet': 'Mensaje', 'Nyelv': 'Idioma', 'Oldal': 'Página', 'Típus': 'Solicitud' } };
+INTL_LABELS.es = { 'Kívánt átvétel': 'Inicio deseado', 'Autó': 'Coche', 'Becsült havidíj': 'Cuota mensual estimada', 'Német rendszám': 'Matrícula alemana', 'Elérhetőség': 'Disponibilidad', 'Felszereltség': 'Equipamiento', 'Futamidő': 'Duración', 'Kaució': 'Fianza', 'Km-keret': 'Kilometraje', 'Konstrukció': 'Tipo de contrato', 'Megjegyzés': 'Nota', 'Szín': 'Color', 'Üzemanyag': 'Combustible', 'Vásárló': 'Tipo de cliente', 'Cégnév': 'Empresa', 'Adószám': 'NIF-IVA', 'Finanszírozás': 'Financiación', 'Fizetés': 'Pago', 'Vásárlás módja': 'Forma de compra', 'Kapcsolattartó': 'Persona de contacto', 'Márka': 'Marca', 'Modell': 'Modelo', 'Évjárat': 'Año', 'Kilométer': 'Kilometraje', 'Futás': 'Kilometraje', 'Ár': 'Precio', 'Kért ár': 'Precio deseado', 'Költségkeret': 'Presupuesto', 'Város': 'Ciudad', 'Székhely': 'Domicilio social' };
+INTL_VALUES.es = { 'Magánszemély': 'Particular', 'Magánszemélyként': 'Particular', 'Cég': 'Empresa', 'Cégként': 'Empresa', 'Benzin': 'Gasolina', 'Dízel': 'Diésel', 'Elektromos': 'Eléctrico', 'Hibrid': 'Híbrido', 'Plug-in hibrid': 'Híbrido enchufable', 'Bérlés': 'Renting', 'Bérlés-vétel': 'Alquiler con opción a compra', 'Azonnal': 'Inmediatamente', 'Azonnal elérhető': 'Disponible de inmediato', 'Készpénz': 'Contado', 'Lízing': 'Leasing', 'Hitel': 'Préstamo', 'Igen': 'Sí', 'Nem': 'No' };
+const EU_REP = {
+  de: 'Kunden in Deutschland, Frankreich, Italien und Spanien betreut die Caradvance GmbH direkt.',
+  fr: 'Caradvance GmbH accompagne directement ses clients en Allemagne, en France, en Italie et en Espagne.',
+  it: 'Caradvance GmbH segue direttamente i clienti in Germania, Francia, Italia e Spagna.',
+  es: 'Caradvance GmbH atiende directamente a sus clientes en Alemania, Francia, Italia y España.'
+};
 /* caradvance.pl (angol / német oldal is): a lengyel kereskedelmi képviselő a levél láblécében */
 const PL_REP = {
   pl: 'Pośrednik handlowy dla Polski: Mr.JOB POLAND Sp. z o.o. · ul. Pory 78, 02-757 Warszawa, Polska · NIP 5213804274 · REGON 368854599',
@@ -598,7 +625,7 @@ const PL_REP = {
 };
 async function sendIntlConfirm(env, data, contact, lang, region, mkt) {
   const T = mkt === 'pl' ? Object.assign({}, INTL_CONFIRM[lang], { rep: PL_REP[lang] || PL_REP.en })
-    : mkt === 'ch' ? chT(lang) : INTL_CONFIRM[lang];
+    : mkt === 'ch' ? chT(lang) : mkt === 'eu' ? Object.assign({}, INTL_CONFIRM[lang] || INTL_CONFIRM.de, { rep: EU_REP[lang] || EU_REP.de }) : INTL_CONFIRM[lang];
   const R = REGIONS[region];
   // A beküldött adatok összefoglalója — minden mező, a mezőnevek és a gyakori értékek a vevő nyelvén
   const skipI = new Set(['event_id', 'ca_attr', 'fbp', 'fbc', 'page', 'user_agent', 'website', 'url_field', 'turnstile_token', 'mkt_consent', 'Típus', 'type', 'form', 'Csatolmány', 'Vezetéknév', 'Keresztnév', 'consent', 'Adatkezelés', 'Ország (IP alapján)', 'beerkezett', 'forras_oldal', 'Nyelv', 'Choice link']);
@@ -614,10 +641,11 @@ async function sendIntlConfirm(env, data, contact, lang, region, mkt) {
   const subj = (T.subjs && T.subjs[kind]) || T.subj;
   const first = String(contact.name || '').trim().split(' ')[0] || '';
   const CHC = mkt === 'ch';   // caradvance.ch: svájci telefonszám és e-mail
-  const phone = R ? R.phone : CHC ? '+41 79 715 85 80' : (env.CONTACT_PHONE || '+36 30 233 6060');
-  const sigPhone = R ? R.phone : CHC ? '+41 79 715 85 80' : '+36 30 214 6989';
-  const sigMail = R ? R.reply : CHC ? 'info@caradvance.ch' : 'info@caradvance.hu';
-  const replyTo = R ? (env['CUSTOMER_REPLY_TO_' + R.tag] || R.reply) : CHC ? 'info@caradvance.ch' : (env.CUSTOMER_REPLY_TO || 'info@caradvance.hu');
+  const EUC = mkt === 'eu';   // caradvance.eu: német telefonszám, import@caradvance.de
+  const phone = R ? R.phone : EUC ? '+49 89 99998 100' : CHC ? '+41 79 715 85 80' : (env.CONTACT_PHONE || '+36 30 233 6060');
+  const sigPhone = R ? R.phone : EUC ? '+49 89 99998 100' : CHC ? '+41 79 715 85 80' : '+36 30 214 6989';
+  const sigMail = R ? R.reply : EUC ? 'import@caradvance.de' : CHC ? 'info@caradvance.ch' : 'info@caradvance.hu';
+  const replyTo = R ? (env['CUSTOMER_REPLY_TO_' + R.tag] || R.reply) : EUC ? 'import@caradvance.de' : CHC ? 'info@caradvance.ch' : (env.CUSTOMER_REPLY_TO || 'info@caradvance.hu');
   const html = `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
     <div style="background:#0b0b0d;padding:18px 24px"><img src="https://www.caradvance.hu/caradvance-logo-email.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
