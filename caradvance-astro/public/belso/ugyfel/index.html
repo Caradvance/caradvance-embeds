@@ -1036,7 +1036,27 @@ function pdfImages(buf){
   });});
 }
 /* felszereltség-lista a konfigurátor szövegéből (a „Sonderausstattung / Ausstattung / Pakete …” blokkok sorai, árak és opciókódok nélkül) */
+/* árak felismerése: „1.250,00 €”, „3 390,00 EUR (inkl. MwSt.)”, „31,18 EUR/Monat”, „+ 990 €”, „62 190,00 euró” … */
+var PRICE_TOK=/[+−–-]?\s*(?:ab\s+|-tól\s+)?(?:(?:€|EUR|Euro|euró)\s*\d{1,3}(?:[.\s  ]\d{3})*(?:,\d{1,2})?|\d{1,3}(?:[.\s  ]\d{3})*(?:,\d{1,2})?\s*(?:€|EUR\b|Euro\b|euró))(?:\s*\((?:inkl|zzgl|exkl|incl|ÁFA|MwSt|brutto|netto)[^)]*\))?(?:\s*\/\s*(?:Monat|Mon\.?|mtl\.?|month|hó|hónap|hónapra))?\*{0,3}/gi;
+function stripPrices(t){return String(t).replace(PRICE_TOK,' ').replace(/\s{2,}/g,' ').replace(/^[\s+|·:–-]+|[\s+|·:–-]+$/g,'').trim();}
+function isPriceLine(t){t=String(t).trim();if(!t)return false;PRICE_TOK.lastIndex=0;if(!PRICE_TOK.test(t))return false;var r=stripPrices(t).replace(/\b(inkl\.?|zzgl\.?|MwSt\.?|Monat|mtl\.?|ab|ÁFA-val|ÁFA|brutto|netto|hó|hónap)\b/gi,'').replace(/[()\s*.,\/+-]/g,'');return r.length<=2;}
+/* gyártónkénti szabályok (a konfigurátor oldaláról átvett szöveghez) — a márkát az oldal címe / a szöveg adja */
+var CFG_UI_SKIP=/^(Weitere Informationen|Mehr Informationen|További információk|Preisdetails anzeigen|Ár részleteinek megjelenítése|Rate ändern|Raten ändern|Változási arány|Probefahrt|Tesztvezetés|Verfügbare Neuwagen|Elérhető új autók|Keressen elérhető|Serienausstattung anzeigen|Alapfelszereltség megjelenítése|Konfiguration (speichern|ändern|ansehen|prüfen)|Konfiguráció (mentése|módosítása|áttekintése)|PDF (speichern|mentése)|Technische Daten|Műszaki adatok|3D-?(Ansicht|nézet)|Kontakt|Lépjen kapcsolatba|Kraftstoffverbrauch|Stromverbrauch|CO₂|CO2|Üzemanyag-fogyasztás|Grundpreis|Alapár|Optionale Ausstattung(en)? gesamt|Sonderausstattung(en)? gesamt|Opcionális felszerelések összesen|Gesamtpreis|Teljes ár|Privatleasing|Magánlízing|Monatliche Rate|Havi díj|Die Preise|Az árak|Alle Angaben|Minden információ)/i;
+var CFG_HEAD_SKIP=/^(Außenfarbe|Lackierung|Külső festék|Räder( (&|und) Reifen)?|Kerekek és gumiabroncsok|Felnik|(Stoff|Leder|Sitz)[- ]?Interieur|Szövet belső terek|Bőr belső terek|Belső terek?|Interieur|Sitze|Ülések|Lenkr(ä|a)der|Kormány(kerekek)?|Dekoreinlagen|Díszbetétek|Pakete|Csomagok|Assistenzsysteme|Vezetéstámogató rendszerek|Licht|Világítás|Infotainment|Komfort|Kényelem|Sport|Exterieur|Külső|Ausstattung|Felszereltség)$/i;
+function audiPairs(lines){
+  /* Audi összesítő: [kategória] → tétel → ár sor (pl. „3.390,00 EUR (inkl. MwSt.)”) → „Weitere Informationen”. A tétel = a közvetlenül ár előtti szöveges sor. */
+  var L=lines.map(function(x){return x.trim();}).filter(function(x){return x&&!/^\d{1,2}$/.test(x)&&x!=='|';}),out=[],seen={};
+  for(var i=0;i<L.length-1;i++){
+    var t=L[i];if(isPriceLine(t)||CFG_UI_SKIP.test(t)||CFG_HEAD_SKIP.test(t))continue;
+    if(!isPriceLine(L[i+1]))continue;
+    t=stripPrices(t);if(t.length<3||t.length>220||!/[a-zäöüßáéíóőúű]{3}/i.test(t))continue;
+    var k=t.toLowerCase();if(seen[k])continue;seen[k]=1;out.push(t);
+  }
+  return out;
+}
 function parseEquipment(text,opts){
+  opts=opts||{};
+  if(/audi/i.test(opts.brand||'')){var ap=audiPairs(String(text).split('\n'));if(ap.length>=2)return ap.slice(0,150);}
   var lines=String(text).split('\n'),out=[],on=false,seen={};
   var START=/^(Außenfarbe(n)?|Lackierung|Räder|Felgen|Interieur(design)?|Polsterung|Fahrerassistenz|Serienausstattung(en)?|Sonderausstattung(en)?|Ausstattung(en|smerkmale)?|Ihre Ausstattung|Gew(ä|a)hlte (Ausstattung|Optionen|Sonderausstattung)|Optionen( (&|und) Pakete)?|Pakete|Extras|Zubehör|Equipment|Options|Standard equipment|Optional equipment|Felszereltség|Szériafelszereltség|Extrafelszereltség|Extrák|Opciók|Csomagok|Tartozékok|Pakete (&|und) Sonderausstattungen)\s*(\(\d+\))?\s*:?$/i;
   var STOP=/^(Preis|Gesamt|Summe|Technische Daten|Verbrauch|Energie|Finanzierung|Leasing|Hinweis|Umwelt|CO2|WLTP|Händler|Kontakt|Ihr (Partner|Händler)|Seite \d|Fahrzeugpreis|Grundpreis|Basispreis|Überführung|Rechtliche|Ár|Teljes ár|Műszaki adatok|Fogyasztás|Finanszírozás)/i;
@@ -1045,15 +1065,16 @@ function parseEquipment(text,opts){
     if(START.test(t)&&t.length<60){on=true;return;}
     if(STOP.test(t)){on=false;return;}
     if(!on)return;
-    t=t.replace(/\s*[-–]?\s*(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:,\d{2})?)\s*(€|EUR)\s*$/i,'').replace(/^(?:(?=[A-Z]*\d)[A-Z0-9]{4,6})\s+(?=[A-ZÄÖÜa-zäöü])/,'').replace(/\s{2,}/g,' ').replace(/\s+(inklusive|inkl\.?|serienmäßig|Serie)$/i,'').trim();
+    if(isPriceLine(t)||CFG_UI_SKIP.test(t))return;
+    t=stripPrices(t).replace(/^(?:(?=[A-Z]*\d)[A-Z0-9]{4,6})\s+(?=[A-ZÄÖÜa-zäöü])/,'').replace(/\s{2,}/g,' ').replace(/\s+(inklusive|inkl\.?|serienmäßig|Serie)$/i,'').trim();
     if(t.length<3||t.length>140||/^[\d\s.,€%-]+$/.test(t)||/^(inklusive|inkl\.|serienmäßig|Serie|Preis|Code|Ändern|Alle|Mehr|Details( anzeigen)?|Vergleichen)$/i.test(t)||/^[#(]?\s*[A-Z0-9]{4,7}\s*\)?$/.test(t)||/^In Ihrer Konfiguration|bereits enthalten$|^Produkt(bilder|beschreibung)$/i.test(t))return;
     var k=t.toLowerCase();if(seen[k])return;seen[k]=1;out.push(t);
   });
   // ha nincs felismerhető fejezetcím (pl. a konfigurátor oldaláról bemásolt szöveg): minden „felszereltség-szerű” sor, a felület elemei nélkül
   if(out.length<3&&opts&&opts.loose){
     var UI=/^(Weiter|Zurück|Speichern|Konfiguration|Details|Mehr|Weniger|Auswählen|Ausgewählt|Hinzufügen|Entfernen|Menü|Suche|Login|Cookie|Akzeptieren|Ablehnen|Teilen|Drucken|Fertig|Schließen|Tovább|Vissza|Mentés|Részletek|Kiválasztva|Hozzáadás|Eltávolítás|Bezárás|Elfogad|Sütik?)\b/i;
-    lines.forEach(function(l){var t=l.trim().replace(/\s*[-–]?\s*(\d{1,3}(?:[.\s]\d{3})*(?:,\d{2})?|\d+(?:,\d{2})?)\s*(€|EUR)\s*$/i,'').replace(/^(?:S?\d{3}[A-Z0-9]{0,2}|[A-Z]{2,3}\d{1,3})\s+(?=[A-ZÄÖÜa-zäöü])/,'').trim();
-      if(t.length<4||t.length>110||!/[a-zäöüß]{3}/i.test(t)||/^[\d\s.,€%\/()-]+$/.test(t)||UI.test(t)||/(km|kWh|g\/km|l\/100|PS|kW)\b.*\d|\d.*(km|kWh)\b|€|https?:|©|@/i.test(t))return;
+    lines.forEach(function(l){if(isPriceLine(l)||CFG_UI_SKIP.test(l.trim())||CFG_HEAD_SKIP.test(l.trim()))return;var t=stripPrices(l.trim()).replace(/^(?:S?\d{3}[A-Z0-9]{0,2}|[A-Z]{2,3}\d{1,3})\s+(?=[A-ZÄÖÜa-zäöü])/,'').trim();
+      if(t.length<4||t.length>110||!/[a-zäöüß]{3}/i.test(t)||/^[\d\s.,€%\/()-]+$/.test(t)||UI.test(t)||/(km|kWh|g\/km|l\/100|PS|kW)\b.*\d|\d.*(km|kWh)\b|€|\bEUR\b|euró|https?:|©|@/i.test(t))return;
       var k=t.toLowerCase();if(seen[k])return;seen[k]=1;out.push(t);});
   }
   return out.slice(0,150);
@@ -1068,12 +1089,12 @@ function parseConfig(text){
     ||t.match(/\bCode\s*[:#]\s*([A-Z0-9]{5,14})\b/);
   if(cm)o.config_code=cm[1].toUpperCase();
   // ár: a „Gesamtpreis / Fahrzeugpreis / Gesamtsumme / Kaufpreis / Total” sorok közül a legnagyobb összeg, különben a legnagyobb €-összeg
-  var priceRe=/(\d{1,3}(?:[.\s]\d{3})+(?:,\d{2})?|\d{4,7}(?:,\d{2})?)\s*(?:€|EUR)|(?:€|EUR)\s*(\d{1,3}(?:[.\s]\d{3})+(?:,\d{2})?|\d{4,7}(?:,\d{2})?)/g;
+  var priceRe=/(\d{1,3}(?:[.\s\u00a0\u202f]\d{3})+(?:,\d{2})?|\d{4,7}(?:,\d{2})?)\s*(?:€|EUR|Euro|euró)|(?:€|EUR)\s*(\d{1,3}(?:[.\s\u00a0\u202f]\d{3})+(?:,\d{2})?|\d{4,7}(?:,\d{2})?)/g;
   var best=0,any=0;
   t.split('\n').forEach(function(l){
     var m,mx=0;priceRe.lastIndex=0;while((m=priceRe.exec(l)))mx=Math.max(mx,eurNum(m[1]||m[2]));
     if(!mx)return;any=Math.max(any,mx);
-    if(/Gesamt|Fahrzeugpreis|Kaufpreis|Summe|Total|Endpreis|Barpreis|Hauspreis|Angebotspreis|Ihr\s*Preis|Végösszeg/i.test(l))best=Math.max(best,mx);
+    if(/Gesamt|Fahrzeugpreis|Kaufpreis|Summe|Total|Endpreis|Barpreis|Hauspreis|Angebotspreis|Ihr\s*Preis|Végösszeg|Teljes ár/i.test(l)&&!/Monat|hónap|\/hó/i.test(l))best=Math.max(best,mx);
   });
   o.price=best||any;
   var pw=t.match(/(\d{2,4})\s*kW\s*\(\s*(\d{2,4})\s*PS\s*\)/);if(pw)o.power=pw[1]+' kW ('+pw[2]+' LE)';
@@ -1101,7 +1122,7 @@ var CFG_BOOKMARKLET='javascript:'+"!function(){var t={u:location.href,t:document
 function cfgImport(o){
   if(!o||!o.x||!o.x.length)return;
   var text=o.x.join('\n');
-  var d=parseConfig(text),eqp=parseEquipment(text,{loose:true}),c=cfgFromUrl(o.u||'');
+  var d=parseConfig(text),c=cfgFromUrl(o.u||''),eqp=parseEquipment(text,{loose:true,brand:c.brand||d.brand||''});
   var title=d.title||String(o.t||'').replace(/\s*[|–-]\s*(BMW|Audi|Volkswagen|Mercedes-Benz|MINI)( Deutschland)?.*$/i,'').replace(/^(Ihr|Ihre)\s+/,'').trim();
   var it={key:'cfgi-'+Date.now(),src:'config',title:title||((d.brand||c.brand)+' '),brand:d.brand||c.brand||'',config_code:d.config_code||c.code||'',config_url:CFG_HOST_RE.test(o.u||'')?String(o.u).slice(0,1500):'',
     price:d.price||0,src_price:d.price||0,currency:'EUR',period:'',vat_mode:'de19',power:d.power||'',fuel:d.fuel||'',color:d.color||'',note:'',needCheck:true,images:[],eq_images:[],equipment:eqp,attach_src:false};
@@ -1165,7 +1186,7 @@ function cfgFiles(files){
         var b64=new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){res(fr.result);};fr.onerror=rej;fr.readAsDataURL(file);});
         return Promise.all([pdfText(buf.slice(0)).catch(function(){return '';}),b64,pdfImages(buf.slice(0)).catch(function(){return [];})]);
       }).then(function(a){
-        var d=parseConfig(a[0]),eqp=parseEquipment(a[0]),imgs=a[2]||[];
+        var d=parseConfig(a[0]),eqp=parseEquipment(a[0],{brand:d.brand||''}),imgs=a[2]||[];
         return api('/card/'+ID+'/files',{method:'POST',body:{name:file.name,mime:'application/pdf',data:a[1],silent:true}}).then(function(r){
           S.files.push(r.file);renderDocs();
           // a kinyert képek feltöltése (rejtett fájlokként) — ezekből és az adatokból készül a CarAdvance-ajánlat PDF
@@ -1295,7 +1316,7 @@ function bindCfgOffer(box,i){
   }
   var cp=box.querySelector('[data-cpaste]');if(cp)cp.addEventListener('paste',function(e){
     var txt=e.clipboardData&&e.clipboardData.getData('text/plain');if(!txt)return;e.preventDefault();
-    var eqp=parseEquipment(txt,{loose:true});if(!eqp.length)return toast('Nem találtam felszereltséget a beillesztett szövegben.',4000);
+    var eqp=parseEquipment(txt,{loose:true,brand:parseConfig(txt).brand||''});if(!eqp.length)return toast('Nem találtam felszereltséget a beillesztett szövegben.',4000);
     var have={};(p.equipment||[]).forEach(function(x){have[x.toLowerCase()]=1;});
     var add=eqp.filter(function(x){return !have[x.toLowerCase()];});p.equipment=(p.equipment||[]).concat(add).slice(0,150);
     // ha a beillesztett szövegből kiderül a modell / kód / teljesítmény, és még üres
