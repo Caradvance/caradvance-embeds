@@ -31,6 +31,8 @@
  * Titok soha nem kerül a válaszba és nem jut ki a böngészőbe.
  */
 
+import { webLeadToCrm } from '../../lib/ajanlatmotor/weblead.ts';
+
 const MAX_BODY = 8 * 1024 * 1024; // csatolmánnyal (base64) együtt
 const MAX_ATTACH = 5 * 1024 * 1024;
 const META_API = 'v21.0';
@@ -123,6 +125,13 @@ export async function onRequestPost(context) {
   ]);
 
   const [notion, mail, hook, capi] = results.map(describe);
+
+  // Belső CRM: import autórendelés (→ Ajánlatmotor) és bérlési igény (→ az autó az adatlapon) — háttérben, a válasz nem vár rá
+  if (env.DB) {
+    const crmJob = webLeadToCrm(env, data, { eventId: String(meta.event_id).toLowerCase(), page: meta.page, origin: new URL(request.url).origin })
+      .catch((e) => console.error('lead → crm', e && e.stack || e));
+    if (context.waitUntil) context.waitUntil(crmJob); else await crmJob;
+  }
 
   // Automatikus visszaigazolás az ügyfélnek (csak ha a belső kézbesítés sikerült).
   let confirm = { status: 'skipped' };
