@@ -381,6 +381,7 @@ function normData(d,deal,addr){
     buyer:{kind:d.buyer&&d.buyer.kind==='ceg'?'ceg':'magan',person:Object.assign({name:'',address:'',phone:'',email:'',tax:'',id_number:'',mother_name:'',birth_place:'',birth_date:'',residence:'',bank:'',licence:'',address_card:'',vpid:''},(d.buyer&&d.buyer.person)||{}),company:Object.assign({name:'',address:'',tax:'',reg:''},(d.buyer&&d.buyer.company)||{})},
     notes:d.notes||'',
     web_pick:d.web_pick||null,
+    cfg_links:Array.isArray(d.cfg_links)?d.cfg_links:[],cfg_factory:d.cfg_factory||'',cfg_links_done:!!d.cfg_links_done,
     request:d.request||''
   };
 }
@@ -852,6 +853,8 @@ function renderChecklist(){
 
 /* ---------------- 4. ajánlat ---------------- */
 var OTAB=null;            // aktív forrás-fül
+function webCfg(){var d=S&&S.card&&S.card.data;return d&&Array.isArray(d.cfg_links)?d.cfg_links.filter(function(u){return /^https?:\/\//.test(u);}):[];}
+function webCfgTodo(){var d=S.card.data;return d.cfg_links_done?[]:webCfg();}
 var MOBQ='';              // beillesztett mobile.de linkek
 var SRC_BADGE={inv:'készlet',mobile:'mobile.de',config:'gyári konfigurátor',manual:'egyedi'};
 function offerTabs(){
@@ -862,7 +865,7 @@ function offerTabs(){
 }
 function renderOffer(){
   var em=S.card.data.person.email||S.deal.email;
-  var tabs=offerTabs();if(!OTAB||!tabs.some(function(t){return t[0]===OTAB;}))OTAB=tabs[0][0];
+  var tabs=offerTabs();if(!OTAB&&webCfg().length&&tabs.some(function(t){return t[0]==='config';}))OTAB='config';if(!OTAB||!tabs.some(function(t){return t[0]===OTAB;}))OTAB=tabs[0][0];
   var h='';
   if(S.deal.line==='Import')h+='<div class="note" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px"><b>Ajánlatmotor:</b> a mobile.de-ről kikeresi a 3 legjobb autót, kiszámolja a teljes árat Budapestig, és prémium ajánlatoldalt készít az ügyfélnek.</span><a class="btn red sm" href="/belso/ajanlatmotor/igeny/'+ID+'">Ajánlatmotor megnyitása →</a></div>';
   if(S.testForward)h+='<div class="note"><b>Teszt-üzem:</b> az ügyfélnek szóló e-mailek most a(z) <b>'+esc(S.testForward)+'</b> címre mennek (a tárgyban ott a valódi címzett). Élesítéshez a fejlesztőnek ki kell kapcsolnia.</div>';
@@ -899,7 +902,8 @@ function renderOTab(){
   }else if(OTAB==='config'){
     el.innerHTML='<div class="drop" id="cfgDrop"><b>Gyári konfigurátoros ajánlat feltöltése</b><span>A BMW, Mercedes-Benz, Audi vagy Volkswagen online konfigurátorában összeállított autó PDF-je (vagy „Ajánlat / Zusammenfassung” letöltése). A rendszer kiolvassa a modellt, az árat és a konfigurációs kódot — ellenőrizd és áraz be. A PDF az ajánlat e-mailhez csatolva megy ki.</span>'
       +'<label class="btn dark sm" style="cursor:pointer;margin-top:10px">PDF kiválasztása<input type="file" id="cfgFile" accept="application/pdf,.pdf" multiple style="display:none"></label><div class="hint" id="cfgSt" style="margin-top:8px"></div></div>'
-      +'<div class="fld" style="margin-top:12px"><label>…vagy konfigurátor link(ek) — BMW / MINI / Mercedes-Benz / Audi / Volkswagen (soronként egy)</label><textarea id="cfgUrl" rows="2" placeholder="pl. https://www.audi.de/de/brand/de/neuwagen.html#audicode=AXYZ1234&#10;https://configure.bmw.de/de_DE/configid/…"></textarea></div>'
+      +'<div class="fld" style="margin-top:12px"><label>…vagy konfigurátor link(ek) — BMW / MINI / Mercedes-Benz / Audi / Volkswagen (soronként egy)</label><textarea id="cfgUrl" rows="2" placeholder="pl. https://www.audi.de/de/brand/de/neuwagen.html#audicode=AXYZ1234&#10;https://configure.bmw.de/de_DE/configid/…">'+esc(webCfgTodo().join('\n'))+'</textarea></div>'
+      +(webCfg().length?'<div class="hint" style="margin-top:6px">🌐 Az ügyfél a weboldalon ezt a konfigurációt küldte'+(S.card.data.cfg_links_done?' (már hozzáadva)':'')+': '+webCfg().map(function(u){return '<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(u.length>70?u.slice(0,70)+'…':u)+'</a>';}).join(', ')+' — a „Link(ek) hozzáadása” gombbal kerül az ajánlatba. Ha PDF-et is küldött, az a Dokumentumok fülön van.</div>':'')
       +'<div class="cfgimp"><b>📥 Automatikus átvétel a konfigurátor oldaláról (adatok + felszereltség + képek)</b>'
       +'<ol><li>Egyszer: húzd ezt a gombot a böngésző könyvjelzősávjára → <a class="bmk" href="'+esc(CFG_BOOKMARKLET)+'" onclick="event.preventDefault();toast(\'Ne kattints rá itt — húzd a könyvjelzősávra (Ctrl+Shift+B megjeleníti).\',5000);">📥 CarAdvance import</a></li>'
       +'<li>Nyisd meg a gyártó konfigurátorában az autó <b>összesítő oldalát</b> (BMW: Zusammenfassung · Mercedes: Zusammenfassung · Audi: Zusammenfassung · VW: Zusammenfassung), várd meg, amíg betölt, és görgess végig rajta, hogy a képek is betöltsenek.</li>'
@@ -1148,7 +1152,7 @@ function cfgLinks(){
       if(r.image)it.image=r.image;
     }).catch(function(){}).then(function(){if(!it.title&&c.brand)it.title=c.brand+' ';PICK.push(it);renderPicked();});
   });});
-  chain.then(function(){b.disabled=false;$('cfgUrl').value='';$('cfgUrlSt').textContent=links.length+' link hozzáadva — add meg / ellenőrizd a modellt és az ajánlati árat lent.';});
+  chain.then(function(){if(webCfg().length&&!S.card.data.cfg_links_done&&webCfg().some(function(u){return links.indexOf(u)>=0;})){S.card.data.cfg_links_done=true;try{saveDataSoon();}catch(e){}}b.disabled=false;$('cfgUrl').value='';$('cfgUrlSt').textContent=links.length+' link hozzáadva — add meg / ellenőrizd a modellt és az ajánlati árat lent.';});
 }
 function cfgFiles(files){
   if(!files.length)return;
