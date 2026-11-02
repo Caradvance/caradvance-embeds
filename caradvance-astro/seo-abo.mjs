@@ -222,7 +222,7 @@ try {
       const name = m.brand + ' ' + m.model;
       let url = ''; try { url = rhref ? abs(rhref(m.brand, m.model)) : ''; if (url && !/[/#?]/.test(url.slice(-1)) && !/\.[a-z]+$/.test(url)) url += '/'; } catch (e) { url = ''; }
       return {
-        key: 'abo-' + slug(name), brand: m.brand === 'VW' ? 'Volkswagen' : m.brand, title: (m.brand === 'VW' ? 'Volkswagen' : m.brand) + ' ' + dn(m.model),
+        key: 'abo-' + slug(name), name, brand: m.brand === 'VW' ? 'Volkswagen' : m.brand, title: (m.brand === 'VW' ? 'Volkswagen' : m.brand) + ' ' + dn(m.model),
         body: m.cat || '', fuels: m.fuels || [], gears: m.gears || [], psMin: m.psMin || 0, psMax: m.psMax || 0,
         net: m.net || 0, price: m.net ? m.net + MARK : 0, months: m.months || [], km: m.km || [], colors: (m.colors || []).map((c) => c.n).filter(Boolean),
         variants: m.variants || [], now: m.now || 0, count: m.count || 0, later: (m.later || []).map((l) => ({ d: l.d, c: l.c })),
