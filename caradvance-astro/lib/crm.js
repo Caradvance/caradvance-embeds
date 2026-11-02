@@ -629,6 +629,7 @@ export function itemToVehicle(it, id, source) {
     year: it.year || '', vin: '', color: it.color || '', engine: it.power || '', ad_id: it.ad_id || '', config_code: it.config_code || '', fuel: it.fuel || '', km: it.km ? String(it.km) : '', hybrid: /hybrid|hibrid|PHEV/i.test(String(it.title || '') + ' ' + String(it.fuel || '')),
     price: Number(it.price) || 0, currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: it.period || '', deposit: Number(it.deposit) || 0,
     image: it.image || '', url: it.ad_url || it.config_url || it.url || '',
+    gearbox: it.gearbox || '', condition: it.condition || (/^0\s*km$/i.test(String(it.km || '').trim()) ? 'Új' : ''), body: it.body || '',
     ...offerFields(it)
   };
 }
