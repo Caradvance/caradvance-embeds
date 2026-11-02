@@ -552,7 +552,7 @@
     });
     DATA.rentN = (SUB.models || []).reduce(function (s, m) { return s + (m.count || 0); }, 0);
     return out.map(function (m) {
-      var eff = m.eurFix || (m.net + 650);
+      var eff = m.eurFix || (m.net + 750);
       return { href: m.href || rhref(m.brand, m.model), t: dispName(m.brand, m.model), img: PHOTO[m.brand + ' ' + m.model] || (m.stock && m.stock[0].i) || '', logo: LK[m.brand] ? '/bl-' + LK[m.brand] + '-dark.webp' : '',
         yr: m.stock ? (String(m.yr || '').split('/').pop() + ' · készleten') : (m.stockOnly ? 'Azonnal elvihető' : '0 km · 2026'), sp: [m.cat].concat(m.gears || []).filter(Boolean).join(' · '),
         avail: m.now > 0 ? m.now + ' ' + t(m.stock ? 'azonnal elérhető' : 'elérhető') : ((m.later && m.later[0]) ? tMonth(m.later[0].d) : t('Hamarosan')), now: m.now > 0,
