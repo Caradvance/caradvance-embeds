@@ -2,21 +2,23 @@
  * Weboldali űrlapok → belső CRM (ügyfél + adatlap), mezőről mezőre, szövegértelmezés nélkül.
  *  - /auto-rendeles/ (import autókeresés, KeresoForm): Import ügyfél + Ajánlatmotor-igény a pontos keresési adatokkal
  *  - /autoink/#berelheto és a /berelheto-auto/… oldalak bérlési űrlapja: Bérlés ügyfél, a választott autóval az adatlapon
+ *  - /egyedi-auto-rendeles/ (új autó ajánlatkérés): Eladás ügyfél, a gyári konfiguráció linkjével / PDF-jével
  * Hívja: functions/api/lead.js (a Notion / e-mail kézbesítés mellett, háttérben).
  */
 import type { Env, Requirements, Fuel } from "./types";
 import { heuristicExtract } from "./extract";
 import { processRequest } from "./engine";
 import { ensureAm, logEvent, nowIso } from "./am";
-import { ensureCrm, saveCard, addEvent, aboFleet } from "../crm.js";
+import { ensureCrm, saveCard, addEvent, aboFleet, putFile, DOC_MAX } from "../crm.js";
 
 type Form = Record<string, unknown>;
 const s = (v: unknown, max = 300) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
 const g = (d: Form, ...keys: string[]) => { for (const k of keys) { const v = s(d[k], 2000); if (v) return v; } return ""; };
 const any = (v: string) => !!v && !/^(mindegy|any|egal|egyéb|-)$/i.test(v);
 
-export function webLeadKind(d: Form): "import" | "berles" | null {
+export function webLeadKind(d: Form): "import" | "berles" | "eladas" | null {
   const t = g(d, "Típus", "type", "form").toLowerCase();
+  if (/ajánlatkérés.*új autó/.test(t)) return "eladas";
   if (/bérl|berl|abo|rent|miet/.test(t)) return "berles";
   if (!t && g(d, "Márka")) return "import"; // KeresoForm (/auto-rendeles/)
   return null;
@@ -88,7 +90,7 @@ async function recentDup(env: Env, line: string, email: string, phone: string) {
 }
 
 /** Új ügyfél a CRM-ben a weboldali űrlapból. Idempotens az event_id-re (am_requests.message_id = web:<event_id>) és 15 percen belüli ismétlésre. */
-export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; page: string; origin?: string }): Promise<{ dealId: number; line: string } | null> {
+export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; page: string; origin?: string; attachment?: { filename: string; content: string } | null }): Promise<{ dealId: number; line: string } | null> {
   const kind = webLeadKind(d);
   if (!kind || !env.DB) return null;
   await ensureCrm(env);
@@ -96,9 +98,44 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
   const email = s(g(d, "E-mail", "email"), 160).toLowerCase();
   const phone = s(g(d, "Telefon", "phone"), 60);
   const company = s(g(d, "Cégnév"), 200);
-  const line = kind === "import" ? "Import" : "Bérlés";
+  const line = kind === "import" ? "Import" : kind === "eladas" ? "Eladás" : "Bérlés";
   if (await recentDup(env, line, email, phone)) return null;
   const text = formText(d);
+
+  if (kind === "eladas") {
+    // csak a magyar oldalról (a külföldi oldalak leadjei az ottani postafiókba mennek; a /en/, /de/… nyelvi változat is ide jön)
+    if (!/^https?:\/\/(www\.)?caradvance\.hu\/(?!(sk|cs|cz|pl|eu|ch)\/)/i.test(ctx.page) && !/^http:\/\/localhost[:/]/.test(ctx.page)) return null;
+    // Új autó ajánlatkérés: az ügyfél a gyártó német konfigurátorában állította össze az autót (link és/vagy PDF)
+    const car = s(g(d, "Autó", "car"), 160);
+    const brand = /^(Mercedes-Benz|Mercedes-AMG)/i.test(car) ? "Mercedes-Benz" : car.split(" ")[0] || "";
+    const link = s(g(d, "Konfiguráció linkje"), 1500);
+    const links = /^https?:\/\//i.test(link) ? [link] : [];
+    const res = await env.DB.prepare(`INSERT INTO deals (line, stage, ch, name, phone, email, car, price, note, when_text, assigned_to)
+        VALUES ('Eladás', 'Érdeklődés', 'Weboldal', ?, ?, ?, ?, 0, ?, 'most', NULL)`)
+      .bind(name, phone, email, car, s(["Ajánlatkérés (új autó)", links.length ? "konfiguráció linkkel" : "", ctx.attachment ? "konfiguráció PDF-fel" : "", g(d, "Konfigurálás"), g(d, "Fizetés") && "Fizetés: " + g(d, "Fizetés"), g(d, "Megjegyzés")].filter(Boolean).join(" · "), 2000)).run();
+    const dealId = Number(res.meta.last_row_id);
+    await saveCard(env, dealId, {
+      status: links.length || ctx.attachment ? "Ajánlatra vár" : "Kapcsolatfelvételre vár",
+      data: {
+        kind: company || /cég/i.test(g(d, "Vásárló")) ? "ceg" : "magan",
+        person: { name, address: "", phone, email, tax: "" },
+        company: { name: company, address: "", tax: s(g(d, "Adószám"), 60), reg: "" },
+        contact_differs: false, contact: { name: "", phone: "", email: "", role: "" },
+        vehicle: { brand, model: car.slice(brand.length).trim() || car },
+        cfg_links: links, cfg_factory: s(g(d, "Gyári konfigurátor"), 500),
+        request: text.slice(0, 4000), notes: "",
+      },
+    }, null, "Weboldal");
+    let fileNote = "";
+    const at = ctx.attachment;
+    if (at && at.content && at.content.length * 0.75 <= DOC_MAX) {
+      const fn = s(at.filename, 120) || "konfiguracio.pdf";
+      const mime = /\.pdf$/i.test(fn) ? "application/pdf" : /\.png$/i.test(fn) ? "image/png" : /\.jpe?g$/i.test(fn) ? "image/jpeg" : "application/octet-stream";
+      try { await putFile(env, dealId, fn, mime, at.content, null); fileNote = " · konfiguráció PDF: " + fn + " (Dokumentumok)"; } catch (e) { console.error("weblead putFile", e); }
+    }
+    await addEvent(env, dealId, "create", `Weboldali ajánlatkérés (új autó): ${car}${links.length ? " · konfiguráció linkje az Ajánlat fülön (Gyári konfigurátor)" : ""}${fileNote}${g(d, "Konfigurálás") ? " · " + g(d, "Konfigurálás") : ""}`, "Weboldal");
+    return { dealId, line };
+  }
 
   if (kind === "import") {
     await ensureAm(env);
