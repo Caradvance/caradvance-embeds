@@ -39,6 +39,20 @@ async function loadDeal(env, user, id) {
   return { deal };
 }
 
+/* ---------------- ügyfél törlése (végleges: adatlap, fájlok, ajánlatok, dokumentumok, aláírások, pénzügy, napló, Ajánlatmotor) ---------------- */
+async function handleDeleteClient(env, user, id) {
+  if (user.role !== 'admin') return json({ error: 'Ügyfelet csak adminisztrátor törölhet.' }, 403);
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const run = async (sql, ...args) => { try { await env.DB.prepare(sql).bind(...args).run(); } catch (e) { if (!/no such table/i.test(String(e && e.message))) throw e; } };
+  // az Ajánlatmotor ajánlat-képei (am_images kulcs: <token>/…)
+  try { const toks = (await env.DB.prepare(`SELECT token FROM am_offers WHERE deal_id = ?`).bind(id).all()).results || []; for (const t of toks) await run(`DELETE FROM am_images WHERE key LIKE ?`, t.token + '/%'); } catch (e) { /* nincs ilyen tábla */ }
+  await run(`DELETE FROM crm_file_chunks WHERE file_id IN (SELECT id FROM crm_files WHERE deal_id = ?)`, id);
+  for (const t of ['crm_files', 'crm_offers', 'crm_events', 'crm_fin', 'crm_docs', 'crm_sign', 'crm_datareq', 'crm_cards', 'am_requests', 'am_candidates', 'am_offers', 'am_events']) await run(`DELETE FROM ${t} WHERE deal_id = ?`, id);
+  await run(`DELETE FROM deals WHERE id = ?`, id);
+  console.log('client deleted', id, deal.name, 'by', user.email);
+  return json({ ok: true });
+}
+
 /* ---------------- lista ---------------- */
 async function handleList(env, user) {
   const sql = `SELECT d.id, d.line, d.stage, d.ch, d.name, d.phone, d.email, d.car, d.price, d.created_at, d.when_text, d.assigned_to, d.client_responded_at,
@@ -1213,6 +1227,7 @@ export async function onRequest(context) {
     m = path.match(/^\/card\/(\d+)$/);
     if (m && method === 'GET') return await handleGetCard(env, user, Number(m[1]));
     if (m && method === 'PATCH') return await handlePatchCard(request, env, user, Number(m[1]));
+    if (m && method === 'DELETE') return await handleDeleteClient(env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/events$/);
     if (m && method === 'GET') { const { error } = await loadDeal(env, user, Number(m[1])); if (error) return error; return json({ events: await listEvents(env, Number(m[1])) }); }
     m = path.match(/^\/card\/(\d+)\/media$/);
