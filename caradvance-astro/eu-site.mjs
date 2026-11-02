@@ -162,6 +162,14 @@ const VL = {
 const fe = (e) => String(Math.round(e)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
 function euVat(h, l) {
   const L = VL[l], r = 1 + VAT[l] / 100, vs = 'style="margin-top:8px;font-size:14px;line-height:1.45"';
+  // autó-adatlap: a régi (szlovák) árat a meta-leírásokban és a JSON-LD-ben az ország bruttó árára cseréljük
+  { const de0 = (h.match(/<div class="ca-vat(?: ca-new)?" data-eur="(\d+)"/) || [])[1]; const old = (h.match(/"price":(\d+)/) || [])[1];
+    if (de0 && old && +de0) {
+      const g = Math.round(+de0 * r), o = String(old), gs = String(g).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      h = h.split('"price":' + o).join('"price":' + g);
+      const ore = new RegExp(o.replace(/\B(?=(\d{3})+(?!\d))/g, '[ \\u00a0\\u202f.]?'), 'g');
+      h = h.replace(/(<meta (?:name|property)="(?:description|og:description|twitter:description)" content=")([^"]*)(")/g, (m, a2, t, c) => a2 + t.replace(ore, gs) + c);
+    } }
   h = h.replace(/<div class="pricerow" data-eur="(\d+)"([^>]*)>[\s\S]*?<\/div>/g, (m, eur, rest) => (+eur ? `<div class="pricerow" data-eur="${eur}"${rest}><span class="price">${fe(+eur * r)}</span><span class="peur">${L.card}</span></div>` : m));
   return h.replace(/<div class="ca-vat( ca-new)?" data-eur="(\d+)"([^>]*)>[\s\S]*?(?=<div class="taxnote">)/g, (m, nw, eur, rest) => {
     const n = +eur; if (!n) return m;
@@ -318,6 +326,8 @@ function run() {
       });
       // relatív magyar visszalinkek (pl. "../../autoink/") → autólista
       h = h.replace(/href="(?:\.\.\/)+autoink\/"/g, `href="/eu/${l}/${EU.slugSeg[l].auta}/"`);
+      // autó-adatlap relatív linkjei ("../auto/…", "../../auto/…") → a nyelv saját útvonala (fr: voiture, es: coche)
+      h = h.replace(/(href="|['"])(?:\.\.\/)+auto\//g, (m, q) => `${q}/eu/${l}/${EU.slugSeg[l].auto}/`);
       h = h.replace(/https:\/\/www\.caradvance\.sk(\/(?:en|de|hu)(?=\/))?(\/[^"\\\s<]*)?/g, (m, lg, q) => { const p2 = skAbs(q || '/', l); return p2 ? SITE + '/' + l + p2 : m; });
       h = h.split('/i18n/rt-sk.js').join(`/i18n/rt-eu-${l}.js`);
       h = h.replace(/data-idx="\/sk\/kereses-index\.json" data-lang="sk"/g, `data-idx="/eu/${l}/kereses-index.json" data-lang="${l}"`);
@@ -326,6 +336,8 @@ function run() {
       h = h.replace(/(<script\b(?![^>]*\bsrc=)(?![^>]*ld\+json)[^>]*>)([\s\S]*?)(<\/script>)/gi, (all, a, js, b) => a + js.split('document.documentElement.lang').join("(/^(de|fr|it|es)$/.test(document.documentElement.lang)&&/caradvance\\.eu$|\\/eu\\//.test(location.hostname+location.pathname)?'sk':document.documentElement.lang)").replace(/var MON=\[[^\]]*\]/, 'var MON=' + EU.monRe) + b);
       h = h.replace(/<a\b([^>]*)\shref="#ca-x"([^>]*)>([\s\S]*?)<\/a>/g, (m, x, y, t, off, all) => (/\bclass=/.test(x + y) || (all[off - 1] === '>' && all[off + m.length] === '<') ? '' : t));
       h = euVat(h, l);
+      // a menüből kimarad az import főpont (a linkjei már kiestek, csak egy üres lenyíló maradna)
+      h = h.replace(/<li class="navitem"><button class="navlink" type="button">[^<]*<span class="chev">⌄<\/span><\/button><div class="dropdown"><div class="dd-inner">\s*<div class="ddi-sub"><div class="flyout"><\/div><\/div>(?:<a class="ddi" href="[^"]*"[^>]*>[^<]*<\/a>\s*)?<\/div><\/div><\/li>/g, '');
       h = h.replace(/<div id="ca-acct" data-lang="sk" data-links="[^"]*">/g, `<div id="ca-acct" data-lang="${l}" data-links="${JSON.stringify({ privacy: '/eu/' + l + '/' + EU.slugSeg[l]['ochrana-osobnych-udajov'] + '/', contact: '/eu/' + l + '/' + EU.slugSeg[l].kontakt + '/' }).replace(/"/g, '&quot;')}">`);
       h = h.replace(/<div class="tq-co-card">(?:(?!<div class="tq-co-card">)[\s\S])*?<h3>Mr\. Job SK s\.r\.o\.<\/h3>[\s\S]*?<\/p>\s*<\/div>/g, '');
       h = h.replace(/<dt>(?:IČ DPH|IČ\u00a0DPH)<\/dt>/g, '<dt>' + { de: 'USt-IdNr.', fr: 'N° de TVA', it: 'Partita IVA', es: 'NIF-IVA' }[l] + '</dt>');
@@ -378,6 +390,7 @@ function run() {
             const dec = (v) => String(v || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
             const tt = (ph.match(/<title>([\s\S]*?)<\/title>/) || [])[1]; if (tt) x.t = dec(tt).replace(/\s*[|—–-]\s*CarAdvance\s*$/i, '');
             const dd = (ph.match(/<meta name="description" content="([^"]*)"/) || [])[1]; if (dd) x.d = dec(dd).slice(0, 160);
+            const pe = (ph.match(/<div class="ca-vat(?: ca-new)?" data-eur="(\d+)"/) || [])[1]; if (pe && +pe && x.ep) { x.ep = Math.round(+pe * (1 + VAT[l] / 100)); if (x.p) x.p = Math.round(x.ep * (d.eur || 390)); }
             const h1 = (ph.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/) || [])[1]; if (h1) x.h = dec(h1);
             if (x.x) { const hs = [...ph.replace(/<script[\s\S]*?<\/script>/g, '').matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/g)].map((m) => dec(m[1])).filter(Boolean); if (hs.length) x.x = hs.slice(0, 14).join(' · ').slice(0, 400); }
           } catch (e) {}
@@ -451,6 +464,13 @@ function run() {
   try {
     const all = [...miss].map(([k, m]) => ({ k, p: m.p, l: [...m.l], n: m.n, en: (m.raw && look1(D, 'en', m.raw)) || null, de: (m.raw && look1(D, 'de', m.raw)) || null, raw: m.raw !== k ? m.raw : undefined }));
     fs.writeFileSync(path.join(DIST, '_eu-missing.json'), JSON.stringify(all));
+    // darabolva is (≤ 45 000 karakter / fájl), hogy egyszerűen letölthető legyen: _eu-missing-1.json …
+    const parts = []; let cur = [], sz = 0;
+    for (const x of all) { const t = JSON.stringify(x).length; if (cur.length && sz + t > 45000) { parts.push(cur); cur = []; sz = 0; } cur.push(x); sz += t; }
+    if (cur.length) parts.push(cur);
+    for (const f of fs.readdirSync(DIST)) if (/^_eu-missing-\d+\.json$/.test(f)) fs.rmSync(path.join(DIST, f));
+    parts.forEach((p, i) => fs.writeFileSync(path.join(DIST, '_eu-missing-' + (i + 1) + '.json'), JSON.stringify(p)));
+    fs.writeFileSync(path.join(DIST, '_eu-missing-n.json'), JSON.stringify({ n: all.length, parts: parts.length }));
   } catch (e) {}
   const pct = (l) => (100 * stat[l][0] / Math.max(1, stat[l][1])).toFixed(1) + '%';
   return `[eu-site] ${written} oldal (${LANGS.map((l) => l + ' ' + pct(l)).join(' | ')}), hiányzó egység ${miss.size}, hibás fordítás ${bad}, runtime ${rtn}, ${EU.live ? 'ÉLES' : 'noindex'}`;
