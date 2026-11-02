@@ -723,7 +723,8 @@ export async function sendCrmMail(env, to, subject, inner, attachments, opts) {
   };
   if (attachments && attachments.length) body.attachments = attachments;
   // másolat a sales@ postafiókba (Google Workspace), hogy a kiküldött ajánlatok / szerződések ott is meglegyenek — a belső értesítéseknél nem
-  const copy = env.CRM_BCC === 'off' ? '' : (env.CRM_BCC || 'sales@caradvance.hu');
+  // másolat (BCC) csak akkor, ha a CRM_BCC környezeti változóban külön meg van adva — a sales@ címre alapból nem megy másolat
+  const copy = !env.CRM_BCC || env.CRM_BCC === 'off' ? '' : env.CRM_BCC;
   const toList = body.to.map((x) => x.toLowerCase());
   if (copy && !(opts && opts.noCopy) && !toList.includes(copy.toLowerCase()) && !toList.includes(notifyTo(env).toLowerCase())) body.bcc = [copy];
   const post = () => fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });

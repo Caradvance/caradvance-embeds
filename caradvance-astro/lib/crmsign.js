@@ -151,7 +151,7 @@ async function finishCosign(env, r, result, att, name, when, fwd) {
   const li = `<ul>${result.map((x) => `<li>${esc(x.name)}</li>`).join('')}</ul>`;
   const client = (parent && parent.signer_name) || parseJ(r.prior, {}).client || '';
   const cEmail = parent ? parent.email : '';
-  const sales = env.CRM_BCC && env.CRM_BCC !== 'off' ? env.CRM_BCC : 'sales@caradvance.hu';
+  const sales = env.CRM_BCC && env.CRM_BCC !== 'off' ? env.CRM_BCC : ''; // a sales@ címre alapból nem megy
   const T = pT(P ? P.lang : 'de');
   try {
     if (cEmail) await sendCrmMail(env, fwd || cEmail, `${fwd ? '[TESZT — ' + cEmail + '] ' : ''}Mindkét fél által aláírt dokumentumok — CarAdvance`,
@@ -162,7 +162,7 @@ async function finishCosign(env, r, result, att, name, when, fwd) {
       `<p>${T.hello}</p><p>${T.doneBody(client, when)}</p>${li}<p>${T.regards}</p>`, files, { noCopy: true });
   } catch (e) { /* nem kritikus */ }
   try {
-    await sendCrmMail(env, sales, `Mindkét fél által aláírva: ${client} — ${result.length} dokumentum`,
+    if (sales) await sendCrmMail(env, sales, `Mindkét fél által aláírva: ${client} — ${result.length} dokumentum`,
       `<p>A(z) <b>${esc(client)}</b> ügyfél és a(z) ${esc(r.signer_name)} (${esc(name)}) is aláírta az alábbi dokumentumokat (${esc(when)}):</p>${li}<p>A végleges PDF-ek csatolva, és az ügyfél adatlapján a feltöltött fájlok között is megtalálhatók.</p><p><a href="${SITE}/belso/ugyfel/?id=${r.deal_id}">Ügyfél adatlap megnyitása</a></p>`, files, { noCopy: true });
   } catch (e) { /* nem kritikus */ }
 }
