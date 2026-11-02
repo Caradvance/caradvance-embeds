@@ -710,7 +710,7 @@
   function init() {
     var wrap = document.querySelector('.ca-navwrap');
     var items = wrap ? [].slice.call(wrap.querySelectorAll('.ca-nav .menu > .navitem')) : [];
-    if (!wrap || items.length < 4) return;
+    if (!wrap || items.length < (DOM === 'eu' ? 3 : 4)) return;
     var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     var panel = el('<div class="mm-panel" role="region" aria-label="' + tx('Főmenü') + '"></div>');
     wrap.appendChild(panel);
