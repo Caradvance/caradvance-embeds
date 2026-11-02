@@ -836,6 +836,8 @@
           var a = m.querySelector('input[name=eurpay]'), b = m.querySelector('input[name=contractdocs]');
           if (a) r['Euróban fizet'] = a.checked ? 'Tudomásul vette (bérleti díj és kaució EUR-ban)' : 'NEM';
           if (b) r['Szerződésdokumentumok'] = b.checked ? 'Megismerte és elfogadta (bérleti szerződés + 1–4. sz. melléklet)' : 'NEM';
+          // pontos euró-díj a belső rendszernek (ajánlat, bérleti szerződés)
+          try { var M0 = stateOf(m), pp = M0 && abPrices(M0); if (pp) { r['Havidíj (EUR, bruttó)'] = String(pp.privE); r['Havidíj (EUR, nettó)'] = String(pp.coE); r['Árfolyam (Ft/EUR)'] = String(window.__ABRATE || ''); } } catch (e2) { }
         }
       } catch (e) { }
       return r;
