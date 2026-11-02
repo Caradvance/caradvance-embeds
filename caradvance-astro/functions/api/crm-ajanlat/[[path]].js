@@ -3,7 +3,7 @@
 // Csak a véletlen, kitalálhatatlan token által címzett sort olvassa/írja.
 // A státusz CSAK a POST-ra változik (az e-mailes link megnyitása önmagában nem — a levelezők
 // biztonsági előtöltése így nem fogad el ajánlatot az ügyfél helyett).
-import { ensureCrm, addEvent, json, parseJ, clean, cleanMulti, saveCard, getCard, vehiclesOf, itemToVehicle, newVehicleId, VEH_KEYS, sendCrmMail, notifyTo, esc, priceLabel, priceVatLabel, specLine, idLine, SITE, b64ToBytes, fileData } from '../../../lib/crm.js';
+import { ensureCrm, addEvent, json, parseJ, clean, cleanMulti, saveCard, getCard, vehiclesOf, itemToVehicle, offerFields, newVehicleId, VEH_KEYS, sendCrmMail, notifyTo, esc, priceLabel, priceVatLabel, specLine, idLine, SITE, b64ToBytes, fileData } from '../../../lib/crm.js';
 
 const TOKEN_RE = /^[a-f0-9]{40}$/;
 const PUBLIC_KEYS = ['title', 'brand', 'year', 'km', 'fuel', 'power', 'gearbox', 'color', 'image', 'url', 'note', 'price', 'currency', 'period', 'ad_id', 'config_code', 'config_url', 'vat_mode'];
@@ -54,12 +54,18 @@ async function handleRespond(request, env, token) {
     const card = await getCard(env, row.deal_id);
     const data = card.data || {}; const list = vehiclesOf(data).slice();
     const empty = (v) => !v.title && !VEH_KEYS.some((k) => v[k]);
-    if (!list.some((v) => (it0.key && v.key === it0.key) || (v.title && v.title === it0.title))) {
+    const same = list.findIndex((v) => (it0.key && v.key === it0.key) || (v.title && v.title === it0.title));
+    if (same < 0) {
       const ei = list.findIndex(empty);
       if (ei >= 0) list[ei] = { ...itemToVehicle(it0, list[ei].id, 'offer'), vin: list[ei].vin || '', color: list[ei].color || '' };
       else list.push(itemToVehicle(it0, newVehicleId(list), 'offer'));
-      fields.data = { ...data, vehicles: list, vehicle: list[0] };
+    } else {
+      // már szerepel: az elfogadott ajánlat ára, ajánlatszáma, dátuma, árfolyama stb. frissül rajta
+      const cur = list[same];
+      list[same] = { ...cur, price: Number(it0.price) || cur.price, currency: it0.currency === 'EUR' ? 'EUR' : 'HUF', period: it0.period || cur.period, deposit: Number(it0.deposit) || cur.deposit || 0, ...offerFields(it0),
+        rent_start: cur.rent_start || it0.rent_start || '', rent_end: cur.rent_end || it0.rent_end || '' };
     }
+    fields.data = { ...data, vehicles: list, vehicle: list[0], web_pick: null };
   }
   await saveCard(env, row.deal_id, fields, null, 'Ügyfél', 'válasz az ajánlatra');
   const pick = choice >= 0 ? items[choice] : null;
