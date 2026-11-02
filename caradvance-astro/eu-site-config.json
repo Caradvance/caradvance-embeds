@@ -1,0 +1,542 @@
+{
+ "_doc": "caradvance.eu — eu-site.mjs beállításai (de/fr/it/es, ország = nyelv). live=false: noindex + robots tilt.",
+ "site": "https://www.caradvance.eu",
+ "live": false,
+ "phone": "+49 89 99998 100",
+ "wa": "36302336060",
+ "email": "import@caradvance.de",
+ "vat": {
+  "de": 19,
+  "fr": 20,
+  "it": 22,
+  "es": 21
+ },
+ "exclude": "^(adatok|alairas|partner|dovoz|hladam-auto|predaj/operativny-lizing|blog/(lizing-auta-pre-fyzicke-osoby-2026|podmienky-lizingu-ojazdeneho-auta-pre-fyzicke-osoby|firemne-auto-operativny-lizing-alebo-dlhodoby-prenajom-zdanovanie-dph|prenajom-auta-v-bratislave-a-v-zahranici|dovoz-auta-z-nemecka|dovoz-mercedesu-z-nemecka|nakup-a-dovoz-bmw-x5-z-nemecka|nakup-ojazdeneho-auta-z-nemecka))/",
+ "slugSeg": {
+  "de": {
+   "auta": "fahrzeuge",
+   "auto": "auto",
+   "blog": "blog",
+   "impressum": "impressum",
+   "konfigurator": "konfigurator",
+   "kontakt": "kontakt",
+   "o-nas": "ueber-uns",
+   "media": "medien",
+   "referencie": "referenzen",
+   "transparentnost": "transparenz",
+   "zabezpecenie-kvality": "qualitaetssicherung",
+   "obchodne-podmienky": "agb",
+   "ochrana-osobnych-udajov": "datenschutz",
+   "predaj": "kaufen",
+   "auto-na-mieru": "neuwagen-nach-wunsch",
+   "caste-otazky": "haeufige-fragen",
+   "financovanie-lizing": "finanzierung-leasing",
+   "vyhody": "vorteile",
+   "prenajom": "langzeitmiete",
+   "podmienky-a-kaucia": "bedingungen-und-kaution",
+   "porovnanie-aut": "fahrzeugvergleich",
+   "proces": "ablauf",
+   "ucet": "konto",
+   "audi-bmw-alebo-mercedes": "audi-bmw-oder-mercedes",
+   "ceny-dlhodobeho-prenajmu-aut-2026": "preise-langzeitmiete-2026",
+   "dlhodoby-prenajom-auta": "langzeitmiete-auto",
+   "nakup-ojazdeneho-premioveho-auta": "premium-gebrauchtwagen-kaufen",
+   "preco-caradvance": "warum-caradvance"
+  },
+  "fr": {
+   "auta": "vehicules",
+   "auto": "voiture",
+   "blog": "blog",
+   "impressum": "mentions-legales",
+   "konfigurator": "configurateur",
+   "kontakt": "contact",
+   "o-nas": "a-propos",
+   "media": "medias",
+   "referencie": "references",
+   "transparentnost": "transparence",
+   "zabezpecenie-kvality": "assurance-qualite",
+   "obchodne-podmienky": "cgv",
+   "ochrana-osobnych-udajov": "protection-des-donnees",
+   "predaj": "achat",
+   "auto-na-mieru": "voiture-neuve-sur-mesure",
+   "caste-otazky": "questions-frequentes",
+   "financovanie-lizing": "financement-leasing",
+   "vyhody": "avantages",
+   "prenajom": "location-longue-duree",
+   "podmienky-a-kaucia": "conditions-et-caution",
+   "porovnanie-aut": "comparateur",
+   "proces": "deroulement",
+   "ucet": "compte",
+   "audi-bmw-alebo-mercedes": "audi-bmw-ou-mercedes",
+   "ceny-dlhodobeho-prenajmu-aut-2026": "prix-location-longue-duree-2026",
+   "dlhodoby-prenajom-auta": "location-longue-duree-voiture",
+   "nakup-ojazdeneho-premioveho-auta": "acheter-voiture-premium-occasion",
+   "preco-caradvance": "pourquoi-caradvance"
+  },
+  "it": {
+   "auta": "veicoli",
+   "auto": "auto",
+   "blog": "blog",
+   "impressum": "note-legali",
+   "konfigurator": "configuratore",
+   "kontakt": "contatti",
+   "o-nas": "chi-siamo",
+   "media": "media",
+   "referencie": "referenze",
+   "transparentnost": "trasparenza",
+   "zabezpecenie-kvality": "garanzia-qualita",
+   "obchodne-podmienky": "condizioni-generali",
+   "ochrana-osobnych-udajov": "privacy",
+   "predaj": "acquisto",
+   "auto-na-mieru": "auto-nuova-su-misura",
+   "caste-otazky": "domande-frequenti",
+   "financovanie-lizing": "finanziamento-leasing",
+   "vyhody": "vantaggi",
+   "prenajom": "noleggio-lungo-termine",
+   "podmienky-a-kaucia": "condizioni-e-deposito",
+   "porovnanie-aut": "confronto-auto",
+   "proces": "come-funziona",
+   "ucet": "account",
+   "audi-bmw-alebo-mercedes": "audi-bmw-o-mercedes",
+   "ceny-dlhodobeho-prenajmu-aut-2026": "prezzi-noleggio-lungo-termine-2026",
+   "dlhodoby-prenajom-auta": "noleggio-auto-lungo-termine",
+   "nakup-ojazdeneho-premioveho-auta": "acquistare-auto-premium-usata",
+   "preco-caradvance": "perche-caradvance"
+  },
+  "es": {
+   "auta": "vehiculos",
+   "auto": "coche",
+   "blog": "blog",
+   "impressum": "aviso-legal",
+   "konfigurator": "configurador",
+   "kontakt": "contacto",
+   "o-nas": "sobre-nosotros",
+   "media": "medios",
+   "referencie": "referencias",
+   "transparentnost": "transparencia",
+   "zabezpecenie-kvality": "garantia-calidad",
+   "obchodne-podmienky": "condiciones-generales",
+   "ochrana-osobnych-udajov": "privacidad",
+   "predaj": "compra",
+   "auto-na-mieru": "coche-nuevo-a-medida",
+   "caste-otazky": "preguntas-frecuentes",
+   "financovanie-lizing": "financiacion-leasing",
+   "vyhody": "ventajas",
+   "prenajom": "renting",
+   "podmienky-a-kaucia": "condiciones-y-fianza",
+   "porovnanie-aut": "comparador",
+   "proces": "como-funciona",
+   "ucet": "cuenta",
+   "audi-bmw-alebo-mercedes": "audi-bmw-o-mercedes",
+   "ceny-dlhodobeho-prenajmu-aut-2026": "precios-renting-2026",
+   "dlhodoby-prenajom-auta": "renting-coche",
+   "nakup-ojazdeneho-premioveho-auta": "comprar-coche-premium-usado",
+   "preco-caradvance": "por-que-caradvance"
+  }
+ },
+ "slugWord": {
+  "de": {
+   "trieda": "klasse",
+   "limuzina": "limousine",
+   "dverova": "tuerer",
+   "elektricke": "elektrisch",
+   "benzin": "benzin",
+   "hybrid": "hybrid",
+   "t-modell": "t-modell"
+  },
+  "fr": {
+   "trieda": "classe",
+   "limuzina": "berline",
+   "dverova": "portes",
+   "elektricke": "electrique",
+   "benzin": "essence",
+   "hybrid": "hybride",
+   "t-modell": "t-modell"
+  },
+  "it": {
+   "trieda": "classe",
+   "limuzina": "berlina",
+   "dverova": "porte",
+   "elektricke": "elettrica",
+   "benzin": "benzina",
+   "hybrid": "ibrida",
+   "t-modell": "t-modell"
+  },
+  "es": {
+   "trieda": "clase",
+   "limuzina": "berlina",
+   "dverova": "puertas",
+   "elektricke": "electrico",
+   "benzin": "gasolina",
+   "hybrid": "hibrido",
+   "t-modell": "t-modell"
+  }
+ },
+ "replace": [
+  [
+   "info@caradvance.sk",
+   "import@caradvance.de"
+  ],
+  [
+   "info@caradvance.cz",
+   "import@caradvance.de"
+  ],
+  [
+   "wa.me/421915410555",
+   "wa.me/36302336060"
+  ],
+  [
+   "tel:+421915410555",
+   "tel:+498999998100"
+  ],
+  [
+   "+421915410555",
+   "+498999998100"
+  ],
+  [
+   "421915410555",
+   "36302336060"
+  ],
+  [
+   "421918700722",
+   "36300942081"
+  ],
+  [
+   "421917222122",
+   "36300942105"
+  ],
+  [
+   "/sk-team/pavel-horemuz.webp",
+   "https://www.caradvance.hu/toth-karoly.webp"
+  ],
+  [
+   "/sk-team/veronika-dinicova.webp",
+   "https://www.caradvance.hu/bajzath-balazs.webp?v=4"
+  ],
+  [
+   "/sk-team/andreas-horemuz.webp",
+   "https://www.caradvance.hu/vadnai-zsombor.webp"
+  ],
+  [
+   "Pavel Horemuž",
+   "Károly Tóth"
+  ],
+  [
+   "Veronika Diničová",
+   "Balázs Bajzáth"
+  ],
+  [
+   "Andreas Horemuž",
+   "Zsombor Vadnai"
+  ],
+  [
+   "HRB 52005445",
+   "HRB 151009"
+  ],
+  [
+   "DE2120860148",
+   "DE232664616"
+  ]
+ ],
+ "replaceRe": [
+  [
+   "\\+421[\\s\\u00a0]?915[\\s\\u00a0]?410[\\s\\u00a0]?555",
+   "+49 89 99998 100"
+  ],
+  [
+   "\\+421[\\s\\u00a0]?918[\\s\\u00a0]?700[\\s\\u00a0]?722",
+   "+36 30 094 2081"
+  ],
+  [
+   "\\+421[\\s\\u00a0]?917[\\s\\u00a0]?222[\\s\\u00a0]?122",
+   "+36 30 094 2105"
+  ],
+  [
+   "Bgm\\.?-Graf-Ring[\\s\\u00a0]\\d+,[\\s\\u00a0]\\d{3}[\\s\\u00a0]?\\d{2}[\\s\\u00a0]Geretsried",
+   "Bgm.-Graf-Ring 21, 82538 Geretsried"
+  ],
+  [
+   "\"streetAddress\":\"Cesta na Senec 2/A\"",
+   "\"streetAddress\":\"Bgm.-Graf-Ring 21\""
+  ],
+  [
+   "\"postalCode\":\"821 04\",\"addressLocality\":\"Bratislava\",\"addressRegion\":\"Bratislavský kraj\"",
+   "\"postalCode\":\"82538\",\"addressLocality\":\"Geretsried\",\"addressRegion\":\"Bayern\""
+  ],
+  [
+   "\"addressCountry\":\"SK\"",
+   "\"addressCountry\":\"DE\""
+  ],
+  [
+   "(?<![/\\w.-])(www\\.)?caradvance\\.sk\\b",
+   "$1caradvance.eu"
+  ],
+  [
+   "\"areaServed\":\"SK\"",
+   "\"areaServed\":[\"DE\",\"FR\",\"IT\",\"ES\"]"
+  ]
+ ],
+ "team": [
+  {
+   "from": "https://www.caradvance.hu/toth-karoly.webp",
+   "img": "https://www.caradvance.hu/toth-karoly.webp",
+   "flags": [
+    "de",
+    "fr",
+    "gb",
+    "hu"
+   ]
+  },
+  {
+   "from": "https://www.caradvance.hu/bajzath-balazs.webp?v=4",
+   "img": "https://www.caradvance.hu/bajzath-balazs.webp?v=4",
+   "flags": [
+    "de",
+    "gb",
+    "hu"
+   ]
+  },
+  {
+   "from": "https://www.caradvance.hu/vadnai-zsombor.webp",
+   "img": "https://www.caradvance.hu/vadnai-zsombor.webp",
+   "flags": [
+    "gb",
+    "hu"
+   ]
+  }
+ ],
+ "fix": [
+  [
+   "/caradvance-logo-white-sk\\.webp",
+   {
+    "de": "/caradvance-logo-white-eu-de.webp",
+    "fr": "/caradvance-logo-white-eu-fr.webp",
+    "it": "/caradvance-logo-white-eu-it.webp",
+    "es": "/caradvance-logo-white-eu-es.webp"
+   }
+  ],
+  [
+   "/caradvance-logo-sk\\.webp",
+   {
+    "de": "/caradvance-logo-eu-de.webp",
+    "fr": "/caradvance-logo-eu-fr.webp",
+    "it": "/caradvance-logo-eu-it.webp",
+    "es": "/caradvance-logo-eu-es.webp"
+   }
+  ],
+  [
+   "const fuelPrice=\\{b:[0-9.]+,d:[0-9.]+,src:'[^']*'\\};",
+   {
+    "de": "const fuelPrice={b:798.56,d:846.4,src:'Orientierungswert: durchschnittlicher Kraftstoffpreis in Deutschland (EU Weekly Oil Bulletin, Oktober 2026); Sie können den Preis anpassen'};",
+    "fr": "const fuelPrice={b:802.24,d:864.8,src:'Valeur indicative : prix moyen du carburant en France (EU Weekly Oil Bulletin, octobre 2026) ; vous pouvez modifier le prix'};",
+    "it": "const fuelPrice={b:739.68,d:828.0,src:'Valore indicativo: prezzo medio del carburante in Italia (EU Weekly Oil Bulletin, ottobre 2026); può modificare il prezzo'};",
+    "es": "const fuelPrice={b:644.0,d:695.52,src:'Valor orientativo: precio medio del carburante en España (EU Weekly Oil Bulletin, octubre 2026); puede modificar el precio'};"
+   }
+  ],
+  [
+   "id=\"pb\" value=\"[0-9.]+\" step=\"0\\.01\"> €/l",
+   {
+    "de": "id=\"pb\" value=\"2.17\" step=\"0.01\"> €/l",
+    "fr": "id=\"pb\" value=\"2.18\" step=\"0.01\"> €/l",
+    "it": "id=\"pb\" value=\"2.01\" step=\"0.01\"> €/l",
+    "es": "id=\"pb\" value=\"1.75\" step=\"0.01\"> €/l"
+   }
+  ],
+  [
+   "id=\"pd\" value=\"[0-9.]+\" step=\"0\\.01\"> €/l",
+   {
+    "de": "id=\"pd\" value=\"2.3\" step=\"0.01\"> €/l",
+    "fr": "id=\"pd\" value=\"2.35\" step=\"0.01\"> €/l",
+    "it": "id=\"pd\" value=\"2.25\" step=\"0.01\"> €/l",
+    "es": "id=\"pd\" value=\"1.89\" step=\"0.01\"> €/l"
+   }
+  ],
+  [
+   "<b id=\"fb\">[^<]*</b>",
+   {
+    "de": "<b id=\"fb\">2,17 €/l</b>",
+    "fr": "<b id=\"fb\">2,18 €/l</b>",
+    "it": "<b id=\"fb\">2,01 €/l</b>",
+    "es": "<b id=\"fb\">1,75 €/l</b>"
+   }
+  ],
+  [
+   "<b id=\"fd\">[^<]*</b>",
+   {
+    "de": "<b id=\"fd\">2,30 €/l</b>",
+    "fr": "<b id=\"fd\">2,35 €/l</b>",
+    "it": "<b id=\"fd\">2,25 €/l</b>",
+    "es": "<b id=\"fd\">1,89 €/l</b>"
+   }
+  ],
+  [
+   "\\s*\\((?:rund|etwa|ca\\.|environ|env\\.|circa|ca|roughly|about|approx\\.)?\\s*≈?\\s*1[0-9][\\s\\u00a0]?×\\s*\\)",
+   ""
+  ],
+  [
+   "\\(\\s*(?:rund|etwa|environ|circa|roughly|about)?\\s*≈?\\s*1[0-9][\\s\\u00a0]?×\\s*;\\s*",
+   "("
+  ],
+  [
+   "\\((?:\\s|&nbsp;|\\u00a0)*(?:rund|etwa|environ|circa|roughly|about)(?:\\s|&nbsp;|\\u00a0)*1[0-9](?:\\s|&nbsp;|\\u00a0)?×(?:\\s|&nbsp;|\\u00a0)*;(?:\\s|&nbsp;|\\u00a0)*",
+   "("
+  ],
+  [
+   "(?:\\s|&nbsp;)?\\(<strong>(?:rund|etwa|environ|circa|roughly|about)(?:\\s|&nbsp;|\\u00a0)*1[0-9](?:\\s|&nbsp;|\\u00a0)?×</strong>;(?:\\s|&nbsp;)*",
+   " ("
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)grösser\\)",
+   "(um ein Vielfaches größer)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)größer\\)",
+   "(um ein Vielfaches größer)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)plus grand\\)",
+   "(bien plus grand)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)più grande\\)",
+   "(molto più grande)"
+  ],
+  [
+   "\\(≈1[0-9]×(?:\\s|&nbsp;|\\u00a0)más grande\\)",
+   "(mucho más grande)"
+  ],
+  [
+   "1[0-9]×(?:\\s|&nbsp;|\\u00a0)grössere Auswahl",
+   "Ein Vielfaches an Auswahl"
+  ],
+  [
+   "1[0-9]×(?:\\s|&nbsp;|\\u00a0)größere Auswahl",
+   "Ein Vielfaches an Auswahl"
+  ],
+  [
+   "Un choix 1[0-9]×(?:\\s|&nbsp;|\\u00a0)plus large",
+   "Un choix bien plus large"
+  ],
+  [
+   "Scelta 1[0-9]×(?:\\s|&nbsp;|\\u00a0)più ampia",
+   "Scelta molto più ampia"
+  ],
+  [
+   "dp\\.textContent=\"Kaució:\\ \"\\+_ft\\(dd\\[0\\]\\)\\+\"\\ Ft\\ \\(\"\\+dd\\[0\\]\\.toLocaleString\\(\"hu\\-HU\"\\)\\+\"\\ €\\)\\ ·\\ a\\ bérlés\\ végén\\ visszajár\";",
+   {
+    "de": "dp.textContent=\"Kaution: \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\" · wird am Ende der Miete zurückerstattet\";",
+    "fr": "dp.textContent=\"Dépôt de garantie : \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\" · restitué à la fin de la location\";",
+    "it": "dp.textContent=\"Deposito cauzionale: \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\" · restituito a fine noleggio\";",
+    "es": "dp.textContent=\"Fianza: \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\" · se devuelve al final del renting\";"
+   }
+  ],
+  [
+   "dp\\.textContent=\"Kaució:\\ \"\\+_ft\\(dd\\[0\\]\\)\\+\"–\"\\+_ft\\(dd\\[1\\]\\)\\+\"\\ Ft\\ \\(\"\\+dd\\[0\\]\\.toLocaleString\\(\"hu\\-HU\"\\)\\+\"–\"\\+dd\\[1\\]\\.toLocaleString\\(\"hu\\-HU\"\\)\\+\"\\ €\\)\\ ·\\ a\\ bérlés\\ végén\\ visszajár\";",
+   {
+    "de": "dp.textContent=\"Kaution: \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\"–\"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[1])+\" · wird am Ende der Miete zurückerstattet\";",
+    "fr": "dp.textContent=\"Dépôt de garantie : \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\"–\"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[1])+\" · restitué à la fin de la location\";",
+    "it": "dp.textContent=\"Deposito cauzionale: \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\"–\"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[1])+\" · restituito a fine noleggio\";",
+    "es": "dp.textContent=\"Fianza: \"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[0])+\"–\"+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(dd[1])+\" · se devuelve al final del renting\";"
+   }
+  ],
+  [
+   "pel\\.textContent=\"nettó\\ \"\\+\"≈\\ \"\\+_pf\\(pp\\[0\\]\\)\\+\"\\ Ft/hó\"\\+\\(pp\\[0\\]===pp\\[1\\]\\?\"\":\"\\-tól\"\\)\\+\"\\ \\+\\ áfa\";",
+   {
+    "de": "pel.textContent=(pp[0]===pp[1]?\"\":\"ab \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/Monat zzgl. MwSt.\";",
+    "fr": "pel.textContent=(pp[0]===pp[1]?\"\":\"dès \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/mois HT\";",
+    "it": "pel.textContent=(pp[0]===pp[1]?\"\":\"da \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/mese + IVA\";",
+    "es": "pel.textContent=(pp[0]===pp[1]?\"\":\"desde \")+(function(e){return String(e).replace(/\\B(?=(\\d{3})+(?!\\d))/g,\"\\u00a0\")+\"\\u00a0€\";})(pp[0]+650)+\"/mes + IVA\";"
+   }
+  ],
+  [
+   "var HUM=\\[[^\\]]*\\];",
+   "var HUM=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];"
+  ],
+  [
+   "(var T=\\{hu:\\{lbl:'7\\. Mikortól bérelnéd\\?'[\\s\\S]*?\\}\\[LG\\];)",
+   {
+    "de": "$1T={\"lbl\": \"7. Ab wann möchten Sie mieten?\", \"tip\": \"Ab Bestellung dauert es mindestens 10 Tage bis zur Übergabe. Bei später verfügbaren Autos ist der früheste Termin der erste Tag des jeweiligen Monats.\", \"note\": \"Frühestmögliche Übergabe: \", \"err\": \"Bitte wählen Sie, ab wann Sie das Auto mieten möchten.\", \"errMin\": \"Frühestmöglicher Beginn: \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString('de-DE',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};",
+    "fr": "$1T={\"lbl\": \"7. À partir de quand souhaitez-vous louer ?\", \"tip\": \"Il faut au moins 10 jours entre la commande et la remise. Pour les voitures disponibles plus tard, la date la plus proche est le premier jour du mois concerné.\", \"note\": \"Remise au plus tôt : \", \"err\": \"Veuillez choisir à partir de quand vous souhaitez louer la voiture.\", \"errMin\": \"Début au plus tôt : \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};",
+    "it": "$1T={\"lbl\": \"7. Da quando desidera noleggiare?\", \"tip\": \"Dall’ordine alla consegna servono almeno 10 giorni. Per le auto disponibili più tardi, la data più vicina è il primo giorno del mese di disponibilità.\", \"note\": \"Consegna al più presto: \", \"err\": \"Scelga da quando desidera noleggiare l’auto.\", \"errMin\": \"Inizio al più presto: \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};",
+    "es": "$1T={\"lbl\": \"7. ¿Desde cuándo desea el renting?\", \"tip\": \"Desde el pedido hasta la entrega pasan al menos 10 días. Para los coches disponibles más tarde, la fecha más próxima es el primer día del mes correspondiente.\", \"note\": \"Entrega lo antes posible: \", \"err\": \"Elija desde cuándo desea alquilar el coche.\", \"errMin\": \"Inicio lo antes posible: \"};nice=function(s){try{return new Date(s+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});}catch(e){return s;}};"
+   }
+  ],
+  [
+   "'<div\\ class=\"pricerow\"><span\\ class=\"price\">'\\+esc\\(Math\\.round\\(car\\.eurNet\\*1\\.23\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €'\\)\\+'</span><span\\ class=\"peur\">'\\+esc\\('s\\ DPH\\ ·\\ '\\+Math\\.round\\(car\\.eurNet\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €\\ bez\\ DPH'\\)\\+'</span></div>'",
+   {
+    "de": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.19).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('inkl. 19 % MwSt.')+'</span></div>'",
+    "fr": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.2).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('TVA 20 % incluse')+'</span></div>'",
+    "it": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.22).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('IVA 22 % inclusa')+'</span></div>'",
+    "es": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.21).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('IVA 21 % incluido')+'</span></div>'"
+   }
+  ],
+  [
+   "'<div\\ class=\"pricerow\"><span\\ class=\"price\">'\\+Math\\.round\\(c\\.eur/1\\.19\\*1\\.23\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €'\\+'</span><span\\ class=\"peur\">s\\ DPH\\ ·\\ '\\+Math\\.round\\(c\\.eur/1\\.19\\)\\.toLocaleString\\('sk\\-SK'\\)\\+'\\ €\\ bez\\ DPH</span></div>'",
+   {
+    "de": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19*1.19).toLocaleString('de-DE')+' €'+'</span><span class=\"peur\">inkl. 19 % MwSt.</span></div>'",
+    "fr": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19*1.2).toLocaleString('de-DE')+' €'+'</span><span class=\"peur\">TVA 20 % incluse</span></div>'",
+    "it": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19*1.22).toLocaleString('de-DE')+' €'+'</span><span class=\"peur\">IVA 22 % inclusa</span></div>'",
+    "es": "'<div class=\"pricerow\"><span class=\"price\">'+Math.round(c.eur/1.19*1.21).toLocaleString('de-DE')+' €'+'</span><span class=\"peur\">IVA 21 % incluido</span></div>'"
+   }
+  ],
+  [
+   "<img class=\"bhg-logo\" src=\"/bh-group-zrt\\.webp\"[^>]*>",
+   ""
+  ],
+  [
+   "info@caradvance\\.hu",
+   "import@caradvance.de"
+  ],
+  [
+   "\\+36(?:\\s|&nbsp;|\\u00a0)?30(?:\\s|&nbsp;|\\u00a0)?233(?:\\s|&nbsp;|\\u00a0)?6060",
+   "+49 89 99998 100"
+  ],
+  [
+   "tel:\\+36302336060",
+   "tel:+498999998100"
+  ],
+  [
+   "<dd>Mr\\. Job SK s\\.r\\.o\\.</dd>",
+   "<dd>Caradvance GmbH</dd>"
+  ],
+  [
+   "IČO[\\s\\u00a0]?52[\\s\\u00a0]?005[\\s\\u00a0]?445[\\s\\u00a0]?·[\\s\\u00a0]?IČ[\\s\\u00a0]DPH[\\s\\u00a0]SK2120860148",
+   "Amtsgericht München, HRB 151009 · DE232664616"
+  ],
+  [
+   "DIČ[\\s\\u00a0]2120860148[\\s\\u00a0]?·[\\s\\u00a0]?IČ[\\s\\u00a0]DPH[\\s\\u00a0]SK2120860148",
+   "DE232664616"
+  ],
+  [
+   ",\"subOrganization\":\\{[^{}]*\"name\":\"Mr\\. Job SK s\\.r\\.o\\.\"[^{}]*\"address\":\\{[^{}]*\\}\\}",
+   ""
+  ],
+  [
+   "<td>Mr\\. Job SK s\\.r\\.o\\.</td>",
+   "<td>Caradvance GmbH</td>"
+  ],
+  [
+   "\"postalCode\":\"821 04\",\"addressLocality\":\"Bratislava\",\"addressCountry\":\"DE\",\"addressRegion\":\"Bratislavský kraj\"",
+   "\"postalCode\":\"82538\",\"addressLocality\":\"Geretsried\",\"addressCountry\":\"DE\",\"addressRegion\":\"Bayern\""
+  ],
+  [
+   "\"knowsLanguage\":\\[[^\\]]*\\]",
+   {
+    "de": "\"knowsLanguage\":[\"de\",\"en\"]",
+    "fr": "\"knowsLanguage\":[\"fr\",\"de\",\"en\"]",
+    "it": "\"knowsLanguage\":[\"de\",\"en\",\"it\"]",
+    "es": "\"knowsLanguage\":[\"de\",\"en\",\"es\"]"
+   }
+  ],
+  [
+   "'<div class=\"pricerow\"><span class=\"price\">'\\+esc\\(Math\\.round\\(car\\.eurNet\\*1\\.23\\)\\.toLocaleString\\('sk-SK'\\)\\+' €'\\)\\+'</span><span class=\"peur\">'\\+esc\\('[^']*'\\+Math\\.round\\(car\\.eurNet\\)\\.toLocaleString\\('sk-SK'\\)\\+'[^']*'\\)\\+'</span></div>'",
+   {
+    "de": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.19).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('inkl. 19 % MwSt.')+'</span></div>'",
+    "fr": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.2).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('TVA 20 % incluse')+'</span></div>'",
+    "it": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.22).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('IVA 22 % inclusa')+'</span></div>'",
+    "es": "'<div class=\"pricerow\"><span class=\"price\">'+esc(Math.round(car.eurNet*1.21).toLocaleString('de-DE')+' €')+'</span><span class=\"peur\">'+esc('IVA 21 % incluido')+'</span></div>'"
+   }
+  ]
+ ],
+ "monRe": "['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december','januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember','janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre','gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre','january','february','march','april','may','june','july','august','september','october','november','december','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"
+}

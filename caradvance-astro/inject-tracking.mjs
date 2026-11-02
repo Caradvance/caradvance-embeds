@@ -54,7 +54,8 @@ const MKT = {
   cs: { mail: 'info@caradvance.cz', PHONE: '+420 604 313 136', WHATSAPP: 'https://wa.me/421915410555', priv: '/ochrana-osobnich-udaju/#cookie' },
   sk: { mail: 'info@caradvance.sk', PHONE: '+421 915 410 555', WHATSAPP: 'https://wa.me/421915410555' },
   pl: { mail: 'info@caradvance.hu', PHONE: '+36 30 233 6060', WHATSAPP: 'https://wa.me/36302336060' },
-  ch: { mail: 'info@caradvance.ch', PHONE: '+41 79 715 85 80', WHATSAPP: 'https://wa.me/41797158580', priv: '/datenschutz/#cookie', base: 'de', subs: ['fr', 'it', 'en'] }
+  ch: { mail: 'info@caradvance.ch', PHONE: '+41 79 715 85 80', WHATSAPP: 'https://wa.me/41797158580', priv: '/datenschutz/#cookie', base: 'de', subs: ['fr', 'it', 'en'] },
+  eu: { mail: 'import@caradvance.de', PHONE: '+49 89 99998 100', WHATSAPP: 'https://wa.me/36302336060', privL: {"de": "/datenschutz/#cookie", "fr": "/protection-des-donnees/#cookie", "it": "/privacy/#cookie", "es": "/privacidad/#cookie"}, base: 'de', subs: ['de', 'fr', 'it', 'es'] }
 };
 const MSG = {
   cs: (m) => ({ THANKS_TITLE: 'Děkujeme za váš zájem!', THANKS_TEXT: 'Vaši poptávku jsme přijali a brzy se vám ozveme s nabídkou na míru.', THANKS_NOTE: 'Pokud spěcháte, klidně nám zavolejte.',
@@ -71,6 +72,8 @@ const MSG = {
     ERROR_TITLE: 'L’envoi a échoué', ERROR_TEXT: 'Malheureusement, nous n’avons pas pu recevoir votre demande. Appelez-nous ou écrivez à ' + m + ' — nous réglons cela en quelques minutes.' }),
   it: (m) => ({ THANKS_TITLE: 'Grazie per il suo interesse!', THANKS_TEXT: 'Abbiamo ricevuto la sua richiesta e la ricontatteremo a breve con un’offerta su misura.', THANKS_NOTE: 'Se ha fretta, ci chiami pure.',
     ERROR_TITLE: 'Invio non riuscito', ERROR_TEXT: 'Purtroppo non siamo riusciti a ricevere la sua richiesta. Ci chiami o scriva a ' + m + ' — risolviamo in pochi minuti.' }),
+  es: (m) => ({ THANKS_TITLE: '¡Gracias por su interés!', THANKS_TEXT: 'Hemos recibido su solicitud y nos pondremos en contacto con usted en breve con una oferta personalizada.', THANKS_NOTE: 'Si tiene prisa, llámenos sin problema.',
+    ERROR_TITLE: 'No se ha podido enviar', ERROR_TEXT: 'Lamentablemente no hemos podido recibir su solicitud. Llámenos o escriba a ' + m + ' — lo resolvemos en unos minutos.' }),
   hu: (m) => ({ ERROR_TEXT: 'Sajnos nem tudtuk fogadni a kérésed. Kérjük, hívj minket, vagy írj a ' + m + ' címre — pár perc alatt elintézzük.' })
 };
 function cfgFor(dir, file) {
@@ -80,7 +83,8 @@ function cfgFor(dir, file) {
   const subs = mk.subs || ['en', 'de', 'hu'];
   const sub = subs.includes(seg[1]) ? seg[1] : (mk.base || seg[0]);
   const o = Object.assign({}, config, MSG[sub](mk.mail), { PHONE: mk.PHONE, WHATSAPP: mk.WHATSAPP });
-  if (mk.priv) o.COOKIE_POLICY_URL = (sub !== (mk.base || seg[0]) && sub !== 'hu' ? '/' + sub : '') + mk.priv;
+  if (mk.privL) o.COOKIE_POLICY_URL = '/' + sub + mk.privL[sub];
+  else if (mk.priv) o.COOKIE_POLICY_URL = (sub !== (mk.base || seg[0]) && sub !== 'hu' ? '/' + sub : '') + mk.priv;
   return o;
 }
 const blockFor = (cfg) => [
