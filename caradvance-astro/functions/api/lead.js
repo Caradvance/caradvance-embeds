@@ -128,7 +128,7 @@ export async function onRequestPost(context) {
 
   // Belső CRM: import autórendelés (→ Ajánlatmotor) és bérlési igény (→ az autó az adatlapon) — háttérben, a válasz nem vár rá
   if (env.DB) {
-    const crmJob = webLeadToCrm(env, data, { eventId: String(meta.event_id).toLowerCase(), page: meta.page, origin: new URL(request.url).origin })
+    const crmJob = webLeadToCrm(env, data, { eventId: String(meta.event_id).toLowerCase(), page: meta.page, origin: new URL(request.url).origin, attachment })
       .catch((e) => console.error('lead → crm', e && e.stack || e));
     if (context.waitUntil) context.waitUntil(crmJob); else await crmJob;
   }
@@ -407,6 +407,7 @@ function leadKind(data) {
   const t = String(pick(data, ['Típus', 'type', 'form']) || '').toLowerCase();
   const car = pick(data, ['Autó', 'car']) || [pick(data, ['Márka']), pick(data, ['Modell'])].filter(Boolean).join(' ');
   if (/bérl|berl|abo/.test(t)) return { key: 'berles', tag: 'Bérlés', internal: 'Új bérlési igény' + (car ? ' · ' + car : ''), subj: 'Megkaptuk a bérlési igényed' + (car ? ' — ' + car : ''), what: 'bérlési igényedet' + (car ? ' (' + car + ')' : '') };
+  if (/ajánlatkérés.*új autó/.test(t)) return { key: 'rendeles', tag: 'Egyedi rendelés', internal: 'Új ajánlatkérés (új autó)' + (car ? ' · ' + car : ''), subj: 'Megkaptuk az ajánlatkérésed' + (car ? ' — ' + car : ''), what: 'ajánlatkérésedet' + (car ? ' (' + car + ')' : '') };
   if (/rendel|order|egyedi/.test(t)) return { key: 'rendeles', tag: 'Egyedi rendelés', internal: 'Új autórendelés' + (car ? ' · ' + car : ''), subj: 'Megkaptuk az autórendelési igényed' + (car ? ' — ' + car : ''), what: 'autórendelési igényedet' + (car ? ' (' + car + ')' : '') };
   if (/bizom|eladás|eladas|eladom/.test(t)) return { key: 'eladas', tag: 'Bizományos értékesítés', internal: 'Új autóeladási ajánlat' + (car ? ' · ' + car : ''), subj: 'Megkaptuk az autód adatait' + (car ? ' — ' + car : ''), what: 'az autód eladásával kapcsolatos megkeresésedet' + (car ? ' (' + car + ')' : '') };
   return { key: 'import', tag: 'Autóimport', internal: 'Új import-érdeklődés', subj: 'Megkaptuk az autókeresési kérésed' + (car ? ' — ' + car : ''), what: 'autókeresési / import kérésedet' + (car ? ' (' + car + ')' : '') };
