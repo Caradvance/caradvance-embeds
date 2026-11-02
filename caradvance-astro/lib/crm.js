@@ -377,7 +377,7 @@ export async function aboFleet() {
     key: c.key, title: c.title, brand: c.brand, body: c.body || '', km: '0 km', power: c.psMin ? (c.psMin === c.psMax || !c.psMax ? c.psMin : c.psMin + '–' + c.psMax) + ' LE' : '',
     gearbox: (c.gears || []).join(' / '), fuel: (c.fuels || []).join(' / '), year: '2026', drive: '',
     image: c.image || '', active: true, price: c.price, currency: 'EUR', period: 'hó', deposit: 0, url: c.url || '',
-    abo: { now: c.now || 0, count: c.count || 0, months: c.months || [], km: c.km || [], colors: c.colors || [], variants: c.variants || [], cfg: c.cfg || null, mark }
+    abo: { now: c.now || 0, count: c.count || 0, months: c.months || [], km: c.km || [], colors: c.colors || [], variants: c.variants || [], cfg: c.cfg || null, mark, name: c.name || '' }
   }));
 }
 
