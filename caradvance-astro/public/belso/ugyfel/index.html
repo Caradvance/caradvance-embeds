@@ -393,6 +393,7 @@ function renderHead(){
     +'<span>Jelentkezett: '+esc(fmtDate(d.created_at))+'</span>'
     +(d.ch?'<span>Csatorna: '+esc(d.ch)+'</span>':'');
   if(window.ovSoon&&$('b0'))ovSoon();
+  if(S.me&&S.me.role==='admin'&&!$('delClient')){var sb=document.querySelector('.stbox');if(sb){var db=document.createElement('button');db.id='delClient';db.className='btn ghost sm';db.style.color='var(--bad)';db.title='Ügyfél végleges törlése';db.textContent='🗑 Törlés';db.addEventListener('click',deleteClient);sb.appendChild(db);}}
   $('statusSel').innerHTML=S.statuses.map(function(s,i){return '<option'+(s===S.card.status?' selected':'')+'>'+esc(s)+'</option>';}).join('');
 }
 $('statusSel').addEventListener('change',function(){
@@ -403,6 +404,12 @@ $('statusSel').addEventListener('change',function(){
 var TABS=[['ov','Áttekintés'],['s1','Ügyfél'],['s2','Autók'],['s4','Ajánlat'],['s5','Dokumentumok'],['s6','Pénzügy'],['s7','Napló']];
 var TAB_SECS={ov:['s0','s3'],s1:['s1'],s2:['s2'],s4:['s4'],s5:['s5'],s6:['s6'],s7:['s7']};
 var TAB=(function(){var h=(location.hash||'').replace('#','');if(h==='s3'||h==='s0')return 'ov';return TAB_SECS[h]?h:'ov';})();
+function deleteClient(){
+  var nm=(S.card.data.kind==='ceg'&&S.card.data.company.name)||S.card.data.person.name||S.deal.name||'';
+  var x=prompt('Az ügyfél VÉGLEGES törlése: '+nm+'\n\nMinden adata törlődik (adatlap, feltöltött fájlok, ajánlatok, dokumentumok, aláírások, pénzügy, napló, Ajánlatmotor). Ez nem vonható vissza.\n\nA megerősítéshez írd be: TÖRLÉS');
+  if(x==null)return;if(String(x).trim().toUpperCase()!=='TÖRLÉS')return toast('Nem törlődött — a megerősítéshez a TÖRLÉS szót kell beírni.',4000);
+  api('/card/'+ID,{method:'DELETE'}).then(function(){toast('Ügyfél törölve.');setTimeout(function(){location.href=$('backLink').href||'/belso/';},800);}).catch(function(e){toast(e.message,5000);});
+}
 function renderAll(){
   $('root').innerHTML=
     '<nav class="tabs" id="tabs">'+TABS.map(function(t){return '<button data-tab="'+t[0]+'"'+(t[0]===TAB?' class="on"':'')+'>'+t[1]+'<span class="bd" id="bd_'+t[0]+'" hidden></span></button>';}).join('')+'</nav>'
