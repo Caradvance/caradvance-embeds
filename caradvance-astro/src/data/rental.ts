@@ -23,7 +23,7 @@ export interface RentalData {
   photo: string; related: RentalRelated[];
 }
 
-const MARGIN = 650; // ugyanaz, mint a kártyán: effNet = net + 650
+const MARGIN = 750; // ugyanaz, mint a kártyán: effNet = net + 750 (km-pricing.mjs: a 2 000 km/hó keret ára)
 let cache: { SUB: any; CFG: any; PHOTO: any } | null | undefined;
 
 function extract(src: string, marker: string): any {
