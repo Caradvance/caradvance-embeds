@@ -210,6 +210,9 @@ try {
     const ri = SEC.indexOf('function rhref(');
     let rhref = null;
     if (ri > -1) { let k = SEC.indexOf('{', ri), dd = 0; for (; k < SEC.length; k++) { if (SEC[k] === '{') dd++; else if (SEC[k] === '}') { dd--; if (!dd) break; } } try { rhref = new Function('return ' + SEC.slice(ri, k + 1))(); } catch (e) { rhref = null; } }
+    // konfigurációs mátrix (üzemanyag, futamidő, km, szín, kivitel, elérhetőség → kaució, flotta-ár) — a STRIP-ben (window.__ABCFG)
+    let ABCFG = {};
+    try { const ci = STRIP.indexOf('window.__ABCFG='); if (ci > -1) { let k = ci + 15, dd = 0, q2 = false; for (; k < STRIP.length; k++) { const ch = STRIP[k]; if (q2) { if (ch === '\\') { k++; continue; } if (ch === '"') q2 = false; continue; } if (ch === '"') { q2 = true; continue; } if (ch === '{') dd++; else if (ch === '}') { dd--; if (!dd) break; } } ABCFG = JSON.parse(STRIP.slice(ci + 15, k + 1)); } } catch (e) { console.log('[abo] ABCFG hiba: ' + e.message); }
     const MARK = +((SEC.match(/effNet = m\.net \? \(m\.net \+ (\d+)\)/) || [])[1] || 0); // a kártyán mutatott (nettó) havidíj = flotta-ár + felár
     const dn = (x) => String(x).replace(/\b(\d)er\b/g, '$1');
     const slug = (x) => String(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -223,10 +226,10 @@ try {
         body: m.cat || '', fuels: m.fuels || [], gears: m.gears || [], psMin: m.psMin || 0, psMax: m.psMax || 0,
         net: m.net || 0, price: m.net ? m.net + MARK : 0, months: m.months || [], km: m.km || [], colors: (m.colors || []).map((c) => c.n).filter(Boolean),
         variants: m.variants || [], now: m.now || 0, count: m.count || 0, later: (m.later || []).map((l) => ({ d: l.d, c: l.c })),
-        image: abs(PHOTO[name] || m.img || ''), url: url || site + '/autoink/#berelheto'
+        image: abs(PHOTO[name] || m.img || ''), url: url || site + '/autoink/#berelheto', cfg: ABCFG[name] || null
       };
     });
-    fs.writeFileSync('dist/abo-fleet.json', JSON.stringify({ updated: new Date().toISOString(), rate: S.rate_fallback || 0, cars }));
+    fs.writeFileSync('dist/abo-fleet.json', JSON.stringify({ updated: new Date().toISOString(), rate: S.rate_fallback || 0, mark: MARK, vat: 0.19, cars }));
     console.log('[abo] abo-fleet.json: ' + cars.length + ' modell');
   }
 } catch (e) { console.log('[abo] abo-fleet.json hiba: ' + e.message); }
