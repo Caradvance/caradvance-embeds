@@ -659,7 +659,7 @@ function renderVehicle(){
     h+='<div class="veh-form"><div class="veh-h"><b>'+esc((i+1)+'. autó — '+vehName(v,i))+'</b><span class="hint">'+esc(SRC_LBL[v.source]||'')+'</span>'+(v.url?'<a class="hint" href="'+esc(v.url)+'" target="_blank" rel="noopener">weboldal ↗</a>':'')+'<span class="sp" style="flex:1"></span><button class="btn ghost sm" id="vehDel">Autó törlése</button></div>'
       +'<div class="grid g4">'+vinp('title','Megnevezés',v.title,' wide')
       +vinp('brand','Márka',v.brand)+vinp('model','Típus',v.model)+vinp('year','Évjárat',v.year)+(rentL?'':vinp('vin','Alvázszám',v.vin)+vinp('plate','Rendszám',v.plate))
-      +vinp('color','Szín',v.color)+vinp('engine','Motor',v.engine)+vinp('fuel','Üzemanyag',v.fuel)+vinp('km','Km',v.km)+(rentL?'':vinp('body','Karosszéria',v.body))
+      +vinp('color','Szín',v.color)+vinp('engine','Motor',v.engine)+vinp('fuel','Üzemanyag',v.fuel)+vinp('km','Km',v.km)+vsel('body','Karosszéria',normBody(v.body)||guessBody(v),BODY_OPTS)
       +vsel('gearbox','Váltó',v.gearbox,['Automata','Manuális'])+vsel('condition','Állapot',v.condition,['Új','Használt'])+(v.ad_id?vinp('ad_id','mobile.de azonosító',v.ad_id):'')+(v.config_code||S.deal.line==='Eladás'?vinp('config_code','Konfigurációs kód',v.config_code):'')
       +vinp('price','Ár / díj',v.price||'')+'<div class="fld"><label>Pénznem</label><select data-vp="currency"><option value="HUF"'+(v.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(v.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-vp="period"><option value="">egyszeri (vételár)</option><option value="hó"'+(v.period==='hó'?' selected':'')+'>havi (bérleti díj)</option></select></div>'
@@ -695,6 +695,8 @@ function renderVehicle(){
       if(el.tagName==='SELECT'||el.type==='checkbox')saveData().then(function(){if(k==='period')renderVehicle();});else saveDataSoon();};
     el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',h2);
   });
+  /* karosszéria: a felismert / egységesített érték mentése, hogy a szerződésbe is bekerüljön */
+  var bs=$('b2').querySelector('select[data-vp=body]');if(v&&bs&&bs.value&&bs.value!==String(v.body||'')){v.body=bs.value;saveDataSoon();}
 }
 /* ---- bérlet: kezdet / vég / figyelmeztetések (Eladás 1. üteme és Bérlés) ---- */
 function hasRent(){return S.deal.line==='Bérlés'||S.deal.line==='Eladás';}
@@ -744,6 +746,21 @@ function bindRent(v){
   });
   $('b2').querySelectorAll('[data-rdel]').forEach(function(x){x.addEventListener('click',function(){var id=x.getAttribute('data-rdel');v.reminders=(v.reminders||[]).filter(function(r){return r.id!==id;});saveData().then(renderVehicle);});});
 }
+var BODY_OPTS=['Sedan (limuzin)','Kombi','Ferdehátú','SUV','Coupé','Cabrio','Egyterű','Kisbusz','Pickup'];
+function normBody(b){var x=String(b||'').trim(),l=x.toLowerCase();if(!x)return '';
+  if(/sedan|limou?sin|sedán|lépcsőshát/.test(l))return 'Sedan (limuzin)';
+  if(/kombi|touring|avant|variant|estate|wagon|break|sportstourer|tourer$|shooting/.test(l)&&!/active tourer|gran tourer/.test(l))return 'Kombi';
+  if(/ferde|hatch|sportback(?!.*suv)|schräg|kompakt|kleinwagen|5-?ajtós|3-?ajtós/.test(l)&&!/suv|q\d/.test(l))return 'Ferdehátú';
+  if(/suv|terep|gelände|crossover|offroad|sav|sac/.test(l))return 'SUV';
+  if(/coup/.test(l))return 'Coupé';
+  if(/cabr|kabri|roadster|spider|spyder|convertible/.test(l))return 'Cabrio';
+  if(/egyter|van$|mpv|active tourer|gran tourer|touran|minivan/.test(l))return 'Egyterű';
+  if(/kisbusz|bus|multivan|transporter|kastenwagen/.test(l))return 'Kisbusz';
+  if(/pick/.test(l))return 'Pickup';
+  return x;}
+function guessBody(v){var t=[v.title,v.brand,v.model].filter(Boolean).join(' ');if(!t)return '';var n0=normBody(t);if(/^(Cabrio|Coupé|Kombi|Kisbusz)$/.test(n0))return n0;
+  if(/\b(X[1-7]|XM|iX\d?|Q[2-8]|SQ\d|GL[ABCES]|G[ -]?\d{2}|EQ[ABCES]|Tiguan|Touareg|T-Roc|T-Cross|Taigo|Tayron|Kodiaq|Karoq|Kamiq|Cayenne|Macan|Range Rover|Defender|Discovery|Evoque|Velar|XC\d{2}|EX\d{2}|Ateca|Arona|Formentor|Tarraco|Terramar|Born|Tavascan|Sportage|Sorento|Tucson|Kona|Santa Fe|ID\.[45])\b/i.test(t))return 'SUV';
+  var n=normBody(t);return BODY_OPTS.indexOf(n)>=0?n:'';}
 function vsel(k,label,val,opts){var cur=String(val||'');var has=!cur||opts.some(function(o){return o.toLowerCase()===cur.toLowerCase();});return '<div class="fld"><label>'+esc(label)+'</label><select data-vp="'+k+'"><option value="">—</option>'+opts.map(function(o){return '<option'+(o.toLowerCase()===cur.toLowerCase()?' selected':'')+'>'+esc(o)+'</option>';}).join('')+(has?'':'<option selected>'+esc(cur)+'</option>')+'</select></div>';}
 function vinp(k,label,val,extra){return '<div class="fld'+(extra||'')+'"><label>'+esc(label)+'</label><input data-vp="'+k+'" value="'+esc(val==null?'':val)+'"'+(k==='price'?' inputmode="decimal"':'')+'></div>';}
 function newVid(){var L=vehs(),i=L.length+1,ids={};L.forEach(function(x){ids[x.id]=1;});while(ids['v'+i])i++;return 'v'+i;}
