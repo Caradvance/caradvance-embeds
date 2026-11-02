@@ -95,8 +95,8 @@ function render(){
     +(KIND==='ceg'?'<div class="sub">Cég adatai</div><div class="grid">'+fld('company.name','Cégnév',c.name,'',1,1)+fld('company.address','Székhely',c.address,'',1,1)+fld('company.reg','Cégjegyzékszám',c.reg,'',0,1)+fld('company.tax','Adószám',c.tax,'',0,1)+'</div><div class="sub">A képviselő személyes adatai</div>':'')
     +'<div class="grid">'+fld('name','Teljes név (ahogy az igazolványban szerepel)',p.name,'',1,1)+fld('address','Lakcím (irányítószám, település, utca, házszám)',p.address,'',1,1)
     +fld('birth_place','Születési hely','','',0,1)+fld('birth_date','Születési idő','','date',0,1)+fld('mother_name','Anyja születési neve','','',1,1)
-    +fld('id_number','Személyi igazolvány száma','','',0,1)+fld('address_card','Lakcímkártya száma','','',0,1)+fld('licence','Vezetői engedély száma','','',0,0)
-    +fld('phone','Telefonszám',p.phone,'tel',0,1)+fld('email','E-mail cím',p.email,'email',0,1)+(KIND==='magan'?fld('tax','Adóazonosító jel','','',0,0):'')+fld('bank','Bankszámlaszám','','',0,0)+'</div></div>'
+    +fld('id_number','Személyi igazolvány száma','','',0,1)+fld('address_card','Lakcímkártya száma','','',0,1)+fld('licence','Vezetői engedély száma','','',0,1)
+    +fld('phone','Telefonszám',p.phone,'tel',0,1)+fld('email','E-mail cím',p.email,'email',0,1)+fld('bank','Bankszámlaszám','','',0,0)+'</div></div>'
     +'<div class="card"><h2><span class="n">2</span>Okmánymásolatok</h2><p class="muted small" style="margin:4px 0 10px">Fényképezze le (vagy szkennelje be) az okmányokat — a személyi igazolványnak mindkét oldalát. JPG, PNG vagy PDF, fájlonként max. 8 MB. A fényképeket feltöltés előtt automatikusan kisebbítjük.</p>'
     +up('id','Személyi igazolvány (mindkét oldal)',1)+up('addr','Lakcímkártya (lakcímet tartalmazó oldal)',1)+(KIND==='ceg'?up('company','Cégkivonat / aláírási címpéldány (nem kötelező)',0):'')+'</div>'
     +'<div class="card"><h2><span class="n">3</span>Beküldés</h2><label class="chk"><input type="checkbox" id="cons"> <span>Hozzájárulok, hogy a CarAdvance a megadott adataimat és okmánymásolataimat a szerződéskötéshez és a kapcsolódó hatósági ügyintézéshez kezelje. Az adatok valósak.</span></label>'
@@ -134,7 +134,7 @@ function send(){
   showErr('');app.querySelectorAll('.bad').forEach(function(x){x.classList.remove('bad');});
   var person={},company={};
   app.querySelectorAll('[data-k]').forEach(function(i){var k=i.getAttribute('data-k'),v=i.value.trim();if(k.indexOf('company.')===0)company[k.slice(8)]=v;else person[k]=v;});
-  var req=['name','address','birth_place','birth_date','mother_name','id_number','address_card','phone','email'],miss=req.filter(function(k){return !person[k];});
+  var req=['name','address','birth_place','birth_date','mother_name','id_number','address_card','licence','phone','email'],miss=req.filter(function(k){return !person[k];});
   if(KIND==='ceg')['name','address','reg','tax'].forEach(function(k){if(!company[k])miss.push('company.'+k);});
   miss.forEach(function(k){var i=app.querySelector('[data-k="'+k+'"]');if(i)i.classList.add('bad');});
   if(miss.length)return showErr(ERR.missing);
