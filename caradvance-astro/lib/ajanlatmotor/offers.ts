@@ -51,7 +51,7 @@ export function toPublicCar(cv: CarView, req: Requirements, images: string[]): P
   const l = cv.listing;
   const wanted = [...req.vehicle.must_have_equipment, ...req.vehicle.nice_to_have_equipment];
   return {
-    cid: cv.candidate.id, slot: cv.candidate.slot!, positioning: cv.candidate.positioning, title: l.title, make: l.make, model: l.model,
+    cid: cv.candidate.id, source_url: /^https:\/\/([a-z0-9-]+\.)*mobile\.de\//i.test(l.url || "") ? l.url : undefined, slot: cv.candidate.slot!, positioning: cv.candidate.positioning, title: l.title, make: l.make, model: l.model,
     variant: l.variant, first_registration: l.first_registration, km: l.km, power_kw: l.power_kw, fuel: l.fuel, gearbox: l.gearbox,
     drivetrain: l.drivetrain, color: l.color, battery_kwh: l.battery_kwh, range_km: l.range_km, previous_owners: l.previous_owners,
     accident_free: l.accident_free, service_book: l.service_book, equipment_count: l.equipment.length, equipment: groupEquipment(l.equipment),

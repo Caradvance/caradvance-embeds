@@ -29,7 +29,9 @@ pub.get("/:token/", async (c) => {
   if (!(await rateLimit(c.env, `o:${ip(c)}`, 120, 60))) return c.text("Túl sok kérés", 429);
   const o = await loadOffer(c.env, token);
   if (!o) return c.text("Ez az ajánlat nem található.", 404, { "X-Robots-Tag": "noindex" });
-  const snap = JSON.parse(o.snapshot_json) as { public: PublicOffer };
+  const snap = JSON.parse(o.snapshot_json) as { public: PublicOffer; internal?: { cid: string; listing?: { url?: string } }[] };
+  // régebbi ajánlatoknál az eredeti hirdetés linkje a belső pillanatképből
+  for (const pc of snap.public.cars) if (!pc.source_url) { const u = (snap.internal || []).find((x) => x.cid === pc.cid)?.listing?.url || ""; if (/^https:\/\/([a-z0-9-]+\.)*mobile\.de\//i.test(u)) pc.source_url = u; }
   const chosen = o.action === "elfogad" && o.choice != null ? snap.public.cars[o.choice]?.cid : null;
   const expired = Date.parse(o.expires_at) < Date.now() && !o.responded_at;
   if (!expired) await markViewed(c.env, o, baseUrl(c.env, c.req.raw));
