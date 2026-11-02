@@ -8,7 +8,7 @@ import {
   bytesToB64, b64ToBytes, sha256hex, priceLabel, priceVatLabel, VAT_MODES, specLine, esc, SITE,
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
 } from '../../../lib/crm.js';
-import { jpegInfo, renderOfferPdf } from '../../../lib/docpdf.js';
+import { jpegInfo, renderOfferPdf, renderRentOfferPdf, groupRentEquipment } from '../../../lib/docpdf.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
 // címre megy az ügyfél helyett (a tárgyban ott a valódi címzett). Éles üzemhez állítsd null-ra,
@@ -319,7 +319,7 @@ async function handleSendOffer(request, env, user, id) {
     eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '',
     attach_src: !!it.attach_src,
     // bérlés (weboldali igényből): km-keret, futamidő, kezdés
-    condition: clean(it.condition, 40), body: clean(it.body, 60),
+    condition: clean(it.condition, 40), body: clean(it.body, 60), abo_name: clean(it.abo_name || (it.abo && it.abo.name), 120), avail: clean(it.avail, 80),
     km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end)
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
@@ -337,6 +337,13 @@ async function handleSendOffer(request, env, user, id) {
   // gyári konfigurátoros autók: CarAdvance-arculatú ajánlat PDF (adatok + képek + felszereltség); a gyári PDF csak kérésre megy
   const att = [];
   for (const [i, it] of items.entries()) {
+    if (isRentItem(it, deal.line)) {
+      try {
+        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user, line: deal.line });
+        att.push({ filename: ('Berleti_arajanlat_' + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').slice(0, 80) + '.pdf', content: bytesToB64(pdf) });
+        it.offer_pdf = true;
+      } catch (e) { console.error('rent offer pdf', e); }
+    }
     if (it.src === 'config' && (it.images.length || it.equipment.length)) {
       try {
         const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user });
@@ -363,7 +370,57 @@ async function handleSendOffer(request, env, user, id) {
 function eqImgs(a) { return (Array.isArray(a) ? a : []).filter((z) => z && Number.isInteger(z.id) && z.id > 0).slice(0, 40).map((z) => ({ id: z.id, idx: Number.isInteger(z.idx) ? z.idx : -1, label: clean(z.label, 160) })); }
 function offerNo(id, i, n) { const d = new Date(); return `AJ-${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}-${String(id).padStart(4, '0')}${n > 1 ? '-' + (i + 1) : ''}`; }
 function offerFileName(it) { return ('CarAdvance_ajanlat_' + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 80) + '.pdf'; }
+/* ---------------- bérleti árajánlat PDF (egy konkrét autóra, a bérleti szerződés fő pontjaival) ---------------- */
+function isRentItem(it, line) { return it && it.period === 'hó' && (line === 'Bérlés' || Number(it.months) > 0 || /^abo-/.test(it.key || '')); }
+async function aboFeatures(name, variant) {
+  if (!name) return [];
+  try {
+    const r = await fetch(SITE + '/abo-feat-hu.json', { cf: { cacheTtl: 600, cacheEverything: true } }); if (!r.ok) return [];
+    const j = await r.json(); const m = j[name] || {};
+    const txt = (variant && m[variant]) || Object.values(m)[0] || '';
+    return String(txt).split(/\s*•\s*/).map((x) => x.trim()).filter(Boolean);
+  } catch (e) { return []; }
+}
+async function buildRentOfferPdf(env, dealId, it, o) {
+  const fmtN = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const sym = it.currency === 'EUR' ? ' €' : ' Ft';
+  const fx = Number(it.fx) > 0 ? Number(it.fx) : (await eurHuf().catch(() => null)) || 0;
+  const V = VAT_MODES[it.vat_mode]; const rate = V && V.rate ? V.rate : (it.vat_mode === 'net' ? 0 : 0.19);
+  const gross = it.vat_mode === 'net' ? it.price * 1.19 : it.price; const net = it.vat_mode === 'net' ? it.price : it.price / (1 + (rate || 0.19));
+  const huf = (eur) => it.currency === 'EUR' && fx ? 'kb. ' + fmtN(Math.round(eur * fx / 1000) * 1000) + ' Ft' : '';
+  const variant = (Array.isArray(it.equipment) && it.equipment[0]) || it.power || '';
+  const km = parseInt(String(it.km_keret || '').replace(/\D/g, ''), 10) || 0; const months = Number(it.months) || 0;
+  const isNew = /^új$/i.test(it.condition || '') || /^0\s*km$/i.test(String(it.km || '').trim()) || /^abo-/.test(it.key || '');
+  const de = /^abo-/.test(it.key || '') || it.vat_mode === 'de19';
+  const today = new Date(); const valid = new Date(today.getTime() + 30 * 864e5);
+  const hd = (d) => d.toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const isoHu = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '') ? s.replace(/-/g, '. ') + '.' : '';
+  let feats = await aboFeatures(it.abo_name, variant);
+  if (!feats.length) feats = (Array.isArray(it.equipment) ? it.equipment : []).filter((x) => x && x !== variant);
+  const overKm = await getSetting(env, 'berles_km_tulfutas', '');
+  const title = [it.title, variant && String(it.title || '').indexOf(variant) < 0 ? variant : ''].filter(Boolean).join(' ');
+  return renderRentOfferPdf({
+    offerNo: o.number, date: hd(today), client: o.client || '', lessor: de ? 'Caradvance GmbH' : 'BH Group Zrt.', title,
+    tagline: [isNew ? 'Új jármű' : '', it.color, de ? 'Német rendszám' : ''].filter(Boolean).join(' · '),
+    strip: [[isNew ? '0 km' : (it.km || '—'), 'Kilométeróra'], [variant || '—', 'Kivitel'], [String(it.fuel || '—').split(' / ')[0], 'Üzemanyag'], [it.gearbox || '—', 'Váltó'], [isNew ? 'Új' : (it.condition || 'Használt'), 'Állapot'], [de ? 'Német' : 'Magyar', 'Rendszám']],
+    price: { main: fmtN(gross) + sym, unit: '/ hó', sub: (it.currency === 'EUR' ? 'nettó ' + fmtN(net) + ' € + 19% ÁFA' : '') + (huf(gross) ? ' · ' + huf(gross) : '') },
+    boxes: [['Bérleti idő', months ? months + ' hónap' : '—', it.rent_start ? 'kezdés: ' + isoHu(it.rent_start) : ''], ['Km-keret', km ? fmtN(km) + ' km' : '—', km ? 'havonta' : ''], ['Kaució', it.deposit ? fmtN(it.deposit) + sym : '—', it.deposit ? huf(it.deposit) : '', true]],
+    vehicle: [['Márka / Modell', it.title], ['Kivitel', variant], ['Kategória', it.body], ['Szín (gyári)', it.color], ['Üzemanyag', it.fuel], ['Váltó', it.gearbox], ['Elérhetőség', it.avail], ['Bérlet kezdete', isoHu(it.rent_start)]],
+    equipment: groupRentEquipment(feats),
+    terms: [
+      months ? `Bérleti időtartam: **${months} hónap**${it.rent_start ? ' (kezdés: ' + isoHu(it.rent_start) + (it.rent_end ? ', vége: ' + isoHu(it.rent_end) : '') + ')' : ''}.` : '',
+      `Havi bérleti díj: **${fmtN(gross)}${sym} bruttó**${it.currency === 'EUR' ? ' (nettó ' + fmtN(net) + ' € + 19% ÁFA)' : ''}, havonta előre, minden hónap elején esedékes.`,
+      it.deposit ? `Kaució: **${fmtN(it.deposit)}${sym}**${huf(it.deposit) ? ' (' + huf(it.deposit) + ')' : ''}, a bérlet kezdetekor fizetendő, a jármű sértetlen visszaadásakor visszajár.` : '',
+      it.currency === 'EUR' && fx ? `Alkalmazott árfolyam: **${fmtN(fx)} Ft / €** (tájékoztató; a díj és a kaució euróban fizetendő).` : '',
+      km ? `Havi kilométerkeret: **${fmtN(km)} km / hó**${months ? ' (a teljes bérleti időre ' + fmtN(km * months) + ' km)' : ''}${overKm ? '; a kereten felül **' + overKm + '** díj fizetendő' : ''}.` : '',
+      isNew ? `A jármű új, 0 km-es${de ? ', **német rendszámmal**' : ''} kerül átadásra.` : '',
+      it.note && !/^(Elérhetőség|Futamidő|Km-keret|Szín|Kivitel):/.test(it.note) ? it.note : '',
+      `Az ajánlat érvényessége: **${hd(valid)}**.`,
+    ].filter(Boolean),
+  });
+}
 async function buildOfferPdf(env, dealId, it, o) {
+  if (isRentItem(it, o && o.line)) return buildRentOfferPdf(env, dealId, it, o);
   const images = [];
   for (const fid of (it.images || []).slice(0, 12)) {
     const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, dealId).first();
@@ -394,9 +451,11 @@ async function handleOfferPdfPreview(request, env, user, id) {
     price: Math.max(0, Number(it.price) || 0), currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(it.period, 20), note: clean(it.note, 400), config_code: clean(it.config_code, 60),
     images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 12),
     equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
-    eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '' };
+    eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '',
+    key: clean(it.key, 120), abo_name: clean(it.abo_name || (it.abo && it.abo.name), 120), condition: clean(it.condition, 40), body: clean(it.body, 60), deposit: Math.max(0, Number(it.deposit) || 0),
+    km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end), avail: clean(it.avail, 80), fx: Math.max(0, Number(it.fx) || 0) };
   const card = await getCard(env, id);
-  const pdf = await buildOfferPdf(env, id, item, { client: (card.data.person && card.data.person.name) || deal.name, number: offerNo(id, 0, 1) + ' (előnézet)', user });
+  const pdf = await buildOfferPdf(env, id, item, { client: (card.data.person && card.data.person.name) || deal.name, number: offerNo(id, 0, 1) + ' (előnézet)', user, line: deal.line });
   return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${offerFileName(item)}"`, 'cache-control': 'no-store' } });
 }
 /** Konfigurátor-kép mentése (JPEG, a böngészőben kicsinyítve) — rejtett fájlként, a feltöltött fájlok között nem látszik. */
