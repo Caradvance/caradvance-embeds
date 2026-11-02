@@ -164,14 +164,20 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
       VALUES ('Bérlés', 'Érdeklődés', 'Weboldal', ?, ?, ?, ?, ?, ?, ?, NULL)`)
     .bind(name, phone, email, car, cur === "HUF" ? price : Math.round(price * 400), s([priceTxt && "Becsült havidíj: " + priceTxt, g(d, "Futamidő") && "Futamidő: " + g(d, "Futamidő"), g(d, "Km-keret") && "Km-keret: " + g(d, "Km-keret"), g(d, "Megjegyzés")].filter(Boolean).join(" · "), 2000), s(g(d, "Elérhetőség"), 80) || "most").run();
   const dealId = Number(res.meta.last_row_id);
+  // az autó még nem kerül az adatlap „Autók” fülére: előbb ajánlat megy ki — az ajánlatkészítő ezzel az autóval nyílik meg
+  // (ha az ügyfél az ajánlatban elfogadja, a meglévő folyamat teszi át az Autók fülre)
+  const pickNote = [g(d, "Futamidő") && "Futamidő: " + g(d, "Futamidő"), g(d, "Km-keret") && "Km-keret: " + g(d, "Km-keret"), g(d, "Szín") && "Szín: " + g(d, "Szín"),
+    g(d, "Felszereltség") && "Kivitel: " + g(d, "Felszereltség"), start && "Kezdés: " + start].filter(Boolean).join(" · ");
+  const webPick = car ? { key: vehicle.key || "web-" + dealId, src: "inv", title: car, brand, year: "2026", km: "0 km", fuel: vehicle.fuel, power: "", gearbox: "", color: vehicle.color,
+    image: img, url: vehicle.url, price, currency: cur, period: "hó", deposit: vehicle.deposit, note: s(pickNote, 400), months, rent_start: start, rent_end: vehicle.rent_end, at: nowIso() } : null;
   await saveCard(env, dealId, {
-    status: "Kapcsolatfelvételre vár",
+    status: car ? "Ajánlatra vár" : "Kapcsolatfelvételre vár",
     data: {
       kind: company || /cég/i.test(g(d, "Vásárló")) ? "ceg" : "magan",
       person: { name, address: "", phone, email, tax: "" },
       company: { name: company, address: "", tax: s(g(d, "Adószám"), 60), reg: "" },
       contact_differs: false, contact: { name: "", phone: "", email: "", role: "" },
-      vehicles: car ? [vehicle] : [], request: text.slice(0, 4000), notes: "",
+      vehicles: [], web_pick: webPick, request: text.slice(0, 4000), notes: "",
     },
   }, null, "Weboldal");
   await addEvent(env, dealId, "create", `Weboldali bérlési igény: ${car}${priceTxt ? " — " + priceTxt : ""}${g(d, "Futamidő") ? " · " + g(d, "Futamidő") : ""}`, "Weboldal");
