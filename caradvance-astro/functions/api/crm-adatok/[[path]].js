@@ -14,7 +14,7 @@ const J = (o, s) => json(o, s || 200, SEC);
 const now = () => Math.floor(Date.now() / 1000);
 const FILE_MAX = 8 * 1024 * 1024;
 const P_FIELDS = ['name', 'address', 'phone', 'email', 'birth_place', 'birth_date', 'mother_name', 'id_number', 'address_card', 'licence', 'tax', 'bank', 'residence'];
-const P_REQ = ['name', 'address', 'phone', 'email', 'birth_place', 'birth_date', 'mother_name', 'id_number', 'address_card'];
+const P_REQ = ['name', 'address', 'phone', 'email', 'birth_place', 'birth_date', 'mother_name', 'id_number', 'address_card', 'licence'];
 const C_FIELDS = ['name', 'address', 'reg', 'tax'];
 
 async function load(env, t) {
