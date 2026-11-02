@@ -305,6 +305,7 @@ async function handleSendOffer(request, env, user, id) {
     eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '',
     attach_src: !!it.attach_src,
     // bérlés (weboldali igényből): km-keret, futamidő, kezdés
+    condition: clean(it.condition, 40), body: clean(it.body, 60),
     km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end)
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
