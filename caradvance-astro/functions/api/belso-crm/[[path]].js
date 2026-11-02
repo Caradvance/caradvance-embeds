@@ -133,6 +133,16 @@ function normVehicles(b) {
     };
   });
 }
+function normWebPick(w) {
+  if (!w || typeof w !== 'object' || !w.title) return null;
+  return {
+    key: clean(w.key, 120), src: 'inv', title: clean(w.title, 200), brand: clean(w.brand, 60), year: clean(w.year, 30), km: clean(w.km, 40), fuel: clean(w.fuel, 60),
+    power: clean(w.power, 40), gearbox: clean(w.gearbox, 40), color: clean(w.color, 80), note: clean(w.note, 400),
+    image: /^https:\/\//.test(w.image || '') ? clean(w.image, 600) : '', url: /^https:\/\//.test(w.url || '') ? clean(w.url, 400) : '',
+    price: Math.max(0, Number(w.price) || 0), currency: w.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(w.period, 20), deposit: Math.max(0, Number(w.deposit) || 0),
+    months: Math.max(0, Number(w.months) || 0), rent_start: isoDate(w.rent_start), rent_end: isoDate(w.rent_end), at: clean(w.at, 40)
+  };
+}
 function isoDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s || '') && !isNaN(Date.parse(s + 'T00:00:00Z')) ? s : ''; }
 function huToday() { return new Date(Date.now() + 2 * 3600e3).toISOString().slice(0, 10); } // közép-európai nap (közelítőleg)
 function daysTo(d) { return Math.round((Date.parse(d + 'T00:00:00Z') - Date.parse(huToday() + 'T00:00:00Z')) / 864e5); }
@@ -165,7 +175,9 @@ function normData(b) {
     buyer: { kind: b.buyer && b.buyer.kind === 'ceg' ? 'ceg' : 'magan', person: pick(b.buyer && b.buyer.person, PERSON_KEYS), company: pick(b.buyer && b.buyer.company, COMPANY_KEYS) },
     notes: cleanMulti(b.notes, 4000),
     // Import: az ügyfél igénye (a munkatárs pontosíthatja)
-    request: cleanMulti(b.request, 4000)
+    request: cleanMulti(b.request, 4000),
+    // weboldali bérlési igény: az ügyfél által választott autó (az ajánlatkészítőbe töltődik, amíg nem megy ki ajánlat)
+    web_pick: normWebPick(b.web_pick)
   };
 }
 
