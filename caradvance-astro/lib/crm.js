@@ -627,8 +627,24 @@ export function itemToVehicle(it, id, source) {
     model: brand && String(it.title || '').indexOf(brand) === 0 ? String(it.title).slice(brand.length).trim() : (it.title || ''),
     year: it.year || '', vin: '', color: it.color || '', engine: it.power || '', ad_id: it.ad_id || '', config_code: it.config_code || '', fuel: it.fuel || '', km: it.km ? String(it.km) : '', hybrid: /hybrid|hibrid|PHEV/i.test(String(it.title || '') + ' ' + String(it.fuel || '')),
     price: Number(it.price) || 0, currency: it.currency === 'EUR' ? 'EUR' : 'HUF', period: it.period || '', deposit: Number(it.deposit) || 0,
-    image: it.image || '', url: it.ad_url || it.config_url || it.url || ''
+    image: it.image || '', url: it.ad_url || it.config_url || it.url || '',
+    ...offerFields(it)
   };
+}
+/** Az ajánlatból az autó adataiba (és onnan a szerződésbe) kerülő mezők: ajánlat száma / dátuma, árfolyam, ÁFA-mód, felszereltség, bérleti feltételek. */
+export function offerFields(it) {
+  const o = {};
+  if (it.offer_no) o.offer_no = String(it.offer_no).slice(0, 60);
+  if (it.offer_date) o.offer_date = String(it.offer_date).slice(0, 10);
+  if (Number(it.fx) > 0) o.fx = Number(it.fx);
+  if (it.vat_mode) o.vat_mode = it.vat_mode;
+  const eq = Array.isArray(it.equipment) ? it.equipment.join(', ') : String(it.equipment || '');
+  if (eq) o.equipment = eq.slice(0, 600);
+  if (it.km_keret) o.km_keret = String(it.km_keret).slice(0, 60);
+  if (Number(it.months) > 0) o.months = Number(it.months);
+  if (it.rent_start) o.rent_start = String(it.rent_start).slice(0, 10);
+  if (it.rent_end) o.rent_end = String(it.rent_end).slice(0, 10);
+  return o;
 }
 export function newVehicleId(list) { let i = (list || []).length + 1; const ids = new Set((list || []).map((v) => v.id)); while (ids.has('v' + i)) i++; return 'v' + i; }
 
@@ -776,6 +792,16 @@ export function docVars(deal, card, vehicle, tpl, persons, seq) {
     ar_netto: '', ar_afa: '', km_tulfutas_dij: '', fizetesi_hatarido: '', foglalo: '', foglalo_betuvel: '', szallitasi_dij: '', jutalek_szazalek: '', bizomany_vege: '',
     auto_allapot: v.condition || '', auto_karosszeria: v.body || '', auto_valto: v.gearbox || ''
   });
+  // az elfogadott ajánlatból (az autó adataiban): felszereltség / kivitel, ajánlat száma és dátuma, árfolyam, km-keret, futamidő
+  if (v.equipment) base.auto_felszereltseg = String(v.equipment);
+  if (v.offer_no) base.ajanlat_szam = v.offer_no;
+  if (v.offer_date) base.ajanlat_datum = huDate(v.offer_date);
+  if (Number(v.fx) > 0) base.arfolyam = fmtNum(Math.round(Number(v.fx) * 100) / 100, true);
+  if (v.km_keret) base.km_keret = v.km_keret;
+  if (!(v.rent_start && v.rent_end) && Number(v.months) > 0) base.futamido = v.months + ' hónap';
+  // a havi díj a szerződésben bruttó (19% német áfával): nettó ajánlati árnál felszorozzuk
+  if (v.period && v.price > 0 && v.currency === 'EUR' && v.vat_mode === 'net') base.havi_dij = fmtPrice(Math.round(v.price * 1.19), 'EUR');
+  if (v.deposit > 0 && v.period) base.kaucio = fmtPrice(v.deposit, v.currency);
   for (const role of Object.keys(PERSON_ROLES)) Object.assign(base, personVars(role, (persons || {})[role]));
   return deriveVars(base);
 }
