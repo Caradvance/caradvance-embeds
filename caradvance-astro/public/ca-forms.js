@@ -320,6 +320,18 @@
     btn: function () { return T.send; }
   };
 
+  /* az ajánlatkérő (új autó) űrlap lépései */
+  var EXTRA_S = {
+    hu: { cfg: ['Konfiguráció', 'Konfiguráld az autót a gyártó hivatalos német konfigurátorában, majd illeszd be a linket vagy töltsd fel a PDF-et.', 'Konfiguráció'], send: ['Beküldés', 'Ellenőrizd az adataidat, fogadd el a feltételeket, és küldd el az ajánlatkérést.', 'Beküldés'] },
+    en: { cfg: ['Configuration', 'Configure the car in the manufacturer’s official German configurator, then paste the link or upload the PDF.', 'Configuration'], send: ['Send', 'Check your details, accept the terms and send your request.', 'Send'] },
+    de: { cfg: ['Konfiguration', 'Konfigurieren Sie das Fahrzeug im offiziellen deutschen Herstellerkonfigurator und fügen Sie den Link ein oder laden Sie das PDF hoch.', 'Konfiguration'], send: ['Absenden', 'Prüfen Sie Ihre Daten, akzeptieren Sie die Bedingungen und senden Sie die Anfrage.', 'Absenden'] },
+    sk: { cfg: ['Konfigurácia', 'Nakonfigurujte auto v oficiálnom nemeckom konfigurátore výrobcu a vložte odkaz alebo nahrajte PDF.', 'Konfigurácia'], send: ['Odoslanie', 'Skontrolujte údaje, prijmite podmienky a odošlite žiadosť.', 'Odoslanie'] },
+    cs: { cfg: ['Konfigurace', 'Nakonfigurujte vůz v oficiálním německém konfigurátoru výrobce a vložte odkaz nebo nahrajte PDF.', 'Konfigurace'], send: ['Odeslání', 'Zkontrolujte údaje, přijměte podmínky a odešlete žádost.', 'Odeslání'] },
+    pl: { cfg: ['Konfiguracja', 'Skonfiguruj samochód w oficjalnym niemieckim konfiguratorze producenta i wklej link lub prześlij PDF.', 'Konfiguracja'], send: ['Wysyłka', 'Sprawdź dane, zaakceptuj warunki i wyślij zapytanie.', 'Wysyłka'] },
+    fr: { cfg: ['Configuration', 'Configurez le véhicule dans le configurateur officiel allemand du constructeur, puis collez le lien ou téléversez le PDF.', 'Configuration'], send: ['Envoi', 'Vérifiez vos données, acceptez les conditions et envoyez la demande.', 'Envoi'] },
+    it: { cfg: ['Configurazione', 'Configuri l’auto nel configuratore ufficiale tedesco del costruttore, poi incolli il link o carichi il PDF.', 'Configurazione'], send: ['Invio', 'Controlli i dati, accetti le condizioni e invii la richiesta.', 'Invio'] },
+    es: { cfg: ['Configuración', 'Configure el coche en el configurador oficial alemán del fabricante y pegue el enlace o suba el PDF.', 'Configuración'], send: ['Envío', 'Revise sus datos, acepte las condiciones y envíe la solicitud.', 'Envío'] }
+  };
   var EGL = {
     sel: '.egl-modal', card: '.egl-modal-card', form: '.egl-form', head: '.egl-modal-head', img: '.egl-modal-head img', title: '.egl-modal-head h3', eyebrow: '.egl-modal-eyebrow',
     tgl: '.egl-tgl', tglAttr: 'data-buyer', buyer: 'input[name=buyer]', submit: '.egl-fsubmit', msg: '.egl-fmsg', close: '.egl-modal-x',
@@ -327,10 +339,19 @@
     kind: function () { return 'order'; },
     steps: function (M) {
       var bl = qa('.egl-fblock', M.modal);
+      /* új (ajánlatkérő) űrlap: 1. Adataid → 2. Konfiguráció → 3. Vásárlás módja → beküldés */
+      var per = q('#eglPersonBlock', M.modal), cfg = q('#eglCfgBlock', M.modal);
+      var buy = bl.filter(function (b) { return b.querySelector('input[name=payment]'); })[0];
+      var C = { person: function () { var c = window.caEglCheck; return c && c.person ? c.person() : ''; }, cfg: function () { var c = window.caEglCheck; return c && c.cfg ? c.cfg() : ''; } };
+      if (per && cfg) {
+        var s2 = [{ k: 'contact', nodes: [per], name: null, check: C.person }, { k: 'cfg', nodes: [cfg], name: null, check: C.cfg }];
+        if (buy) s2.push({ k: 'mode', nodes: [buy], name: 'payment' });
+        s2.push({ k: 'send', nodes: ['.egl-consent', '.egl-fmsg', '.egl-fnote'], contact: true });
+        return s2;
+      }
       var fuel = q('#eglFuelBlock', M.modal) || bl[0];
       var file = bl.filter(function (b) { return b.querySelector('input[type=file]'); })[0];
       var cont = bl.filter(function (b) { return b.querySelector('input[name=lastname]'); })[0];
-      var buy = bl.filter(function (b) { return b.querySelector('input[name=payment]'); })[0];
       var s = [{ k: 'fuel', nodes: [fuel], name: 'fuel' }];
       if (buy) s.push({ k: 'mode', nodes: [buy], name: 'payment' });
       if (file) s.push({ k: 'file', nodes: [file], name: null });
@@ -344,7 +365,7 @@
       var f = c && c.ds && c.ds.fuels; if (f) out.push(['fuel', f.split(',').map(function (x) { return x.trim(); }).join(' / ')]);
       return out;
     },
-    btn: function () { return T.order; }
+    btn: function (M) { return M && q('#eglCfgBlock', M.modal) ? (T.offerSend || T.send) : T.order; }
   };
   var ADS = [AB, CAIN, EGL];
 
@@ -924,7 +945,7 @@
     M.steps.innerHTML = ''; M.stepper.innerHTML = '';
     M.kind = kind; M.defs = A.steps(M, kind); M.cur = 0;
     M.defs.forEach(function (d, i) {
-      var s = T.s[d.k] || [d.k, '', d.k];
+      var s = T.s[d.k] || (EXTRA_S[LG] || EXTRA_S[MK] || EXTRA_S.en)[d.k] || [d.k, '', d.k];
       var sec = mk('section', 'caf-step', '<div class="caf-sh"><span class="n">' + (i + 1) + '</span><div><h4>' + esc(s[0]) + '</h4><p>' + esc(s[1]) + '</p></div><span class="caf-sum"></span></div><div class="caf-sb"><div class="caf-body"></div></div>');
       var body = q('.caf-body', sec);
       d.nodes.forEach(function (n) { var e = resolve(M, n); if (e) body.appendChild(e); });
@@ -983,6 +1004,7 @@
   function clearErr(M) { qa('.caf-err.on', M.modal).forEach(function (e) { e.classList.remove('on'); }); }
 
   function valid(M, d) {
+    if (d.check) { var ce = d.check(); if (ce) { d.cerr = ce; return false; } d.cerr = ''; }
     if (d.names) return d.names.every(function (n) { return valid(M, { name: n, sec: d.sec }); });
     if (!d.name) return true;
     var f = q(M.A.form, M.modal), all = qa('input[name="' + d.name + '"]', f).filter(function (i) { return d.sec.contains(i) || d.name === 'mode'; });
@@ -993,7 +1015,7 @@
 
   function next(M) {
     var d = M.defs[M.cur];
-    if (!valid(M, d)) { var e = q('.caf-err', d.sec); if (e) e.classList.add('on'); return; }
+    if (!valid(M, d)) { var e = q('.caf-err', d.sec); if (e) { if (!e.__t) e.__t = e.textContent; e.textContent = d.cerr || e.__t; e.classList.add('on'); } return; }
     if (M.cur >= lastIdx(M)) {
       if (!reqOk(M)) { var g = q(M.A.msg, M.modal); if (g) { g.className = (M.A === AB ? 'ab-msg' : 'cain-msg') + ' err'; g.textContent = T.consErr; } var bl = q('.caf-req.bad', M.modal); if (bl) bl.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
       submit(M); return;
