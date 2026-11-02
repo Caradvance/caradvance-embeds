@@ -363,7 +363,21 @@ export async function inventory(line) {
       url: x.slug ? `${SITE}/${line === 'Bérlés' ? 'berles' : 'auto'}/${x.slug}/` : ''
     });
   });
+  if (line === 'Bérlés') { try { out.push(...(await aboFleet())); } catch (e) { console.error('abo-fleet', e && e.message); } }
   return out;
+}
+
+/** A weboldal /autoink/#berelheto (Auto-Abo) flottája — a build állítja elő: /abo-fleet.json */
+export async function aboFleet() {
+  const r = await fetch(SITE + '/abo-fleet.json', { cf: { cacheTtl: 300, cacheEverything: true } });
+  if (!r.ok) return [];
+  const j = await r.json();
+  return (j.cars || []).filter((c) => c.price > 0).map((c) => ({
+    key: c.key, title: c.title, brand: c.brand, body: c.body || '', km: '0 km', power: c.psMin ? (c.psMin === c.psMax || !c.psMax ? c.psMin : c.psMin + '–' + c.psMax) + ' LE' : '',
+    gearbox: (c.gears || []).join(' / '), fuel: (c.fuels || []).join(' / '), year: '2026', drive: '',
+    image: c.image || '', active: true, price: c.price, currency: 'EUR', period: 'hó', deposit: 0, url: c.url || '',
+    abo: { now: c.now || 0, count: c.count || 0, months: c.months || [], km: c.km || [], colors: c.colors || [], variants: c.variants || [] }
+  }));
 }
 
 /* ============================== ajánlat e-mail ============================== */
