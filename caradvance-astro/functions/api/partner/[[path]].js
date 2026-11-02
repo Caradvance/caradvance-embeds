@@ -119,13 +119,10 @@ async function signMany(env, request, p, b, ip) {
   const ids = pickIds(b); if (!ids.length) return J({ ok: false, error: 'none' }, 400);
   if (!p.sig || !p.sig_name) return J({ ok: false, error: 'no_sig' }, 400);
   if (b.consent !== true) return J({ ok: false, error: 'consent' }, 400);
-  if (!p.code_hash || !p.code_exp || p.code_exp < nowSec()) return J({ ok: false, error: 'code_expired' }, 400);
-  if ((p.code_attempts || 0) >= 5) return J({ ok: false, error: 'too_many' }, 429);
-  const ok = (await sha256hex('pcode|' + p.id + '|' + String(b.code || '').replace(/\D/g, '') + '|' + ids.sort((a, c) => a - c).join(','))) === p.code_hash;
-  if (!ok) { await env.DB.prepare(`UPDATE crm_partners SET code_attempts = code_attempts + 1 WHERE id = ?`).bind(p.id).run(); return J({ ok: false, error: 'wrong_code', left: Math.max(0, 4 - (p.code_attempts || 0)) }, 400); }
-  await env.DB.prepare(`UPDATE crm_partners SET code_hash = NULL, code_exp = NULL WHERE id = ?`).bind(p.id).run();
+  // e-mailes egyszeri kód nincs: a partner jelszavas bejelentkezéssel (munkamenet) + kifejezett nyilatkozattal ír alá
+  if (!(await rateOk(env, 'psign:' + p.id, 30, 3600))) return J({ ok: false, error: 'rate' }, 429);
   const sigBytes = b64ToBytes(p.sig); const ua = clean(request.headers.get('user-agent') || '', 300);
-  const ident = `Partnerportal (Anmeldung ${p.login}) + Einmalcode (OTP) an ${p.notify_email || p.login} — gespeicherte Unterschrift`;
+  const ident = `Partnerportal — Anmeldung mit Passwort (${p.login}), ausdrückliche Bestätigung — gespeicherte Unterschrift`;
   const out = [];
   for (const sid of ids) {
     const r = await getReq(env, p, sid);
