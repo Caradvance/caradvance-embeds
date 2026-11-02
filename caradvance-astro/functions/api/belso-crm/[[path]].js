@@ -196,7 +196,11 @@ function normData(b) {
     // Import: az ügyfél igénye (a munkatárs pontosíthatja)
     request: cleanMulti(b.request, 4000),
     // weboldali bérlési igény: az ügyfél által választott autó (az ajánlatkészítőbe töltődik, amíg nem megy ki ajánlat)
-    web_pick: normWebPick(b.web_pick)
+    web_pick: normWebPick(b.web_pick),
+    // weboldali új autó ajánlatkérés: a gyári (német) konfiguráció linkje(i)
+    cfg_links: (Array.isArray(b.cfg_links) ? b.cfg_links : []).map((u) => String(u || '').trim().slice(0, 1500)).filter((u) => /^https?:\/\/\S+$/i.test(u)).slice(0, 5),
+    cfg_factory: /^https:\/\/\S+$/i.test(String(b.cfg_factory || '')) ? String(b.cfg_factory).slice(0, 500) : '',
+    cfg_links_done: !!b.cfg_links_done
   };
 }
 
