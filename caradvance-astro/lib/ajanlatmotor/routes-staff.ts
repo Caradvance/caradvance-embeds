@@ -428,7 +428,7 @@ export function cspHeaders(nonce: string) {
       "form-action 'self'", "frame-ancestors 'none'", "base-uri 'none'",
     ].join("; "),
     "X-Robots-Tag": "noindex, nofollow, noarchive",
-    "Referrer-Policy": "no-referrer",
+    "Referrer-Policy": "same-origin",
     "X-Content-Type-Options": "nosniff",
     "Cache-Control": "private, no-store",
   };

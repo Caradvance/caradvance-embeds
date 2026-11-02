@@ -13,8 +13,14 @@ export const pub = new Hono<H>().basePath("/ajanlat/auto");
 
 const ip = (c: any) => c.req.header("CF-Connecting-IP") || "local";
 const sameOrigin = (c: any) => {
+  // "no-referrer" alatt a böngésző „Origin: null”-t küld — ilyenkor a Sec-Fetch-Site dönt (saját oldalról jött-e)
+  const site = c.req.header("Sec-Fetch-Site") || "";
+  if (site === "same-origin") return true;
+  if (site === "cross-site") return false;
   const origin = c.req.header("Origin") || c.req.header("Referer") || "";
-  try { return !origin || new URL(origin).host === new URL(c.req.url).host; } catch { return false; }
+  if (!origin || origin === "null") return true;
+  const bare = (h: string) => h.replace(/^www\./, "");
+  try { return bare(new URL(origin).host) === bare(new URL(c.req.url).host); } catch { return false; }
 };
 
 pub.get("/:token/", async (c) => {
