@@ -1151,6 +1151,7 @@ function renderPicked(){
       +'<div class="fld"><label>Pénznem</label><select data-f="currency"><option value="HUF"'+(p.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(p.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-f="period"><option value="">egyszeri</option><option value="hó"'+(p.period==='hó'?' selected':'')+'>/ hó</option></select></div></div>'
       +(p.abo&&p.abo.cfg?aboBlock(p,i):'')
+      +(p.period==='hó'&&S.deal.line==='Bérlés'?'<div class="row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="button" class="btn sm" data-rprev="1">👁 Bérleti árajánlat PDF előnézet</button><span class="hint">ez megy csatolva az ügyfélnek: a konkrét autó, a díjak és a bérleti szerződés fő pontjai</span></div>':'')
       +(src==='config'?cfgOfferBlock(p,i):'')
       +(editable&&src!=='mobile'?'<div class="idrow"><label>Az autó adatlapja (link, nem kötelező)</label><input data-f="url" value="'+esc(p.url||'')+'" placeholder="https://www.caradvance.hu/auto/…" style="flex:1;min-width:220px">'+(/^https:\/\//.test(p.url||'')?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">megnyitás ↗</a>':'')+'</div>':'')
       +(!editable?'<div class="hint">'+esc(spec(p))+(p.url?' · <a href="'+esc(p.url)+'" target="_blank" rel="noopener">autó adatlapja ↗</a> <span class="hint">(az ajánlatban az ügyfél is megnyithatja)</span>':'')+'</div>':'')+'</div>';
@@ -1162,6 +1163,8 @@ function renderPicked(){
       f.addEventListener('input',set);f.addEventListener('change',set);
     });
     bindCfgOffer(box,i);bindAbo(box,i);
+    var rp=box.querySelector('[data-rprev]');if(rp)rp.addEventListener('click',function(){var w=window.open('','_blank');var it=Object.assign({},PICK[i]);delete it.abo;it.abo_name=PICK[i].abo_name||(PICK[i].abo&&PICK[i].abo.name)||'';
+      fetch(API+'/card/'+ID+'/offerpdf',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({item:it})}).then(function(r){if(!r.ok)throw new Error('Az előnézet nem készült el.');return r.blob();}).then(function(b){var u=URL.createObjectURL(b);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();toast(e.message);});});
     var pa=box.querySelector('[data-paste]');if(pa)pa.addEventListener('paste',function(){setTimeout(function(){pasteMob(i,pa.value);},30);});
     box.querySelector('[data-rm]').addEventListener('click',function(){PICK.splice(i,1);renderPicked();renderInv();});
   });
@@ -1178,7 +1181,7 @@ function aboApply(p){
   p.price=Math.round((lo[7]+mark)*1.19);p.currency='EUR';p.period='hó';p.vat_mode='de19';p.deposit=lo[6]||0;p.aboFrom=lo[7]!==hi[7];
   var v=function(d){var di=ABO_DIM.filter(function(x){return x[0]===d;})[0];return sel[d]!=null?(c[d]||[])[sel[d]]:(rows.every(function(x){return x[di[2]]===lo[di[2]];})?(c[d]||[])[lo[di[2]]]:null);};
   var F=v('F'),T=v('T'),K=v('K'),C=v('C'),TR=v('TR'),A=v('A');
-  p.fuel=F?aboLbl('F',F):(c.F||[]).join(' / ');p.color=C||'';p.equipment=TR?[TR]:[];p.power=TR||'';p.condition='Új';p.months=T||0;p.km_keret=K?aboLbl('K',K):'';
+  p.fuel=F?aboLbl('F',F):(c.F||[]).join(' / ');p.color=C||'';p.equipment=TR?[TR]:[];p.power=TR||'';p.condition='Új';p.avail=A||'';p.abo_name=p.abo.name||'';p.months=T||0;p.km_keret=K?aboLbl('K',K):'';
   p.note=[A?'Elérhetőség: '+A:'',T?'Futamidő: '+T+' hónap':'',K?'Km-keret: '+aboLbl('K',K):'',C?'Szín: '+C:'',TR?'Kivitel: '+TR:''].filter(Boolean).join(' · ')+(p.aboFrom?' · ár: -tól':'');
 }
 function aboBlock(p,i){
@@ -1275,7 +1278,7 @@ function sendOffer(){
   var nPdf=PICK.filter(function(p){return p.file_id;}).length;
   if(!confirm('Elküldöd az ajánlatot ('+PICK.length+' autó'+(nPdf?', '+nPdf+' konfigurátoros PDF csatolva':'')+') erre a címre: '+em+'?'))return;
   var b=$('sendOffer');b.disabled=true;b.textContent='Küldés…';
-  var items=PICK.map(function(p){var o=Object.assign({},p);o.src=p.src||(p.manual?'manual':'inv');delete o.needPaste;delete o.needCheck;return o;});
+  var items=PICK.map(function(p){var o=Object.assign({},p);o.src=p.src||(p.manual?'manual':'inv');delete o.needPaste;delete o.needCheck;if(o.abo){o.abo_name=o.abo_name||o.abo.name||'';delete o.abo;}return o;});
   api('/card/'+ID+'/offer',{method:'POST',body:{items:items,message:$('offMsg').value}}).then(function(r){
     toast(r.test?'Ajánlat elküldve (TESZT: '+r.sentTo+')':'Ajánlat elküldve: '+r.sentTo,4000);
     PICK=[];$('offMsg').value='';refreshLog();S.card.status=r.status;renderHead();
