@@ -6,7 +6,7 @@
  * Választható km-keret: 2 000 km (+0 €), 3 000 km (+250 €), 4 000 km (+500 €) — havonta, nettó.
  * Csak olyan keret választható, amely nem nagyobb a Choice-ajánlat saját km-kereténél
  * (pl. egy 2 500 km-es Choice-autónál csak a 2 000 km).
- * A saját raktári autók (window.__ABSTOCK, táblázatból) árai változatlanok: ott a táblázat km-sávjai érvényesek.
+ * Saját raktári autók (window.__ABSTOCK, táblázat): a táblázat 2 000 km-es ára + 100 €, 3 000 km +250 €, 4 000 km +500 € (Marc, 2026-11-02).
  *
  * A napi Choice-szinkron (tools/choice-sync.js) a seo-abo.mjs-t írja; ez a lépés a build-konténerben,
  * a szinkron által írt adatokból számol (a repóban lévő fájl nem változik), így a szinkron nem írja felül.
@@ -91,8 +91,14 @@ function run() {
   // 3) árrés a kódban: 650 → 750 (kártya, foglaló ablak, raktári autók visszaszámolása)
   const R = [
     [sec, 'var effNet = m.net ? (m.net + 650) : 0;', `var effNet = m.net ? (m.net + ${MARGIN}) : 0;`],
-    [sec, 'if(e&&(!best.net||e-650<best.net))best.net=e-650;', `if(e&&(!best.net||e-${MARGIN}<best.net))best.net=e-${MARGIN};`],
-    [sec, 'c.d||0,r[1]-650]', `c.d||0,r[1]-${MARGIN}]`],
+    // saját raktári autók (táblázat): a 2 000 km-es táblázati ár + 100 € a 2 000 km-es ár (mint a Choice-autóknál: 650 → 750),
+    // 3 000 km +250 €, 4 000 km +500 €; a táblázat saját 3 000 km-es ára nem számít. Elérhetőség: „Azonnal” (mint a Choice-autóknál).
+    [sec, "(c.r||[]).forEach(function(r){if(r&&r[0]&&r[1])g.X.push([fi,ti,ix(g.K,r[0]),ci,tri,ai,c.d||0,r[1]-650]);});",
+      "(function(){var rr=(c.r||[]).filter(function(r){return r&&r[0]&&r[1];});if(!rr.length)return;var b0=rr.filter(function(r){return +r[0]===2000;})[0]||rr.slice().sort(function(a,b){return a[0]-b[0];})[0];" + JSON.stringify(TIERS) + ".forEach(function(t){g.X.push([fi,ti,ix(g.K,t[0]),ci,tri,ai,c.d||0,b0[1]-650+t[1]]);});})();"],
+    [sec, "ai=ix(g.A,'Raktáron – azonnal elvihető')", "ai=ix(g.A,'Azonnal')"],
+    [sec, 'km:[2000,3000],months:[6],net:0,stockOnly:true', 'km:[2000,3000,4000],months:[6],net:0,stockOnly:true'],
+    // csak raktári autóból álló modell: nincs bérlési modelloldal → a „Részletek” az autó saját adatlapjára visz
+    [sec, 'var _det=rhref(m.brand,m.model);', 'var _det=(m.stockOnly&&m.stock&&m.stock[0]&&m.stock[0].u)?m.stock[0].u:rhref(m.brand,m.model);'],
     [strip, 'Math.ceil((n+650)*_vm*_pr/10000)', `Math.ceil((n+${MARGIN})*_vm*_pr/10000)`],
     [strip, 'var _eu=_pp[0]+650;', `var _eu=_pp[0]+${MARGIN};`]
   ];
