@@ -158,7 +158,7 @@ const CH = `
 const EU = `
 # CarAdvance — caradvance.eu — Deutschland (/de/), France (/fr/), Italia (/it/), España (/es/) — website in German, French, Italian and Spanish
 - Seller, lessor and only contractual party: Caradvance GmbH, Bgm.-Graf-Ring 21, 82538 Geretsried (near Munich), Germany (Amtsgericht München, HRB 151009, VAT ID DE232664616). Since 2003, more than 5000 premium cars sold. No local agent or partner: customers in Germany, France, Italy and Spain are served directly by Caradvance GmbH. Contracts are signed online.
-- Contact: import@caradvance.de · +49 89 99998 100 · Mon–Fri 9–17 · https://www.caradvance.eu/de/kontakt/ (fr: https://www.caradvance.eu/fr/contact/, it: https://www.caradvance.eu/it/contatti/, es: https://www.caradvance.eu/es/contacto/). Advice in German and English (French too); written enquiries also in Italian and Spanish.
+- Contact: import@caradvance.de · phone +49 89 99998 100 · WhatsApp +36 30 233 6060 (WhatsApp only on this number, not on the phone number) · Mon–Fri 9–17 · https://www.caradvance.eu/de/kontakt/ (fr: https://www.caradvance.eu/fr/contact/, it: https://www.caradvance.eu/it/contatti/, es: https://www.caradvance.eu/es/contacto/). Advice in German and English (French too); written enquiries also in Italian and Spanish.
 - Each language version addresses one country: German = Germany, French = France, Italian = Italy, Spanish = Spain. Answer for the country of the visitor's language.
 
 ## Services (only these three — there is NO import service, NO car-search service, NO consignment, NO charity on caradvance.eu)
