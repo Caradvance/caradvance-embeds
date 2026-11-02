@@ -134,19 +134,26 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
   // Bérlés: a kiválasztott autó az adatlap „Autók” fülére kerül
   const car = s(g(d, "Autó", "car"), 160);
   const priceTxt = g(d, "Becsült havidíj");
-  const price = nums(priceTxt.replace(/\s(?=\d{3}\b)/g, ""))[0] || 0;
-  const cur = /€|eur/i.test(priceTxt) ? "EUR" : "HUF";
+  // pl. "≈ 510 000 Ft/hó-tól 1367 €/hó-tól · bruttó" → az euró összeg (a bérleti díjak euróban vannak), különben a forint
+  const amt = (txt: string, unit: RegExp) => { const m = txt.match(new RegExp("(\\d[\\d\\s.\u00a0\u202f]*)(?:[–-]\\s*\\d[\\d\\s.\u00a0\u202f]*)?\\s*" + unit.source, "i")); return m ? parseInt(m[1].replace(/\D/g, ""), 10) || 0 : 0; };
+  const pe = amt(priceTxt, /(€|eur)/), ph = amt(priceTxt, /(ft|huf)/);
+  const price = pe || ph || nums(priceTxt)[0] || 0;
+  const cur = pe ? "EUR" : "HUF";
   const parts = car.split(" ");
   const brand = /^(Mercedes-Benz|Land Rover|Range Rover|Alfa Romeo|Aston Martin)/i.test(car) ? car.match(/^(\S+ \S+)/)![1] : parts[0] || "";
   let img = s(g(d, "Kép"), 500);
   if (img && img.startsWith("/")) img = (ctx.origin || "https://www.caradvance.hu") + img;
   if (img && !/^https:\/\//.test(img)) img = "";
   const months = nums(g(d, "Futamidő"))[0] || 0;
+  // kívánt kezdés (pl. "2026-11-12" vagy "2026. 11. 12.") → a bérlet kezdete; a futamidőből a vége
+  const dm = g(d, "Elérhetőség", "Kezdés").match(/(20\d\d)[.\-/]\s*(\d{1,2})[.\-/]\s*(\d{1,2})/);
+  const start = dm ? `${dm[1]}-${dm[2].padStart(2, "0")}-${dm[3].padStart(2, "0")}` : "";
+  const addMonths = (iso: string, n: number) => { const [y, m, dd] = iso.split("-").map(Number); const t = new Date(Date.UTC(y, m - 1 + n, dd)); return t.toISOString().slice(0, 10); };
   const vehicle = {
     id: "v1", source: "web", key: "", title: car, brand, model: car.slice(brand.length).trim(), year: "", vin: "", plate: "", ad_id: "", config_code: "",
     color: s(g(d, "Szín"), 80), engine: "", fuel: s(g(d, "Üzemanyag"), 60), km: s(g(d, "Km-keret"), 60), condition: "", body: "", gearbox: "", hybrid: /hibrid|hybrid|phev/i.test(g(d, "Üzemanyag")),
-    price, currency: cur, period: "hó", deposit: nums(g(d, "Kaució").replace(/\s(?=\d{3}\b)/g, ""))[0] || 0, image: img, url: /^https:\/\//.test(ctx.page) ? s(ctx.page, 500) : "",
-    rent_start: "", rent_end: "", reminders: [], months,
+    price, currency: cur, period: "hó", deposit: cur === "EUR" ? amt(g(d, "Kaució"), /(€|eur)/) || amt(g(d, "Kaució"), /(ft|huf)/) : amt(g(d, "Kaució"), /(ft|huf)/) || amt(g(d, "Kaució"), /(€|eur)/), image: img, url: /^https:\/\//.test(ctx.page) ? s(ctx.page, 500) : "",
+    rent_start: start, rent_end: start && months ? addMonths(start, months) : "", reminders: [], months,
   };
   const res = await env.DB.prepare(`INSERT INTO deals (line, stage, ch, name, phone, email, car, price, note, when_text, assigned_to)
       VALUES ('Bérlés', 'Érdeklődés', 'Weboldal', ?, ?, ?, ?, ?, ?, ?, NULL)`)
