@@ -738,7 +738,7 @@ function renderVehPick(){
   var rows=INV.filter(function(it){return (!act||it.active)&&(!q||(it.title+' '+it.brand+' '+it.year+' '+it.fuel).toLowerCase().indexOf(q)>=0);});
   el.innerHTML=rows.map(function(it){
     return '<div class="row'+(have[it.key]?' on':'')+'" data-key="'+esc(it.key)+'"><div class="th"'+(it.image?' style="background-image:url(\''+esc(it.image)+'\')"':'')+'></div>'
-      +'<div class="tt"><b>'+esc(it.title)+(it.active?'':'<span class="off">inaktív</span>')+'</b><span>'+esc(spec(it))+'</span></div>'
+      +'<div class="tt"><b>'+esc(it.title)+(it.active?'':'<span class="off">inaktív</span>')+(it.abo?'<span class="off" style="color:#2a5aa8;border-color:#c9d8f3" title="A weboldal /autoink/#berelheto flottájából">Auto-Abo'+(it.abo.now?' · azonnal '+it.abo.now+' db':'')+'</span>':'')+'</b><span>'+esc(spec(it))+(it.abo&&it.abo.months&&it.abo.months.length?' · '+esc(it.abo.months.join('/'))+' hó':'')+'</span></div>'
       +'<div class="pr">'+fmtPrice(it.price,it.currency)+(it.period?'/'+esc(it.period):'')+'</div><button class="btn sm '+(have[it.key]?'ghost':'dark')+'">'+(have[it.key]?'Már hozzáadva':'Hozzáadás')+'</button></div>';
   }).join('')||'<div class="loading" style="padding:24px">Nincs találat.</div>';
   el.querySelectorAll('.row').forEach(function(r){r.addEventListener('click',function(){var k=r.getAttribute('data-key');if(have[k])return toast('Ez az autó már szerepel az ügyfélnél.');var it=INV.filter(function(x){return x.key===k;})[0];if(it)addVehicle(invToVehicle(it));});});
@@ -867,7 +867,7 @@ function renderInv(){
   $('inv').innerHTML=rows.map(function(it){
     return '<div class="row'+(picked[it.key]?' on':'')+'" data-key="'+esc(it.key)+'"><input type="checkbox"'+(picked[it.key]?' checked':'')+' tabindex="-1">'
       +'<div class="th"'+(it.image?' style="background-image:url(\''+esc(it.image)+'\')"':'')+'></div>'
-      +'<div class="tt"><b>'+esc(it.title)+(it.active?'':'<span class="off">inaktív</span>')+'</b><span>'+esc(spec(it))+'</span></div>'
+      +'<div class="tt"><b>'+esc(it.title)+(it.active?'':'<span class="off">inaktív</span>')+(it.abo?'<span class="off" style="color:#2a5aa8;border-color:#c9d8f3" title="A weboldal /autoink/#berelheto flottájából">Auto-Abo'+(it.abo.now?' · azonnal '+it.abo.now+' db':'')+'</span>':'')+'</b><span>'+esc(spec(it))+(it.abo&&it.abo.months&&it.abo.months.length?' · '+esc(it.abo.months.join('/'))+' hó':'')+'</span></div>'
       +'<div class="pr">'+fmtPrice(it.price,it.currency)+(it.period?'/'+esc(it.period):'')+'</div></div>';
   }).join('')||'<div class="loading" style="padding:30px">Nincs találat.</div>';
   $('inv').querySelectorAll('.row').forEach(function(el){
