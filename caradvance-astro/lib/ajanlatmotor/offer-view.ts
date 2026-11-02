@@ -75,7 +75,7 @@ const I18N = {
     cb: ["Bármikor", "Délelőtt", "Délután", "Este"],
     consent: "Tudomásul veszem, hogy az autó csak a foglaló befizetése és az eladó visszaigazolása után számít lefoglaltnak.",
     chooseTitle: (t: string) => `${t}`, chooseLead: "Visszahívunk, és együtt végigmegyünk a következő lépéseken.",
-    thanks: (t: string) => `Köszönjük, rögzítettük a választásodat: ${t}.`,
+    thanks: (t: string) => `Köszönjük, rögzítettük a választásodat: ${t}.`, orderThanks: "Köszönjük a megrendelést!", orderSoon: "Hamarosan jelentkezünk.",
     next: ["1 munkanapon belül hívunk.", "Az eladónál ellenőrizzük az autó elérhetőségét és állapotát.", "Foglaló és szerződés, utána indul a szállítás.", "Honosítás és forgalomba helyezés, átadás Budapesten."],
     noneThanks: "Köszönjük a visszajelzést. Hamarosan új ajánlattal jelentkezünk.",
     chosenBadge: "A választásod", fx: (r: string, d: string) => `≈ árak, 1 € = ${r} Ft (${d}). Az árfolyam minden reggel 8:00-kor frissül.`,
@@ -101,7 +101,7 @@ const I18N = {
     cb: ["Jederzeit", "Vormittags", "Nachmittags", "Abends"],
     consent: "Mir ist bekannt, dass das Fahrzeug erst nach Anzahlung und Bestätigung durch den Verkäufer reserviert ist.",
     chooseTitle: (t: string) => `${t}`, chooseLead: "Wir rufen Sie zurück und besprechen die nächsten Schritte.",
-    thanks: (t: string) => `Vielen Dank, Ihre Wahl ist gespeichert: ${t}.`,
+    thanks: (t: string) => `Vielen Dank, Ihre Wahl ist gespeichert: ${t}.`, orderThanks: "Vielen Dank für Ihre Bestellung!", orderSoon: "Wir melden uns in Kürze.",
     next: ["Wir melden uns innerhalb eines Werktags.", "Wir prüfen Verfügbarkeit und Zustand beim Verkäufer.", "Anzahlung und Vertrag, danach startet der Transport.", "Zulassung in Ungarn, Übergabe in Budapest."],
     noneThanks: "Danke für Ihr Feedback. Wir melden uns bald mit einem neuen Angebot.",
     chosenBadge: "Ihre Wahl", fx: (r: string, d: string) => `≈ Preise, 1 € = ${r} Ft (${d}). Der Kurs wird jeden Morgen um 8:00 Uhr aktualisiert.`,
@@ -389,7 +389,7 @@ export function renderOffer(o: PublicOffer, s: OfferState): string {
   </div>`;
 
   const doneBlock = s.done === "chosen" && chosen
-    ? `<section class="done" id="kesz"><div class="wrap"><h2>${esc(L.thanks(chosen.title))}</h2><ol>${L.next.map((n: string) => `<li>${n}</li>`).join("")}</ol></div></section>`
+    ? `<section class="done" id="kesz"><div class="wrap"><h2>${esc(L.orderThanks)}</h2><p style="font-size:18px">${esc(L.orderSoon)}</p><p style="opacity:.75">${esc(chosen.title)} · #${esc(o.offer_no)}-${chosen.slot}</p></div></section>`
     : s.done === "none" ? `<section class="done"><div class="wrap"><h2>${L.noneThanks}</h2></div></section>` : "";
 
   const expiredBlock = s.expired
@@ -453,12 +453,7 @@ ${cars.map(carSection).join("")}
 <dialog id="chooseDlg"><form class="sheet" method="post" action="${base}/choose">
   <h3 id="chooseTitle"></h3><p>${L.chooseLead}</p>
   <input type="hidden" name="cid" id="chooseCid">
-  <label for="f-name">${L.name}</label><input id="f-name" name="name" required autocomplete="name" value="${esc(o.customer_name)}">
-  <label for="f-phone">${L.phone}</label><input id="f-phone" name="phone" required autocomplete="tel" inputmode="tel">
-  <label for="f-cb">${L.callback}</label><select id="f-cb" name="callback">${L.cb.map((x: string) => `<option>${x}</option>`).join("")}</select>
-  <label for="f-msg">${L.message}</label><textarea id="f-msg" name="message" rows="3"></textarea>
-  <label class="chk"><input type="checkbox" name="consent" value="1" required><span>${L.consent}</span></label>
-  <div class="row"><button type="button" class="btn btn-line" data-close>${L.cancel}</button><button class="btn btn-red">${L.choose}</button></div>
+  <input type="hidden" name="name" value="${esc(o.customer_name)}">
 </form></dialog>
 <dialog id="noneDlg"><form class="sheet" method="post" action="${base}/none">
   <h3>${L.none}</h3><p>${L.noneBody}</p>
@@ -478,7 +473,8 @@ const so=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return
 document.querySelectorAll("section[id]").forEach(s=>so.observe(s));
 let depth=0;addEventListener("scroll",()=>{const d=(scrollY+innerHeight)/document.body.scrollHeight;for(const m of[.5,.9])if(d>=m&&depth<m){depth=m;beacon("scroll",{depth:m})}},{passive:true});
 const dlg=document.getElementById("chooseDlg");
-document.querySelectorAll("[data-choose]").forEach(b=>b.addEventListener("click",()=>{document.getElementById("chooseCid").value=b.dataset.choose;document.getElementById("chooseTitle").textContent=b.dataset.title;beacon("choose_open",{cid:b.dataset.choose});dlg.showModal()}));
+/* egy kattintás: a választás azonnal elmegy, utána „Köszönjük a megrendelést” */
+document.querySelectorAll("[data-choose]").forEach(b=>b.addEventListener("click",()=>{if(P){alert("Előnézet — az ügyfél itt választ.");return;}document.getElementById("chooseCid").value=b.dataset.choose;beacon("choose_open",{cid:b.dataset.choose});document.querySelectorAll("[data-choose]").forEach(x=>{x.disabled=true;});b.textContent="…";dlg.querySelector("form").submit()}));
 /* e-mailből: …#valaszt-<autó> → a választás ablaka azonnal megnyílik */
 (function(){var h=decodeURIComponent(location.hash||"");if(h.indexOf("#valaszt-")!==0)return;var b=document.querySelector('[data-choose="'+h.slice(9).replace(/"/g,"")+'"]');if(b)setTimeout(function(){b.scrollIntoView({block:"center"});b.click();},400);})();
 const nb=document.getElementById("noneBtn");if(nb)nb.addEventListener("click",()=>document.getElementById("noneDlg").showModal());

@@ -231,7 +231,7 @@ export async function chooseCar(env: Env, o: OfferRecord, choice: { cid: string;
   const idx = pub.cars.findIndex((c) => c.cid === choice.cid);
   if (idx < 0) throw new Error("Ismeretlen autó.");
   const car = pub.cars[idx];
-  const msg = [`Telefon: ${choice.phone}`, choice.callback ? `Visszahívás: ${choice.callback}` : "", choice.message ? `Üzenet: ${choice.message}` : ""].filter(Boolean).join("\n");
+  const msg = [choice.phone ? `Telefon: ${choice.phone}` : "", choice.callback ? `Visszahívás: ${choice.callback}` : "", choice.message ? `Üzenet: ${choice.message}` : ""].filter(Boolean).join("\n");
   const upd = await env.DB.prepare(`UPDATE crm_offers SET responded_at = datetime('now'), action = 'elfogad', choice = ?, client_msg = ?, client_ip = ?
       WHERE token = ? AND responded_at IS NULL`).bind(idx, msg.slice(0, 2000), choice.ip.slice(0, 60), o.token).run();
   if (!upd.meta?.changes) return { already: true, car };

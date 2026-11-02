@@ -52,9 +52,11 @@ pub.post("/:token/choose", async (c) => {
   if (!o) return c.text("Nem található", 404);
   if (Date.parse(o.expires_at) < Date.now() && !o.responded_at) return c.html(renderExpiredShell(o.language as any, isTest(c.env)), 410);
   const f = await c.req.parseBody();
-  const name = String(f.name || "").trim().slice(0, 120);
+  // egy kattintásos választás: név / telefon nem kell (az ügyfél adatai az adatlapon vannak)
+  const snapName = (() => { try { return String(JSON.parse(o.snapshot_json).public.customer_name || ""); } catch { return ""; } })();
+  const name = (String(f.name || "").trim() || snapName || "Ügyfél").slice(0, 120);
   const phone = String(f.phone || "").trim().slice(0, 40);
-  if (f.consent !== "1" || !phone || !name) return c.text("Hiányzó adatok", 400);
+  if (!f.cid) return c.text("Hiányzó adatok", 400);
   try {
     await chooseCar(c.env, o, { cid: String(f.cid), name, phone, callback: String(f.callback || "").slice(0, 40), message: String(f.message || "").slice(0, 2000), ip: ip(c) }, baseUrl(c.env, c.req.raw));
   } catch (e: any) {
