@@ -348,9 +348,9 @@ export function renderOffer(o: PublicOffer, s: OfferState): string {
           </div>
         </div>
       </div>
-      <div class="story">${c.sections.map((sec, i) => chapter(c, sec, i)).join("")}</div>
-      <div class="panel reveal"><h4>${L.gallery}</h4>
-        <div class="gal">${c.images.map((u, i) => `<button type="button" data-lb="${c.slot}" data-i="${i}" aria-label="${L.gallery} ${i + 1}"><img src="${esc(u)}" alt="" loading="lazy" width="400" height="300"></button>`).join("")}</div>
+      <div class="panel reveal"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px"><h4 style="margin:0">${L.gallery}</h4>
+        ${c.source_url ? `<a class="btn btn-red" href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer">${L.source} ↗</a>` : ""}</div>
+        <div class="gal">${c.images.slice(0, 8).map((u, i) => `<button type="button" data-lb="${c.slot}" data-i="${i}" aria-label="${L.gallery} ${i + 1}" style="position:relative"><img src="${esc(u)}" alt="" loading="lazy" width="400" height="300">${i === 7 && c.images.length > 8 ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,11,13,.55);color:#fff;font-weight:800;font-size:20px">+${c.images.length - 8}</span>` : ""}</button>`).join("")}</div>
       </div>
       <div class="panel reveal"><h4>${L.equipment} · ${c.equipment_count}</h4>
         <div class="equip">${Object.entries(c.equipment).map(([cat, items]) => `<section><h5>${esc(cat)}</h5><ul>${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></section>`).join("")}</div>
