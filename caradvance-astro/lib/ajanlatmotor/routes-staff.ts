@@ -217,7 +217,7 @@ staff.post("/igeny/:id/publish", async (c) => {
   const g = await guardDeal(c, id); if (g) return g;
   const f = await c.req.parseBody();
   try {
-    const r = await publishOffer(c.env, id, c.get("user"), baseUrl(c.env, c.req.raw), { message: String(f.message || ""), send: f.send === "1" });
+    const r = await publishOffer(c.env, id, c.get("user"), baseUrl(c.env, c.req.raw), { message: String(f.message || ""), send: f.send === "1", force: f.force === "1" });
     const mail = r.sent ? `E-mail elküldve: ${r.sentTo}.` : r.mailError ? `Az e-mail nem ment ki (${r.mailError}); a linket kézzel küldd.` : "E-mail nem ment, a linket kézzel küldd.";
     return back(c, reqPath(id), `Közzétéve: ${r.offerNo}. ${mail} Az adatlap státusza: Ajánlat kiküldve.`);
   } catch (e: any) {

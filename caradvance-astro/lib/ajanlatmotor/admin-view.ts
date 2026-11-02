@@ -192,15 +192,21 @@ export function requestPage(o: {
    ${o.searchUrl && !published ? `<a class="btn red" href="#mdSearch" title="A keresési adatok ellenőrzése / módosítása, majd a mobile.de keresés megnyitása.">mobile.de keresés ↓</a>` : ""}
    <form method="post" action="${B}/search"><button class="btn" ${published ? "disabled" : ""}>Keresés újrafuttatása</button></form>
    <form method="post" action="${B}/describe"><button class="btn" ${published ? "disabled" : ""}>Mindhárom leírás generálása</button></form>
-   <a class="btn" href="${B}/preview" target="_blank">Előnézet ↗</a>
+   <a class="btn dark" href="${B}/preview" target="_blank" title="Pontosan ez az oldal nyílik meg az ügyfélnek az e-mailből">Ajánlat megtekintése ↗</a>
+   ${!published && o.cars.length ? `<a class="btn red" href="#kikuldes">Ajánlat kiküldése ↓</a>` : ""}
   </div></div>
   ${req && !published ? searchEditor(req, row.deal_id, o.searchMaxEur) : ""}
-  ${o.blockers.length && !published ? `<div class="flag"><strong>Közzététel előtt:</strong> ${o.blockers.map(esc).join(" · ")}</div>` : ""}
-  ${!published ? `<form method="post" action="${B}/publish" class="card row" style="margin-top:14px;align-items:flex-start">
-    <div style="flex:1;min-width:280px"><label class="small"><b>Kísérő üzenet az ügyfélnek</b> (nem kötelező)</label><textarea name="message" rows="2" style="font-family:inherit;font-size:13.5px"></textarea></div>
-    <div style="display:grid;gap:8px;min-width:260px"><label class="row small"><input type="checkbox" name="send" value="1" style="width:auto" ${o.hasEmail ? "checked" : "disabled"}> link küldése e-mailben ${o.hasEmail ? "" : "(nincs e-mail cím)"}</label>
-    <button class="btn red" ${ready ? "" : "disabled"}>Ajánlat közzététele</button>
-    <span class="small muted">A belső teszt-üzem szerint az e-mail most Marc címére megy.</span></div></form>` : ""}
+  ${o.blockers.length && !published ? `<div class="flag"><strong>Kiküldés előtt nézd át:</strong> ${o.blockers.map(esc).join(" · ")}</div>` : ""}
+  ${!published && o.cars.length ? `<form method="post" action="${B}/publish" class="card" id="kikuldes" style="margin-top:14px">
+    <h2 style="margin:0 0 4px">Ajánlat kiküldése</h2>
+    <div class="small muted" style="margin-bottom:10px">${o.cars.length} autó (${o.cars.map((c) => c.candidate.slot + ".").join(", ")} hely) · az ügyfél e-mailben megkapja az autókat képpel, árral, sorszámmal és „Ezt választom” gombbal; a választott autó az ügyfél adatlapjára (Autók) kerül, az ajánlat és az autó sorszámával.</div>
+    <div class="row" style="align-items:flex-start">
+    <div style="flex:1;min-width:280px"><label class="small"><b>Kísérő üzenet az ügyfélnek</b> (nem kötelező)</label><textarea name="message" rows="3" style="font-family:inherit;font-size:13.5px"></textarea></div>
+    <div style="display:grid;gap:8px;min-width:280px">
+     <label class="row small"><input type="checkbox" name="send" value="1" style="width:auto" ${o.hasEmail ? "checked" : "disabled"}> küldés e-mailben ${o.hasEmail ? "az ügyfél címére" : "(nincs e-mail cím — a linket kézzel küldd)"}</label>
+     ${o.blockers.filter((b) => !/hely még üres/.test(b)).length ? `<label class="row small" style="color:#a2660b"><input type="checkbox" name="force" value="1" style="width:auto" required> átnéztem a fenti figyelmeztetéseket, így is kiküldöm</label>` : ""}
+     <div class="row"><a class="btn" href="${B}/preview" target="_blank">Megtekintés ↗</a><button class="btn red">Ajánlat kiküldése</button></div>
+    </div></div></form>` : ""}
   ${o.offers.map((of) => `<div class="msg">${esc(of.offer_no || "")} · ügyfél-link: <a href="${esc(o.baseUrl)}/ajanlat/auto/${esc(of.token)}/" target="_blank">${esc(o.baseUrl)}/ajanlat/auto/${esc(of.token)}/</a>
     · ${of.sent ? "e-mail: " + esc(of.sent_to || "") : "nincs e-mailben elküldve, a linket kézzel küldd"} · lejár: ${new Date(of.expires_at).toLocaleDateString("hu-HU")} · ${answer(of)}</div>`).join("")}
   <div class="grid" style="margin-top:18px">

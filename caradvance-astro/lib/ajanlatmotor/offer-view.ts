@@ -301,6 +301,7 @@ export function renderOffer(o: PublicOffer, s: OfferState): string {
       <span class="chosen-tag">${L.chosenBadge}</span>
       ${c.positioning ? `<div class="pos">${esc(c.positioning)}</div>` : ""}
       <h2>${esc(carTitle(c))}<span>${esc(c.variant || "")}</span></h2>
+      <div class="carno" style="font-size:12px;opacity:.7;margin:-4px 0 8px">#${esc(o.offer_no)}-${c.slot}</div>
       <dl class="specs">
         <div><dt>${L.rows.year}</dt><dd>${ym(c.first_registration)}</dd></div>
         <div><dt>${L.rows.km}</dt><dd>${c.km.toLocaleString("hu-HU")} km</dd></div>
@@ -474,6 +475,8 @@ document.querySelectorAll("section[id]").forEach(s=>so.observe(s));
 let depth=0;addEventListener("scroll",()=>{const d=(scrollY+innerHeight)/document.body.scrollHeight;for(const m of[.5,.9])if(d>=m&&depth<m){depth=m;beacon("scroll",{depth:m})}},{passive:true});
 const dlg=document.getElementById("chooseDlg");
 document.querySelectorAll("[data-choose]").forEach(b=>b.addEventListener("click",()=>{document.getElementById("chooseCid").value=b.dataset.choose;document.getElementById("chooseTitle").textContent=b.dataset.title;beacon("choose_open",{cid:b.dataset.choose});dlg.showModal()}));
+/* e-mailből: …#valaszt-<autó> → a választás ablaka azonnal megnyílik */
+(function(){var h=decodeURIComponent(location.hash||"");if(h.indexOf("#valaszt-")!==0)return;var b=document.querySelector('[data-choose="'+h.slice(9).replace(/"/g,"")+'"]');if(b)setTimeout(function(){b.scrollIntoView({block:"center"});b.click();},400);})();
 const nb=document.getElementById("noneBtn");if(nb)nb.addEventListener("click",()=>document.getElementById("noneDlg").showModal());
 document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>b.closest("dialog").close()));
 document.querySelectorAll("dialog").forEach(d=>d.addEventListener("click",e=>{if(e.target===d)d.close()}));

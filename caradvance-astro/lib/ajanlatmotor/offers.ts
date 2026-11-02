@@ -12,7 +12,7 @@ import { groupEquipment, equipHu } from "./describe";
 import { mockImageSvg } from "./mock";
 import { notifyStaff } from "./notify";
 import type { PublicCar, PublicOffer } from "./offer-view";
-import { ensureCrm, getCard, saveCard, sendCrmMail } from "../crm.js";
+import { ensureCrm, getCard, saveCard, sendCrmMail, vehiclesOf, itemToVehicle, offerFields, newVehicleId, addEvent } from "../crm.js";
 
 export const DEFAULT_CONTACT = {
   name: "Vadnai Zsombor",
@@ -106,20 +106,24 @@ async function copyImages(env: Env, token: string, cv: CarView): Promise<string[
   return out.length ? out : cv.listing.images;
 }
 
-export async function publishOffer(env: Env, dealId: number, user: Staff, origin: string, opts: { message?: string; send?: boolean }) {
+export async function publishOffer(env: Env, dealId: number, user: Staff, origin: string, opts: { message?: string; send?: boolean; force?: boolean }) {
   await ensureAm(env);
   await ensureCrm(env);
   const row = await getRequest(env, dealId);
   const deal = await getDeal(env, dealId);
   if (!row || !deal) throw new Error("Az igény nem található.");
   const { req, cars } = await slotViews(env, dealId);
-  const blockers = publishBlockers(cars);
-  if (blockers.length) throw new Error("Nem tehető közzé: " + blockers.join(" · "));
+  if (!cars.length) throw new Error("Nincs autó a helyeken — legalább egy autó kell az ajánlatba.");
+  // a figyelmeztetések (pl. megerősítetlen díjak, ellenőrizetlen fotók) tudomásulvétellel kiküldhetők
+  const blockers = publishBlockers(cars).filter((b) => !/hely még üres/.test(b));
+  if (blockers.length && !opts.force) throw new Error("Kiküldés előtt nézd át: " + blockers.join(" · ") + " — vagy jelöld be, hogy így is kiküldöd.");
 
   const token = randomHex(20); // same format as belső crm_offers tokens
   const expires = new Date(Date.now() + validDays(env) * 864e5);
   const d = new Date();
-  const offerNo = `CA-${String(d.getUTCFullYear()).slice(2)}${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(dealId).padStart(4, "0")}`;
+  // ajánlat sorszáma (ügyfelenként a második ajánlattól /2, /3 …); az autók sorszáma: <ajánlatszám>-<hely>
+  const prevN = ((await env.DB.prepare("SELECT COUNT(*) AS n FROM am_offers WHERE deal_id = ?").bind(dealId).first<{ n: number }>()) || { n: 0 }).n || 0;
+  const offerNo = `CA-${String(d.getUTCFullYear()).slice(2)}${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(dealId).padStart(4, "0")}${prevN ? "/" + (prevN + 1) : ""}`;
 
   const imageMap = new Map<string, string[]>();
   for (const cv of cars) imageMap.set(cv.candidate.id, await copyImages(env, token, cv));
@@ -132,6 +136,7 @@ export async function publishOffer(env: Env, dealId: number, user: Staff, origin
     fuel: FUEL_HU[c.fuel] || c.fuel, power: `${c.power_kw} kW`, gearbox: c.gearbox === "automatic" ? "Automata" : "Manuális",
     image: c.images[0] ? new URL(c.images[0], origin).toString() : "", url: link, note: c.positioning || "",
     price: c.total_huf, currency: "HUF", period: "", deposit: 0,
+    offer_no: `${offerNo}-${c.slot}`, offer_date: nowIso().slice(0, 10), fx: c.total_eur ? Math.round(c.total_huf / c.total_eur * 100) / 100 : 0, slot: c.slot,
   }));
   const card = await getCard(env, dealId);
   const to = String(card?.data?.person?.email || deal.email || "").trim();
@@ -144,7 +149,7 @@ export async function publishOffer(env: Env, dealId: number, user: Staff, origin
   if (opts.send && to) {
     const fwd = env.CRM_TEST_FORWARD === "off" ? null : (env.CRM_TEST_FORWARD as string) || "marc.nemethy@bhgeu.com";
     const r = await sendCrmMail(env, fwd || to, `${fwd ? "[TESZT — " + to + "] " : ""}Személyre szabott ajánlatunk — 3 autó`,
-      offerMailHtml(clientName, link, message, pub));
+      offerMailHtml(clientName, link, message, pub, items));
     sent = r.ok ? 1 : 0;
     sentTo = fwd || to;
     if (!r.ok) mailError = r.error || "küldési hiba";
@@ -168,14 +173,33 @@ export async function publishOffer(env: Env, dealId: number, user: Staff, origin
   return { token, link, offerNo, sent: !!sent, sentTo, mailError, test: isTest(env) };
 }
 
-function offerMailHtml(name: string, link: string, message: string, pub: PublicOffer) {
-  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+export function offerMailHtml(name: string, link: string, message: string, pub: PublicOffer, items?: { offer_no?: string; image?: string }[]) {
+  const esc = (s: string) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
   const first = firstName(name, pub.language);
+  const n = pub.cars.length;
+  // autónként: kép, sorszám, adatok, végösszeg és „Ezt választom” (az ajánlat oldalán nyitja meg a választást)
+  const cars = pub.cars.map((c, i) => {
+    const img = (items && items[i] && items[i].image) || "";
+    const no = (items && items[i] && items[i].offer_no) || `${pub.offer_no}-${c.slot}`;
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:14px;margin:0 0 14px;border-collapse:separate;overflow:hidden"><tr>
+  ${img ? `<td width="190" style="width:190px;padding:0;vertical-align:top"><img src="${esc(img)}" width="190" alt="" style="display:block;width:190px;height:auto;border-radius:14px 0 0 14px"></td>` : ""}
+  <td style="padding:12px 14px;vertical-align:top;font:14px/1.5 Arial,Helvetica,sans-serif;color:#141519">
+   <div style="font-size:11px;font-weight:bold;letter-spacing:.06em;color:#e2001a;text-transform:uppercase">${i + 1}. autó${c.positioning ? " · " + esc(c.positioning) : ""}</div>
+   <div style="font-size:16px;font-weight:bold;margin:2px 0 4px">${esc(c.title)}</div>
+   <div style="color:#5a6b82;font-size:13px">${esc(c.first_registration.slice(0, 7).replace("-", "."))} · ${c.km.toLocaleString("hu-HU")} km · ${c.power_kw} kW</div>
+   <div style="font-size:17px;font-weight:bold;margin:8px 0 2px">≈ ${c.total_huf.toLocaleString("hu-HU")} Ft</div>
+   <div style="color:#5a6b82;font-size:12px">Budapesten, forgalomba helyezve · azonosító: <b>${esc(no)}</b></div>
+   <div style="margin-top:10px"><a href="${esc(link)}#valaszt-${esc(c.cid)}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:9px 16px;border-radius:999px;display:inline-block">Ezt választom</a>
+    <a href="${esc(link)}#auto-${c.slot}" style="color:#141519;font-size:13px;margin-left:10px">Részletek</a></div>
+  </td></tr></table>`;
+  }).join("");
   return `<p>Szia${first ? " " + esc(first) : ""},</p>
-<p>összeállítottuk a három autót, amelyek a legjobban illenek ahhoz, amit kértél. Mindegyiknél látod a teljes árat Budapesten, forgalomba helyezve.</p>
+<p>összeállítottuk ${n === 1 ? "az autót, amely" : n === 2 ? "a két autót, amelyek" : "a három autót, amelyek"} a legjobban ${n === 1 ? "illik" : "illenek"} ahhoz, amit kértél. Mindegyiknél látod a teljes árat Budapesten, forgalomba helyezve.</p>
+<p style="color:#5a6b82;font-size:13px">Ajánlat száma: <b style="color:#141519">${esc(pub.offer_no)}</b></p>
 ${message ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(message)}</p>` : ""}
-<p style="margin:22px 0"><a href="${esc(link)}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:999px;display:inline-block">Az ajánlat megnyitása</a></p>
-<p style="color:#6b7280;font-size:13px">Az ajánlat ${esc(pub.valid_until)}-ig érvényes. Ha a gomb nem működik: ${esc(link)}</p>`;
+${cars}
+<p style="margin:18px 0"><a href="${esc(link)}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:999px;display:inline-block">A teljes ajánlat megnyitása</a></p>
+<p style="color:#6b7280;font-size:13px">Az „Ezt választom” gombbal az ajánlat oldalán megerősítheted a választásodat. Az ajánlat ${esc(pub.valid_until)}-ig érvényes. Ha a gomb nem működik: ${esc(link)}</p>`;
 }
 
 /* ---------------- customer side ---------------- */
@@ -214,15 +238,23 @@ export async function chooseCar(env: Env, o: OfferRecord, choice: { cid: string;
   await ensureCrm(env);
   const card = await getCard(env, o.deal_id);
   const data = card.data || {};
-  const v = { ...(data.vehicle || {}) };
-  const fill: Record<string, string> = {
-    brand: car.make, model: [car.model, car.variant].filter(Boolean).join(" "), year: car.first_registration.slice(0, 4),
-    fuel: FUEL_HU[car.fuel] || car.fuel, km: String(car.km), engine: `${car.power_kw} kW`, color: car.color || "",
-  };
-  for (const [k, val] of Object.entries(fill)) if (!v[k] && val) v[k] = String(val).slice(0, 200);
+  // a választott autó az adatlap „Autók” részébe kerül — ajánlat- és autó-sorszámmal, dátummal, árfolyammal
+  const row = await env.DB.prepare("SELECT items FROM crm_offers WHERE token = ?").bind(o.token).first<{ items: string }>();
+  const items: any[] = row ? JSON.parse(row.items || "[]") : [];
+  const it: any = { ...(items[idx] || {}), title: car.title, brand: car.make, year: car.first_registration.slice(0, 4), fuel: FUEL_HU[car.fuel] || car.fuel,
+    km: `${car.km.toLocaleString("hu-HU")} km`, power: `${car.power_kw} kW`, color: car.color || "", price: car.total_huf, currency: "HUF", period: "",
+    offer_no: (items[idx] && items[idx].offer_no) || `${o.offer_no}-${car.slot}`, offer_date: (items[idx] && items[idx].offer_date) || String(o.published_at || nowIso()).slice(0, 10),
+    fx: (items[idx] && items[idx].fx) || (car.total_eur ? Math.round(car.total_huf / car.total_eur * 100) / 100 : 0), ad_id: (items[idx] && items[idx].ad_id) || "" };
+  const list = vehiclesOf(data).slice();
+  const same = list.findIndex((v: any) => (it.key && v.key === it.key) || (v.title && v.title === it.title));
+  const emptyIdx = list.findIndex((v: any) => !v.title && !v.brand && !v.model && !v.vin);
+  if (same >= 0) list[same] = { ...list[same], price: it.price, currency: "HUF", ...offerFields(it) };
+  else if (emptyIdx >= 0) list[emptyIdx] = { ...itemToVehicle(it, list[emptyIdx].id, "offer"), vin: list[emptyIdx].vin || "" };
+  else list.push(itemToVehicle(it, newVehicleId(list), "offer"));
   const person = { ...(data.person || {}) };
   if (!person.phone && choice.phone) person.phone = choice.phone.slice(0, 200);
-  await saveCard(env, o.deal_id, { status: "Ajánlat elfogadva", data: { ...data, vehicle: v, person } }, null);
+  await saveCard(env, o.deal_id, { status: "Ajánlat elfogadva", data: { ...data, vehicles: list, vehicle: list[0], person } }, null, "Ügyfél", "választott az ajánlatból");
+  try { await addEvent(env, o.deal_id, "client", `Ügyfél választott az ajánlatból (${o.offer_no}): ${it.offer_no} · ${car.title} — ≈ ${car.total_huf.toLocaleString("hu-HU")} Ft`, "Ügyfél"); } catch { /* ignore */ }
   await env.DB.prepare("UPDATE am_candidates SET pool = 'declined' WHERE deal_id = ? AND slot IS NOT NULL AND id != ?").bind(o.deal_id, car.cid).run();
   try { await transition(env, o.deal_id, "CHOSEN", "customer", { cid: car.cid }); } catch { /* ignore */ }
   await logEvent(env, o.deal_id, "customer", "chosen", { cid: car.cid, slot: car.slot });
