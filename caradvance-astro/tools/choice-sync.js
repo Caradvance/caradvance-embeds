@@ -229,6 +229,7 @@ var CADV_SYNC = (function () {
     report.fileChanged = out !== text;
     return { file: out, feat: featNew, featChanged: featChanged, report: report };
   }
+  build.norm = norm;
   return build;
 })();
 if (typeof module !== 'undefined') module.exports = CADV_SYNC;
