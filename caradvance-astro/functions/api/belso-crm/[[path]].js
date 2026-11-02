@@ -125,6 +125,9 @@ function normVehicles(b) {
       image: /^https:\/\//.test((v && v.image) || '') ? clean(v.image, 600) : '', url: /^https:\/\//.test((v && v.url) || '') ? clean(v.url, 400) : '',
       // bérlet (Eladás 1. üteme és Bérlés): kezdet, vég, figyelmeztetések a lejárat előtt
       rent_start: isoDate(v && v.rent_start), rent_end: isoDate(v && v.rent_end),
+      // az elfogadott ajánlatból: felszereltség / kivitel, ajánlat száma, dátuma, árfolyam, ÁFA-mód, km-keret, futamidő
+      equipment: clean(v && v.equipment, 600), offer_no: clean(v && v.offer_no, 60), offer_date: isoDate(v && v.offer_date), fx: Math.max(0, Number(v && v.fx) || 0),
+      vat_mode: VAT_MODES[v && v.vat_mode] ? v.vat_mode : '', km_keret: clean(v && v.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(v && v.months, 10) || 0)),
       reminders: (Array.isArray(v && v.reminders) ? v.reminders : []).slice(0, 20).map((r, j) => ({
         id: /^[a-z0-9_-]{1,20}$/i.test(r && r.id || '') ? r.id : 'r' + (j + 1),
         date: isoDate(r && r.date), days: Number.isInteger(r && r.days) && r.days >= 0 && r.days <= 730 ? r.days : null,
@@ -140,7 +143,9 @@ function normWebPick(w) {
     power: clean(w.power, 40), gearbox: clean(w.gearbox, 40), color: clean(w.color, 80), note: clean(w.note, 400),
     image: /^https:\/\//.test(w.image || '') ? clean(w.image, 600) : '', url: /^https:\/\//.test(w.url || '') ? clean(w.url, 400) : '',
     price: Math.max(0, Number(w.price) || 0), currency: w.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(w.period, 20), deposit: Math.max(0, Number(w.deposit) || 0),
-    months: Math.max(0, Number(w.months) || 0), rent_start: isoDate(w.rent_start), rent_end: isoDate(w.rent_end), at: clean(w.at, 40)
+    months: Math.max(0, Number(w.months) || 0), rent_start: isoDate(w.rent_start), rent_end: isoDate(w.rent_end), at: clean(w.at, 40),
+    vat_mode: VAT_MODES[w.vat_mode] ? w.vat_mode : '', km_keret: clean(w.km_keret, 60), fx: Math.max(0, Number(w.fx) || 0),
+    equipment: (Array.isArray(w.equipment) ? w.equipment : []).map((x) => clean(x, 300)).filter(Boolean).slice(0, 20)
   };
 }
 function isoDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s || '') && !isNaN(Date.parse(s + 'T00:00:00Z')) ? s : ''; }
@@ -298,9 +303,16 @@ async function handleSendOffer(request, env, user, id) {
     images: (Array.isArray(it.images) ? it.images : []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 12),
     equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
     eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '',
-    attach_src: !!it.attach_src
+    attach_src: !!it.attach_src,
+    // bérlés (weboldali igényből): km-keret, futamidő, kezdés
+    km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end)
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
+  // ajánlatszám, dátum és árfolyam automatikusan — elfogadáskor az autó adataiba, onnan a szerződésbe kerül
+  const fxNow = await eurHuf().catch(() => null);
+  const today = new Date(Date.now() + 3600e3).toISOString().slice(0, 10);
+  const prevN = ((await env.DB.prepare(`SELECT COUNT(*) AS n FROM crm_offers WHERE deal_id = ?`).bind(id).first()) || {}).n || 0;
+  items.forEach((it, i) => { it.offer_no = offerNo(id, i, items.length) + (prevN ? '/' + (prevN + 1) : ''); it.offer_date = today; if (fxNow) it.fx = Math.round(fxNow * 100) / 100; });
   const message = cleanMulti(b.message, 2000).trim();
   const token = randomHex(20);
   const link = `${SITE}/ajanlat/valasz/?t=${token}`;
@@ -312,7 +324,7 @@ async function handleSendOffer(request, env, user, id) {
   for (const [i, it] of items.entries()) {
     if (it.src === 'config' && (it.images.length || it.equipment.length)) {
       try {
-        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: offerNo(id, i, items.length), user });
+        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user });
         att.push({ filename: offerFileName(it), content: bytesToB64(pdf) });
         if (!it.image && it.images.length) it.image = `${SITE}/api/crm-ajanlat/${token}/kep/${it.images[0]}`;
         it.offer_pdf = true;
