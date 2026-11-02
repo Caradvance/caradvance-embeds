@@ -8,7 +8,7 @@ import type { Env, Requirements, Fuel } from "./types";
 import { heuristicExtract } from "./extract";
 import { processRequest } from "./engine";
 import { ensureAm, logEvent, nowIso } from "./am";
-import { ensureCrm, saveCard, addEvent } from "../crm.js";
+import { ensureCrm, saveCard, addEvent, aboFleet } from "../crm.js";
 
 type Form = Record<string, unknown>;
 const s = (v: unknown, max = 300) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
@@ -149,10 +149,15 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
   const dm = g(d, "Elérhetőség", "Kezdés").match(/(20\d\d)[.\-/]\s*(\d{1,2})[.\-/]\s*(\d{1,2})/);
   const start = dm ? `${dm[1]}-${dm[2].padStart(2, "0")}-${dm[3].padStart(2, "0")}` : "";
   const addMonths = (iso: string, n: number) => { const [y, m, dd] = iso.split("-").map(Number); const t = new Date(Date.UTC(y, m - 1 + n, dd)); return t.toISOString().slice(0, 10); };
+  // a weboldali flotta-kártya (abo-fleet.json) adatai: kulcs, fotó, modell-oldal — így az ajánlatkészítő is felismeri
+  const nk = (x: string) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\bvw\b/g, "volkswagen").replace(/[^a-z0-9]+/g, " ").trim();
+  let fl: any = null;
+  try { fl = (await aboFleet()).find((x: any) => nk(x.title) === nk(car)) || null; } catch { fl = null; }
+  if (fl && !img) img = fl.image || "";
   const vehicle = {
-    id: "v1", source: "web", key: "", title: car, brand, model: car.slice(brand.length).trim(), year: "", vin: "", plate: "", ad_id: "", config_code: "",
+    id: "v1", source: "web", key: fl ? fl.key : "", title: car, brand, model: car.slice(brand.length).trim(), year: "", vin: "", plate: "", ad_id: "", config_code: "",
     color: s(g(d, "Szín"), 80), engine: "", fuel: s(g(d, "Üzemanyag"), 60), km: s(g(d, "Km-keret"), 60), condition: "", body: "", gearbox: "", hybrid: /hibrid|hybrid|phev/i.test(g(d, "Üzemanyag")),
-    price, currency: cur, period: "hó", deposit: cur === "EUR" ? amt(g(d, "Kaució"), /(€|eur)/) || amt(g(d, "Kaució"), /(ft|huf)/) : amt(g(d, "Kaució"), /(ft|huf)/) || amt(g(d, "Kaució"), /(€|eur)/), image: img, url: /^https:\/\//.test(ctx.page) ? s(ctx.page, 500) : "",
+    price, currency: cur, period: "hó", deposit: cur === "EUR" ? amt(g(d, "Kaució"), /(€|eur)/) || amt(g(d, "Kaució"), /(ft|huf)/) : amt(g(d, "Kaució"), /(ft|huf)/) || amt(g(d, "Kaució"), /(€|eur)/), image: img, url: fl && fl.url ? fl.url : /^https:\/\//.test(ctx.page) ? s(ctx.page, 500) : "",
     rent_start: start, rent_end: start && months ? addMonths(start, months) : "", reminders: [], months,
   };
   const res = await env.DB.prepare(`INSERT INTO deals (line, stage, ch, name, phone, email, car, price, note, when_text, assigned_to)
