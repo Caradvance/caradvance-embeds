@@ -34,6 +34,17 @@ export const SITES = {
     wa: '36302336060',
     email: 'info@caradvance.hu'
   },
+  eu: {
+    base: 'https://www.caradvance.eu',
+    indexBase: 'https://www.caradvance.hu',   // a keresőindex a közös Pages-projektben van
+    index: '/kereses-index-eu-de.json',
+    indexL: {"de": "/kereses-index-eu-de.json", "fr": "/kereses-index-eu-fr.json", "it": "/kereses-index-eu-it.json", "es": "/kereses-index-eu-es.json"},
+    prefix: '/eu',
+    lang: 'de',
+    phone: '+49 89 99998 100',
+    wa: '36302336060',
+    email: 'import@caradvance.de'
+  },
   ch: {
     base: 'https://www.caradvance.ch',
     indexBase: 'https://www.caradvance.hu',   // a keresőindex a közös Pages-projektben van
@@ -57,7 +68,7 @@ export const SITES = {
 };
 
 export const LANG_NAME = {
-  hu: 'Hungarian', sk: 'Slovak', cs: 'Czech', pl: 'Polish', it: 'Italian', en: 'English', de: 'German', fr: 'French', uk: 'Ukrainian', zh: 'Simplified Chinese'
+  hu: 'Hungarian', sk: 'Slovak', cs: 'Czech', pl: 'Polish', it: 'Italian', es: 'Spanish', en: 'English', de: 'German', fr: 'French', uk: 'Ukrainian', zh: 'Simplified Chinese'
 };
 
 const HU = `
@@ -144,4 +155,18 @@ const CH = `
 - In der Schweiz bieten wir keinen Kommissionsverkauf, kein Operating Leasing für Privatpersonen und kein Charity-Programm an — erwähne sie nicht. Keine Kurzzeitmiete.
 `;
 
-export const KB = { hu: HU, sk: SK, cz: CZ, pl: PL, ch: CH };
+const EU = `
+# CarAdvance — caradvance.eu — Deutschland (/de/), France (/fr/), Italia (/it/), España (/es/) — website in German, French, Italian and Spanish
+- Seller, lessor and only contractual party: Caradvance GmbH, Bgm.-Graf-Ring 21, 82538 Geretsried (near Munich), Germany (Amtsgericht München, HRB 151009, VAT ID DE232664616). Since 2003, more than 5000 premium cars sold. No local agent or partner: customers in Germany, France, Italy and Spain are served directly by Caradvance GmbH. Contracts are signed online.
+- Contact: import@caradvance.de · +49 89 99998 100 · Mon–Fri 9–17 · https://www.caradvance.eu/de/kontakt/ (fr: https://www.caradvance.eu/fr/contact/, it: https://www.caradvance.eu/it/contatti/, es: https://www.caradvance.eu/es/contacto/). Advice in German and English (French too); written enquiries also in Italian and Spanish.
+- Each language version addresses one country: German = Germany, French = France, Italian = Italy, Spanish = Spain. Answer for the country of the visitor's language.
+
+## Services (only these three — there is NO import service, NO car-search service, NO consignment, NO charity on caradvance.eu)
+1) Long-term rental (DE Langzeitmiete, FR location longue durée, IT noleggio a lungo termine, ES renting) of new premium cars: minimum 6 months, then open-ended with 30 days' notice; 2 000–4 000 km/month depending on the car; one-off refundable deposit (security, not rent). Included: service and maintenance, vehicle tax, liability and comprehensive insurance (German insurer, excess per contract), summer and winter tyres, breakdown assistance. Cars are registered in Germany to Caradvance GmbH (German plates). Customers with residence or registered office in Germany, France, Italy, Spain or another EU country can rent. Rental prices are shown net: DE plus 19 % VAT; private customers in FR/IT/ES pay the VAT of their country (FR 20 %, IT 22 %, ES 21 %); companies with an EU VAT number are invoiced without VAT (reverse charge). Italy: under art. 93-bis Codice della Strada a document signed by the owner is kept on board (we provide it); use in Italy for more than 30 days a year requires entry in the REVE register. France/Spain: whether a German-registered car may be used long-term depends on national rules — we clarify this before the contract.
+   Rental pages: de https://www.caradvance.eu/de/langzeitmiete/ · fr https://www.caradvance.eu/fr/location-longue-duree/ · it https://www.caradvance.eu/it/noleggio-lungo-termine/ · es https://www.caradvance.eu/es/renting/
+2) Cars for sale from our stock in Germany (checked premium cars, mostly with manufacturer warranty), delivered to the customer's door with all documents (registration certificate, CoC, invoice) or collected near Munich: de https://www.caradvance.eu/de/fahrzeuge/ · fr https://www.caradvance.eu/fr/vehicules/ · it https://www.caradvance.eu/it/veicoli/ · es https://www.caradvance.eu/es/vehiculos/. The buyer registers the car in his own country (DE: we can handle the German registration on request). VAT: DE price incl. 19 %; FR/IT/ES private buyers: VAT of their country on delivery by us (FR 20 %, IT 22 %, ES 21 %), German 19 % if they collect the car in Germany; companies with a valid EU VAT number: tax-exempt intra-Community supply.
+3) New cars to order (BMW, MINI, Mercedes-Benz, Audi) with the configurator: de https://www.caradvance.eu/de/kaufen/neuwagen-nach-wunsch/ (fr /fr/achat/voiture-neuve-sur-mesure/, it /it/acquisto/auto-nuova-su-misura/, es /es/compra/coche-nuevo-a-medida/). New cars: VAT of the country of registration (FR/IT/ES: invoiced without German VAT, the buyer pays local VAT at registration). Financing/leasing via partner leasing companies after a credit check; terms depend on the country.
+- Prices on the website are in EUR and indicative; the final price is in the written offer.
+`;
+
+export const KB = { hu: HU, sk: SK, cz: CZ, pl: PL, ch: CH, eu: EU };

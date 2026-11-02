@@ -26,6 +26,7 @@ const ORIGINS = [
   'https://www.caradvance.cz', 'https://caradvance.cz',
   'https://www.caradvance.pl', 'https://caradvance.pl',
   'https://www.caradvance.ch', 'https://caradvance.ch',
+  'https://www.caradvance.eu', 'https://caradvance.eu',
   'https://caradvance-astro.pages.dev'
 ];
 const MODELS_FALLBACK = ['claude-sonnet-5-5', 'claude-sonnet-5'];
@@ -52,10 +53,11 @@ function json(obj, status, origin) {
   return new Response(JSON.stringify(obj), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...cors(origin) } });
 }
 function siteOf(req, body) {
-  const pick = (h) => (/caradvance\.sk$/i.test(h) ? 'sk' : /caradvance\.cz$/i.test(h) ? 'cz' : /caradvance\.pl$/i.test(h) ? 'pl' : /caradvance\.ch$/i.test(h) ? 'ch' : /caradvance\.hu$/i.test(h) ? 'hu' : null);
+  const pick = (h) => (/caradvance\.sk$/i.test(h) ? 'sk' : /caradvance\.cz$/i.test(h) ? 'cz' : /caradvance\.pl$/i.test(h) ? 'pl' : /caradvance\.ch$/i.test(h) ? 'ch' : /caradvance\.eu$/i.test(h) ? 'eu' : /caradvance\.hu$/i.test(h) ? 'hu' : null);
   // caradvance.hu/pl/ előnézet (a .pl domain bekötése előtt): a lengyel oldal
   if (/^\/pl(\/|$)/.test(String((body && body.page) || '')) || String((body && body.market) || '') === 'pl') return 'pl';
   if (/^\/ch(\/|$)/.test(String((body && body.page) || '')) || String((body && body.market) || '') === 'ch') return 'ch';
+  if (/^\/eu(\/|$)/.test(String((body && body.page) || '')) || String((body && body.market) || '') === 'eu') return 'eu';
   for (const v of [req.headers.get('Origin'), req.headers.get('Referer')]) {
     try { const s = v && pick(new URL(v).hostname); if (s) return s; } catch (e) {}
   }
@@ -166,6 +168,7 @@ const FALLBACK = {
   sk: (S) => `Ospravedlňujeme sa, teraz nemôžem odpovedať. Napíšte nám na WhatsApp (${S.phone}) alebo na ${S.email}.`,
   de: (S) => `Entschuldigung, ich kann gerade nicht antworten. Schreiben Sie uns per WhatsApp (${S.phone}) oder an ${S.email}.`,
   fr: (S) => `Désolé, je ne peux pas répondre pour le moment. Écrivez-nous sur WhatsApp (${S.phone}) ou à ${S.email}.`,
+  es: (S) => `Lo sentimos, ahora mismo no puedo responder. Escríbanos por WhatsApp (${S.phone}) o a ${S.email}.`,
   it: (S) => `Spiacenti, al momento non posso rispondere. Ci scriva su WhatsApp (${S.phone}) o a ${S.email}.`,
   pl: (S) => `Przepraszamy, w tej chwili nie mogę odpowiedzieć. Napisz do nas na WhatsApp (${S.phone}) lub na ${S.email}.`,
   cs: (S) => `Omlouváme se, teď nemohu odpovědět. Napište nám na WhatsApp (${S.phone}) nebo na ${S.email}.`,
