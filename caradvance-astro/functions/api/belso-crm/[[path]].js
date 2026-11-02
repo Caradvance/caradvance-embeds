@@ -144,7 +144,7 @@ function normWebPick(w) {
     image: /^https:\/\//.test(w.image || '') ? clean(w.image, 600) : '', url: /^https:\/\//.test(w.url || '') ? clean(w.url, 400) : '',
     price: Math.max(0, Number(w.price) || 0), currency: w.currency === 'EUR' ? 'EUR' : 'HUF', period: clean(w.period, 20), deposit: Math.max(0, Number(w.deposit) || 0),
     months: Math.max(0, Number(w.months) || 0), rent_start: isoDate(w.rent_start), rent_end: isoDate(w.rent_end), at: clean(w.at, 40),
-    vat_mode: VAT_MODES[w.vat_mode] ? w.vat_mode : '', km_keret: clean(w.km_keret, 60), fx: Math.max(0, Number(w.fx) || 0),
+    vat_mode: VAT_MODES[w.vat_mode] ? w.vat_mode : '', km_keret: clean(w.km_keret, 60), avail: clean(w.avail, 80), fx: Math.max(0, Number(w.fx) || 0),
     equipment: (Array.isArray(w.equipment) ? w.equipment : []).map((x) => clean(x, 300)).filter(Boolean).slice(0, 20)
   };
 }
