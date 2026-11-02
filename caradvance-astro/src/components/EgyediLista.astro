@@ -438,7 +438,7 @@ const _rebuild='rebuild-nudge-3';
   var BT = (function(){ try { return localStorage.getItem('ca_bt') === 'c' ? 'c' : 'p'; } catch(e){ return 'p'; } })();
   // .sk oldalon (euró) az árat közvetlenül euróban mutatjuk (nem a forintból visszaváltva), így nincs két eltérő €-összeg
   var EURDOM = /(^|\.)caradvance\.sk$/i.test(location.hostname);
-  function EURS(e){ return String(Math.round(e)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0€'; }
+  function EURS(e){ return String(Math.round(e)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0\u20ac'; }
   var EGLROOT = document.querySelector('section.egl') || document.documentElement; EGLROOT.setAttribute('data-bt', BT);
   var dpct = function(c){ return DISC[c.name] || 0; };
   var dnet = function(c){ var n = net(c.from), p = dpct(c); return p ? Math.round(n * (1 - p / 100)) : n; };
