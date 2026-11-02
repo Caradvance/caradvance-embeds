@@ -34,8 +34,24 @@ const MAKE_IDS: Record<string, number> = {
 };
 
 const FUEL_CODE: Record<Fuel, string> = {
-  electric: "ELECTRICITY", petrol: "PETROL", diesel: "DIESEL", hybrid: "HYBRID", phev: "HYBRID",
+  electric: "ELECTRICITY", petrol: "PETROL", diesel: "DIESEL", hybrid: "HYBRID", phev: "HYBRID_PLUGIN",
 };
+/** mobile.de vehicle categories (c=) for our body types */
+const BODY_CODE: Record<string, string[]> = {
+  estate: ["EstateCar"], suv: ["OffRoad"], sedan: ["Limousine"], hatchback: ["Limousine", "SmallCar"], coupe: ["SportsCar"], convertible: ["Cabrio"], van: ["Van"], pickup: ["OffRoad"],
+};
+/** full make / model ID list (same as the /auto-rendeles/ form's comparison links) */
+import MOBILE_IDS from "./mobile-ids.json";
+const norm = (x: string) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+function mobileIds(make?: string, model?: string): { make?: string; model?: string } {
+  if (!make) return {};
+  const mk = Object.keys(MOBILE_IDS.makes).find((k) => norm(k) === norm(make));
+  const makeId = mk ? (MOBILE_IDS.makes as Record<string, string>)[mk] : MAKE_IDS[make.toLowerCase()] ? String(MAKE_IDS[make.toLowerCase()]) : undefined;
+  if (!makeId) return {};
+  const models = (mk && (MOBILE_IDS.models as Record<string, Record<string, string>>)[mk]) || {};
+  const md = model ? Object.keys(models).find((k) => norm(k) === norm(model)) : undefined;
+  return { make: makeId, model: md ? models[md] : undefined };
+}
 
 /** mobile.de feature codes (fe=) for must-have equipment; Panorama, HUD and Standheizung checked in a live search 2026-10. Tow bar is its own parameter (tct). */
 const FEATURE_CODE: Record<string, string> = {
@@ -54,16 +70,23 @@ const FEATURE_CODE: Record<string, string> = {
  */
 export function buildSearchUrl(req: Requirements, maxVehicleEur?: number): string {
   const p = new URLSearchParams({ dam: "false", isSearchRequest: "true", s: "Car", vc: "Car", sb: "p", od: "up", ref: "srp" });
-  const make = req.vehicle.makes[0]?.toLowerCase();
-  const model = (req.vehicle.models[0] || "").replace(/\b(touring|avant|kombi|sportback|limousine|limuzin)\b/gi, "").trim();
-  if (make && MAKE_IDS[make]) p.set("ms", `${MAKE_IDS[make]};;;${model}`);
-  else if (req.vehicle.models[0]) p.set("q", req.vehicle.models[0]);
-  if (req.vehicle.body_types.includes("estate")) p.set("c", "EstateCar");
-  if (req.vehicle.fuel[0]) p.set("ft", FUEL_CODE[req.vehicle.fuel[0]]);
-  if (req.vehicle.year_min) p.set("fr", `${req.vehicle.year_min}:`);
-  if (req.vehicle.km_max) p.set("ml", `:${req.vehicle.km_max}`);
+  const v = req.vehicle;
+  const model = (v.models[0] || "").replace(/\b(touring|avant|kombi|sportback|limousine|limuzin)\b/gi, "").trim();
+  const ids = mobileIds(v.makes[0], v.models[0]) ;
+  const idm = ids.model ? ids : mobileIds(v.makes[0], model);
+  if (idm.make && idm.model) p.set("ms", `${idm.make};${idm.model};;`);
+  else if (ids.make) p.set("ms", `${ids.make};;;${model}`);
+  else if (v.makes[0] || v.models[0]) p.set("q", [v.makes[0], v.models[0]].filter(Boolean).join(" "));
+  const cats = [...new Set((v.body_types || []).flatMap((b) => BODY_CODE[b] || []))];
+  for (const c of cats) p.append("c", c);
+  for (const f of [...new Set((v.fuel || []).map((f) => FUEL_CODE[f]).filter(Boolean))]) p.append("ft", f);
+  if (v.year_min || v.year_max) p.set("fr", `${v.year_min || ""}:${v.year_max || ""}`);
+  if (v.km_min || v.km_max) p.set("ml", `${v.km_min || ""}:${v.km_max || ""}`);
   if (maxVehicleEur && maxVehicleEur > 1000) p.set("p", `:${Math.round(maxVehicleEur / 1000) * 1000}`);
-  if (req.vehicle.gearbox === "automatic") p.set("tr", "AUTOMATIC_GEAR");
+  if (v.gearbox === "automatic") p.set("tr", "AUTOMATIC_GEAR");
+  else if (v.gearbox === "manual") p.set("tr", "MANUAL_GEAR");
+  if (v.drivetrain === "awd" && !(v.must_have_equipment || []).some((e) => /^allrad/i.test(e))) p.append("fe", "FOUR_WHEEL_DRIVE");
+
   if ((req.vehicle.must_have_equipment || []).some((e) => /^anhängerkupplung/i.test(e))) p.set("tct", "TRAILER_COUPLING_FIX"); // fixed, detachable or swivelling
   for (const e of req.vehicle.must_have_equipment || []) {
     const code = Object.entries(FEATURE_CODE).find(([k]) => e.toLowerCase().startsWith(k.toLowerCase()))?.[1];

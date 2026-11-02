@@ -83,6 +83,7 @@ export interface Requirements {
     gearbox?: "automatic" | "manual";
     year_min?: number;
     year_max?: number;
+    km_min?: number;
     km_max?: number;
     power_kw_min?: number;
     budget_huf_max?: number;

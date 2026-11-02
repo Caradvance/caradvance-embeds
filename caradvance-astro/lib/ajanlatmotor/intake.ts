@@ -45,6 +45,13 @@ export async function createRequest(env: Env, lead: InboundLead): Promise<{ deal
     if (dup) return { dealId: dup.deal_id, duplicate: true, isCar: true };
   }
   const full = `${lead.subject ? "Tárgy: " + lead.subject + "\n" : ""}${lead.text}`;
+  // the website's lead e-mail (/auto-rendeles/) is already in the CRM via /api/lead (message_id = web:<event_id>)
+  if (lead.source === "email") {
+    for (const ev of full.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi) || []) {
+      const dup = await env.DB.prepare("SELECT deal_id FROM am_requests WHERE message_id = ?").bind("web:" + ev.toLowerCase()).first<{ deal_id: number }>();
+      if (dup) return { dealId: dup.deal_id, duplicate: true, isCar: true };
+    }
+  }
   const car = lead.source !== "email" || isCarRequest(full);
   // non-car mail from the intake address is not turned into a deal; it is only logged
   if (!car) {
