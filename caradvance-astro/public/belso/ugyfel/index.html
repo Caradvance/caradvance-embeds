@@ -374,7 +374,7 @@ function normData(d,deal,addr){
     company:Object.assign({name:'',address:'',tax:'',reg:''},d.company||{}),
     contact_differs:!!d.contact_differs,
     contact:Object.assign({name:'',role:'',phone:'',email:''},d.contact||{}),
-    vehicles:(d.vehicles||[]).map(function(v){return Object.assign({id:'',title:'',brand:'',model:'',year:'',vin:'',plate:'',ad_id:'',config_code:'',color:'',engine:'',fuel:'',km:'',condition:'',body:'',gearbox:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[]},v);}),
+    vehicles:(d.vehicles||[]).map(function(v){return Object.assign({id:'',title:'',brand:'',model:'',year:'',vin:'',plate:'',ad_id:'',config_code:'',color:'',engine:'',fuel:'',km:'',condition:'',body:'',gearbox:'',hybrid:false,source:'manual',key:'',price:0,currency:'HUF',period:'',deposit:0,image:'',url:'',rent_start:'',rent_end:'',reminders:[],equipment:'',offer_no:'',offer_date:'',fx:0,km_keret:'',vat_mode:'',months:0},v);}),
     buyer:{kind:d.buyer&&d.buyer.kind==='ceg'?'ceg':'magan',person:Object.assign({name:'',address:'',phone:'',email:'',tax:'',id_number:'',mother_name:'',birth_place:'',birth_date:'',residence:'',bank:'',licence:'',address_card:'',vpid:''},(d.buyer&&d.buyer.person)||{}),company:Object.assign({name:'',address:'',tax:'',reg:''},(d.buyer&&d.buyer.company)||{})},
     notes:d.notes||'',
     web_pick:d.web_pick||null,
@@ -651,6 +651,10 @@ function renderVehicle(){
       +vinp('color','Szín',v.color)+vinp('engine','Motor',v.engine)+vinp('fuel','Üzemanyag',v.fuel)+vinp('km','Km',v.km)+vinp('body','Karosszéria',v.body)+vinp('gearbox','Váltó',v.gearbox)+vinp('condition','Állapot',v.condition)+(v.ad_id?vinp('ad_id','mobile.de azonosító',v.ad_id):'')+(v.config_code||S.deal.line==='Eladás'?vinp('config_code','Konfigurációs kód',v.config_code):'')
       +vinp('price','Ár / díj',v.price||'')+'<div class="fld"><label>Pénznem</label><select data-vp="currency"><option value="HUF"'+(v.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(v.currency==='EUR'?' selected':'')+'>€</option></select></div>'
       +'<div class="fld"><label>Időszak</label><select data-vp="period"><option value="">egyszeri (vételár)</option><option value="hó"'+(v.period==='hó'?' selected':'')+'>havi (bérleti díj)</option></select></div>'
+      +(v.period?'<div class="fld"><label>Ár típusa</label><select data-vp="vat_mode"><option value=""'+(!v.vat_mode?' selected':'')+'>bruttó (alap)</option><option value="de19"'+(v.vat_mode==='de19'?' selected':'')+'>bruttó, 19% német áfa</option><option value="hu27"'+(v.vat_mode==='hu27'?' selected':'')+'>bruttó, 27% magyar áfa</option><option value="net"'+(v.vat_mode==='net'?' selected':'')+'>nettó</option></select></div>':'')
+      +vinp('equipment','Felszereltség / kivitel',v.equipment,' wide')
+      +(v.period?vinp('km_keret','Km-keret',v.km_keret):'')
+      +vinp('offer_no','Ajánlat száma',v.offer_no)+'<div class="fld"><label>Ajánlat dátuma</label><input type="date" data-vp="offer_date" value="'+esc(v.offer_date||'')+'"></div>'+vinp('fx','Ajánlat szerinti árfolyam (Ft/€)',v.fx||'')
       +'</div><label class="chk" style="margin-top:14px"><input type="checkbox" data-vp="hybrid"'+(v.hybrid?' checked':'')+'> Hibrid</label>'
       +'<div class="hint" style="margin-top:8px">Az ár / díj a szerződésbe és a pénzügyhöz (bevétel) töltődik be. A szerződés és a pénzügy autónként külön kezelhető.</div>'
       +(hasRent()?rentBlock(v):'')+'</div>';
@@ -674,9 +678,9 @@ function renderVehicle(){
   if(v&&hasRent())bindRent(v);
   $('b2').querySelectorAll('[data-vp]').forEach(function(el){
     var k=el.getAttribute('data-vp');
-    var h2=function(){var val=el.type==='checkbox'?el.checked:el.value;if(k==='price')val=parseFloat(String(val).replace(/\s/g,'').replace(',','.'))||0;v[k]=val;
+    var h2=function(){var val=el.type==='checkbox'?el.checked:el.value;if(k==='price'||k==='fx')val=parseFloat(String(val).replace(/\s/g,'').replace(',','.'))||0;v[k]=val;
       if(k==='title'||k==='brand'||k==='model'){var c=$('b2').querySelector('.vchip.on b');if(c)c.textContent=(L.indexOf(v)+1)+'. '+vehName(v);renderContractVehSel();}
-      if(el.tagName==='SELECT'||el.type==='checkbox')saveData();else saveDataSoon();};
+      if(el.tagName==='SELECT'||el.type==='checkbox')saveData().then(function(){if(k==='period')renderVehicle();});else saveDataSoon();};
     el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',h2);
   });
 }
