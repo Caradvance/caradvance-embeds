@@ -119,10 +119,10 @@ var I18N={
   sigTitle:'Gespeicherte Unterschrift',sigTxt:'Diese Unterschrift wird bei der Gegenzeichnung in die Dokumente eingefügt. Sie können sie jederzeit ändern.',
   sigName:'Name des Unterzeichners (z. B. Dr. Max Mustermann, Geschäftsführer)',sigDraw:'Unterschreiben Sie mit dem Finger oder der Maus im Feld:',sigHere:'Hier unterschreiben',clear:'Löschen',sigSave:'Unterschrift speichern',sigSaved:'Gespeichert am',sigNone:'Noch keine Unterschrift gespeichert.',
   saved:'Gespeichert.',
-  mTitle:'Dokumente unterschreiben',mTxt:function(n,e){return n+' Vorgang/Vorgänge werden mit Ihrer gespeicherten Unterschrift unterschrieben. Zur Bestätigung haben wir einen 6-stelligen Code an '+e+' gesendet.';},
+  mTitle:'Dokumente unterschreiben',mTxt:function(n){return n+' Vorgang/Vorgänge werden mit Ihrer gespeicherten Unterschrift unterschrieben. Bitte bestätigen Sie die Erklärung.';},
   code:'Code aus der E-Mail',signNow:'Jetzt unterschreiben',cancel:'Abbrechen',working:'Wird unterschrieben…',
   done:function(ok,f){return ok+' Vorgang/Vorgänge unterschrieben'+(f?' · '+f+' fehlgeschlagen':'')+'. Die beidseitig unterschriebenen Dokumente wurden an Sie, den Kunden und CarAdvance gesendet.';},
-  sec:'Einfache elektronische Signatur. Anmeldung, Einmalcode, Zeitpunkt, IP-Adresse und Gerät werden im Signaturprotokoll jedes Dokuments festgehalten.',
+  sec:'Einfache elektronische Signatur. Anmeldung, Bestätigung, Zeitpunkt, IP-Adresse und Gerät werden im Signaturprotokoll jedes Dokuments festgehalten.',
   err:{bad_login:'Benutzername oder Passwort ist falsch.',locked:'Zu viele Fehlversuche — das Konto ist für 15 Minuten gesperrt.',rate:'Zu viele Anfragen — bitte warten Sie einige Minuten.',auth:'Bitte melden Sie sich erneut an.',bad_old:'Das aktuelle Passwort ist falsch.',weak:'Das neue Passwort ist zu schwach (mind. 10 Zeichen, nicht das Startpasswort).',bad_name:'Bitte geben Sie den Namen ein.',bad_signature:'Bitte unterschreiben Sie im Feld.',no_sig:'Bitte speichern Sie zuerst Ihre Unterschrift.',none:'Bitte wählen Sie mindestens einen Vorgang aus.',too_many_codes:'Zu viele Code-Anfragen — bitte in einer Stunde erneut versuchen.',mail_failed:'Der Code konnte nicht gesendet werden.',consent:'Bitte bestätigen Sie die Erklärung.',code_expired:'Der Code ist abgelaufen — bitte erneut anfordern.',too_many:'Zu viele Fehlversuche — bitte neuen Code anfordern.',wrong_code:'Falscher Code.',must_change:'Bitte ändern Sie zuerst Ihr Passwort.',server:'Unerwarteter Fehler — bitte erneut versuchen.'}},
  en:{portal:'Partner portal',login:'Sign in',user:'Username (e-mail)',pass:'Password',loginBtn:'Sign in',logout:'Sign out',
   sub:function(m){return m.company+' · '+m.country;},
@@ -140,10 +140,10 @@ var I18N={
   sigTitle:'Saved signature',sigTxt:'This signature is inserted into the documents when you countersign. You can change it at any time.',
   sigName:'Name of the signatory (e.g. Dr. Max Mustermann, Managing Director)',sigDraw:'Sign with your finger or the mouse in the box:',sigHere:'Sign here',clear:'Clear',sigSave:'Save signature',sigSaved:'Saved on',sigNone:'No signature saved yet.',
   saved:'Saved.',
-  mTitle:'Sign documents',mTxt:function(n,e){return n+' request(s) will be signed with your saved signature. To confirm, we sent a 6-digit code to '+e+'.';},
+  mTitle:'Sign documents',mTxt:function(n){return n+' request(s) will be signed with your saved signature. Please confirm the statement.';},
   code:'Code from the e-mail',signNow:'Sign now',cancel:'Cancel',working:'Signing…',
   done:function(ok,f){return ok+' request(s) signed'+(f?' · '+f+' failed':'')+'. The documents signed by both parties were sent to you, the client and CarAdvance.';},
-  sec:'Simple electronic signature. Sign-in, one-time code, time, IP address and device are recorded in the signature certificate of each document.',
+  sec:'Simple electronic signature. Sign-in, confirmation, time, IP address and device are recorded in the signature certificate of each document.',
   err:{bad_login:'Wrong username or password.',locked:'Too many failed attempts — the account is locked for 15 minutes.',rate:'Too many requests — please wait a few minutes.',auth:'Please sign in again.',bad_old:'The current password is wrong.',weak:'The new password is too weak (min. 10 characters, not the initial password).',bad_name:'Please enter the name.',bad_signature:'Please sign in the box.',no_sig:'Please save your signature first.',none:'Please select at least one request.',too_many_codes:'Too many code requests — try again in an hour.',mail_failed:'The code could not be sent.',consent:'Please confirm the statement.',code_expired:'The code has expired — please request a new one.',too_many:'Too many failed attempts — request a new code.',wrong_code:'Wrong code.',must_change:'Please change your password first.',server:'Unexpected error — please try again.'}},
  hu:{portal:'Partnerfelület',login:'Bejelentkezés',user:'Felhasználónév (e-mail)',pass:'Jelszó',loginBtn:'Belépés',logout:'Kijelentkezés',
   sub:function(m){return m.company+' · '+m.country;},
@@ -161,10 +161,10 @@ var I18N={
   sigTitle:'Mentett aláírás',sigTxt:'Ez az aláírás kerül a dokumentumokba ellenjegyzéskor. Bármikor módosítható.',
   sigName:'Az aláíró neve (pl. Dr. Max Mustermann, ügyvezető)',sigDraw:'Írjon alá ujjal vagy egérrel a keretben:',sigHere:'Ide írjon alá',clear:'Törlés',sigSave:'Aláírás mentése',sigSaved:'Mentve',sigNone:'Még nincs mentett aláírás.',
   saved:'Mentve.',
-  mTitle:'Dokumentumok aláírása',mTxt:function(n,e){return n+' kérelem kerül aláírásra a mentett aláírással. Megerősítéshez 6 jegyű kódot küldtünk ide: '+e+'.';},
+  mTitle:'Dokumentumok aláírása',mTxt:function(n){return n+' kérelem kerül aláírásra a mentett aláírással. Kérjük, fogadja el a nyilatkozatot.';},
   code:'Az e-mailben kapott kód',signNow:'Aláírás most',cancel:'Mégse',working:'Aláírás folyamatban…',
   done:function(ok,f){return ok+' kérelem aláírva'+(f?' · '+f+' sikertelen':'')+'. A mindkét fél által aláírt dokumentumokat elküldtük Önnek, az ügyfélnek és a CarAdvance-nek.';},
-  sec:'Egyszerű elektronikus aláírás. A bejelentkezés, az egyszeri kód, az időpont, az IP-cím és az eszköz minden dokumentum aláírási tanúsítványában rögzül.',
+  sec:'Egyszerű elektronikus aláírás. A bejelentkezés, a megerősítés, az időpont, az IP-cím és az eszköz minden dokumentum aláírási tanúsítványában rögzül.',
   err:{bad_login:'Hibás felhasználónév vagy jelszó.',locked:'Túl sok hibás próbálkozás — a fiók 15 percre zárolva.',rate:'Túl sok kérés — várjon néhány percet.',auth:'Jelentkezzen be újra.',bad_old:'A jelenlegi jelszó hibás.',weak:'Az új jelszó túl gyenge (min. 10 karakter, nem a kezdő jelszó).',bad_name:'Adja meg a nevet.',bad_signature:'Írjon alá a keretben.',no_sig:'Előbb mentse el az aláírását.',none:'Jelöljön ki legalább egy kérelmet.',too_many_codes:'Túl sok kódkérés — próbálja újra egy óra múlva.',mail_failed:'A kódot nem sikerült elküldeni.',consent:'Fogadja el a nyilatkozatot.',code_expired:'A kód lejárt — kérjen újat.',too_many:'Túl sok hibás próbálkozás — kérjen új kódot.',wrong_code:'Hibás kód.',must_change:'Előbb változtassa meg a jelszavát.',server:'Váratlan hiba — próbálja újra.'}}
 };
 function L(){return I18N[LANG]||I18N.de;}
@@ -310,26 +310,23 @@ function openPdf(id,i){
 function startSign(){
   var ids=Object.keys(SEL).filter(function(k){return SEL[k];}).map(Number);if(!ids.length)return;
   if(!ME.has_sig){alert(L().needSig);TAB='sig';renderMain();return;}
-  var g=$('sgo');g.disabled=true;
-  post('/code',{ids:ids}).then(function(j){g.disabled=false;modal(ids,j.email);}).catch(function(e){g.disabled=false;alert(e.message);});
+  modal(ids);
 }
-function modal(ids,email){
+function modal(ids){
   var ov=document.createElement('div');ov.className='mdl';
-  ov.innerHTML='<div class="card"><h2>'+L().mTitle+'</h2><p class="small">'+esc(L().mTxt(ids.length,email))+'</p>'
+  ov.innerHTML='<div class="card"><h2>'+L().mTitle+'</h2><p class="small">'+esc(L().mTxt(ids.length))+'</p>'
     +(ME.sig?'<img class="sigimg" src="'+esc(ME.sig)+'" alt=""><div class="small muted" style="margin-top:4px">'+esc(ME.sig_name)+'</div>':'')
-    +'<label class="f">'+L().code+'<input class="in code" id="mc" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></label>'
     +'<label class="chk"><input type="checkbox" id="mcons"> <span class="small">'+esc(STMT)+'</span></label>'
     +'<div id="merr"></div><div class="row" style="margin-top:10px"><button class="btn red" id="mok">'+L().signNow+'</button><button class="btn ghost" id="mno">'+L().cancel+'</button></div></div>';
-  document.body.appendChild(ov);$('mc').focus();
+  document.body.appendChild(ov);
   $('mno').addEventListener('click',function(){ov.remove();});
   $('mok').addEventListener('click',function(){
-    var code=($('mc').value||'').replace(/\D/g,'');if(code.length!==6)return note('merr',L().err.wrong_code);
     if(!$('mcons').checked)return note('merr',L().err.consent);
     var b=this;b.disabled=true;b.textContent=L().working;note('merr','');
-    post('/sign',{ids:ids,code:code,consent:true}).then(function(j){
+    post('/sign',{ids:ids,consent:true}).then(function(j){
       var ok=j.results.filter(function(x){return x.ok;}).length,f=j.results.length-ok;ov.remove();
       return loadList().then(function(){$('pane').insertAdjacentHTML('afterbegin','<div class="note ok">'+esc(L().done(ok,f))+'</div>');});
-    }).catch(function(e){note('merr',e.message+(e.code==='wrong_code'&&e.left!=null?' ('+e.left+')':''));b.disabled=false;b.textContent=L().signNow;});
+    }).catch(function(e){note('merr',e.message);b.disabled=false;b.textContent=L().signNow;});
   });
 }
 function renderSig(){
