@@ -137,8 +137,10 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
   // pl. "≈ 510 000 Ft/hó-tól 1367 €/hó-tól · bruttó" → az euró összeg (a bérleti díjak euróban vannak), különben a forint
   const amt = (txt: string, unit: RegExp) => { const m = txt.match(new RegExp("(\\d[\\d\\s.\u00a0\u202f]*)(?:[–-]\\s*\\d[\\d\\s.\u00a0\u202f]*)?\\s*" + unit.source, "i")); return m ? parseInt(m[1].replace(/\D/g, ""), 10) || 0 : 0; };
   const pe = amt(priceTxt, /(€|eur)/), ph = amt(priceTxt, /(ft|huf)/);
-  const price = pe || ph || nums(priceTxt)[0] || 0;
-  const cur = pe ? "EUR" : "HUF";
+  // a weboldal pontos euró-díja (bruttó, 19% német áfával) — ezzel számol a bérleti szerződés is
+  const eurGross = nums(g(d, "Havidíj (EUR, bruttó)"))[0] || 0;
+  let price = eurGross || pe || ph || nums(priceTxt)[0] || 0;
+  let cur = eurGross || pe ? "EUR" : "HUF";
   const parts = car.split(" ");
   const brand = /^(Mercedes-Benz|Land Rover|Range Rover|Alfa Romeo|Aston Martin)/i.test(car) ? car.match(/^(\S+ \S+)/)![1] : parts[0] || "";
   let img = s(g(d, "Kép"), 500);
@@ -146,14 +148,24 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
   if (img && !/^https:\/\//.test(img)) img = "";
   const months = nums(g(d, "Futamidő"))[0] || 0;
   // kívánt kezdés (pl. "2026-11-12" vagy "2026. 11. 12.") → a bérlet kezdete; a futamidőből a vége
-  const dm = g(d, "Elérhetőség", "Kezdés").match(/(20\d\d)[.\-/]\s*(\d{1,2})[.\-/]\s*(\d{1,2})/);
-  const start = dm ? `${dm[1]}-${dm[2].padStart(2, "0")}-${dm[3].padStart(2, "0")}` : "";
+  const HUM = ["január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december"];
+  const dateOf = (t: string) => {
+    let m = t.match(/(20\d\d)[.\-/]\s*(\d{1,2})[.\-/]\s*(\d{1,2})/); if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+    m = t.toLowerCase().match(/(20\d\d)\.?\s*([a-záéíóöőúüű]+)\s*(\d{1,2})/); const mi = m ? HUM.indexOf(m[2]) : -1;
+    return m && mi >= 0 ? `${m[1]}-${String(mi + 1).padStart(2, "0")}-${m[3].padStart(2, "0")}` : "";
+  };
+  const start = dateOf(g(d, "Kívánt átvétel")) || dateOf(g(d, "Elérhetőség", "Kezdés"));
   const addMonths = (iso: string, n: number) => { const [y, m, dd] = iso.split("-").map(Number); const t = new Date(Date.UTC(y, m - 1 + n, dd)); return t.toISOString().slice(0, 10); };
   // a weboldali flotta-kártya (abo-fleet.json) adatai: kulcs, fotó, modell-oldal — így az ajánlatkészítő is felismeri
   const nk = (x: string) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\bvw\b/g, "volkswagen").replace(/[^a-z0-9]+/g, " ").trim();
   let fl: any = null;
   try { fl = (await aboFleet()).find((x: any) => nk(x.title) === nk(car)) || null; } catch { fl = null; }
   if (fl && !img) img = fl.image || "";
+  // csak forintos becslés jött: a flotta „-tól” díja (nettó + 19%) euróban
+  if (cur === "HUF" && fl && fl.price > 0) { price = Math.round(fl.price * 1.19); cur = "EUR"; }
+  const fx = parseFloat(String(g(d, "Árfolyam (Ft/EUR)")).replace(",", ".")) || 0;
+  const kmKeret = s(g(d, "Km-keret"), 60);
+  const equipment = s(g(d, "Felszereltség"), 300);
   const vehicle = {
     id: "v1", source: "web", key: fl ? fl.key : "", title: car, brand, model: car.slice(brand.length).trim(), year: "", vin: "", plate: "", ad_id: "", config_code: "",
     color: s(g(d, "Szín"), 80), engine: "", fuel: s(g(d, "Üzemanyag"), 60), km: s(g(d, "Km-keret"), 60), condition: "", body: "", gearbox: "", hybrid: /hibrid|hybrid|phev/i.test(g(d, "Üzemanyag")),
@@ -169,7 +181,8 @@ export async function webLeadToCrm(env: Env, d: Form, ctx: { eventId: string; pa
   const pickNote = [g(d, "Futamidő") && "Futamidő: " + g(d, "Futamidő"), g(d, "Km-keret") && "Km-keret: " + g(d, "Km-keret"), g(d, "Szín") && "Szín: " + g(d, "Szín"),
     g(d, "Felszereltség") && "Kivitel: " + g(d, "Felszereltség"), start && "Kezdés: " + start].filter(Boolean).join(" · ");
   const webPick = car ? { key: vehicle.key || "web-" + dealId, src: "inv", title: car, brand, year: "2026", km: "0 km", fuel: vehicle.fuel, power: "", gearbox: "", color: vehicle.color,
-    image: img, url: vehicle.url, price, currency: cur, period: "hó", deposit: vehicle.deposit, note: s(pickNote, 400), months, rent_start: start, rent_end: vehicle.rent_end, at: nowIso() } : null;
+    image: img, url: vehicle.url, price, currency: cur, period: "hó", deposit: vehicle.deposit, note: s(pickNote, 400), months, rent_start: start, rent_end: vehicle.rent_end,
+    vat_mode: cur === "EUR" ? "de19" : "", km_keret: kmKeret, equipment: equipment ? [equipment] : [], fx: fx || undefined, at: nowIso() } : null;
   await saveCard(env, dealId, {
     status: car ? "Ajánlatra vár" : "Kapcsolatfelvételre vár",
     data: {
