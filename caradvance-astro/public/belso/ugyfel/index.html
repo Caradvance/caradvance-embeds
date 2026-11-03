@@ -1230,6 +1230,7 @@ function cfgFiles(files){
 function renderPicked(){
   var el=$('picked');if(!el)return;
   if(!PICK.length){el.innerHTML='<div class="hint">Válassz autót a fenti fülek egyikén (több is lehet), majd áraz be mindegyiket.</div>';return;}
+  if(S.deal.line==='Bérlés')PICK.forEach(function(p){if(p.period==='hó'&&p.delivery==null&&p.currency==='EUR')p.delivery=300;});
   el.innerHTML=PICK.map(function(p,i){
     var src=p.src||(p.manual?'manual':'inv');
     var editable=src!=='inv';
@@ -1243,7 +1244,7 @@ function renderPicked(){
       +'<div class="fld"><label>Ajánlati ár</label><input data-f="price" inputmode="numeric" value="'+esc(p.price?Math.round(p.price):'')+'"></div>'
       +'<div class="fld"><label>Ár típusa</label><select data-f="vat_mode"><option value="">—</option><option value="net"'+(p.vat_mode==='net'?' selected':'')+'>nettó</option><option value="hu27"'+(p.vat_mode==='hu27'?' selected':'')+'>bruttó, 27% magyar ÁFA</option><option value="de19"'+(p.vat_mode==='de19'?' selected':'')+'>bruttó, 19% német ÁFA</option></select></div>'
       +'<div class="fld"><label>Pénznem</label><select data-f="currency"><option value="HUF"'+(p.currency!=='EUR'?' selected':'')+'>Ft</option><option value="EUR"'+(p.currency==='EUR'?' selected':'')+'>€</option></select></div>'
-      +'<div class="fld"><label>Időszak</label><select data-f="period"><option value="">egyszeri</option><option value="hó"'+(p.period==='hó'?' selected':'')+'>/ hó</option></select></div></div>'
+      +'<div class="fld"><label>Időszak</label><select data-f="period"><option value="">egyszeri</option><option value="hó"'+(p.period==='hó'?' selected':'')+'>/ hó</option></select></div>'+(S.deal.line==='Bérlés'&&p.period==='hó'?'<div class="fld" title="Egyszeri szállítási díj — alapból 300 €, 0 = nincs. Megjelenik az ajánlatban, a PDF-ben és a szerződésben."><label>Szállítási díj ('+(p.currency==='EUR'?'€':'Ft')+')</label><input data-f="delivery" inputmode="numeric" value="'+esc(p.delivery==null?'':Math.round(p.delivery))+'"></div>':'')+'</div>'
       +(p.abo&&p.abo.cfg?aboBlock(p,i):'')
       +(p.period==='hó'&&S.deal.line==='Bérlés'?'<div class="row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="button" class="btn sm" data-rprev="1">👁 Bérleti árajánlat PDF előnézet</button><span class="hint">ez megy csatolva az ügyfélnek: a konkrét autó, a díjak és a bérleti szerződés fő pontjai</span></div>':'')
       +(src==='config'?cfgOfferBlock(p,i):'')
@@ -1253,7 +1254,7 @@ function renderPicked(){
   el.querySelectorAll('.pk').forEach(function(box){
     var i=parseInt(box.getAttribute('data-i'),10);
     box.querySelectorAll('[data-f]').forEach(function(f){
-      var set=function(){var k=f.getAttribute('data-f');PICK[i][k]=k==='price'?(parseFloat(String(f.value).replace(/\s/g,'').replace(',','.'))||0):f.value;};
+      var set=function(){var k=f.getAttribute('data-f');PICK[i][k]=k==='delivery'?Math.max(0,parseFloat(String(f.value).replace(/\s/g,'').replace(',','.'))||0):k==='price'?(parseFloat(String(f.value).replace(/\s/g,'').replace(',','.'))||0):f.value;};
       f.addEventListener('input',set);f.addEventListener('change',set);
     });
     bindCfgOffer(box,i);bindAbo(box,i);
