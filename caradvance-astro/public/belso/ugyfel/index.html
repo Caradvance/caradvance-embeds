@@ -1440,32 +1440,41 @@ function payModal(){
   var b=$('payBtn');b.disabled=true;
   api('/card/'+ID+'/payreq').then(function(D){
     b.disabled=false;
-    var rent=D.kind==='kaucio',V=D.vehicles||[],cur=V[0]||{amount:0,currency:'EUR',name:''};
+    var rent=D.kind==='kaucio',V=D.vehicles||[],cur=V[0]||{amount:0,currency:'EUR',name:''},P=D.party||{};
     var ov=document.createElement('div');ov.className='mdl';
     var f=function(k,l,v,a){return '<div class="fld"><label>'+l+'</label><input data-p="'+k+'" value="'+esc(v==null?'':v)+'"'+(a||'')+'></div>';};
-    ov.innerHTML='<div class="mdl-b"><h3>'+(rent?'Kaució díjbekérő':'Előlegbekérő')+'</h3><p class="hint">'+(rent?'Az összeg az elfogadott ajánlat kauciója':'Az összeg a teljes ár 30%-a')+' — küldés előtt bármit átírhatsz. A kedvezményezettet és a bankszámlát a rendszer megjegyzi.</p>'
+    var pf=function(k,l){return '<div class="fld"><label>'+l+'</label><input data-pp="'+k+'" value="'+esc(P[k]||'')+'"></div>';};
+    ov.innerHTML='<div class="mdl-b"><h3>'+(rent?'Kaució díjbekérő (Kaution · Óvadék)':'Előlegbekérő (Anzahlung · Előleg)')+'</h3><p class="hint">Kétnyelvű (DE / HU) fizetési felszólítás PDF-ben'+(rent?'':'')+', bankszámla-adatokkal és QR-kóddal (euróban) — e-mail mellékletként megy ki, és a Fájlok közé is mentődik. '+(rent?'Az összeg az elfogadott ajánlat kauciója':'Az összeg a teljes ár 30%-a')+' — küldés előtt bármit átírhatsz.</p>'
       +(V.length>1?'<div class="fld"><label>Autó</label><select data-p="veh">'+V.map(function(v,i){return '<option value="'+i+'">'+esc(v.name||('Autó '+(i+1)))+'</option>';}).join('')+'</select></div>':'')
       +'<div class="grid g3" style="margin-top:8px">'
       +f('amount',(rent?'Kaució':'Előleg')+' összege',cur.amount||'',' inputmode="decimal"')
       +'<div class="fld"><label>Pénznem</label><select data-p="currency"><option value="EUR"'+(cur.currency!=='HUF'?' selected':'')+'>€</option><option value="HUF"'+(cur.currency==='HUF'?' selected':'')+'>Ft</option></select></div>'
-      +(rent?'':'<div class="fld"><label>Teljes ár (30% ebből)</label><input data-p="total" value="'+esc(cur.total||'')+'" inputmode="decimal"></div>')
-      +f('car','Jármű',cur.name)+f('beneficiary','Kedvezményezett',D.beneficiary)+f('account','Bankszámlaszám (IBAN)',D.account,' placeholder="pl. DE.. / HU.."')
-      +f('reference','Közlemény',D.contract)+f('due','Fizetési határidő',D.due,' type="date"')+f('to','Címzett e-mail',D.to)
-      +'</div><div class="fld" style="margin-top:8px"><label>Megjegyzés az ügyfélnek (nem kötelező)</label><textarea data-p="note" rows="2" style="width:100%"></textarea></div>'
-      +'<div class="actions"><button class="btn red" id="payOk">Díjbekérő küldése</button><button class="btn ghost" id="payNo">Mégse</button></div></div>';
+      +(rent?f('rent','Első havi díj (bruttó, a tudnivalókhoz)',cur.rent||'',' inputmode="decimal"'):f('total','Teljes ár (ennek 30%-a)',cur.total||'',' inputmode="decimal"'))
+      +f('due','Fizetési határidő',D.due,' type="date"')+f('contract','Szerződésszám',cur.contract)+f('contract_date','Szerződés kelte',cur.contract_date,' type="date"')
+      +f('reference','Közlemény (azonosító)',cur.contract)+f('car','Jármű',cur.name)+f('vin','Alvázszám',cur.vin)
+      +f('client','Ügyfél neve',cur.client||D.name)+'<div class="fld"><label>Megszólítás (német)</label><select data-p="salutation"><option value="">Sehr geehrte Damen und Herren</option><option value="Frau">Frau …</option><option value="Herr">Herr …</option></select></div>'+f('to','Címzett e-mail',D.to)
+      +'<div class="fld wide" style="grid-column:span 2"><label>Ügyfél címe</label><input data-p="address" value="'+esc(cur.address||'')+'"></div>'+f('country','Ország',cur.country)
+      +'</div><details style="margin-top:10px"'+(P.iban?'':' open')+'><summary style="cursor:pointer;font-weight:800;font-size:13px">Kedvezményezett és bankszámla — '+esc(P.name||'')+(P.iban?' · '+esc(P.iban):' · nincs IBAN megadva')+'</summary><div class="grid g3" style="margin-top:8px">'
+      +pf('name','Kedvezményezett')+pf('address','Cím')+pf('country','Ország (DE / HU)')+pf('bank','Bank')+pf('iban','IBAN')+pf('bic','BIC / SWIFT')+pf('signer','Aláíró')+pf('signer_title','Beosztás')+pf('city','Helység')
+      +'</div><div class="hint">A rendszer üzletáganként megjegyzi.</div></details>'
+      +'<div class="fld" style="margin-top:8px"><label>Megjegyzés az e-mailbe (nem kötelező)</label><textarea data-p="note" rows="2" style="width:100%"></textarea></div>'
+      +'<div class="actions"><button class="btn red" id="payOk">Díjbekérő küldése</button><button class="btn ghost" id="payPrev">👁 PDF előnézet</button><button class="btn ghost" id="payNo">Mégse</button></div></div>';
     document.body.appendChild(ov);
     var q=function(k){return ov.querySelector('[data-p='+k+']');};
-    var vs=q('veh');if(vs)vs.addEventListener('change',function(){var v=V[+vs.value]||{};q('amount').value=v.amount||'';q('currency').value=v.currency==='HUF'?'HUF':'EUR';q('car').value=v.name||'';if(q('total'))q('total').value=v.total||'';});
+    var vs=q('veh');if(vs)vs.addEventListener('change',function(){var v=V[+vs.value]||{};q('amount').value=v.amount||'';q('currency').value=v.currency==='HUF'?'HUF':'EUR';q('car').value=v.name||'';q('vin').value=v.vin||'';q('contract').value=v.contract||'';q('reference').value=v.contract||'';q('contract_date').value=v.contract_date||'';if(q('total'))q('total').value=v.total||'';if(q('rent'))q('rent').value=v.rent||'';});
     var tt=q('total');if(tt)tt.addEventListener('input',function(){var n=parseFloat(String(tt.value).replace(/\s/g,'').replace(',','.'))||0;q('amount').value=n?Math.round(n*0.3):'';});
+    var num=function(x){return parseFloat(String(x||'').replace(/\s/g,'').replace(',','.'))||0;};
+    var body=function(){var o={};['amount','currency','total','rent','due','contract','contract_date','reference','car','vin','client','salutation','to','address','country','note'].forEach(function(k){var e=q(k);o[k]=e?e.value.trim():'';});
+      o.amount=num(o.amount);o.total=num(o.total);o.rent=num(o.rent);o.percent=30;o.party={};ov.querySelectorAll('[data-pp]').forEach(function(i){o.party[i.getAttribute('data-pp')]=i.value.trim();});return o;};
+    var check=function(o){if(!(o.amount>0)){toast('Add meg az összeget.');return false;}if(!o.due){toast('Add meg a fizetési határidőt.');return false;}if(!o.party.name||!o.party.iban){ov.querySelector('details').open=true;toast('Add meg a kedvezményezettet és az IBAN-t.');return false;}return true;};
     ov.querySelector('#payNo').addEventListener('click',function(){ov.remove();});
+    ov.querySelector('#payPrev').addEventListener('click',function(){var o=body();if(!check(o))return;o.preview=true;var w=window.open('','_blank');
+      fetch(API+'/card/'+ID+'/payreq',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){if(!r.ok)return r.json().then(function(j){throw new Error(j.error||'Az előnézet nem készült el.');});return r.blob();}).then(function(bl){var u=URL.createObjectURL(bl);if(w)w.location.href=u;else location.href=u;}).catch(function(e){if(w)w.close();toast(e.message,5000);});});
     ov.querySelector('#payOk').addEventListener('click',function(){
-      var body={};['amount','currency','car','beneficiary','account','reference','due','to','note'].forEach(function(k){var e=q(k);body[k]=e?e.value.trim():'';});
-      body.amount=parseFloat(String(body.amount).replace(/\s/g,'').replace(',','.'))||0;
-      if(!(body.amount>0))return toast('Add meg az összeget.');
-      if(!body.account)return toast('Add meg a bankszámlaszámot.');
+      var o=body();if(!check(o))return;
       var ok=ov.querySelector('#payOk');ok.disabled=true;ok.textContent='Küldés…';
-      api('/card/'+ID+'/payreq',{method:'POST',body:body}).then(function(r){ov.remove();toast((rent?'Kaució':'Előleg')+'bekérő elküldve: '+r.sentTo+(r.test?' (TESZT)':''),4500);
-        return api('/card/'+ID+'/events').then(function(j){S.events=j.events;renderLog();renderPay();ovSoon();});
+      api('/card/'+ID+'/payreq',{method:'POST',body:o}).then(function(r){ov.remove();toast((rent?'Kaució':'Előleg')+'bekérő elküldve: '+r.sentTo+(r.test?' (TESZT)':''),4500);
+        return api('/card/'+ID).then(function(j){S.events=j.events;if(j.files)S.files=j.files;renderLog();renderPay();if(typeof renderFiles==='function')renderFiles();ovSoon();});
       }).catch(function(e){toast(e.message,6000);ok.disabled=false;ok.textContent='Díjbekérő küldése';});
     });
   }).catch(function(e){b.disabled=false;toast(e.message,5000);});
