@@ -52,6 +52,14 @@ export function CONV(s, F) {
   function fromHuf(h) { return fromEur(h / F.HUF); }
   // 0) árfolyam-megjegyzés "(1 € = 368 Ft)"
   s = s.replace(/\s?\(\s?1\s?€\s?[=≈]\s?\d[\d\s., ]*\s?(?:Ft|HUF)\s?\)/g, F.S === '€' ? '' : ' (1 € = ' + String(F.T).replace('.', ',') + ' ' + F.S + ')');
+  // 0b) tartomány + zárójeles €-tartomány (kaució: "910 000–1 092 000 Ft (2500–3000 €)") → a €-tartomány az irányadó
+  var DASH = SP + '[–-]' + SP;
+  s = s.replace(new RegExp(NUM + DASH + NUM + SP + '(?:Ft|HUF)\\b(\\s*)\\(\\s*' + NUM + DASH + NUM + SP + '€\\s*\\)', 'g'), function (m, a, b, sp, c, d) {
+    var eu = g(n(c)) + '–' + g(n(d)) + NB + '€';
+    return F.S === '€' ? eu : fromEur(n(c)).replace(NB + F.S, '') + '–' + fromEur(n(d)) + sp + '(' + eu + ')';
+  });
+  // 0c) puszta Ft-tartomány: mindkét vége átváltva
+  s = s.replace(new RegExp(NUM + DASH + NUM + SP + '(?:Ft|HUF)\\b', 'g'), function (m, a, b) { return fromHuf(n(a)).replace(NB + F.S, '') + '–' + fromHuf(n(b)); });
   // 1) Ft + zárójeles / pontos €-ár → a €-ár az irányadó
   s = s.replace(new RegExp(NUM + SP + '(?:Ft|HUF)\\b(\\s*)\\(\\s*' + NUM + SP + '€\\s*\\)', 'g'), function (m, a, sp, b) {
     return F.S === '€' ? g(n(b)) + NB + '€' : fromEur(n(b)) + sp + '(' + g(n(b)) + NB + '€)';

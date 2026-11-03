@@ -20,6 +20,7 @@ import { parse, serialize, visit, finishLd, maskNums, unmaskNums } from './i18n-
 import { maskModels, unmaskModels, neutralL, maskModels2, normNums, phraseFix } from './skcz-langs-mask.mjs';
 import { SKL } from './skcz-langs-data.mjs';
 import { plCalcPage, CALC_PAGES } from './pl-calc.mjs';
+import { plRt } from './pl-rt-fix.mjs';
 
 const PL = JSON.parse(fs.readFileSync('pl-site-config.json', 'utf8'));
 const DIST = 'dist';
@@ -341,6 +342,7 @@ function run() {
       b = b.replace('var LG="sk"', 'var LG="pl"').replace(/var GN=\d+/, 'var GN=' + Object.keys(G).length);
       const s2 = part(b, 'var SL=', 'var M='); b = b.slice(0, s2[0]) + sl + b.slice(s2[1]);
       b = fixCur(b).replace(/^\/\* CarAdvance i18n runtime \([^)]*\) \*\//, '/* CarAdvance i18n runtime (caradvance.pl, pl) */');
+      b = plRt(b, 'pl');
       fs.writeFileSync(path.join(DIST, 'i18n', 'rt-pl.js'), b); rtn++;
     }
     for (const l of ['en', 'de']) {
@@ -350,6 +352,7 @@ function run() {
       const mR = part(b, 'var M=', ';var G=');
       if (mR) { try { const M = JSON.parse(b.slice(mR[0] + 6, mR[1])); for (const k of Object.keys(M)) M[k] = localize(M[k], l); b = b.slice(0, mR[0]) + 'var M=' + JSON.stringify(M) + b.slice(mR[1]); } catch (e) {} }
       b = fixCur(b).replace(/^\/\* CarAdvance i18n runtime \([^)]*\) \*\//, `/* CarAdvance i18n runtime (caradvance.pl, ${l}) */`);
+      b = plRt(b, l);
       fs.writeFileSync(path.join(DIST, 'i18n', `rt-pl-${l}.js`), b); rtn++;
     }
   }
