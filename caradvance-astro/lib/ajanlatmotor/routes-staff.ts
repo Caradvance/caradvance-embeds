@@ -160,6 +160,8 @@ staff.post("/igeny/:id/kereses", async (c) => {
   v.body_types = many("body").filter((x) => ["estate", "suv", "sedan", "hatchback", "coupe", "convertible", "van", "pickup"].includes(x));
   const gb = one("gearbox"); v.gearbox = gb === "automatic" || gb === "manual" ? gb : undefined;
   v.search_price_max_eur = num("price_max");
+  // a kézzel szerkesztett üzemanyag / karosszéria felülírja a weboldali űrlap mobile.de-szűrőit (a többi szűrő marad)
+  if (v.mobile_extra) { const ex = new URLSearchParams(v.mobile_extra); ex.delete("c"); ex.delete("ft"); ex.delete("tr"); v.mobile_extra = ex.toString() || undefined; }
   const eq = many("equip");
   v.must_have_equipment = [...eq, ...(v.must_have_equipment || []).filter((e) => !eq.includes(e) && !Object.keys(FEATURE_CODE).some((k) => e.toLowerCase().startsWith(k.toLowerCase())) && !/^anhängerkupplung/i.test(e))];
   if ((v.makes.length || v.body_types.length) && (v.budget_huf_max || v.budget_eur_max || v.search_price_max_eur)) req.missing_critical_fields = [];

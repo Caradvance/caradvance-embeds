@@ -97,6 +97,8 @@ export interface Requirements {
     colors_excluded: string[];
     drivetrain?: "awd" | "rwd" | "fwd";
     vat_deductible_needed?: boolean;
+    /** the customer's exact mobile.de filters from the website form (query string): colours, upholstery, features, doors, owners … — added to the search as-is */
+    mobile_extra?: string;
   };
   urgency?: string;
   notes?: string;

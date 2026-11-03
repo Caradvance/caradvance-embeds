@@ -67,6 +67,37 @@ export const FEATURE_CODE: Record<string, string> = {
   "Allradantrieb": "FOUR_WHEEL_DRIVE",
 };
 
+/** keys the structured request owns (staff can edit them) — the customer's original values are not re-added */
+const MOBILE_OWNED = new Set(["ms", "q", "fr", "ml", "p", "tr", "dam", "s", "vc", "isSearchRequest", "sb", "od", "ref", "pageNumber"]);
+const MOBILE_MULTI = new Set(["c", "ft", "fe", "ecol", "icol", "it"]);
+/** The website form's exact mobile.de filters (colours, upholstery, features, doors, seats, owners, emission class …) on top of the structured search. */
+export function applyMobileExtra(p: URLSearchParams, extra?: string) {
+  if (!extra) return;
+  const ex = new URLSearchParams(extra);
+  for (const [k, val] of ex) {
+    if (!val) continue;
+    if (k === "ms") { // a make our ID list does not know, or the same make / model with the customer's model description
+      if (!p.has("ms")) { p.delete("q"); p.set("ms", val); }
+      else { const b = String(p.get("ms")).split(";"), e = val.split(";"); if (b[0] === e[0] && (!b[1] || b[1] === e[1]) && e[3]) p.set("ms", val); }
+      continue;
+    }
+    if (k === "tr") { if (!p.has("tr")) p.set("tr", val); continue; } // e.g. semi-automatic
+    if (MOBILE_OWNED.has(k)) continue;
+    if (MOBILE_MULTI.has(k)) { if (!p.getAll(k).includes(val)) p.append(k, val); }
+    else if (!p.has(k)) p.set(k, val);
+  }
+}
+/** Only the mobile.de filter part of a search URL (for Requirements.vehicle.mobile_extra). */
+export function mobileExtraFrom(url?: string): string | undefined {
+  try {
+    const u = new URL(String(url || ""));
+    if (!/(^|\.)mobile\.de$/i.test(u.hostname)) return undefined;
+    const out = new URLSearchParams();
+    for (const [k, v] of u.searchParams) if (v && !["p", "s", "vc", "isSearchRequest", "sb", "od", "ref", "pageNumber", "dam"].includes(k)) out.append(k, v.slice(0, 80));
+    const s = out.toString(); return s ? s.slice(0, 1500) : undefined;
+  } catch { return undefined; }
+}
+
 /**
  * Prefilled mobile.de search for a request (button "mobile.de keresés" and the extension helper).
  * Format checked against a live search 2026-10: ms=<makeId>;;;<model>, c=EstateCar, ft, fr, ml, p, fe, dam=false.
@@ -88,13 +119,14 @@ export function buildSearchUrl(req: Requirements, maxVehicleEur?: number): strin
   if (maxVehicleEur && maxVehicleEur > 1000) p.set("p", `:${Math.round(maxVehicleEur / 1000) * 1000}`);
   if (v.gearbox === "automatic") p.set("tr", "AUTOMATIC_GEAR");
   else if (v.gearbox === "manual") p.set("tr", "MANUAL_GEAR");
-  if (v.drivetrain === "awd" && !(v.must_have_equipment || []).some((e) => /^allrad/i.test(e))) p.append("fe", "FOUR_WHEEL_DRIVE");
+  if (v.drivetrain === "awd" && !/(^|&)dt=/.test(v.mobile_extra || "") && !(v.must_have_equipment || []).some((e) => /^allrad/i.test(e))) p.append("fe", "FOUR_WHEEL_DRIVE");
 
   if ((req.vehicle.must_have_equipment || []).some((e) => /^anhängerkupplung/i.test(e))) p.set("tct", "TRAILER_COUPLING_FIX"); // fixed, detachable or swivelling
   for (const e of req.vehicle.must_have_equipment || []) {
     const code = Object.entries(FEATURE_CODE).find(([k]) => e.toLowerCase().startsWith(k.toLowerCase()))?.[1];
     if (code) p.append("fe", code);
   }
+  applyMobileExtra(p, v.mobile_extra);
   return `https://suchen.mobile.de/fahrzeuge/search.html?${p.toString()}`;
 }
 

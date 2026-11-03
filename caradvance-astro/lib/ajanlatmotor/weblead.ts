@@ -7,6 +7,7 @@
  */
 import type { Env, Requirements, Fuel } from "./types";
 import { heuristicExtract } from "./extract";
+import { mobileExtraFrom, FEATURE_CODE } from "./sources";
 import { processRequest } from "./engine";
 import { ensureAm, logEvent, nowIso } from "./am";
 import { ensureCrm, saveCard, addEvent, aboFleet, putFile, DOC_MAX } from "../crm.js";
@@ -32,8 +33,9 @@ function range(v: string): [number | undefined, number | undefined] {
   return [a || undefined, b || undefined];
 }
 
-const FUEL: Record<string, Fuel> = { benzin: "petrol", "dízel": "diesel", dizel: "diesel", hibrid: "hybrid", "plug-in hibrid": "phev", elektromos: "electric" };
-const BODY: Record<string, string> = { "ferdehátú": "hatchback", sedan: "sedan", limuzin: "sedan", kombi: "estate", "coupé": "coupe", coupe: "coupe", "kabrió": "convertible", suv: "suv", "terepjáró": "suv", "egyterű": "van", pickup: "pickup" };
+const FUEL: Record<string, Fuel> = { benzin: "petrol", "dízel": "diesel", dizel: "diesel", hibrid: "hybrid", "hibrid (benzin)": "hybrid", "plug-in hibrid": "phev", elektromos: "electric" };
+const BODY: Record<string, string> = { "ferdehátú": "hatchback", sedan: "sedan", limuzin: "sedan", "limuzin / sedan": "sedan", kombi: "estate", "coupé": "coupe", coupe: "coupe", "sportautó / coupé": "coupe", "kabrió": "convertible", "kabrió / roadster": "convertible", suv: "suv", "terepjáró": "suv", "terepjáró / suv / pickup": "suv", "egyterű": "van", "egyterű / kisbusz": "van", pickup: "pickup" };
+const list = (v: string) => v.split(/\s*,\s*/).map((x) => x.trim().toLowerCase()).filter(Boolean);
 
 export function formRequirements(d: Form): Requirements {
   const make = g(d, "Márka"), model = g(d, "Modell"), code = g(d, "Típusjel");
@@ -50,7 +52,7 @@ export function formRequirements(d: Form): Requirements {
   const vat = g(d, "Vásárlás módja (ÁFA)");
   const ext = g(d, "Külső szín"), int = g(d, "Belső szín");
   const missing: string[] = [];
-  if (!any(make) && !any(body)) missing.push("márka/modell vagy karosszéria");
+  if (!any(make) && !list(body).some((b) => !/^mindegy/.test(b))) missing.push("márka/modell vagy karosszéria");
   if (!bn) missing.push("keret");
   const summary = [make, any(model) && !/^egyéb/i.test(model) ? model : "", code, yMin || yMax ? `${yMin || "?"}–${yMax || "?"}` : "", kMax ? `max. ${kMax.toLocaleString("hu-HU")} km` : "", any(fuel) ? fuel : "", any(gear) ? gear : "", budget ? "keret: " + budget : ""].filter(Boolean).join(", ");
   return {
@@ -58,15 +60,16 @@ export function formRequirements(d: Form): Requirements {
     vehicle: {
       makes: any(make) ? [make] : [],
       models: any(model) && !/^egyéb/i.test(model) ? [model] : code ? [code] : [],
-      body_types: BODY[body] ? [BODY[body]] : [],
-      fuel: FUEL[fuel] ? [FUEL[fuel]] : [],
-      gearbox: /automat/.test(gear) ? "automatic" : /manu|kézi/.test(gear) ? "manual" : undefined,
+      body_types: [...new Set(list(body).map((b) => BODY[b]).filter(Boolean))],
+      fuel: [...new Set(list(fuel).map((f) => FUEL[f]).filter(Boolean))] as Fuel[],
+      gearbox: /^automat/.test(gear) ? "automatic" : /manu|kézi/.test(gear) ? "manual" : undefined,
       year_min: yMin, year_max: yMax, km_min: kMin, km_max: kMax,
-      power_kw_min: h.vehicle.power_kw_min,
+      power_kw_min: (() => { const m = g(d, "Teljesítmény").match(/(\d+)\s*(?:LE|PS|hp)?\s*[–-]/i) || g(d, "Teljesítmény").match(/^(\d+)/); return m ? Math.round(parseInt(m[1], 10) * 0.7355) : h.vehicle.power_kw_min; })(),
       budget_huf_max: bn && !eur ? bn : undefined, budget_eur_max: bn && eur ? bn : undefined, budget_is_total_delivered: true,
-      must_have_equipment: h.vehicle.must_have_equipment, nice_to_have_equipment: h.vehicle.nice_to_have_equipment,
+      must_have_equipment: [...new Set([...(h.vehicle.must_have_equipment || []), ...new URLSearchParams(mobileExtraFrom(g(d, "mobile.de keresés")) || "").getAll("fe").map((c) => Object.keys(FEATURE_CODE).find((k) => FEATURE_CODE[k] === c)).filter(Boolean) as string[]])], nice_to_have_equipment: h.vehicle.nice_to_have_equipment,
       colors_preferred: [ext].filter(any), colors_excluded: [],
-      drivetrain: h.vehicle.drivetrain,
+      drivetrain: /össz/i.test(g(d, "Hajtás")) ? "awd" : /hátsó/i.test(g(d, "Hajtás")) ? "rwd" : /első/i.test(g(d, "Hajtás")) ? "fwd" : h.vehicle.drivetrain,
+      mobile_extra: mobileExtraFrom(g(d, "mobile.de keresés")),
       vat_deductible_needed: /cég|nettó/i.test(vat) || !!company || undefined,
     } as Requirements["vehicle"],
     urgency: [g(d, "Mikorra kell"), g(d, "Meddig keressünk")].filter(Boolean).join(" · ") || undefined,
