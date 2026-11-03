@@ -58,26 +58,23 @@ export const MINI: Record<string, RentalContent> = {
   },
 
 
-  // John Cooper Works — külön bérlési kártya és oldal (Marc, 2026-11-03): a Choice 'JCW' kivitelei a choice-sync.js-ben saját modellként
+  // John Cooper Works — külön bérlési kártya és oldal (Marc, 2026-11-03). A Choice 'JCW' kivitelei a choice-sync.js-ben saját modellként jelennek meg.
+  // A szövegek szándékosan a MINI Cooper / Cooper Cabrio már lefordított mondatai (minden nyelven és piacon fordítva jelennek meg); a fotók a JCW sajtófotói.
   'MINI John Cooper Works': {
-    mainImg: P('mini-jcw', 'main'), mainAlt: 'MINI John Cooper Works bérlés — a legsportosabb MINI tartós bérletben',
+    mainImg: P('mini-jcw', 'main'), mainAlt: 'MINI John Cooper Works',
     body: 'Kisautó',
-    overviewH2: 'MINI John Cooper Works tartós bérlet — a legsportosabb MINI havidíjjal',
-    guideIntro: 'A <strong>MINI John Cooper Works</strong> a legsportosabb MINI: 231 LE-s kétliteres turbómotor, sportfutómű, erősebb fékek és egyedi JCW dizájn. <strong>Tartós bérletben</strong> önerő és értékvesztés nélkül vezetheted — egyetlen havi díjat fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
     guideBlocks: [
-      { h3: 'Miért a John Cooper Works?', html: 'A <strong>John Cooper Works (JCW)</strong> 231 lóerővel, sportfutóművel, erősebb fékekkel és egyedi JCW dizájnnal a legsportosabb MINI: 0–100 km/h 6,1 másodperc alatt.' },
-      { h3: 'Kinek ajánljuk a MINI John Cooper Works bérlését?', html: 'Azoknak, akik a MINI gokartszerű vezetési élményét a lehető legsportosabban szeretnék: közvetlen kormányzás, jellegzetes hang és JCW sportülések — a városban kompakt, kanyargós úton igazi élmény.' },
+      { h3: 'MINI Cooper S vagy John Cooper Works?', html: 'A <strong>Cooper S</strong> 204 lóerős, kétliteres turbómotorja a mindennapokban is fürge és takarékos — ez a legnépszerűbb MINI. A <strong>John Cooper Works (JCW)</strong> 231 lóerővel, sportfutóművel, erősebb fékekkel és egyedi JCW dizájnnal a legsportosabb MINI: 0–100 km/h 6,1 másodperc alatt.' },
       { h3: 'MINI Cooper méretek és csomagtér', html: 'A háromajtós MINI Cooper hossza 3876 mm, szélessége 1744 mm, magassága 1432 mm, tengelytávja 2495 mm. A csomagtér 210 literes, a hátsó ülések döntésével 725 literre bővíthető.' },
     ],
-    design: { h3: 'JCW sportdizájn', text: 'Nagyobb légbeömlők, JCW lökhárítók, hátsó spoiler, piros részletek és 18"-os JCW keréktárcsák.', bullets: ['JCW aerodinamikai csomag', 'JCW sportfékek', '18" JCW keréktárcsák'], img: P('mini-jcw', 'design'), alt: 'MINI John Cooper Works JCW sportdizájn' },
-    interior: { h3: 'JCW sportutastér', text: 'JCW sportülések, JCW kormány és kerek OLED kijelző JCW nézetekkel.', bullets: ['JCW sportülések', 'Go-Kart mód', 'Harman Kardon hangrendszer (opció)'], img: P('mini-jcw', 'interior'), alt: 'MINI John Cooper Works vezetőtér, JCW sportülések' },
+    design: { h3: 'Ikonikus forma, letisztult részletek', text: 'Az új MINI Cooper megtartotta a klasszikus arányokat — kerek fényszórók, rövid túlnyúlások, lebegő tető —, de letisztultabb, modernebb lett: kevesebb krómdísz, választható LED fénygrafikák és a háromszögletű hátsó lámpák.', bullets: ['Kerek LED fényszórók választható fénymintával', 'Kontrasztszínű tető és tükörház', '17–18" könnyűfém keréktárcsák (felszereltségtől függően)'], img: P('mini-jcw', 'design'), alt: 'MINI John Cooper Works' },
+    interior: { h3: 'Kerek OLED kijelző, textil műszerfal', text: 'A műszerfal közepén a 24 cm-es kerek OLED érintőképernyő minden funkciót egy helyen kezel, alatta a klasszikus MINI kapcsolósor az indítóval és a menetkapcsolóval. A műszerfalat újrahasznosított textil borítja, a MINI Experience Modes pedig a fényeket, hangokat és a kijelző megjelenését is megváltoztatja.', bullets: ['24 cm-es kerek OLED kijelző, MINI Operating System 9', 'MINI Experience Modes', 'Head-up kijelző, vezeték nélküli okostelefon-integráció (felszereltségtől függően)'], img: P('mini-jcw', 'interior'), alt: 'MINI John Cooper Works' },
     boot: '210–725 liter',
     specs: {
       'JCW': { label: 'John Cooper Works', fuel: 'Benzin', power: '231 LE (170 kW)', torque: '380 Nm', drive: 'Elsőkerék / 7 fok. duplakuplungos', accel: '6,1 mp', vmax: '250 km/h', boot: '210–725 liter', rec: 'A legsportosabb MINI', note: 'sportfutómű, JCW fékek és dizájn', img: P('mini-jcw', 'g1') },
     },
-    gallery: G('mini-jcw', 'MINI John Cooper Works', [['g1', 'menet közben'], ['g2', 'JCW keréktárcsa'], ['g3', 'vezetőtér']]),
+    gallery: ['g1', 'g2', 'g3'].map((k) => ({ img: P('mini-jcw', k), alt: 'MINI John Cooper Works' })),
     faqExtra: [
-      { q: 'Mennyi a MINI John Cooper Works teljesítménye?', a: 'A MINI John Cooper Works kétliteres turbómotorja 231 lóerős (170 kW) és 380 Nm nyomatékú, 0–100 km/h 6,1 mp, végsebessége 250 km/h.' },
       { q: 'Mekkora a MINI Cooper csomagtartója?', a: 'A háromajtós MINI Cooper csomagtere 210 literes, a hátsó ülések döntésével 725 literre bővíthető.' },
     ],
     egyediSlug: 'mini-john-cooper-works',
@@ -85,25 +82,23 @@ export const MINI: Record<string, RentalContent> = {
   },
 
   'MINI John Cooper Works Cabrio': {
-    mainImg: P('mini-jcw-cabrio', 'main'), mainAlt: 'MINI John Cooper Works Cabrio bérlés — a legsportosabb nyitott MINI tartós bérletben',
+    mainImg: P('mini-jcw-cabrio', 'main'), mainAlt: 'MINI John Cooper Works Cabrio',
     body: 'Kabrió',
-    overviewH2: 'MINI John Cooper Works Cabrio tartós bérlet — a legsportosabb nyitott MINI havidíjjal',
-    guideIntro: 'A <strong>MINI John Cooper Works Cabrio</strong> a legsportosabb nyitott MINI: 231 LE, sportfutómű és elektromos vászontető. <strong>Cabrio bérlés</strong> tartós bérletben: nem kell önerőt letenned, nem kell a téli tárolással és a továbbeladással foglalkoznod — egyetlen havi díjat fizetsz, a szerviz, az adó és a gumik benne vannak.',
     guideBlocks: [
-      { h3: 'Miért a John Cooper Works Cabrio?', html: 'A <strong>John Cooper Works Cabrio</strong> 231 lóerővel és sportfutóművel a legdinamikusabb nyitott MINI: 0–100 km/h 6,4 másodperc alatt, JCW dizájnnal és négy üléssel.' },
+      { h3: 'Cooper C, Cooper S vagy JCW Cabrio?', html: 'A <strong>Cooper C Cabrio</strong> 163 lóerős háromhengeres turbómotorja takarékos és bőven elég a nyugodt, nyitott tetős cirkáláshoz. A <strong>Cooper S Cabrio</strong> 204 lóerejével már kifejezetten sportos, a <strong>John Cooper Works Cabrio</strong> pedig 231 lóerővel és sportfutóművel a legdinamikusabb nyitott MINI.' },
       { h3: 'Hogyan működik a MINI Cabrio teteje?', html: 'Az elektromos vászontető 18 másodperc alatt nyílik vagy zárul, akár 30 km/h sebességig menet közben is. Részlegesen is nyitható, napfénytetőként — így esősebb napokon is élvezheted a friss levegőt.' },
       { h3: 'MINI Cooper Cabrio méretek és csomagtér', html: 'Hossz 3879 mm, szélesség 1744 mm, tengelytáv 2495 mm. A csomagtér nyitott tetővel 160, zárt tetővel 215 liter, a hátsó ülések dönthetők.' },
     ],
-    design: { h3: 'Sportos nyitott MINI', text: 'JCW lökhárítók, piros részletek, vászontető és 18"-os JCW keréktárcsák.', bullets: ['JCW aerodinamikai csomag', 'Elektromos vászontető', 'JCW sportfékek'], img: P('mini-jcw-cabrio', 'design'), alt: 'MINI John Cooper Works Cabrio nyitott tetővel' },
-    interior: { h3: 'JCW utastér nyitott tetővel', text: 'JCW sportülések, JCW kormány és kerek OLED kijelző.', bullets: ['JCW sportülések', 'Ülésfűtés (opció)', 'MINI Experience Modes'], img: P('mini-jcw-cabrio', 'interior'), alt: 'MINI John Cooper Works Cabrio utastér' },
+    design: { h3: 'Négy ülés, nyitott ég', text: 'A Cabrio megőrzi a MINI klasszikus arányait, a vászontető pedig zárt állapotban is elegáns, tiszta tetővonalat ad. Kerek LED fényszórók, háromszögletű hátsó lámpák és választható tetőszínek teszik egyedivé.', bullets: ['Elektromos vászontető, 18 mp alatt nyílik', 'Napfénytető-funkció, menet közben 30 km/h-ig', 'Borulásvédelmi rendszer, négy ülés'], img: P('mini-jcw-cabrio', 'design'), alt: 'MINI John Cooper Works Cabrio' },
+    interior: { h3: 'Prémium utastér nyitott tetővel', text: 'A kerek OLED kijelző, a textilborítású műszerfal és a klasszikus kapcsolósor a Cabrióban is megvan; a kabrióhoz tervezett klíma- és hangrendszer nyitott tetővel is kellemes utazást biztosít.', bullets: ['24 cm-es kerek OLED kijelző', 'Ülésfűtés, kormányfűtés (felszereltségtől függően)', 'MINI Experience Modes'], img: P('mini-jcw-cabrio', 'interior'), alt: 'MINI John Cooper Works Cabrio' },
     boot: '160–215 liter',
     specs: {
       'JCW': { label: 'John Cooper Works Cabrio', fuel: 'Benzin', power: '231 LE (170 kW)', torque: '380 Nm', drive: 'Elsőkerék / 7 fok. duplakuplungos', accel: '6,4 mp', vmax: '250 km/h', rec: 'A legsportosabb nyitott MINI', note: 'sportfutómű, JCW dizájn', img: P('mini-jcw-cabrio', 'g1') },
     },
-    gallery: G('mini-jcw-cabrio', 'MINI John Cooper Works Cabrio', [['g1', 'menet közben'], ['g2', 'JCW keréktárcsa'], ['g3', 'vezetőtér']]),
+    gallery: ['g1', 'g2', 'g3'].map((k) => ({ img: P('mini-jcw-cabrio', k), alt: 'MINI John Cooper Works Cabrio' })),
     faqExtra: [
-      { q: 'Mennyi a MINI John Cooper Works Cabrio teljesítménye?', a: 'A MINI John Cooper Works Cabrio kétliteres turbómotorja 231 lóerős (170 kW) és 380 Nm nyomatékú, 0–100 km/h 6,4 mp, végsebessége 250 km/h.' },
       { q: 'Menet közben is nyitható a MINI Cabrio teteje?', a: 'Igen, az elektromos vászontető 30 km/h sebességig menet közben is nyitható és zárható, a művelet kb. 18 másodperc.' },
+      { q: 'Érdemes kabriót tartós bérletben használni?', a: 'Igen: a tartós bérlet havidíjában benne van a szerviz, az adó és a téli-nyári gumi, így egész évben gond nélkül használhatod — a vászontető zárt állapotban télen is jól szigetel.' },
     ],
     egyediSlug: 'mini-john-cooper-works-cabrio',
     schema: { doors: 2, drive: 'FWD' },
