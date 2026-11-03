@@ -7,6 +7,7 @@ import {
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, priceVatLabel, VAT_MODES, specLine, esc, SITE,
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
+  , IMPORT_CX, importAuto, COUNTRY_HU
 } from '../../../lib/crm.js';
 import { jpegInfo, renderOfferPdf, renderRentOfferPdf, groupRentEquipment } from '../../../lib/docpdf.js';
 
@@ -126,6 +127,7 @@ const COMPANY_KEYS = ['name', 'address', 'tax', 'reg'];
 const CONTACT_KEYS = ['name', 'phone', 'email', 'role'];
 const VEHICLE_KEYS = ['brand', 'model', 'year', 'vin', 'plate', 'color', 'engine', 'fuel', 'km', 'ad_id', 'config_code', 'condition', 'body', 'gearbox'];
 function pick(src, keys, max) { const o = {}; src = src || {}; for (const k of keys) o[k] = clean(src[k], max || 200); return o; }
+function cxInput(o) { const out = {}; if (o && typeof o === 'object') for (const k of IMPORT_CX) { const x = clean(o[k], 300); if (x) out[k] = x; } return out; }
 function normVehicles(b) {
   const list = Array.isArray(b.vehicles) ? b.vehicles : vehiclesOf(b);
   const seen = new Set();
@@ -142,6 +144,8 @@ function normVehicles(b) {
       // az elfogadott ajánlatból: felszereltség / kivitel, ajánlat száma, dátuma, árfolyam, ÁFA-mód, km-keret, futamidő
       equipment: clean(v && v.equipment, 600), offer_no: clean(v && v.offer_no, 60), offer_date: isoDate(v && v.offer_date), fx: Math.max(0, Number(v && v.fx) || 0),
       vat_mode: VAT_MODES[v && v.vat_mode] ? v.vat_mode : '', km_keret: clean(v && v.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(v && v.months, 10) || 0)),
+      // Import-szerződések autónkénti adatai (foglaló, díjak, átvétel helye …) — lásd IMPORT_CX
+      cx: cxInput(v && v.cx),
       reminders: (Array.isArray(v && v.reminders) ? v.reminders : []).slice(0, 20).map((r, j) => ({
         id: /^[a-z0-9_-]{1,20}$/i.test(r && r.id || '') ? r.id : 'r' + (j + 1),
         date: isoDate(r && r.date), days: Number.isInteger(r && r.days) && r.days >= 0 && r.days <= 730 ? r.days : null,
@@ -778,7 +782,34 @@ const OPTIONAL_VARS = new Set(['auto_rendszam', 'fizetesi_munkanap', 'egyeb_okma
 async function docVarsEnv(env, ...a) {
   const v = docVars(...a);
   if (!String(v.bh_bankszamla || '').trim()) v.bh_bankszamla = await getSetting(env, 'bh_bankszamla', '');
+  const [deal, , vehicle] = a;
+  if (deal && deal.line === 'Import' || vehicle && vehicle.cx && Object.keys(vehicle.cx).length) await importVars(env, deal, vehicle, v);
   return v;
+}
+/** Import: az autó „Szerződés adatai” (vehicle.cx) + az előszerződés száma / kelte a már elkészült előszerződésből + számolt mezők. */
+async function importVars(env, deal, vehicle, v) {
+  const cx = (vehicle && vehicle.cx) || {};
+  for (const k of IMPORT_CX) if (String(cx[k] || '').trim()) v[k] = cx[k];
+  if (!String(v.eloszerzodes_szam || '').trim() && deal) {
+    const r = await env.DB.prepare(`SELECT vars, created_at FROM crm_docs WHERE deal_id = ? AND (vehicle_id = ? OR vehicle_id = '') AND (name LIKE '%lőszerződés%' OR name LIKE '%Vorvertrag%') ORDER BY id DESC LIMIT 1`)
+      .bind(deal.id, vehicle ? vehicle.id : '').first();
+    if (r) { const pv = parseJ(r.vars, {}); if (pv.szerzodes_szam) v.eloszerzodes_szam = pv.szerzodes_szam; if (!String(v.eloszerzodes_datum || '').trim()) v.eloszerzodes_datum = pv.keltezes_datum || String(r.created_at || '').slice(0, 10).replace(/-/g, '. ') + '.'; }
+  }
+  importAuto(v, vehicle);
+  return v;
+}
+/** Az autó Import-szerződés adatai a felülethez: a jelenlegi (számolt vagy mentett) értékek. */
+async function handleCxGet(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const b = await request.json().catch(() => ({}));
+  const card = await getCard(env, id); const vehicles = vehiclesOf(card.data);
+  const vehicle = vehicles.find((x) => x.id === b.vehicle_id) || vehicles[0] || null;
+  const tpls = ((await env.DB.prepare(`SELECT body FROM crm_templates WHERE active = 1`).all()).results || []).filter((t) => true);
+  const v = await docVarsEnv(env, deal, card, vehicle, { party: 'client' }, {}, 0);
+  deriveVars(v);
+  const used = new Set(); for (const t of tpls) for (const k of usedKeys(t.body || '')) used.add(k);
+  const saved = (vehicle && vehicle.cx) || {};
+  return json({ vehicle_id: vehicle ? vehicle.id : '', fields: IMPORT_CX.map((k) => ({ key: k, label: VAR_LABELS[k] || k, value: String(v[k] == null ? '' : v[k]), saved: !!String(saved[k] || '').trim(), used: used.has(k) })) });
 }
 /** Előzetes ellenőrzésnél a számított mezőt nem kérjük, ha a forrása is hiányzik (abból készül). */
 function checkMissing(text, vars) {
@@ -863,6 +894,15 @@ async function handleDocCreate(request, env, user, id) {
   const vars = await docVarsEnv(env, deal, card, vehicle, tpl, persons, 0);
   const extra = varsInput(b.extra || {});
   for (const [k, x] of Object.entries(extra)) if (!String(vars[k] == null ? '' : vars[k]).trim()) vars[k] = x;
+  if (deal.line === 'Import') importAuto(vars, vehicle); // a most megadott adatokból számolható mezők (pl. % → foglaló)
+  // Import: a hiányzó adatok ablakában megadott szerződés-adatok az autóhoz is mentődnek (a következő dokumentum már ezekkel készül)
+  if (vehicle && b.save_cx !== false && deal.line === 'Import') {
+    const add = {}; for (const k of IMPORT_CX) if (extra[k]) add[k] = extra[k];
+    if (Object.keys(add).length) {
+      const list = vehiclesOf(card.data).map((x) => x.id === vehicle.id ? { ...x, cx: { ...(x.cx || {}), ...add } } : x);
+      await saveCard(env, id, { data: { ...card.data, vehicles: list, vehicle: list[0] } }, null, user.name, 'szerződés-adatok az autóhoz');
+    }
+  }
   deriveVars(vars);
   const used = usedKeys(tpl.body); const keep = {}; for (const k of used) keep[k] = String(vars[k] != null ? vars[k] : '');
   // csak akkor generálható, ha minden szükséges adat megvan
@@ -1291,6 +1331,8 @@ export async function onRequest(context) {
     if (m && method === 'POST') return await handleDataReqRevoke(env, user, Number(m[1]), Number(m[2]));
     m = path.match(/^\/card\/(\d+)\/sign\/(\d+)\/revoke$/);
     if (m && method === 'POST') return await handleSignRevoke(env, user, Number(m[1]), Number(m[2]));
+    m = path.match(/^\/card\/(\d+)\/cx$/);
+    if (m && method === 'POST') return await handleCxGet(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/docs\/check$/);
     if (m && method === 'POST') return await handleDocCheck(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/docs\/send$/);
