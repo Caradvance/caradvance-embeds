@@ -181,6 +181,41 @@ function makeModelTpl(D) {
     return null;
   };
 }
+// Modelltartalom nélküli (új) bérlési modellek általános mondatai (rentalPage.ts alapszövegei), 2026-11-03
+const GEN_FUEL = {
+  en: { benzin: 'petrol', 'dízel': 'diesel', 'plug-in hibrid': 'plug-in hybrid', elektromos: 'electric', hibrid: 'hybrid' },
+  de: { benzin: 'Benzin', 'dízel': 'Diesel', 'plug-in hibrid': 'Plug-in-Hybrid', elektromos: 'Elektro', hibrid: 'Hybrid' },
+  fr: { benzin: 'essence', 'dízel': 'diesel', 'plug-in hibrid': 'hybride rechargeable', elektromos: 'électrique', hibrid: 'hybride' },
+  uk: { benzin: 'бензин', 'dízel': 'дизель', 'plug-in hibrid': 'плагін-гібрид', elektromos: 'електро', hibrid: 'гібрид' },
+  zh: { benzin: '汽油', 'dízel': '柴油', 'plug-in hibrid': '插电混动', elektromos: '纯电', hibrid: '混动' },
+};
+const GEN = {
+  en: {
+    h2: (n, b) => `${n} long-term rental — a brand-new ${b} for a monthly fee`,
+    intro: (n, b) => `The <g0>${n}</g0> is a popular choice in the ${b} class. On <g1>long-term rental</g1> you can drive it without tying up a large sum: you pay a single <g2>monthly fee</g2>, and we take care of servicing, tax and tyres. That is the essence of <g3>long-term car rental</g3>: predictable costs, a new car and no resale worries.`,
+    one: (t, f, x) => `Currently, the <g0>${t}</g0> version is available to rent (${f}), from ${x} €/month.`,
+  },
+  de: {
+    h2: (n, b) => `${n} in Langzeitmiete — ${b} fabrikneu zur Monatsrate`,
+    intro: (n, b) => `Der <g0>${n}</g0> ist eine beliebte Wahl in der Klasse ${b}. In der <g1>Langzeitmiete</g1> fahren Sie ihn, ohne viel Kapital zu binden: Sie zahlen eine einzige <g2>Monatsrate</g2>, Service, Steuer und Reifen übernehmen wir. Das ist der Kern der <g3>Langzeitmiete</g3>: planbare Kosten, ein neues Auto und keine Sorgen um den Wiederverkauf.`,
+    one: (t, f, x) => `Derzeit ist die Version <g0>${t}</g0> mietbar (${f}), ab ${x} €/Monat.`,
+  },
+  fr: {
+    h2: (n, b) => `${n} en location longue durée — ${b} à l’état neuf, avec loyer mensuel`,
+    intro: (n, b) => `La <g0>${n}</g0> est un choix apprécié dans la catégorie ${b}. En <g1>location longue durée</g1>, vous la conduisez sans immobiliser une grosse somme : vous payez un seul <g2>loyer mensuel</g2>, et nous nous occupons de l’entretien, des taxes et des pneus. C’est tout l’intérêt de la <g3>location longue durée</g3> : des coûts prévisibles, une voiture neuve et aucun souci de revente.`,
+    one: (t, f, x) => `Actuellement, c’est la version <g0>${t}</g0> qui est proposée à la location (${f}), à partir de ${x} €/mois.`,
+  },
+  uk: {
+    h2: (n, b) => `Довгострокова оренда ${n} — новий автомобіль (${b}) за щомісячним платежем`,
+    intro: (n, b) => `<g0>${n}</g0> — популярний вибір у класі «${b}». У <g1>довгостроковій оренді</g1> ви керуєте ним, не заморожуючи великої суми: сплачуєте лише один <g2>щомісячний платіж</g2>, а сервіс, податки й шини беремо на себе. У цьому суть <g3>довгострокової оренди авто</g3>: передбачувані витрати, нове авто й жодного клопоту з перепродажем.`,
+    one: (t, f, x) => `Наразі для оренди доступна версія <g0>${t}</g0> (${f}), від ${x} €/міс.`,
+  },
+  zh: {
+    h2: (n, b) => `${n} 长期租赁，按月付费的全新${b}`,
+    intro: (n, b) => `<g0>${n}</g0> 是${b}级别中的热门之选。通过<g1>长期租赁</g1>，您无需投入大笔资金即可驾驶：只需支付一笔<g2>月租费</g2>，保养、税费和轮胎均由我们负责。这正是<g3>长期租车</g3>的意义：成本可预期、全新车辆、无需操心转售。`,
+    one: (t, f, x) => `目前可租 <g0>${t}</g0> 版本（${f}），${x} €/月起。`,
+  },
+};
 // „<modell> bérlés — tartós bérlet {n} €/hó-tól” oldalcím (seo-fix) — bármely új Choice-modellhez (pl. MINI John Cooper Works, 2026-11-03)
 const TITLE = {
   en: (n, x) => `${n} rental — long-term rental from ${x} €/month`,
@@ -264,6 +299,12 @@ export function makeRental(l, D, RT = {}) {
         return a1 + tr + a2;
       });
       if (ok && r !== k) return r;
+    }
+    const G = GEN[l];
+    if (G) {
+      if ((m = k.match(/^(.+?) tartós bérlet — vadonatúj (.+?) havidíjjal$/))) return G.h2(nm(m[1]), body(m[2]));
+      if ((m = k.match(/^Az? <g0>(.+?)<\/g0> (.+?) kategóriájában népszerű választás\. <g1>Tartós bérletben<\/g1> úgy vezetheted, hogy nem kötsz le benne nagy összeget: egyetlen <g2>havi díjat<\/g2> fizetsz, a szervizt, az adót és a gumikat mi intézzük\. Ez a <g3>hosszú távú autóbérlés<\/g3> lényege: kiszámítható költség, új autó, továbbeladási gond nélkül\.$/))) return G.intro(nm(m[1]), body(m[2]));
+      if ((m = k.match(/^Jelenleg a\(z\) <g0>(.+?)<\/g0> kivitel bérelhető \((.+?)\), (\{\d+\}) €\/hó-tól\.$/))) { const f = m[2].split(' / ').map((x) => GEN_FUEL[l][x.toLowerCase()] || x).join(' / '); return G.one(m[1], f, m[3]); }
     }
     return mtpl(k);
   };
