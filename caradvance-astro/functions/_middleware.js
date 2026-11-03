@@ -138,6 +138,14 @@ async function serveDomain(context, url, l) {
     const loc = locOf(await slugMap(env, l, url.origin), p);           // régi magyar cím → új cím
     if (loc && loc !== p) { url.pathname = loc; return Response.redirect(url.toString(), 301); }
     { const g = goneRedirect(request); if (g) return g; } // kivezetett bérelhető modell / eladott autó → 301 a márkára szűrt listára
+    if (l === 'sk' || l === 'cs') { // nem létező cím: valódi 404 a helyi nyelvű hibaoldallal (nem soft-404 átirányítás a főoldalra)
+      for (const nfp of ['/404-' + l, '/404-' + l + '.html']) {
+        try {
+          const nf = await env.ASSETS.fetch(new Request(new URL(nfp, url.origin).toString()));
+          if (nf.status === 200) { const h = new Headers(nf.headers); h.set('Cache-Control', 'public, max-age=0, must-revalidate'); h.set('X-Robots-Tag', 'noindex'); h.set('X-CA-Domain', l); return new Response(request.method === 'HEAD' ? null : nf.body, { status: 404, headers: h }); }
+        } catch (e) {}
+      }
+    }
     return Response.redirect(new URL('/', url.origin).toString(), 302);
   }
   const isFileUrl = (v) => /\.[a-z0-9]{1,5}$/i.test(v.split(/[?#]/)[0]);
