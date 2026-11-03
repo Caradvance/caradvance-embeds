@@ -6,6 +6,8 @@
  * követhetők — itt a rentalPage.ts mondat-sablonjait tükrözzük minden nyelvre. A számok {n}
  * helyőrzőként, a típusnevek változatlanul kerülnek át.
  */
+import fs from 'node:fs';
+
 const LIST = '\\{\\d+\\}(?:(?:, \\{\\d+\\})* vagy \\{\\d+\\}|–\\{\\d+\\})?'; // „{1}–{2}” = tartomány (futáskeret 2 000–4 000)
 const KMT = `(?:(${LIST}) km\\/hó futáskerettel|egyedi futáskerettel)`;
 const MOT = `(?:(${LIST}) hónapos futamidővel|rugalmas futamidővel)`;
@@ -131,6 +133,54 @@ const MONTHS = {
   cs: ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'],
 };
 
+// Új Choice-modellek (pl. MINI John Cooper Works, 2026-11-03): a bérlési oldal mondatai más modellek már lefordított
+// mondataiból, a modellnév cseréjével (sablon). Csak számjegy nélküli modellnevekkel (a számok {n} helyőrzők).
+let NAMES_CACHE = null;
+function rentalNames(D) {
+  if (NAMES_CACHE) return NAMES_CACHE;
+  const set = new Set();
+  const DIG = { '1': '1-es', '2': '2-es', '3': '3-as', '4': '4-es', '5': '5-ös', '6': '6-os', '7': '7-es', '8': '8-as' };
+  try {
+    const src = fs.readFileSync('seo-abo.mjs', 'utf8');
+    const sec = Buffer.from((src.match(/const SEC_B64 = "([^"]+)"/) || [])[1] || '', 'base64').toString('utf8');
+    const i = sec.indexOf('window.SUB='); if (i > -1) {
+      let d = 0, k = i + 11; for (; k < sec.length; k++) { const c = sec[k]; if (c === '{') d++; else if (c === '}') { d--; if (!d) { k++; break; } } }
+      for (const m of JSON.parse(sec.slice(i + 11, k)).models || []) {
+        const b = m.brand === 'VW' ? 'Volkswagen' : m.brand;
+        set.add(b + ' ' + String(m.model).replace(/\b(\d)er\b/g, (x, n) => DIG[n] || n).replace(/\bLimousine\b/g, 'Limuzin').replace(/\bCoupe\b/g, 'Coupé').replace(/\b([A-Z])-Klasse\b/g, '$1-osztály'));
+      }
+    }
+  } catch (e) {}
+  for (const k of Object.keys(D)) { const m = k.match(/^([A-Z][A-Za-z-]+(?: [A-Za-zÀ-ž-]+){1,4}) bérlés$/); if (m) set.add(m[1]); }
+  NAMES_CACHE = [...set].filter((n) => !/\d/.test(n) && n.split(' ').length >= 2).sort((a, b) => b.length - a.length);
+  return NAMES_CACHE;
+}
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function makeModelTpl(D) {
+  const names = rentalNames(D), T = new Map();
+  const res = names.map((n) => [n, new RegExp('(?<![\\p{L}\\d-])' + esc(n) + '(?![\\p{L}\\d-]| [A-Z][a-z]+\\b(?! ))', 'gu')]);
+  for (const [k, v] of Object.entries(D)) {
+    if (typeof v !== 'string' || k.length < 12) continue;
+    for (const [n, re] of res) {
+      if (!k.includes(n)) continue;
+      re.lastIndex = 0; if (!re.test(k)) break;
+      if (!v.includes(n)) break;
+      const tk = k.split(n).join('⟨M⟩'), tv = v.split(n).join('⟨M⟩');
+      if (!T.has(tk)) T.set(tk, tv);
+      break; // a leghosszabb illeszkedő név számít
+    }
+  }
+  return (k) => {
+    for (const [n, re] of res) {
+      if (!k.includes(n)) continue;
+      re.lastIndex = 0; if (!re.test(k)) continue;
+      const v = T.get(k.split(n).join('⟨M⟩'));
+      if (v) return v.split('⟨M⟩').join(n);
+      return null;
+    }
+    return null;
+  };
+}
 // „<modell> bérlés — tartós bérlet {n} €/hó-tól” oldalcím (seo-fix) — bármely új Choice-modellhez (pl. MINI John Cooper Works, 2026-11-03)
 const TITLE = {
   en: (n, x) => `${n} rental — long-term rental from ${x} €/month`,
@@ -143,6 +193,7 @@ const TITLE = {
 };
 export function makeRental(l, D, RT = {}) {
   const p = P[l]; if (!p) return () => null;
+  const mtpl = makeModelTpl(D);
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const w = (x) => { if (!x) return x; const t = D[x] || D[cap(x)] || RT[x] || RT[cap(x)]; if (!t) return x; return x[0] === x[0].toLowerCase() && l !== 'de' ? t.charAt(0).toLowerCase() + t.slice(1) : t; };
   const words = (s) => s.split(', ').map(w).join(', ');
@@ -214,6 +265,6 @@ export function makeRental(l, D, RT = {}) {
       });
       if (ok && r !== k) return r;
     }
-    return null;
+    return mtpl(k);
   };
 }
