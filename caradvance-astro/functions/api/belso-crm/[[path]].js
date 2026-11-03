@@ -1162,31 +1162,50 @@ async function handleSignRevoke(env, user, id, sid) {
 
 /* ---------------- felszereltség-lista fordítása németről magyarra (Cloudflare Workers AI) ---------------- */
 const TR_MODELS = ['@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/meta/llama-3.1-8b-instruct'];
+/* még németnek látszó sor (a fordítás után újrapróbáljuk tételenként) */
+const DE_RE = /[äßÄ]|\w(paket|assistenz|assistent|sitze|heizung|leuchten|scheinwerfer|felgen|spiegel|lenkrad|anlage|zugang|kamera|dach|haube|leisten|einlagen|polsterung|lackierung|ausstattung|fahrwerk|bremsen|verglasung|steuerung|regelung|hilfe|warner|automatik|kupplung|raum|tür|türen|stoff)\b|\b\w*(ung|keit|heit|lich|isch)\b|\b(und|mit|für|ohne|vorn|vorne|hinten|inkl|inklusive|innen|außen|aussen|links|rechts|elektrisch|beheizt|beheizbar|getönt|abgedunkelt|schwarz|weiß|weiss|grau|silber|blau|rot|Paket|Sitze?|Sitzheizung|Lenkrad|Leder|Stoff|Räder|Felgen?|Reifen|Spiegel|Scheinwerfer|Leuchten|Licht|Heizung|Ausstattung|Fahrer|Beifahrer|Assistent|Assistenz|Dach|Glasdach|Lackierung|Farbe|Dekor|Einlagen?|Zierleisten|Fenster|Scheiben|Türen|Kofferraum|Gepäckraum|Klimaanlage|Klimaautomatik|Anhängevorrichtung|Anhängerkupplung|Kamera|Einparkhilfe|Parkassistent|Rückfahrkamera|Notbremsassistent|Spurhalte|Tempomat|Verkehrszeichen|Ablage|Steckdose|Ladekabel|Wärmepumpe|Ambiente|Beleuchtung|Bedienung|Anzeige|Navigation|Schlüssel|Komfortzugang|Abstandsregel|Fahrwerk|Bremsen|Sperre|Verglasung|Polsterung|Himmel|Dachhimmel|Armaturen|Mittelarmlehne|Kopfstützen|Gurt|Airbags?|Seitenairbags|Ladeboden|Netz|Rollo|Sonnenschutz|Halterung|Kennzeichen|Lieferung|Werksabholung|Zulassung)\b/i;
+const TR_SYS = 'Precíz német–magyar autóipari fordító vagy. Csak JSON tömböt adsz vissza.';
+const TR_RULES = 'Fordítsd le magyarra az alábbi autó-felszereltségi tételeket (német gyári konfigurátorból). Szabályok: MINDEN német szót fordíts le magyarra; csak a márka- és termékneveket (pl. BMW Live Cockpit, Driving Assistant Plus, M Sportpaket, Harman Kardon, Bang & Olufsen, xDrive, quattro, AMG Line, S line, R-Line, Matrix LED, MBUX, Burmester) hagyd eredeti formában. Tömör, magyar autós szaknyelvet használj (pl. Sitzheizung vorn → Ülésfűtés elöl, Anhängerkupplung → Vonóhorog, Metallic-Lackierung → Metálfényezés, Stoff-Interieur → Szövet belső tér, Räder 5-Speichen → 5 küllős felnik, Komfortpaket → Kényelmi csomag). Pontosan ugyanannyi tételt adj vissza, ugyanabban a sorrendben, kizárólag egy JSON tömbként (stringek), magyarázat nélkül.\n\n';
+async function trRun(env, chunk, models, errs) {
+  for (const m of models) {
+    try {
+      const r = await env.AI.run(m, { messages: [{ role: 'system', content: TR_SYS }, { role: 'user', content: TR_RULES + JSON.stringify(chunk) }], max_tokens: 3500, temperature: 0.1 });
+      // a Workers AI a JSON-nak látszó választ már objektumként (tömbként) is visszaadhatja
+      const resp = r && (r.response ?? (r.result && r.result.response));
+      let arr = Array.isArray(resp) ? resp : null;
+      if (!arr && resp && typeof resp === 'object') arr = Object.values(resp).find(Array.isArray) || null;
+      if (!arr) { const txt = String(resp || ''); const mm = txt.match(/\[[\s\S]*\]/); try { arr = mm ? JSON.parse(mm[0]) : null; } catch (e) { arr = null; } if (!arr) errs.push(m + ': nem JSON válasz: ' + txt.slice(0, 120)); }
+      if (Array.isArray(arr) && arr.length === chunk.length) return arr.map((x, k) => clean(String(x || ''), 400) || chunk[k]);
+      if (Array.isArray(arr)) errs.push(m + ': ' + arr.length + ' tétel jött ' + chunk.length + ' helyett');
+    } catch (e) { errs.push(m + ': ' + String(e && e.message || e).slice(0, 160)); }
+  }
+  return null;
+}
+/* egy adag fordítása; ha a modell nem pontosan annyi tételt ad vissza, kettévágjuk az adagot (végül tételenként) */
+async function trChunk(env, chunk, errs, depth = 0) {
+  const r = await trRun(env, chunk, TR_MODELS, errs);
+  if (r) return r;
+  if (chunk.length === 1 || depth > 5) return chunk.slice();
+  const h = Math.ceil(chunk.length / 2);
+  return [...await trChunk(env, chunk.slice(0, h), errs, depth + 1), ...await trChunk(env, chunk.slice(h), errs, depth + 1)];
+}
 async function handleTranslate(request, env) {
   const b = await request.json().catch(() => ({}));
-  const lines = (Array.isArray(b.lines) ? b.lines : []).map((x) => clean(x, 200)).filter(Boolean).slice(0, 150);
+  const lines = (Array.isArray(b.lines) ? b.lines : []).map((x) => clean(x, 400)).filter(Boolean).slice(0, 200);
   if (!lines.length) return json({ lines: [] });
   if (!env.AI) return json({ error: 'A fordítás nincs beállítva (Workers AI).' }, 501);
-  const out = []; const errs = [];
-  for (let i = 0; i < lines.length; i += 40) {
-    const chunk = lines.slice(i, i + 40);
-    const prompt = 'Fordítsd le magyarra az alábbi autó-felszereltségi tételeket (német gyári konfigurátorból). Szabályok: a márka- és termékneveket (pl. BMW Live Cockpit, Driving Assistant Plus, M Sportpaket, Harman Kardon, xDrive, AMG, S line, R-Line, Matrix LED) hagyd eredeti formában; a többit tömör, magyar autós szaknyelven add vissza (pl. Sitzheizung vorn → Ülésfűtés elöl, Anhängerkupplung → Vonóhorog, Metallic-Lackierung → Metálfényezés). Pontosan ugyanannyi tételt adj vissza, ugyanabban a sorrendben, kizárólag egy JSON tömbként (stringek), magyarázat nélkül.\n\n' + JSON.stringify(chunk);
-    let res = null;
-    for (const m of TR_MODELS) {
-      try {
-        const r = await env.AI.run(m, { messages: [{ role: 'system', content: 'Precíz német–magyar autóipari fordító vagy. Csak JSON tömböt adsz vissza.' }, { role: 'user', content: prompt }], max_tokens: 3000, temperature: 0.1 });
-        // a Workers AI a JSON-nak látszó választ már objektumként (tömbként) is visszaadhatja
-        let resp = r && (r.response ?? (r.result && r.result.response));
-        let arr = Array.isArray(resp) ? resp : null;
-        if (!arr && resp && typeof resp === 'object') arr = Object.values(resp).find(Array.isArray) || null;
-        if (!arr) { const txt = String(resp || ''); const mm = txt.match(/\[[\s\S]*\]/); try { arr = mm ? JSON.parse(mm[0]) : null; } catch (e) { arr = null; } if (!arr) errs.push(m + ': nem JSON válasz: ' + txt.slice(0, 120)); }
-        if (Array.isArray(arr) && arr.length === chunk.length) { res = arr.map((x, k) => clean(String(x || ''), 200) || chunk[k]); break; }
-        if (Array.isArray(arr)) errs.push(m + ': ' + arr.length + ' tétel jött ' + chunk.length + ' helyett');
-      } catch (e) { errs.push(m + ': ' + String(e && e.message || e).slice(0, 160)); }
-    }
-    out.push(...(res || chunk));
+  const errs = [];
+  const out = [];
+  for (let i = 0; i < lines.length; i += 20) out.push(...await trChunk(env, lines.slice(i, i + 20), errs));
+  // 2. kör: ami változatlan maradt vagy még németnek látszik, azt tételenként (5-ösével párhuzamosan) újra
+  const redo = out.map((x, k) => (x === lines[k] || DE_RE.test(x)) && DE_RE.test(lines[k]) ? k : -1).filter((k) => k >= 0).slice(0, 80);
+  for (let i = 0; i < redo.length; i += 5) {
+    const part = redo.slice(i, i + 5);
+    const res = await Promise.all(part.map((k) => trRun(env, [lines[k]], TR_MODELS, errs)));
+    res.forEach((r, n) => { if (r && r[0] && !DE_RE.test(r[0])) out[part[n]] = r[0]; else if (r && r[0] && out[part[n]] === lines[part[n]]) out[part[n]] = r[0]; });
   }
-  return json({ lines: out, translated: out.some((x, k) => x !== lines[k]), errors: errs.slice(0, 6) });
+  const left = out.filter((x) => DE_RE.test(x)).length;
+  return json({ lines: out, translated: out.some((x, k) => x !== lines[k]), left, errors: errs.slice(0, 6) });
 }
 
 /* ---------------- konfigurátor-képek átvétele (csak a gyártók képszervereiről; a böngésző JPEG-re alakítja) ---------------- */
