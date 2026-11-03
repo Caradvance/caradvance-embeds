@@ -125,6 +125,7 @@
   var PILL = {
     'Kapcsolatfelvételre vár': ['p-new', 'Új'], 'Ajánlatra vár': ['p-cont', 'Ajánlatra vár'], 'Ajánlat kiküldve': ['p-offer', 'Ajánlat kiküldve'],
     'Ajánlat módosítva': ['p-neg', 'Módosítás kérve'], 'Ajánlat elfogadva': ['p-won', 'Elfogadva'], 'Ajánlat elutasítva': ['p-lost', 'Elutasítva'],
+    'Aláírásra vár ügyfél': ['p-offer', 'Aláírásra vár – ügyfél'], 'Aláírásra vár partner': ['p-offer', 'Aláírásra vár – partner'], 'Szerződés aláírva': ['p-won', 'Szerződés aláírva'],
     'Megvalósítás': ['p-won', 'Megvalósítás'], 'Lezárva': ['p-won', 'Lezárva'],
     'Új érdeklődő': ['p-new', 'Új'], 'Kapcsolatfelvétel': ['p-cont', 'Kapcsolatfelvétel'], 'Igényfelmérés': ['p-cont', 'Igényfelmérés'], 'Autókeresés': ['p-cont', 'Autókeresés'],
     'Foglaló beérkezett': ['p-neg', 'Foglaló beérkezett'], 'Behozatal folyamatban': ['p-neg', 'Behozatal'], 'Bizomány – hirdetés alatt': ['p-cont', 'Hirdetés alatt'],
