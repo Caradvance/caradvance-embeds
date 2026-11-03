@@ -340,6 +340,9 @@ const yes = (v) => /^(igen|yes|true|1|x)$/i.test(String(v || '').trim());
  *  Import: vételár EUR-ban · Bizományos: a "bizomanyos" lap.
  */
 export async function inventory(line) {
+  // Bérlés: pontosan a weboldal bérelhető kínálata (/autoink/#berelheto, Auto-Abo flotta) az opciókkal együtt —
+  // a táblázat régi bérleti sorai a weboldalon már nem bérelhetők, ezért itt sem jelennek meg
+  if (line === 'Bérlés') return aboFleet();
   const src = line === 'Bizományos' ? SHEET + '&sheet=bizomanyos' : SHEET;
   const r = await fetch(src, { cf: { cacheTtl: 120, cacheEverything: true } });
   if (!r.ok) throw new Error('A készlet-tábla nem érhető el (' + r.status + ').');
@@ -363,7 +366,6 @@ export async function inventory(line) {
       url: x.slug ? `${SITE}/${line === 'Bérlés' ? 'berles' : 'auto'}/${x.slug}/` : ''
     });
   });
-  if (line === 'Bérlés') { try { out.push(...(await aboFleet())); } catch (e) { console.error('abo-fleet', e && e.message); } }
   return out;
 }
 
@@ -389,6 +391,9 @@ export function specLine(it) {
 export function idLine(it) {
   return [it.ad_id ? 'mobile.de hirdetés-azonosító: ' + it.ad_id : '', it.config_code ? (it.brand ? it.brand + ' ' : '') + 'konfigurációs kód: ' + it.config_code : ''].filter(Boolean).join(' · ');
 }
+/** Bérlés: az autó egyszeri szállítási díja (alapból 300 €). */
+export const RENT_DELIVERY_EUR = 300;
+export function deliveryLabel(it) { return it && Number(it.delivery) > 0 ? 'Szállítási díj: ' + fmtPrice(it.delivery, it.currency) + ' (egyszeri)' : ''; }
 export function priceLabel(it) { return fmtPrice(it.price, it.currency) + (it.period ? ' / ' + it.period : ''); }
 /** Az ajánlati ár ÁFA-típusa: nettó / bruttó 27% magyar ÁFA / bruttó 19% német ÁFA. */
 export const VAT_MODES = { net: { short: 'nettó', long: 'nettó ár (ÁFA nélkül)', rate: 0 }, hu27: { short: 'bruttó, 27% ÁFA', long: 'bruttó ár, 27% magyar ÁFA-val', rate: 0.27 }, de19: { short: 'bruttó, 19% német ÁFA', long: 'bruttó ár, 19% német ÁFA-val', rate: 0.19 } };
@@ -408,6 +413,7 @@ export function offerEmailHtml({ clientName, items, message, link, attached }) {
         ${it.config_url ? `<div style="margin-top:6px"><a href="${esc(it.config_url)}" style="font-size:13px;font-weight:bold;color:#22447d">A konfiguráció megtekintése a gyártó oldalán ↗</a></div>` : ''}
         ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
         <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it))}${vatText(it) ? `<span style="font-size:12px;font-weight:normal;color:#6b7280"> · ${esc(VAT_MODES[it.vat_mode].long)}</span>` : ''}</div>
+        ${deliveryLabel(it) ? `<div style="font-size:13px;color:#374151;margin-top:3px">+ ${esc(deliveryLabel(it))}</div>` : ''}
         <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block;margin:0 6px 6px 0">Ezt választom</a>${it.url ? `<a href="${esc(it.url)}" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;font-size:13px;padding:9px 17px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 6px">Az autó adatlapja ↗</a>` : ''}</div>
       </td></tr>
     </table>
@@ -644,6 +650,7 @@ export function offerFields(it) {
   if (eq) o.equipment = eq.slice(0, 600);
   if (it.km_keret) o.km_keret = String(it.km_keret).slice(0, 60);
   if (Number(it.months) > 0) o.months = Number(it.months);
+  if (Number(it.delivery) > 0) o.delivery = Number(it.delivery);
   if (it.rent_start) o.rent_start = String(it.rent_start).slice(0, 10);
   if (it.rent_end) o.rent_end = String(it.rent_end).slice(0, 10);
   return o;
@@ -805,6 +812,7 @@ export function docVars(deal, card, vehicle, tpl, persons, seq) {
   // a havi díj a szerződésben bruttó (19% német áfával): nettó ajánlati árnál felszorozzuk
   if (v.period && v.price > 0 && v.currency === 'EUR' && v.vat_mode === 'net') base.havi_dij = fmtPrice(Math.round(v.price * 1.19), 'EUR');
   if (v.deposit > 0 && v.period) base.kaucio = fmtPrice(v.deposit, v.currency);
+  if (Number(v.delivery) > 0 && v.period && !base.szallitasi_dij) base.szallitasi_dij = fmtPrice(v.delivery, v.currency);
   for (const role of Object.keys(PERSON_ROLES)) Object.assign(base, personVars(role, (persons || {})[role]));
   return deriveVars(base);
 }
