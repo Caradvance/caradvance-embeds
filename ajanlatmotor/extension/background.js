@@ -52,7 +52,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "open-panel" && sender.tab) {
     chrome.sidePanel.open({ tabId: sender.tab.id }).catch(() => {});
   }
-  // in-page panel on a mobile.de listing: open requests + send
+  // in-page panel on a mobile.de / AutoScout24 listing: open requests + send
   if (msg.type === "ext-requests") {
     Promise.all([api("/requests"), chrome.storage.local.get("lastReq")]).then(([r, { lastReq }]) => sendResponse({ ...r, lastReq }));
     return true;

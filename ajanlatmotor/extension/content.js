@@ -1,4 +1,4 @@
-// Caradvance Sourcing – content script on mobile.de. Acts only on the open page and only on click.
+// Caradvance Sourcing – content script on mobile.de and AutoScout24. Acts only on the open page and only on click.
 (function () {
   const P = self.CaradvanceParser;
   if (!P || window.__caradvanceLoaded) return;
@@ -92,7 +92,7 @@
     };
     btn.classList.add("tray");
     btn.onclick = () => chrome.runtime.sendMessage({ type: "open-panel" });
-    const links = [...document.querySelectorAll("a[href*='details.html?id='], a[href*='/auto-inserat/']")];
+    const links = [...document.querySelectorAll("a[href*='details.html?id='], a[href*='/auto-inserat/'], a[href*='/angebote/'], a[href*='/offers/'], a[href*='/annunci/'], a[href*='/aanbod/'], a[href*='/offres/'], a[href*='/anuncios/'], a[href*='/ofertas/']")];
     const seen = new Set();
     for (const a of links) {
       const id = P.adIdFromUrl(a.href);

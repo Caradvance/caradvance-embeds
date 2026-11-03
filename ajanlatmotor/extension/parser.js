@@ -1,5 +1,5 @@
 /*
- * Caradvance Sourcing – mobile.de listing parser.
+ * Caradvance Sourcing – mobile.de and AutoScout24 listing parser.
  * Pure function over an HTML string, so it runs in the content script, the side panel
  * and in Node tests. Three layers: JSON-LD → embedded page state → DOM text patterns.
  * Field patterns come from the Worker's /api/ext/parser-config (versioned); DEFAULT_CONFIG
@@ -10,9 +10,9 @@
 
   var DEFAULT_CONFIG = {
     version: 1,
-    listing_url: ["/auto-inserat/", "/fahrzeuge/details.html"],
-    search_url: ["/fahrzeuge/search.html", "/auto/"],
-    search_card_selectors: ["[data-testid^='result-listing']", "article[class*='result']", "a[href*='details.html?id=']"],
+    listing_url: ["/auto-inserat/", "/fahrzeuge/details.html", "/angebote/", "/offers/", "/annunci/", "/aanbod/", "/offres/", "/anuncios/", "/ofertas/"],
+    search_url: ["/fahrzeuge/search.html", "/auto/", "/lst"],
+    search_card_selectors: ["[data-testid^='result-listing']", "article[class*='result']", "article[data-guid]", "a[href*='details.html?id=']"],
     state_markers: ["firstRegistration", "mileage", "make"],
     dom_patterns: {
       km: "(?:Kilometerstand|Mileage)\\s*([\\d.]+)\\s*km",
@@ -55,9 +55,14 @@
     return String(v).trim() || null;
   }
   function adIdFromUrl(url) {
-    var m = String(url || "").match(/[?&]id=(\d{6,})/) || String(url || "").match(/\/(\d{6,})\.html/);
+    var u = String(url || "");
+    // AutoScout24: …/angebote/<slug>-<uuid>
+    var a = /autoscout24\./i.test(u) && u.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[?#]|$)/i);
+    if (a) return a[1].toLowerCase();
+    var m = u.match(/[?&]id=(\d{6,})/) || u.match(/\/(\d{6,})\.html/);
     return m ? m[1] : null;
   }
+  function isAs24(url) { return /^https?:\/\/([a-z0-9-]+\.)*autoscout24\.[a-z.]+\//i.test(String(url || "")); }
   function scripts(html, typeRe) {
     var out = [], re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi, m;
     while ((m = re.exec(html))) if (!typeRe || typeRe.test(m[1])) out.push({ attrs: m[1], text: m[2] });
@@ -227,6 +232,46 @@
     return out;
   }
 
+  // ---------- layer A: AutoScout24 vehicle page (Next.js __NEXT_DATA__ → props.pageProps.listingDetails; checked 2026-11) ----------
+  function fromAs24(html) {
+    var m = html.match(/<script[^>]*id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i);
+    if (!m) return {};
+    var j; try { j = JSON.parse(m[1]); } catch (e) { return {}; }
+    var ld = j && j.props && j.props.pageProps && j.props.pageProps.listingDetails;
+    if (!ld || !ld.vehicle) return {};
+    var v = ld.vehicle, pr = (ld.prices && ld.prices.public) || {}, loc = ld.location || {}, sel = ld.seller || {};
+    var fuel = (v.fuelCategory && v.fuelCategory.formatted) || (v.primaryFuel && v.primaryFuel.formatted) || null;
+    if (fuel && /elektro\/(benzin|diesel)/i.test(fuel)) fuel = "Plug-in-Hybrid"; // AS24 nem különíti el a sima hibridet
+    var eq = [];
+    if (v.equipment && typeof v.equipment === "object") Object.keys(v.equipment).forEach(function (k) {
+      [].concat(v.equipment[k] || []).forEach(function (x) { var t = str(x && (x.id || x.name || x.label) || x); if (t && eq.indexOf(t) === -1) eq.push(t); });
+    });
+    var imgs = [].concat(ld.images || []).map(function (u) { return typeof u === "string" ? u.replace(/\/\d+x\d+\.webp$/i, "/1280x960.jpg") : null; }).filter(Boolean);
+    var cat = pr.category, rating = cat === 0 ? "very_good" : cat === 1 ? "good" : cat === 2 ? "fair" : null;
+    var fr = firstReg(v.firstRegistrationDateRaw) || firstReg(v.firstRegistrationDate);
+    var desc = ld.description ? decode(String(ld.description).replace(/<(br|\/li|\/p|\/ul)[^>]*>/gi, "\n").replace(/<[^>]+>/g, " ")).replace(/[ \t]+/g, " ").replace(/\n\s*\n+/g, "\n").trim() : null;
+    var variant = [v.modelVersionInput, v.variant !== v.model ? v.variant : null].filter(Boolean)[0] || null;
+    return {
+      title: [v.make, v.model, v.modelVersionInput].filter(Boolean).join(" ") || str(ld.title),
+      make: str(v.make), model: str(v.model), variant: variant,
+      price_gross_eur: num(pr.priceRaw != null ? pr.priceRaw : pr.price),
+      price_net_eur: num(pr.netPriceRaw), vat_reclaimable: pr.taxDeductible === true || pr.netPriceRaw != null ? true : null,
+      price_rating: rating,
+      km: num(v.mileageInKmRaw != null ? v.mileageInKmRaw : v.mileageInKm),
+      first_registration: fr,
+      power_kw: num(v.rawPowerInKw != null ? v.rawPowerInKw : v.powerInKw),
+      fuel: fuel, gearbox: str(v.transmissionType), color: str(v.bodyColorOriginal) || str(v.bodyColor), body: str(v.bodyType),
+      condition: ld.isNew ? "new" : "used",
+      equipment: eq.length ? eq : null,
+      accident_free: v.hadAccident === false ? true : v.hadAccident === true ? false : null,
+      previous_owners: num(v.noOfPreviousOwners),
+      images: imgs.length ? imgs : null,
+      description_de: desc,
+      seller: { name: str(sel.companyName) || str(sel.contactName), city: str(loc.city), zip: str(loc.zip), country: str(loc.countryCode) || "DE",
+        lat: num(loc.latitude), lon: num(loc.longitude), type: sel.isDealer === false || /private/i.test(String(sel.type || "")) ? "private" : "dealer" }
+    };
+  }
+
   // ---------- layer 0: mobile.de vehicle page (2026 layout: dt/dd technical data, data-testid gallery and features) ----------
   function fromVip(html) {
     var out = {}, m;
@@ -292,7 +337,9 @@
     cfg = cfg || DEFAULT_CONFIG;
     var layers = [];
     var out = {};
-    var l0 = fromVip(html), l1 = fromJsonLd(html), l2 = fromState(html, cfg), l3 = fromDom(html, cfg);
+    var la = isAs24(url) ? fromAs24(html) : {};
+    if (Object.keys(la).length) { layers.push("as24"); set(out, la); }
+    var l0 = isAs24(url) ? {} : fromVip(html), l1 = fromJsonLd(html), l2 = isAs24(url) ? {} : fromState(html, cfg), l3 = fromDom(html, cfg);
     if (Object.keys(l0).length) { layers.push("vip"); set(out, l0); }
     if (Object.keys(l1).length) layers.push("jsonld");
     if (Object.keys(l2).length) layers.push("state");
@@ -320,10 +367,13 @@
     return { listing: out, layers: layers, missing: missing, parser_version: cfg.version };
   }
 
-  function isListingUrl(url, cfg) { return (cfg || DEFAULT_CONFIG).listing_url.some(function (p) { return String(url).indexOf(p) !== -1; }); }
-  function isSearchUrl(url, cfg) { return (cfg || DEFAULT_CONFIG).search_url.some(function (p) { return String(url).indexOf(p) !== -1; }) && !isListingUrl(url, cfg); }
+  function isListingUrl(url, cfg) {
+    if (isAs24(url)) return /\/(angebote|offers|annunci|aanbod|offres|anuncios|ofertas)\/[^?#]*[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(url));
+    return (cfg || DEFAULT_CONFIG).listing_url.some(function (p) { return String(url).indexOf(p) !== -1; });
+  }
+  function isSearchUrl(url, cfg) { if (isAs24(url)) return /\/lst(\/|\?|$)/.test(String(url)) && !isListingUrl(url, cfg); return (cfg || DEFAULT_CONFIG).search_url.some(function (p) { return String(url).indexOf(p) !== -1; }) && !isListingUrl(url, cfg); }
 
-  var api = { parseListing: parseListing, isListingUrl: isListingUrl, isSearchUrl: isSearchUrl, adIdFromUrl: adIdFromUrl, DEFAULT_CONFIG: DEFAULT_CONFIG };
+  var api = { parseListing: parseListing, isListingUrl: isListingUrl, isSearchUrl: isSearchUrl, adIdFromUrl: adIdFromUrl, isAs24: isAs24, DEFAULT_CONFIG: DEFAULT_CONFIG };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.CaradvanceParser = api;
 })(typeof self !== "undefined" ? self : globalThis);

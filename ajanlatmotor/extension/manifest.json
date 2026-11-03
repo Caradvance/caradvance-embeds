@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Caradvance Sourcing",
   "short_name": "Caradvance",
-  "version": "0.5.1",
-  "description": "mobile.de hirdetések küldése a Caradvance ajánlatmotorba egy kattintással.",
+  "version": "0.6.0",
+  "description": "mobile.de és AutoScout24 hirdetések küldése a Caradvance ajánlatmotorba egy kattintással.",
   "permissions": [
     "storage",
     "sidePanel",
@@ -12,6 +12,15 @@
   "host_permissions": [
     "https://suchen.mobile.de/*",
     "https://www.mobile.de/*",
+    "https://www.autoscout24.de/*",
+    "https://www.autoscout24.com/*",
+    "https://www.autoscout24.at/*",
+    "https://www.autoscout24.it/*",
+    "https://www.autoscout24.nl/*",
+    "https://www.autoscout24.be/*",
+    "https://www.autoscout24.fr/*",
+    "https://www.autoscout24.es/*",
+    "https://www.autoscout24.lu/*",
     "https://www.caradvance.hu/*",
     "https://*.caradvance-astro.pages.dev/*",
     "http://localhost:8788/*",
@@ -40,7 +49,16 @@
     {
       "matches": [
         "https://suchen.mobile.de/*",
-        "https://www.mobile.de/*"
+        "https://www.mobile.de/*",
+        "https://www.autoscout24.de/*",
+        "https://www.autoscout24.com/*",
+        "https://www.autoscout24.at/*",
+        "https://www.autoscout24.it/*",
+        "https://www.autoscout24.nl/*",
+        "https://www.autoscout24.be/*",
+        "https://www.autoscout24.fr/*",
+        "https://www.autoscout24.es/*",
+        "https://www.autoscout24.lu/*"
       ],
       "js": [
         "parser.js",

@@ -152,14 +152,14 @@ async function sendTray() {
   $("sendTray").disabled = false;
 }
 
-async function openSearch() {
+async function openSearch(portal) {
   if (!$("req").value) return;
-  const r = await api(`/requests/${$("req").value}/search-url`);
+  const r = await api(`/requests/${$("req").value}/search-url${portal === "as24" ? "?portal=as24" : ""}`);
   if (r.ok) chrome.tabs.create({ url: r.body.url });
 }
 
 // Unpacked installs don't pick up new background/content code until reloaded; the panel is served from disk, so it does it.
-const BUILD = "0.5.1";
+const BUILD = "0.6.0";
 if (chrome.runtime.getManifest().version !== BUILD) chrome.runtime.reload();
 
 async function init() {
@@ -177,7 +177,8 @@ async function init() {
 $("req").addEventListener("change", () => { chrome.storage.local.set({ lastReq: $("req").value }); validate(); });
 $("send").addEventListener("click", send);
 $("sendTray").addEventListener("click", sendTray);
-$("openSearch").addEventListener("click", openSearch);
+$("openSearch").addEventListener("click", () => openSearch());
+$("openSearchAs").addEventListener("click", () => openSearch("as24"));
 document.querySelectorAll("#listingBox input").forEach((i) => i.addEventListener("input", validate));
 chrome.storage.onChanged.addListener((ch, area) => {
   if (area === "session" && ch.current) { current = ch.current.newValue; renderListing(); }
