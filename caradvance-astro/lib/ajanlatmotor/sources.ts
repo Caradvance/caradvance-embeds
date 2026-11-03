@@ -21,9 +21,11 @@ export function getSource(env: Env): ListingSource {
   }
 }
 
-/** Extract the mobile.de ad id from a listing URL or a bare id. */
+/** Extract the ad id from a listing URL or a bare id (mobile.de: number; AutoScout24: UUID at the end of the URL). */
 export function adIdFrom(input: string): string | null {
   const s = input.trim();
+  const as = s.match(/autoscout24\.[a-z.]+\/[^?#]*?([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+  if (as) return as[1].toLowerCase();
   const m = s.match(/[?&]id=(\d{6,})/) || s.match(/\/(\d{6,})\.html/) || s.match(/^(\d{6,})$/) || s.match(/(\d{4})$/);
   return m ? m[1] : null;
 }
@@ -94,6 +96,75 @@ export function buildSearchUrl(req: Requirements, maxVehicleEur?: number): strin
     if (code) p.append("fe", code);
   }
   return `https://suchen.mobile.de/fahrzeuge/search.html?${p.toString()}`;
+}
+
+/** Listing portal of a URL (for labels: „mobile.de hirdetés”, „AutoScout24 hirdetés”). */
+export function portalOf(url?: string): { key: "mobile" | "as24" | ""; name: string } {
+  const u = String(url || "");
+  if (/^https:\/\/([a-z0-9-]+\.)*autoscout24\.[a-z.]+\//i.test(u)) return { key: "as24", name: "AutoScout24" };
+  if (/^https:\/\/([a-z0-9-]+\.)*mobile\.de\//i.test(u)) return { key: "mobile", name: "mobile.de" };
+  return { key: "", name: "" };
+}
+
+/* AutoScout24 felszereltség-nevek → a mobile.de-s kanonikus nevek (equipment.json), hogy a fordítás és az igény-egyezés is működjön */
+import EQUIP_JSON from "./equipment.json";
+const AS24_EQ: Record<string, string> = {
+  "Allrad": "Allradantrieb", "Alufelgen": "Leichtmetallfelgen", "Antiblockiersystem": "ABS", "DAB-Radio": "Radio DAB", "Elektrische Fensterheber": "Elektr. Fensterheber",
+  "Elektrische Heckklappe": "Elektr. Heckklappe", "Elektrische Seitenspiegel": "Elektr. Seitenspiegel", "Elektrische Sitze": "Elektr. Sitzeinstellung",
+  "Elektrische Sitzeinstellung, hinten": "Elektr. Sitzeinstellung, hinten", "Geschwindigkeits-begrenzungsanlage": "Geschwindigkeitsbegrenzer", "Getönte Scheiben": "Abgedunkelte Scheiben",
+  "Innenspiegel automatisch abblendend": "Innenspiegel autom. abblendend", "Müdigkeitswarnsystem": "Müdigkeitswarner", "Reifendruckkontrollsystem": "Reifendruckkontrolle",
+  "Schlüssellose Zentralverriegelung": "Schlüssellose Zentralverriegelung (Keyless)", "Start/Stop-Automatik": "Start/Stopp-Automatik", "Wegfahrsperre": "Elektr. Wegfahrsperre",
+  "Zentralverriegelung mit Funkfernbedienung": "Zentralverriegelung", "Bi-Xenon Scheinwerfer": "Xenonscheinwerfer", "CD": "CD-Spieler", "Radio": "Tuner/Radio", "Taxi oder Mietwagen": "Taxi",
+  "Voll-LED Scheinwerfer": "LED-Scheinwerfer",
+};
+const EQ_KEYS: Record<string, string> = Object.fromEntries(Object.keys((EQUIP_JSON as any).map || {}).map((k) => [k.toLowerCase().replace(/[^a-z0-9äöüß]/g, ""), k]));
+export function as24Equip(e: string): string {
+  if (AS24_EQ[e]) return AS24_EQ[e];
+  const al = e.match(/^Alufelgen\s*(\(.*\))?$/i); if (al) return "Leichtmetallfelgen" + (al[1] ? " " + al[1] : "");
+  return EQ_KEYS[e.toLowerCase().replace(/[^a-z0-9äöüß]/g, "")] || e;
+}
+
+/* ---------------- AutoScout24 keresés (a /lst/<márka>/<modell> útvonal és a szűrők — élő kereséssel ellenőrizve 2026-11) ---------------- */
+export const AS24 = {
+  fuel: { petrol: "B", diesel: "D", electric: "E", hybrid: "2,3", phev: "2,3" } as Record<Fuel, string>,
+  body: { suv: "4", estate: "5", sedan: "6", hatchback: "1", coupe: "3", convertible: "2", van: "12", pickup: "4" } as Record<string, string>,
+  eq: { "Anhängerkupplung": "20", "Panorama-Dach": "50", "Head-Up Display": "123", "Standheizung": "52", "Navigationssystem": "23", "Sitzheizung": "34", "Schiebedach": "4", "Allradantrieb": "11", "Luftfederung": "144", "Massagesitze": "145", "360° Kamera": "187", "Abstandstempomat": "133" } as Record<string, string>,
+  countries: { D: "Németország", A: "Ausztria", "D,A": "Németország + Ausztria", "A,B,D,E,F,I,L,NL": "Európa (AS24 összes ország)" } as Record<string, string>,
+};
+/** a márka / modell az AutoScout24 útvonalában: „mercedes-benz/c-klasse”, „bmw/3er”, „bmw/x5”, „land-rover/range-rover-sport” */
+export function as24Slug(make?: string, model?: string): string {
+  const sl = (x: string) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  let mk = sl(make || "");
+  if (mk === "vw") mk = "volkswagen";
+  if (mk === "mercedes") mk = "mercedes-benz";
+  if (!mk) return "";
+  let md = String(model || "").replace(/\b(touring|avant|kombi|sportback|limousine|limuzin|sedan|gran coupe|coupe|cabrio|kabrio|t-modell)\b/gi, " ").replace(/\s+/g, " ").trim();
+  md = md.replace(/^(\d)\s*-?\s*(as|es|ös|os|er|series)\b/i, "$1er").replace(/^([a-z]{1,3})\s*-?\s*(osztály|osztaly|klasse|class)\b/i, "$1-klasse");
+  const t = md.split(" ");
+  if (/^\d{3}[a-z]{1,2}$/i.test(t[0]) && /bmw/.test(mk)) t[0] = t[0].replace(/[a-z]+$/i, ""); // 320d → 320
+  if (t.length > 1 && /^[\d.]+[a-z]{0,2}$/i.test(t[1]) && !/^(model|range|id\.?)$/i.test(t[0])) t.length = 1; // GLC 300 → glc
+  md = sl(t.join(" "));
+  return md ? `${mk}/${md}` : mk;
+}
+export function buildAs24SearchUrl(req: Requirements, maxVehicleEur?: number, countries = "D"): string {
+  const v = req.vehicle;
+  const p = new URLSearchParams({ atype: "C", cy: countries, damaged_listing: "exclude", desc: "0", sort: "price", powertype: "kw", ustate: "N,U" });
+  const f = [...new Set((v.fuel || []).flatMap((x) => (AS24.fuel[x] || "").split(",")).filter(Boolean))];
+  if (f.length) p.set("fuel", f.join(","));
+  const b = [...new Set((v.body_types || []).map((x) => AS24.body[x]).filter(Boolean))];
+  if (b.length) p.set("body", b.join(","));
+  if (v.year_min) p.set("fregfrom", String(v.year_min));
+  if (v.year_max) p.set("fregto", String(v.year_max));
+  if (v.km_min) p.set("kmfrom", String(v.km_min));
+  if (v.km_max) p.set("kmto", String(v.km_max));
+  if (maxVehicleEur && maxVehicleEur > 1000) p.set("priceto", String(Math.round(maxVehicleEur / 1000) * 1000));
+  if (v.gearbox === "automatic") p.set("gear", "A"); else if (v.gearbox === "manual") p.set("gear", "M");
+  const eq = new Set<string>();
+  for (const e of v.must_have_equipment || []) { const c = Object.entries(AS24.eq).find(([k]) => e.toLowerCase().startsWith(k.toLowerCase()))?.[1]; if (c) eq.add(c); }
+  if (v.drivetrain === "awd") eq.add("11");
+  if (eq.size) p.set("eq", [...eq].join(","));
+  const path = as24Slug(v.makes[0], v.models[0]);
+  return `https://www.autoscout24.de/lst${path ? "/" + path : ""}?${p.toString().replace(/%2C/g, ",")}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -187,7 +258,7 @@ function mapLooseItem(x: any): Listing | null {
 // ---------------------------------------------------------------------------
 // Normalisation + validation (used for every source, and server-side for the extension)
 // ---------------------------------------------------------------------------
-const ALLOWED_IMAGE_HOSTS = [/(^|\.)classistatic\.de$/, /(^|\.)mobile\.de$/];
+const ALLOWED_IMAGE_HOSTS = [/(^|\.)classistatic\.de$/, /(^|\.)mobile\.de$/, /(^|\.)autoscout24\.net$/];
 
 export class ListingValidationError extends Error {
   constructor(public problems: string[]) { super(problems.join("; ")); }
@@ -244,7 +315,7 @@ export function normalizeListing(x: any, opts: { allowLocalImages?: boolean } = 
     euro_norm: x.euro_norm ?? null,
     battery_kwh: Number.isFinite(num(x.battery_kwh)) ? num(x.battery_kwh) : null,
     range_km: Number.isFinite(num(x.range_km)) ? num(x.range_km) : null,
-    equipment: Array.isArray(x.equipment) ? [...new Set(x.equipment.map((e: any) => String(e).trim()).filter(Boolean))] as string[] : [],
+    equipment: Array.isArray(x.equipment) ? [...new Set(x.equipment.map((e: any) => portalOf(String(x.url || "")).key === "as24" ? as24Equip(String(e).trim()) : String(e).trim()).filter(Boolean))] as string[] : [],
     accident_free: x.accident_free ?? null,
     previous_owners: Number.isFinite(num(x.previous_owners)) ? num(x.previous_owners) : null,
     service_book: x.service_book ?? null,

@@ -6,7 +6,7 @@ import type { Listing, Requirements } from "./types";
 import { equipHu } from "./describe";
 import { sectionLabel } from "./offer-view";
 import { unverifiedPaths, type RateConfig } from "./rates";
-import { MOBILE_IDS, FUEL_CODE, BODY_CODE, FEATURE_CODE } from "./sources";
+import { MOBILE_IDS, FUEL_CODE, BODY_CODE, FEATURE_CODE, AS24, as24Slug, portalOf } from "./sources";
 
 const CSS = `
 :root{--navy:#161922;--red:#E2001A;--bg:#F6F7FB;--line:#ECEEF2;--muted:#6b7280;--ok:#128a63;--warn:#fff3b0;--warnline:#e6c200}
@@ -77,7 +77,7 @@ const ago = (iso: string) => {
 export type InboxRow = RequestRow & { deal_name: string | null; deal_email: string | null; assigned_name: string | null; card_status: string | null };
 
 export function inboxPage(rows: InboxRow[], test: boolean) {
-  return `<h1>Ajánlatmotor · igények</h1><p class="muted">Import-érdeklődések, amelyekhez a motor mobile.de-ről a három legjobb autót keresi. Válaszidő-cél: 24 óra; a piros időpontú igényeknél még nincs kiküldött ajánlat.</p>
+  return `<h1>Ajánlatmotor · igények</h1><p class="muted">Import-érdeklődések, amelyekhez a motor a mobile.de-ről és az AutoScout24-ről a három legjobb autót keresi. Válaszidő-cél: 24 óra; a piros időpontú igényeknél még nincs kiküldött ajánlat.</p>
   ${test ? `<form method="post" action="/belso/ajanlatmotor/teszt/demo" class="row" style="margin:12px 0"><button class="btn dark">Demó e-mail szimulálása (BMW i5 Touring)</button>
   <span class="muted small">Teszt: egy valósághű ügyfél-e-mailt visz végig a teljes folyamaton (ügyfél + adatlap + top 3).</span></form>` : ""}
   <div class="card" style="padding:0;overflow-x:auto"><table><thead><tr><th>Állapot</th><th>Ügyfél</th><th>Igény</th><th>Adatlap státusz</th><th>Felelős</th><th>Érkezett</th></tr></thead><tbody>
@@ -136,7 +136,7 @@ function slotCard(cv: CarView, published: boolean) {
    <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/photos" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Fotók szűrése</button></form>
    <span class="muted small">${l.images.length} kép · ${(l as any).photos_checked ? `<span class="ok">✓ csak autófotó</span>${(l as any).photos_removed ? ` (${(l as any).photos_removed} kiszűrve)` : ""}` : `<span style="color:var(--red)">fotók nincsenek ellenőrizve</span>`}</span></div>`}
   <h3>${esc(l.title)}</h3>
-  <div class="muted small">${mock ? "TESZTHIRDETÉS (mock)" : `<a href="${esc(l.url)}" target="_blank" rel="noopener">mobile.de hirdetés ↗</a>`} · ${esc(l.seller.name)} · ${esc(l.seller.city)} · <strong>${Math.round(cv.distanceKm)} km</strong> Budapesttől (${cv.distanceMethod === "ors" ? "útvonal" : "becslés"})</div>
+  <div class="muted small">${mock ? "TESZTHIRDETÉS (mock)" : `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(portalOf(l.url).name || "Eredeti")} hirdetés ↗</a>`} · ${esc(l.seller.name)} · ${esc(l.seller.city)} · <strong>${Math.round(cv.distanceKm)} km</strong> Budapesttől (${cv.distanceMethod === "ors" ? "útvonal" : "becslés"})</div>
   <dl class="kv" style="margin:10px 0"><dt>Első forg.</dt><dd>${l.first_registration}</dd><dt>Km</dt><dd>${l.km.toLocaleString("hu-HU")}</dd>
    <dt>Teljesítmény</dt><dd>${l.power_kw} kW</dd><dt>Ár</dt><dd>${fmtEur(l.price_gross_eur)} bruttó${l.price_net_eur ? ` · ${fmtEur(l.price_net_eur)} nettó` : ""} ${l.vat_reclaimable ? "(ÁFA visszaigényelhető)" : ""}</dd>
    <dt>Felszereltség</dt><dd>${l.equipment.length} tétel</dd></dl>
@@ -171,7 +171,7 @@ export function requestPage(o: {
   const slotHtml = [1, 2, 3].map((n) => {
     const cv = bySlot.get(n);
     if (cv) return slotCard(cv, published);
-    return `<div class="slot-empty"><strong>${n}. hely üres</strong><p>Válassz a tartalékok közül, vagy adj hozzá mobile.de linket.</p></div>`;
+    return `<div class="slot-empty"><strong>${n}. hely üres</strong><p>Válassz a tartalékok közül, vagy küldj be egy autót a Chrome bővítménnyel (mobile.de vagy AutoScout24).</p></div>`;
   }).join("");
   const runnerRow = (c: CandidateRow, rejected = false) => {
     const l: Listing = JSON.parse(c.listing_json);
@@ -189,7 +189,7 @@ export function requestPage(o: {
   <div><h1>${esc(d.name || req?.customer.name || row.from_email || "Ismeretlen ügyfél")} <span class="chip ${row.status}">${STATUS_LABEL[row.status as Status] || row.status}</span></h1>
   <div class="muted">${esc(d.email || row.from_email || "")}${d.phone ? " · " + esc(d.phone) : ""} · adatlap: <b>${esc(o.cardStatus)}</b> · <a href="/belso/ugyfel/?id=${row.deal_id}" target="_blank">Ügyfél adatlap ↗</a> · forrás: ${esc(row.source)} · ${new Date(row.created_at).toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })} · kinyerés: ${esc(o.extraction?.engine || "–")}</div></div>
   <div class="row">
-   ${o.searchUrl && !published ? `<a class="btn red" href="#mdSearch" title="A keresési adatok ellenőrzése / módosítása, majd a mobile.de keresés megnyitása.">mobile.de keresés ↓</a>` : ""}
+   ${o.searchUrl && !published ? `<a class="btn red" href="#mdSearch" title="A keresési adatok ellenőrzése / módosítása, majd a mobile.de vagy AutoScout24 keresés megnyitása.">mobile.de / AutoScout24 keresés ↓</a>` : ""}
    <form method="post" action="${B}/search"><button class="btn" ${published ? "disabled" : ""}>Keresés újrafuttatása</button></form>
    <form method="post" action="${B}/describe"><button class="btn" ${published ? "disabled" : ""}>Mindhárom leírás generálása</button></form>
    <a class="btn dark" href="${B}/preview" target="_blank" title="Pontosan ez az oldal nyílik meg az ügyfélnek az e-mailből">Ajánlat megtekintése ↗</a>
@@ -260,7 +260,7 @@ export function settingsPage(o: { version: number; rates: RateConfig; history: {
 
 export function extensionPage(tokens: { id: string; user_name: string; label: string | null; created_at: string; last_used_at: string | null; revoked_at: string | null }[], newToken: string | null, baseUrl: string, isAdminUser: boolean) {
   return `<h1>Chrome bővítmény (Caradvance Sourcing)</h1>
-  <p class="muted">A bővítménnyel egy kattintással küldhetsz autót egy mobile.de hirdetésről az ügyfél ajánlatába. Ha ebben a Chrome-ban be vagy lépve a belső felületre, a bővítmény token nélkül működik, és azt látja, amit te. Token csak más böngészőhöz kell.${isAdminUser ? " Adminként mindenki tokenjét látod." : ""}</p>
+  <p class="muted">A bővítménnyel egy kattintással küldhetsz autót egy mobile.de vagy AutoScout24 hirdetésről az ügyfél ajánlatába. Ha ebben a Chrome-ban be vagy lépve a belső felületre, a bővítmény token nélkül működik, és azt látja, amit te. Token csak más böngészőhöz kell.${isAdminUser ? " Adminként mindenki tokenjét látod." : ""}</p>
   ${newToken ? `<div class="msg">Új token (most másold ki, többet nem látszik):<br><code style="font-size:15px;user-select:all">${esc(newToken)}</code><br>Szerver címe a bővítményben: <code style="user-select:all">${esc(baseUrl)}</code></div>` : ""}
   <form method="post" action="/belso/ajanlatmotor/bovitmeny" class="card row"><input name="label" placeholder="Melyik gép? (pl. irodai laptop)" style="max-width:320px"><button class="btn red">Saját token létrehozása</button></form>
   <div class="card" style="padding:0"><table><thead><tr><th>Felhasználó</th><th>Megjegyzés</th><th>Létrehozva</th><th>Utoljára használva</th><th></th></tr></thead><tbody>
@@ -269,7 +269,7 @@ export function extensionPage(tokens: { id: string; user_name: string; label: st
   </tbody></table></div>
   <div class="card"><h2>Telepítés</h2><ol><li>Töltsd le a bővítményt: <a href="/belso/ajanlatmotor-bovitmeny.zip">ajanlatmotor-bovitmeny.zip</a>, és csomagold ki.</li>
   <li>Chrome → <code>chrome://extensions</code> → Fejlesztői mód be → „Kicsomagolt bővítmény betöltése” → a kicsomagolt mappa.</li>
-  <li>Maradj belépve a belső felületre ugyanebben a Chrome-ban (token nem kell).</li><li>Nyiss meg egy mobile.de hirdetést → „Küldés az ajánlatba”.</li></ol></div>`;
+  <li>Maradj belépve a belső felületre ugyanebben a Chrome-ban (token nem kell).</li><li>Nyiss meg egy mobile.de vagy AutoScout24 hirdetést → „Küldés az ajánlatba”.</li></ol></div>`;
 }
 
 export function startPage(deal: DealRow) {
@@ -299,7 +299,7 @@ export function searchEditor(req: Requirements, dealId: number, maxEur?: number)
   const eqOn = (k: string) => (v.must_have_equipment || []).some((e) => e.toLowerCase().startsWith(k.toLowerCase()));
   const chk = (name: string, val: string, lbl: string, on: boolean) => `<label class="mds-c"><input type="checkbox" name="${name}" value="${esc(val)}"${on ? " checked" : ""}> ${esc(lbl)}</label>`;
   const inp = (name: string, lbl: string, val: unknown, ph = "") => `<label class="mds-f"><span>${lbl}</span><input name="${name}" value="${val == null ? "" : esc(String(val))}" placeholder="${esc(ph)}" inputmode="numeric"></label>`;
-  const cfg = { ids, fuel: FUEL_CODE, body: BODY_CODE, feat: FEATURE_CODE };
+  const cfg = { ids, fuel: FUEL_CODE, body: BODY_CODE, feat: FEATURE_CODE, as24: AS24 };
   return `<style>
   .mds{margin-top:14px}.mds h2{margin:0 0 4px}.mds-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
   @media(max-width:900px){.mds-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -309,7 +309,7 @@ export function searchEditor(req: Requirements, dealId: number, maxEur?: number)
   .mds-url{font:12px ui-monospace,Menlo,monospace;color:#6b7280;word-break:break-all;margin-top:10px;background:#f6f7fb;border-radius:8px;padding:8px 10px}
   </style>
   <form class="card mds" id="mdSearch" method="post" action="/belso/ajanlatmotor/igeny/${dealId}/kereses">
-   <h2>mobile.de keresés</h2><div class="small muted">Az igényből kitöltve — módosítsd, ha kell, majd nyisd meg. A „Mentés” az igénybe is beírja a változtatásokat.</div>
+   <h2>Keresés: mobile.de · AutoScout24</h2><div class="small muted">Az igényből kitöltve — módosítsd, ha kell, majd nyisd meg valamelyik portálon. A „Mentés” az igénybe is beírja a változtatásokat.</div>
    <div class="mds-g">
     <label class="mds-f"><span>Márka</span><select name="make" id="mdsMake"><option value="">— bármely —</option>${makes.map((m) => `<option${m === mk ? " selected" : ""}>${esc(m)}</option>`).join("")}</select></label>
     <label class="mds-f"><span>Modell</span><input name="model" id="mdsModel" list="mdsModels" value="${esc(v.models[0] || "")}" placeholder="pl. X5"><datalist id="mdsModels"></datalist></label>
@@ -321,12 +321,14 @@ export function searchEditor(req: Requirements, dealId: number, maxEur?: number)
    <div class="mds-row"><b>Üzemanyag</b>${FUEL_HU.map(([k, l]) => chk("fuel", k, l, (v.fuel || []).includes(k as any))).join("")}</div>
    <div class="mds-row"><b>Karosszéria</b>${BODY_HU.map(([k, l]) => chk("body", k, l, (v.body_types || []).includes(k))).join("")}</div>
    <div class="mds-row"><b>Felszereltség</b>${EQUIP_HU.map(([k, l]) => chk("equip", k, l, eqOn(k) || (k === "Allradantrieb" && v.drivetrain === "awd"))).join("")}</div>
-   <div class="mds-url" id="mdsUrl"></div>
-   <div class="row" style="margin-top:10px"><a class="btn red" id="mdsGo" href="#" target="_blank" rel="noopener">Keresés a mobile.de-n ↗</a><button class="btn dark">Mentés az igénybe</button>
-    <span class="small muted">A jó hirdetést a Chrome bővítménnyel küldd be („Küldés az ajánlatba”).</span></div>
+   <div class="mds-row"><b>AutoScout24 ország</b><select name="as24_cy" style="font:inherit;font-size:13px;padding:6px 10px;border:1px solid #dfe3ea;border-radius:9px">${Object.entries(AS24.countries).map(([k, l]) => `<option value="${esc(k)}">${esc(l)}</option>`).join("")}</select></div>
+   <div class="mds-url" id="mdsUrl"></div><div class="mds-url" id="asUrl"></div>
+   <div class="row" style="margin-top:10px"><a class="btn red" id="mdsGo" href="#" target="_blank" rel="noopener">Keresés a mobile.de-n ↗</a><a class="btn red" id="asGo" href="#" target="_blank" rel="noopener" style="background:#333">Keresés az AutoScout24-en ↗</a><button class="btn dark">Mentés az igénybe</button>
+    <span class="small muted">A jó hirdetést a Chrome bővítménnyel küldd be („Küldés az ajánlatba”) — mindkét portálon működik.</span></div>
   </form>
   <script>(function(){
   var C=${JSON.stringify(cfg).replace(/</g, "\\u003c")};
+  var AS24SLUG=${as24Slug.toString()};
   var f=document.getElementById('mdSearch');if(!f)return;
   var nm=function(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();};
   var all=function(n){return [].slice.call(f.querySelectorAll('[name="'+n+'"]:checked')).map(function(x){return x.value;});};
@@ -349,6 +351,17 @@ export function searchEditor(req: Requirements, dealId: number, maxEur?: number)
     eq.forEach(function(e){var c=C.feat[e];if(c)p.append('fe',c);});
     var u='https://suchen.mobile.de/fahrzeuge/search.html?'+p.toString();
     document.getElementById('mdsGo').href=u;document.getElementById('mdsUrl').textContent=u;
+    // AutoScout24: /lst/<márka>/<modell>?…
+    var A=C.as24,q=new URLSearchParams({atype:'C',cy:val('as24_cy')||'D',damaged_listing:'exclude',desc:'0',sort:'price',powertype:'kw',ustate:'N,U'});
+    var af=[];all('fuel').forEach(function(x){String(A.fuel[x]||'').split(',').forEach(function(c){if(c&&af.indexOf(c)<0)af.push(c);});});if(af.length)q.set('fuel',af.join(','));
+    var ab=[];all('body').forEach(function(x){var c=A.body[x];if(c&&ab.indexOf(c)<0)ab.push(c);});if(ab.length)q.set('body',ab.join(','));
+    if(dig('year_min'))q.set('fregfrom',dig('year_min'));if(dig('year_max'))q.set('fregto',dig('year_max'));
+    if(dig('km_min'))q.set('kmfrom',dig('km_min'));if(dig('km_max'))q.set('kmto',dig('km_max'));
+    if(pm>1000)q.set('priceto',String(Math.round(pm/1000)*1000));
+    if(gb==='automatic')q.set('gear','A');else if(gb==='manual')q.set('gear','M');
+    var ae=[];eq.forEach(function(e){var c=A.eq[e];if(c&&ae.indexOf(c)<0)ae.push(c);});if(ae.length)q.set('eq',ae.join(','));
+    var path=AS24SLUG(mk,md),au='https://www.autoscout24.de/lst'+(path?'/'+path:'')+'?'+q.toString().replace(/%2C/g,',');
+    document.getElementById('asGo').href=au;document.getElementById('asUrl').textContent=au;
   }
   f.addEventListener('input',build);f.addEventListener('change',function(e){if(e.target&&e.target.name==='make'){f.elements.model.value='';models();}build();});
   models();build();

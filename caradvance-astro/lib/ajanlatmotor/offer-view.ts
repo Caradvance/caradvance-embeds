@@ -64,7 +64,7 @@ const I18N = {
     eyebrow: "Személyre szabott ajánlat",
     hello: (n: string) => `Szia ${n}, itt a három autó, amit neked választottunk.`,
     intro: "Mindhárom autót egyenként átnéztük. Az árak Budapesten, forgalomba helyezve értendők, minden díjjal együtt.",
-    valid: "Érvényes", contactTitle: "Kérdésed van? Írj vagy hívj.", details: "Részletek", source: "Eredeti hirdetés (mobile.de)", choose: "Ezt választom",
+    valid: "Érvényes", contactTitle: "Kérdésed van? Írj vagy hívj.", details: "Részletek", source: "Eredeti hirdetés ({p})", choose: "Ezt választom",
     totalLabel: "Teljes ár Budapesten, forgalomba helyezve", compare: "Összehasonlítás", prices: "Árak",
     gallery: "Galéria", equipment: "Felszereltség", location: (c: string, km: number) => `Az autó jelenleg itt áll: ${c}, Németország, ${km} km-re Budapesttől.`,
     rows: { year: "Első forgalomba helyezés", km: "Futásteljesítmény", power: "Teljesítmény", fuel: "Hajtás típusa", range: "Hatótáv (WLTP, hirdetés szerint)",
@@ -90,7 +90,7 @@ const I18N = {
     eyebrow: "Ihr persönliches Angebot",
     hello: (n: string) => `Hallo ${n}, hier sind die drei Fahrzeuge, die wir für Sie ausgewählt haben.`,
     intro: "Wir haben jedes Fahrzeug einzeln geprüft. Die Preise verstehen sich zugelassen in Budapest, inklusive aller Gebühren.",
-    valid: "Gültig bis", contactTitle: "Fragen? Schreiben oder rufen Sie uns an.", details: "Details", source: "Originalinserat (mobile.de)", choose: "Dieses Fahrzeug wählen",
+    valid: "Gültig bis", contactTitle: "Fragen? Schreiben oder rufen Sie uns an.", details: "Details", source: "Originalinserat ({p})", choose: "Dieses Fahrzeug wählen",
     totalLabel: "Gesamtpreis in Budapest, zugelassen", compare: "Vergleich", prices: "Preise",
     gallery: "Galerie", equipment: "Ausstattung", location: (c: string, km: number) => `Standort: ${c}, Deutschland, ${km} km von Budapest entfernt.`,
     rows: { year: "Erstzulassung", km: "Kilometerstand", power: "Leistung", fuel: "Antriebsart", range: "Reichweite (WLTP, laut Inserat)",
@@ -313,7 +313,7 @@ export function renderOffer(o: PublicOffer, s: OfferState): string {
       <div class="price"><span class="big">≈ ${huf(c.total_huf)}</span><span class="eur">≈ ${eur(c.total_eur)}</span><small>${L.totalLabel}</small></div>
       <div class="acts">
         <a class="btn btn-line" href="#auto-${c.slot}">${L.details}</a>
-        ${c.source_url ? `<a class="btn btn-line" href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer">${L.source} ↗</a>` : ""}
+        ${c.source_url ? `<a class="btn btn-line" href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer">${L.source.replace("{p}", /autoscout24\./i.test(c.source_url || "") ? "AutoScout24" : "mobile.de")} ↗</a>` : ""}
         ${s.expired ? "" : `<button class="btn btn-red choose-btn" data-choose="${c.cid}" data-title="${esc(c.title)}">${L.choose}</button>`}
       </div>
     </div>
@@ -344,12 +344,12 @@ export function renderOffer(o: PublicOffer, s: OfferState): string {
           <div class="cta">
             <span class="big">≈ ${huf(c.total_huf)}</span><small>${L.totalLabel}</small>
             ${s.expired ? "" : `<button class="btn btn-red choose-btn" data-choose="${c.cid}" data-title="${esc(c.title)}">${L.choose}</button>`}
-            ${c.source_url ? `<a class="btn btn-line" href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer" style="margin-top:8px">${L.source} ↗</a>` : ""}
+            ${c.source_url ? `<a class="btn btn-line" href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer" style="margin-top:8px">${L.source.replace("{p}", /autoscout24\./i.test(c.source_url || "") ? "AutoScout24" : "mobile.de")} ↗</a>` : ""}
           </div>
         </div>
       </div>
       <div class="panel reveal"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px"><h4 style="margin:0">${L.gallery}</h4>
-        ${c.source_url ? `<a class="btn btn-red" href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer">${L.source} ↗</a>` : ""}</div>
+        ${c.source_url ? `<a class="btn btn-red" href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer">${L.source.replace("{p}", /autoscout24\./i.test(c.source_url || "") ? "AutoScout24" : "mobile.de")} ↗</a>` : ""}</div>
         <div class="gal">${c.images.slice(0, 8).map((u, i) => `<button type="button" data-lb="${c.slot}" data-i="${i}" aria-label="${L.gallery} ${i + 1}" style="position:relative"><img src="${esc(u)}" alt="" loading="lazy" width="400" height="300">${i === 7 && c.images.length > 8 ? `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,11,13,.55);color:#fff;font-weight:800;font-size:20px">+${c.images.length - 8}</span>` : ""}</button>`).join("")}</div>
       </div>
       <div class="panel reveal"><h4>${L.equipment} · ${c.equipment_count}</h4>

@@ -25,6 +25,7 @@ type Seen = { v: Verdict; c?: string };
 
 /** Smaller mobile.de rendition is enough for the check. */
 function checkUrl(u: string) {
+  if (/autoscout24\.net/.test(u)) return u.replace(/\/\d+x\d+\.(webp|jpg)$/i, "/640x480.jpg");
   return /classistatic\.de/.test(u) ? u.replace(/rule=mo-\d+\.jpg/, "rule=mo-640.jpg") : u;
 }
 
@@ -75,7 +76,7 @@ export async function answerText(r: any): Promise<string> {
 }
 
 async function imageBytes(url: string) {
-  const res = await fetch(checkUrl(url), { headers: { "User-Agent": "Mozilla/5.0 (Caradvance Ajanlatmotor)", Accept: "image/*", Referer: "https://suchen.mobile.de/" } });
+  const res = await fetch(checkUrl(url), { headers: { "User-Agent": "Mozilla/5.0 (Caradvance Ajanlatmotor)", Accept: "image/*", Referer: /autoscout24\.net/.test(url) ? "https://www.autoscout24.de/" : "https://suchen.mobile.de/" } });
   if (!res.ok) throw new Error(`image fetch ${res.status}`);
   return { bytes: new Uint8Array(await res.arrayBuffer()), type: res.headers.get("content-type") || "image/jpeg" };
 }

@@ -6,7 +6,9 @@ import { aiModel } from "./am";
 const MAP = (equipment as any).map as Record<string, [string, string]>;
 
 export function equipHu(e: string): { hu: string; cat: string } {
-  const m = MAP[e];
+  let m = MAP[e];
+  // „Leichtmetallfelgen (22")” → a zárójel nélküli név fordítása + a zárójeles rész
+  if (!m) { const p = e.match(/^(.*?)\s*(\([^)]*\))$/); const b = p && MAP[p[1]]; if (b) return { hu: b[0] + " " + p![2], cat: b[1] }; }
   return m ? { hu: m[0], cat: m[1] } : { hu: e, cat: "Egyéb" };
 }
 

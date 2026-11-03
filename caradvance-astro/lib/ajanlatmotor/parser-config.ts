@@ -1,9 +1,9 @@
 /** Remote parser config for the Chrome extension (kept in sync with extension/parser.js DEFAULT_CONFIG by a test). */
 export const PARSER_CONFIG = {
   version: 1,
-  listing_url: ["/auto-inserat/", "/fahrzeuge/details.html"],
-  search_url: ["/fahrzeuge/search.html", "/auto/"],
-  search_card_selectors: ["[data-testid^='result-listing']", "article[class*='result']", "a[href*='details.html?id=']"],
+  listing_url: ["/auto-inserat/", "/fahrzeuge/details.html", "/angebote/", "/offers/", "/annunci/", "/aanbod/", "/offres/", "/anuncios/", "/ofertas/"],
+  search_url: ["/fahrzeuge/search.html", "/auto/", "/lst"],
+  search_card_selectors: ["[data-testid^='result-listing']", "article[class*='result']", "article[data-guid]", "a[href*='details.html?id=']"],
   state_markers: ["firstRegistration", "mileage", "make"],
   dom_patterns: {
     km: "(?:Kilometerstand|Mileage)\\s*([\\d.]+)\\s*km",

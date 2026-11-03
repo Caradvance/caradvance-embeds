@@ -102,7 +102,7 @@ export function rationaleFor(s: Scored, req: Requirements): string {
   ];
   const nice = req.vehicle.nice_to_have_equipment.filter((e) => l.equipment.includes(e));
   if (nice.length) parts.push(`plusz: ${nice.join(", ")}`);
-  if (l.price_rating === "very_good" || l.price_rating === "good") parts.push("mobile.de szerint jó ár");
+  if (l.price_rating === "very_good" || l.price_rating === "good") parts.push(/autoscout24\./i.test(l.url || "") ? "AutoScout24 szerint jó ár" : "mobile.de szerint jó ár");
   if (l.seller.type === "private") parts.push("magáneladó");
   return parts.join(" · ");
 }

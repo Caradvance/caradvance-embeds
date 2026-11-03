@@ -99,7 +99,7 @@ export async function processRequest(env: Env, dealId: number, actor = "system",
   const source = getSource(env);
   if (source.name === "manual") {
     // no automatic mobile.de search yet: staff use the prefilled search + the Chrome extension
-    const note = "Automatikus mobile.de keresés még nincs bekapcsolva. Nyisd meg a „mobile.de keresés ↗” gombbal az előre kitöltött keresést, és a jó autókat a Chrome bővítménnyel küldd be.";
+    const note = "Automatikus mobile.de keresés még nincs bekapcsolva. Nyisd meg a „mobile.de / AutoScout24 keresés” gombbal az előre kitöltött keresést, és a jó autókat a Chrome bővítménnyel küldd be.";
     await env.DB.prepare("UPDATE am_requests SET search_note = ?, updated_at = ? WHERE deal_id = ?").bind(note, nowIso(), dealId).run();
     await transition(env, dealId, "NEEDS_REVIEW", actor, { source: "manual" });
     await notifyStaff(env, `Új autóigény: ${who}`, `<p>${note}</p><p><a href="${link}">Megnyitás az Ajánlatmotorban</a></p>`);

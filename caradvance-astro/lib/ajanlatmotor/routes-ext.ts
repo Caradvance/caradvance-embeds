@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import type { Env, Requirements } from "./types";
 import { baseUrl, cacheGet, canSeeDeal, ensureAm, isAdmin, isTest, logEvent, nowIso, rateLimit, sessionUser, type Staff } from "./am";
 import { addListing, getRequest } from "./engine";
-import { buildSearchUrl, ListingValidationError, normalizeListing } from "./sources";
+import { buildSearchUrl, buildAs24SearchUrl, ListingValidationError, normalizeListing } from "./sources";
 import { mockImageSvg } from "./mock";
 import { PARSER_CONFIG } from "./parser-config";
 import { hashExtToken } from "./routes-staff";
@@ -94,7 +94,7 @@ ext.get("/ext/requests/:id/search-url", async (c) => {
   // rough vehicle-price ceiling: budget minus ~2.5M HUF import costs, at the cached rate
   const fx = (await cacheGet<{ rate: number }>(c.env, "fx:EURHUF"))?.rate || 395;
   const ceiling = req.vehicle.budget_huf_max ? (req.vehicle.budget_huf_max - 2_500_000) / fx : req.vehicle.budget_eur_max;
-  return c.json({ url: buildSearchUrl(req, ceiling) });
+  return c.json({ url: c.req.query("portal") === "as24" ? buildAs24SearchUrl(req, ceiling, c.req.query("cy") || "D") : buildSearchUrl(req, ceiling) });
 });
 
 ext.post("/ext/listings", async (c) => {

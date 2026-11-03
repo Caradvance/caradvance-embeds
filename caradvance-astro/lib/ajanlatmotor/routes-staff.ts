@@ -185,7 +185,7 @@ staff.post("/igeny/:id/add", async (c) => {
   let listing;
   try { listing = await getSource(c.env).getById(String(f.url || "")); } catch (e: any) { return back(c, reqPath(id), undefined, e.message); }
   if (!listing) return back(c, reqPath(id), undefined, sourceName(c.env) === "manual"
-    ? "Hirdetést a Chrome bővítménnyel küldj be: nyisd meg a mobile.de hirdetést, és kattints a „Küldés az ajánlatba” gombra."
+    ? "Hirdetést a Chrome bővítménnyel küldj be: nyisd meg a mobile.de vagy AutoScout24 hirdetést, és kattints a „Küldés az ajánlatba” gombra."
     : isTest(c.env)
     ? (/mobile\.de/i.test(String(f.url || ""))
       ? "Tesztben a szerver nem kérdezi le a mobile.de-t (mock forrás). Valódi hirdetést a Chrome bővítménnyel küldjön be („Küldés az ajánlatba”), vagy próbáljon tesztazonosítót: 1001–1007, 2001, 3001."
@@ -424,7 +424,7 @@ export function cspHeaders(nonce: string) {
   return {
     "Content-Security-Policy": [
       "default-src 'self'", `script-src 'nonce-${nonce}'`, "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src https://fonts.gstatic.com", "img-src 'self' data: https://www.caradvance.hu https://img.classistatic.de", "connect-src 'self'",
+      "font-src https://fonts.gstatic.com", "img-src 'self' data: https://www.caradvance.hu https://img.classistatic.de https://prod.pictures.autoscout24.net", "connect-src 'self'",
       "form-action 'self'", "frame-ancestors 'none'", "base-uri 'none'",
     ].join("; "),
     "X-Robots-Tag": "noindex, nofollow, noarchive",
