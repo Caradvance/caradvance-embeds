@@ -121,7 +121,7 @@ const BLANK_RE = /^(?:…{2,}|\.{4,}|_{3,})$/;
 function tokenize(text, base, bold) {
   const words = []; let curW = null; let isBold = false;
   const pushSeg = (seg) => { if (!curW) { curW = []; words.push(curW); } curW.push(seg); };
-  const s = String(text).replace(/\s+/g, ' ').trim();
+  const s = String(text).replace(/[ \t\r\n\f\v]+/g, ' ').trim();
   let i = 0;
   while (i < s.length) {
     if (s.startsWith('**', i)) { isBold = !isBold; i += 2; continue; }
@@ -154,6 +154,7 @@ function wrapWords(d, words, size, maxW, base) {
 function drawLine(d, ln, x, y, size, color, base, page, align, maxW) {
   const sp = d.width(' ', base, size); let cx = x;
   if (align === 'right' && maxW) cx = x + maxW - ln.w;
+  else if (align === 'center' && maxW) cx = x + (maxW - ln.w) / 2;
   ln.words.forEach((w, wi) => {
     if (wi) cx += sp;
     for (const s of w) {
@@ -720,4 +721,96 @@ export function groupRentEquipment(list) {
   // a külső előre, mint a mintán
   const order = ['Külső felszereltség', 'Komfort / belső tér', 'Biztonság / asszisztensek', 'Sport', 'Connectivity / egyéb'];
   return order.map((n) => out.find((g) => g[0] === n)).filter((g) => g[1].length);
+}
+
+/* ============================== díjbekérő (kaució / előleg) — kétnyelvű DE / HU ============================== */
+/**
+ * o: { title, sub, meta: [[[szöveg, félkövér?]…]…] (jobb felső sorok), to: { label, lines[] }, from: { label, lines[] },
+ *      letter: [de, hu] (**félkövér**), boxes: [[címke, érték, alsó sor]…3] (az első sötét), section1, bank: [[címke, érték, nagy?]…],
+ *      qr: bool mátrix | null, qrCaption: [de, hu], section2, notes: [[de, hu]…], closing, footer: { left, right } }
+ */
+export function renderPayReqPdf(o) {
+  o = o || {};
+  const L = new Layout({ header: ['', ''] }); const d = L.d; L.bottom = 43; L.top = PH - 34;
+  const RED = C.red, INK = C.ink, LAB = C.lab;
+  const spaced = (t, x, y, f, s, col, sp) => { let cx = x; for (const ch of String(t)) { d.text(ch, cx, y, f, s, col); cx += d.width(ch, f, s) + sp; } return cx - x; };
+  const spacedW = (t, f, s, sp) => [...String(t)].reduce((a, ch) => a + d.width(ch, f, s) + sp, 0);
+  // ---- fej
+  let y = PH - 40;
+  const lh = 34, lw = lh * LOGO_W / LOGO_H; d.image(ML, y - lh + 4, lw, lh);
+  const ttl = String(o.title || '').toUpperCase(); const tw = spacedW(ttl, 'B', 19, 1.2); spaced(ttl, PW - MR - tw, y - 12, 'B', 19, INK, 1.2);
+  let my = y - 28;
+  const rightRich = (parts, yy) => { const w = parts.reduce((a, [t, b]) => a + d.width(t, b ? 'S' : 'L', 7.8), 0); let x = PW - MR - w; for (const [t, b] of parts) { d.text(t, x, yy, b ? 'S' : 'L', 7.8, b ? INK : LAB); x += d.width(t, b ? 'S' : 'L', 7.8); } };
+  if (o.sub) { rightRich([[o.sub, false]], my); my -= 11; }
+  for (const parts of (o.meta || [])) { rightRich(parts, my); my -= 11; }
+  y = Math.min(y - lh - 6, my + 2); d.fill(ML, y, CW, 2.2, RED); y -= 20;
+  // ---- címzett / feladó
+  const gap = 26, cw = (CW - gap) / 2;
+  const party = (p, x) => { let yy = y; spaced(String(p.label || '').toUpperCase(), x, yy, 'L', 6.6, LAB, 0.9); yy -= 13; (p.lines || []).forEach((t, i) => { if (!t) return; d.text(t, x, yy, i === 0 ? 'S' : 'L', 8.4, i === 0 ? INK : C.txt); yy -= 11.5; }); return y - yy; };
+  const h1 = party(o.to || {}, ML), h2 = party(o.from || {}, ML + cw + gap);
+  L.y = y - Math.max(h1, h2) - 8;
+  // ---- levél (két hasáb)
+  if (o.letter) {
+    const A = L.measure(o.letter[0], { w: cw, size: 8.2, f: 'L', bf: 'S', num: false, bullets: false, lh: 1.45 });
+    const B = L.measure(o.letter[1], { w: cw, size: 8.2, f: 'L', bf: 'S', num: false, bullets: false, lh: 1.45 });
+    L.drawMeasured(A, ML, L.y, C.txt); L.drawMeasured(B, ML + cw + gap, L.y, C.txt);
+    L.y -= Math.max(A.lines.length * A.lh, B.lines.length * B.lh) + 10;
+  }
+  // ---- összeg / határidő / közlemény dobozok
+  const bxs = (o.boxes || []).slice(0, 3); const bh = 60, bg = 10, bw = (CW - 2 * bg) / 3;
+  L.ensure(bh + 10);
+  bxs.forEach(([lbl, val, sub], i) => {
+    const bx = ML + i * (bw + bg), top = L.y; const dark = i === 0;
+    if (dark) d.fill(bx, top - bh, bw, bh, '0.2 0.21 0.24'); else d.stroke(bx, top - bh, bw, bh, C.line, 0.8);
+    spaced(String(lbl).toUpperCase(), bx + 12, top - 16, 'L', 6.2, dark ? '0.78 0.8 0.84' : LAB, 0.8);
+    let v = String(val || '—'); let vs = 17; while (vs > 10 && d.width(v, 'B', vs) > bw - 24) vs -= 0.5;
+    d.text(v, bx + 12, top - 34, 'B', vs, dark ? '1 1 1' : INK);
+    if (sub) { const m = L.measure(sub, { w: bw - 24, size: 6.8, f: 'L', num: false, bullets: false, lh: 1.35 }); L.drawMeasured(m, bx + 12, top - 39, dark ? '0.85 0.86 0.9' : C.mut); }
+  });
+  L.y -= bh + 14;
+  const section = (de, hu) => { L.ensure(40); d.fill(ML, L.y - 13, 3, 15, RED); const w1 = spaced(String(de).toUpperCase(), ML + 11, L.y - 10, 'B', 10, INK, 1.1); spaced(' / ' + String(hu).toUpperCase(), ML + 11 + w1, L.y - 10, 'B', 10, LAB, 1.1); L.y -= 23; };
+  // ---- bankszámla adatai + QR
+  if (o.bank && o.bank.length) {
+    section(o.section1 ? o.section1[0] : 'Bankverbindung', o.section1 ? o.section1[1] : 'Bankszámla adatai');
+    const qrW = o.qr ? 104 : 0; const tw2 = CW - (qrW ? qrW + 22 : 0); const rh = 16; const top = L.y;
+    L.ensure(o.bank.length * rh + 6);
+    o.bank.forEach(([lbl, val, big], i) => {
+      if (i % 2 === 0) d.fill(ML, L.y - rh, tw2, rh, C.note);
+      d.text(lbl, ML + 8, L.y - 11, 'L', 7.6, LAB);
+      let v = String(val || '—'); const fs = big ? 10.5 : 8.2; while (v.length > 3 && d.width(v, 'S', fs) > tw2 * 0.6) v = v.slice(0, -2) + '…';
+      d.text(v, ML + tw2 * 0.37, L.y - (big ? 11.8 : 11), 'S', fs, INK);
+      L.y -= rh;
+    });
+    if (o.qr) {
+      const N = o.qr.length, s = (qrW - 8) / N, qx = PW - MR - qrW + 4, qy = top - 4;
+      for (let r = 0; r < N; r++) { let c = 0; while (c < N) { if (!o.qr[r][c]) { c++; continue; } let e = c; while (e < N && o.qr[r][e]) e++; d.fill(qx + c * s, qy - (r + 1) * s, (e - c) * s + 0.05, s + 0.05, '0 0 0'); c = e; } }
+      let cy = qy - qrW - 4;
+      for (const [k, t] of (o.qrCaption || []).entries()) { const m = L.measure(t, { w: qrW + 10, size: 6.4, f: k ? 'L' : 'L', num: false, bullets: false, lh: 1.3 }); L.drawMeasured(m, qx - 5, cy, k ? C.mut : C.txt, null, { align: 'center', maxW: qrW + 10 }); cy -= m.lines.length * m.lh + 1; }
+      L.y = Math.min(L.y, cy - 2);
+    }
+    L.y -= 10;
+  }
+  // ---- tudnivalók (DE | HU, számozott pontok)
+  if (o.notes && o.notes.length) {
+    section(o.section2 ? o.section2[0] : 'Hinweise', o.section2 ? o.section2[1] : 'Tudnivalók');
+    const cw2 = (CW - gap) / 2;
+    d.text('DEUTSCH', ML, L.y - 7, 'S', 6.8, RED); d.text('MAGYAR', ML + cw2 + gap, L.y - 7, 'S', 6.8, LAB);
+    d.line(ML, L.y - 11, ML + cw2, L.y - 11, RED, 0.8); d.line(ML + cw2 + gap, L.y - 11, PW - MR, L.y - 11, C.line, 0.8); L.y -= 15;
+    o.notes.forEach(([a, b], i) => {
+      const A = L.measure(`**${i + 1}.** ` + a, { w: cw2, size: 7.4, f: 'L', bf: 'S', num: false, bullets: false, lh: 1.4 });
+      const B = L.measure(`**${i + 1}.** ` + b, { w: cw2, size: 7.4, f: 'L', bf: 'S', num: false, bullets: false, lh: 1.4 });
+      const h = Math.max(A.lines.length * A.lh, B.lines.length * B.lh); L.ensure(h + 4);
+      L.drawMeasured(A, ML, L.y, C.txt); L.drawMeasured(B, ML + cw2 + gap, L.y, C.txt); L.y -= h + 3;
+    });
+    L.y -= 2;
+  }
+  if (o.closing) L.para(o.closing, { size: 7.4, f: 'L', bf: 'S', lh: 1.45, color: C.mut });
+  const ft = o.footer || {};
+  const deco = (pg, i, total) => {
+    d.line(ML, 40, PW - MR, 40, C.line, 0.6, pg);
+    d.text(ft.left || 'caradvance · Miete · Import · Verkauf', ML, 27, 'L', 6.8, LAB, pg);
+    const r = (ft.right || 'www.caradvance.hu') + ' · Seite / oldal ' + (i + 1) + ' / ' + total;
+    d.text(r, PW - MR - d.width(r, 'L', 6.8), 27, 'L', 6.8, LAB, pg);
+  };
+  return d.build({ title: o.docTitle || o.title || 'Zahlungsaufforderung', author: 'CarAdvance' }, deco);
 }
