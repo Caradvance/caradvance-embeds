@@ -16,8 +16,9 @@ export const SITE = 'https://www.caradvance.hu';
 
 export const STATUSES = [
   'Kapcsolatfelvételre vár', 'Ajánlatra vár', 'Ajánlat kiküldve', 'Ajánlat elfogadva',
-  'Ajánlat elutasítva', 'Ajánlat módosítva', 'Megvalósítás', 'Lezárva'
+  'Ajánlat elutasítva', 'Ajánlat módosítva', 'Aláírásra vár ügyfél', 'Aláírásra vár partner', 'Szerződés aláírva', 'Megvalósítás', 'Lezárva'
 ];
+export const SIGN_STATUSES = ['Aláírásra vár ügyfél', 'Aláírásra vár partner', 'Szerződés aláírva'];
 export const DEFAULT_STATUS = STATUSES[0];
 
 export const CHECKLIST = [
@@ -294,6 +295,28 @@ export async function listEvents(env, dealId) {
 }
 
 /** actor: ki végezte (munkatárs neve / „Ügyfél”) — a státuszváltozás bekerül a naplóba. */
+/**
+ * Aláírási státusz az e-aláírási kérelmekből: kint van az ügyfélnél → „Aláírásra vár ügyfél”; az ügyfél aláírta,
+ * a partner ellenjegyzésére vár → „Aláírásra vár partner”; minden kiküldött dokumentum aláírva → „Szerződés aláírva”.
+ * A későbbi státuszokat (Megvalósítás, Lezárva) nem írja felül.
+ */
+export async function syncSignStatus(env, dealId, actor) {
+  try {
+    const rows = (await env.DB.prepare(`SELECT signer_role, status, expires_at FROM crm_sign WHERE deal_id = ?`).bind(dealId).all()).results || [];
+    const nowS = Math.floor(Date.now() / 1000);
+    const open = (r) => (r.status === 'pending' || r.status === 'signing') && !(Number(r.expires_at) && Number(r.expires_at) < nowS);
+    const cos = await env.DB.prepare(`SELECT COUNT(*) AS n FROM crm_docs WHERE deal_id = ? AND sign_status = 'cosign'`).bind(dealId).first();
+    let next = '';
+    if (rows.some((r) => open(r) && r.signer_role !== 'partner')) next = 'Aláírásra vár ügyfél';
+    else if (rows.some((r) => open(r) && r.signer_role === 'partner') || (cos && cos.n > 0)) next = 'Aláírásra vár partner';
+    else if (rows.some((r) => r.status === 'signed')) next = 'Szerződés aláírva';
+    const cur = await getCard(env, dealId);
+    const ci = STATUSES.indexOf(cur.status);
+    if (!next || cur.status === next || ci >= STATUSES.indexOf('Megvalósítás')) return cur.status;
+    await saveCard(env, dealId, { status: next }, null, actor || 'Rendszer', 'e-aláírás');
+    return next;
+  } catch (e) { console.error('syncSignStatus', e && e.message); return null; }
+}
 export async function saveCard(env, dealId, fields, userId, actor, reason) {
   const cur = await getCard(env, dealId);
   const next = {
