@@ -9,7 +9,8 @@ import {
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
   , IMPORT_CX, importAuto, COUNTRY_HU
 } from '../../../lib/crm.js';
-import { jpegInfo, renderOfferPdf, renderRentOfferPdf, groupRentEquipment } from '../../../lib/docpdf.js';
+import { jpegInfo, renderOfferPdf, renderRentOfferPdf, renderPayReqPdf, groupRentEquipment } from '../../../lib/docpdf.js';
+import { qrMatrix, epcPayload } from '../../../lib/qr.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
 // címre megy az ügyfél helyett (a tárgyban ott a valódi címzett). Éles üzemhez állítsd null-ra,
@@ -402,35 +403,57 @@ async function handleResendOffer(request, env, user, id, token) {
 }
 
 
-/* ---------------- díjbekérő: kaució (Bérlés) / előleg (Eladás, Import) — a szerződések aláírása után ---------------- */
+/* ---------------- díjbekérő: kaució (Bérlés) / előleg (Eladás, Import) — a szerződések aláírása után ----------------
+   Kétnyelvű (DE / HU) PDF a CarAdvance-minta szerint (Kaution · Óvadék / Anzahlung · Előleg), EPC (GiroCode) QR-kóddal, e-mail mellékletként. */
 const PAYREQ = { kaucio: { t: 'Kaució', subj: 'Díjbekérő — kaució' }, eloleg: { t: 'Előleg', subj: 'Előlegbekérő' } };
 const payKind = (line) => (line === 'Bérlés' ? 'kaucio' : 'eloleg');
-const fmtAmt = (n, cur) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (cur === 'EUR' ? ' €' : ' Ft');
+const fmtAmt = (n, cur) => (Math.round(n * 100) % 100 ? Number(n).toFixed(2).replace('.', ',') : Math.round(n).toString()).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + (cur === 'EUR' ? '\u00a0€' : '\u00a0Ft');
 function amtOf(x) { const t = String(x == null ? '' : x).replace(/[\s ]/g, ''); const cur = /ft|huf/i.test(t) ? 'HUF' : /€|eur/i.test(t) ? 'EUR' : ''; const n = parseFloat(t.replace(/[^\d,.]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return { n: isFinite(n) ? n : 0, cur }; }
-/** Alapértékek autónként: kaució az ajánlatból / az autó adataiból, előleg a teljes ár 30%-a. */
+const PAY_PARTY = {
+  gmbh: { name: 'Caradvance GmbH', address: 'Bgm.-Graf-Ring 21, 82538 Geretsried', country: 'Deutschland / Németország', bank: 'Commerzbank AG', iban: 'DE06 7008 0000 0493 6668 00', bic: 'DRESDEFF700', signer: 'Dr. Alexander Röther', signer_title: 'Geschäftsführer / ügyvezető', city: 'Geretsried' },
+  bhg: { name: 'BH Group Zrt.', address: '2083 Solymár, Ibolya utca 18.', country: 'Ungarn / Magyarország', bank: '', iban: '', bic: '', signer: '', signer_title: '', city: 'Solymár' }
+};
+const PARTY_KEYS = ['name', 'address', 'country', 'bank', 'iban', 'bic', 'signer', 'signer_title', 'city'];
+async function payParty(env, line) {
+  const saved = await getSetting(env, 'payreq_party_' + line, null);
+  const def = { ...(line === 'Import' ? PAY_PARTY.bhg : PAY_PARTY.gmbh) };
+  if (line === 'Import' && !def.iban) def.iban = await getSetting(env, 'bh_bankszamla', '');
+  return saved && saved.name ? { ...def, ...saved } : def;
+}
+const huD = (iso) => (/^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.replace(/-/g, '. ') + '.' : '');
+const deD = (iso) => (/^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.' + iso.slice(0, 4) : '');
+const huToIso = (t) => { const m = String(t || '').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/); return m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : ''; };
+/** Alapértékek: autónként az összeg (kaució az ajánlatból, előleg a teljes ár 30%-a), az ügyfél és a szerződés adatai. */
 async function payDefaults(env, deal, card) {
   const kind = payKind(deal.line); const vehicles = vehiclesOf(card.data);
   const acc = await env.DB.prepare(`SELECT items, choice FROM crm_offers WHERE deal_id = ? AND action = 'elfogad' ORDER BY responded_at DESC LIMIT 1`).bind(deal.id).first();
   const accIt = acc ? parseJ(acc.items, [])[acc.choice] : null;
-  const list = (vehicles.length ? vehicles : [null]).map((v) => {
-    let amount = 0, currency = (v && v.currency) || (accIt && accIt.currency) || 'EUR', total = 0;
-    if (kind === 'kaucio') { amount = Number(v && v.deposit) || Number(accIt && accIt.deposit) || 0; if (!(v && v.deposit) && accIt) currency = accIt.currency || currency; }
-    else {
+  const docs = (await env.DB.prepare(`SELECT vehicle_id, vars FROM crm_docs WHERE deal_id = ? AND sign_status = 'signed' ORDER BY id DESC`).bind(deal.id).all()).results || [];
+  const list = [];
+  for (const v of (vehicles.length ? vehicles : [null])) {
+    let amount = 0, currency = (v && v.currency) || (accIt && accIt.currency) || 'EUR', total = 0, rent = 0;
+    if (kind === 'kaucio') {
+      amount = Number(v && v.deposit) || Number(accIt && accIt.deposit) || 0; if (!(v && v.deposit) && accIt) currency = accIt.currency || currency;
+      const pr = Number(v && v.price) || Number(accIt && accIt.price) || 0; const net = (v && v.vat_mode) === 'net' || (!v && accIt && accIt.vat_mode === 'net');
+      rent = pr ? Math.round(net ? pr * 1.19 : pr) : 0;
+    } else {
       const ar = amtOf(v && v.cx && v.cx.ar);
       if (ar.n > 0) { total = ar.n; currency = ar.cur || 'EUR'; }
       else { total = Number(v && v.price) || Number(accIt && accIt.price) || 0; if (deal.line === 'Import' && currency === 'HUF' && total > 0 && total < 1e6) currency = 'EUR'; }
       amount = Math.round(total * 0.3);
     }
-    return { vehicle_id: v ? v.id : '', name: v ? (v.title || [v.brand, v.model].filter(Boolean).join(' ')) : (deal.car || ''), amount, currency, total };
-  });
-  const doc = await env.DB.prepare(`SELECT vars FROM crm_docs WHERE deal_id = ? AND sign_status = 'signed' ORDER BY id DESC LIMIT 1`).bind(deal.id).first();
-  const contract = (doc && parseJ(doc.vars, {}).szerzodes_szam) || `CA-${({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}`;
-  const sk = 'payreq_' + kind;
-  const due = new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10);
+    const dv = (v && docs.find((x) => x.vehicle_id === v.id)) || docs[0];
+    const base = await docVarsEnv(env, deal, card, v, { party: 'client' }, {}, 0);
+    const sv = { ...base, ...(dv ? parseJ(dv.vars, {}) : {}) };
+    list.push({
+      vehicle_id: v ? v.id : '', name: sv.auto_megnevezes || (v ? (v.title || [v.brand, v.model].filter(Boolean).join(' ')) : (deal.car || '')), vin: sv.auto_alvazszam || (v && v.vin) || '',
+      amount, currency, total, rent, contract: sv.szerzodes_szam || '', contract_date: huToIso(sv.keltezes_datum) || '',
+      client: sv.ugyfel_nev || '', address: sv.ugyfel_cim || '', country: [sv.ugyfel_orszag_de, sv.ugyfel_orszag].filter(Boolean).join(' / ') || 'Ungarn / Magyarország'
+    });
+  }
   return {
-    kind, title: PAYREQ[kind].t, percent: kind === 'eloleg' ? 30 : 0, vehicles: list, contract, due,
-    beneficiary: await getSetting(env, sk + '_benef', deal.line === 'Bérlés' ? 'Caradvance GmbH' : 'BH Group Zrt.'),
-    account: await getSetting(env, sk + '_acc', deal.line === 'Bérlés' ? '' : await getSetting(env, 'bh_bankszamla', '')),
+    kind, title: PAYREQ[kind].t, percent: kind === 'eloleg' ? 30 : 0, vehicles: list, due: new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10),
+    party: await payParty(env, deal.line), company: card.data.kind === 'ceg',
     to: clean((card.data.person && card.data.person.email) || deal.email, 160), name: (card.data.person && card.data.person.name) || deal.name || ''
   };
 }
@@ -439,36 +462,95 @@ async function handlePayDefaults(env, user, id) {
   if (!['Bérlés', 'Eladás', 'Import'].includes(deal.line)) return json({ error: 'Ennél az üzletágnál nincs díjbekérő.' }, 400);
   return json(await payDefaults(env, deal, await getCard(env, id)));
 }
+const asciiName = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+/** A díjbekérő PDF tartalma (kétnyelvű). */
+function payPdfData(kind, line, p) {
+  const K = kind === 'kaucio'; const cur = p.currency; const amt = fmtAmt(p.amount, cur); const amtCode = (Math.round(p.amount * 100) / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (cur === 'EUR' ? ' EUR' : ' HUF');
+  const P = p.party; const today = new Date(Date.now() + 3600e3).toISOString().slice(0, 10);
+  const roles = K ? ['Vermieter / Bérbeadó', 'Mieter / Bérlő'] : line === 'Import' ? ['Auftragnehmer / Megbízott', 'Auftraggeber / Megbízó'] : ['Verkäufer / Eladó', 'Käufer / Vevő'];
+  const ctr = K ? ['Mietvertrag', 'bérleti szerződés'] : line === 'Import' ? ['Vertrag', 'szerződés'] : ['Kaufvertrag', 'adásvételi szerződés'];
+  const no = p.contract || '—'; const cdDe = deD(p.contract_date), cdHu = huD(p.contract_date);
+  const dueDe = deD(p.due), dueHu = huD(p.due);
+  const fam = String(p.client || '').trim().split(/\s+/)[0] || '';
+  const salDe = p.salutation === 'Frau' || p.salutation === 'Herr' ? `Sehr geehrte${p.salutation === 'Herr' ? 'r' : ''} ${p.salutation} ${fam},` : 'Sehr geehrte Damen und Herren,';
+  const salHu = `Tisztelt ${p.client || 'Ügyfelünk'}!`;
+  const carDe = p.car ? ` über den **${p.car}**${p.vin ? ` (FIN ${p.vin}${K ? '; § 3 und Anlage 1 Ziffer 2.5' : ''})` : K ? ' (§ 3 und Anlage 1 Ziffer 2.5)' : ''}` : '';
+  const carHu = p.car ? `, a **${p.car}** gépjárműre vonatkozóan${p.vin ? ` (alvázszám: ${p.vin})` : ''}` : '';
+  const totalTxt = !K && p.total ? fmtAmt(p.total, cur) : '';
+  const letter = K
+    ? [`${salDe} // gemäß **${ctr[0]} Nr. ${no}${cdDe ? ' vom ' + cdDe : ''}**${carDe} bitten wir Sie, die **Kaution von ${amt}** bis spätestens **${dueDe}** auf das unten genannte Konto zu überweisen.`,
+       `${salHu} // A **${cdHu ? cdHu.replace(/\.$/, '') + '-i, ' : ''}${no} számú ${ctr[1]}** (3. § és 1. sz. melléklet 2.5. pont) alapján${carHu} kérjük, hogy a **${amt} összegű óvadékot** legkésőbb **${dueHu}** napjáig utalja át az alábbi bankszámlára.`]
+    : [`${salDe} // gemäß **${ctr[0]} Nr. ${no}${cdDe ? ' vom ' + cdDe : ''}**${carDe} bitten wir Sie, die **Anzahlung von ${amt}**${totalTxt ? ` (${p.percent || 30} % des Gesamtpreises von ${totalTxt})` : ''} bis spätestens **${dueDe}** auf das unten genannte Konto zu überweisen.`,
+       `${salHu} // A **${cdHu ? cdHu.replace(/\.$/, '') + '-i, ' : ''}${no} számú ${ctr[1]}** alapján${carHu} kérjük, hogy a **${amt} összegű előleget**${totalTxt ? ` (a ${totalTxt} teljes ár ${p.percent || 30}%-a)` : ''} legkésőbb **${dueHu}** napjáig utalja át az alábbi bankszámlára.`];
+  const ref = p.reference || no; const transfer = `${K ? 'Kaution' : 'Anzahlung'} ${ref} ${asciiName(p.client)}`.trim();
+  const eur = cur === 'EUR';
+  const notes = K ? [
+    [`Die Zahlung ist **ausschließlich in Euro und ausschließlich per Überweisung** möglich. **Eine Zahlung in Forint oder in bar ist nicht möglich.**`, `A fizetés **kizárólag euróban és kizárólag átutalással** lehetséges. **Forintban vagy készpénzben fizetni nem lehet.**`],
+    [`Auf dem Konto des Vermieters müssen **volle ${amt} eingehen**. Bank-, Überweisungs- und Umrechnungsgebühren trägt der Mieter. Wird von einem Forintkonto überwiesen, ist der Auftrag **in Euro** zu erteilen (Betrag ${amtCode}).`, `A Bérbeadó számlájára **a teljes ${amt}-nak kell beérkeznie**. A bank-, átutalási és átváltási költségek a Bérlőt terhelik. Forintszámláról történő utalás esetén a megbízást **euróban** kell megadni (${amtCode}).`],
+    [`Die Kaution ist **kein Entgelt** und unterliegt **nicht der Umsatzsteuer**; es wird keine Rechnung erstellt. Der Vermieter bestätigt den Eingang schriftlich (Anlage 1 Ziffer 2.5.1).`, `Az óvadék **nem ellenérték**, ezért **áfát nem tartalmaz**; számla nem készül róla. A Bérbeadó a beérkezést írásban visszaigazolja (1. sz. melléklet 2.5.1. pont).`],
+    [`**Das Fahrzeug wird erst nach Eingang der Kaution und der ersten Monatsmiete${p.rent ? ' von ' + fmtAmt(p.rent, cur) : ''} übergeben**; die erste Monatsmiete ist spätestens bei der Übergabe fällig und wird gesondert in Rechnung gestellt (Anlage 1 Ziffern 2.3 und 2.5).`, `**A gépjármű átadására csak az óvadék és az első${p.rent ? ', ' + fmtAmt(p.rent, cur) + '-s' : ''} havi bérleti díj beérkezése után kerül sor**; az első havi díj legkésőbb az átadáskor esedékes, arról külön számla készül (1. sz. melléklet 2.3. és 2.5. pont).`],
+    [`Nach ordnungsgemäßer Rückgabe des Fahrzeugs wird die Kaution abgerechnet und **innerhalb von zehn (10) Werktagen** in Euro auf ein vom Mieter benanntes Konto zurückgezahlt (Anlage 1 Ziffer 2.5.3).`, `A gépjármű szerződésszerű visszaadása után a Bérbeadó az óvadékkal elszámol, és azt **tíz (10) munkanapon belül** euróban visszautalja a Bérlő által megadott bankszámlára (1. sz. melléklet 2.5.3. pont).`]
+  ] : [
+    eur ? [`Die Zahlung ist **ausschließlich in Euro und ausschließlich per Überweisung** möglich. **Eine Barzahlung ist nicht möglich.**`, `A fizetés **kizárólag euróban és kizárólag átutalással** lehetséges. **Készpénzes fizetésre nincs lehetőség.**`]
+        : [`Die Zahlung ist **ausschließlich per Überweisung in Forint** möglich. **Eine Barzahlung ist nicht möglich.**`, `A fizetés **kizárólag forintban, átutalással** lehetséges. **Készpénzes fizetésre nincs lehetőség.**`],
+    [`Auf dem Konto des Empfängers müssen **volle ${amt} eingehen**. Bank-, Überweisungs- und Umrechnungsgebühren trägt der Kunde.${eur ? ` Wird von einem Forintkonto überwiesen, ist der Auftrag **in Euro** zu erteilen (Betrag ${amtCode}).` : ''}`, `A Kedvezményezett számlájára **a teljes ${amt}-nak kell beérkeznie**. A bank-, átutalási és átváltási költségek az Ügyfelet terhelik.${eur ? ` Forintszámláról történő utalás esetén a megbízást **euróban** kell megadni (${amtCode}).` : ''}`],
+    [`Über die Anzahlung wird nach Eingang eine **Anzahlungsrechnung** ausgestellt; der Eingang wird schriftlich bestätigt.`, `Az előlegről a beérkezést követően **előlegszámlát** állítunk ki, a beérkezést írásban visszaigazoljuk.`],
+    [`Die **Bestellung bzw. Beschaffung des Fahrzeugs** wird erst nach Eingang der Anzahlung eingeleitet.`, `A gépjármű **megrendelése, illetve beszerzése** csak az előleg beérkezése után indul.`],
+    ...(p.total ? [[`Der **Restbetrag von ${fmtAmt(Math.max(0, p.total - p.amount), cur)}** ist gemäß Vertrag fällig; die Anzahlung wird auf den Gesamtpreis angerechnet.`, `A **fennmaradó ${fmtAmt(Math.max(0, p.total - p.amount), cur)}** a szerződés szerint esedékes; az előleg a teljes árba beszámít.`]] : [])
+  ];
+  let qr = null;
+  const ibanOk = /^[A-Z]{2}\d{2}[A-Z0-9]{8,30}$/.test(String(P.iban || '').replace(/\s/g, '').toUpperCase());
+  if (eur && ibanOk) { try { qr = qrMatrix(epcPayload({ bic: P.bic, name: P.name, iban: P.iban, amount: p.amount, text: transfer })); } catch (e) { qr = null; } }
+  const title = K ? 'Kaution · Óvadék' : 'Anzahlung · Előleg';
+  return {
+    title, docTitle: (K ? 'Kaution / Óvadék — ' : 'Anzahlung / Előleg — ') + no, sub: 'Zahlungsaufforderung / Fizetési felszólítás',
+    meta: [[['Vertragsnummer / Szerződésszám ', false], [no, true], [' · ' + deD(today), false]], [[roles[0] + ': ', false], [P.name, true], [' · ' + roles[1] + ': ', false], [p.client || '', true]]],
+    to: { label: 'An / Címzett', lines: [p.client, p.address, p.country, p.to] },
+    from: { label: 'Von / Feladó', lines: [P.name, P.address, P.country, 'info@caradvance.hu · +36 30 233 6060'] },
+    letter,
+    boxes: [['Betrag / Összeg', amt, K ? 'Kaution, keine USt. / óvadék, áfa nélkül' : (totalTxt ? `Anzahlung ${p.percent || 30} % / előleg ${p.percent || 30}% · ${totalTxt}` : 'Anzahlung / előleg')],
+      ['Fällig bis / Fizetési határidő', dueDe, dueHu], ['Verwendungszweck / Közlemény', ref, 'bitte unbedingt angeben / kérjük, feltétlenül tüntesse fel']],
+    bank: [['Empfänger / Kedvezményezett', P.name], ['Anschrift / Cím', [P.address, (P.country || '').split(' / ')[0]].filter(Boolean).join(', ')], ['Bank', P.bank], ['IBAN', P.iban, true], ['BIC / SWIFT', P.bic],
+      ['Betrag / Összeg', amtCode], ['Verwendungszweck / Közlemény', transfer], ['Zahlungsart / Fizetés módja', eur ? 'SEPA-Überweisung in Euro / SEPA-átutalás euróban' : 'Banküberweisung in Forint / banki átutalás forintban']].filter((r) => r[1]),
+    qr, qrCaption: qr ? ['QR-Code mit der Banking-App scannen (EPC-QR / GiroCode)', 'QR-kód beolvasása a banki alkalmazással'] : null,
+    notes,
+    closing: `Mit freundlichen Grüßen / Üdvözlettel · **${P.name}**${P.signer ? ', ' + P.signer + (P.signer_title ? ', ' + P.signer_title : '') : ''}${P.city ? ' · ' + P.city + ', ' + deD(today) : ''} · Fragen / Kérdések: info@caradvance.hu · +36 30 233 6060`,
+    footer: { left: 'caradvance · Miete · Import · Verkauf', right: (K ? 'Kaution / Óvadék' : 'Anzahlung / Előleg') + ' · ' + no + ' · www.caradvance.hu' },
+    fileName: `CarAdvance_${asciiName(fam || p.client).replace(/[^A-Za-z0-9]+/g, '_')}_${K ? 'Kaution_Ovadek' : 'Anzahlung_Eloleg'}_Zahlungsaufforderung${p.car ? '_' + asciiName(p.car).replace(/^(BMW|MINI|Audi|Mercedes-Benz|Volkswagen|VW)\s+/i, '').replace(/[^A-Za-z0-9]+/g, '_').slice(0, 30) : ''}.pdf`.replace(/_+/g, '_')
+  };
+}
 async function handlePaySend(request, env, user, id) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
   if (!['Bérlés', 'Eladás', 'Import'].includes(deal.line)) return json({ error: 'Ennél az üzletágnál nincs díjbekérő.' }, 400);
   const b = await request.json().catch(() => ({}));
   const kind = payKind(deal.line); const T = PAYREQ[kind];
-  const amount = Math.round(Math.max(0, Number(b.amount) || 0) * 100) / 100; const currency = b.currency === 'HUF' ? 'HUF' : 'EUR';
-  const to = clean(b.to, 160), beneficiary = clean(b.beneficiary, 120), account = clean(b.account, 80), reference = clean(b.reference, 120), car = clean(b.car, 200), note = cleanMulti(b.note, 1000).trim();
-  const due = /^\d{4}-\d{2}-\d{2}$/.test(b.due || '') ? b.due : '';
-  if (!(amount > 0)) return json({ error: 'Add meg az összeget.' }, 400);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return json({ error: 'Adj meg érvényes e-mail címet.' }, 400);
-  if (!beneficiary || !account) return json({ error: 'Add meg a kedvezményezettet és a bankszámlaszámot.' }, 400);
-  const sk = 'payreq_' + kind; await setSetting(env, sk + '_benef', beneficiary); await setSetting(env, sk + '_acc', account);
-  const card = await getCard(env, id);
-  const name = (card.data.person && card.data.person.name) || deal.name || '';
-  const dueHu = due ? due.replace(/-/g, '. ') + '.' : '';
-  const row = (k, v, big) => `<tr><td style="padding:8px 12px;color:#6b7280;font-size:13px;border-bottom:1px solid #eef1f5;white-space:nowrap">${k}</td><td style="padding:8px 12px;font-size:${big ? 18 : 14}px;font-weight:bold;color:${big ? '#e2001a' : '#141519'};border-bottom:1px solid #eef1f5">${esc(v)}</td></tr>`;
-  const html = `<p>Kedves ${esc(name || 'Ügyfelünk')}!</p>
-<p>Köszönjük, hogy aláírta a szerződés${kind === 'kaucio' ? 't' : 'eket'}! ${kind === 'kaucio' ? 'A bérlet indításához kérjük, utalja át a <b>kauciót</b>' : 'A megrendelés elindításához kérjük, utalja át az <b>előleget</b>'} az alábbi adatokkal:</p>
-<table cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;border-collapse:separate;overflow:hidden;width:100%;max-width:520px">
-${row(T.t, fmtAmt(amount, currency), true)}${car ? row('Jármű', car) : ''}${row('Kedvezményezett', beneficiary)}${row('Bankszámlaszám', account)}${row('Közlemény', reference || '—')}${dueHu ? row('Fizetési határidő', dueHu) : ''}
-</table>
-${note ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(note)}</p>` : ''}
-<p>Kérjük, a közleményben tüntesse fel a fenti azonosítót, hogy az utalást gyorsan be tudjuk azonosítani.${kind === 'kaucio' ? ' A kaució a jármű sértetlen visszaadásakor visszajár.' : ''}</p>
-<p>Kérdés esetén keressen minket bizalommal.</p><p>Üdvözlettel:<br>CarAdvance</p>`;
+  const party = {}; const bp = b.party || {}; for (const k of PARTY_KEYS) party[k] = clean(bp[k], k === 'address' ? 200 : 120);
+  const p = {
+    amount: Math.round(Math.max(0, Number(b.amount) || 0) * 100) / 100, currency: b.currency === 'HUF' ? 'HUF' : 'EUR', total: Math.max(0, Number(b.total) || 0), percent: Math.max(0, Math.min(100, Number(b.percent) || 30)),
+    rent: Math.max(0, Number(b.rent) || 0), to: clean(b.to, 160), reference: clean(b.reference, 120), car: clean(b.car, 200), vin: clean(b.vin, 40),
+    contract: clean(b.contract, 80), contract_date: /^\d{4}-\d{2}-\d{2}$/.test(b.contract_date || '') ? b.contract_date : '', due: /^\d{4}-\d{2}-\d{2}$/.test(b.due || '') ? b.due : '',
+    client: clean(b.client, 160), address: clean(b.address, 240), country: clean(b.country, 80), salutation: ['Frau', 'Herr'].includes(b.salutation) ? b.salutation : '', note: cleanMulti(b.note, 1000).trim(), party
+  };
+  if (!(p.amount > 0)) return json({ error: 'Add meg az összeget.' }, 400);
+  if (!p.due) return json({ error: 'Add meg a fizetési határidőt.' }, 400);
+  if (!party.name || !party.iban) return json({ error: 'Add meg a kedvezményezettet és a bankszámlaszámot (IBAN).' }, 400);
+  const D = payPdfData(kind, deal.line, p);
+  const pdf = renderPayReqPdf(D);
+  if (b.preview) return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${D.fileName}"`, 'cache-control': 'no-store' } });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.to)) return json({ error: 'Adj meg érvényes e-mail címet.' }, 400);
+  await setSetting(env, 'payreq_party_' + deal.line, party);
+  const dueHu = huD(p.due); const amt = fmtAmt(p.amount, p.currency);
+  const html = `<p>Tisztelt ${esc(p.client || 'Ügyfelünk')}!</p>
+<p>Köszönjük, hogy aláírta a szerződés${kind === 'kaucio' ? 't' : 'eket'}! ${kind === 'kaucio' ? 'A bérlet indításához kérjük, utalja át a <b>' + esc(amt) + ' óvadékot (kauciót)</b>' : 'A megrendelés elindításához kérjük, utalja át a <b>' + esc(amt) + ' előleget</b>'} legkésőbb <b>${esc(dueHu)}</b> napjáig. A fizetési felszólítást (bankszámla-adatokkal${D.qr ? ' és QR-kóddal' : ''}) csatoltan küldjük.</p>
+<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px">Kedvezményezett: <b>${esc(party.name)}</b><br>IBAN: <b>${esc(party.iban)}</b>${party.bic ? '<br>BIC: <b>' + esc(party.bic) + '</b>' : ''}<br>Összeg: <b>${esc(amt)}</b><br>Közlemény: <b>${esc(D.bank.find((r) => r[0].startsWith('Verwendungszweck'))[1])}</b></p>
+${p.note ? `<p style="white-space:pre-line">${esc(p.note)}</p>` : ''}<p>Kérdés esetén keressen minket bizalommal: info@caradvance.hu · +36 30 233 6060</p><p>Üdvözlettel:<br>CarAdvance</p>`;
   const fwd = testForward(env);
-  const r = await sendCrmMail(env, fwd || to, `${fwd ? '[TESZT — ' + to + '] ' : ''}${T.subj}${reference ? ' — ' + reference : ''} — CarAdvance`, html, []);
-  const txt = `${T.t}bekérő ${r.ok ? 'elküldve' : 'küldése SIKERTELEN'}: ${fmtAmt(amount, currency)}${car ? ' — ' + car : ''} → ${fwd ? 'TESZT → ' + fwd : to}${dueHu ? ', határidő: ' + dueHu : ''}${reference ? ', közlemény: ' + reference : ''}${r.ok ? '' : ' — ' + r.error}`;
+  const r = await sendCrmMail(env, fwd || p.to, `${fwd ? '[TESZT — ' + p.to + '] ' : ''}${T.subj}${p.contract ? ' — ' + p.contract : ''} — CarAdvance`, html, [{ filename: D.fileName, content: bytesToB64(pdf) }]);
+  if (r.ok) { try { await putFile(env, id, D.fileName, 'application/pdf', bytesToB64(pdf), user.id); } catch (e) { /* nem kritikus */ } }
+  const txt = `${T.t}bekérő ${r.ok ? 'elküldve' : 'küldése SIKERTELEN'}: ${amt}${p.car ? ' — ' + p.car : ''} → ${fwd ? 'TESZT → ' + fwd : p.to}, határidő: ${dueHu}${p.reference || p.contract ? ', közlemény: ' + (p.reference || p.contract) : ''}${r.ok ? '' : ' — ' + r.error}`;
   await addEvent(env, id, 'payreq', txt, user.name);
   if (!r.ok) return json({ ok: false, error: r.error }, 502);
-  return json({ ok: true, sentTo: fwd || to, test: !!fwd });
+  return json({ ok: true, sentTo: fwd || p.to, test: !!fwd });
 }
 
 /* ---------------- CarAdvance-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ---------------- */
