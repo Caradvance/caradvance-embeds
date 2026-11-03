@@ -225,6 +225,31 @@ export async function markViewed(env: Env, o: OfferRecord, origin: string) {
     `<p>${pub.offer_no}</p><p><a href="${origin}/belso/ajanlatmotor/igeny/${o.deal_id}">Megnyitás az Ajánlatmotorban</a></p>`, o.deal_id);
 }
 
+const CC_HU: Record<string, string> = { DE: "Németország", AT: "Ausztria", IT: "Olaszország", NL: "Hollandia", BE: "Belgium", FR: "Franciaország", ES: "Spanyolország", LU: "Luxemburg", CH: "Svájc", CZ: "Csehország", PL: "Lengyelország", DK: "Dánia" };
+const nf = (n: number) => Math.round(n).toLocaleString("hu-HU").replace(/\u00a0/g, " ");
+/** Az Import-szerződések (előszerződés, adásvételi, honosítási megbízás) adatai a kiválasztott autó ajánlati számításából. */
+export function importCx(l: any, costs: any, offerNo?: string): Record<string, string> {
+  const cx: Record<string, string> = {};
+  if (!l) return cx;
+  const lines: any[] = (costs && costs.lines) || [];
+  const sum = (g: string[]) => lines.filter((x) => g.includes(x.group)).reduce((a, b) => a + (Number(b.amount_huf) || 0), 0);
+  const fx = Number(costs && costs.fx && costs.fx.rate) || 0;
+  if (offerNo) cx.ugyszam = String(offerNo);
+  if (l.price_gross_eur) cx.ar = nf(l.price_gross_eur) + " €";
+  if (l.km != null) cx.auto_km = nf(l.km) + " km";
+  const s = l.seller || {};
+  const cc = String(s.country || "DE").toUpperCase();
+  cx.auto_szarmazasi_orszag = CC_HU[cc] || cc;
+  const place = [s.name, [s.zip, s.city].filter(Boolean).join(" "), CC_HU[cc] || cc].filter(Boolean).join(", ");
+  if (place) cx.auto_atvetel_hely = place;
+  const logistics = sum(["logistics"]), homol = sum(["homologation"]), service = sum(["service", "margin"]) + Math.max(0, (Number(costs && costs.customer_total_huf) || 0) - sum(["vehicle", "logistics", "homologation", "service", "margin"]));
+  if (logistics) { cx.szallitasi_dij = nf(logistics) + " Ft"; if (fx) cx.visszaszallitas_koltseg = nf(logistics / fx); }
+  if (homol) { cx.hatosagi_dijak = nf(homol); cx.eloleg = nf(homol) + " Ft"; }
+  // a megbízási díj nettó (a szerződés 27% áfát számol rá) — így a bruttó díj megegyezik az ajánlatban szereplő szolgáltatási résszel
+  if (service) cx.megbizasi_dij = nf(Math.round(service / 1.27 / 100) * 100) + " Ft";
+  return cx;
+}
+
 /** Customer picks a car: same fields and status as the belső /ajanlat/valasz/ flow ("Ajánlat elfogadva"). */
 export async function chooseCar(env: Env, o: OfferRecord, choice: { cid: string; name: string; phone: string; callback: string; message: string; ip: string }, origin: string) {
   const pub = (JSON.parse(o.snapshot_json) as { public: PublicOffer }).public;
@@ -245,12 +270,18 @@ export async function chooseCar(env: Env, o: OfferRecord, choice: { cid: string;
     km: `${car.km.toLocaleString("hu-HU")} km`, power: `${car.power_kw} kW`, color: car.color || "", price: car.total_huf, currency: "HUF", period: "",
     offer_no: (items[idx] && items[idx].offer_no) || `${o.offer_no}-${car.slot}`, offer_date: (items[idx] && items[idx].offer_date) || String(o.published_at || nowIso()).slice(0, 10),
     fx: (items[idx] && items[idx].fx) || (car.total_eur ? Math.round(car.total_huf / car.total_eur * 100) / 100 : 0), ad_id: (items[idx] && items[idx].ad_id) || "" };
+  // Import-szerződések adatai (az autó „Szerződés adatai” blokkja): az ajánlat belső számításából
+  try {
+    const snap: any = JSON.parse(o.snapshot_json);
+    const inn = (snap.internal || []).find((x: any) => x.cid === car.cid);
+    if (inn) it.cx = importCx(inn.listing, inn.costs, it.offer_no);
+  } catch { /* nincs belső adat */ }
   const list = vehiclesOf(data).slice();
   const same = list.findIndex((v: any) => (it.key && v.key === it.key) || (v.title && v.title === it.title));
   const emptyIdx = list.findIndex((v: any) => !v.title && !v.brand && !v.model && !v.vin);
-  if (same >= 0) list[same] = { ...list[same], price: it.price, currency: "HUF", ...offerFields(it) };
-  else if (emptyIdx >= 0) list[emptyIdx] = { ...itemToVehicle(it, list[emptyIdx].id, "offer"), vin: list[emptyIdx].vin || "" };
-  else list.push(itemToVehicle(it, newVehicleId(list), "offer"));
+  if (same >= 0) list[same] = { ...list[same], price: it.price, currency: "HUF", ...offerFields(it), cx: { ...(it.cx || {}), ...(list[same].cx || {}) } };
+  else if (emptyIdx >= 0) list[emptyIdx] = { ...itemToVehicle(it, list[emptyIdx].id, "offer"), vin: list[emptyIdx].vin || "", cx: it.cx || {} };
+  else list.push({ ...itemToVehicle(it, newVehicleId(list), "offer"), cx: it.cx || {} });
   const person = { ...(data.person || {}) };
   if (!person.phone && choice.phone) person.phone = choice.phone.slice(0, 200);
   await saveCard(env, o.deal_id, { status: "Ajánlat elfogadva", data: { ...data, vehicles: list, vehicle: list[0], person } }, null, "Ügyfél", "választott az ajánlatból");
