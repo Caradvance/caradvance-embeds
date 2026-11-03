@@ -255,7 +255,7 @@ ${faq.map(([q, aa]) => `<details><summary>${escAttr(q)}</summary><p>${escAttr(aa
     if (!/"@type":"OfferCatalog"/.test(a)) {
       a = addLd(a, { '@context': 'https://schema.org', '@type': 'OfferCatalog', name: 'Bérelhető autóink – prémium autóbérlés és tartós bérlet', url: SITE + '/autoink/#berelheto', provider: { '@id': SITE + '/#dealer' },
         itemListElement: cars.map((c, i) => ({ '@type': 'Offer', position: i + 1, url: c.url, priceCurrency: 'HUF', price: c.ft, businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
-          priceSpecification: { '@type': 'UnitPriceSpecification', price: c.ft, priceCurrency: 'HUF', unitCode: 'MON' }, itemOffered: { '@type': 'Product', name: `${c.name} bérlés`, brand: { '@type': 'Brand', name: c.brand }, url: c.url } })) });
+          priceSpecification: { '@type': 'UnitPriceSpecification', price: c.ft, priceCurrency: 'HUF', unitCode: 'MON' }, itemOffered: { '@type': 'Product', name: `${c.name} bérlés`, brand: { '@type': 'Brand', name: c.brand }, url: c.url, ...(c.img ? { image: c.img } : {}), offers: { '@type': 'Offer', url: c.url, price: c.ft, priceCurrency: 'HUF', availability: 'https://schema.org/InStock', businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut', priceSpecification: { '@type': 'UnitPriceSpecification', price: c.ft, priceCurrency: 'HUF', unitCode: 'MON' } } } })) });
       a = addLd(a, { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map(([q, aa]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: aa } })) });
     }
     wr(ar, a);

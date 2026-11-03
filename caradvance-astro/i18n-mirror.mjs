@@ -82,12 +82,12 @@ try {
   const linkFix = (html, l) => html.replace(/(\shref=")((?:https?:\/\/(?:www\.)?caradvance\.hu)?)(\/[^"]*)"/g, (m, pre, host, p) => {
     if (/^\/(en|de|fr|uk|zh|sk|cs|_np|api)\//.test(p)) return m;
     const clean = p.split(/[?#]/)[0]; const rest = p.slice(clean.length);
-    if (/^\/berelheto\/?$/.test(clean)) return `${pre}${L(l, '/autoink/')}#berelheto"`; // a /berelheto/ oldal = /autoink/ Bérelhető fül
+    if (/^\/berelheto\/?$/.test(clean)) return `${pre}${host ? SITE : ''}${L(l, '/autoink/')}#berelheto"`; // a /berelheto/ oldal = /autoink/ Bérelhető fül
     const norm = clean.endsWith('/') ? clean : clean + '/';
     if (/\.[a-z0-9]{2,5}$/i.test(clean)) return m;        // fájl
     const tgt = PAGESET.has(norm) ? norm : (REDIR[norm] && PAGESET.has(REDIR[norm]) ? REDIR[norm] : null);
     if (!tgt) return m;
-    return `${pre}${L(l, tgt)}${rest}"`;
+    return `${pre}${host ? SITE : ''}${L(l, tgt)}${rest}"`; // abszolút hivatkozás (canonical) abszolút marad
   });
 
   for (const rel of pages) {
