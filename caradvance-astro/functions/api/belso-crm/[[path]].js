@@ -143,7 +143,7 @@ function normVehicles(b) {
       rent_start: isoDate(v && v.rent_start), rent_end: isoDate(v && v.rent_end),
       // az elfogadott ajánlatból: felszereltség / kivitel, ajánlat száma, dátuma, árfolyam, ÁFA-mód, km-keret, futamidő
       equipment: clean(v && v.equipment, 600), offer_no: clean(v && v.offer_no, 60), offer_date: isoDate(v && v.offer_date), fx: Math.max(0, Number(v && v.fx) || 0),
-      vat_mode: VAT_MODES[v && v.vat_mode] ? v.vat_mode : '', km_keret: clean(v && v.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(v && v.months, 10) || 0)),
+      vat_mode: VAT_MODES[v && v.vat_mode] ? v.vat_mode : '', km_keret: clean(v && v.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(v && v.months, 10) || 0)), delivery: Math.max(0, Number(v && v.delivery) || 0),
       // Import-szerződések autónkénti adatai (foglaló, díjak, átvétel helye …) — lásd IMPORT_CX
       cx: cxInput(v && v.cx),
       reminders: (Array.isArray(v && v.reminders) ? v.reminders : []).slice(0, 20).map((r, j) => ({
@@ -328,7 +328,8 @@ async function handleSendOffer(request, env, user, id) {
     attach_src: !!it.attach_src,
     // bérlés (weboldali igényből): km-keret, futamidő, kezdés
     condition: clean(it.condition, 40), body: clean(it.body, 60), abo_name: clean(it.abo_name || (it.abo && it.abo.name), 120), avail: clean(it.avail, 80),
-    km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end)
+    km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end),
+    delivery: Math.max(0, Math.min(100000, Number(it.delivery) || 0))
   })).filter((it) => it.title && it.price > 0);
   if (!items.length) return json({ error: 'Jelölj ki legalább egy autót, és adj meg árat.' }, 400);
   // ajánlatszám, dátum és árfolyam automatikusan — elfogadáskor az autó adataiba, onnan a szerződésbe kerül
@@ -413,12 +414,13 @@ async function buildRentOfferPdf(env, dealId, it, o) {
     strip: [[isNew ? '0 km' : (it.km || '—'), 'Kilométeróra'], [variant || '—', 'Kivitel'], [String(it.fuel || '—').split(' / ')[0], 'Üzemanyag'], [it.gearbox || '—', 'Váltó'], [isNew ? 'Új' : (it.condition || 'Használt'), 'Állapot'], [de ? 'Német' : 'Magyar', 'Rendszám']],
     price: { main: fmtN(gross) + sym, unit: '/ hó', sub: (it.currency === 'EUR' ? 'nettó ' + fmtN(net) + ' € + 19% ÁFA' : '') + (huf(gross) ? ' · ' + huf(gross) : '') },
     boxes: [['Bérleti idő', months ? months + ' hónap' : '—', it.rent_start ? 'kezdés: ' + isoHu(it.rent_start) : ''], ['Km-keret', km ? fmtN(km) + ' km' : '—', km ? 'havonta' : ''], ['Kaució', it.deposit ? fmtN(it.deposit) + sym : '—', it.deposit ? huf(it.deposit) : '', true]],
-    vehicle: [['Márka / Modell', it.title], ['Kivitel', variant], ['Kategória', it.body], ['Szín (gyári)', it.color], ['Üzemanyag', it.fuel], ['Váltó', it.gearbox], ['Elérhetőség', it.avail], ['Bérlet kezdete', isoHu(it.rent_start)]],
+    vehicle: [['Márka / Modell', it.title], ['Kivitel', variant], ['Kategória', it.body], ['Szín (gyári)', it.color], ['Üzemanyag', it.fuel], ['Váltó', it.gearbox], ['Elérhetőség', it.avail], ['Bérlet kezdete', isoHu(it.rent_start)], ['Szállítási díj', Number(it.delivery) > 0 ? fmtN(it.delivery) + sym + ' (egyszeri)' : '']],
     equipment: groupRentEquipment(feats),
     terms: [
       months ? `Bérleti időtartam: **${months} hónap**${it.rent_start ? ' (kezdés: ' + isoHu(it.rent_start) + (it.rent_end ? ', vége: ' + isoHu(it.rent_end) : '') + ')' : ''}.` : '',
       `Havi bérleti díj: **${fmtN(gross)}${sym} bruttó**${it.currency === 'EUR' ? ' (nettó ' + fmtN(net) + ' € + 19% ÁFA)' : ''}, havonta előre, minden hónap elején esedékes.`,
       it.deposit ? `Kaució: **${fmtN(it.deposit)}${sym}**${huf(it.deposit) ? ' (' + huf(it.deposit) + ')' : ''}, a bérlet kezdetekor fizetendő, a jármű sértetlen visszaadásakor visszajár.` : '',
+      Number(it.delivery) > 0 ? `Szállítási díj: **${fmtN(it.delivery)}${sym}** (egyszeri), a jármű átadásakor fizetendő${huf(it.delivery) ? ' (' + huf(it.delivery) + ')' : ''}.` : '',
       it.currency === 'EUR' && fx ? `Alkalmazott árfolyam: **${fmtN(fx)} Ft / €** (tájékoztató; a díj és a kaució euróban fizetendő).` : '',
       km ? `Havi kilométerkeret: **${fmtN(km)} km / hó**${months ? ' (a teljes bérleti időre ' + fmtN(km * months) + ' km)' : ''}${overKm ? '; a kereten felül **' + overKm + '** díj fizetendő' : ''}.` : '',
       isNew ? `A jármű új, 0 km-es${de ? ', **német rendszámmal**' : ''} kerül átadásra.` : '',
@@ -461,7 +463,7 @@ async function handleOfferPdfPreview(request, env, user, id) {
     equipment: (Array.isArray(it.equipment) ? it.equipment : String(it.equipment || '').split('\n')).map((x) => clean(x, 160)).filter(Boolean).slice(0, 150),
     eq_images: eqImgs(it.eq_images), vat_mode: VAT_MODES[it.vat_mode] ? it.vat_mode : '',
     key: clean(it.key, 120), abo_name: clean(it.abo_name || (it.abo && it.abo.name), 120), condition: clean(it.condition, 40), body: clean(it.body, 60), deposit: Math.max(0, Number(it.deposit) || 0),
-    km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end), avail: clean(it.avail, 80), fx: Math.max(0, Number(it.fx) || 0) };
+    km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end), avail: clean(it.avail, 80), fx: Math.max(0, Number(it.fx) || 0), delivery: Math.max(0, Math.min(100000, Number(it.delivery) || 0)) };
   const card = await getCard(env, id);
   const pdf = await buildOfferPdf(env, id, item, { client: (card.data.person && card.data.person.name) || deal.name, number: offerNo(id, 0, 1) + ' (előnézet)', user, line: deal.line });
   return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${offerFileName(item)}"`, 'cache-control': 'no-store' } });
