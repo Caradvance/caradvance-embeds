@@ -78,6 +78,7 @@
   .hint{font-size:12px;color:var(--muted)}
   .note{background:#fff8e6;border:1px solid #f3e2b3;color:#7a5a0d;border-radius:10px;padding:10px 12px;font-size:12.5px;margin-bottom:12px}
   /* ajánlat */
+  .cxb{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}.cxh{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}.cxa,.cxs{font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:1px}.cxa{background:#e9f7ef;color:#14864d}.cxs{background:#eef2ff;color:#3346a8}
   .inv-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
   .invf{display:inline-flex;gap:8px;flex-wrap:wrap;align-items:center}
   .invsel{font:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;max-width:200px}
@@ -670,7 +671,7 @@ function renderVehicle(){
       +vinp('offer_no','Ajánlat száma',v.offer_no)+'<div class="fld"><label>Ajánlat dátuma</label><input type="date" data-vp="offer_date" value="'+esc(v.offer_date||'')+'"></div>'+vinp('fx','Ajánlat szerinti árfolyam (Ft/€)',v.fx||'')
       +'</div><label class="chk" style="margin-top:14px"><input type="checkbox" data-vp="hybrid"'+(v.hybrid?' checked':'')+'> Hibrid</label>'
       +'<div class="hint" style="margin-top:8px">Az ár / díj a szerződésbe és a pénzügyhöz (bevétel) töltődik be. A szerződés és a pénzügy autónként külön kezelhető.</div>'
-      +(hasRent()?rentBlock(v):'')+'</div>';
+      +(hasRent()?rentBlock(v):'')+(S.deal.line==='Import'?'<div class="cxb" id="cxBox"><div class="cxh"><b>Szerződés adatai (Import)</b><span class="hint">Az előszerződés, az adásvételi szerződés és a honosítási megbízás adatai ennél az autónál. Ami kiszámolható (az elfogadott ajánlatból, a vételárból, a már elkészült előszerződésből), az magától töltődik; amit itt átírsz, az kerül minden Import-dokumentumba.</span></div><div class="loading" style="padding:14px">Betöltés…</div></div>':'')+'</div>';
   }
   if(S.deal.car)h+='<div class="hint" style="margin-top:10px">Az érdeklődéskor megadott autó: <b>'+esc(S.deal.car)+'</b></div>';
   $('b2').innerHTML=h;
@@ -689,15 +690,36 @@ function renderVehicle(){
     VSEL='';saveData().then(function(){renderVehicle();renderFin();});
   });
   if(v&&hasRent())bindRent(v);
+  if(v&&S.deal.line==='Import')loadCx(v);
   $('b2').querySelectorAll('[data-vp]').forEach(function(el){
     var k=el.getAttribute('data-vp');
     var h2=function(){var val=el.type==='checkbox'?el.checked:el.value;if(k==='price'||k==='fx')val=parseFloat(String(val).replace(/\s/g,'').replace(',','.'))||0;v[k]=val;
       if(k==='title'||k==='brand'||k==='model'){var c=$('b2').querySelector('.vchip.on b');if(c)c.textContent=(L.indexOf(v)+1)+'. '+vehName(v);renderContractVehSel();}
-      if(el.tagName==='SELECT'||el.type==='checkbox')saveData().then(function(){if(k==='period')renderVehicle();});else saveDataSoon();};
+      if(el.tagName==='SELECT'||el.type==='checkbox')saveData().then(function(){if(k==='period')renderVehicle();if(k==='currency'&&S.deal.line==='Import')loadCx(v);});else if(S.deal.line==='Import'&&/^(price|km|offer_no)$/.test(k)){clearTimeout(window.__cxp);window.__cxp=setTimeout(function(){saveData().then(function(){loadCx(v);});},900);}else saveDataSoon();};
     el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',h2);
   });
   /* karosszéria: a felismert / egységesített érték mentése, hogy a szerződésbe is bekerüljön */
   var bs=$('b2').querySelector('select[data-vp=body]');if(v&&bs&&bs.value&&bs.value!==String(v.body||'')){v.body=bs.value;saveDataSoon();}
+}
+/* ---- Import: a szerződések autónkénti adatai (vehicle.cx) — a szerver számolja ki, ami kiszámolható ---- */
+var CX_HINT={ar:'a jármű vételára, pl. 48 990 €',foglalo_szazalek:'pl. 10 — ebből a foglaló kiszámolódik',foglalo:'pl. 4 899 € — vagy add meg a %-ot',hatralek:'vételár − foglaló (szám, €)',szallitasi_hatarido:'pl. 2026. 12. 15. vagy 4–6 hét',fizetesi_munkanap:'pl. 5',atadas_datum:'pl. 2026. 12. 20.',visszaszallitas_koltseg:'szám, €',megbizasi_dij:'nettó, pl. 350 000 Ft — az áfa és a bruttó kiszámolódik',szallitasi_dij:'bruttó, pl. 420 000 Ft',hatosagi_dijak:'szám, Ft',eloleg:'pl. 1 250 000 Ft',fizetesi_hatarido:'pl. a szerződéskötéstől számított 5 nap',ugyintezes_munkanap:'pl. 15',telefon_rogzites:'kérem / nem kérem',atvevo_nev:'ki veszi át a foglalót'};
+var CXSEQ=0;
+function loadCx(v){
+  var my=++CXSEQ;
+  api('/card/'+ID+'/cx',{method:'POST',body:{vehicle_id:v.id}}).then(function(r){
+    if(my!==CXSEQ||!$('cxBox'))return;
+    var F=r.fields.filter(function(f){return f.used||f.saved||f.value;});
+    var box=$('cxBox');box.querySelector('.loading')&&box.querySelector('.loading').remove();
+    var g=box.querySelector('.grid');if(g)g.remove();
+    g=document.createElement('div');g.className='grid g3';
+    g.innerHTML=F.map(function(f){return '<div class="fld'+(/hely$/.test(f.key)?' wide':'')+'"><label>'+esc(f.label)+(f.saved?' <span class="cxs" title="Kézzel megadva">kézi</span>':f.value?' <span class="cxa" title="Automatikusan kitöltve">auto</span>':'')+'</label><input data-cx="'+esc(f.key)+'" value="'+esc(f.saved?(v.cx||{})[f.key]||f.value:'')+'" placeholder="'+esc(f.value||CX_HINT[f.key]||'')+'"></div>';}).join('');
+    box.appendChild(g);
+    var tm=0;
+    g.querySelectorAll('[data-cx]').forEach(function(i){i.addEventListener('input',function(){
+      var k=i.getAttribute('data-cx'),val=i.value.trim();v.cx=v.cx||{};if(val)v.cx[k]=val;else delete v.cx[k];
+      clearTimeout(tm);tm=setTimeout(function(){saveData().then(function(){if(document.activeElement&&document.activeElement.getAttribute&&document.activeElement.getAttribute('data-cx'))return;loadCx(v);});},900);
+    });i.addEventListener('blur',function(){setTimeout(function(){if(!(document.activeElement&&document.activeElement.getAttribute&&document.activeElement.getAttribute('data-cx')))loadCx(v);},1200);});});
+  }).catch(function(e){var b=$('cxBox');if(b)b.innerHTML+='<div class="hint">'+esc(e.message)+'</div>';});
 }
 /* ---- bérlet: kezdet / vég / figyelmeztetések (Eladás 1. üteme és Bérlés) ---- */
 function hasRent(){return S.deal.line==='Bérlés'||S.deal.line==='Eladás';}
@@ -1685,7 +1707,7 @@ function dmCreate(){
 }
 function missingModal(miss,done,cancel){
   var ov=document.createElement('div');ov.className='mdl';
-  ov.innerHTML='<div class="mdl-b"><h3>Hiányzó adatok</h3><p class="hint">A dokumentum csak akkor generálható, ha minden szükséges adat ki van töltve. Az ügyfél / autó adatait az Ügyfél és Autók fülön is pótolhatod — az itt megadott értékek csak ezekbe a dokumentumokba kerülnek.</p>'
+  ov.innerHTML='<div class="mdl-b"><h3>Hiányzó adatok</h3><p class="hint">A dokumentum csak akkor generálható, ha minden szükséges adat ki van töltve. Az ügyfél / autó adatait az Ügyfél és Autók fülön is pótolhatod'+(S.deal.line==='Import'?' — az Import szerződés-adatok (foglaló, díjak, határidők …) az autó „Szerződés adatai” blokkjába is mentődnek, a következő dokumentum már ezekkel készül.':' — az itt megadott értékek csak ezekbe a dokumentumokba kerülnek.')+'</p>'
     +'<div class="vars" style="margin-top:10px">'+miss.map(function(m){return '<div class="fld"><label>'+esc(m.label)+'</label><input data-mk="'+esc(m.key)+'"><small class="hint">'+esc(m.templates.join(', '))+'</small></div>';}).join('')+'</div>'
     +'<div class="actions"><button class="btn red" id="mdlOk">Generálás</button><button class="btn ghost" id="mdlNo">Mégse</button></div></div>';
   document.body.appendChild(ov);
