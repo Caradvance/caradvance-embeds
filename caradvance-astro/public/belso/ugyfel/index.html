@@ -1332,8 +1332,15 @@ function bindCfgOffer(box,i){
 }
 /* a felszereltség (német gyári szöveg) fordítása magyarra — a szerveren (Workers AI); az eredmény szerkeszthető marad */
 function translateEq(p){
-  var L=(p.equipment||[]).filter(Boolean);if(!L.length)return Promise.resolve();
-  return api('/translate',{method:'POST',body:{lines:L}}).then(function(r){if(r.lines&&r.lines.length===L.length){p.equipment=r.lines;p.eq_hu=true;toast(r.translated?'Felszereltség lefordítva — ellenőrizd.':(r.errors&&r.errors.length?'A fordítás nem sikerült: '+r.errors[0]:'Nem volt mit fordítani.'),r.translated?3500:7000);}});
+  var L=(p.equipment||[]).map(function(x){return String(x||'').trim();}).filter(Boolean).slice(0,190);
+  // a szín is (pl. „Arkonaweiß”, „Mythosschwarz Metallic”) — a gyári PDF-ből németül jön
+  var col=String(p.color||'').trim(),wc=col&&/[äöüß]|weiß|weiss|schwarz|grau|blau|rot|grün|silber|metallic|perleffekt|uni\b|lackierung/i.test(col);
+  var send=wc?L.concat([col]):L;if(!send.length)return Promise.resolve();
+  return api('/translate',{method:'POST',body:{lines:send}}).then(function(r){
+    if(!(r.lines&&r.lines.length===send.length))return toast('A fordítás nem sikerült'+(r.errors&&r.errors.length?': '+r.errors[0]:'.'),7000);
+    p.equipment=r.lines.slice(0,L.length);if(wc)p.color=r.lines[L.length];p.eq_hu=true;
+    toast(!r.translated?(r.errors&&r.errors.length?'A fordítás nem sikerült: '+r.errors[0]:'Nem volt mit fordítani.'):r.left?'Felszereltség lefordítva — '+r.left+' tétel még németnek tűnik, azt kézzel javítsd (vagy kattints újra a „Fordítás” gombra).':'Felszereltség lefordítva — ellenőrizd.',r.translated&&!r.left?3500:8000);
+  });
 }
 function imgToJpeg(file,max){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){var sc=Math.min(1,(max||1600)/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(im.naturalWidth*sc);cv.height=Math.round(im.naturalHeight*sc);var c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);res(cv.toDataURL('image/jpeg',0.84));};im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('A kép nem olvasható.'));};im.src=u;});}
 // képlenyomat (8×8 átlag-hash) — ugyanazon kép különböző méretű változatainak kiszűrésére
