@@ -809,6 +809,37 @@ export function docVars(deal, card, vehicle, tpl, persons, seq) {
   return deriveVars(base);
 }
 
+/* ---------- Import: a szerződések (előszerződés, adásvételi, honosítási megbízás) autónkénti adatai ----------
+ * Az autó adatai között (vehicle.cx) tároljuk — az elfogadott ajánlatból (Ajánlatmotor) automatikusan töltődnek,
+ * a „Szerződés adatai” blokkban felülírhatók, és minden Import-dokumentum innen veszi őket. */
+export const IMPORT_CX = ['ugyszam', 'ar', 'foglalo_szazalek', 'foglalo', 'hatralek', 'szallitasi_hatarido', 'fizetesi_munkanap', 'atadas_datum', 'atadas_hely',
+  'auto_szarmazasi_orszag', 'auto_atvetel_hely', 'auto_km', 'visszaszallitas_koltseg', 'megbizasi_dij', 'szallitasi_dij', 'hatosagi_dijak', 'eloleg',
+  'fizetesi_hatarido', 'ugyintezes_munkanap', 'eloszerzodes_szam', 'eloszerzodes_datum', 'telefon_rogzites', 'atvevo_nev'];
+export const COUNTRY_HU = { DE: 'Németország', AT: 'Ausztria', IT: 'Olaszország', NL: 'Hollandia', BE: 'Belgium', FR: 'Franciaország', ES: 'Spanyolország', LU: 'Luxemburg', CH: 'Svájc', CZ: 'Csehország', PL: 'Lengyelország', SK: 'Szlovákia', DK: 'Dánia', SE: 'Svédország' };
+/** Az Import-szerződések számolható adatai (csak az üres mezőket tölti; a kézzel megadott érték elsőbbséget élvez). */
+export function importAuto(v, vehicle) {
+  const veh = vehicle || {};
+  const empty = (k) => !String(v[k] == null ? '' : v[k]).trim();
+  const set = (k, val) => { if (empty(k) && val != null && String(val).trim()) v[k] = String(val); };
+  set('ugyszam', veh.offer_no || v.szerzodes_szam);
+  set('auto_km', veh.km ? (/km/i.test(String(veh.km)) ? veh.km : fmtNum(parseAmt(veh.km) || 0) + ' km') : '');
+  set('auto_szarmazasi_orszag', 'Németország');
+  // vételár (EUR) → foglaló ↔ foglaló %, fennmaradó összeg
+  // üres vételár → az autó ára (Importnál az 1 M alatti „Ft” ár valójában euró); csak szám → euró
+  if (empty('ar') && Number(veh.price) > 0) set('ar', fmtPrice(veh.price, veh.currency === 'EUR' || Number(veh.price) < 1e6 ? 'EUR' : 'HUF'));
+  if (/^\s*\d[\d\s.,\u00a0]*(ft|huf)?\s*$/i.test(String(v.ar || '')) && parseAmt(v.ar) && (!/ft|huf/i.test(v.ar) || parseAmt(v.ar) < 1e6)) v.ar = fmtNum(parseAmt(v.ar)) + ' €';
+  const arTxt = String(v.ar || ''); const isFt = /ft|huf|forint/i.test(arTxt); const cur = isFt ? ' Ft' : ' €';
+  const ar = /€|eur|ft|huf|forint/i.test(arTxt) ? parseAmt(arTxt) : null;
+  const pct = parseAmt(v.foglalo_szazalek); let fog = parseAmt(v.foglalo);
+  if (ar && fog == null && pct) { fog = Math.round(ar * pct / 100); set('foglalo', fmtNum(fog) + cur); }
+  if (ar && fog && empty('foglalo_szazalek')) { const p = Math.round(fog / ar * 1000) / 10; set('foglalo_szazalek', fmtNum(p, !Number.isInteger(p))); }
+  if (ar && fog != null && empty('hatralek')) set('hatralek', fmtNum(Math.max(0, Math.round(ar - fog))));
+  if (fog && Number.isInteger(fog)) set('foglalo_betuvel', numHu(fog));
+  // előleg a közterhekre = a becsült hatósági díjak
+  const hd = parseAmt(v.hatosagi_dijak); if (hd) set('eloleg', fmtNum(hd) + ' Ft');
+  return v;
+}
+
 /* ---------- számított változók (betűvel, nettó/áfa, forint) ---------- */
 /** Számított kulcs → a forrásváltozó. Ha a forrás hiányzik, a számított kulcsot nem kérjük külön (a forrásból készül). */
 export const DERIVED = {
