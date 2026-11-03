@@ -439,8 +439,10 @@ function setTab(t){if(!TAB_SECS[t])t='ov';TAB=t;showTab();try{history.replaceSta
 window.addEventListener('hashchange',function(){var h=(location.hash||'').replace('#','');if(h==='s3')h='ov';if(TAB_SECS[h]&&h!==TAB)setTab(h);});
 
 /* ---------------- áttekintés: státusz-folyamat, teendők, összefoglaló kártyák, legutóbbi események ---------------- */
-var STEP_MAIN=['Kapcsolatfelvételre vár','Ajánlatra vár','Ajánlat kiküldve','Ajánlat elfogadva','Megvalósítás','Lezárva'];
-var STEP_LBL=['Kapcsolatfelvétel','Ajánlatra vár','Ajánlat kiküldve','Elfogadva','Megvalósítás','Lezárva'];
+var STEP_MAIN=['Kapcsolatfelvételre vár','Ajánlatra vár','Ajánlat kiküldve','Ajánlat elfogadva','Szerződés aláírva','Megvalósítás','Lezárva'];
+var STEP_LBL=['Kapcsolatfelvétel','Ajánlatra vár','Ajánlat kiküldve','Elfogadva','Aláírva','Megvalósítás','Lezárva'];
+/* a státusz helye a folyamatban (az aláírásra váró állapotok az „Aláírva” lépésnél, sárgán) */
+function stepIdx(st){var i=STEP_MAIN.indexOf(st);if(i<0&&/^Aláírásra vár/.test(st||''))i=4;if(i<0&&st==='Ajánlat módosítva')i=2;if(i<0&&st==='Ajánlat elutasítva')i=3;return i;}
 var __ov=null;
 function ovSoon(){clearTimeout(__ov);__ov=setTimeout(renderOverview,60);}
 function personMissing(P,kind){
@@ -464,7 +466,7 @@ function ovTodos(){
   var O=S.offers||[],lo=O[0];
   var wp=d.web_pick;
   if(!O.length&&wp&&wp.title)T.push({c:'warn',i:'✉',t:'Ajánlat küldése: '+wp.title,s:'Az ügyfél a weboldalon ezt az autót választotta'+(wp.price?' ('+fmtPrice(wp.price,wp.currency)+'/hó)':'')+' — az ajánlatkészítőben már be van töltve',a:go('s4','Ajánlat küldése')});
-  else if(!O.length){if(STEP_MAIN.indexOf(S.card.status)<3)T.push({c:'',i:'✉',t:'Még nem ment ki ajánlat',s:'Állíts össze ajánlatot a készletből vagy gyári konfigurátorból',a:go('s4','Ajánlat készítése')});}
+  else if(!O.length){if(stepIdx(S.card.status)<3)T.push({c:'',i:'✉',t:'Még nem ment ki ajánlat',s:'Állíts össze ajánlatot a készletből vagy gyári konfigurátorból',a:go('s4','Ajánlat készítése')});}
   else if(lo.sent&&!lo.responded_at)T.push({c:'wait',i:'⏳',t:'Az ajánlat válaszra vár',s:'Kiküldve: '+fmtDate(lo.created_at)+' · '+lo.items.length+' autó',a:go('s4')});
   else if(lo.responded_at&&lo.action!=='elfogad')T.push({c:'warn',i:'✎',t:'Az ügyfél módosítást kért',s:(lo.client_msg||'').slice(0,120)||'Válasz: '+fmtDate(lo.responded_at),a:go('s4','Új ajánlat')});
   // dokumentumok
@@ -475,11 +477,11 @@ function ovTodos(){
     pend.forEach(function(r){T.push({c:'wait',i:'✍',t:(r.role==='partner'?'Partner ellenjegyzésére vár':'Aláírásra vár')+': '+r.signer,s:r.docs.length+' dokumentum · kiküldve: '+fmtDate(r.created_at)+(r.opened_at?' · megnyitva':' · még nem nyitotta meg'),a:go('s5')});});
     var drafts=DM.docs.filter(function(x){return !x.sign_status&&!x.sent_at&&!x.missing_n;});
     if(drafts.length&&!pend.length)T.push({c:'',i:'📄',t:drafts.length+' dokumentum még nincs kiküldve',s:drafts.map(function(x){return x.name;}).slice(0,3).join(', '),a:go('s5','Küldés / aláírás')});
-    if(!DM.docs.length&&STEP_MAIN.indexOf(S.card.status)>=3)T.push({c:'',i:'📄',t:'Szerződés / meghatalmazás még nem készült',s:'Töltsd ki sablonból az ügyfél és az autó adataival',a:go('s5','Dokumentum készítése')});
+    if(!DM.docs.length&&stepIdx(S.card.status)>=3)T.push({c:'',i:'📄',t:'Szerződés / meghatalmazás még nem készült',s:'Töltsd ki sablonból az ügyfél és az autó adataival',a:go('s5','Dokumentum készítése')});
   }
   // pénzügy
   var F=S.fin&&S.fin.items||[];
-  if(STEP_MAIN.indexOf(S.card.status)>=3&&vehs().some(function(v){return v.price>0;})&&!F.some(function(x){return x.kind==='income';}))T.push({c:'',i:'💰',t:'Bevétel még nincs rögzítve',s:'Az autó ára egy kattintással felvehető',a:go('s6')});
+  if(stepIdx(S.card.status)>=3&&vehs().some(function(v){return v.price>0;})&&!F.some(function(x){return x.kind==='income';}))T.push({c:'',i:'💰',t:'Bevétel még nincs rögzítve',s:'Az autó ára egy kattintással felvehető',a:go('s6')});
   // következő checklist-feladat
   var ph=S.checklist.phases.filter(function(p){return p.items.some(function(c){return !(cl[c[0]]&&cl[c[0]].done);});})[0];
   if(ph){var nx=ph.items.filter(function(c){return !(cl[c[0]]&&cl[c[0]].done);});T.push({c:'',i:'✓',t:'Következő feladat: '+nx[0][1],s:(ph.title?ph.title+' · ':'')+'még '+nx.length+' nyitott tétel',a:{scroll:'s3',lbl:'Checklist'}});}
@@ -488,7 +490,7 @@ function ovTodos(){
 function renderOverview(){
   var el=$('b0');if(!el||!S.card)return;
   var d=S.card.data,P=d.person,st=S.card.status,si=STEP_MAIN.indexOf(st),cls='';
-  if(st==='Ajánlat módosítva'){si=2;cls=' warn';}else if(st==='Ajánlat elutasítva'){si=3;cls=' bad';}
+  if(st==='Ajánlat módosítva'){si=2;cls=' warn';}else if(st==='Ajánlat elutasítva'){si=3;cls=' bad';}else if(/^Aláírásra vár/.test(st||'')){si=4;cls=' warn';}
   var steps='<div class="steps">'+STEP_MAIN.map(function(x,i){return '<button class="st'+(i<si?' done':i===si?' cur'+cls:'')+'" data-step="'+esc(x)+'" title="Státusz: '+esc(x)+'"><i></i>'+esc(STEP_LBL[i])+(i===si&&cls?'<small>'+esc(st)+'</small>':'')+'</button>';}).join('')+'</div>';
   var T=ovTodos();
   var todo='<div class="sub-h" style="margin-top:18px">Teendők'+(T.length?' ('+T.length+')':'')+'</div>'+(T.length?'<div class="todo">'+T.map(function(t,k){return '<div class="td '+t.c+'"><span class="ic">'+t.i+'</span><span class="tx"><b>'+esc(t.t)+'</b><span>'+esc(t.s||'')+'</span></span><button class="go" data-todo="'+k+'">'+esc(t.a.lbl)+' →</button></div>';}).join('')+'</div>':'<div class="hint">Nincs nyitott teendő. 👍</div>');
