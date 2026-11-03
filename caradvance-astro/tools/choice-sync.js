@@ -17,6 +17,11 @@ var CADV_SYNC = (function () {
   var BRAND = { 'Mini': 'MINI', 'Volkswagen': 'VW', 'Mercedes': 'Mercedes-Benz', 'Cupra': 'CUPRA', 'SEAT': 'Seat' };
   // model renames / merges decided with Marc (key = brand + ' ' + model)
   var RENAME = { 'MINI Cooper 3-Türer': 'MINI Cooper' };
+  // külön kártya a John Cooper Works kivitelnek (Marc, 2026-11-03): a Choice 'JCW' kivitelei saját modellként jelennek meg
+  var SPLIT = {
+    'MINI Cooper': { re: /^(?:JCW|John Cooper Works)\b/i, to: 'MINI John Cooper Works' },
+    'MINI Cooper Cabrio': { re: /^(?:JCW|John Cooper Works)\b/i, to: 'MINI John Cooper Works Cabrio' }
+  };
   // márka-áthelyezés: a Choice 'VW NFZ' (haszonjármű) címkéjű modellek közül ezek a Volkswagen személyautók közé kerülnek (Marc, 2026-10-25)
   var MOVE = { 'VW NFZ Multivan': 'VW', 'VW NFZ T7 Multivan': 'VW' };
   var MERGE = { 'Audi A5 Avant e-hybrid': 'Audi A5 Avant', 'Audi Q5 Sportback e-hybrid': 'Audi Q5 Sportback', 'Audi A6 Avant e-hybrid': 'Audi A6 Avant' };
@@ -75,6 +80,7 @@ var CADV_SYNC = (function () {
     var model = String(ro.CarModell || '').replace(/\s+/g, ' ').trim();
     var key = brand + ' ' + model, trim = fixTrim(ro.CarModellspec), merged = false;
     if (RENAME[key]) key = RENAME[key];
+    if (SPLIT[key] && SPLIT[key].re.test(trim)) key = SPLIT[key].to;
     if (MOVE[key]) { var mvModel = key.slice(brand.length + 1).replace(/^T7\s+/, ''); brand = MOVE[key]; key = brand + ' ' + mvModel; }
     if (MERGE[key]) { key = MERGE[key]; merged = true; if (!/hybrid/i.test(trim)) trim = fixTrim('e-Hybrid ' + trim); }
     var colDe = String(ro.Color || it.Color || '').replace(/\s+/g, ' ').trim() || '—';
@@ -208,6 +214,11 @@ var CADV_SYNC = (function () {
       if (k !== k0) featChanged = true;
       featNew[k] = featNew[k] || {};
       Object.keys(o).forEach(function (t) { var nt = fixTrim(t); if (isM && !/hybrid/i.test(nt)) nt = fixTrim('e-Hybrid ' + nt); if (nt !== t) featChanged = true; if (!featNew[k][nt]) featNew[k][nt] = o[t]; });
+    });
+    // a különválasztott kivitelek (SPLIT) magyar felszereltségi szövegei átkerülnek az új modellhez
+    Object.keys(SPLIT).forEach(function (src) {
+      var sp = SPLIT[src], o = featNew[src] || {};
+      Object.keys(o).forEach(function (t) { if (!sp.re.test(t)) return; featNew[sp.to] = featNew[sp.to] || {}; if (!featNew[sp.to][t]) { featNew[sp.to][t] = o[t]; featChanged = true; } });
     });
     recs.forEach(function (r) {
       if (!r.eq) return;
