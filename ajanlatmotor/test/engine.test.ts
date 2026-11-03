@@ -24,6 +24,20 @@ describe("NAV registration tax", () => {
   });
 });
 
+describe("honosítás kalkulátor (caradvance.hu/honositas-kalkulator)", () => {
+  it("regadó + illeték + eredetiség + okmányok like the website calculator", () => {
+    const l = { ...MOCK_LISTINGS[0], power_kw: 150, fuel: "diesel", first_registration: "2021-06", euro_norm: "Euro 5", title: "Test 2.0 TDI" } as Listing;
+    const c = computeCosts({ listing: l, req: heuristicExtract(DEMO_EMAIL.text, DEMO_EMAIL.from, DEMO_EMAIL.name), rates: DEFAULT_RATES, rateVersion: 1,
+      fx: { rate: 400, date: "2026-11-01", fallback: false }, distanceKm: 690, distanceFallback: false, registrationMonth: "2026-11" });
+    const g = (k: string) => c.lines.find((x) => x.key === k)?.amount_huf;
+    expect(g("regado")).toBe(462480); // 141–180 kW, 12–14 (3.), 66 hó → 1 128 000 × 0,41
+    expect(g("illetek")).toBe(127500); // 150 kW × 850 Ft (120 kW felett, 4–8 év)
+    expect(g("eredetiseg")).toBe(24975);
+    expect(g("okmany")).toBe(12000);
+    expect(g("muszaki")).toBeUndefined();
+  });
+});
+
 describe("cost calculator", () => {
   const req = heuristicExtract(DEMO_EMAIL.text, DEMO_EMAIL.from, DEMO_EMAIL.name);
   const base = { req, rates: DEFAULT_RATES, rateVersion: 1, fx, distanceKm: 690, distanceFallback: false, registrationMonth: "2026-11" };
@@ -37,7 +51,9 @@ describe("cost calculator", () => {
   });
   it("flags every unverified placeholder", () => {
     const c = computeCosts({ ...base, listing: MOCK_LISTINGS[0] });
-    expect(c.unverified).toEqual(expect.arrayContaining(["logistics", "eredetiseg", "muszaki", "illetek", "ugyintezes", "margin"]));
+    expect(c.unverified).toEqual(expect.arrayContaining(["logistics", "ugyintezes", "margin"]));
+    expect(c.unverified).not.toContain("illetek");
+    expect(c.unverified).not.toContain("eredetiseg");
     expect(c.unverified).not.toContain("vehicle");
     expect(c.unverified).not.toContain("regado");
   });
