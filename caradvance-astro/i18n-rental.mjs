@@ -131,6 +131,16 @@ const MONTHS = {
   cs: ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'],
 };
 
+// „<modell> bérlés — tartós bérlet {n} €/hó-tól” oldalcím (seo-fix) — bármely új Choice-modellhez (pl. MINI John Cooper Works, 2026-11-03)
+const TITLE = {
+  en: (n, x) => `${n} rental — long-term rental from ${x} €/month`,
+  de: (n, x) => `${n} mieten — Langzeitmiete ab ${x} €/Monat`,
+  fr: (n, x) => `Location ${n} — location longue durée à partir de ${x} €/mois`,
+  uk: (n, x) => `Оренда ${n} — довгострокова оренда від ${x} €/міс.`,
+  zh: (n, x) => `${n} 租赁，长期租赁每月 ${x} € 起`,
+  sk: (n, x) => `Prenájom ${n} — dlhodobý prenájom od ${x} €/mes.`,
+  cs: (n, x) => `Pronájem ${n} — dlouhodobý pronájem od ${x} €/měs.`,
+};
 export function makeRental(l, D, RT = {}) {
   const p = P[l]; if (!p) return () => null;
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -194,6 +204,7 @@ export function makeRental(l, D, RT = {}) {
       for (const it of m[2].split('; ')) { const x = it.match(/^(<g(\d+)>.*?<\/g\2>) — (.*?), (\{\d+\}) €\/hó-tól$/); if (!x) { ok = false; break; } const t = note(x[3]); if (!t) { ok = false; break; } out.push(`${x[1]} — ${t}, ${p.vprice(x[4])}`); }
       if (ok) return p.vintro(m[1]) + out.join(l === 'zh' ? '；' : '; ') + (l === 'zh' ? '。' : '.');
     }
+    if (TITLE[l] && (m = k.match(/^([A-Z][^<>{}]*?(?:\{\d+\}[^<>{}]*?)*) bérlés — tartós bérlet (\{\d+\}) €\/hó-tól( \| CarAdvance)?$/))) return TITLE[l](nm(m[1]), m[2]) + (m[3] || '');
     if ((m = k.match(/^([A-Z][^<>{}]*?(?:\{\d+\}[^<>{}]*?)*) bérlés$/))) return p.rent(nm(m[1]));
     if (/^(<g\d+>[^<]*<\/g\d+>)+$/.test(k)) {
       let ok = true;
