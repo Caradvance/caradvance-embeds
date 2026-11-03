@@ -353,6 +353,17 @@ staff.post("/jelolt/:cid/lock", async (c) => {
   return back(c, reqPath(gc.dealId!));
 });
 
+/** Autó törlése az igény listájából (helyről, tartalékok vagy kiesettek közül). A már kiküldött ajánlatot nem érinti. */
+staff.post("/jelolt/:cid/delete", async (c) => {
+  const cid = c.req.param("cid");
+  const gc = await guardCand(c, cid); if (gc.err) return gc.err;
+  const row = await c.env.DB.prepare("SELECT slot, ad_id, listing_json FROM am_candidates WHERE id = ?").bind(cid).first<{ slot: number | null; ad_id: string; listing_json: string }>();
+  let title = ""; try { title = JSON.parse(row!.listing_json).title || ""; } catch { /* - */ }
+  await c.env.DB.prepare("DELETE FROM am_candidates WHERE id = ?").bind(cid).run();
+  await logEvent(c.env, gc.dealId!, c.get("user").name, "candidate_deleted", { cid, ad_id: row?.ad_id, slot: row?.slot, title });
+  return back(c, reqPath(gc.dealId!), `Autó törölve${row?.slot ? ` (${row.slot}. hely felszabadult)` : ""}: ${title}`);
+});
+
 staff.post("/jelolt/:cid/slot", async (c) => {
   const cid = c.req.param("cid");
   const gc = await guardCand(c, cid); if (gc.err) return gc.err;

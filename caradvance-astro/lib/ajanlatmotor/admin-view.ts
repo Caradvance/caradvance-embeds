@@ -150,6 +150,7 @@ function slotCard(cv: CarView, published: boolean) {
   <img class="thumb" src="${esc(l.images[0] || "")}" alt="" style="margin:10px 0 4px">
   ${mock ? "" : `<div class="row" style="gap:6px;margin:0 0 8px;align-items:center">
    ${l.images.length > 1 ? `<form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/cover" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Másik borítókép ↻</button></form>` : ""}
+   <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/delete" style="margin:0;display:inline" onsubmit="return confirm('Biztosan törlöd ezt az autót az ajánlatmotor listájából?')"><button class="btn" style="padding:4px 10px;font-size:12px;color:#b8000f" title="Autó törlése a listából">🗑 Törlés</button></form>
    <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/photos" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Fotók szűrése</button></form>
    ${imagePicker(cid, l, published)}
    <span class="muted small">${l.images.length} kép · ${(l as any).photos_checked ? `<span class="ok">✓ csak autófotó</span>${(l as any).photos_removed ? ` (${(l as any).photos_removed} kiszűrve)` : ""}` : `<span style="color:var(--red)">fotók nincsenek ellenőrizve</span>`}</span></div>`}
@@ -195,7 +196,7 @@ export function requestPage(o: {
     const l: Listing = JSON.parse(c.listing_json);
     return `<tr><td><strong>${esc(l.title)}</strong><div class="muted small">${esc(l.seller.city)} · ${l.first_registration} · ${l.km.toLocaleString("hu-HU")} km · ${fmtEur(l.price_gross_eur)}</div></td>
     <td>${c.score ?? "–"}</td><td class="small">${esc(c.rationale || "")}</td>
-    <td>${published ? "" : `<form method="post" action="/belso/ajanlatmotor/jelolt/${c.id}/slot" class="row">${[1, 2, 3].map((n) => `<button class="btn" name="slot" value="${n}">→ ${n}</button>`).join("")}</form>`}${rejected ? "" : ""}</td></tr>`;
+    <td>${published ? "" : `<form method="post" action="/belso/ajanlatmotor/jelolt/${c.id}/slot" class="row">${[1, 2, 3].map((n) => `<button class="btn" name="slot" value="${n}">→ ${n}</button>`).join("")}</form>`}<form method="post" action="/belso/ajanlatmotor/jelolt/${c.id}/delete" style="margin:0;display:inline" onsubmit="return confirm('Biztosan törlöd ezt az autót az ajánlatmotor listájából?')"><button class="btn" style="padding:4px 10px;font-size:12px;color:#b8000f" title="Autó törlése a listából">🗑 Törlés</button></form></td></tr>`;
   };
   const ready = !o.blockers.length;
   const flags = [...(req?.flags || []), ...(req?.missing_critical_fields.length ? ["Hiányzó adatok: " + req.missing_critical_fields.join(", ")] : [])];
