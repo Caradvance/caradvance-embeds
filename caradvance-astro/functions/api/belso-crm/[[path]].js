@@ -3,7 +3,7 @@
 // Ugyanazt a munkamenetet (ca_session süti) és jogosultságot használja, mint az /api/belso/*:
 // admin mindent lát, a többi munkatárs csak a hozzá rendelt ügyfeleket.
 import {
-  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, finSummary, vehiclesOf,
+  ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, syncSignStatus, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, priceVatLabel, VAT_MODES, specLine, esc, SITE,
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
@@ -1101,6 +1101,7 @@ async function handleSignCreate(request, env, user, id) {
      <p style="margin:18px 0"><a href="${esc(link)}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:999px;display:inline-block">Dokumentumok megtekintése és aláírása</a></p>
      <p style="color:#6b7280;font-size:12px">A link személyes, ne továbbítsa. Érvényes: ${new Date(exp * 1000).toLocaleDateString('hu-HU', { timeZone: 'Europe/Budapest' })}-ig. Ha nem Ön az érintett, kérjük, jelezze nekünk.</p>`);
   await addEvent(env, id, 'sign', `Aláírásra kiküldve (#${sid}) → ${signerName} (${fwd ? 'TESZT → ' + fwd : email}): ${docs.map((d) => d.name).join('; ')}${r.ok ? '' : ' — AZ E-MAIL NEM MENT KI: ' + r.error}`, user.name);
+  await syncSignStatus(env, id, user.name); // Aláírásra vár ügyfél
   return json({ ok: true, id: sid, link, sentTo: fwd || email, test: !!fwd, mailError: r.ok ? null : r.error });
 }
 /** Melyik partner jegyzi ellen a dokumentumot (a hasábnevek alapján) — { cosign: [nevek], cosign_pid }. */
@@ -1199,6 +1200,7 @@ async function handleSignRevoke(env, user, id, sid) {
   // a partner ellenjegyzésének visszavonása: a dokumentumok az ügyfél aláírásával maradnak
   if (r.signer_role === 'partner') await env.DB.prepare(`UPDATE crm_docs SET sign_status = 'signed' WHERE sign_id = ? AND deal_id = ? AND sign_status = 'cosign'`).bind(r.parent_id || 0, id).run();
   await addEvent(env, id, 'sign', `Aláírási kérelem visszavonva (#${sid})`, user.name);
+  await syncSignStatus(env, id, user.name);
   return json({ ok: true });
 }
 
