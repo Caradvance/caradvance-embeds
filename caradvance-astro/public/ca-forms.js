@@ -37,6 +37,16 @@
     chen: {"v2":{"chosen":"Your selection","change":"Change","monthly":"Monthly rent","gross":"incl. VAT","net":"Net · + VAT","depT":"Refundable deposit","incl":["Service, tyres and vehicle tax included","Liability and fully comprehensive insurance included (with excess)","Breakdown assistance"],"declT":"Declarations and documents","declS":"Please read and confirm the following declarations.","contactT":"Contact","contactS":"Request our offer – we will get back to you shortly.","sendNote":"The request is non-binding – we will get back to you shortly.","phoneReq":"Please also enter your phone number so we can call you.","reqP":"* Required field","back":"Back","send2":"Request an offer","dep":"Deposit","disc":"The price is indicative. The exact rent depends on the chosen configuration and availability.","plateInfo":"The cars are registered to Caradvance GmbH (Germany) and run on German plates – rental is aimed at customers resident abroad (e.g. cross-border commuters) and at companies.","eurInfo":"Rent and deposit are invoiced in euros; the Swiss franc amounts are indicative.","docsT":"Show / hide documents","aszfT":"Open the terms","pick":"Select","avail1":"available","send":"Request an offer","lbl":{"lastname":"Last name","firstname":"First name","company":"Company name","taxid":"UID / VAT no.","phone":"Phone","email":"E-mail","message":"Message"},"ph":{"lastname":"e.g. Smith","firstname":"e.g. Anna","company":"Company name","taxid":"CHE-123.456.789","phone":"+41 79 123 45 67","email":"name@example.ch","message":"Message, desired equipment…"},"months":"months"},"recap":"Summary","recapSub":"Check your selection before sending.","change":"Change","adapted":"The other settings have been adapted to your choice.","otherCfg":"Available with a different configuration – click to switch","co":"As a company · net price","priv":"As a private individual (resident abroad)","vat19":"(incl. VAT)","plusVat":"+ VAT","estG":"Estimated monthly rate (incl. VAT)","estN":"Estimated monthly rate (net)","priceN":"Price (net)","priceG":"Price (incl. VAT)","price":"Price","cancel":"Cancel","back":"Back","next":"Next step","send":"Request an offer","order":"Send order","inq":"Send request","sending":"Sending…","info":"Important information","pick":"Please choose an option to continue.","disc":"The price is indicative. The exact rate depends on the chosen configuration and availability.","discSale":"The price is indicative. The final price is in the written offer.","avail":"Available","dep":"Deposit","newCar":"New car · to order","fuels":"Powertrain","opt":"optional","s":{"avail":["Availability","Choose when you would like to take over the car.","Availability"],"fuel":["Powertrain","Choose the powertrain.","Powertrain"],"term":["Rental term","How long would you like to rent the car?","Term"],"km":["Mileage / month","Choose your monthly mileage.","Mileage"],"spec":["Colour & trim","Choose the colour and the equipment.","Trim"],"contact":["Your details","Enter your contact details – we will send the offer there.","Details"],"mode":["Purchase type","How would you like to buy the car?","Purchase"],"pay":["Payment","Pay in one sum or with financing?","Payment"],"start":["Start","From when do you need the car?","Start"],"file":["Specification","Upload your equipment list if you have one (optional).","Spec"]}},
   };
   var T = MK === 'eu' ? (TX['eu' + LG] || TX.eude) : MK === 'ch' ? (TX['ch' + LG] || TX.chde) : (TX[LG] || TX[MK] || TX.hu);
+  (function () { // a .eu/.ch szótárakból hiányzó függvények/kulcsok pótlása — nélkülük a lépések frissítése elhasal (T.availNow is not a function), és nem változik az ár (2026-11-04)
+    var AV = {
+      fr: { availIn: function (c, m) { return 'Pour le mois choisi (' + m + '), ' + c + ' véhicule(s) disponible(s). Vous finaliserez votre réservation aux étapes suivantes.'; }, availNow: function (c) { return c + ' véhicule(s) disponible(s) immédiatement. Vous finaliserez votre réservation aux étapes suivantes.'; } },
+      it: { availIn: function (c, m) { return 'Nel mese scelto (' + m + ') sono disponibili ' + c + ' auto. Completerà la prenotazione nei passaggi successivi.'; }, availNow: function (c) { return c + ' auto disponibili subito. Completerà la prenotazione nei passaggi successivi.'; } },
+      es: { availIn: function (c, m) { return 'En el mes elegido (' + m + ') hay ' + c + ' coche(s) disponible(s). Completará la reserva en los siguientes pasos.'; }, availNow: function (c) { return c + ' coche(s) disponible(s) de inmediato. Completará la reserva en los siguientes pasos.'; } }
+    };
+    function fill(t, b) { for (var k in b) { var v = b[k]; if (typeof v === 'function') { if (typeof t[k] !== 'function') t[k] = v; } else if (t[k] === undefined) t[k] = v; else if (v && typeof v === 'object' && !Array.isArray(v) && t[k] && typeof t[k] === 'object' && !Array.isArray(t[k])) fill(t[k], v); } }
+    if (AV[LG]) fill(T, AV[LG]);
+    var B = TX[LG] || TX.en; if (B && B !== T) fill(T, B);
+  })();
 
   /* ---------- ikonok ---------- */
   var IC = {
@@ -230,9 +240,9 @@
       var pp = MK === 'hu' ? abPrices(M) : null, eur = '';
       if (pp) eur = Math.round(priv ? pp.privE : pp.coE).toLocaleString('hu-HU').replace(/\u00a0/g, ' ') + ' €/hó' + (pp.from ? '-tól' : '') + (priv ? ' · bruttó' : ' · nettó');
       var val = c.v;
-      if (MK !== 'hu' && val && /-\s*t[óő]l\b/.test(val)) {   // magyar „-tól” rag a lefordított árban → „od …”
+      if (MK !== 'hu' && LG !== 'hu' && val && /-\s*t[óő]l\b/.test(val)) {   // magyar „-tól” rag a lefordított árban → „od …”
         val = val.replace(/\s*-\s*t[óő]l\b/, '');
-        if (!/\bod\b/i.test(val)) val = val.replace(/^(≈\s*)?/, function (m0) { return (m0 || '') + (MK === 'ch' || MK === 'eu' ? ({ de: 'ab ', fr: 'dès ', it: 'da ', es: 'desde ', en: 'from ' }[LG] || 'ab ') : 'od '); });
+        if (!/\bod\b/i.test(val)) val = val.replace(/^(≈\s*)?/, function (m0) { return (m0 || '') + (({ de: 'ab ', fr: 'dès ', it: 'da ', es: 'desde ', en: 'from ' })[LG] || (MK === 'ch' || MK === 'eu' ? 'ab ' : 'od ')); });
       }
       return { label: priv ? T.estG : T.estN, val: val, sub: c.sub, eur: eur, dep: dep, disc: T.disc };
     },
@@ -259,7 +269,7 @@
     },
     info: function (M) {
       var o = q('#abAvPick .ab-opt.active', M.modal);
-      if (o) { var c = tx(q('.ab-cnt', o)).replace(/\D/g, ''), mth = tx(o).replace(/\s*\d+\s*db\s*$/, ''); if (c) return /azonnal|raktáron|immediately|sofort/i.test(mth) ? T.availNow(c) : T.availIn(c, mth); }
+      if (o) { var c = tx(q('.ab-cnt', o)).replace(/\D/g, ''), mth = tx(o).replace(/\s*\d+\s*(?:db|ks\.?|szt\.?|Stk\.?|pcs\.?|pz\.?|uds\.?|unit[ée]s?|kus[ůy])\s*$/i, ''); if (c) return /azonnal|raktáron|immediately|sofort|okamžit|ihneď|ihned|od zaraz|imm[ée]diat|subito|inmediat/i.test(mth) ? T.availNow(c) : T.availIn(c, mth); }
       var tip = q('#abAvBlock .ab-av-tip', M.modal); return tip ? tx(tip) : '';
     },
     btn: function () { return T.send; }
