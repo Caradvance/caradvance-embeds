@@ -184,7 +184,8 @@ function euVat(h, l) {
 /* a „taxnote” (hívjon minket) és a mailto-tárgy */
 const SUBJ = { de: 'Angebotsanfrage', fr: 'Demande d’offre', it: 'Richiesta di offerta', es: 'Solicitud de oferta' };
 function mailSubj(h, l) {
-  return h.replace(/(mailto:[^"?]+\?subject=)([^"&]*)/g, (m, a, s) => {
+  return h.replace(/(mailto:[^"?']+\?subject=)([^"&']*)/g, (m, a, s) => { // a ' kizárva: JS-kódban ('…?subject='+x) nem nyúlunk hozzá
+    if (!s) return m;
     let d; try { d = decodeURIComponent(s); } catch (e) { return m; }
     d = d.replace(/^(Žiadosť o ponuku|Dopyt|Ponuka)\s*:?/i, SUBJ[l] + ':');
     return a + encodeURIComponent(d);
