@@ -342,7 +342,20 @@ async function handleSendOffer(request, env, user, id) {
   const link = `${SITE}/ajanlat/valasz/?t=${token}`;
   const clientName = (card.data.kind === 'ceg' && card.data.contact_differs && card.data.contact && card.data.contact.name) || (card.data.person && card.data.person.name) || deal.name;
   const fwd = testForward(env);
-  const subject = `${fwd ? '[TESZT — ' + to + '] ' : ''}Ajánlatunk — ${items.length > 1 ? items.length + ' autó' : items[0].title}`;
+  const r = await mailOffer(env, id, deal, user, items, token, clientName, message, to, fwd);
+  await env.DB.prepare(`INSERT INTO crm_offers (token, deal_id, line, client_name, items, message, sent_to, sent, created_by) VALUES (?,?,?,?,?,?,?,?,?)`)
+    .bind(token, id, deal.line || '', clientName || '', JSON.stringify(items), message, fwd || to, r.ok ? 1 : 0, user.id).run();
+  const carList = items.map((it) => `${it.title} (${priceVatLabel(it)}${it.ad_id ? ', mobile.de: ' + it.ad_id : ''}${it.config_code ? ', konfig.: ' + it.config_code : ''})`).join('; ');
+  if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat küldése sikertelen — ${items.length} autó: ${carList}`, user.name); return json({ ok: false, error: r.error + ' — az ajánlat-link elkészült, kézzel is elküldheted.', link }, 502); }
+  await addEvent(env, id, 'offer', `Ajánlat elküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${items.length} autó: ${carList}`, user.name);
+  await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id, user.name, 'ajánlat elküldve');
+  return json({ ok: true, link, status: 'Ajánlat kiküldve', sentTo: fwd || to, test: !!fwd });
+}
+
+/** Az ajánlat e-mailje (PDF-mellékletekkel) — első küldésnél és újraküldésnél is ez megy ki, ugyanazzal a linkkel. */
+async function mailOffer(env, id, deal, user, items, token, clientName, message, to, fwd, again) {
+  const link = `${SITE}/ajanlat/valasz/?t=${token}`;
+  const subject = `${fwd ? '[TESZT — ' + to + '] ' : ''}${again ? 'Emlékeztető: ' : ''}Ajánlatunk — ${items.length > 1 ? items.length + ' autó' : items[0].title}`;
   // gyári konfigurátoros autók: CarAdvance-arculatú ajánlat PDF (adatok + képek + felszereltség); a gyári PDF csak kérésre megy
   const att = [];
   for (const [i, it] of items.entries()) {
@@ -365,14 +378,27 @@ async function handleSendOffer(request, env, user, id) {
     const f = await env.DB.prepare(`SELECT id, name, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(it.file_id, id).first();
     if (f) att.push({ filename: f.name, content: await fileData(env, f) }); else it.file_id = null;
   }
-  const r = await sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link, attached: att.length > 0 }), att);
-  await env.DB.prepare(`INSERT INTO crm_offers (token, deal_id, line, client_name, items, message, sent_to, sent, created_by) VALUES (?,?,?,?,?,?,?,?,?)`)
-    .bind(token, id, deal.line || '', clientName || '', JSON.stringify(items), message, fwd || to, r.ok ? 1 : 0, user.id).run();
-  const carList = items.map((it) => `${it.title} (${priceVatLabel(it)}${it.ad_id ? ', mobile.de: ' + it.ad_id : ''}${it.config_code ? ', konfig.: ' + it.config_code : ''})`).join('; ');
-  if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat küldése sikertelen — ${items.length} autó: ${carList}`, user.name); return json({ ok: false, error: r.error + ' — az ajánlat-link elkészült, kézzel is elküldheted.', link }, 502); }
-  await addEvent(env, id, 'offer', `Ajánlat elküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${items.length} autó: ${carList}`, user.name);
-  await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id, user.name, 'ajánlat elküldve');
-  return json({ ok: true, link, status: 'Ajánlat kiküldve', sentTo: fwd || to, test: !!fwd });
+  return sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link, attached: att.length > 0 }), att);
+}
+/** Már kiküldött ajánlat újraküldése (ugyanaz a link és tartalom) — pl. ha nem érkezett meg, vagy új e-mail címre. */
+async function handleResendOffer(request, env, user, id, token) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  const o = await env.DB.prepare(`SELECT * FROM crm_offers WHERE token = ? AND deal_id = ?`).bind(token, id).first();
+  if (!o) return json({ error: 'Az ajánlat nem található.' }, 404);
+  const b = await request.json().catch(() => ({}));
+  const card = await getCard(env, id);
+  const to = clean(b.to || (card.data.person && card.data.person.email) || deal.email, 160);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return json({ error: 'Adj meg érvényes e-mail címet.' }, 400);
+  const items = parseJ(o.items, []);
+  const message = b.message !== undefined ? cleanMulti(b.message, 2000).trim() : (o.message || '');
+  const fwd = testForward(env);
+  const r = await mailOffer(env, id, deal, user, items, token, o.client_name || deal.name, message, to, fwd, true);
+  const carList = items.map((it) => it.title).join('; ');
+  if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat újraküldése sikertelen (${fwd ? 'TESZT → ' + fwd : to}) — ${carList}: ${r.error}`, user.name); return json({ ok: false, error: r.error }, 502); }
+  await env.DB.prepare(`UPDATE crm_offers SET sent = 1, sent_to = ? WHERE token = ?`).bind(fwd || to, token).run();
+  await addEvent(env, id, 'offer', `Ajánlat újraküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${carList}`, user.name);
+  if (!o.responded_at) { const cur = await getCard(env, id); if (STATUSES.indexOf(cur.status) < STATUSES.indexOf('Ajánlat kiküldve')) await saveCard(env, id, { status: 'Ajánlat kiküldve' }, user.id, user.name, 'ajánlat újraküldve'); }
+  return json({ ok: true, sentTo: fwd || to, test: !!fwd });
 }
 
 /* ---------------- CarAdvance-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ---------------- */
@@ -1362,6 +1388,8 @@ export async function onRequest(context) {
     if (m && method === 'POST') return await handleMediaUpload(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/offerpdf$/);
     if (m && method === 'POST') return await handleOfferPdfPreview(request, env, user, Number(m[1]));
+    m = path.match(/^\/card\/(\d+)\/offer\/([a-f0-9]{20,64})\/resend$/);
+    if (m && method === 'POST') return await handleResendOffer(request, env, user, Number(m[1]), m[2]);
     m = path.match(/^\/card\/(\d+)\/offer$/);
     if (m && method === 'POST') return await handleSendOffer(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/files$/);
