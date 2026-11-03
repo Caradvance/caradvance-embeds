@@ -137,6 +137,7 @@ async function serveDomain(context, url, l) {
   if (r.status !== 200) {
     const loc = locOf(await slugMap(env, l, url.origin), p);           // régi magyar cím → új cím
     if (loc && loc !== p) { url.pathname = loc; return Response.redirect(url.toString(), 301); }
+    { const g = goneRedirect(request); if (g) return g; } // kivezetett bérelhető modell / eladott autó → 301 a márkára szűrt listára
     return Response.redirect(new URL('/', url.origin).toString(), 302);
   }
   const isFileUrl = (v) => /\.[a-z0-9]{1,5}$/i.test(v.split(/[?#]/)[0]);
