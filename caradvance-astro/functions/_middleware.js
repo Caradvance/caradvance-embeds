@@ -17,9 +17,29 @@ function withHeaders(res, extra) {
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 }
 
+// Megszűnt bérlési modell vagy eladott/törölt autó (2026-11-03): 404 helyett 301 a márka bérelhető autóira,
+// illetve az autók listájára — minden domainen és nyelven. Ha a modell visszatér, az oldal újra él (nincs 404, nincs átirányítás).
+const GONE_HUB = { hu: 'autoink', sk: 'auta', cs: 'vozy', pl: 'samochody', ch: 'fahrzeuge', eu: { de: 'fahrzeuge', fr: 'vehicules', it: 'veicoli', es: 'vehiculos' } };
+const GONE_BRAND = [['mercedes', 'mercedes'], ['volkswagen', 'volkswagen'], ['vw-', 'volkswagen'], ['bmw', 'bmw'], ['audi', 'audi'], ['mini', 'mini'], ['cupra', 'cupra'], ['seat', 'seat'], ['hyundai', 'hyundai'], ['kia', 'kia'], ['volvo', 'volvo'], ['man-', 'man']];
+function goneRedirect(request) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return null;
+  const url = new URL(request.url);
+  const m = /^(?:\/(en|de|fr|uk|zh|hu|it|es))?\/(berelheto-auto|prenajom|pronajem|wynajem|mieten|langzeitmiete|location-longue-duree|noleggio-lungo-termine|renting|auto)\/([a-z0-9-]+)\/?$/.exec(url.pathname);
+  if (!m) return null;
+  const dl = DOMAINS[url.hostname] || 'hu', lang = m[1] || '';
+  let hub = GONE_HUB[dl]; if (hub && typeof hub === 'object') hub = hub[lang || 'de'];
+  if (!hub) return null;
+  const rent = m[2] !== 'auto';
+  const b = rent ? (GONE_BRAND.find(([p]) => m[3].startsWith(p)) || [])[1] : null;
+  const to = (lang ? '/' + lang : '') + '/' + hub + '/' + (b ? '?marka=' + b : '') + (rent ? '#berelheto' : '');
+  return new Response(null, { status: 301, headers: { Location: new URL(to, url.origin).toString(), 'Cache-Control': 'public, max-age=3600' } });
+}
+
 export async function onRequest(context) {
   try {
-    return await handle(context);
+    const res = await handle(context);
+    if (res && res.status === 404) { const g = goneRedirect(context.request); if (g) return g; }
+    return res;
   } catch (e) {
     // Bármilyen hiba esetén az eredeti oldal megy ki — a magyar látogatót soha nem akaszthatja meg.
     return context.next();
