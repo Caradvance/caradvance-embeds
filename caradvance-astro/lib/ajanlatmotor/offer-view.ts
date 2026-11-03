@@ -208,12 +208,12 @@ body.has-choice .choose-btn{display:none}
 .gal{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
 .gal button{padding:0;border:0;background:var(--soft);border-radius:12px;overflow:hidden;cursor:zoom-in;aspect-ratio:4/3}
 .gal button img{width:100%;height:100%;object-fit:cover;transition:transform .4s}.gal button:hover img{transform:scale(1.05)}
-.equip{columns:3 240px;column-gap:32px}
-.equip section{break-inside:avoid;margin-bottom:22px}
-.equip h5{margin:0 0 8px;font-size:14px;font-weight:800}
-.equip ul{margin:0;padding:0;list-style:none;font-size:14.5px;color:#2b313a}
-.equip li{padding:5px 0 5px 20px;position:relative;border-bottom:1px solid #f0f3f8}
-.equip li:before{content:"";position:absolute;left:2px;top:13px;width:8px;height:8px;border-radius:2px;background:var(--red);transform:rotate(45deg) scale(.7)}
+.equip{columns:3 220px;column-gap:28px}
+.equip section{margin-bottom:14px}
+.equip h5{margin:0 0 4px;font-size:13.5px;font-weight:800;break-after:avoid}
+.equip ul{margin:0;padding:0;list-style:none;font-size:14px;line-height:1.35;color:#2b313a}
+.equip li{padding:3px 0 3px 18px;position:relative;border-bottom:1px solid #f3f5f9;break-inside:avoid}
+.equip li:before{content:"";position:absolute;left:2px;top:9px;width:8px;height:8px;border-radius:2px;background:var(--red);transform:rotate(45deg) scale(.7)}
 .loc{display:flex;gap:12px;align-items:center;font-weight:600;color:#2b313a}
 .loc svg{flex:none;width:22px;height:22px;color:var(--red)}
 .block{padding:clamp(48px,7vw,104px) 0 0}

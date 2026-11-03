@@ -60,6 +60,8 @@ export interface Listing {
   body?: string | null;
   color?: string | null;
   co2_g_km?: number | null;
+  /** hengerűrtartalom, cm³ (eredetiségvizsgálat díja) */
+  cc?: number | null;
   euro_norm?: string | null;
   battery_kwh?: number | null;
   range_km?: number | null;

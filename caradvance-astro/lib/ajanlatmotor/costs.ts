@@ -31,33 +31,71 @@ export function ageMultiplier(months: number, table: [number, number][]): number
   return m;
 }
 
-/** Default NAV column for a listing. Only electric and hybrid are certain; the rest is flagged. */
+/**
+ * Default NAV column for a listing — the honosítás kalkulátor (caradvance.hu/honositas-kalkulator) classes:
+ * 0 = 5E/5Z electric, 1 = better than 14 and first registered after 2020-12-31 (or hybrid), 2 = better than 14, 3 = 12–14, 4 = 9–11, 5 = 8 or worse.
+ * Euro 6 ≈ class 15 (better than 14), Euro 4–5 ≈ 12–14, Euro 3 ≈ 9–11. Without the Euro norm the first registration date decides (flagged).
+ */
 export function defaultEnvGroup(l: Listing): { group: number; certain: boolean } {
   if (l.fuel === "electric") return { group: 0, certain: true };
   if (l.fuel === "hybrid" || l.fuel === "phev") return { group: 1, certain: true };
-  const e = (l.euro_norm || "").toLowerCase();
-  if (e.includes("6")) return { group: 2, certain: false };
-  if (e.includes("5")) return { group: 3, certain: false };
-  if (e.includes("4")) return { group: 4, certain: false };
+  const after2020 = String(l.first_registration || "") >= "2021-01";
+  const e = (l.euro_norm || "").toLowerCase().replace(/\s/g, "");
+  const m = e.match(/euro?(\d)/) || e.match(/^(\d)/);
+  const n = m ? Number(m[1]) : 0;
+  if (n >= 6) return { group: after2020 ? 1 : 2, certain: true };
+  if (n === 5 || n === 4) return { group: 3, certain: true };
+  if (n === 3) return { group: 4, certain: true };
+  if (n && n < 3) return { group: 5, certain: true };
+  const fr = String(l.first_registration || "");
+  if (after2020) return { group: 1, certain: false };
+  if (fr >= "2015-09") return { group: 2, certain: false };
+  if (fr >= "2006-01") return { group: 3, certain: false };
+  if (fr >= "2001-01") return { group: 4, certain: false };
   return { group: 5, certain: false };
 }
 
-export function regado(l: Listing, rates: RateConfig, envGroup: number, regMonth: string) {
-  if (envGroup === 0 && rates.regado.electric_exempt) return { amount: 0, base: 0, months: 0, mult: 0 };
-  const band = rates.regado.kw_upper.findIndex((u) => Math.round(l.power_kw) <= u);
-  const base = rates.regado.table[band][envGroup - 1];
-  const months = monthsSince(l.first_registration, regMonth);
-  const mult = ageMultiplier(months, rates.regado.age_multipliers);
+/* ---------- Honosítás kalkulátor (caradvance.hu/honositas-kalkulator) — ugyanazok a táblák és szabályok ---------- */
+export const HK = {
+  kw_upper: [80, 100, 120, 140, 180, 250, 99999],
+  regado: [
+    [47000, 70500, 282000, 564000, 1128000], [70500, 105750, 423000, 846000, 1692000], [94000, 141000, 564000, 1128000, 2256000],
+    [141000, 211500, 846000, 1692000, 3384000], [188000, 282000, 1128000, 2256000, 4512000], [282000, 423000, 1692000, 3384000, 6768000],
+    [423000, 634500, 2538000, 5076000, 10152000],
+  ],
+  age: [[0, 1.0], [1, 0.97], [3, 0.92], [5, 0.87], [7, 0.82], [13, 0.77], [19, 0.72], [25, 0.67], [31, 0.62], [37, 0.55], [49, 0.47], [61, 0.41], [73, 0.35],
+    [85, 0.3], [97, 0.26], [109, 0.22], [121, 0.19], [133, 0.16], [145, 0.14], [157, 0.12], [169, 0.1]] as [number, number][],
+  // vagyonszerzési illeték, Ft/kW: sorok = kW-sáv (≤40, ≤80, ≤120, 120 felett), oszlopok = kor (0–3 év, 4–8 év, 8 év felett)
+  il_kw: [40, 80, 120, 99999],
+  il: [[550, 450, 300], [750, 550, 450], [850, 750, 550], [950, 850, 750]],
+  okmany: 12000,
+};
+/** Eredetiségvizsgálat díja a hengerűrtartalom szerint (elektromos: 22 950 Ft). */
+export function eredetisegFee(l: Listing): { fee: number; known: boolean; cc: number | null } {
+  if (l.fuel === "electric") return { fee: 22950, known: true, cc: null };
+  let cc = Number((l as any).cc) || 0; let known = cc > 0;
+  if (!cc) { const m = `${l.title || ""} ${l.variant || ""}`.match(/\b([1-6])[.,]([0-9])\s?(?:l\b|tfsi|tsi|tdi|d\b|i\b|v6|v8|crdi|hdi|dci)/i); if (m) cc = Number(m[1]) * 1000 + Number(m[2]) * 100 - 5; }
+  const fee = !cc ? 24975 : cc <= 1400 ? 22950 : cc <= 2000 ? 24975 : 27000;
+  return { fee, known, cc: cc || null };
+}
+
+export function regado(l: Listing, _rates: RateConfig, envGroup: number, regMonth: string) {
+  if (envGroup === 0) return { amount: 0, base: 0, months: 0, mult: 0 };
+  const band = HK.kw_upper.findIndex((u) => l.power_kw <= u);
+  const base = HK.regado[band][envGroup - 1];
+  const months = Math.max(0, monthsSince(l.first_registration, regMonth));
+  const mult = ageMultiplier(months, HK.age);
   return { amount: Math.round(base * mult), base, months, mult };
 }
 
-export function illetek(l: Listing, rates: RateConfig, regMonth: string) {
-  const r = rates.illetek;
-  if (l.fuel === "electric" && r.electric_exempt.v) return 0;
-  const ageYears = Number(regMonth.slice(0, 4)) - Number(l.first_registration.slice(0, 4));
-  const row = r.age_upper_years.findIndex((u) => ageYears <= u);
-  const col = r.kw_upper.findIndex((u) => Math.round(l.power_kw) <= u);
-  return Math.round(l.power_kw) * r.huf_per_kw[row][col];
+/** Vagyonszerzési illeték — a kalkulátor szerint: kW × Ft/kW (kW-sáv és kor szerint); 5E/5Z mentes. */
+export function illetek(l: Listing, _rates: RateConfig, regMonth: string, envGroup?: number) {
+  if (envGroup === 0 || l.fuel === "electric") return { amount: 0, rate: 0 };
+  const ageYears = Math.max(0, Number(regMonth.slice(0, 4)) - Number(l.first_registration.slice(0, 4)));
+  const row = HK.il_kw.findIndex((u) => l.power_kw <= u);
+  const col = ageYears <= 3 ? 0 : ageYears <= 8 ? 1 : 2;
+  const rate = HK.il[row][col];
+  return { amount: Math.round(l.power_kw) * rate, rate };
 }
 
 export function logisticsEur(rates: RateConfig, km: number, mode: "trailer" | "driver") {
@@ -113,15 +151,16 @@ export function computeCosts(input: CostInput): CostResult {
     logEur * fx.rate, "logistics", rates.logistics.verified, rates.logistics.note);
   const rg = regado(l, rates, envGroup, regMonth);
   add("regado", envGroup === 0 ? "Regisztrációs adó (környezetkímélő, mentes)" :
-    `Regisztrációs adó (alap ${fmtHuf(rg.base)} × ${rg.mult}, ${rg.months} hó)`, rg.amount, "homologation",
-    rates.regado.verified && (overrides.env_group !== undefined || envDefault.certain),
+    `Regisztrációs adó (${envGroup}. oszlop, alap ${fmtHuf(rg.base)} × ${rg.mult}, ${rg.months} hó)`, rg.amount, "homologation",
+    overrides.env_group !== undefined || envDefault.certain,
     overrides.env_group !== undefined || envDefault.certain ? undefined : "környezetvédelmi osztály feltételezett");
-  add("eredetiseg", "Eredetiségvizsgálat", rates.fees.eredetiseg.v, "homologation", rates.fees.eredetiseg.verified, rates.fees.eredetiseg.note);
-  add("muszaki", "Honosítási műszaki vizsga", rates.fees.muszaki.v, "homologation", rates.fees.muszaki.verified, rates.fees.muszaki.note);
-  add("forgalomba", "Forgalomba helyezés és okmányok", rates.fees.forgalomba.v, "homologation", rates.fees.forgalomba.verified, rates.fees.forgalomba.note);
-  add("rendszam", "Rendszámtábla", rates.fees.rendszam.v, "homologation", rates.fees.rendszam.verified, rates.fees.rendszam.note);
-  add("illetek", "Vagyonszerzési illeték (átírás)", illetek(l, rates, regMonth), "homologation",
-    rates.illetek.verified && (l.fuel !== "electric" || rates.illetek.electric_exempt.verified), rates.illetek.note);
+  // a többi honosítási tétel is a honosítás kalkulátor szerint (caradvance.hu/honositas-kalkulator)
+  const il = illetek(l, rates, regMonth, envGroup);
+  add("illetek", il.amount ? `Vagyonszerzési illeték (${Math.round(l.power_kw)} kW × ${il.rate} Ft/kW)` : "Vagyonszerzési illeték (mentes)", il.amount, "homologation", true);
+  const ev = eredetisegFee(l);
+  add("eredetiseg", `Eredetiségvizsgálat${ev.cc ? ` (${ev.known ? "" : "kb. "}${ev.cc.toLocaleString("hu-HU")} cm³)` : l.fuel === "electric" ? " (elektromos)" : ""}`, ev.fee, "homologation", true,
+    ev.known || l.fuel === "electric" ? undefined : "hengerűrtartalom nem ismert — a kalkulátor alapértékével (1401–2000 cm³) számolva");
+  add("okmany", "Okmányok (forgalmi engedély, törzskönyv)", HK.okmany, "homologation", true);
   add("ugyintezes", "Ügyintézési díj", rates.ugyintezes.v, "service", rates.ugyintezes.verified, rates.ugyintezes.note);
 
   const vehicleHuf = lines.find((x) => x.key === "vehicle")!.amount_huf;

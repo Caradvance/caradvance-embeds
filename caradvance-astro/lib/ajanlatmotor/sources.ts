@@ -344,6 +344,7 @@ export function normalizeListing(x: any, opts: { allowLocalImages?: boolean } = 
     body: x.body ?? null,
     color: x.color ?? null,
     co2_g_km: Number.isFinite(num(x.co2_g_km)) ? num(x.co2_g_km) : null,
+    cc: Number.isFinite(num(x.cc)) && num(x.cc) > 400 && num(x.cc) < 9000 ? Math.round(num(x.cc)) : null,
     euro_norm: x.euro_norm ?? null,
     battery_kwh: Number.isFinite(num(x.battery_kwh)) ? num(x.battery_kwh) : null,
     range_km: Number.isFinite(num(x.range_km)) ? num(x.range_km) : null,

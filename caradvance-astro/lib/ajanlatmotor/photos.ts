@@ -150,7 +150,7 @@ export async function filterCarPhotos(env: Env, images: string[]): Promise<Photo
 export async function withCarPhotos(env: Env, l: Listing): Promise<Listing & { photos_checked?: boolean; photos_removed?: number; photo_tags?: string[] }> {
   if (l.url.startsWith("mock://")) return { ...l, photos_checked: true, photos_removed: 0 };
   const r = await filterCarPhotos(env, l.images);
-  return { ...l, images: r.images, photo_tags: r.tags, photos_checked: r.checked, photos_removed: r.removed.length };
+  return { ...l, images: r.images, photo_tags: r.tags, photos_checked: r.checked, photos_removed: r.removed.length, all_images: (l as any).all_images || l.images } as any;
 }
 
 /** Which photo categories suit each description section, best first. */

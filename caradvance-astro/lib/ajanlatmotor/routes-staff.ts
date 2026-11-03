@@ -205,13 +205,38 @@ staff.post("/igeny/:id/add", async (c) => {
 staff.post("/igeny/:id/describe", async (c) => {
   const id = Number(c.req.param("id"));
   const g = await guardDeal(c, id); if (g) return g;
+  const f = await c.req.parseBody();
+  const onlyMissing = String(f.missing || "") === "1", lockAll = String(f.lock || "") === "1";
   const { req, cars } = await slotViews(c.env, id);
+  let made = 0;
   for (const cv of cars) {
-    const { sections, engine } = await describe(c.env, cv.listing, cv.distanceKm, req.customer.language as Lang);
-    await c.env.DB.prepare("UPDATE am_candidates SET descriptions_json = ? WHERE id = ?").bind(JSON.stringify(sections), cv.candidate.id).run();
-    await logEvent(c.env, id, c.get("user").name, "described", { cid: cv.candidate.id, engine });
+    if (!(onlyMissing && cv.sections && cv.sections.length)) {
+      const { sections, engine } = await describe(c.env, cv.listing, cv.distanceKm, req.customer.language as Lang);
+      await c.env.DB.prepare("UPDATE am_candidates SET descriptions_json = ? WHERE id = ?").bind(JSON.stringify(sections), cv.candidate.id).run();
+      await logEvent(c.env, id, c.get("user").name, "described", { cid: cv.candidate.id, engine });
+      made++;
+    }
+    if (lockAll && !cv.candidate.locked) {
+      await c.env.DB.prepare("UPDATE am_candidates SET locked = 1 WHERE id = ?").bind(cv.candidate.id).run();
+      await logEvent(c.env, id, c.get("user").name, "locked", { cid: cv.candidate.id });
+    }
   }
-  return back(c, reqPath(id), `Leírások elkészültek (${c.env.ANTHROPIC_API_KEY ? "Claude" : "sablon, nincs Claude API kulcs"}).`);
+  const eng = c.env.ANTHROPIC_API_KEY ? "Claude" : "sablon, nincs Claude API kulcs";
+  return back(c, reqPath(id), `${made ? `${made} leírás elkészült (${eng})` : "Minden autónak volt már leírása"}${lockAll ? `, mind a(z) ${cars.length} autó zárolva` : ""}.`);
+});
+
+/** Az összes kiválasztott autó zárolása / feloldása egyszerre. */
+staff.post("/igeny/:id/lock", async (c) => {
+  const id = Number(c.req.param("id"));
+  const g = await guardDeal(c, id); if (g) return g;
+  const f = await c.req.parseBody();
+  const v = Number(f.locked) ? 1 : 0;
+  const { cars } = await slotViews(c.env, id);
+  for (const cv of cars) if (!!cv.candidate.locked !== !!v) {
+    await c.env.DB.prepare("UPDATE am_candidates SET locked = ? WHERE id = ?").bind(v, cv.candidate.id).run();
+    await logEvent(c.env, id, c.get("user").name, v ? "locked" : "unlocked", { cid: cv.candidate.id });
+  }
+  return back(c, reqPath(id), v ? `Mind a(z) ${cars.length} autó zárolva.` : "Az autók zárolása feloldva.");
 });
 
 staff.post("/igeny/:id/publish", async (c) => {
@@ -265,13 +290,43 @@ staff.post("/jelolt/:cid/photos", async (c) => {
   const gc = await guardCand(c, cid); if (gc.err) return gc.err;
   const row = await c.env.DB.prepare("SELECT listing_json FROM am_candidates WHERE id = ?").bind(cid).first<{ listing_json: string }>();
   const before = JSON.parse(row!.listing_json);
-  const l = await withCarPhotos(c.env, { ...before, photos_checked: false });
+  // az újraellenőrzés az eredeti hirdetés összes képéből indul (a kézi képválasztás ilyenkor újrakezdődik)
+  const src = Array.isArray(before.all_images) && before.all_images.length ? before.all_images : before.images;
+  const l: any = await withCarPhotos(c.env, { ...before, images: src, photos_checked: false });
+  l.all_images = src; delete l.all_tags;
   await c.env.DB.prepare("UPDATE am_candidates SET listing_json = ? WHERE id = ?").bind(JSON.stringify(l), cid).run();
   await logEvent(c.env, gc.dealId!, c.get("user").name, "photos_checked", { cid, kept: l.images.length, removed: l.photos_removed, checked: l.photos_checked, error: l.photos_checked ? undefined : lastPhotoError });
   if (!c.env.AI) return back(c, reqPath(gc.dealId!), undefined, "A fotószűrő nincs bekötve (Workers AI „AI” binding hiányzik).");
   return back(c, reqPath(gc.dealId!), l.photos_checked
     ? `Fotók ellenőrizve: ${l.images.length} autófotó maradt, ${l.photos_removed} nem autós kép kiszűrve.`
     : undefined, l.photos_checked ? undefined : "A fotók egy részét nem sikerült ellenőrizni, próbálja újra.");
+});
+
+/** Képválasztás: mely képek kerüljenek az ajánlatba (az eredeti hirdetés képei közül) és melyik legyen a borítókép. */
+staff.post("/jelolt/:cid/images", async (c) => {
+  const cid = c.req.param("cid");
+  const gc = await guardCand(c, cid); if (gc.err) return gc.err;
+  const f = await c.req.parseBody({ all: true });
+  const row = await c.env.DB.prepare("SELECT listing_json FROM am_candidates WHERE id = ?").bind(cid).first<{ listing_json: string }>();
+  const l = JSON.parse(row!.listing_json);
+  const all: string[] = Array.isArray(l.all_images) && l.all_images.length ? l.all_images : (l.images || []);
+  // a képcímkék (fotószűrő) a kép címéhez kötve, hogy átrendezés után is a helyükön maradjanak
+  const tagOf: Record<string, string> = { ...(l.all_tags || {}) };
+  (l.images || []).forEach((u: string, i: number) => { if (Array.isArray(l.photo_tags) && l.photo_tags[i] != null) tagOf[u] = l.photo_tags[i]; });
+  const arr = (k: string) => (Array.isArray(f[k]) ? (f[k] as any[]) : f[k] != null ? [f[k]] : []).map((x) => parseInt(String(x), 10)).filter((n) => n >= 0 && n < all.length);
+  let keep = String(f.all || "") === "1" ? all.map((_, i) => i) : arr("keep");
+  const cover = arr("cover")[0];
+  if (cover != null && !keep.includes(cover)) keep.push(cover);
+  if (!keep.length) return back(c, reqPath(gc.dealId!), undefined, "Legalább egy képet hagyj meg.");
+  keep = [...new Set(keep)].sort((a, b) => a - b);
+  const ci = String(f.all || "") === "1" ? (all.indexOf((l.images || [])[0]) >= 0 ? all.indexOf(l.images[0]) : keep[0]) : (cover != null ? cover : keep[0]);
+  const order = [ci, ...keep.filter((i) => i !== ci)];
+  l.all_images = all; l.all_tags = tagOf;
+  l.images = order.map((i) => all[i]);
+  if (Object.keys(tagOf).length) l.photo_tags = l.images.map((u: string) => tagOf[u] || "other");
+  await c.env.DB.prepare("UPDATE am_candidates SET listing_json = ? WHERE id = ?").bind(JSON.stringify(l), cid).run();
+  await logEvent(c.env, gc.dealId!, c.get("user").name, "images_selected", { cid, shown: l.images.length, of: all.length, cover: ci });
+  return back(c, reqPath(gc.dealId!), `Képek mentve: ${l.images.length} / ${all.length} kép, a borítókép a(z) ${ci + 1}. kép.`);
 });
 
 /** Next photo becomes the cover (dealer banners are often the first mobile.de image). */

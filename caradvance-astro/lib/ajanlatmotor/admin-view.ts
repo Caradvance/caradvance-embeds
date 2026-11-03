@@ -121,6 +121,23 @@ function costTable(cv: CarView) {
   </div>`;
 }
 
+/** Melyik képek jelenjenek meg az ajánlatban és melyik legyen a borítókép (az eredeti hirdetés összes képe közül). */
+function imagePicker(cid: string, l: any, published: boolean) {
+  const all: string[] = Array.isArray(l.all_images) && l.all_images.length ? l.all_images : l.images || [];
+  if (all.length < 2) return "";
+  const shown = new Set<string>(l.images || []); const cover = (l.images || [])[0];
+  return `<details class="imgpick" style="flex-basis:100%;margin:4px 0"><summary class="small" style="cursor:pointer;font-weight:700">Képek kiválasztása (${shown.size} / ${all.length}) — borítókép</summary>
+  <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/images" style="margin:8px 0 0">
+   <div class="muted small" style="margin-bottom:6px">Pipáld be, mely képek jelenjenek meg az ajánlatban; a ★ a borítókép.</div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px">${all.map((u, i) => `<div style="border:1px solid var(--line,#e3e7ee);border-radius:8px;padding:4px;background:#fff">
+    <img src="${esc(u)}" alt="" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;display:block">
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-top:3px"><label style="display:flex;gap:4px;align-items:center;margin:0"><input type="checkbox" name="keep" value="${i}" ${shown.has(u) ? "checked" : ""}> ${i + 1}.</label>
+    <label title="Borítókép" style="display:flex;gap:3px;align-items:center;margin:0"><input type="radio" name="cover" value="${i}" ${u === cover ? "checked" : ""}>★</label></div></div>`).join("")}</div>
+   <div class="row" style="margin-top:8px;gap:8px"><button class="btn" style="padding:5px 12px;font-size:12px" ${published ? "disabled" : ""}>Képek mentése</button>
+    <button class="btn" style="padding:5px 12px;font-size:12px" name="all" value="1" ${published ? "disabled" : ""}>Összes kép vissza</button></div>
+  </form></details>`;
+}
+
 function slotCard(cv: CarView, published: boolean) {
   const l = cv.listing;
   const c = cv.candidate;
@@ -134,6 +151,7 @@ function slotCard(cv: CarView, published: boolean) {
   ${mock ? "" : `<div class="row" style="gap:6px;margin:0 0 8px;align-items:center">
    ${l.images.length > 1 ? `<form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/cover" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Másik borítókép ↻</button></form>` : ""}
    <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/photos" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Fotók szűrése</button></form>
+   ${imagePicker(cid, l, published)}
    <span class="muted small">${l.images.length} kép · ${(l as any).photos_checked ? `<span class="ok">✓ csak autófotó</span>${(l as any).photos_removed ? ` (${(l as any).photos_removed} kiszűrve)` : ""}` : `<span style="color:var(--red)">fotók nincsenek ellenőrizve</span>`}</span></div>`}
   <h3>${esc(l.title)}</h3>
   <div class="muted small">${mock ? "TESZTHIRDETÉS (mock)" : `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(portalOf(l.url).name || "Eredeti")} hirdetés ↗</a>`} · ${esc(l.seller.name)} · ${esc(l.seller.city)} · <strong>${Math.round(cv.distanceKm)} km</strong> Budapesttől (${cv.distanceMethod === "ors" ? "útvonal" : "becslés"})</div>
@@ -191,7 +209,9 @@ export function requestPage(o: {
   <div class="row">
    ${o.searchUrl && !published ? `<a class="btn red" href="#mdSearch" title="A keresési adatok ellenőrzése / módosítása, majd a mobile.de vagy AutoScout24 keresés megnyitása.">mobile.de / AutoScout24 keresés ↓</a>` : ""}
    <form method="post" action="${B}/search"><button class="btn" ${published ? "disabled" : ""}>Keresés újrafuttatása</button></form>
-   <form method="post" action="${B}/describe"><button class="btn" ${published ? "disabled" : ""}>Mindhárom leírás generálása</button></form>
+   ${o.cars.length ? `<form method="post" action="${B}/describe" title="Ahol még nincs leírás, ott elkészíti, majd mindhárom autót zárolja"><input type="hidden" name="missing" value="1"><input type="hidden" name="lock" value="1"><button class="btn dark" ${published ? "disabled" : ""}>Mindhárom: leírás + zárolás</button></form>` : ""}
+   <form method="post" action="${B}/describe"><button class="btn" ${published ? "disabled" : ""}>Mindhárom leírás (újra)generálása</button></form>
+   ${o.cars.length ? (() => { const all = o.cars.every((cv: any) => cv.candidate.locked); return `<form method="post" action="${B}/lock"><input type="hidden" name="locked" value="${all ? 0 : 1}"><button class="btn" ${published ? "disabled" : ""}>${all ? "Mindhárom feloldása" : "Mindhárom zárolása"}</button></form>`; })() : ""}
    <a class="btn dark" href="${B}/preview" target="_blank" title="Pontosan ez az oldal nyílik meg az ügyfélnek az e-mailből">Ajánlat megtekintése ↗</a>
    ${!published && o.cars.length ? `<a class="btn red" href="#kikuldes">Ajánlat kiküldése ↓</a>` : ""}
   </div></div>
@@ -328,6 +348,8 @@ export function searchEditor(req: Requirements, dealId: number, maxEur?: number)
   </form>
   <script>(function(){
   var C=${JSON.stringify(cfg).replace(/</g, "\\u003c")};
+  // a szerver-oldali build (keepNames) a függvény forrásába __name(...) hívást tesz — a böngészőben ez nincs definiálva
+  var __name=function(f){return f;};
   var AS24SLUG=${as24Slug.toString()};
   var f=document.getElementById('mdSearch');if(!f)return;
   var nm=function(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();};
