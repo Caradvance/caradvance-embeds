@@ -181,6 +181,8 @@
           equipment: feats.length ? feats : null,
           accident_free: ad.accidentDamaged === false || ad.damageUnrepaired === false ? true : ad.accidentFree != null ? !!ad.accidentFree : null,
           previous_owners: num(ad.numberOfPreviousOwners != null ? ad.numberOfPreviousOwners : ad.previousOwners),
+          cc: num(ad.cubicCapacity != null ? ad.cubicCapacity : ad.engineDisplacement),
+          euro_norm: str(ad.emissionClass || ad.pollutionClass),
           images: imgs.length ? imgs : null,
           description_de: str(ad.description),
           seller: {
@@ -265,6 +267,8 @@
       equipment: eq.length ? eq : null,
       accident_free: v.hadAccident === false ? true : v.hadAccident === true ? false : null,
       previous_owners: num(v.noOfPreviousOwners),
+      cc: num(v.rawDisplacementInCCM != null ? v.rawDisplacementInCCM : v.displacementInCCM),
+      euro_norm: str(v.environmentEuDirective || v.emissionClass),
       images: imgs.length ? imgs : null,
       description_de: desc,
       seller: { name: str(sel.companyName) || str(sel.contactName), city: str(loc.city), zip: str(loc.zip), country: str(loc.countryCode) || "DE",
@@ -289,6 +293,10 @@
     out.body = g("Kategorie");
     out.condition = /neu/i.test(g("Fahrzeugzustand") || "") && !/gebraucht/i.test(g("Fahrzeugzustand") || "") ? "new" : g("Fahrzeugzustand") ? "used" : null;
     if (g("Anzahl der Fahrzeughalter") != null) out.previous_owners = num(g("Anzahl der Fahrzeughalter"));
+    // honosítás: hengerűrtartalom (eredetiségvizsgálat díja) és Euro-norma (regisztrációs adó oszlopa)
+    if ((m = String(g("Hubraum") || "").replace(/\./g, "").match(/(\d{3,5})\s*cm/))) out.cc = num(m[1]);
+    if (g("Schadstoffklasse")) out.euro_norm = g("Schadstoffklasse");
+    if (g("CO₂-Emissionen (komb.)") || g("CO2-Emissionen (komb.)")) { var co = String(g("CO₂-Emissionen (komb.)") || g("CO2-Emissionen (komb.)")).match(/(\d+)\s*g/); if (co) out.co2_g_km = num(co[1]); }
     var bat = Object.keys(dt).filter(function (k) { return /^Batteriekapazit/.test(k); })[0];
     if (bat) out.battery_kwh = num(dt[bat]);
     // gallery: data-testid="image-N" slides, in order, full-size rendition

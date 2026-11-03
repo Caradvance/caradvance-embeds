@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Caradvance Sourcing",
   "short_name": "Caradvance",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "mobile.de és AutoScout24 hirdetések küldése a Caradvance ajánlatmotorba egy kattintással.",
   "permissions": [
     "storage",
