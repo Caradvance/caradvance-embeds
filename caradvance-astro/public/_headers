@@ -23,19 +23,19 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Képek, videók, betűk (nem hash-eltek, de ritkán változnak) — 7 nap
+# Képek, videók, betűk (nem hash-eltek, de ritkán változnak) — 30 nap (+1 nap stale-while-revalidate)
 /*.webp
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 /*.jpg
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 /*.jpeg
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 /*.png
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 /*.svg
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 /*.mp4
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 /*.woff2
   Cache-Control: public, max-age=2592000
 
