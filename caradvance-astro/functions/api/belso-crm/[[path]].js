@@ -401,6 +401,76 @@ async function handleResendOffer(request, env, user, id, token) {
   return json({ ok: true, sentTo: fwd || to, test: !!fwd });
 }
 
+
+/* ---------------- díjbekérő: kaució (Bérlés) / előleg (Eladás, Import) — a szerződések aláírása után ---------------- */
+const PAYREQ = { kaucio: { t: 'Kaució', subj: 'Díjbekérő — kaució' }, eloleg: { t: 'Előleg', subj: 'Előlegbekérő' } };
+const payKind = (line) => (line === 'Bérlés' ? 'kaucio' : 'eloleg');
+const fmtAmt = (n, cur) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (cur === 'EUR' ? ' €' : ' Ft');
+function amtOf(x) { const t = String(x == null ? '' : x).replace(/[\s ]/g, ''); const cur = /ft|huf/i.test(t) ? 'HUF' : /€|eur/i.test(t) ? 'EUR' : ''; const n = parseFloat(t.replace(/[^\d,.]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return { n: isFinite(n) ? n : 0, cur }; }
+/** Alapértékek autónként: kaució az ajánlatból / az autó adataiból, előleg a teljes ár 30%-a. */
+async function payDefaults(env, deal, card) {
+  const kind = payKind(deal.line); const vehicles = vehiclesOf(card.data);
+  const acc = await env.DB.prepare(`SELECT items, choice FROM crm_offers WHERE deal_id = ? AND action = 'elfogad' ORDER BY responded_at DESC LIMIT 1`).bind(deal.id).first();
+  const accIt = acc ? parseJ(acc.items, [])[acc.choice] : null;
+  const list = (vehicles.length ? vehicles : [null]).map((v) => {
+    let amount = 0, currency = (v && v.currency) || (accIt && accIt.currency) || 'EUR', total = 0;
+    if (kind === 'kaucio') { amount = Number(v && v.deposit) || Number(accIt && accIt.deposit) || 0; if (!(v && v.deposit) && accIt) currency = accIt.currency || currency; }
+    else {
+      const ar = amtOf(v && v.cx && v.cx.ar);
+      if (ar.n > 0) { total = ar.n; currency = ar.cur || 'EUR'; }
+      else { total = Number(v && v.price) || Number(accIt && accIt.price) || 0; if (deal.line === 'Import' && currency === 'HUF' && total > 0 && total < 1e6) currency = 'EUR'; }
+      amount = Math.round(total * 0.3);
+    }
+    return { vehicle_id: v ? v.id : '', name: v ? (v.title || [v.brand, v.model].filter(Boolean).join(' ')) : (deal.car || ''), amount, currency, total };
+  });
+  const doc = await env.DB.prepare(`SELECT vars FROM crm_docs WHERE deal_id = ? AND sign_status = 'signed' ORDER BY id DESC LIMIT 1`).bind(deal.id).first();
+  const contract = (doc && parseJ(doc.vars, {}).szerzodes_szam) || `CA-${({ 'Eladás': 'ELA', 'Import': 'IMP', 'Bérlés': 'BER' })[deal.line] || 'SZ'}-${new Date().getUTCFullYear()}-${String(deal.id).padStart(4, '0')}`;
+  const sk = 'payreq_' + kind;
+  const due = new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10);
+  return {
+    kind, title: PAYREQ[kind].t, percent: kind === 'eloleg' ? 30 : 0, vehicles: list, contract, due,
+    beneficiary: await getSetting(env, sk + '_benef', deal.line === 'Bérlés' ? 'Caradvance GmbH' : 'BH Group Zrt.'),
+    account: await getSetting(env, sk + '_acc', deal.line === 'Bérlés' ? '' : await getSetting(env, 'bh_bankszamla', '')),
+    to: clean((card.data.person && card.data.person.email) || deal.email, 160), name: (card.data.person && card.data.person.name) || deal.name || ''
+  };
+}
+async function handlePayDefaults(env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  if (!['Bérlés', 'Eladás', 'Import'].includes(deal.line)) return json({ error: 'Ennél az üzletágnál nincs díjbekérő.' }, 400);
+  return json(await payDefaults(env, deal, await getCard(env, id)));
+}
+async function handlePaySend(request, env, user, id) {
+  const { deal, error } = await loadDeal(env, user, id); if (error) return error;
+  if (!['Bérlés', 'Eladás', 'Import'].includes(deal.line)) return json({ error: 'Ennél az üzletágnál nincs díjbekérő.' }, 400);
+  const b = await request.json().catch(() => ({}));
+  const kind = payKind(deal.line); const T = PAYREQ[kind];
+  const amount = Math.round(Math.max(0, Number(b.amount) || 0) * 100) / 100; const currency = b.currency === 'HUF' ? 'HUF' : 'EUR';
+  const to = clean(b.to, 160), beneficiary = clean(b.beneficiary, 120), account = clean(b.account, 80), reference = clean(b.reference, 120), car = clean(b.car, 200), note = cleanMulti(b.note, 1000).trim();
+  const due = /^\d{4}-\d{2}-\d{2}$/.test(b.due || '') ? b.due : '';
+  if (!(amount > 0)) return json({ error: 'Add meg az összeget.' }, 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return json({ error: 'Adj meg érvényes e-mail címet.' }, 400);
+  if (!beneficiary || !account) return json({ error: 'Add meg a kedvezményezettet és a bankszámlaszámot.' }, 400);
+  const sk = 'payreq_' + kind; await setSetting(env, sk + '_benef', beneficiary); await setSetting(env, sk + '_acc', account);
+  const card = await getCard(env, id);
+  const name = (card.data.person && card.data.person.name) || deal.name || '';
+  const dueHu = due ? due.replace(/-/g, '. ') + '.' : '';
+  const row = (k, v, big) => `<tr><td style="padding:8px 12px;color:#6b7280;font-size:13px;border-bottom:1px solid #eef1f5;white-space:nowrap">${k}</td><td style="padding:8px 12px;font-size:${big ? 18 : 14}px;font-weight:bold;color:${big ? '#e2001a' : '#141519'};border-bottom:1px solid #eef1f5">${esc(v)}</td></tr>`;
+  const html = `<p>Kedves ${esc(name || 'Ügyfelünk')}!</p>
+<p>Köszönjük, hogy aláírta a szerződés${kind === 'kaucio' ? 't' : 'eket'}! ${kind === 'kaucio' ? 'A bérlet indításához kérjük, utalja át a <b>kauciót</b>' : 'A megrendelés elindításához kérjük, utalja át az <b>előleget</b>'} az alábbi adatokkal:</p>
+<table cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;border-collapse:separate;overflow:hidden;width:100%;max-width:520px">
+${row(T.t, fmtAmt(amount, currency), true)}${car ? row('Jármű', car) : ''}${row('Kedvezményezett', beneficiary)}${row('Bankszámlaszám', account)}${row('Közlemény', reference || '—')}${dueHu ? row('Fizetési határidő', dueHu) : ''}
+</table>
+${note ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(note)}</p>` : ''}
+<p>Kérjük, a közleményben tüntesse fel a fenti azonosítót, hogy az utalást gyorsan be tudjuk azonosítani.${kind === 'kaucio' ? ' A kaució a jármű sértetlen visszaadásakor visszajár.' : ''}</p>
+<p>Kérdés esetén keressen minket bizalommal.</p><p>Üdvözlettel:<br>CarAdvance</p>`;
+  const fwd = testForward(env);
+  const r = await sendCrmMail(env, fwd || to, `${fwd ? '[TESZT — ' + to + '] ' : ''}${T.subj}${reference ? ' — ' + reference : ''} — CarAdvance`, html, []);
+  const txt = `${T.t}bekérő ${r.ok ? 'elküldve' : 'küldése SIKERTELEN'}: ${fmtAmt(amount, currency)}${car ? ' — ' + car : ''} → ${fwd ? 'TESZT → ' + fwd : to}${dueHu ? ', határidő: ' + dueHu : ''}${reference ? ', közlemény: ' + reference : ''}${r.ok ? '' : ' — ' + r.error}`;
+  await addEvent(env, id, 'payreq', txt, user.name);
+  if (!r.ok) return json({ ok: false, error: r.error }, 502);
+  return json({ ok: true, sentTo: fwd || to, test: !!fwd });
+}
+
 /* ---------------- CarAdvance-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ---------------- */
 function eqImgs(a) { return (Array.isArray(a) ? a : []).filter((z) => z && Number.isInteger(z.id) && z.id > 0).slice(0, 40).map((z) => ({ id: z.id, idx: Number.isInteger(z.idx) ? z.idx : -1, label: clean(z.label, 160) })); }
 function offerNo(id, i, n) { const d = new Date(); return `AJ-${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}-${String(id).padStart(4, '0')}${n > 1 ? '-' + (i + 1) : ''}`; }
@@ -1390,6 +1460,9 @@ export async function onRequest(context) {
     if (m && method === 'POST') return await handleOfferPdfPreview(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/offer\/([a-f0-9]{20,64})\/resend$/);
     if (m && method === 'POST') return await handleResendOffer(request, env, user, Number(m[1]), m[2]);
+    m = path.match(/^\/card\/(\d+)\/payreq$/);
+    if (m && method === 'GET') return await handlePayDefaults(env, user, Number(m[1]));
+    if (m && method === 'POST') return await handlePaySend(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/offer$/);
     if (m && method === 'POST') return await handleSendOffer(request, env, user, Number(m[1]));
     m = path.match(/^\/card\/(\d+)\/files$/);
