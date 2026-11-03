@@ -1398,7 +1398,7 @@ function renderOffers(){
   el.innerHTML=S.offers.map(function(o){
     var pill=!o.sent?'<span class="pill bad">Nem ment ki</span>':!o.responded_at?'<span class="pill wait">Válaszra vár</span>':o.action==='elfogad'?'<span class="pill ok">Elfogadva</span>':'<span class="pill mod">Módosítást kért</span>';
     return '<div class="of"><div class="h"><b>'+esc(fmtDate(o.created_at))+'</b>'+pill+(o.responded_at?'<span class="hint">válasz: '+esc(fmtDate(o.responded_at))+'</span>':'')
-      +'<span class="sp" style="flex:1"></span><a class="btn ghost sm" href="'+esc(o.link)+'" target="_blank" rel="noopener">Ügyfél nézet ↗</a></div>'
+      +'<span class="sp" style="flex:1"></span><button type="button" class="btn ghost sm" data-resend="'+esc(o.token)+'" title="Ugyanaz az ajánlat és link újra kimegy e-mailben (a PDF-mellékletekkel)">↻ Újraküldés</button><a class="btn ghost sm" href="'+esc(o.link)+'" target="_blank" rel="noopener">Ügyfél nézet ↗</a></div>'
       +'<ul>'+o.items.map(function(it,i){return '<li'+(o.responded_at&&o.choice===i?' class="ch"':'')+'>'+esc(it.title)+' — '+fmtPrice(it.price,it.currency)+(it.period?'/'+esc(it.period):'')
         +(it.ad_id?' · <span class="hint">mobile.de: '+(it.ad_url?'<a href="'+esc(it.ad_url)+'" target="_blank" rel="noopener">'+esc(it.ad_id)+'</a>':esc(it.ad_id))+'</span>':'')
         +(it.config_code?' · <span class="hint">kód: '+esc(it.config_code)+'</span>':'')
@@ -1406,6 +1406,16 @@ function renderOffers(){
       +(o.client_msg?'<div class="hint" style="margin-top:8px;white-space:pre-line">Ügyfél üzenete: <b style="color:var(--ink)">'+esc(o.client_msg)+'</b></div>':'')
       +'<div class="hint" style="margin-top:6px">Címzett: '+esc(o.sent_to)+'</div></div>';
   }).join('');
+  el.querySelectorAll('[data-resend]').forEach(function(b){b.addEventListener('click',function(){
+    var tok=b.getAttribute('data-resend'),o=S.offers.filter(function(x){return x.token===tok;})[0]||{};
+    var em=((S.card.data.person||{}).email)||S.deal.email||'';
+    var to=prompt('Ajánlat újraküldése — címzett e-mail címe:',em);if(to===null)return;to=to.trim();if(!to){toast('Adj meg e-mail címet.');return;}
+    b.disabled=true;b.textContent='Küldés…';
+    api('/card/'+ID+'/offer/'+tok+'/resend',{method:'POST',body:{to:to}}).then(function(r){
+      toast('Ajánlat újraküldve: '+r.sentTo+(r.test?' (TESZT)':''),4000);
+      return api('/card/'+ID).then(function(j){S.offers=j.offers;if(j.card)S.card.status=j.card.status;renderOffers();refreshLog();if(typeof renderHead==='function')renderHead();});
+    }).catch(function(e){toast(e.message,6000);b.disabled=false;b.textContent='↻ Újraküldés';});
+  });});
 }
 
 /* ---------------- 5. szerződés + dokumentumok ---------------- */
