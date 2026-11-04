@@ -193,6 +193,31 @@ function inText(h, fn) {
 }
 const fmtN = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
+/* színnév-tartalék (ha sem a szótárban, sem a gyári német névben nincs): magyar színszavak → SK / CZ, a márkanév marad */
+const CW = {
+  sk: { kék: 'modrá', piros: 'červená', vörös: 'červená', zöld: 'zelená', szürke: 'sivá', fehér: 'biela', fekete: 'čierna', ezüst: 'strieborná', sárga: 'žltá', barna: 'hnedá', bézs: 'béžová', lila: 'fialová', narancs: 'oranžová', bordó: 'bordová', metál: 'metalíza', gyöngyház: 'perleť', uni: 'uni', sötét: 'tmavá', világos: 'svetlá', petrol: 'petrolejová' },
+  cs: { kék: 'modrá', piros: 'červená', vörös: 'červená', zöld: 'zelená', szürke: 'šedá', fehér: 'bílá', fekete: 'černá', ezüst: 'stříbrná', sárga: 'žlutá', barna: 'hnědá', bézs: 'béžová', lila: 'fialová', narancs: 'oranžová', bordó: 'vínová', metál: 'metalíza', gyöngyház: 'perleť', uni: 'uni', sötét: 'tmavá', világos: 'světlá', petrol: 'petrolejová' },
+};
+const PF = {
+  sk: { tanzanit: 'Tanzanitová', oxid: 'Oxidová', hegyi: 'Horská', urán: 'Uránová', atlasz: 'Atlas', nyíl: 'Šípová', elefántcsont: 'Slonovinová', delfin: 'Delfínová', grafit: 'Grafitová', éjfél: 'Polnočná', zafír: 'Zafírová', ásvány: 'Minerálna', gleccser: 'Ľadovcová', kristály: 'Kryštálová', obszidián: 'Obsidiánová', ónix: 'Ónyxová', holdkő: 'Mesačná', árnyék: 'Tieňová', füst: 'Dymová', réz: 'Medená', kozmosz: 'Kozmická', mítosz: 'Mýtická', alkony: 'Súmračná', ibolya: 'Fialková', óceán: 'Oceánska' },
+  cs: { tanzanit: 'Tanzanitová', oxid: 'Oxidová', hegyi: 'Horská', urán: 'Uranová', atlasz: 'Atlas', nyíl: 'Šípová', elefántcsont: 'Slonovinová', delfin: 'Delfínová', grafit: 'Grafitová', éjfél: 'Půlnoční', zafír: 'Safírová', ásvány: 'Minerální', gleccser: 'Ledovcová', kristály: 'Křišťálová', obszidián: 'Obsidiánová', ónix: 'Onyxová', holdkő: 'Měsíční', árnyék: 'Stínová', füst: 'Kouřová', réz: 'Měděná', kozmosz: 'Kosmická', mítosz: 'Mýtická', alkony: 'Soumračná', ibolya: 'Fialková', óceán: 'Oceánská' },
+};
+const CWRE = /^(.*?)(kék|piros|vörös|zöld|szürke|fehér|fekete|ezüst|sárga|barna|bézs|lila|narancs|bordó)$/i;
+function colTr(c, lg) {
+  const W = CW[lg], X = PF[lg]; let hit = false;
+  const out = c.split(' ').map((t) => {
+    const l = t.toLowerCase();
+    if (W[l]) { hit = true; return W[l]; }
+    const m = l.match(CWRE);
+    if (m && m[1]) { const p = X[m[1]]; if (!p) return null; hit = true; return p + ' ' + W[m[2]]; }
+    if (/[őűöüáéíóú]/i.test(t)) return null;
+    return t;
+  });
+  if (!hit || out.some((x) => x == null)) return null;
+  const r = out.join(' ');
+  return r.charAt(0).toUpperCase() + r.slice(1);
+}
+
 /* ---------- futtatás ---------- */
 if (process.argv[1] && /skcz-fix1104\.mjs$/.test(process.argv[1])) {
   let DE = {};
@@ -210,7 +235,7 @@ if (process.argv[1] && /skcz-fix1104\.mjs$/.test(process.argv[1])) {
       const CADD = {};
       for (const c of Object.keys(COL)) {
         if (OV[S.lg][c]) continue;
-        if (M0[c] == null || M0[c] === c) { if (DE[c] && DE[c] !== c) CADD[c] = DE[c]; }
+        if (M0[c] == null || M0[c] === c) { if (DE[c] && DE[c] !== c) CADD[c] = DE[c]; else { const x = colTr(c, S.lg); if (x && x !== c) CADD[c] = x; } }
       }
       // a futásidejű szótár: lektorált + hiányzó színek; CZ: „Dízel …” → „Nafta …”
       const M = Object.assign({}, M0, CADD, OV[S.lg]);
