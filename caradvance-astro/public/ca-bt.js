@@ -41,6 +41,8 @@ var R=[
 [new RegExp('A forintár a napi árfolyammal számolt(?: \\(1\\s*€ = '+N+'\\s*(Ft|Kč)\\))?\\.','g'),function(m,n,u){return u==='Ft'?L.fx.replace('$1',String(n).trim()):'';}], /* .sk/.cz: az árfolyam-mondat (vagy a csonka/átváltott változata) kimarad — ott az árak már euróban/koronában vannak */
 [new RegExp('A feltüntetett ár nettó havidíj: '+N+' €(?:\\s*\\(≈[^)]*\\))?\\/hó \\+ áfa \\(cégeknek\\)\\.','g'),f(L.netCo)],
 [new RegExp('A feltüntetett ár nettó havidíj: '+N+' €(?:\\s*\\(≈[^)]*\\))?\\/hó\\.','g'),f(L.netM)],
+/* CH: az összeg már frankban érkezik („CHF 1’062 (≈ 1149 €)”), a „nettó”/„hó” lehet már lefordítva — Marc, 2026-11-04 */
+[new RegExp('A feltüntetett ár nett[oó] havidíj: (CHF[^/]+?)\\s*\\/[^.]+\\.','g'),function(m,a){return L.netM.replace('$1 €',String(a).trim());}],
 [/Magánszemélyként erre jön a 19% német áfa — a fenti összeg már ezzel számolt\./g,f(L.privIncl)],
 [/Magánszemélyként erre jön a 19% német áfa\./g,f(L.privAdd)],
 [/Cégként erre jön az áfa\./g,f(L.coVat)],
