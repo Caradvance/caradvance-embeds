@@ -76,6 +76,20 @@ export const OTHERS: Record<string, RentalContent> = {
     faqExtra: [ { q: 'Milyen gyorsan tölt a Hyundai IONIQ 6?', a: 'A 800 voltos rendszernek köszönhetően megfelelő DC töltőn kb. 18 perc alatt tölt 10-ről 80%-ra.' } ],
     schema: { drive: 'AWD' },
   },
+  'Hyundai IONIQ 5': {
+    overviewH2: 'Hyundai IONIQ 5 tartós bérlet — elektromos crossover akár 570 km hatótávval',
+    guideIntro: 'A <strong>Hyundai IONIQ 5</strong> a megújult, retró-futurisztikus elektromos crossover: 84 kWh-s akkumulátor, WLTP szerint akár <strong>570 km</strong> hatótáv, 800 voltos rendszer és 3 méteres tengelytáv a tágas utastérért. A bérelhető <strong>84 kWh 2WD UNIQ</strong> változat 229 LE-s hátsókerék-hajtással érkezik. <strong>Elektromos autó tartós bérletben</strong>: egyetlen havi díjat fizetsz, az akkumulátor és az értékvesztés kockázata nem a tiéd.',
+    guideBlocks: [
+      { h3: 'Miért az IONIQ 5?', html: 'A 800 voltos technikának köszönhetően megfelelő DC töltőn (max. 260 kW) kb. 18 perc alatt tölt 10-ről 80%-ra, a 84 kWh-s akkumulátor pedig hosszabb utakra is elég. A V2L funkcióval az autó áramforrásként is használható: laptopot, elektromos kerékpárt vagy kempingfelszerelést is tölthetsz róla.' },
+      { h3: 'IONIQ 5 vagy IONIQ 6?', html: 'Technikában rokonok. Az <strong>IONIQ 5</strong> magasabb, crossover-karakterű, nagyobb csomagtartóval, az <a href="/berelheto-auto/hyundai-ioniq-6-berles">IONIQ 6</a> alacsonyabb, áramvonalas limuzin.' },
+      { h3: 'Miért érdemes elektromos autót bérelni?', html: EV_WHY },
+    ],
+    design: { h3: 'Parametrikus pixel-dizájn', text: 'Tiszta, éles vonalak, parametrikus pixel LED lámpák és megújult lökhárítók — az IONIQ 5 formája első ránézésre felismerhető.', bullets: ['Parametrikus pixel LED fényszórók és hátsó lámpák', 'Megújult első és hátsó lökhárító', '3000 mm-es tengelytáv'] },
+    interior: { h3: 'Tágas, nappali-szerű utastér', text: 'Lapos padló, két 12,3"-os kijelző, csúsztatható középkonzol és kényelmes ülések — a hátsó utasok is bőséges lábteret kapnak.', bullets: ['12,3"+12,3" kijelzők', '520 literes csomagtartó + 57 literes első tárolórekesz', 'V2L – külső eszközök áramellátása'] },
+    specs: { '84 kWh 2WD UNIQ': { label: 'IONIQ 5 84 kWh 2WD UNIQ', fuel: 'Elektromos', power: '229 LE (168 kW)', torque: '350 Nm', drive: 'Hátsókerék (egy villanymotor)', accel: '7,5 mp', vmax: '185 km/h', boot: '520–1580 liter', rec: 'Nagy hatótáv, tágas családi crossover', note: 'WLTP akár 570 km, 800 V' } },
+    faqExtra: [ { q: 'Mekkora a Hyundai IONIQ 5 hatótávja?', a: 'A 84 kWh-s, hátsókerék-hajtású IONIQ 5 WLTP szerint akár 570 km-t tesz meg egy töltéssel, a 800 voltos rendszernek köszönhetően pedig megfelelő DC töltőn kb. 18 perc alatt tölt 10-ről 80%-ra.' } ],
+    schema: { drive: 'RWD' },
+  },
   'Hyundai IONIQ 5 N': {
     overviewH2: 'Hyundai IONIQ 5 N tartós bérlet — 609 LE-s elektromos sportautó',
     guideIntro: 'A <strong>Hyundai IONIQ 5 N</strong> a világ egyik legizgalmasabb elektromos sportautója: akár <strong>609 LE</strong> (N Grin Boost), 740 Nm, összkerékhajtás, 0–100 km/h 3,5 másodperc, versenypályára hangolt futómű és virtuális váltó (N e-shift). <strong>Tartós bérletben</strong> egyetlen havi díjat fizetsz — a szerviz, az adó és a gumik benne vannak.',
@@ -236,6 +250,7 @@ withPhotos('CUPRA Raval', 'cupra-raval', 'CUPRA Raval', true, [['g1', 'elölnéz
 withPhotos('CUPRA Tavascan', 'cupra-tavascan', 'CUPRA Tavascan', true, [['g1', 'naplementében'], ['g2', 'világító hátsó logó']]);
 withPhotos('Hyundai Tucson', 'hyundai-tucson', 'Hyundai Tucson', true, [['g1', 'oldalnézet'], ['g2', 'oldalnézet, modern épület előtt'], ['g3', 'menet közben'], ['g4', 'elölnézet'], ['g5', 'hátulról'], ['g6', 'városban'], ['g7', 'hátulról, menet közben'], ['g8', 'országúton'], ['g9', 'fehér színben'], ['g10', 'első ülések']]);
 withPhotos('Hyundai IONIQ 6', 'hyundai-ioniq-6', 'Hyundai IONIQ 6', true, [['g1', 'N Line, piros színben'], ['g2', 'elölnézet'], ['g3', 'városban'], ['g4', 'menet közben'], ['g5', 'országúton'], ['g6', 'hátulról'], ['g7', 'hátulról, menet közben'], ['g8', 'keréktárcsa'], ['g9', 'vezetőtér']]);
+withPhotos('Hyundai IONIQ 5', 'hyundai-ioniq-5', 'Hyundai IONIQ 5', true, [['g1', 'oldalnézet, modern épület előtt'], ['g2', 'hátulról, parkolóban'], ['g3', 'hátulról, tengerparton'], ['g4', 'felülnézet, panorámatető'], ['g5', 'első ülések, csúsztatható középkonzol'], ['g6', 'hátsó ülések'], ['g7', 'panorámatető belülről']]);
 withPhotos('Hyundai IONIQ 5 N', 'hyundai-ioniq-5-n', 'Hyundai IONIQ 5 N', false, [['g1', 'kilátóponton'], ['g2', 'szerpentinen'], ['g3', 'kanyarban'], ['g4', 'hegyi úton'], ['g5', 'modern épület előtt'], ['g6', 'menet közben'], ['g7', 'naplementében'], ['g8', 'hátulról, kanyarban'], ['g9', 'N keréktárcsa, piros féknyereg']]);
 withPhotos('Hyundai IONIQ 6 N', 'hyundai-ioniq-6-n', 'Hyundai IONIQ 6 N', true, [['g1', 'hegyi úton'], ['g2', 'versenypályán'], ['g3', 'elölnézet'], ['g4', 'pályán, menet közben'], ['g5', 'box előtt'], ['g6', 'elölnézet, N lökhárító'], ['g7', 'drift közben'], ['g8', 'N keréktárcsa'], ['g9', 'hátsó szárny'], ['g10', 'N kagylóülés']]);
 withPhotos('Hyundai Staria', 'hyundai-staria', 'Hyundai Staria', true, [['g1', 'szabadban'], ['g2', 'hátsó ülések'], ['g3', 'utastér'], ['g4', 'műszerfal'], ['g5', 'kempingezés közben']]);
