@@ -83,9 +83,11 @@ function run() {
   const homeF = path.join(DIST, 'index.html'); let home = read(homeF);
   if (home && !home.includes('window.__RENTPG=')) {
     const A = `href="/auto/'+slug+'/?rent=1"`;
-    const B = `href="'+(function(m){var x=String(m||'').match(/^(\\S+)\\s+(\\S+)/),P=window.__RENTPG||{};return (x&&P[x[1]+' '+x[2]])||('/auto/'+slug+'/?rent=1');})(car.modell)+'"`;
+    // a slugból (mindkét főoldali szkriptben elérhető: rent-home-grid és a „Bérelhető” körhinta) — pl. bmw-x5-… → /berelheto-auto/bmw-x5-berles/
+    const B = `href="'+(function(s){var P=window.__RENTPGS||{};for(var k in P){if(String(s).indexOf(k+'-')===0)return P[k];}return '/auto/'+s+'/?rent=1';})(slug)+'"`;
     const n = home.split(A).length - 1;
-    if (n) { home = home.split(A).join(B).replace(/<head>/i, '<head><script>window.__RENTPG=' + JSON.stringify(RENTPG) + ';</script>'); fs.writeFileSync(homeF, home); }
+    const RENTPGS = {}; for (const [k, v] of Object.entries(RENTPG)) RENTPGS[slugify(k)] = v;
+    if (n) { home = home.split(A).join(B).replace(/<head>/i, '<head><script>window.__RENTPG=' + JSON.stringify(RENTPG) + ';window.__RENTPGS=' + JSON.stringify(RENTPGS) + ';</script>'); fs.writeFileSync(homeF, home); }
     out.push(`főoldal: ${n} link`);
   }
   return `${Object.keys(RENTPG).length} modell bérlési oldallal (${Object.keys(RENTPG).join(', ')}) · ` + out.join(' · ');
