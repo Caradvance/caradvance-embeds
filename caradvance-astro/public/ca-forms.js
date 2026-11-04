@@ -771,8 +771,55 @@
     qa('.ab-opt.dis:not([title])', M.modal).forEach(function (l) { l.title = T.otherCfg; });
     qa('#abColor .caf-col:not([data-tt])', M.modal).forEach(function (l) { l.setAttribute('data-tt', '1'); if (!l.title) l.title = tx(l); var i = q('input', l); if (i) i.setAttribute('aria-label', tx(l)); });
     colorHead(M);
+    avTrims(M);
     pkgLoc(M.modal); if (M.bar && !M.modal.contains(M.bar)) pkgLoc(M.bar);
     if (M.v2) decorateV2(M);
+  }
+  // Elérhetőség lépés: elérhetőségenként (azonnal / hónap) hány autó van kivitelenként (csomag nélkül), pl. „20d xDrive 12 db”.
+  // Kattintásra kiválasztja az elérhetőséget és — ha a kivitelnek nincs több csomagja — a kivitelt is; a csomagot a Kivitel lépésben
+  // lehet kiválasztani (a választott kivitel csomagjai kiemelve). Marc, 2026-11-04.
+  var AVW = { hu: 'db', en: 'cars', de: 'Fahrzeuge', fr: 'voitures', it: 'auto', es: 'coches', sk: 'áut', cs: 'aut', pl: 'aut', uk: 'авто', zh: '辆' }[LG] || 'db';
+  function baseTr(t) { return String(t || '').replace(/\s*·\s*\d+\.\s*csomag$/, ''); }
+  function avTrims(M) {
+    var m = M.modal, cfg = abCfg(M); if (!m || !cfg || !cfg.N || !cfg.TR) return;
+    if (!document.getElementById('caf-avtr-css')) {
+      var st = document.createElement('style'); st.id = 'caf-avtr-css';
+      st.textContent = '#abAvPick .ab-opt{flex-wrap:wrap}#abAvPick .caf-avtr{display:flex;flex-wrap:wrap;gap:6px;flex-basis:100%;width:100%;margin-top:8px}' +
+        '#abAvPick .caf-avt{font-size:12px;font-weight:500;line-height:1.3;color:#1d2430;background:#f1f4f8;border:1px solid #e1e6ee;border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap}' +
+        '#abAvPick .caf-avt b{font-weight:700}#abAvPick .caf-avt:hover{background:#e3f5f0;border-color:#9fd8c8}#abAvPick .caf-avt.on{background:#e3f5f0;border-color:#00806A;color:#00594a}' +
+        '#abAvPick .ab-opt.dis .caf-avtr{display:none}#abAus .ab-opt.caf-pref{box-shadow:0 0 0 2px #00806A inset}';
+      document.head.appendChild(st);
+    }
+    qa('#abAvPick .ab-opt', m).forEach(function (l) {
+      var ai = +l.getAttribute('data-vi'); if (isNaN(ai)) return;
+      var agg = {}, ord = [];
+      cfg.N.forEach(function (x) { if (x[1] !== ai || !(x[2] > 0)) return; var b = baseTr(cfg.TR[x[0]]); if (!(b in agg)) { agg[b] = 0; ord.push(b); } agg[b] += x[2]; });
+      ord.sort(function (a, b) { return agg[b] - agg[a] || (a < b ? -1 : 1); });
+      var key = ai + ':' + ord.map(function (b) { return b + '=' + agg[b]; }).join(',') + ':' + (M.prefTr || '');
+      var ex = q('.caf-avtr', l);
+      if (!ord.length) { if (ex) ex.remove(); return; }
+      if (ex && ex.getAttribute('data-k') === key) return;
+      if (!ex) { ex = mk('span', 'caf-avtr'); l.appendChild(ex); }
+      ex.setAttribute('data-k', key);
+      ex.innerHTML = ord.map(function (b) { return '<span class="caf-avt' + (M.prefTr === b && l.classList.contains('active') ? ' on' : '') + '" data-tr="' + esc(b) + '"><b>' + esc(b) + '</b> · ' + agg[b] + ' ' + AVW + '</span>'; }).join('');
+    });
+    qa('#abAus .ab-opt', m).forEach(function (o) {
+      var on = !!M.prefTr && baseTr(cfg.TR[+o.getAttribute('data-vi')]) === M.prefTr;
+      if (o.classList.contains('caf-pref') !== on) o.classList.toggle('caf-pref', on);
+    });
+    if (!m.__avtrClick) {
+      m.__avtrClick = true;
+      m.addEventListener('click', function (e) {
+        var c = e.target && e.target.closest && e.target.closest('.caf-avt'); if (!c) return;
+        var b = c.getAttribute('data-tr'); M.prefTr = b;
+        setTimeout(function () {
+          var cf = abCfg(M); if (!cf) return; var ti = [];
+          cf.TR.forEach(function (t, i) { if (baseTr(t) === b) ti.push(i); });
+          if (ti.length === 1) { var o = q('#abAus .ab-opt[data-vi="' + ti[0] + '"]', m); if (o && !o.classList.contains('active')) o.click(); }
+          avTrims(M);
+        }, 80);
+      });
+    }
   }
   // Choice felszereltségi csomagok („R-Line · 1. csomag”) — a csomag szó az oldal nyelvén (Marc, 2026-11-04)
   var PKGW = { en: 'Package', de: 'Paket', fr: 'Pack', it: 'Pacchetto', es: 'Paquete', sk: 'Balík', cs: 'Balíček', pl: 'Pakiet', uk: 'Пакет', zh: '套餐' }[LG];
