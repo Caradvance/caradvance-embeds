@@ -802,13 +802,14 @@
       var agg = {}, ord = [];
       cfg.N.forEach(function (x) { if (x[1] !== ai || !(x[2] > 0)) return; var b = baseTr(cfg.TR[x[0]]); if (!(b in agg)) { agg[b] = 0; ord.push(b); } agg[b] += x[2]; });
       ord.sort(function (a, b) { return agg[b] - agg[a] || (a < b ? -1 : 1); });
-      var key = ai + ':' + ord.map(function (b) { return b + '=' + agg[b]; }).join(',') + ':' + (M.prefTr || '');
+      var cnE = q('.ab-cnt', l), UNIT = ((cnE && String(cnE.textContent || '').match(/\d+\s*(\S.*)$/)) || [])[1] || AVW;
+      var key = UNIT + ':' + ai + ':' + ord.map(function (b) { return b + '=' + agg[b]; }).join(',') + ':' + (M.prefTr || '');
       var ex = q('.caf-avtr', l);
       if (!ord.length) { if (ex) ex.remove(); return; }
       if (ex && ex.getAttribute('data-k') === key) return;
       if (!ex) { ex = mk('span', 'caf-avtr'); l.appendChild(ex); }
       ex.setAttribute('data-k', key);
-      ex.innerHTML = ord.map(function (b) { return '<span class="caf-avt' + (M.prefTr === b && l.classList.contains('active') ? ' on' : '') + '" data-tr="' + esc(b) + '"><span class="n">' + esc(b) + fuelBadges(cfg, cfg.TR.reduce(function (a, t, i) { if (baseTr(t) === b) a.push(i); return a; }, [])) + '</span><span class="c">' + agg[b] + ' ' + AVW + '</span></span>'; }).join('');
+      ex.innerHTML = ord.map(function (b) { return '<span class="caf-avt' + (M.prefTr === b && l.classList.contains('active') ? ' on' : '') + '" data-tr="' + esc(b) + '"><span class="n">' + esc(b) + fuelBadges(cfg, cfg.TR.reduce(function (a, t, i) { if (baseTr(t) === b) a.push(i); return a; }, [])) + '</span><span class="c">' + agg[b] + ' ' + UNIT + '</span></span>'; }).join('');
     });
     qa('#abAus .ab-opt', m).forEach(function (o) {
       var on = !!M.prefTr && baseTr(cfg.TR[+o.getAttribute('data-vi')]) === M.prefTr;
