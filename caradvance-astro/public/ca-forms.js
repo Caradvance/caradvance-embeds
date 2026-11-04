@@ -771,7 +771,16 @@
     qa('.ab-opt.dis:not([title])', M.modal).forEach(function (l) { l.title = T.otherCfg; });
     qa('#abColor .caf-col:not([data-tt])', M.modal).forEach(function (l) { l.setAttribute('data-tt', '1'); if (!l.title) l.title = tx(l); var i = q('input', l); if (i) i.setAttribute('aria-label', tx(l)); });
     colorHead(M);
+    pkgLoc(M.modal); if (M.bar && !M.modal.contains(M.bar)) pkgLoc(M.bar);
     if (M.v2) decorateV2(M);
+  }
+  // Choice felszereltségi csomagok („R-Line · 1. csomag”) — a csomag szó az oldal nyelvén (Marc, 2026-11-04)
+  var PKGW = { en: 'Package', de: 'Paket', fr: 'Pack', it: 'Pacchetto', es: 'Paquete', sk: 'Balík', cs: 'Balíček', pl: 'Pakiet', uk: 'Пакет', zh: '套餐' }[LG];
+  function pkgTxt(s) { return PKGW ? String(s).replace(/·\s*(\d+)\.\s*csomag/g, '· ' + PKGW + ' $1') : s; }
+  function pkgLoc(root) {
+    if (!PKGW || !root) return;
+    var w = document.createTreeWalker(root, 4), n; while ((n = w.nextNode())) { if (n.nodeValue.indexOf('csomag') > -1) { var v = pkgTxt(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; } }
+    qa('#abAus [title]', root).forEach(function (e) { if (e.title.indexOf('csomag') > -1) e.title = pkgTxt(e.title); });
   }
   var FIN = {
     hu: { metal: 'Metálfényezés', pearl: 'Gyöngyházfényezés', uni: 'Uni fényezés', matt: 'Matt fényezés', pick: 'Válassz színt' },
