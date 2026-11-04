@@ -315,4 +315,24 @@ if (process.argv[1] && /skcz-fix1104\.mjs$/.test(process.argv[1])) {
       console.log('[skcz-fix1104] ' + S.lg + ': ' + n + ' oldal, ' + tr + ' statikus fordítás, +' + Object.keys(CADD).length + ' szín (gyári név), prémium bérlés: ' + Object.keys(PREM).length + ' kártya / ' + pn + ' adatlap' + (min ? ', legolcsóbb: ' + min.n + ' ' + min.v + ' €, BMW: ' + (bmw && bmw.n + ' ' + bmw.v) : ''));
     } catch (e) { console.log('[skcz-fix1104] ' + S.lg + ' hiba:', e && e.stack || e); }
   }
+
+  // A bérlési gomb ár-címkéje (data-price) a szlovák formában („od 1 149 €/mes.”) került a többi piac / nyelv oldalára:
+  // PL, CH, EU és a SK / CZ idegen nyelvű változatai — az oldal nyelvén (Marc, 2026-11-04).
+  try {
+    const UNIT = { pl: ['od ', ' €/mies.'], en: ['from ', ' €/month'], de: ['ab ', ' €/Monat'], hu: ['', ' €/hó-tól'], fr: ['dès ', ' €/mois'], it: ['da ', ' €/mese'], es: ['desde ', ' €/mes'] };
+    const ROOTS = [['pl', null], ['ch', null], ['eu', null], ['sk', /^(en|de|hu)\//], ['cs', /^(en|de)\//]];
+    let dp = 0;
+    for (const [d, only] of ROOTS) {
+      const root = path.join(DIST, d);
+      for (const f of walk(root, [])) {
+        if (!/\.html$/.test(f)) continue;
+        const rel = path.relative(root, f).split(path.sep).join('/'); if (only && !only.test(rel)) continue;
+        const s = fs.readFileSync(f, 'utf8'); if (s.indexOf('data-price="') < 0) continue;
+        const lg = ((s.match(/<html[^>]*\slang="([a-z]{2})/i) || [])[1] || '').toLowerCase(); const U = UNIT[lg]; if (!U) continue;
+        const h = s.replace(/data-price="([^"]*?)od ((?:\d|&nbsp;|\s| )+?) €\/(?:mes|měs)\."/g, (m, pre, n) => 'data-price="' + pre + U[0] + n + U[1] + '"');
+        if (h !== s) { fs.writeFileSync(f, h); dp++; }
+      }
+    }
+    console.log('[skcz-fix1104] data-price nyelvi forma: ' + dp + ' oldal');
+  } catch (e) { console.log('[skcz-fix1104] data-price hiba:', e && e.message); }
 }
