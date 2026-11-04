@@ -37,7 +37,7 @@ var CADV_VEH = (function () {
       x.addEventListener('readystatechange', function () {
         if (x.readyState !== 4) return; var t = RT.call(x);
         if (/mobilityOffer\/grouped/.test(x.__vu) && !x.__vrw) window.__vehGOOD = t;
-        if (x.__vrw) window.__vehRES = t;
+        if (x.__vrw) window.__vehRES = { u: x.__vu, t: t }; // the answer is tied to its own URL (a late answer can never be taken for the next version)
       });
       return os.apply(this, arguments);
     };
@@ -53,8 +53,8 @@ var CADV_VEH = (function () {
       '&Station=&AvailableFrom=&DeliveryBeginLocation=&DeliveryEndLocation=&ROType=&ShopSubdomain=&Language=de-de';
     window.__vehRES = null; window.__vehRW = url;
     if (!(await toggle())) { window.__vehRW = null; return 'NOSORT'; }
-    for (var i = 0; i < 60 && window.__vehRES == null; i++) await sleep(150);
-    window.__vehRW = null; return window.__vehRES;
+    for (var i = 0; i < 80 && !(window.__vehRES && window.__vehRES.u === url); i++) await sleep(150);
+    window.__vehRW = null; return window.__vehRES && window.__vehRES.u === url ? window.__vehRES.t : null;
   }
   return {
     init: async function (items) {

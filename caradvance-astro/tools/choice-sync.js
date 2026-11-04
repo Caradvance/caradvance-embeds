@@ -222,7 +222,7 @@ var CADV_SYNC = (function () {
     // ---------- __ABCFG ----------
     var cfgNew = {};
     order.forEach(function (key) {
-      var c = { F: [], T: [], K: [], C: [], TR: [] }, D = {};
+      var c = { F: [], T: [], K: [], C: [], TR: [] }, D = {}, NC = {};
       function gi(a, x) { var i = a.indexOf(x); if (i > -1) return i; a.push(x); return a.length - 1; }
       // kivitelek sorrendje: az alapkivitel első előfordulása szerint, azon belül 1., 2., … csomag
       var t0 = [], tl = [];
@@ -230,6 +230,7 @@ var CADV_SYNC = (function () {
       tl.sort(function (a, b) { return a.g - b.g || a.p - b.p; }); c.TR = tl.map(function (x) { return x.t; });
       groups[key].forEach(function (r) {
         var fi = gi(c.F, r.fuel), ci = gi(c.C, r.colHu || r.colDe), tri = gi(c.TR, r.trim), dep = deposit(r.gross);
+        if (r.n > 0) { var nk = tri + '|' + r.avail; NC[nk] = (NC[nk] || 0) + r.n; }
         var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|'), id0 = [key, r.fuel, r.colHu || r.colDe, r.trim0].join('|');
         var tks = (r.exact ? [] : (combos[id] || combos[id0] || [])).concat([[r.term, r.km]]);
         tks.forEach(function (tk) {
@@ -241,6 +242,8 @@ var CADV_SYNC = (function () {
       });
       var labs = []; Object.keys(D).map(function (k) { return D[k]; }).sort(function (a, b) { return a.rank - b.rank; }).forEach(function (d) { if (labs.indexOf(d.lab) < 0) labs.push(d.lab); });
       c.A = labs;
+      // darabszám kivitelenként és elérhetőségenként: [kivitel-index, elérhetőség-index, db] — az „Elérhetőség” lépés ezt mutatja (Marc, 2026-11-04)
+      c.N = Object.keys(NC).map(function (nk) { var p = nk.indexOf('|'); return [+nk.slice(0, p), labs.indexOf(nk.slice(p + 1)), NC[nk]]; }).filter(function (x) { return x[1] > -1; });
       c.X = Object.keys(D).map(function (ck) { var d = D[ck]; return ck.split(',').map(Number).concat([labs.indexOf(d.lab), d.dep, d.net]); });
       cfgNew[key] = c;
     });
