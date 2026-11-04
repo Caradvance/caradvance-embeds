@@ -163,6 +163,10 @@ export function getRental(brand: string, model: string): RentalData | null {
       const fuel = Array.from(new Set(rows.map((r: number[]) => c.F[r[0]]))).join(' / ');
       return { name, eur: tEur, huf: toHuf(tEur, R), dep: tDep, depHuf: toDepHuf(tDep, R), fuel };
     }).filter(Boolean) as RentalTrim[];
+    // Choice-csomagok („· N. csomag”) az oldalon egy kivitelként, a legolcsóbb árral — a választás a foglaló ablakban történik
+    const byName = new Map<string, RentalTrim>();
+    for (const t of trims) { const n = t.name.replace(/\s*·\s*\d+\.\s*csomag$/, ''); const prev = byName.get(n); if (!prev || t.eur < prev.eur) byName.set(n, { ...t, name: n }); }
+    trims = Array.from(byName.values());
     trims.sort((a, b) => a.eur - b.eur);
     if (c.X.length) dep = Math.min(...c.X.map((r: number[]) => r[6]));
   }
