@@ -24,7 +24,7 @@ const b2at = fromEgyedi('2eratb-benzin');
 
 export const CONTENT: Record<string, RentalContent> = {
   'BMW X1': {
-    mainImg: P('bmw-x1', 'main'), mainAlt: 'BMW X1 bérlés — vadonatúj kompakt prémium SUV tartós bérletben',
+    mainImg: P('bmw-x1', 'g4'), mainAlt: 'BMW X1 bérlés — vadonatúj kompakt prémium SUV tartós bérletben',
     heroVideo: '/caradvance-hero-x5.mp4',
     overviewH2: 'BMW X1 tartós bérlet — a legkeresettebb kompakt prémium SUV havidíjjal',
     guideIntro: 'A <strong>BMW X1</strong> a márka belépő SUV-ja, és Magyarországon is az egyik legnépszerűbb prémium modell: magas üléspozíció, tágas utastér és 540 literes csomagtartó egy városban is könnyen kezelhető, 4,5 méteres karosszériában. <strong>Tartós bérletben</strong> nem kell önerőt letenned és nem kell a továbbeladással foglalkoznod — egyetlen <strong>havi díjat</strong> fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
@@ -41,7 +41,7 @@ export const CONTENT: Record<string, RentalContent> = {
       'sDrive20i': { fuel: 'Benzin (mild-hybrid)', power: '170 LE (125 kW)', torque: '240 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', accel: '8,3 mp', vmax: '216 km/h', rec: 'Kiegyensúlyozott, vegyes használatra', note: 'mild-hybrid benzines, kiegyensúlyozott választás', img: P('bmw-x1', 'g1') },
       'M35i xDrive': { fuel: 'Benzin', power: '300 LE (221 kW)', torque: '400 Nm', drive: 'xDrive összkerék / 7 fok. Steptronic', accel: '5,4 mp', vmax: '250 km/h', rec: 'Sportos vezetéshez', note: 'az M Performance csúcsmodell, összkerékhajtással', img: P('bmw-x1', 'v1') },
     },
-    gallery: G('bmw-x1', 'BMW X1', [['g1', 'szürke színben, hegyi úton'], ['g2', 'Utah narancs színben'], ['g3', 'naplementében, elölnézet'], ['g4', 'menet közben, elölnézet'], ['g5', 'hátulról'], ['g6', 'veserács és LED fényszóró'], ['g8', 'hátsó ülések'], ['g9', 'M sportkormány']]),
+    gallery: G('bmw-x1', 'BMW X1', [['g1', 'szürke színben, hegyi úton'], ['g2', 'Utah narancs színben'], ['g3', 'naplementében, elölnézet'], ['g4', 'menet közben, elölnézet'], ['g6', 'veserács és LED fényszóró'], ['g8', 'hátsó ülések'], ['g9', 'M sportkormány']]),
     faqExtra: [
       { q: 'Mekkora a BMW X1 csomagtartója?', a: 'A BMW X1 csomagtartója 540 literes, a hátsó ülések döntésével akár 1600 literre bővíthető.' },
       { q: 'Van összkerékhajtású BMW X1 bérelhető?', a: 'Igen, az M35i xDrive összkerékhajtású; az sDrive változatok elsőkerék-hajtásúak, ami a városi és országúti használathoz takarékosabb.' },
@@ -50,7 +50,7 @@ export const CONTENT: Record<string, RentalContent> = {
   },
 
   'BMW X2': {
-    mainImg: P('bmw-x2', 'main'), mainAlt: 'BMW X2 bérlés — sportos SUV Coupé tartós bérletben',
+    mainImg: P('bmw-x2', 's1'), mainAlt: 'BMW X2 bérlés — sportos SUV Coupé tartós bérletben',
     heroVideo: '/caradvance-hero-x5.mp4',
     overviewH2: 'BMW X2 tartós bérlet — sportos SUV Coupé havidíjjal',
     guideIntro: 'Az új <strong>BMW X2</strong> az X1 technikájára épülő, lecsapott tetővonalú <strong>SUV Coupé</strong>: feltűnő, sportos megjelenés, ugyanakkor 560 literes csomagtartó és kényelmes, magas üléspozíció. <strong>Tartós bérletben</strong> úgy vezetheted, hogy nem kötöd le a pénzed egy autóban — egyetlen havi díjat fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
@@ -62,12 +62,12 @@ export const CONTENT: Record<string, RentalContent> = {
     interior: { h3: 'Digitális vezetőtér, prémium anyagok', text: 'A BMW Curved Display, a lebegő középkonzol és a sportülések vezetőközpontú utasteret adnak. A hátsó ülések kényelmesen két felnőttnek is elegendő helyet kínálnak, a csomagtér pedig a mindennapokra és a hosszabb utakra is bőven elég.', bullets: ['BMW Curved Display, iDrive 9', 'Sportülések, M bőrkormány', 'Vezeték nélküli okostelefon-integráció'], img: P('bmw-x2', 'interior'), alt: 'BMW X2 belső tér — BMW Curved Display' },
     boot: '560–1470 liter',
     specs: {
-      'sDrive18d': { fuel: 'Dízel', power: '150 LE (110 kW)', torque: '360 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', vmax: '211 km/h', rec: 'Takarékos dízel', note: 'takarékos dízel a sokat autózóknak', img: P('bmw-x2', 'g2') },
-      'sDrive20i': { fuel: 'Benzin (mild-hybrid)', power: '170 LE (125 kW)', torque: '240 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', vmax: '220 km/h', rec: 'Kiegyensúlyozott benzines', note: 'mild-hybrid benzines, kiegyensúlyozott választás', img: P('bmw-x2', 'g1') },
-      'sDrive20d': { fuel: 'Dízel (mild-hybrid)', power: '163 LE (120 kW)', torque: '360 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', rec: 'Erősebb dízel', note: 'erősebb mild-hybrid dízel', img: P('bmw-x2', 'g3') },
+      'sDrive18d': { fuel: 'Dízel', power: '150 LE (110 kW)', torque: '360 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', vmax: '211 km/h', rec: 'Takarékos dízel', note: 'takarékos dízel a sokat autózóknak', img: P('bmw-x2', 's1') },
+      'sDrive20i': { fuel: 'Benzin (mild-hybrid)', power: '170 LE (125 kW)', torque: '240 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', vmax: '220 km/h', rec: 'Kiegyensúlyozott benzines', note: 'mild-hybrid benzines, kiegyensúlyozott választás', img: P('bmw-x2', 's1') },
+      'sDrive20d': { fuel: 'Dízel (mild-hybrid)', power: '163 LE (120 kW)', torque: '360 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', rec: 'Erősebb dízel', note: 'erősebb mild-hybrid dízel', img: P('bmw-x2', 's1') },
       'M35i xDrive': { fuel: 'Benzin', power: '300 LE (221 kW)', torque: '400 Nm', drive: 'xDrive összkerék / 7 fok. Steptronic', accel: '5,4 mp', vmax: '250 km/h', rec: 'Sportos csúcsmodell', note: 'az M Performance csúcsmodell, összkerékhajtással', img: P('bmw-x2', 'v1') },
     },
-    gallery: G('bmw-x2', 'BMW X2', [['g1', 'zöld színben, elölnézet'], ['g2', 'tengerparton'], ['g3', 'menet közben'], ['g4', 'hátsó háromnegyedes nézet'], ['g5', 'LED fényszóró'], ['g6', 'csomagtartó'], ['g7', 'BMW Curved Display'], ['g8', 'hátsó ülések']]),
+    gallery: G('bmw-x2', 'BMW X2', [['s1', 'bérlés — sportos SUV Coupé tartós bérletben'], ['g6', 'csomagtartó'], ['g7', 'BMW Curved Display'], ['g8', 'hátsó ülések']]),
     faqExtra: [
       { q: 'Mekkora a BMW X2 csomagtartója?', a: 'A BMW X2 csomagtartója 560 literes, a hátsó ülések döntésével 1470 literre bővíthető.' },
     ],
