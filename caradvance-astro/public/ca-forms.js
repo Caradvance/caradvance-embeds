@@ -276,6 +276,18 @@
         val = val.replace(/\s*-\s*t[óő]l\b/, '');
         if (!/\bod\b/i.test(val)) val = val.replace(/^(≈\s*)?/, function (m0) { return (m0 || '') + (({ de: 'ab ', fr: 'dès ', it: 'da ', es: 'desde ', en: 'from ' })[LG] || (MK === 'ch' || MK === 'eu' ? 'ab ' : 'od ')); });
       }
+      // SK / CZ / PL: a lefordított ár a kerekített forintárból van visszaszámolva (pl. 1 141 € 1 149 € helyett) → a pontos euróár
+      // (CZ: × a cseh árfolyam, mint az oldal többi Kč-ára; PL: a zł-összeg ugyanazzal az aránnyal). Marc, 2026-11-04.
+      if (MK !== 'hu' && MK !== 'ch' && MK !== 'eu' && val) {
+        var p2 = abPrices(M), F = window.__CA_FX || {};
+        var E = p2 ? Math.round(priv ? p2.privE : p2.coE) : 0;
+        if (E > 0) {
+          var nf = function (n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
+          var NUM = '\\d{1,3}(?:[ \\u00a0\\u202f]\\d{3})*', oe = 0;
+          val = val.replace(new RegExp('(' + NUM + ')(\\s?)(€|Kč)'), function (m0, n, sp, cu) { oe = +n.replace(/\D/g, '') / (cu === '€' ? 1 : (+F.T || 1)); var R = +F.R || 1; return nf(cu === '€' ? E : Math.round(E * (+F.T || 1) / R) * R) + sp + cu; });
+          if (oe) val = val.replace(new RegExp('(' + NUM + ')(\\s?)zł'), function (m0, n, sp) { return nf(Math.round(+n.replace(/\D/g, '') / oe * E / 10) * 10) + sp + 'zł'; });
+        }
+      }
       return { label: priv ? T.estG : T.estN, val: val, sub: c.sub, eur: eur, dep: dep, disc: T.disc };
     },
     specs: function (M) {
