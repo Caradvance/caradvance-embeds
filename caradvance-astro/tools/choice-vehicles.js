@@ -11,7 +11,7 @@
  *
  *   paste this file once, then:  await CADV_VEH.init(items)   // items = Items of the captured grouped list
  *                                 await CADV_VEH.step()        // repeat until {left:0}
- *   result: window.__VEH = { 'CarLabel|CarModell|CarModellspec': [[colour, months, km, price, count], …] }
+ *   result: window.__VEH = { 'CarLabel|CarModell|CarModellspec': [[colour, months, km, price, count, countAvailableNow], …] }
  *   pass it to the builder: CADV_SYNC({…, vehicles: window.__VEH})
  * Consistency: the builder only uses a version if its car count equals the grouped VehiclesCount sum.
  */
@@ -47,10 +47,10 @@ var CADV_VEH = (function () {
     if (!cur) { cur = leaf('Preis aufsteigend')[0]; target = 'Verfügbarkeit aufsteigend'; }
     if (!cur) return false; cur.click(); await sleep(600); var o = leaf(target).slice(-1)[0]; if (o) o.click(); return true;
   }
-  async function fetchOne(k) {
+  async function fetchOne(k, av) {
     var p = k.split('|');
     var url = API + '?CarDescription=' + encodeURIComponent(p[2]) + '&CarLabel=' + encodeURIComponent(p[0]) + '&CarModel=' + encodeURIComponent(p[1]) +
-      '&Station=&AvailableFrom=&DeliveryBeginLocation=&DeliveryEndLocation=&ROType=&ShopSubdomain=&Language=de-de';
+      '&Station=&AvailableFrom=' + (av || '') + '&DeliveryBeginLocation=&DeliveryEndLocation=&ROType=&ShopSubdomain=&Language=de-de';
     window.__vehRES = null; window.__vehRW = url;
     if (!(await toggle())) { window.__vehRW = null; return 'NOSORT'; }
     for (var i = 0; i < 80 && !(window.__vehRES && window.__vehRES.u === url); i++) await sleep(150);
@@ -68,10 +68,16 @@ var CADV_VEH = (function () {
       var t0 = Date.now(), done = 0, fail = [];
       for (var i = 0; i < window.__vehKeys.length; i++) {
         var k = window.__vehKeys[i]; if (window.__VEH[k]) continue; if (Date.now() - t0 > 28000) break;
-        var t = await fetchOne(k); if (t === 'NOSORT') { fail.push('NOSORT (reload the page and run init again)'); break; }
+        // every car (AvailableFrom='') and the cars available right now (AvailableFrom=0) → per row: [colour, months, km, price, count, countNow]
+        var t = await fetchOne(k, ''); if (t === 'NOSORT') { fail.push('NOSORT (reload the page and run init again)'); break; }
+        await sleep(150);
+        var t0n = await fetchOne(k, '0'); if (t0n === 'NOSORT') { fail.push('NOSORT (reload the page and run init again)'); break; }
         try {
-          var agg = {}; JSON.parse(t).Items.forEach(function (v) { var kk = [v.Color, v.SubscriptionPeriodMonths, v.KMPackage, v.Price].join('|'); agg[kk] = (agg[kk] || 0) + 1; });
-          window.__VEH[k] = Object.keys(agg).map(function (kk) { var q = kk.split('|'); return [q[0], +q[1], +q[2], +q[3], agg[kk]]; }); done++;
+          var agg = {}, now = {}, key = function (v) { return [v.Color, v.SubscriptionPeriodMonths, v.KMPackage, v.Price].join('|'); };
+          JSON.parse(t).Items.forEach(function (v) { var kk = key(v); agg[kk] = (agg[kk] || 0) + 1; });
+          JSON.parse(t0n).Items.forEach(function (v) { var kk = key(v); now[kk] = (now[kk] || 0) + 1; });
+          if (Object.keys(now).some(function (kk) { return !agg[kk] || now[kk] > agg[kk]; })) throw new Error('now ⊄ all');
+          window.__VEH[k] = Object.keys(agg).map(function (kk) { var q = kk.split('|'); return [q[0], +q[1], +q[2], +q[3], agg[kk], now[kk] || 0]; }); done++;
         } catch (e) { fail.push(k); }
         await sleep(150);
       }
