@@ -886,7 +886,12 @@
     de: { metal: 'Metallic-Lackierung', pearl: 'Perleffekt-Lackierung', uni: 'Uni-Lackierung', matt: 'Matt-Lackierung', pick: 'Farbe wählen' },
     sk: { metal: 'Metalický lak', pearl: 'Perleťový lak', uni: 'Nemetalický lak', matt: 'Matný lak', pick: 'Vyberte farbu' },
     cs: { metal: 'Metalický lak', pearl: 'Perleťový lak', uni: 'Nemetalický lak', matt: 'Matný lak', pick: 'Vyberte barvu' },
-    pl: { metal: 'Lakier metalik', pearl: 'Lakier perłowy', uni: 'Lakier niemetalizowany', matt: 'Lakier matowy', pick: 'Wybierz kolor' }
+    pl: { metal: 'Lakier metalik', pearl: 'Lakier perłowy', uni: 'Lakier niemetalizowany', matt: 'Lakier matowy', pick: 'Wybierz kolor' },
+    fr: { metal: 'Peinture métallisée', pearl: 'Peinture nacrée', uni: 'Peinture unie', matt: 'Peinture mate', pick: 'Choisir une couleur' },
+    it: { metal: 'Vernice metallizzata', pearl: 'Vernice perlata', uni: 'Vernice pastello', matt: 'Vernice opaca', pick: 'Scegli un colore' },
+    es: { metal: 'Pintura metalizada', pearl: 'Pintura perlada', uni: 'Pintura sólida', matt: 'Pintura mate', pick: 'Elige un color' },
+    uk: { metal: 'Фарба металік', pearl: 'Перламутрова фарба', uni: 'Неметалік', matt: 'Матова фарба', pick: 'Оберіть колір' },
+    zh: { metal: '金属漆', pearl: '珠光漆', uni: '素色漆', matt: '哑光漆', pick: '选择颜色' }
   };
   function colorHead(M, hov) {
     var blk = q('#abColor', M.modal), pick = blk && q('.ab-pick', blk);
