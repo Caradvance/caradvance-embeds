@@ -146,17 +146,29 @@ var CADV_SYNC = (function () {
     // és darabszámával marad, a kivitel többi színe / futamideje 0 darabos kiegészítő sorként kerül hozzá.
     var VEH = opts.vehicles || null, vstat = { keys: 0, exact: 0, multi: 0, skipped: [] };
     if (VEH) {
+      // A Choice ajánlatcsoportjai (csomagok) jellemzően elérhetőség szerint is külön vannak: a „most elérhető” (AvailableFrom=0) autók
+      // a „most” csoport(ok)hoz, a többi a későbbi csoport(ok)hoz tartozik. Ha egy elérhetőségi körben egy csoport van, a hozzárendelés pontos.
       var byRk = {}; recs.forEach(function (r) { (byRk[r.rk] = byRk[r.rk] || []).push(r); });
       var exp = [];
+      var mk = function (r, cd0, v, n) { var o = {}; Object.keys(r).forEach(function (k) { o[k] = r[k]; }); var cd = String(cd0 || '').replace(/\s+/g, ' ').trim() || r.colDe; o.colDe = cd; o.colHu = colorHu(cd, extraColors); o.term = +v[1] || r.term; o.km = +v[2] || r.km; o.net = typeof v[3] === 'number' ? v[3] : r.net; o.n = n; o.exact = true; return o; };
       Object.keys(byRk).forEach(function (rk) {
         var L = byRk[rk], vs = VEH[rk];
         var tot = L.reduce(function (a, r) { return a + r.n; }, 0), vtot = (vs || []).reduce(function (a, v) { return a + (+v[4] || 0); }, 0);
         if (!vs || !vs.length || vtot !== tot) { if (vs) vstat.skipped.push(rk + ' (' + tot + '/' + vtot + ')'); L.forEach(function (r) { exp.push(r); }); return; }
+        var hasNow = vs.some(function (v) { return v.length > 5; });
+        var cats = hasNow ? [
+          { g: L.filter(function (r) { return r.rank === 0; }), v: vs.map(function (v) { return [v[0], v[1], v[2], v[3], +v[5] || 0]; }) },
+          { g: L.filter(function (r) { return r.rank !== 0; }), v: vs.map(function (v) { return [v[0], v[1], v[2], v[3], (+v[4] || 0) - (+v[5] || 0)]; }) }
+        ] : [{ g: L, v: vs }];
+        var ok = cats.every(function (c) { var gt = c.g.reduce(function (a, r) { return a + r.n; }, 0), vt = c.v.reduce(function (a, v) { return a + v[4]; }, 0); return gt === vt; });
+        if (!ok) { cats = [{ g: L, v: vs }]; } // a „most” bontás nem egyezik a csoportok darabszámával → egy körben kezeljük
         vstat.keys++;
-        var mk = function (r, v, n) { var o = {}; Object.keys(r).forEach(function (k) { o[k] = r[k]; }); var cd = String(v[0] || '').replace(/\s+/g, ' ').trim() || r.colDe; o.colDe = cd; o.colHu = colorHu(cd, extraColors); o.term = +v[1] || r.term; o.km = +v[2] || r.km; o.net = typeof v[3] === 'number' ? v[3] : r.net; o.n = n; o.exact = true; return o; };
-        if (L.length === 1) { vstat.exact++; vs.forEach(function (v) { exp.push(mk(L[0], v, +v[4] || 1)); }); return; }
-        vstat.multi++;
-        L.forEach(function (r) { r.exact = true; exp.push(r); vs.forEach(function (v) { exp.push(mk(r, v, 0)); }); });
+        cats.forEach(function (c) {
+          var V = c.v.filter(function (v) { return v[4] > 0; }); if (!c.g.length) return;
+          if (c.g.length === 1) { vstat.exact++; V.forEach(function (v) { exp.push(mk(c.g[0], v[0], v, v[4])); }); return; }
+          vstat.multi++;
+          c.g.forEach(function (r) { r.exact = true; exp.push(r); V.forEach(function (v) { exp.push(mk(r, v[0], v, 0)); }); });
+        });
       });
       recs = exp;
     }
