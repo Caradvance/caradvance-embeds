@@ -213,13 +213,12 @@
   var AB = {
     sel: '.ab-modal', card: '.ab-card', form: '#abForm', head: '.ab-head', img: '#abImg', title: '#abTitle', eyebrow: '.ab-eyebrow',
     tgl: '.ab-tgl', tglAttr: 'data-abb', buyer: '#abBuyer', submit: '.ab-submit', msg: '#abMsg', close: '.ab-x',
-    hide: ['.ab-toggle', '.ab-sticky', '.ab-submit', '#abPrice', '#abAvail', '#abDep'],
+    hide: ['.ab-toggle', '.ab-sticky', '.ab-submit', '#abPrice', '#abAvail', '#abDep', '#abFuel'],
     kind: function () { return 'rent'; },
     steps: function (M) {
       var m = M.modal, cb = q('#abCo', m); cb = cb && cb.closest('.ab-block');
       return [
         { k: 'avail', nodes: ['#abAvBlock', '#abDateBlock'], late: '#abDateBlock', name: 'avail', info: true, renum: true },
-        { k: 'fuel', nodes: ['#abFuel'], name: 'fuel' },
         { k: 'term', nodes: ['#abTerm'], name: 'term' },
         { k: 'km', nodes: ['#abKm'], name: 'km' },
         { k: 'spec', nodes: ['#abColor', '#abAus', '#abAusInfo'], name: null, names: ['color', 'ausstattung'], renum: true, split: true },
@@ -779,13 +778,23 @@
   // Kattintásra kiválasztja az elérhetőséget és — ha a kivitelnek nincs több csomagja — a kivitelt is; a csomagot a Kivitel lépésben
   // lehet kiválasztani (a választott kivitel csomagjai kiemelve). Marc, 2026-11-04.
   var AVW = { hu: 'db', en: 'cars', de: 'Fahrzeuge', fr: 'voitures', it: 'auto', es: 'coches', sk: 'áut', cs: 'aut', pl: 'aut', uk: 'авто', zh: '辆' }[LG] || 'db';
+  // üzemanyag-címke a kivitel neve mögött (az Üzemanyag lépés helyett, Marc 2026-11-04)
+  var FUELW = { hu: { b: 'Benzin', d: 'Dízel', h: 'Hibrid', m: 'Mild-hibrid', p: 'Plug-in hibrid', e: 'Elektromos' }, en: { b: 'Petrol', d: 'Diesel', h: 'Hybrid', m: 'Mild hybrid', p: 'Plug-in hybrid', e: 'Electric' }, de: { b: 'Benzin', d: 'Diesel', h: 'Hybrid', m: 'Mild-Hybrid', p: 'Plug-in-Hybrid', e: 'Elektro' }, fr: { b: 'Essence', d: 'Diesel', h: 'Hybride', m: 'Hybride léger', p: 'Hybride rechargeable', e: 'Électrique' }, it: { b: 'Benzina', d: 'Diesel', h: 'Ibrido', m: 'Mild hybrid', p: 'Ibrido plug-in', e: 'Elettrico' }, es: { b: 'Gasolina', d: 'Diésel', h: 'Híbrido', m: 'Microhíbrido', p: 'Híbrido enchufable', e: 'Eléctrico' }, sk: { b: 'Benzín', d: 'Diesel', h: 'Hybrid', m: 'Mild hybrid', p: 'Plug-in hybrid', e: 'Elektro' }, cs: { b: 'Benzín', d: 'Diesel', h: 'Hybrid', m: 'Mild hybrid', p: 'Plug-in hybrid', e: 'Elektro' }, pl: { b: 'Benzyna', d: 'Diesel', h: 'Hybryda', m: 'Miękka hybryda', p: 'Hybryda plug-in', e: 'Elektryczny' }, uk: { b: 'Бензин', d: 'Дизель', h: 'Гібрид', m: 'М’який гібрид', p: 'Plug-in гібрид', e: 'Електро' }, zh: { b: '汽油', d: '柴油', h: '混动', m: '轻混', p: '插电混动', e: '纯电' } }[LG] || null;
+  function fuelKey(f) { f = String(f || '').toLowerCase(); return /plug|phev/.test(f) ? 'p' : /mild/.test(f) ? 'm' : /hibrid|hybrid/.test(f) ? 'h' : /elektr|electric/.test(f) ? 'e' : /dízel|diesel/.test(f) ? 'd' : /benzin|petrol/.test(f) ? 'b' : ''; }
+  function fuelBadges(cfg, tis) {
+    var seen = {}, out = '';
+    (cfg.X || []).forEach(function (x) { if (tis.indexOf(x[4]) < 0) return; var f = cfg.F[x[0]], k = fuelKey(f); if (seen[k + f]) return; seen[k + f] = 1; out += '<span class="caf-fb caf-fb-' + (k || 'x') + '" translate="no">' + esc((FUELW && FUELW[k]) || f) + '</span>'; });
+    return out;
+  }
+  function addFuelToTrims(m, cfg) { qa('#abAus .ab-opt', m).forEach(function (o) { var ti = +o.getAttribute('data-vi'); if (!isNaN(ti) && !q('.caf-fb', o)) { var fb = fuelBadges(cfg, [ti]); if (fb) o.insertAdjacentHTML('beforeend', fb); } }); }
   function baseTr(t) { return String(t || '').replace(/\s*·\s*\d+\.\s*csomag$/, ''); }
   function avTrims(M) {
-    var m = M.modal, cfg = abCfg(M); if (!m || !cfg || !cfg.N || !cfg.TR) return;
+    var m = M.modal, cfg = abCfg(M); if (!m || !cfg || !cfg.TR) return;
+    addFuelToTrims(m, cfg); if (!cfg.N) return;
     var pk = q('#abAvPick', m); if (pk && !pk.classList.contains('caf-avbd')) pk.classList.add('caf-avbd');
     if (!document.getElementById('caf-avtr-css')) {
       var st = document.createElement('style'); st.id = 'caf-avtr-css';
-      st.textContent = "#abAvPick.caf-avbd{grid-template-columns:1fr!important;gap:10px!important}#abAvPick.caf-avbd .ab-opt{flex-wrap:wrap;align-items:center;align-content:flex-start;padding:14px 16px 8px;row-gap:8px}#abAvPick.caf-avbd .ab-opt .ab-cnt{margin-left:auto}#abAvPick .caf-avtr{display:block;flex-basis:100%;width:100%;margin:0;border-top:1px solid #edf0f5}#abAvPick .caf-avt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 4px;border-bottom:1px solid #f1f3f7;font-size:13.5px;line-height:1.35;cursor:pointer}#abAvPick .caf-avt:last-child{border-bottom:0}#abAvPick .caf-avt .n{font-weight:500;color:#1d2430;min-width:0}#abAvPick .caf-avt .c{flex:none;font-weight:700;font-size:12.5px;color:#00806A;white-space:nowrap}#abAvPick .caf-avt:hover .n{color:#e2001a}#abAvPick .caf-avt.on .n{color:#e2001a;font-weight:700}#abAvPick .caf-avt.on .c::before{content:\"✓ \"}#abAvPick .ab-opt.dis .caf-avtr{opacity:.7}#abAus .ab-opt.caf-pref{box-shadow:0 0 0 2px #00806A inset}";
+      st.textContent = "#abAvPick.caf-avbd{grid-template-columns:1fr!important;gap:10px!important}#abAvPick.caf-avbd .ab-opt{flex-wrap:wrap;align-items:center;align-content:flex-start;padding:14px 16px 8px;row-gap:8px}#abAvPick.caf-avbd .ab-opt .ab-cnt{margin-left:auto}#abAvPick .caf-avtr{display:block;flex-basis:100%;width:100%;margin:0;border-top:1px solid #edf0f5}#abAvPick .caf-avt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 4px;border-bottom:1px solid #f1f3f7;font-size:13.5px;line-height:1.35;cursor:pointer}#abAvPick .caf-avt:last-child{border-bottom:0}#abAvPick .caf-avt .n{font-weight:500;color:#1d2430;min-width:0}#abAvPick .caf-avt .c{flex:none;font-weight:700;font-size:12.5px;color:#00806A;white-space:nowrap}#abAvPick .caf-avt:hover .n{color:#e2001a}#abAvPick .caf-avt.on .n{color:#e2001a;font-weight:700}#abAvPick .caf-avt.on .c::before{content:\"✓ \"}#abAvPick .ab-opt.dis .caf-avtr{opacity:.7}#abAus .ab-opt.caf-pref{box-shadow:0 0 0 2px #00806A inset}.caf-fb{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;line-height:1.5;color:#fff;vertical-align:1px;white-space:nowrap}.caf-fb+.caf-fb{margin-left:4px}.caf-fb-b{background:#E8820C}.caf-fb-d{background:#2B3440}.caf-fb-h,.caf-fb-m{background:#2E8B57}.caf-fb-p{background:#0E7C86}.caf-fb-e{background:#2563EB}.caf-fb-x{background:#6B7280}";
       document.head.appendChild(st);
     }
     qa('#abAvPick .ab-opt', m).forEach(function (l) {
@@ -799,7 +808,7 @@
       if (ex && ex.getAttribute('data-k') === key) return;
       if (!ex) { ex = mk('span', 'caf-avtr'); l.appendChild(ex); }
       ex.setAttribute('data-k', key);
-      ex.innerHTML = ord.map(function (b) { return '<span class="caf-avt' + (M.prefTr === b && l.classList.contains('active') ? ' on' : '') + '" data-tr="' + esc(b) + '"><span class="n">' + esc(b) + '</span><span class="c">' + agg[b] + ' ' + AVW + '</span></span>'; }).join('');
+      ex.innerHTML = ord.map(function (b) { return '<span class="caf-avt' + (M.prefTr === b && l.classList.contains('active') ? ' on' : '') + '" data-tr="' + esc(b) + '"><span class="n">' + esc(b) + fuelBadges(cfg, cfg.TR.reduce(function (a, t, i) { if (baseTr(t) === b) a.push(i); return a; }, [])) + '</span><span class="c">' + agg[b] + ' ' + AVW + '</span></span>'; }).join('');
     });
     qa('#abAus .ab-opt', m).forEach(function (o) {
       var on = !!M.prefTr && baseTr(cfg.TR[+o.getAttribute('data-vi')]) === M.prefTr;
