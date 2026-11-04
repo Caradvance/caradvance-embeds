@@ -185,12 +185,45 @@
   function octx(M, k) { var c = M && M.oc; if (!c) return null; if (k === 'card' && c.k === 'page') return c; return c.k === k ? c : null; }
 
   /* ---------- adapterek ---------- */
+  // A Choice-adatban egy kivitel+szín+futamidő+km kombináció csak a legkorábbi elérhetőséggel szerepel (X), a darabszám (N)
+  // viszont elérhetőségenként: a későbbi elérhetőségek (pl. november) is választhatók legyenek ugyanazokkal az értékekkel. Marc, 2026-11-04.
+  function fixAvail(g) {
+    if (!g || g.__nf || !g.N || !g.X) return g; g.__nf = 1;
+    var has = {}, add = [];
+    g.X.forEach(function (x) { has[x[4] + '|' + x[5]] = 1; });
+    g.N.forEach(function (n) {
+      var tri = n[0], ai = n[1]; if (ai < 0 || has[tri + '|' + ai]) return; has[tri + '|' + ai] = 1;
+      var seen = {};
+      g.X.forEach(function (x) { if (x[4] !== tri) return; var k = [x[0], x[1], x[2], x[3]].join(','); if (seen[k]) return; seen[k] = 1; var y = x.slice(); y[5] = ai; add.push(y); });
+    });
+    if (add.length) g.X = g.X.concat(add);
+    return g;
+  }
+  // Elérhetőség-lépés sora: az elérhetőség + a kivitel (több csomagnál az 1. csomag, ha a kiválasztott nem ehhez a kivitelhez tartozik);
+  // ha a korábbi választás (szín, üzemanyag) ütközik, minden törlődik, a futamidő és a km-keret visszaáll, ha még érvényes. Marc, 2026-11-04.
+  function selectVersion(M, ai, b) {
+    var m = M.modal, cf = abCfg(M); if (!m || !cf) return;
+    var ti = []; cf.TR.forEach(function (t, i) { if (baseTr(t) === b) ti.push(i); }); if (!ti.length) return;
+    // csak az ebben az elérhetőségben létező csomagok közül (pl. azonnal csak a 2. csomag)
+    var cand = ti.filter(function (i) { return ai == null || cf.X.some(function (x) { return x[4] === i && x[5] === ai; }); }); if (!cand.length) cand = ti;
+    var cur = activeVi(m, 4), pick = cand.indexOf(cur) > -1 ? cur : cand.filter(function (i) { return /·\s*1\.\s*csomag$/.test(cf.TR[i]); })[0];
+    if (pick == null) pick = cand[0];
+    var A = function () { return ai == null ? null : m.querySelector('#abAvPick .ab-opt[data-vi="' + ai + '"]'); };
+    var T = function () { return m.querySelector('#abAus .ab-opt[data-vi="' + pick + '"]'); };
+    var cl = function (o) { if (o && !o.classList.contains('dis') && !o.classList.contains('active')) o.click(); };
+    var ok = function () { var a = A(), t = T(); return (!a || a.classList.contains('active')) && !!t && t.classList.contains('active'); };
+    cl(A()); cl(T()); if (ok()) return;
+    var k1 = activeVi(m, 1), k2 = activeVi(m, 2);
+    for (var c = 0; c < 3; c++) for (var p = 0; p <= 5; p++) { var o = m.querySelector('.ab-opt.active[data-fp="' + p + '"]'); if (o) o.click(); }
+    cl(A()); if (k1 != null) cl(m.querySelector('.ab-opt[data-fp="1"][data-vi="' + k1 + '"]'));
+    cl(T()); if (k2 != null) cl(m.querySelector('.ab-opt[data-fp="2"][data-vi="' + k2 + '"]'));
+  }
   function abCfg(M) {
     var c = window.__ABCFG; if (!c) return null;
     var t = tx(q('#abTitle', M.modal));
     var dn = function (s) { return String(s).replace(/(\d)er\b/g, '$1').replace(/^VW(?=\s|$)/, 'Volkswagen'); };
-    var x = octx(M, 'rent'); if (x && x.ds && x.ds.name && c[x.ds.name]) return c[x.ds.name];
-    for (var k in c) { if (dn(k) === t || k === t) return c[k]; }
+    var x = octx(M, 'rent'); if (x && x.ds && x.ds.name && c[x.ds.name]) return fixAvail(c[x.ds.name]);
+    for (var k in c) { if (dn(k) === t || k === t) return fixAvail(c[k]); }
     return null;
   }
   function abPrices(M) {
@@ -817,16 +850,14 @@
     });
     if (!m.__avtrClick) {
       m.__avtrClick = true;
+      // rögzítő fázis: a sor kattintása ne kapcsolja ki a már kiválasztott elérhetőséget (a sor az elérhetőség-opción belül van)
       m.addEventListener('click', function (e) {
         var c = e.target && e.target.closest && e.target.closest('.caf-avt'); if (!c) return;
+        e.stopPropagation(); e.preventDefault();
         var b = c.getAttribute('data-tr'); M.prefTr = b;
-        setTimeout(function () {
-          var cf = abCfg(M); if (!cf) return; var ti = [];
-          cf.TR.forEach(function (t, i) { if (baseTr(t) === b) ti.push(i); });
-          if (ti.length) { var act = q('#abAus .ab-opt.active', m), av = act ? +act.getAttribute('data-vi') : -1; if (ti.indexOf(av) < 0) { var pick = ti.filter(function (i) { return /·\s*1\.\s*csomag$/.test(cf.TR[i]); })[0]; if (pick == null) pick = ti[0]; var o = q('#abAus .ab-opt[data-vi="' + pick + '"]', m); if (o && !o.classList.contains('active')) { if (o.classList.contains('dis')) forceSelect(M, +o.getAttribute('data-fp'), pick); else o.click(); } } }
-          avTrims(M);
-        }, 80);
-      });
+        var lo = c.closest('.ab-opt'), ai = lo ? +lo.getAttribute('data-vi') : null;
+        setTimeout(function () { selectVersion(M, ai, b); avTrims(M); }, 0);
+      }, true);
     }
   }
   // Choice felszereltségi csomagok („R-Line · 1. csomag”) — a csomag szó az oldal nyelvén (Marc, 2026-11-04)
@@ -893,7 +924,7 @@
   }
   document.addEventListener('click', function (e) {
     var o = e.target && e.target.closest && e.target.closest('.caf .ab-opt.dis');
-    if (!o) return;
+    if (!o || e.target.closest('.caf-avt')) return; // az Elérhetőség-lépés kivitel-sorait a selectVersion kezeli
     var mo = o.closest('.ab-modal'), M = mo && stateOf(mo); if (!M) return;
     e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation();
     forceSelect(M, +o.getAttribute('data-fp'), +o.getAttribute('data-vi'));
