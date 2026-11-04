@@ -74,7 +74,7 @@ function run() {
   for (const [key, v] of Object.entries(stockOnly)) {
     const f = path.join(DIST, v.href.replace(/^\//, ''), 'index.html');
     let h = read(f); if (!h || h.includes('id="ca-stockrent"') || !MERGE) continue;
-    const inj = '<script id="ca-stockrent">window.__ABSTOCK=' + JSON.stringify(v.cars).replace(/</g, '\\u003c') + ';window.SUB=window.SUB||{models:[],brand_order:[]};</script><script>' + MERGE + '</script>';
+    const inj = '<script id="ca-stockrent">window.__ABSTOCK=' + JSON.stringify(v.cars).replace(/</g, '\\u003c') + ';window.SUB=window.SUB||{models:[]};window.SUB.models=window.SUB.models||[];window.SUB.brand_order=window.SUB.brand_order||[];</script><script>' + MERGE + '</script>';
     h = h.replace(/<\/body>/i, inj + '</body>');
     fs.writeFileSync(f, h); out.push(`${key}: ${v.cars.length} autó → ${v.href}/`);
   }
