@@ -823,7 +823,7 @@
         setTimeout(function () {
           var cf = abCfg(M); if (!cf) return; var ti = [];
           cf.TR.forEach(function (t, i) { if (baseTr(t) === b) ti.push(i); });
-          if (ti.length === 1) { var o = q('#abAus .ab-opt[data-vi="' + ti[0] + '"]', m); if (o && !o.classList.contains('active')) o.click(); }
+          if (ti.length) { var act = q('#abAus .ab-opt.active', m), av = act ? +act.getAttribute('data-vi') : -1; if (ti.indexOf(av) < 0) { var pick = ti.filter(function (i) { return /·\s*1\.\s*csomag$/.test(cf.TR[i]); })[0]; if (pick == null) pick = ti[0]; var o = q('#abAus .ab-opt[data-vi="' + pick + '"]', m); if (o && !o.classList.contains('active')) o.click(); } }
           avTrims(M);
         }, 80);
       });
