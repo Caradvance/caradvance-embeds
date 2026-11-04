@@ -546,9 +546,34 @@ const VAL_EXTRA = {
   sk: { ...COLORS_DE, 'Tudomásul vette': 'Berie na vedomie', 'Cég': 'Firma s IČ DPH', 'Cégként': 'Firma s IČ DPH', 'Dízel': 'Nafta', 'Saját finanszírozás': 'Vlastné financovanie', 'Bérlés (Auto-Abo)': 'Prenájom (Auto-Abo)', 'Nettó EUR, Németországból (Caradvance GmbH)': 'Bez DPH, z Nemecka (Caradvance GmbH)', 'Finanszírozással': 'S financovaním', 'Egy összegben': 'Jednorazovo', 'Még nem tudom': 'Ešte neviem' },
   cs: { ...COLORS_CS, ...COLORS_DE, 'Tudomásul vette': 'Bere na vědomí', 'Dízel': 'Nafta', 'Saját finanszírozás': 'Vlastní financování', 'Bérlés (Auto-Abo)': 'Pronájem (Auto-Abo)', 'Nettó EUR, Németországból (Caradvance GmbH)': 'Bez DPH, z Německa (Caradvance GmbH)', 'Finanszírozással': 'S financováním', 'Egy összegben': 'Jednorázově', 'Még nem tudom': 'Ještě nevím' }
 };
+/* színnév-tartalék (sem COLORS_DE, sem szótár): magyar színszavak → SK / CZ, a márkanév marad (Marc, 2026-11-04) */
+const CW = {
+  sk: { kék: 'modrá', piros: 'červená', vörös: 'červená', zöld: 'zelená', szürke: 'sivá', fehér: 'biela', fekete: 'čierna', ezüst: 'strieborná', sárga: 'žltá', barna: 'hnedá', bézs: 'béžová', lila: 'fialová', narancs: 'oranžová', bordó: 'bordová', metál: 'metalíza', gyöngyház: 'perleť', uni: 'uni', sötét: 'tmavá', világos: 'svetlá', petrol: 'petrolejová' },
+  cs: { kék: 'modrá', piros: 'červená', vörös: 'červená', zöld: 'zelená', szürke: 'šedá', fehér: 'bílá', fekete: 'černá', ezüst: 'stříbrná', sárga: 'žlutá', barna: 'hnědá', bézs: 'béžová', lila: 'fialová', narancs: 'oranžová', bordó: 'vínová', metál: 'metalíza', gyöngyház: 'perleť', uni: 'uni', sötét: 'tmavá', világos: 'světlá', petrol: 'petrolejová' },
+};
+const PF = {
+  sk: { tanzanit: 'Tanzanitová', oxid: 'Oxidová', hegyi: 'Horská', urán: 'Uránová', atlasz: 'Atlas', nyíl: 'Šípová', elefántcsont: 'Slonovinová', delfin: 'Delfínová', grafit: 'Grafitová', éjfél: 'Polnočná', zafír: 'Zafírová', ásvány: 'Minerálna', gleccser: 'Ľadovcová', kristály: 'Kryštálová', obszidián: 'Obsidiánová', ónix: 'Ónyxová', holdkő: 'Mesačná', árnyék: 'Tieňová', füst: 'Dymová', réz: 'Medená', kozmosz: 'Kozmická', mítosz: 'Mýtická', alkony: 'Súmračná', ibolya: 'Fialková', óceán: 'Oceánska' },
+  cs: { tanzanit: 'Tanzanitová', oxid: 'Oxidová', hegyi: 'Horská', urán: 'Uranová', atlasz: 'Atlas', nyíl: 'Šípová', elefántcsont: 'Slonovinová', delfin: 'Delfínová', grafit: 'Grafitová', éjfél: 'Půlnoční', zafír: 'Safírová', ásvány: 'Minerální', gleccser: 'Ledovcová', kristály: 'Křišťálová', obszidián: 'Obsidiánová', ónix: 'Onyxová', holdkő: 'Měsíční', árnyék: 'Stínová', füst: 'Kouřová', réz: 'Měděná', kozmosz: 'Kosmická', mítosz: 'Mýtická', alkony: 'Soumračná', ibolya: 'Fialková', óceán: 'Oceánská' },
+};
+const CWRE = /^(.*?)(kék|piros|vörös|zöld|szürke|fehér|fekete|ezüst|sárga|barna|bézs|lila|narancs|bordó)$/i;
+function colTr(c, lg) {
+  const W = CW[lg], X = PF[lg]; let hit = false;
+  const out = String(c).split(' ').map((t) => {
+    const l = t.toLowerCase();
+    if (W[l]) { hit = true; return W[l]; }
+    const m = l.match(CWRE);
+    if (m && m[1]) { const p = X[m[1]]; if (!p) return null; hit = true; return p + ' ' + W[m[2]]; }
+    if (/[őűöüáéíóú]/i.test(t)) return null;
+    return t;
+  });
+  if (!hit || out.some((x) => x == null)) return null;
+  const r = out.join(' ');
+  return r.charAt(0).toUpperCase() + r.slice(1);
+}
+const COLEND = /(kék|piros|vörös|zöld|szürke|fehér|fekete|ezüst|sárga|barna|bézs|lila|narancs|bordó|metál|gyöngyház|uni)$/i;
 const VAL_RE = {
-  sk: [[/(\d[\d\s.\u00a0]*?)\s*km\s*\/\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => String(+n.replace(/\D/g, '')).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' km/mesiac'], [/(\d+)\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => n + (+n === 1 ? ' mesiac' : +n < 5 ? ' mesiace' : ' mesiacov')], [/\+\s*áfa(?![\p{L}])/gu, '+ DPH'], [/(?<![\p{L}])áfa(?![\p{L}])/gu, 'DPH'], [/^(\d)-(?:es|as|ös|os)$/g, 'Rad $1'], [/\bBMW (\d)-(?:es|as|ös|os) /g, 'BMW rad $1 '], [/\bBMW (\d)-(?:es|as|ös|os)$/g, 'BMW rad $1'], [/trieda ([A-Z]+) Limuzin(?![\p{L}])/gu, 'triedy $1 Limuzína'], [/Limuzin(?![\p{L}])/gu, 'Limuzína'], [/ hónap(?![\p{L}])/gu, ' mesiacov'], [/ km \/ hó(?![\p{L}])/gu, ' km / mes.']],
-  cs: [[/(\d[\d\s.\u00a0]*?)\s*km\s*\/\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => String(+n.replace(/\D/g, '')).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' km/měsíc'], [/(\d+)\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => n + (+n === 1 ? ' měsíc' : +n < 5 ? ' měsíce' : ' měsíců')], [/\+\s*áfa(?![\p{L}])/gu, '+ DPH'], [/(?<![\p{L}])áfa(?![\p{L}])/gu, 'DPH'], [/^(\d)-(?:es|as|ös|os)$/g, 'Řada $1'], [/\bBMW (\d)-(?:es|as|ös|os) /g, 'BMW řady $1 '], [/\bBMW (\d)-(?:es|as|ös|os)$/g, 'BMW řady $1'], [/třída ([A-Z]+) Limuzin(?![\p{L}])/gu, 'třídy $1 Limuzína'], [/Limuzin(?![\p{L}])/gu, 'Limuzína'], [/ hónap(?![\p{L}])/gu, ' měsíců'], [/ km \/ hó(?![\p{L}])/gu, ' km / měs.']]
+  sk: [[/(\d[\d\s.\u00a0]*?)\s*km\s*\/\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => String(+n.replace(/\D/g, '')).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' km/mesiac'], [/(\d+)\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => n + (+n === 1 ? ' mesiac' : +n < 5 ? ' mesiace' : ' mesiacov')], [/\+\s*áfa(?![\p{L}])/gu, '+ DPH'], [/(?<![\p{L}])áfa(?![\p{L}])/gu, 'DPH'], [/^(\d)-(?:es|as|ös|os)$/g, 'Rad $1'], [/\bBMW (\d)-(?:es|as|ös|os) /g, 'BMW rad $1 '], [/\bBMW (\d)-(?:es|as|ös|os)$/g, 'BMW rad $1'], [/trieda ([A-Z]+) Limuzin(?![\p{L}])/gu, 'triedy $1 Limuzína'], [/Limuzin(?![\p{L}])/gu, 'Limuzína'], [/ hónap(?![\p{L}])/gu, ' mesiacov'], [/ km \/ hó(?![\p{L}])/gu, ' km / mes.'], [/^[^·]+$/u, (m) => (COLEND.test(m) ? colTr(m, 'sk') || m : m)]],
+  cs: [[/(\d[\d\s.\u00a0]*?)\s*km\s*\/\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => String(+n.replace(/\D/g, '')).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' km/měsíc'], [/(\d+)\s*hó(?:nap)?(?![\p{L}])/gu, (m, n) => n + (+n === 1 ? ' měsíc' : +n < 5 ? ' měsíce' : ' měsíců')], [/\+\s*áfa(?![\p{L}])/gu, '+ DPH'], [/(?<![\p{L}])áfa(?![\p{L}])/gu, 'DPH'], [/^(\d)-(?:es|as|ös|os)$/g, 'Řada $1'], [/\bBMW (\d)-(?:es|as|ös|os) /g, 'BMW řady $1 '], [/\bBMW (\d)-(?:es|as|ös|os)$/g, 'BMW řady $1'], [/třída ([A-Z]+) Limuzin(?![\p{L}])/gu, 'třídy $1 Limuzína'], [/Limuzin(?![\p{L}])/gu, 'Limuzína'], [/ hónap(?![\p{L}])/gu, ' měsíců'], [/ km \/ hó(?![\p{L}])/gu, ' km / měs.'], [/^[^·]+$/u, (m) => (COLEND.test(m) ? colTr(m, 'cs') || m : m)]]
 };
 const SKIP_LOC = /^(Típus|type|form|Nyelv|E-mail|email|Telefon|phone|Név|name|Cégnév|company|Vezetéknév|Keresztnév|Megjegyzés|Üzenet|message|forras_oldal|page|event_id|beerkezett|turnstile_token|fbp|fbc|user_agent)$/i;
 function localizeVals(obj, lang) {
