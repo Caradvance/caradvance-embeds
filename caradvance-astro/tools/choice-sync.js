@@ -127,6 +127,15 @@ var CADV_SYNC = (function () {
     Object.keys(cfgOld).forEach(function (k) { var c = cfgOld[k]; (c.X || []).forEach(function (x) { var id = [k, c.F[x[0]], c.C[x[3]], fixTrim(c.TR[x[4]])].join('|'); (combos[id] = combos[id] || []).push([c.T[x[1]], c.K[x[2]]]); }); });
 
     var recs = items.map(function (it) { return norm(it, today, extraColors); });
+    // ---------- felszereltségi csomagok (Choice „Ausstattungspaket”, Marc 2026-11-04) ----------
+    // Egy kivitelen (trim) belül a különböző felszereltségű autók külön választható csomagok: „<kivitel> · 2. csomag”.
+    // A sorszám a felszereltségi lista ábécérendje szerint stabil; egycsomagos kivitelnél nincs utótag.
+    var PKG = {};
+    var PMIN = {}; // csomagonként a legolcsóbb nettó ár: az 1. csomag a legolcsóbb
+    recs.forEach(function (r) { var id = r.key + '|' + r.trim; PKG[id] = PKG[id] || []; if (r.eq && PKG[id].indexOf(r.eq) < 0) PKG[id].push(r.eq);
+      if (r.eq && r.net != null) { var pk = id + '|' + r.eq; PMIN[pk] = PMIN[pk] == null ? r.net : Math.min(PMIN[pk], r.net); } });
+    Object.keys(PKG).forEach(function (id) { PKG[id].sort(function (a, b) { var pa = PMIN[id + '|' + a], pb = PMIN[id + '|' + b]; pa = pa == null ? 1e9 : pa; pb = pb == null ? 1e9 : pb; return pa - pb || (a < b ? -1 : a > b ? 1 : 0); }); });
+    recs.forEach(function (r) { r.trim0 = r.trim; var L = PKG[r.key + '|' + r.trim]; if (L && L.length > 1 && r.eq) { r.pkg = L.indexOf(r.eq) + 1; r.trim = r.trim + ' · ' + r.pkg + '. csomag'; } });
     var groups = {}, order = [];
     recs.forEach(function (r) { if (!groups[r.key]) { groups[r.key] = []; order.push(r.key); } groups[r.key].push(r); });
 
@@ -140,15 +149,15 @@ var CADV_SYNC = (function () {
       v.forEach(function (r) {
         var cn = r.colHu || r.colDe; if (!r.colHu && r.colDe !== '—') untrans[r.colDe] = 1;
         cnt[cn] = (cnt[cn] || 0) + r.n; deOf[cn] = r.colDe;
-        if (r.trim !== '—' && variants.indexOf(r.trim) < 0) variants.push(r.trim);
+        if (r.trim0 !== '—' && variants.indexOf(r.trim0) < 0) variants.push(r.trim0);
         if (r.fuel && fuels.indexOf(r.fuel) < 0) fuels.push(r.fuel);
         if (r.gear && gears.indexOf(r.gear) < 0) gears.push(r.gear);
         if (r.ps != null) ps.push(r.ps);
         if (r.net != null) minnet = minnet == null ? r.net : Math.min(minnet, r.net);
         if (r.rank === 0) now += r.n; else later[r.rank] = { d: r.avail, c: ((later[r.rank] || {}).c || 0) + r.n };
         if (!cat && r.cat) cat = r.cat;
-        var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|');
-        (combos[id] || [[r.term, r.km]]).concat([[r.term, r.km]]).forEach(function (tk) { if (tk[0]) months[tk[0]] = 1; if (tk[1]) kms[tk[1]] = 1; });
+        var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|'), id0 = [key, r.fuel, r.colHu || r.colDe, r.trim0].join('|');
+        (combos[id] || combos[id0] || [[r.term, r.km]]).concat([[r.term, r.km]]).forEach(function (tk) { if (tk[0]) months[tk[0]] = 1; if (tk[1]) kms[tk[1]] = 1; });
       });
       var cols = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; });
       var ph = colorHex(deOf[cols[0]]);
@@ -190,10 +199,14 @@ var CADV_SYNC = (function () {
     order.forEach(function (key) {
       var c = { F: [], T: [], K: [], C: [], TR: [] }, D = {};
       function gi(a, x) { var i = a.indexOf(x); if (i > -1) return i; a.push(x); return a.length - 1; }
+      // kivitelek sorrendje: az alapkivitel első előfordulása szerint, azon belül 1., 2., … csomag
+      var t0 = [], tl = [];
+      groups[key].forEach(function (r) { if (t0.indexOf(r.trim0 || r.trim) < 0) t0.push(r.trim0 || r.trim); if (!tl.some(function (x) { return x.t === r.trim; })) tl.push({ t: r.trim, g: t0.indexOf(r.trim0 || r.trim), p: r.pkg || 0 }); });
+      tl.sort(function (a, b) { return a.g - b.g || a.p - b.p; }); c.TR = tl.map(function (x) { return x.t; });
       groups[key].forEach(function (r) {
         var fi = gi(c.F, r.fuel), ci = gi(c.C, r.colHu || r.colDe), tri = gi(c.TR, r.trim), dep = deposit(r.gross);
-        var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|');
-        var tks = (combos[id] || []).concat([[r.term, r.km]]);
+        var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|'), id0 = [key, r.fuel, r.colHu || r.colDe, r.trim0].join('|');
+        var tks = (combos[id] || combos[id0] || []).concat([[r.term, r.km]]);
         tks.forEach(function (tk) {
           if (!tk[0] || !tk[1]) return;
           var ti = gi(c.T, tk[0]), ki = gi(c.K, tk[1]), ck = [fi, ti, ki, ci, tri].join(',');
@@ -220,10 +233,18 @@ var CADV_SYNC = (function () {
       var sp = SPLIT[src], o = featNew[src] || {};
       Object.keys(o).forEach(function (t) { if (!sp.re.test(t)) return; featNew[sp.to] = featNew[sp.to] || {}; if (!featNew[sp.to][t]) { featNew[sp.to][t] = o[t]; featChanged = true; } });
     });
+    // Csomagonként (kivitel · N. csomag) saját felszereltség. A '__de|<címke>' kulcs a német forrásszöveg rövid ujjlenyomatát (hossz:FNV-1a) őrzi: ha a csomag
+    // tartalma nem változott, a magyar fordítás marad; átszámozásnál a fordítás átkerül; új / megváltozott tartalom → newFeat (fordítandó).
+    var fp = function (t) { var x = 0x811c9dc5; for (var i = 0; i < t.length; i++) { x ^= t.charCodeAt(i); x = Math.imul(x, 0x01000193) >>> 0; } return t.length.toString(36) + ':' + x.toString(36); };
     recs.forEach(function (r) {
       if (!r.eq) return;
-      featNew[r.key] = featNew[r.key] || {};
-      if (!featNew[r.key][r.trim]) { featNew[r.key][r.trim] = r.eq; featChanged = true; report.newFeat.push({ model: r.key, trim: r.trim }); }
+      var F = featNew[r.key] = featNew[r.key] || {}, deK = '__de|' + r.trim, h = fp(r.eq);
+      if (F[deK] === h && F[r.trim]) return;
+      if (F[r.trim] && !F[deK] && !r.pkg) { F[deK] = h; featChanged = true; return; }
+      var reuse = null;
+      Object.keys(F).forEach(function (k) { if (k.indexOf('__de|') === 0 && F[k] === h && F[k.slice(5)] && F[k.slice(5)] !== r.eq) reuse = F[k.slice(5)]; });
+      F[r.trim] = reuse || r.eq; F[deK] = h; featChanged = true;
+      if (!reuse && !report.newFeat.some(function (x) { return x.model === r.key && x.trim === r.trim; })) report.newFeat.push({ model: r.key, trim: r.trim });
     });
 
     // ---------- write back ----------
