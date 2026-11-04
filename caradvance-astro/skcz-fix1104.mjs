@@ -327,9 +327,12 @@ if (process.argv[1] && /skcz-fix1104\.mjs$/.test(process.argv[1])) {
       for (const f of walk(root, [])) {
         if (!/\.html$/.test(f)) continue;
         const rel = path.relative(root, f).split(path.sep).join('/'); if (only && !only.test(rel)) continue;
-        const s = fs.readFileSync(f, 'utf8'); if (s.indexOf('data-price="') < 0) continue;
+        const s = fs.readFileSync(f, 'utf8'); if (s.indexOf('data-price="') < 0 && !/\/(?:mes|měs)\./.test(s)) continue;
         const lg = ((s.match(/<html[^>]*\slang="([a-z]{2})/i) || [])[1] || '').toLowerCase(); const U = UNIT[lg]; if (!U) continue;
-        const h = s.replace(/data-price="([^"]*?)od ((?:\d|&nbsp;|\s| )+?) €\/(?:mes|měs)\."/g, (m, pre, n) => 'data-price="' + pre + U[0] + n + U[1] + '"');
+        const unit = U[1].slice(U[1].indexOf('/') + 1);
+        // „od 1 149 €/mes.”, „od CHF 1’030/mes.”, „od 27 260 Kč/měs.”, „od 1 114 € (≈ 4 890 zł)/mes.” — a gomb data-price-ában és a listákban is
+        const h = s.replace(/data-price="([^"]*?)od ([^"<>]{1,40}?\d[^"<>]{0,40}?)\/(?:mes|měs)\."/g, (m, pre, n) => 'data-price="' + pre + U[0] + n + '/' + unit + '"')
+          .replace(/>od ([^"<>]{1,40}?\d[^"<>]{0,40}?)\/(?:mes|měs)\.(\s*)</g, (m, n, ws) => '>' + U[0] + n + '/' + unit + ws + '<');
         if (h !== s) { fs.writeFileSync(f, h); dp++; }
       }
     }
