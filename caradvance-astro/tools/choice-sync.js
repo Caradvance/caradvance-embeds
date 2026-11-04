@@ -1,7 +1,10 @@
 /* CarAdvance – Choice fleetshop -> Bérelhető sync builder
  * Pure function, runs in the browser (fleetshop tab) or Node.
- *   CADV_SYNC({items, file, feat, today}) -> {file, feat, featChanged, report}
+ *   CADV_SYNC({items, file, feat, today, vehicles}) -> {file, feat, featChanged, report}
  * items: Items[] of the fleetshop /v1/mobilityOffer/grouped response
+ * vehicles (optional, Marc 2026-11-04): { 'CarLabel|CarModell|CarModellspec': [[color, months, km, price, count], …] }
+ *   = every single car of that version from /v1/mobilityOffers (tools/choice-vehicles.js). The grouped list holds only one
+ *   sample car per offer group, so without this the form would miss colours / terms (e.g. BMW X3 40d: 21 cars, 4 colours).
  * file : current caradvance-astro/seo-abo.mjs text
  * feat : current caradvance-astro/public/abo-feat.json object
  * today: 'YYYY-MM-DD'
@@ -88,6 +91,7 @@ var CADV_SYNC = (function () {
     var av = monthLabel(ro.DateRegistration, today);
     var eq = (ro.Equipment || []).map(function (x) { return String(x).trim(); }).filter(Boolean).join(' • ');
     return {
+      rk: [ro.CarLabel, ro.CarModell, ro.CarModellspec].map(function (x) { return String(x == null ? '' : x); }).join('|'),
       key: key, brand: brand, model: key.slice(brand.length + 1), merged: merged,
       trim: trim || '—', colDe: colDe, colHu: colorHu(colDe, extraColors),
       fuel: FUEL[fuelRaw.toLowerCase()] || fuelRaw, gear: GEAR[gearRaw.toLowerCase()] || gearRaw,
@@ -136,6 +140,26 @@ var CADV_SYNC = (function () {
       if (r.eq && r.net != null) { var pk = id + '|' + r.eq; PMIN[pk] = PMIN[pk] == null ? r.net : Math.min(PMIN[pk], r.net); } });
     Object.keys(PKG).forEach(function (id) { PKG[id].sort(function (a, b) { var pa = PMIN[id + '|' + a], pb = PMIN[id + '|' + b]; pa = pa == null ? 1e9 : pa; pb = pb == null ? 1e9 : pb; return pa - pb || (a < b ? -1 : a > b ? 1 : 0); }); });
     recs.forEach(function (r) { r.trim0 = r.trim; var L = PKG[r.key + '|' + r.trim]; if (L && L.length > 1 && r.eq) { r.pkg = L.indexOf(r.eq) + 1; r.trim = r.trim + ' · ' + r.pkg + '. csomag'; } });
+    // ---------- minden egyes autó (opts.vehicles): szín × futamidő × km × ár, darabszámmal ----------
+    // Egy ajánlatcsoportú kivitel: a csoport helyett autónkénti sorok (pontos darabszám).
+    // Több csomagos kivitel: a Choice nem adja meg, melyik autó melyik csomagba tartozik — a csomag a saját mintaautójával
+    // és darabszámával marad, a kivitel többi színe / futamideje 0 darabos kiegészítő sorként kerül hozzá.
+    var VEH = opts.vehicles || null, vstat = { keys: 0, exact: 0, multi: 0, skipped: [] };
+    if (VEH) {
+      var byRk = {}; recs.forEach(function (r) { (byRk[r.rk] = byRk[r.rk] || []).push(r); });
+      var exp = [];
+      Object.keys(byRk).forEach(function (rk) {
+        var L = byRk[rk], vs = VEH[rk];
+        var tot = L.reduce(function (a, r) { return a + r.n; }, 0), vtot = (vs || []).reduce(function (a, v) { return a + (+v[4] || 0); }, 0);
+        if (!vs || !vs.length || vtot !== tot) { if (vs) vstat.skipped.push(rk + ' (' + tot + '/' + vtot + ')'); L.forEach(function (r) { exp.push(r); }); return; }
+        vstat.keys++;
+        var mk = function (r, v, n) { var o = {}; Object.keys(r).forEach(function (k) { o[k] = r[k]; }); var cd = String(v[0] || '').replace(/\s+/g, ' ').trim() || r.colDe; o.colDe = cd; o.colHu = colorHu(cd, extraColors); o.term = +v[1] || r.term; o.km = +v[2] || r.km; o.net = typeof v[3] === 'number' ? v[3] : r.net; o.n = n; o.exact = true; return o; };
+        if (L.length === 1) { vstat.exact++; vs.forEach(function (v) { exp.push(mk(L[0], v, +v[4] || 1)); }); return; }
+        vstat.multi++;
+        L.forEach(function (r) { r.exact = true; exp.push(r); vs.forEach(function (v) { exp.push(mk(r, v, 0)); }); });
+      });
+      recs = exp;
+    }
     var groups = {}, order = [];
     recs.forEach(function (r) { if (!groups[r.key]) { groups[r.key] = []; order.push(r.key); } groups[r.key].push(r); });
 
@@ -148,7 +172,7 @@ var CADV_SYNC = (function () {
       var cnt = {}, deOf = {}, variants = [], fuels = [], gears = [], ps = [], kms = {}, months = {}, now = 0, later = {}, minnet = null, cat = null;
       v.forEach(function (r) {
         var cn = r.colHu || r.colDe; if (!r.colHu && r.colDe !== '—') untrans[r.colDe] = 1;
-        cnt[cn] = (cnt[cn] || 0) + r.n; deOf[cn] = r.colDe;
+        cnt[cn] = (cnt[cn] || 0) + r.n; if (!deOf[cn]) deOf[cn] = r.colDe;
         if (r.trim0 !== '—' && variants.indexOf(r.trim0) < 0) variants.push(r.trim0);
         if (r.fuel && fuels.indexOf(r.fuel) < 0) fuels.push(r.fuel);
         if (r.gear && gears.indexOf(r.gear) < 0) gears.push(r.gear);
@@ -157,7 +181,7 @@ var CADV_SYNC = (function () {
         if (r.rank === 0) now += r.n; else later[r.rank] = { d: r.avail, c: ((later[r.rank] || {}).c || 0) + r.n };
         if (!cat && r.cat) cat = r.cat;
         var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|'), id0 = [key, r.fuel, r.colHu || r.colDe, r.trim0].join('|');
-        (combos[id] || combos[id0] || [[r.term, r.km]]).concat([[r.term, r.km]]).forEach(function (tk) { if (tk[0]) months[tk[0]] = 1; if (tk[1]) kms[tk[1]] = 1; });
+        (r.exact ? [] : (combos[id] || combos[id0] || [])).concat([[r.term, r.km]]).forEach(function (tk) { if (tk[0]) months[tk[0]] = 1; if (tk[1]) kms[tk[1]] = 1; });
       });
       var cols = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; });
       var ph = colorHex(deOf[cols[0]]);
@@ -188,6 +212,7 @@ var CADV_SYNC = (function () {
     });
     Object.keys(oldByKey).forEach(function (k) { if (!groups[k]) report.removed.push(k + ' (' + oldByKey[k].count + ' autó)'); });
     report.untranslatedColors = Object.keys(untrans);
+    report.vehicles = VEH ? vstat : null;
 
     var bt = {}; models.forEach(function (m) { bt[m.brand] = (bt[m.brand] || 0) + m.count; });
     var brandOrder = Object.keys(bt).sort(function (a, b) { return bt[b] - bt[a] || a.localeCompare(b); });
@@ -206,7 +231,7 @@ var CADV_SYNC = (function () {
       groups[key].forEach(function (r) {
         var fi = gi(c.F, r.fuel), ci = gi(c.C, r.colHu || r.colDe), tri = gi(c.TR, r.trim), dep = deposit(r.gross);
         var id = [key, r.fuel, r.colHu || r.colDe, r.trim].join('|'), id0 = [key, r.fuel, r.colHu || r.colDe, r.trim0].join('|');
-        var tks = (combos[id] || combos[id0] || []).concat([[r.term, r.km]]);
+        var tks = (r.exact ? [] : (combos[id] || combos[id0] || [])).concat([[r.term, r.km]]);
         tks.forEach(function (tk) {
           if (!tk[0] || !tk[1]) return;
           var ti = gi(c.T, tk[0]), ki = gi(c.K, tk[1]), ck = [fi, ti, ki, ci, tri].join(',');
