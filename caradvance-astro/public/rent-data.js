@@ -66,7 +66,7 @@ window.RENT = (function () {
       function g(row,n){var j=ix[n];return j==null?'':String(row[j]||'').trim();}
       var out=[];
       for(var r=1;r<rows.length;r++){ var row=rows[r]; if(!row||!row.length)continue;
-        var modell=g(row,'modell'); if(!modell)continue;
+        var modell=g(row,'modell'); if(!modell)continue; if(/^BMW (M3|i5)\b/i.test(modell))continue; /* nem bérelhető (Marc, 2026-11-04) — = src/data/rentalStock.ts STOCK_EXCLUDE */
         if((g(row,'aktiv')||'').toLowerCase()==='nem')continue;
         // only CarAdvance's own fleet is rentable — exclude WeGa/partner cars
         var _forras=(g(row,'forras')||'').toLowerCase(), _sajat=(g(row,'sajat')||'').toLowerCase();

@@ -548,7 +548,7 @@
       var m = (SUB.models || []).filter(function (x) { return x.brand === pk[0] && x.model === pk[1]; })[0];
       if (m && m.net) { out.push(m); return; }
       var st = ab.filter(function (c) { return c.b === (pk[0] === 'VW' ? 'Volkswagen' : pk[0]) && new RegExp('\\b' + pk[1] + '\\b').test(c.t) && c.r && c.r[0]; });
-      if (st.length) out.push({ brand: pk[0], model: pk[1], stock: st, cat: 'SUV / Terepjáró', gears: ['Automata'], fuels: [st[0].f === 'Diesel' ? 'Dízel' : st[0].f], now: st.length, eurFix: st[0].r[0][1], href: st[0].u, yr: st[0].y });
+      if (st.length) out.push({ brand: pk[0], model: pk[1], stock: st, cat: 'SUV / Terepjáró', gears: ['Automata'], fuels: [st[0].f === 'Diesel' ? 'Dízel' : st[0].f], now: st.length, eurFix: st[0].r[0][1], href: rhref(pk[0], pk[1]), yr: st[0].y }); /* raktári modell: saját bérlési oldal (stock-rent.mjs, 2026-11-04) */
     });
     DATA.rentN = (SUB.models || []).reduce(function (s, m) { return s + (m.count || 0); }, 0);
     return out.map(function (m) {
