@@ -247,7 +247,7 @@ var CADV_SYNC = (function () {
         var tks = (r.exact ? [] : (combos[id] || combos[id0] || [])).concat([[r.term, r.km]]);
         tks.forEach(function (tk) {
           if (!tk[0] || !tk[1]) return;
-          var ti = gi(c.T, tk[0]), ki = gi(c.K, tk[1]), ck = [fi, ti, ki, ci, tri].join(',');
+          var ti = gi(c.T, tk[0]), ki = gi(c.K, tk[1]), ck = [fi, ti, ki, ci, tri].join(',') + '|' + r.rank; // elérhetőségenként külön sor: a későbbi hónapok is választhatók (Marc, 2026-11-04)
           var cur = D[ck];
           if (!cur || r.rank < cur.rank || (r.rank === cur.rank && r.net < cur.net)) D[ck] = { rank: r.rank, lab: r.avail, dep: dep, net: r.net };
         });
@@ -256,7 +256,7 @@ var CADV_SYNC = (function () {
       c.A = labs;
       // darabszám kivitelenként és elérhetőségenként: [kivitel-index, elérhetőség-index, db] — az „Elérhetőség” lépés ezt mutatja (Marc, 2026-11-04)
       c.N = Object.keys(NC).map(function (nk) { var p = nk.indexOf('|'); return [+nk.slice(0, p), labs.indexOf(nk.slice(p + 1)), NC[nk]]; }).filter(function (x) { return x[1] > -1; });
-      c.X = Object.keys(D).map(function (ck) { var d = D[ck]; return ck.split(',').map(Number).concat([labs.indexOf(d.lab), d.dep, d.net]); });
+      c.X = Object.keys(D).map(function (ck) { var d = D[ck]; return ck.split('|')[0].split(',').map(Number).concat([labs.indexOf(d.lab), d.dep, d.net]); });
       cfgNew[key] = c;
     });
 
