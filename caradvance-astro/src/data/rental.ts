@@ -10,6 +10,7 @@
 // számolja, hogy a "Részletek" gomb a helyes oldalra mutasson.
 import fs from 'node:fs';
 import path from 'node:path';
+import { stockCars } from './rentalStock';
 
 export interface RentalTrim { name: string; eur: number; huf: number; dep: number; depHuf: number; fuel: string; }
 export interface RentalRelated { key: string; name: string; href: string; img: string; eur: number; huf: number; }
@@ -21,6 +22,7 @@ export interface RentalData {
   eur: number; huf: number; dep: number; depHuf: number;
   trims: RentalTrim[]; colors: string[]; colorsHex?: string[]; avail: string[]; rate: number;
   photo: string; related: RentalRelated[];
+  stock?: boolean; years?: string; // saját raktári (nem Choice) modell: használt, kevés km-es autók — nem „vadonatúj, 0 km”
 }
 
 const MARGIN = 750; // ugyanaz, mint a kártyán: effNet = net + 750 (km-pricing.mjs: a 2 000 km/hó keret ára)
@@ -59,9 +61,45 @@ function load() {
     const CFG = extract(strip, 'window.__ABCFG=');
     const PHOTO = extract(sec, 'var PHOTO=') || {};
     if (!SUB || !CFG) { console.log('rental: SUB/__ABCFG nem olvasható'); return cache; }
+    addStockModels(SUB, PHOTO);
     cache = { SUB, CFG, PHOTO };
   } catch (e: any) { console.log('rental: hiba - ' + (e && e.message)); cache = null; }
   return cache;
+}
+
+// ---- saját raktári modellek, amelyeknek nincs Choice-kínálata (pl. BMW X5, X7): ugyanúgy, mint a kártya JS-e (seo-abo) ----
+// A havidíj a táblázat 2 000 km-es ára + 100 € (km-pricing.mjs), a kaució a táblázatból; minden autó külön kivitelként jelenik meg.
+const STOCK_FUEL: Record<string, string> = { diesel: 'Dízel', benzin: 'Benzin', elektro: 'Elektromos' };
+const stockFuel = (f: string) => { const x = String(f || '').toLowerCase(); return /hybrid|hibrid/.test(x) ? 'Hibrid' : (STOCK_FUEL[x] || ''); };
+const nz = (x: string) => String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+function addStockModels(SUB: any, PHOTO: any) {
+  try {
+    const M: any[] = SUB.models || (SUB.models = []);
+    let egy: { b: string; n: string; img: string }[] = [];
+    try {
+      const src = fs.readFileSync(path.resolve(process.cwd(), 'src/data/egyediCars.ts'), 'utf8');
+      const rr = /\{"brand":\s*"([^"]+)",\s*"key":\s*"[^"]*",\s*"name":\s*"([^"]+)"[^}]*?"img":\s*"([^"]+)"/g; let q;
+      while ((q = rr.exec(src))) egy.push({ b: q[1], n: q[2], img: q[3] });
+    } catch {}
+    for (const c of stockCars()) {
+      const br = c.b, bn = nz(br), rest = nz(c.t).replace(new RegExp('^' + bn + '\\s*'), '');
+      if (M.some((m: any) => !m.stockOnly && nz(m.brand) === bn && nz(m.model) && (rest + ' ').indexOf(nz(m.model) + ' ') === 0)) continue; // Choice-modellbe olvad (pl. X6)
+      const w = String(c.t).replace(new RegExp('^' + br + '\\s*', 'i'), '').split(/\s+/)[0] || '';
+      if (!w || !(c.r && c.r[0])) continue;
+      let m = M.find((x: any) => x.stockOnly && x.brand === br && x.model === w);
+      if (!m) {
+        m = { brand: br, model: w, cat: c.k === 'SUV' ? 'SUV / Terepjáró' : (c.k || ''), count: 0, now: 0, later: [], colors: [], variants: [], packages: [], fuels: [], gears: ['Automata'], km: [2000, 3000, 4000], months: [6], psMin: 0, psMax: 0, net: 0, stockOnly: true, __stock: [] };
+        M.push(m);
+        const key = br + ' ' + w;
+        if (!PHOTO[key]) { const e = egy.find((x) => x.b === br && x.n === key); if (e) PHOTO[key] = e.img; }
+      }
+      m.count++; m.now++; m.__stock.push(c);
+      const f = stockFuel(c.f); if (f && !m.fuels.includes(f)) m.fuels.push(f);
+      const b0 = c.r.find((r) => +r[0] === 2000) || c.r.slice().sort((a, b) => a[0] - b[0])[0];
+      const eur = b0[1] + 100;
+      if (!m.net || eur - MARGIN < m.net) m.net = eur - MARGIN;
+    }
+  } catch (e: any) { console.log('rental: raktári modellek hiba - ' + (e && e.message)); }
 }
 
 // ---- magyar modellnév + URL-slug (a kártya JS-e ugyanezt számolja) ----
@@ -105,7 +143,18 @@ export function getRental(brand: string, model: string): RentalData | null {
 
   let trims: RentalTrim[] = [];
   let dep = 0;
-  if (c && Array.isArray(c.X) && Array.isArray(c.TR)) {
+  if (m.stockOnly && Array.isArray(m.__stock)) {
+    const seen = new Map<string, RentalTrim>();
+    for (const s of m.__stock) {
+      const b0 = s.r.find((r: number[]) => +r[0] === 2000) || s.r.slice().sort((a: number[], b: number[]) => a[0] - b[0])[0];
+      const tEur = b0[1] + 100;
+      const name = String(s.t).replace(new RegExp('^' + brand + '\\s+' + model + '\\s*', 'i'), '').trim() || model;
+      const t = { name, eur: tEur, huf: toHuf(tEur, R), dep: s.d || 0, depHuf: toDepHuf(s.d || 0, R), fuel: stockFuel(s.f) || 'Dízel' };
+      const prev = seen.get(name); if (!prev || t.eur < prev.eur) seen.set(name, t);
+    }
+    trims = Array.from(seen.values()).sort((a, b) => a.eur - b.eur);
+    dep = trims.length ? Math.min(...trims.map((t) => t.dep)) : 0;
+  } else if (c && Array.isArray(c.X) && Array.isArray(c.TR)) {
     trims = c.TR.map((name: string, ti: number) => {
       const rows = c.X.filter((r: number[]) => r[4] === ti);
       if (!rows.length) return null;
@@ -135,6 +184,7 @@ export function getRental(brand: string, model: string): RentalData | null {
     eur, huf: toHuf(eur, R), dep, depHuf: toDepHuf(dep, R),
     trims, colors: (m.colors || []).map((x: any) => x.n), colorsHex: (m.colors || []).map((x: any) => x.n + '¦' + (x.h || '#ccc')), avail: (c && c.A) || [], rate: R,
     photo: String(PHOTO[key] || ''), related,
+    ...(m.stockOnly ? { stock: true, years: Array.from(new Set((m.__stock || []).map((s: any) => (String(s.y).match(/(\d{4})/) || [])[1]).filter(Boolean))).sort().join(', ') } : {}),
   };
 }
 

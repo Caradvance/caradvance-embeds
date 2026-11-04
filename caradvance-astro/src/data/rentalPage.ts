@@ -102,7 +102,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   }
   const variants = trimList.map((t, i) => {
     const sm = c.specMatch ? matchSpec(t.name) : null;
-    const s: TrimSpec = specs[t.name] || sm || {};
+    const s: TrimSpec = specs[t.name] || sm || (r.stock ? (Object.entries(specs).find(([k]) => t.name.indexOf(k) === 0) || [])[1] : undefined) || {};
     const gl = sm && sm.label ? groupLines[sm.label] || [] : [];
     return {
       key: 'v' + i, label: (r.trims.length ? (s.label || t.name) : name),
@@ -116,12 +116,14 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
   const descBase = `${name} bérlés és tartós bérlet ${huf}/hó-tól${km ? `, ${kmList} km/hó futáskerettel` : ''}${months ? `, ${moList} hónapra` : ''}, kaució ${fmtNum(dep)} €-tól. Vadonatúj, 0 km-es ${lc(body)}`;
   const trimLbl = variants.length > 1 ? variants.map((v) => v.label).join(', ') : '';
   const descLong = descBase + (trimLbl ? ` — ${trimLbl}.` : '.');
-  const description = c.description || (descLong.length <= 175 ? descLong : descBase + ', azonnal vagy hamarosan elérhető.');
+  // Saját raktári modell (r.stock): használt, keveset futott autók — a „Vadonatúj, 0 km-es” állítás kimarad (a rövidített, lefordított leírás-alakkal)
+  const descShort = descBase.split('. Vadonatúj')[0] + '.';
+  const description = c.description || (r.stock ? descShort : (descLong.length <= 175 ? descLong : descBase + ', azonnal vagy hamarosan elérhető.'));
 
   const highlights = c.highlights || [
     { icon: '€', title: `${huf}/hó-tól`, text: `Átlátható havi bérleti díj ${kmTxt} és ${moTxt} — ugyanaz az ár, mint a bérelhető autóink között.` },
     { icon: '⛽', title: r.fuels.length > 1 ? 'Több hajtás közül' : cap(fuelHu(r.fuels[0] || 'benzin')) + ' hajtás', text: variants.length > 1 ? 'Bérelhető: ' + variants.map((v) => v.label + ' (' + fuelHu(v.t.fuel) + ')').join(', ') + '.' : `${cap(fuelsTxt || 'benzin')} hajtás${psTxt ? ', ' + psTxt : ''}, ${gear.toLowerCase()} váltóval.` },
-    { icon: '◈', title: r.count ? `${r.count} db ${name}` : `Bérelhető ${name}`, text: `${r.now ? r.now + ' db azonnal elérhető' : 'Hamarosan elérhető'}${laterTxt ? '; további autók — ' + laterTxt : ''}. Vadonatúj, 0 km-es autók.` },
+    { icon: '◈', title: r.count ? `${r.count} db ${name}` : `Bérelhető ${name}`, text: r.stock ? variants.map((v) => v.label).join(' · ') : `${r.now ? r.now + ' db azonnal elérhető' : 'Hamarosan elérhető'}${laterTxt ? '; további autók — ' + laterTxt : ''}. Vadonatúj, 0 km-es autók.` },
     { icon: '✓', title: 'Szerviz, adó, gumi a díjban', text: `A szervizt, az adót és a nyári-téli gumiszettet mi álljuk — egyszeri, visszajáró kaució ${fmtNum(dep)} €-tól.` },
   ];
 
@@ -133,7 +135,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
     { h3: 'Tartós bérlet, lízing vagy vásárlás?', html: `Ha nem szeretnél tulajdonolni, a <strong>tartós autóbérlés</strong> a legrugalmasabb: nincs önerő, nincs maradványérték-kockázat, és akár félévente új modellre válthatsz. Cégként a bérleti díj elszámolható költség — hasonlóan az <strong>operatív lízinghez</strong>, de hosszú kötöttség nélkül. Ha mégis a sajátod lenne, nézd meg a <a href="/finanszirozas-lizing">lízing</a> és az <a href="${c.egyediSlug ? '/egyedi-auto-rendeles/' + c.egyediSlug : '/egyedi-auto-rendeles'}">egyedi rendelés</a> lehetőségeit.${r.related.length ? ` Más modellt keresel? Nézd meg a bérelhető <a href="${r.related[0].href}">${r.related[0].name}</a>${r.related[1] ? ` és <a href="${r.related[1].href}">${r.related[1].name}</a>` : ''} modelleket is.` : ''}` },
   ];
 
-  const faq = [
+  const faqAll = [
     { q: `Mennyibe kerül ${A} ${name} bérlése?`, a: `${cap(A)} ${name} havi bérleti díja ${huf} (${eur} €) -tól indul ${kmTxt} és ${moTxt}.${variants.length > 1 ? ' Változatonként: ' + variants.map((v) => v.label + ' ' + v.t.eur + ' €/hó-tól').join(', ') + '.' : ''} Pontos, személyre szabott ajánlatért keress minket.` },
     { q: `Mekkora a futáskeret ${A} ${name} tartós bérletnél?`, a: KM_FAQ },
     { q: 'Mit tartalmaz a havi bérleti díj?', a: `A havidíj a vadonatúj ${name} használatát tartalmazza a megadott futáskerettel; a szervizt, az adót és a nyári-téli gumiszettet mi álljuk. A pontos feltételeket az ajánlatban előre, írásban rögzítjük.` },
@@ -143,6 +145,11 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
     ...(c.faqExtra || []),
     { q: `Magánszemélyként és cégként is bérelhető ${A} ${name}?`, a: `Igen, ${A} ${name} tartós bérlet magánszemélyeknek és cégeknek is elérhető. Cégként a bérleti díj a könyvelésben elszámolható költség.` },
   ];
+  const faq = r.stock ? faqAll.filter((f) => !/vadonatúj|Vadonatúj/.test(f.a)) : faqAll;
+  // Raktári modellnél a bevezető a havidíj-mondat (lefordított alak), ezért a „Mennyibe kerül” blokk nem ismétlődik
+  const priceBlock = guideBlocks.find((b: any) => /^Mennyibe kerül /.test(b.h3 || ''));
+  const stockLead = r.stock && !c.overviewLead && priceBlock ? priceBlock.html : '';
+  const guideOut = stockLead ? guideBlocks.filter((b) => b !== priceBlock) : guideBlocks;
 
   const chips = c.chips || [body, ...(r.fuels.length ? [r.fuels.map(fuelCap).join(' · ')] : []), gear, `${kmList} km/hó`];
 
@@ -150,19 +157,19 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
     slug: r.slug, name, brand: r.brand === 'VW' ? 'Volkswagen' : r.brand, brandKey: br.key,
     h1: c.h1 || `${name} bérlés`,
     title, description,
-    heroSub: c.heroSub || `Vadonatúj ${name} tartós bérletben ${huf}/hó-tól — ${kmTxt}, ${moTxt} és egyszeri, visszajáró kaucióval. ${cap(fuelsTxt || 'benzin')} hajtás, ${gear.toLowerCase()} váltó.`,
+    heroSub: c.heroSub || (r.stock ? descShort : '') || `Vadonatúj ${name} tartós bérletben ${huf}/hó-tól — ${kmTxt}, ${moTxt} és egyszeri, visszajáró kaucióval. ${cap(fuelsTxt || 'benzin')} hajtás, ${gear.toLowerCase()} váltó.`,
     heroVideo: c.heroVideo !== undefined ? c.heroVideo : (br.video || ''),
     heroPoster: c.heroPoster || '',
     brandLogo: br.logo, brandLogoInvert: !!br.invert,
-    mainImg: photo, mainAlt: c.mainAlt || `${name} bérlés — vadonatúj ${lc(body)} tartós bérletben`, mainContain: !c.mainImg,
-    chips, yearChip: 'Vadonatúj · 0 km',
+    mainImg: photo, mainAlt: c.mainAlt || (r.stock ? `${name} bérlés` : `${name} bérlés — vadonatúj ${lc(body)} tartós bérletben`), mainContain: !c.mainImg,
+    chips, yearChip: r.stock ? (r.years || '') : 'Vadonatúj · 0 km', used: !!r.stock,
     bodyType: body,
-    overviewH2: c.overviewH2 || `${name} tartós bérlet — vadonatúj ${lc(body)} havidíjjal`,
-    overviewLead: c.overviewLead || `${cap(A)} <strong>${name} bérlés</strong> a legegyszerűbb út egy vadonatúj autóhoz: <strong>tartós bérletben</strong> ${huf}/hó-tól vezetheted, ${kmTxt} és ${moTxt}. ${r.count ? `Jelenleg ${r.count} db ${name} közül választhatsz${r.now ? ` (${r.now} db azonnal elérhető)` : ''}` : 'Több változat közül választhatsz'}${variants.length > 1 ? `, ${variants.map((v) => v.label).join(', ')} kivitelben` : ''}. Egyszeri, visszajáró <strong>kaució</strong> ${fmtNum(dep)} €-tól; a szervizt, az adót és a nyári-téli gumit mi álljuk. Nem kell tulajdonolnod: a bérlet végén egyszerűen visszaadod, vagy új modellre váltasz.`,
+    overviewH2: c.overviewH2 || (r.stock ? `${name} bérlés — így működik a tartós bérlet` : '') || `${name} tartós bérlet — vadonatúj ${lc(body)} havidíjjal`,
+    overviewLead: c.overviewLead || stockLead || `${cap(A)} <strong>${name} bérlés</strong> a legegyszerűbb út egy vadonatúj autóhoz: <strong>tartós bérletben</strong> ${huf}/hó-tól vezetheted, ${kmTxt} és ${moTxt}. ${r.count ? `Jelenleg ${r.count} db ${name} közül választhatsz${r.now ? ` (${r.now} db azonnal elérhető)` : ''}` : 'Több változat közül választhatsz'}${variants.length > 1 ? `, ${variants.map((v) => v.label).join(', ')} kivitelben` : ''}. Egyszeri, visszajáró <strong>kaució</strong> ${fmtNum(dep)} €-tól; a szervizt, az adót és a nyári-téli gumit mi álljuk. Nem kell tulajdonolnod: a bérlet végén egyszerűen visszaadod, vagy új modellre váltasz.`,
     highlights,
     design: c.design ? { ...c.design, text: c.design.text + (r.colors.length ? ` Bérelhető színek: ${r.colors.join(', ')}.` : '') } : null,
     interior: c.interior || null,
-    prose: { h2: `${name} bérlés — így működik a tartós bérlet`, blocks: guideBlocks },
+    prose: { h2: `${name} bérlés — így működik a tartós bérlet`, blocks: guideOut },
     variants, gallery: c.gallery || [],
     faq,
     related: r.related.map((x) => ({ name: x.name, href: x.href, img: x.img, sub: fmtNum(x.huf) + ' Ft/hó-tól' })),
@@ -170,7 +177,7 @@ export function buildRentalModel(r: RentalData, c: RentalContent = {}) {
     rentEur: eur, kaucioEur: dep,
     orderKey: '', orderFuels: r.fuels.join(','), netEur: eur, modelCode: '',
     schema: {
-      modelName: name, modelDate: '2026', bodyTypeEn: body, doors: 5, transmission: gear === 'Automata' ? 'Automatic' : 'Manual',
+      modelName: name, modelDate: r.stock && r.years ? r.years.split(', ').pop() : '2026', bodyTypeEn: body, doors: 5, transmission: gear === 'Automata' ? 'Automatic' : 'Manual',
       drive: '', fuelType: r.fuels.join(', '), engineFuel: r.fuels.join(', '), powerKw: r.psMax ? Math.round(r.psMax * 0.7355) : undefined,
       ...(c.schema || {}),
     },

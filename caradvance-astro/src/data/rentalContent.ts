@@ -94,6 +94,27 @@ export const CONTENT: Record<string, RentalContent> = {
     ],
   },
 
+  // Saját raktári bérautó (nem Choice-modell): a mondatok szerkezete az X5-ével azonos, így minden nyelven fordítva jelenik meg (2026-11-04)
+  'BMW X7': {
+    mainAlt: 'BMW X7 bérlés — nagy prémium SUV tartós bérletben',
+    overviewH2: 'BMW X7 tartós bérlet — a nagy prémium SUV havidíjjal',
+    guideIntro: 'A <strong>BMW X7</strong> a nagy prémium SUV-k mércéje: tágas, kifinomult, hosszú utakon is kivételesen kényelmes, ugyanakkor meglepően dinamikus. <strong>Tartós bérletben</strong> úgy vezetheted, hogy a jelentős vételár és az értékvesztés kockázata nem téged terhel — egyetlen <strong>havi díjat</strong> fizetsz, a szervizt, az adót és a gumikat mi intézzük.',
+    guideBlocks: [
+      { h3: 'Miért a BMW X7 xDrive40d?', html: 'A hathengeres <strong>xDrive40d</strong> dízel az X7 legkedveltebb változata: nagy nyomatékú, takarékos, és utánfutóval is magabiztos (akár 3,5 tonna vontatható tömeg). Az xDrive összkerékhajtás télen és rossz útviszonyok között is biztonságot ad — ideális céges és családi autónak egyaránt.' },
+      { h3: 'BMW X7 méretek és csomagtér', html: 'Hossz 5181 mm, szélesség 2000 mm, magasság 1835 mm, tengelytáv 3105 mm. A csomagtartó 750 literes, a hátsó ülések döntésével akár 2120 literre bővíthető.' },
+    ],
+    boot: '750–2120 liter',
+    specs: {
+      'xDrive40d': { fuel: 'Dízel (mild-hybrid, 6 henger)', power: '352 LE (259 kW)', torque: '720 Nm', drive: 'xDrive összkerék / 8 fok. Steptronic', accel: '5,9 mp', vmax: '250 km/h', rec: 'Nagy nyomaték, takarékos hosszú utakra', note: 'hathengeres dízel, xDrive összkerékhajtással', img: '/bmw/x7.webp?v=6' },
+      'M50d': { power: '400 LE (294 kW)', torque: '760 Nm', drive: 'xDrive összkerék / 8 fok. Steptronic', accel: '5,4 mp', vmax: '250 km/h', rec: 'Sportos, mégis takarékos', note: 'hathengeres dízel, xDrive összkerékhajtással', img: '/bmw/x7.webp?v=6' },
+    },
+    egyediSlug: 'bmw-x7',
+    faqExtra: [
+      { q: 'Mekkora a BMW X7 csomagtartója?', a: 'A BMW X7 csomagtartója 750 literes, a hátsó ülések döntésével akár 2120 literre bővíthető.' },
+      { q: 'Húzhatok utánfutót a bérelt BMW X7-tel?', a: 'Az X7 xDrive40d akár 3500 kg vontatására alkalmas, ha az autó vonóhoroggal szerelt. A konkrét autó felszereltségét az ajánlatban jelezzük.' },
+    ],
+  },
+
   'BMW X6': {
     mainImg: x6.mainImg, mainAlt: 'BMW X6 bérlés — sportos SUV Coupé tartós bérletben',
     heroVideo: x6.heroVideo || '/caradvance-hero-x5.mp4', heroPoster: x6.heroPoster,
