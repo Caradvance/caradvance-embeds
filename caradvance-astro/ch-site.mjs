@@ -267,6 +267,35 @@ function translate(src, l, D, rel, miss) {
   return { h, cover: tot ? (tot - st.miss) / tot : 1 };
 }
 
+// German-language Swiss artwork; other markets and languages are unchanged.
+function swissPageImages(h, l, pagePath) {
+  if (l !== 'de') return h;
+  const groups = { berles: ['rental', 6], elony: ['purchase', 7], 'miert-mi': ['why-us', 9] };
+  h = h.replace(/(?:https:\/\/www\.caradvance\.hu)?\/l10n\/sk\/(berles|elony|miert-mi)-(\d{2})-[^"'\s<>]+\.webp/g, (old, prefix, number) => {
+    const [group, count] = groups[prefix];
+    return +number >= 1 && +number <= count ? `/l10n/ch-de/${group}-${number}-de-CH.png` : old;
+  });
+  if (pagePath === '/kaufen/vorteile/') {
+    h = h.replaceAll('Preis in Euro — kein Wechselkursrisiko', 'Fahrzeugpreis in EUR — Umrechnung in CHF');
+    h = h.replace('Wir kaufen deutsche Autos direkt in Euro, und den Preis weisen wir Ihnen im Angebot von Anfang an klar aus. So wissen Sie genau, wie viel Sie zahlen, und können Ihr Budget im Voraus planen.', 'Wir kaufen deutsche Autos direkt in Euro. Der Endpreis in Schweizer Franken hängt vom EUR/CHF-Wechselkurs ab. Den vereinbarten Preis und die enthaltenen Kosten weisen wir Ihnen in der Offerte transparent aus.');
+  }
+  if (pagePath === '/ueber-uns/' && !h.includes('/why-us-09-de-CH.png')) {
+    const cards = h.match(/<div class="zz(?: flip)?"[^>]*>[\s\S]*?<\/a>\s*<\/div>\s*<\/div>/g) || [];
+    const last = cards.find(card => card.includes('/why-us-08-de-CH.png'));
+    if (!last) throw new Error('Swiss image integration: eighth reason card missing');
+    const ninth = last.replace('class="zz flip"', 'class="zz"')
+      .replace('/why-us-08-de-CH.png', '/why-us-09-de-CH.png')
+      .replace(/alt="[^"]*"/, 'alt="Kommissionsverkauf — gemeinsam helfen"')
+      .replace(/\s+onerror="[^"]*"/, '')
+      .replace(/(<span class="zz-num"[^>]*>)08(<\/span>)/, (_, open, close) => open + '09' + close)
+      .replace(/(<h3\b[^>]*>)[\s\S]*?(<\/h3>)/, '$1Kommissionsverkauf — gemeinsam helfen$2')
+      .replace(/(<p\b[^>]*>)[\s\S]*?(<\/p>)/, '$1Beim Kommissionsverkauf spenden wir <strong>30 % unserer Provision</strong> für wohltätige Zwecke. Sprechen Sie uns an, wenn Sie Ihr Auto mit CarAdvance verkaufen möchten.$2')
+      .replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*>)[\s\S]*?(<\/a>)/, '$1/ch/kontakt/$2Kommissionsverkauf anfragen →$3');
+    h = h.replace(last, last + '\n' + ninth);
+  }
+  return h;
+}
+
 function run() {
   if (!fs.existsSync(SK)) return 'nincs dist/sk';
   const { D, bad } = dicts();
@@ -323,6 +352,7 @@ function run() {
       h = chfHtml(h, R);
       h = chVat(h, l, R);
       h = chPartner(h, l);
+      h = swissPageImages(h, l, plPath);
       if (l === 'de') h = h.replace(/ß/g, 'ss');
       h = h.replace(/[^.<>"]*CO₂[^.<>"]*/g, (m) => m.replace(/6(?:[\s\u00a0’'.]|&nbsp;)?000(?=(?:\s|&nbsp;|\u00a0)?km)/g, '5000'));
       // robots: élesítésig noindex
@@ -447,3 +477,4 @@ function run() {
 }
 
 try { console.log(run()); } catch (e) { console.log('[ch-site] hiba: ' + (e && e.stack || e)); }
+
