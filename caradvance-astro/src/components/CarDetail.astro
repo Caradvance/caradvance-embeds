@@ -87,8 +87,8 @@ const carJson = {
   model: model.schema.modelName, vehicleModelDate: model.schema.modelDate,
   bodyType: model.schema.bodyTypeEn, numberOfDoors: model.schema.doors, vehicleTransmission: model.schema.transmission,
   driveWheelConfiguration: model.schema.drive, fuelType: model.schema.fuelType,
-  itemCondition: 'https://schema.org/NewCondition',
-  mileageFromOdometer: { '@type': 'QuantitativeValue', value: 0, unitCode: 'KMT' },
+  itemCondition: (model as any).used ? 'https://schema.org/UsedCondition' : 'https://schema.org/NewCondition', // raktári bérautó: használt (2026-11-04)
+  mileageFromOdometer: (model as any).used ? undefined : { '@type': 'QuantitativeValue', value: 0, unitCode: 'KMT' },
   vehicleEngine: { '@type': 'EngineSpecification', fuelType: model.schema.engineFuel, enginePower: { '@type': 'QuantitativeValue', value: model.schema.powerKw, unitText: 'kW' }, torque: { '@type': 'QuantitativeValue', value: model.schema.torqueNm, unitText: 'Nm' } },
   speed: { '@type': 'QuantitativeValue', value: model.schema.vmaxKmh, unitCode: 'KMH' },
   accelerationTime: { '@type': 'QuantitativeValue', value: model.schema.accelSec, unitCode: 'SEC' },
@@ -98,7 +98,7 @@ const carJson = {
   offers: isRent ? {
     '@type': 'Offer', price: rentEur, priceCurrency: 'EUR', businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
     priceSpecification: { '@type': 'UnitPriceSpecification', price: rentEur, priceCurrency: 'EUR', unitCode: 'MON', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MON' } },
-    availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition',
+    availability: 'https://schema.org/InStock', itemCondition: (model as any).used ? 'https://schema.org/UsedCondition' : 'https://schema.org/NewCondition',
     priceValidUntil: priceValid, url: pageUrl,
     seller: { '@type': 'Organization', name: 'CarAdvance', url: ORIGIN },
   } : poa ? undefined : {
@@ -150,7 +150,7 @@ const crumbJson = { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
       <nav class="cd-crumb"><a href="/">Főoldal</a> / <a href={isRent ? berlesBack : brandHref}>{isRent ? 'Bérelhető autók' : ('Egyedi ' + model.brand + ' rendelés')}</a> / <b>{model.name}</b></nav>
       <div class="cd-intro-grid">
         <div class="cd-info">
-          <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}<span class="cd-chip cd-chip-year">{model.yearChip}</span></div>
+          <div class="cd-chips">{model.chips.map((c) => (<span class="cd-chip">{c}</span>))}{model.yearChip && (<span class="cd-chip cd-chip-year">{model.yearChip}</span>)}</div>
           {isRent ? (<Fragment><div class="ca-pbox ca-pbox--lg" data-bteur={rentEur} data-fx={FX}><div class="ca-ptop"><span class="ca-seg" role="group" aria-label="Ár megjelenítése"><button type="button" data-bt="c" class="on" aria-pressed="true">Cég</button><button type="button" data-bt="p" aria-pressed="false">Magán</button></span><span class="ca-pt">nettó</span></div><div class="ca-prow"><b class="ca-pv">{rentHuf}</b><span class="ca-pm">/hó -tól</span></div><div class="ca-pe">{rentEur} €/hó · nettó</div></div><link rel="stylesheet" href="/ca-bt.css?v=1" /><script is:inline src="/ca-bt.js?v=6" defer></script>
           <p class="cd-note" data-km={rent && Array.isArray(rent.km) ? rent.km.join(',') : ''}>Havi bérleti díj {'2 000–4 000 km/hó futáskerettel (autótól függően)'}{', legalább ' + Math.max(6, rentMonths || 6) + ' hónapos futamidőre'}; egyszeri, visszatérítendő kaució: <span class="cd-dep-live" data-eur={kaucioEur}>{kaucioHuf}</span> ({nf(kaucioEur)} €)-tól. A kaució a bérlés végén — káresemény nélkül — visszajár. <a href="/berlesi-feltetelek/#kaucio">Mi történik a kaucióval? →</a></p></Fragment>) : (<Fragment>{poa ? (<Fragment><div class="cd-price"><span class="cd-huf">{poaLabel}</span></div>
           <p class="cd-note">{model.soon ? 'Ez a modell hamarosan rendelhető — a hivatalos árlista megjelenése után azonnal közöljük az árat. Kérj előzetes ajánlatot, és elsőként értesítünk.' : 'Ez a modell egyedi ajánlat alapján rendelhető — a pontos árat a kiválasztott motor és felszereltség alapján adjuk meg.'}</p></Fragment>) : (<Fragment><div class="cd-price">{disc ? (<span class="cd-disc">−{disc}%</span>) : null}<span class="cd-net">nettó</span><span class="cd-huf cd-huf-live" id="cdHuf" data-net={model.netEur}>{huf}</span><span class="cd-eur">{eur} -tól</span>{disc ? (<s class="cd-list"><span class="cd-huf-live" data-net={model.listEur}>{listHuf}</span></s>) : null}</div>
