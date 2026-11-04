@@ -155,7 +155,7 @@
   /* ---------- segédek ---------- */
   function q(s, r) { return (r || document).querySelector(s); }
   function qa(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
-  function tx(e) { if (!e) return ''; var s = String(e.textContent || ''); if (e.querySelector) { var av = e.querySelector('.caf-avtr'); if (av) s = s.replace(av.textContent, ' '); } return s.replace(/\s+/g, ' ').trim(); }
+  function tx(e) { if (!e) return ''; var s = String(e.textContent || ''); if (e.querySelector && e.querySelector('.caf-avtr,.caf-fb')) { var c = e.cloneNode(true); [].forEach.call(c.querySelectorAll('.caf-avtr,.caf-fb'), function (x) { x.remove(); }); s = String(c.textContent || ''); } return s.replace(/\s+/g, ' ').trim(); }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function mk(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function shown(e) { if (!e) return false; if (e.hidden) return false; var s = e.style && e.style.display; return s !== 'none'; }
