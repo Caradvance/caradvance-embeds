@@ -95,6 +95,8 @@ const WORD = {
     ['Kontroly a 1-ročná zodpovednosť za vady', 'Kontroly a zodpovednosť za vady'],
     ['— a na každé auto platí 1-ročná zodpovednosť za vady.', '— a zodpovednosť za vady je 1 rok pri jazdených a 2 roky pri nových autách.'],
     ['Na každé predané auto platí 1-ročná zodpovednosť za vady.', 'Na každé predané auto platí zodpovednosť za vady: 1 rok pri jazdených, 2 roky pri nových autách.'],
+    ['; na každé auto platí 1-ročná zodpovednosť za vady.', '; zodpovednosť za vady je 1 rok pri jazdených a 2 roky pri nových autách.'],
+    [', 1-ročná zodpovednosť za vady, dovoz', ', zodpovednosť za vady 1–2 roky (jazdené / nové autá), dovoz'],
     [/>(\s*)1-ročná na každé auto(\s*)</g, (m, a, b) => '>' + a + '1 rok pri jazdených, 2 roky pri nových autách' + b + '<'],
     [/>(\s*)1-ročná(\s*)</g, (m, a, b) => '>' + a + '1–2 roky' + b + '<'],
     // C15
