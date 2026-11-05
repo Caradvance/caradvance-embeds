@@ -19,8 +19,13 @@
     'html.ca-dark select:disabled{color:#7D8796!important}',
     'html.ca-dark ::placeholder{color:#7D8796!important;opacity:1}',
     'html.ca-dark option,html.ca-dark optgroup{background-color:#12151B;color:#E8EBF0}',
-    'html.ca-dark .dm-chip{background-color:#F2F4F7!important;border-radius:10px;padding:4px 8px;box-sizing:content-box}',
-    'html.ca-dark hr{border-color:#2B313C}'
+    'html.ca-dark hr{border-color:#2B313C}',
+    'html.ca-dark .dm-dot{background-color:rgba(255,255,255,.55)!important}',
+    'html.ca-dark .burger span,html.ca-dark .burger i{background-color:#fff!important}',
+    'html.ca-dark .dm-mono{filter:brightness(0) invert(1)!important}',
+    'html.ca-dark .card.charity{background:linear-gradient(135deg,#2B1017 0%,#1B1E26 55%,#1B1E26 100%)!important;border:1px solid rgba(226,0,26,.35)!important;box-shadow:0 24px 60px rgba(0,0,0,.45)!important}',
+    'html.ca-dark .card.charity .org-logo{background-color:#fff!important;border-color:#fff!important}',
+    'html.ca-dark .card.charity .org-logo.org-sos{background-color:#009DE0!important}'
   ].join('\n');
 
   var style = document.createElement('style');
@@ -36,6 +41,22 @@
   }
   function lum(c) { return (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b) / 255; }
   function sat(c) { return Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b); }
+  // sötét háttéren olvashatóvá világosított színes szöveg (pl. piros kiemelés)
+  function lighten(c) {
+    var r = c.r / 255, g = c.g / 255, b = c.b / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), h = 0, s2 = 0, l = (mx + mn) / 2;
+    if (mx !== mn) { var dd = mx - mn; s2 = l > 0.5 ? dd / (2 - mx - mn) : dd / (mx + mn); h = mx === r ? (g - b) / dd + (g < b ? 6 : 0) : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; h /= 6; }
+    l = Math.max(l, 0.66);
+    return 'hsl(' + Math.round(h * 360) + ',' + Math.round(Math.min(1, s2 + 0.1) * 100) + '%,' + Math.round(l * 100) + '%)';
+  }
+  // fehér hátterű fotókeret (autófotó) — fehér marad, hogy a kép egybeolvadjon vele
+  function isPhotoBox(el) {
+    if (el === document.body) return false;
+    var im = el.querySelector('img');
+    if (!im) return false;
+    var src = im.getAttribute('src') || '';
+    if (/logo|brand-|bl-|badge|icon|flag/i.test(src)) return false;
+    return (el.textContent || '').replace(/\s+/g, '').length <= 3;
+  }
   var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, LINK: 1, META: 1, TEMPLATE: 1, BR: 1, IMG: 1, VIDEO: 1, SOURCE: 1, PICTURE: 1, IFRAME: 1, CANVAS: 1 };
 
   // a legközelebbi nem átlátszó háttér sötét-e (átalakítás után)
@@ -52,17 +73,27 @@
     return true;
   }
 
+  var WHITE = [
+    [/\/(brand-bmw\.png|bmw-hero-logo\.png)/, '/bl-bmw.webp'],
+    [/\/(brand-mercedes\.png|mb-star\.webp)/, '/bl-mercedes.webp'],
+    [/\/audi(\/audi)?-logo\.webp/, '/bl-audi.webp'],
+    [/\/(mini-logo\.webp|mini-hero-logo\.webp)/, '/bl-mini.webp']
+  ];
   function fixImg(img) {
     var s = img.getAttribute('src') || '';
     if (img.dataset.dm) return;
     if (/\/caradvance-logo\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('caradvance-logo.webp', 'caradvance-logo-white.webp')); return; }
     if (/\/bl-[a-z0-9-]+-dark\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('-dark.webp', '.webp')); return; }
-    if (/brand-[a-z-]+\.png|euroleasing|merkantil|bmw-hero-logo|mini-logo|mb-star|audi-logo/.test(s) && darkBehind(img.parentElement || img)) { img.classList.add('dm-chip'); img.dataset.dm = 'chip'; }
+    if (!darkBehind(img.parentElement || img)) return;
+    for (var i = 0; i < WHITE.length; i++) {
+      if (WHITE[i][0].test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace(/^(https?:\/\/[^/]+)?\/.*$/, function (all, origin) { return (origin || '') + WHITE[i][1]; })); return; }
+    }
+    if (/brand-porsche\.png|euroleasing|merkantil/.test(s)) { img.classList.add('dm-mono'); img.dataset.dm = 'mono'; }
   }
   function unfixImgs() {
     document.querySelectorAll('img[data-dm]').forEach(function (img) {
       var o = img.dataset.dm;
-      if (o === 'chip') img.classList.remove('dm-chip'); else img.setAttribute('src', o);
+      if (o === 'mono') img.classList.remove('dm-mono'); else img.setAttribute('src', o);
       delete img.dataset.dm;
     });
   }
@@ -76,7 +107,11 @@
       if (el.closest('svg') && el.tagName.toLowerCase() !== 'svg') continue;
       var cs = getComputedStyle(el);
       var bg = rgba(cs.backgroundColor);
-      if (bg && bg.a > 0.35 && sat(bg) < 40 && lum(bg) > 0.82) el.classList.add(lum(bg) > 0.95 ? 'dm-s' : 'dm-s2');
+      if (bg && bg.a > 0.35 && sat(bg) < 40 && lum(bg) > 0.82) {
+        if (!isPhotoBox(el)) el.classList.add(lum(bg) > 0.95 ? 'dm-s' : 'dm-s2');
+      } else if (bg && bg.a > 0.5 && sat(bg) < 40 && lum(bg) < 0.3 && el.offsetWidth > 0 && el.offsetWidth <= 14 && el.offsetHeight <= 14 && darkBehind(el.parentElement || el)) {
+        el.classList.add('dm-dot');
+      }
       var bi = cs.backgroundImage;
       if (bi && bi.indexOf('gradient') >= 0 && bi.indexOf('url(') < 0) {
         var cols = bi.match(/rgba?\([^)]+\)/g) || [];
@@ -88,8 +123,44 @@
       if (c && c.a > 0.3 && sat(c) < 45) {
         var L = lum(c);
         if (L < 0.5 && darkBehind(el)) el.classList.add(L < 0.3 ? 'dm-t' : 'dm-t2');
+      } else if (c && c.a > 0.3 && lum(c) < 0.42 && !el.hasAttribute('data-dmc') && darkBehind(el)) {
+        el.setAttribute('data-dmc', el.style.getPropertyValue('color') || '');
+        el.style.setProperty('color', lighten(c), 'important');
       }
     }
+  }
+
+  // :hover / :focus / aktív állapotok világos háttereinek felülírása (ezeket a pásztázás nem látja)
+  var probe = null;
+  function resolve(v) {
+    if (!v) return null;
+    if (!probe) { probe = document.createElement('i'); probe.style.display = 'none'; document.body.appendChild(probe); }
+    probe.style.color = ''; probe.style.color = v;
+    return rgba(getComputedStyle(probe).color);
+  }
+  function splitSel(sel) { var out = [], depth = 0, cur = ''; for (var i = 0; i < sel.length; i++) { var ch = sel[i]; if (ch === '(') depth++; if (ch === ')') depth--; if (ch === ',' && !depth) { out.push(cur); cur = ''; } else cur += ch; } out.push(cur); return out.map(function (x) { return x.trim(); }).filter(Boolean); }
+  function pre(sel) { return /^html\b/.test(sel) ? sel.replace(/^html/, 'html.ca-dark') : (/^:root/.test(sel) ? sel.replace(/^:root/, 'html.ca-dark') : 'html.ca-dark ' + sel); }
+  var STATE = /:hover|:focus|:active|:checked|\.active\b|\.open\b|\.is-|\.on\b|\.sel\b|\[aria-(selected|expanded|current|pressed)/;
+  var sheetDone = false;
+  function sheetPass() {
+    if (sheetDone || !document.body) return; sheetDone = true;
+    var rules = [];
+    function walk(list) { for (var i = 0; i < list.length; i++) { var r = list[i]; if (r.cssRules && !r.selectorText) { try { walk(r.cssRules); } catch (e) {} } else if (r.selectorText && STATE.test(r.selectorText)) rules.push(r); } }
+    for (var i = 0; i < document.styleSheets.length; i++) { var sh = document.styleSheets[i]; if (sh.ownerNode && sh.ownerNode.id && sh.ownerNode.id.indexOf('ca-dark') === 0) continue; try { walk(sh.cssRules); } catch (e) {} }
+    var out = [];
+    rules.forEach(function (r) {
+      var st = r.style, decl = [];
+      var bgv = st.getPropertyValue('background-color'), bgc = resolve(bgv);
+      if (bgc && bgc.a > 0.35 && sat(bgc) < 40 && lum(bgc) > 0.82) decl.push('background-color:' + (lum(bgc) > 0.95 ? '#232833' : '#262C37') + '!important');
+      var bim = st.getPropertyValue('background-image');
+      if (bim && bim.indexOf('gradient') >= 0 && bim.indexOf('url(') < 0) { var cols = bim.match(/rgba?\([^)]+\)|#[0-9a-f]{3,8}\b/gi) || []; if (cols.length && cols.every(function (x) { var q = resolve(x); return q && (q.a < 0.2 || (lum(q) > 0.82 && sat(q) < 40)); })) decl.push('background-image:none!important;background-color:#232833!important'); }
+      var cc = resolve(st.getPropertyValue('color'));
+      if (cc && cc.a > 0.3 && lum(cc) < 0.42) decl.push('color:' + (sat(cc) < 45 ? '#F1F3F6' : lighten(cc)) + '!important');
+      var bdc = resolve(st.getPropertyValue('border-top-color'));
+      if (bdc && lum(bdc) > 0.78 && sat(bdc) < 40) decl.push('border-color:#3A414D!important');
+      if (decl.length) out.push(splitSel(r.selectorText).map(pre).join(',') + '{' + decl.join(';') + '}');
+    });
+    var st2 = document.createElement('style'); st2.id = 'ca-dark-states'; st2.textContent = out.join('\n'); document.head.appendChild(st2);
   }
 
   var pending = null;
@@ -107,17 +178,20 @@
       document.querySelectorAll('.' + k).forEach(function (e) { e.classList.remove(k); });
     });
     unfixImgs();
+    document.querySelectorAll('[data-dmc]').forEach(function (e) { var o = e.getAttribute('data-dmc'); e.style.removeProperty('color'); if (o) e.style.setProperty('color', o); e.removeAttribute('data-dmc'); });
+    var st2 = document.getElementById('ca-dark-states'); if (st2) st2.disabled = true;
   }
   function apply() {
     if (mq.matches) {
       d.classList.add('ca-dark');
-      if (document.body) { scan(); obs.observe(document.body, { childList: true, subtree: true }); setTimeout(function () { scan(); }, 1200); }
+      var st3 = document.getElementById('ca-dark-states'); if (st3) st3.disabled = false;
+      if (document.body) { sheetPass(); scan(); obs.observe(document.body, { childList: true, subtree: true }); setTimeout(function () { scan(); }, 1200); }
     } else {
       obs.disconnect(); d.classList.remove('ca-dark'); clearAll();
     }
   }
   if (mq.matches) d.classList.add('ca-dark');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply();
-  window.addEventListener('load', function () { if (mq.matches) scan(); });
+  window.addEventListener('load', function () { if (mq.matches) { sheetDone = false; var o = document.getElementById('ca-dark-states'); if (o) o.remove(); sheetPass(); scan(); } });
   if (mq.addEventListener) mq.addEventListener('change', apply); else if (mq.addListener) mq.addListener(apply);
 })();
