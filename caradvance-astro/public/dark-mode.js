@@ -17,7 +17,7 @@
     'html.ca-dark .dm-b{border-color:#2B313C!important}',
     'html.ca-dark input:not([type=checkbox]):not([type=radio]):not([type=range]),html.ca-dark select,html.ca-dark textarea{background-color:#12151B!important;color:#E8EBF0!important;border-color:#343B47!important}',
     'html.ca-dark select:disabled{color:#7D8796!important}',
-    'html.ca-dark ::placeholder{color:#7D8796!important;opacity:1}',
+    'html.ca-dark ::placeholder{color:#7D8796;opacity:1}','html.ca-dark .caf-f:not(:focus-within) input::placeholder,html.ca-dark .caf-f:not(:focus-within) textarea::placeholder{color:transparent}',
     'html.ca-dark option,html.ca-dark optgroup{background-color:#12151B;color:#E8EBF0}',
     'html.ca-dark hr{border-color:#2B313C}',
     'html.ca-dark .cstage{background-color:#B4BAC2!important}',
