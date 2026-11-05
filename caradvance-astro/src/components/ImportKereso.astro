@@ -18,6 +18,22 @@ const FEATS = [['PANORAMIC_GLASS_ROOF','Panorámatető'],['SUNROOF','Napfénytet
 const terms = ['12','24','36','48','60','72','84','96'];
 const BUDGETS = ['5 000 000','7 500 000','10 000 000','12 500 000','15 000 000','20 000 000','25 000 000','30 000 000','40 000 000','50 000 000','75 000 000','100 000 000'];
 const KMS = ['10000','20000','30000','50000','75000','100000','125000','150000','200000'];
+const BODIES = [
+  ['Cabrio','Kabrió / Roadster','M4 22H3v-6l12-2h42l5 2v6h-2M20 22h24M24 14l4-6'],
+  ['OffRoad','Terepjáró / SUV / Pickup','M4 22H3v-8l8-2 6-8h28l8 8 8 2v8h-2M20 22h24'],
+  ['SmallCar','Kisautó','M4 22H3v-6l8-3 8-7h17l8 9 8 2v5h-2M20 22h24'],
+  ['EstateCar','Kombi','M4 22H3v-6l9-3 8-7h31l6 9 4 1v6h-2M20 22h24'],
+  ['Limousine','Limuzin / Sedan','M4 22H3v-6l10-3 9-6h17l9 6 11 2v7h-2M20 22h24'],
+  ['SportsCar','Sportautó / Coupé','M4 22H3v-5l12-3 10-5h13l11 6 12 2v5h-2M20 22h24'],
+  ['Van','Egyterű / Kisbusz','M4 22H3V9l4-5h45l9 9v9h-2M20 22h24'],
+  ['OtherCar','Egyéb','']
+];
+const SWATCH = { BLACK:'#15171b', WHITE:'#ffffff', GREY:'#8a8f98', SILVER:'linear-gradient(135deg,#f1f3f5,#a7aeb6)', BLUE:'#1f5fbf', RED:'#d0021b', GREEN:'#2e8b57', BROWN:'#7b4a2a', BEIGE:'#d9c6a5', GOLD:'linear-gradient(135deg,#f3d27a,#b8860b)', YELLOW:'#f5c400', ORANGE:'#f28c28', PURPLE:'#7b3fa0' };
+const MAINT = [['FULL_SERVICE_HISTORY','Vezetett szervizkönyv'],['NEW_SERVICE','Friss szerviz'],['NONSMOKER_VEHICLE','Nemdohányzó autó'],['WARRANTY','Garancia']];
+const PARK = [['CAM_360_DEGREES','360°-os kamera'],['REAR_VIEW_CAM','Tolatókamera'],['FRONT_SENSORS','Parkolóradar elöl'],['REAR_SENSORS','Parkolóradar hátul'],['REAR_TRAFFIC_ALERT','Hátsó keresztforgalom-figyelő'],['AUTOMATIC_PARKING','Önparkoló rendszer']];
+const EXTRAS = [['ABS','ABS'],['BENDING_LIGHTS','Kanyarkövető fényszóró'],['ADAPTIVE_LIGHTING','Adaptív fényszóró'],['AIR_SUSPENSION','Légrugózás'],['ALL_SEASON_TIRES','Négyévszakos gumik'],['ALLOY_WHEELS','Könnyűfém felni'],['BI_XENON_HEADLIGHTS','Bi-xenon fényszóró'],['BLIND_SPOT_MONITOR','Holttérfigyelő'],['CENTRAL_LOCKING','Központi zár'],['DAYTIME_RUNNING_LIGHTS','Nappali menetfény'],['DISABLED_ACCESSIBLE','Mozgáskorlátozott-barát'],['DISTANCE_WARNING_SYSTEM','Távolságfigyelő'],['DYNAMIC_CHASSIS_CONTROL','Adaptív futómű'],['ELECTRIC_TAILGATE','Elektromos csomagtérajtó'],['COLLISION_AVOIDANCE','Vészfékasszisztens'],['EMERGENCY_TYRE','Mankókerék'],['EMERGENCY_TYRE_REPAIR_KIT','Defektjavító készlet'],['ESP','ESP'],['FOG_LAMPS','Ködlámpa'],['FOLDING_ROOF','Nyitható tető'],['GLARE_FREE_HIGH_BEAM','Nem vakító távfény (mátrix)'],['HEADLIGHT_WASHER_SYSTEM','Fényszórómosó'],['HEATED_WINDSHIELD','Fűthető szélvédő'],['HIGH_BEAM_ASSIST','Távfényasszisztens'],['HILL_START_ASSIST','Emelkedőn elindulást segítő'],['IMMOBILIZER','Indításgátló'],['KEYLESS_ENTRY','Kulcs nélküli nyitás'],['LANE_DEPARTURE_WARNING','Sávtartó asszisztens'],['LASER_HEADLIGHTS','Lézer fényszóró'],['LED_HEADLIGHTS','LED fényszóró'],['LED_RUNNING_LIGHTS','LED nappali menetfény'],['LIGHT_SENSOR','Fényérzékelő'],['NIGHT_VISION_ASSIST','Éjjellátó'],['PANORAMIC_GLASS_ROOF','Panorámatető'],['POWER_ASSISTED_STEERING','Szervokormány'],['AUTOMATIC_RAIN_SENSOR','Esőérzékelő'],['ROOF_RAILS','Tetősín'],['SPARE_TYRE','Pótkerék'],['SPEED_LIMITER','Sebességkorlátozó'],['SPORT_PACKAGE','Sportcsomag'],['PERFORMANCE_HANDLING_SYSTEM','Sportfutómű'],['START_STOP_SYSTEM','Start-stop rendszer'],['STEEL_WHEELS','Acélfelni'],['SUMMER_TIRES','Nyári gumik'],['SUNROOF','Napfénytető'],['TINTED_WINDOWS','Sötétített üvegek'],['TRACTION_CONTROL_SYSTEM','Kipörgésgátló'],['TRAFFIC_SIGN_RECOGNITION','Táblafelismerő'],['TYRE_PRESSURE_MONITORING','Keréknyomás-ellenőrző'],['WINTER_PACKAGE','Télicsomag'],['WINTER_TIRES','Téli gumik'],['XENON_HEADLIGHTS','Xenon fényszóró']];
+const INTFEAT = [['ALARM_SYSTEM','Riasztó'],['AMBIENT_LIGHTING','Ambiente világítás'],['ANDROID_AUTO','Android Auto'],['CARPLAY','Apple CarPlay'],['ARM_REST','Kartámasz'],['AUTOMATICALLY_DIMMING_INTERIOR_MIRROR','Automatikusan sötétedő belső tükör'],['AUXILIARY_HEATING','Állófűtés'],['BLUETOOTH','Bluetooth'],['CARGO_BARRIER','Csomagtérrács'],['CD_PLAYER','CD-lejátszó'],['DIGITAL_RADIO','DAB rádió'],['DIGITAL_COCKPIT','Digitális műszerfal'],['ELECTRIC_BACKSEAT_ADJUSTMENT','Elektromos hátsóülés-állítás'],['ELECTRIC_ADJUSTABLE_SEATS','Elektromos ülésállítás'],['ELECTRIC_EXTERIOR_MIRRORS','Elektromos külső tükör'],['ELECTRIC_WINDOWS','Elektromos ablakok'],['MEMORY_SEATS','Memóriás elektromos ülések'],['EMERGENCY_CALL_SYSTEM','Segélyhívó rendszer'],['FATIGUE_WARNING_SYSTEM','Fáradtságfigyelő'],['FOLD_FLAT_PASSENGER_SEAT','Lehajtható utasülés'],['FOLDING_EXTERIOR_MIRRORS','Behajtható külső tükör'],['HANDS_FREE_PHONE_SYSTEM','Kihangosító'],['HEAD_UP_DISPLAY','Head-up display'],['ELECTRIC_HEATED_SEATS','Ülésfűtés'],['ELECTRIC_HEATED_REAR_SEATS','Hátsó ülésfűtés'],['HEATED_STEERING_WHEEL','Kormányfűtés'],['WIRELESS_CHARGING','Vezeték nélküli töltés'],['MUSIC_STREAMING','Zenestreaming'],['ISOFIX','Isofix'],['ISOFIX_PASSENGER_SEAT','Isofix az utasülésen'],['LEATHER_STEERING_WHEEL','Bőrkormány'],['LUMBAR_SUPPORT','Deréktámasz'],['MASSAGE_SEATS','Masszázsülés'],['MULTIFUNCTIONAL_WHEEL','Multikormány'],['NAVIGATION_SYSTEM','Navigáció'],['ON_BOARD_COMPUTER','Fedélzeti számítógép'],['PADDLE_SHIFTERS','Váltófülek'],['RIGHT_HAND_DRIVE','Jobbkormányos'],['VENTILATED_SEATS','Ülésszellőzés'],['SKI_BAG','Sízsák'],['SMOKERS_PACKAGE','Dohányzócsomag'],['SOUND_SYSTEM','Prémium hangrendszer'],['SPORT_SEATS','Sportülések'],['TOUCHSCREEN','Érintőképernyő'],['TUNER','Rádió'],['TV','TV'],['USB','USB'],['VIRTUAL_SIDE_MIRROR','Virtuális visszapillantó'],['VOICE_CONTROL','Hangvezérlés'],['WIFI_HOTSPOT','Wi-Fi hotspot']];
+const REGTYPES = ['Klasszikus','Bemutató autó','Dolgozói autó','Napi rendszámos (előregisztrált)','Volt taxi'];
 
 const faqJsonld = {
   '@context': 'https://schema.org',
@@ -89,74 +105,166 @@ const faqJsonld = {
         </div>
 
         <div class="ik-more" id="ikMore" hidden>
-          <p class="kw-hint" style="margin-top:0">A szűrők ugyanazok, mint a <b>mobile.de</b> keresőjében — pontosan ezekkel a feltételekkel keresünk a teljes kínálatban.</p>
-          <div class="sf-grid">
-            <label class="sf-field"><span>Modell-leírás <small style="font-weight:600;color:var(--muted)">(opcionális)</small></span>
-              <input id="b-type" type="text" placeholder="pl. M Sport, Touring, AMG Line" />
-            </label>
-            <label class="sf-field"><span>Állapot</span>
-              <select id="b-con"><option value="">Bármely</option><option value="USED">Használt</option><option value="NEW">Új</option></select>
-            </label>
-            <label class="sf-field"><span>Évjárat (ig)</span>
-              <select id="b-year-to"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
-            </label>
-            <label class="sf-field"><span>Futásteljesítmény (min.)</span>
-              <select id="b-km-from"><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
-            </label>
-          </div>
-          <div class="sf-grid">
-            <label class="sf-field"><span>Hajtás</span>
-              <select id="b-drive"><option value="">Bármely</option><option value="ALL_WHEEL">Összkerékhajtás</option><option value="FRONT">Elsőkerék-hajtás</option><option value="REAR">Hátsókerék-hajtás</option></select>
-            </label>
-            <label class="sf-field"><span>Teljesítmény — tól (LE)</span>
-              <input id="b-hp-from" type="text" inputmode="numeric" placeholder="pl. 150" />
-            </label>
-            <label class="sf-field"><span>Teljesítmény — ig (LE)</span>
-              <input id="b-hp-to" type="text" inputmode="numeric" placeholder="Bármely" />
-            </label>
-          </div>
-          <div class="kw-sub">Üzemanyag <small>(több is választható)</small></div>
-          <div class="kw-chips" data-mf="ft">{FUELS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
-          <div class="kw-sub">Karosszéria <small>(több is választható)</small></div>
-          <div class="kw-chips" data-mf="c">{CATS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
-          <div class="sf-grid" style="margin-top:18px">
-            <label class="sf-field"><span>Ajtók száma</span>
-              <select id="b-door"><option value="">Bármely</option><option value="TWO_OR_THREE">2/3</option><option value="FOUR_OR_FIVE">4/5</option><option value="SIX_OR_SEVEN">6/7</option></select>
-            </label>
-            <label class="sf-field"><span>Ülések — tól</span>
-              <select id="b-seat-from"><option value="">Bármely</option>{[2,3,4,5,6,7,8,9].map((n) => <option>{n}</option>)}</select>
-            </label>
-            <label class="sf-field"><span>Ülések — ig</span>
-              <select id="b-seat-to"><option value="">Bármely</option>{[2,3,4,5,6,7,8,9].map((n) => <option>{n}</option>)}</select>
-            </label>
-            <label class="sf-field"><span>Előző tulajdonosok (max.)</span>
-              <select id="b-owners"><option value="">Bármely</option><option value="1">legfeljebb 1</option><option value="2">legfeljebb 2</option><option value="3">legfeljebb 3</option><option value="4">legfeljebb 4</option></select>
-            </label>
-          </div>
-          <div class="sf-grid">
-            <label class="sf-field"><span>Emissziós osztály (min.)</span>
-              <select id="b-emc"><option value="">Bármely</option><option value="EURO4">Euro 4</option><option value="EURO5">Euro 5</option><option value="EURO6">Euro 6</option><option value="EURO6C">Euro 6c</option><option value="EURO6D_TEMP">Euro 6d-TEMP</option><option value="EURO6D">Euro 6d</option><option value="EURO6E">Euro 6e</option></select>
-            </label>
-            <label class="sf-field"><span>Klíma</span>
-              <select id="b-clim"><option value="">Bármely</option><option value="MANUAL_CLIMATISATION">Manuális vagy automata</option><option value="AUTOMATIC_CLIMATISATION">Automata klíma</option><option value="AUTOMATIC_CLIMATISATION_2_ZONES">Automata, 2 zónás</option><option value="AUTOMATIC_CLIMATISATION_3_ZONES">Automata, 3 zónás</option><option value="AUTOMATIC_CLIMATISATION_4_ZONES">Automata, 4 zónás</option></select>
-            </label>
-            <label class="sf-field"><span>Tempomat</span>
-              <select id="b-cruise"><option value="">Bármely</option><option value="CRUISE_CONTROL">Tempomat</option><option value="ADAPTIVE_CRUISE_CONTROL">Adaptív tempomat (ACC)</option></select>
-            </label>
-            <label class="sf-field"><span>Vonóhorog</span>
-              <select id="b-tow"><option value="">Bármely</option><option value="TRAILER_COUPLING_FIX">Van (fix, levehető vagy behajtható)</option><option value="TRAILER_COUPLING_DETACHABLE">Levehető vagy behajtható</option><option value="TRAILER_COUPLING_SWIVELING">Behajtható</option></select>
-            </label>
-          </div>
-          <div class="kw-sub">Külső szín</div>
-          <div class="kw-chips" data-mf="ecol">{COLORS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
-          <label class="kw-chip kw-chip-solo"><input type="checkbox" id="b-metal" /><span>Csak metálfényezés</span></label>
-          <div class="kw-sub">Belső szín</div>
-          <div class="kw-chips" data-mf="icol">{ICOLORS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
-          <div class="kw-sub">Kárpit</div>
-          <div class="kw-chips" data-mf="it">{ITYPES.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
-          <div class="kw-sub">Felszereltség <small>(ami mindenképp legyen benne)</small></div>
-          <div class="kw-chips" data-mf="fe">{FEATS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
-          <label class="sf-field sf-full"><span>Mi még fontos? (felszereltség, extrák, kizárt dolgok)</span>
+          <!-- Részletes keresés — a mobile.de részletes keresőjének felépítése szerint -->
+          <section class="ik-sec">
+            <h3>Alapadatok</h3>
+            <div class="sf-grid ik-grid">
+              <label class="sf-field"><span>Változat <small style="font-weight:600;color:var(--muted)">(opcionális)</small></span>
+                <input id="b-type" type="text" placeholder="pl. GTI, M Sport, AMG Line" />
+              </label>
+              <label class="sf-field"><span>Állapot</span>
+                <select id="b-con"><option value="">Bármely</option><option value="NEW">Új</option><option value="USED">Használt</option></select>
+              </label>
+              <label class="sf-field"><span>Eladó</span>
+                <select id="b-seller" data-lead="Eladó"><option value="">Bármely</option><option>Kereskedő</option><option>Magánszemély</option><option>Céges autó</option></select>
+              </label>
+              <label class="sf-field"><span>Előző tulajdonosok (max.)</span>
+                <select id="b-owners"><option value="">Bármely</option><option value="1">legfeljebb 1</option><option value="2">legfeljebb 2</option><option value="3">legfeljebb 3</option><option value="4">legfeljebb 4</option></select>
+              </label>
+            </div>
+            <div class="ik-sub">Karosszéria</div>
+            <div class="ik-checks ik-bodies" data-mf="c">{BODIES.map(([c, l, d]) => <label class="ik-check ik-body"><input type="checkbox" value={c} data-hu={l} />{d ? <svg viewBox="0 0 64 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={d} /><circle cx="15" cy="22" r="4.5" /><circle cx="49" cy="22" r="4.5" /></svg> : null}<span>{l}</span></label>)}</div>
+            <div class="sf-grid ik-grid" style="margin-top:20px">
+              <label class="sf-field"><span>Ülések — tól</span>
+                <select id="b-seat-from"><option value="">Bármely</option>{[2,3,4,5,6,7,8,9,10].map((n) => <option>{n}</option>)}</select>
+              </label>
+              <label class="sf-field"><span>Ülések — ig</span>
+                <select id="b-seat-to"><option value="">Bármely</option>{[2,3,4,5,6,7,8,9,10].map((n) => <option>{n}</option>)}</select>
+              </label>
+              <label class="sf-field"><span>Ajtók száma</span>
+                <select id="b-door"><option value="">Bármely</option><option value="TWO_OR_THREE">2/3</option><option value="FOUR_OR_FIVE">4/5</option><option value="SIX_OR_SEVEN">6/7</option></select>
+              </label>
+              <label class="sf-field"><span>Tolóajtó</span>
+                <select id="b-slide" data-lead="Tolóajtó"><option value="">Bármely</option><option>Jobb oldali tolóajtó</option><option>Bal oldali tolóajtó</option><option>Mindkét oldali tolóajtó</option></select>
+              </label>
+            </div>
+            <div class="sf-grid ik-grid">
+              <label class="sf-field"><span>Költségvetés (min.)</span>
+                <select id="b-budget-from" data-lead="Költségkeret (min)"><option value="" selected>Bármely</option>{BUDGETS.map((b) => <option value={b}>{b} Ft</option>)}</select>
+              </label>
+              <label class="sf-field"><span>Évjárat (ig)</span>
+                <select id="b-year-to"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
+              </label>
+              <label class="sf-field"><span>Futásteljesítmény (min.)</span>
+                <select id="b-km-from"><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
+              </label>
+              <label class="sf-field"><span>Műszaki vizsga érvényes</span>
+                <select id="b-tuv" data-lead="Műszaki vizsga érvényes"><option value="">Bármely</option><option>Új vizsga</option><option>legalább 3 hónap</option><option>legalább 6 hónap</option><option>legalább 9 hónap</option><option>legalább 12 hónap</option><option>legalább 18 hónap</option></select>
+              </label>
+            </div>
+            <div class="ik-sub">Karbantartás</div>
+            <div class="ik-checks" data-mf="fm" data-q="fe" data-lead="Karbantartás">{MAINT.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}<label class="ik-check"><input type="checkbox" id="b-roadworthy" data-lead="Közlekedésre alkalmas" /><span>Közlekedésre alkalmas</span></label></div>
+          </section>
+
+          <section class="ik-sec">
+            <h3>Műszaki adatok</h3>
+            <div class="ik-sub" style="margin-top:0">Üzemanyag <small>(több is választható)</small></div>
+            <div class="ik-checks" data-mf="ft">{FUELS.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+            <div class="sf-grid ik-grid" style="margin-top:20px">
+              <label class="sf-field"><span>Teljesítmény — tól (LE)</span>
+                <input id="b-hp-from" type="text" inputmode="numeric" placeholder="pl. 150" />
+              </label>
+              <label class="sf-field"><span>Teljesítmény — ig (LE)</span>
+                <input id="b-hp-to" type="text" inputmode="numeric" placeholder="Bármely" />
+              </label>
+              <label class="sf-field"><span>Hengerűrtartalom — tól (cm³)</span>
+                <input id="b-cc-from" type="text" inputmode="numeric" placeholder="pl. 1 500" data-lead="Hengerűrtartalom (tól, cm³)" />
+              </label>
+              <label class="sf-field"><span>Hengerűrtartalom — ig (cm³)</span>
+                <input id="b-cc-to" type="text" inputmode="numeric" placeholder="Bármely" data-lead="Hengerűrtartalom (ig, cm³)" />
+              </label>
+            </div>
+            <div class="sf-grid ik-grid">
+              <label class="sf-field"><span>Hajtás</span>
+                <select id="b-drive"><option value="">Bármely</option><option value="ALL_WHEEL">Összkerékhajtás</option><option value="FRONT">Elsőkerék-hajtás</option><option value="REAR">Hátsókerék-hajtás</option></select>
+              </label>
+              <label class="sf-field"><span>Kombinált fogyasztás (max.)</span>
+                <select id="b-cons" data-lead="Kombinált fogyasztás (max.)"><option value="">Bármely</option>{[3,4,5,6,7,8,9,10,12,15].map((n) => <option>{n} l/100 km</option>)}</select>
+              </label>
+              <label class="sf-field"><span>Környezetvédelmi matrica</span>
+                <select id="b-sticker" data-lead="Környezetvédelmi matrica"><option value="">Bármely</option><option>1 (nincs)</option><option>2 (piros)</option><option>3 (sárga)</option><option>4 (zöld)</option></select>
+              </label>
+              <label class="sf-field"><span>Emissziós osztály (min.)</span>
+                <select id="b-emc"><option value="">Bármely</option><option value="EURO1">Euro 1</option><option value="EURO2">Euro 2</option><option value="EURO3">Euro 3</option><option value="EURO4">Euro 4</option><option value="EURO5">Euro 5</option><option value="EURO6">Euro 6</option><option value="EURO6C">Euro 6c</option><option value="EURO6D_TEMP">Euro 6d-TEMP</option><option value="EURO6D">Euro 6d</option><option value="EURO6E">Euro 6e</option></select>
+              </label>
+            </div>
+            <div class="ik-checks" data-mf="fpf" data-q="fe" data-lead="Részecskeszűrő" style="margin-top:6px"><label class="ik-check"><input type="checkbox" value="PARTICULATE_FILTER_DIESEL" data-hu="igen" /><span>Részecskeszűrő</span></label></div>
+          </section>
+
+          <section class="ik-sec">
+            <h3>Külső</h3>
+            <div class="ik-sub" style="margin-top:0">Külső szín</div>
+            <div class="ik-checks" data-mf="ecol">{COLORS.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><i class="ik-sw" style={'background:' + (SWATCH[c] || '#ccc')}></i><span>{l}</span></label>)}</div>
+            <div class="ik-checks" style="margin-top:12px">
+              <label class="ik-check"><input type="checkbox" id="b-matt" data-lead="Matt fényezés" /><span>Matt</span></label>
+              <label class="ik-check"><input type="checkbox" id="b-metal" /><span>Metál</span></label>
+            </div>
+            <div class="sf-grid ik-grid" style="margin-top:20px">
+              <label class="sf-field"><span>Vonóhorog</span>
+                <select id="b-tow"><option value="">Bármely</option><option value="TRAILER_COUPLING_FIX">Fix, levehető vagy behajtható</option><option value="TRAILER_COUPLING_DETACHABLE">Levehető vagy behajtható</option><option value="TRAILER_COUPLING_SWIVELING">Behajtható</option></select>
+              </label>
+              <label class="sf-field"><span>Fékezett vontatható tömeg (min.)</span>
+                <input id="b-tl-braked" type="text" inputmode="numeric" placeholder="kg" data-lead="Fékezett vontatható tömeg (min., kg)" />
+              </label>
+              <label class="sf-field"><span>Fékezetlen vontatható tömeg (min.)</span>
+                <input id="b-tl-unbraked" type="text" inputmode="numeric" placeholder="kg" data-lead="Fékezetlen vontatható tömeg (min., kg)" />
+              </label>
+              <label class="sf-field"><span>Támaszterhelés (min.)</span>
+                <input id="b-tl-support" type="text" inputmode="numeric" placeholder="kg" data-lead="Támaszterhelés (min., kg)" />
+              </label>
+            </div>
+            <div class="ik-checks" style="margin-top:6px"><label class="ik-check"><input type="checkbox" id="b-trailer-assist" data-lead="Utánfutó-asszisztens" /><span>Utánfutó-asszisztens</span></label></div>
+            <div class="ik-sub">Parkolássegítő</div>
+            <div class="ik-checks" data-mf="fp" data-q="fe" data-lead="Parkolássegítő">{PARK.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+            <div class="sf-grid ik-grid" style="margin-top:20px">
+              <label class="sf-field"><span>Tempomat</span>
+                <select id="b-cruise"><option value="">Bármely</option><option value="CRUISE_CONTROL">Tempomat</option><option value="ADAPTIVE_CRUISE_CONTROL">Adaptív tempomat (ACC)</option></select>
+              </label>
+            </div>
+            <div class="ik-sub">Extrák</div>
+            <div class="ik-checks" data-mf="fx" data-q="fe" data-lead="Extrák (külső)">{EXTRAS.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          </section>
+
+          <section class="ik-sec">
+            <h3>Belső</h3>
+            <div class="ik-sub" style="margin-top:0">Belső szín</div>
+            <div class="ik-checks" data-mf="icol">{ICOLORS.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><i class="ik-sw" style={'background:' + (SWATCH[c] || 'conic-gradient(#e2001a,#f5c400,#1a9e4a,#1f6fd1,#e2001a)')}></i><span>{l}</span></label>)}</div>
+            <div class="ik-sub">Kárpit</div>
+            <div class="ik-checks" data-mf="it">{ITYPES.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+            <div class="sf-grid ik-grid" style="margin-top:20px">
+              <label class="sf-field"><span>Légzsákok</span>
+                <select id="b-airbag" data-lead="Légzsákok"><option value="">Bármely</option><option>Vezetőoldali légzsák</option><option>Első légzsákok</option><option>Első és oldalsó légzsákok</option><option>Első, oldalsó és további légzsákok</option></select>
+              </label>
+              <label class="sf-field"><span>Klíma</span>
+                <select id="b-clim"><option value="">Bármely</option><option value="MANUAL_CLIMATISATION">Manuális vagy automata</option><option value="AUTOMATIC_CLIMATISATION">Automata klíma</option><option value="AUTOMATIC_CLIMATISATION_2_ZONES">Automata, 2 zónás</option><option value="AUTOMATIC_CLIMATISATION_3_ZONES">Automata, 3 zónás</option><option value="AUTOMATIC_CLIMATISATION_4_ZONES">Automata, 4 zónás</option></select>
+              </label>
+            </div>
+            <div class="ik-sub">Belső felszereltség</div>
+            <div class="ik-checks" data-mf="fi" data-q="fe" data-lead="Belső felszereltség">{INTFEAT.map(([c, l]) => <label class="ik-check"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          </section>
+
+          <section class="ik-sec">
+            <h3>Hirdetés részletei</h3>
+            <div class="sf-grid ik-grid">
+              <label class="sf-field"><span>Kereskedő értékelése</span>
+                <select id="b-rating" data-lead="Kereskedő értékelése"><option value="">Bármely</option><option>legalább 3 csillag</option><option>legalább 4 csillag</option><option>5 csillag</option></select>
+              </label>
+              <label class="sf-field"><span>Sérült járművek</span>
+                <select id="b-damaged" data-lead="Sérült járművek"><option value="">Ne mutassa</option><option>Mutassa is</option></select>
+              </label>
+              <label class="sf-field sf-span2"><span>Keresés a hirdetés leírásában</span>
+                <input id="b-desc" type="text" placeholder="pl. első tulajdonos, gyári garancia" data-lead="Keresés a leírásban" />
+              </label>
+            </div>
+            <div class="ik-checks" style="margin-top:6px">
+              <label class="ik-check"><input type="checkbox" id="b-vatded" data-lead="ÁFA visszaigényelhető" /><span>ÁFA visszaigényelhető</span></label>
+              <label class="ik-check"><input type="checkbox" id="b-approved" data-lead="Gyári minősített használtautó-program" /><span>Gyári minősített használtautó-program</span></label>
+            </div>
+            <div class="ik-sub">Forgalomba helyezés típusa</div>
+            <div class="ik-checks" data-mf="rt" data-lead="Forgalomba helyezés típusa">{REGTYPES.map((l) => <label class="ik-check"><input type="checkbox" value={l} data-hu={l} /><span>{l}</span></label>)}</div>
+          </section>
+
+          <label class="sf-field sf-full" style="margin-top:18px"><span>Mi még fontos? (felszereltség, extrák, kizárt dolgok)</span>
             <textarea id="b-notes" rows="3" placeholder="pl. vonóhorog, panoráma tető, ülésfűtés, head-up, csak sérülésmentes…"></textarea>
           </label>
         </div>
@@ -376,17 +484,33 @@ const faqJsonld = {
   .ik-reset{font-weight:600}
   .ik-reset svg{width:17px;height:17px}
   .ik-reset:hover,.ik-more-t:hover b{color:var(--red)}
-  .ik-more{margin-top:16px;border-top:1px solid var(--line);padding-top:20px}
+  .ik-more{margin-top:16px;border-top:1px solid var(--line);padding-top:4px}
+  .ik-sec{border:1px solid var(--line);border-radius:16px;padding:22px 24px 24px;margin-top:16px;background:#FBFCFE}
+  .ik-sec h3{font-size:19px;font-weight:800;margin:0 0 18px;color:var(--ink)}
+  .ik-sub{font-size:14.5px;font-weight:800;margin:20px 0 12px;color:var(--ink)}
+  .ik-sub small{font-weight:600;color:var(--muted)}
+  .ik-checks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 20px}
+  .ik-check{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.3;cursor:pointer;color:var(--ink)}
+  .ik-check input{width:20px;height:20px;margin:0;flex:0 0 auto;accent-color:var(--red);cursor:pointer}
+  .ik-body svg{width:58px;height:28px;flex:0 0 auto;color:#5b6472}
+  .ik-body input:checked ~ svg{color:var(--red)}
+  .ik-sw{width:18px;height:18px;border-radius:50%;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(11,11,13,.18)}
+  .ik .sf-span2{grid-column:span 2}
   .ik-go{margin-top:24px;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--red);color:#fff;border:0;border-radius:12px;padding:17px 20px;font:inherit;font-size:19px;font-weight:800;cursor:pointer;box-shadow:0 12px 26px rgba(226,0,26,.24);transition:filter .15s,transform .15s}
   .ik-go:hover{filter:brightness(.94);transform:translateY(-1px)}
   .ik-go svg{width:24px;height:24px}
   .ik-free{margin:12px 0 0;text-align:center;font-size:13px;color:var(--muted)}
   .ik .kw-nav{margin-top:24px}
   @media(max-width:900px){
+    .ik-checks{grid-template-columns:repeat(2,minmax(0,1fr))}
     .ik{margin-top:-150px}
     .ik .sf-grid.ik-grid{grid-template-columns:1fr 1fr;gap:16px}
   }
   @media(max-width:560px){
+    .ik-sec{padding:18px 16px 20px}
+    .ik-checks{grid-template-columns:1fr}
+    .ik-checks.ik-bodies{grid-template-columns:1fr 1fr}
+    .ik .sf-span2{grid-column:auto}
     .ik{margin-top:-110px}
     .ik .wrap{padding:0 12px}
     .ik .sf-grid.ik-grid{grid-template-columns:1fr}
@@ -585,8 +709,11 @@ const faqJsonld = {
     chipVals('it').forEach(function(x){ add('it', x.code); });
     chipVals('fe').forEach(function(x){ add('fe', x.code); });
     add('cn', val('b-cn'));
+    var ccf = (val('b-cc-from')||'').replace(/\D/g,''), cct = (val('b-cc-to')||'').replace(/\D/g,''); if(ccf||cct) add('cc', ccf+':'+cct);
+    form.querySelectorAll('[data-mf][data-q] input[data-hu]:checked').forEach(function(i){ add(i.closest('[data-mf]').getAttribute('data-q'), i.value); });
+    var vd = document.getElementById('b-vatded'); if(vd && vd.checked && !/nettó/.test(radioVal('vat')||'')) add('vat', '1');
     if(/nettó/.test(radioVal('vat')||'')) add('vat', '1');
-    if(withPrice){ var be = toEur(val('b-budget'), val('b-cur')); if(be) add('p', ':'+be); }
+    if(withPrice){ var be = toEur(val('b-budget'), val('b-cur')), bf = toEur(val('b-budget-from'), val('b-cur')); if(be||bf) add('p', (bf||'')+':'+(be||'')); }
     return 'https://suchen.mobile.de/fahrzeuge/search.html?' + q.join('&');
   };
   var updateCompare = function(){
@@ -735,6 +862,14 @@ const faqJsonld = {
       ['Vásárló típusa', radioVal('who')],
       ['Adatkezelés', 'ÁSZF és adatkezelési tájékoztató elfogadva']
     ];
+    form.querySelectorAll('[data-lead]').forEach(function(el){
+      var v = '';
+      if(el.hasAttribute('data-mf')) v = [].slice.call(el.querySelectorAll('input[data-hu]:checked')).map(function(i){ return i.getAttribute('data-hu'); }).join(', ');
+      else if(el.tagName === 'SELECT') v = el.value ? el.options[el.selectedIndex].text : '';
+      else if(el.type === 'checkbox') v = el.checked ? 'igen' : '';
+      else v = (el.value||'').trim();
+      if(v) rows.push([el.getAttribute('data-lead'), v]);
+    });
     if(comp){
       rows.push(['Cégnév', val('b-cname')], ['Adószám', val('b-tax')], ['Közösségi (EU) adószám', val('b-euvat')], ['Kapcsolattartó', val('b-contact')], ['E-mail', val('b-cemail')], ['Telefon', val('b-cphone')], ['Székhely', val('b-caddr')]);
     } else {
@@ -799,7 +934,7 @@ const faqJsonld = {
   setTimeout(hashGo, 60);
   // nem forintos piacokon (átváltott ár) kerek összegek a költségvetés-listában — a futásidejű átváltás után is
   var roundBudget = function(){
-    var bs = document.getElementById('b-budget'); if(!bs || !bs.options[1]) return;
+    ['b-budget','b-budget-from'].forEach(function(bid){ var bs = document.getElementById(bid); if(!bs || !bs.options[1]) return;
     [].slice.call(bs.options).forEach(function(o, i){
       var cur = o.textContent;
       if(i === 0 || cur === o.getAttribute('data-r') || /Ft\s*$/.test(cur)) return;
@@ -810,7 +945,7 @@ const faqJsonld = {
       var p = Math.pow(10, Math.max(0, String(n).length - 2)); n = Math.round(n / p) * p;
       t = t.replace(m[0], String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep));
       o.textContent = t; o.setAttribute('data-r', t);
-    });
+    }); });
   };
   var rbTry = 0, rbT = setInterval(function(){ roundBudget(); if(++rbTry > 50) clearInterval(rbT); }, 200);
 
