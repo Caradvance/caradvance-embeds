@@ -66,37 +66,38 @@ const faqJsonld = {
       <!-- STEP 1 — Autót keresek -->
       <div class="kw-panel" data-step="1">
         <div class="sf-grid ik-grid">
-          <label class="sf-field ik-grey"><span>Márka</span>
+          <label class="sf-field ik-grey"><span class="req">Márka</span>
             <select id="b-make"><option value="" disabled selected>Válassz…</option><optgroup label="Népszerű">{makesTop.map((m) => <option>{m}</option>)}</optgroup><optgroup label="Összes márka (A–Z)">{makes.map((m) => <option>{m}</option>)}</optgroup><option>Egyéb</option></select>
           </label>
-          <label class="sf-field ik-grey"><span>Modell</span>
+          <label class="sf-field ik-grey"><span class="req">Modell</span>
             <select id="b-model" disabled><option value="" disabled selected>Előbb válassz márkát…</option></select>
           </label>
-          <label class="sf-field"><span>Évjárat (tól)</span>
-            <select id="b-year-from"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
+          <label class="sf-field"><span class="req">Évjárat (tól)</span>
+            <select id="b-year-from"><option value="" disabled selected>Válassz…</option><option value="">Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
           </label>
-          <label class="sf-field"><span>Évjárat (ig)</span>
-                <select id="b-year-to"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
+          <label class="sf-field"><span class="req">Évjárat (ig)</span>
+                <select id="b-year-to"><option value="" disabled selected>Válassz…</option><option value="">Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
               </label>
         </div>
         <div class="sf-grid ik-grid">
-          <label class="sf-field"><span>Futásteljesítmény (min.)</span>
-                <select id="b-km-from"><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
+          <label class="sf-field"><span class="req">Futásteljesítmény (min.)</span>
+                <select id="b-km-from"><option value="" disabled selected>Válassz…</option><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
               </label>
-          <label class="sf-field"><span>Futásteljesítmény (max.)</span>
-            <select id="b-km-to"><option value="" selected>Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
+          <label class="sf-field"><span class="req">Futásteljesítmény (max.)</span>
+            <select id="b-km-to"><option value="" disabled selected>Válassz…</option><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
           </label>
-          <label class="sf-field"><span>Üzemanyag</span>
-            <select id="b-fuel"><option value="" selected>Bármely</option>{FUELS.map(([c, l]) => <option value={c}>{l}</option>)}</select>
+          <label class="sf-field"><span class="req">Üzemanyag</span>
+            <select id="b-fuel"><option value="" disabled selected>Válassz…</option><option value="">Bármely</option>{FUELS.map(([c, l]) => <option value={c}>{l}</option>)}</select>
           </label>
-          <label class="sf-field"><span>Váltó</span>
-            <select id="b-gear"><option value="">Bármely</option><option value="AUTOMATIC_GEAR">Automata</option><option value="MANUAL_GEAR">Manuális</option><option value="SEMIAUTOMATIC_GEAR">Félautomata</option></select>
+          <label class="sf-field"><span class="req">Váltó</span>
+            <select id="b-gear"><option value="" disabled selected>Válassz…</option><option value="">Bármely</option><option value="AUTOMATIC_GEAR">Automata</option><option value="MANUAL_GEAR">Manuális</option><option value="SEMIAUTOMATIC_GEAR">Félautomata</option></select>
           </label>
         </div>
         <div class="sf-grid ik-grid">
           <div class="ik-row ik-linkcell"><button type="button" class="ik-reset" id="ikReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Űrlap törlése</button><button type="button" class="ik-more-t" id="ikMoreT" aria-expanded="false" aria-controls="ikMore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><b>További szűrők</b></button></div>
           <div class="sf-field ik-gocell"><button type="button" class="ik-go" id="kwGo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>Autót keresek</button></div>
         </div>
+        <p class="ik-err-msg" id="ikErr" hidden>Kérlek, tölts ki minden mezőt — ha mindegy, válaszd a „Bármely” lehetőséget.</p>
         <input type="hidden" id="b-cn" value="DE" />
         <input type="hidden" id="b-cur" value="Ft" />
 
@@ -489,6 +490,9 @@ const faqJsonld = {
   .ik .ik-row.ik-linkcell{grid-column:span 3;margin-top:0;min-height:48px;align-self:end;flex-wrap:nowrap}
   .ik-more-t svg{width:20px;height:20px;flex:0 0 auto}
   .ik-more-t[aria-expanded=true] b,.ik-more-t[aria-expanded=true] svg{color:var(--red)}
+  .ik .req::after{content:" *";color:var(--red)}
+  .ik .sf-field.ik-err select{border-color:var(--red);box-shadow:0 0 0 3px rgba(226,0,26,.12)}
+  .ik-err-msg{margin:12px 0 0;color:var(--red);font-size:13.5px;font-weight:600}
   .ik-sec{border:1px solid var(--line);border-radius:16px;padding:22px 24px 24px;margin-top:16px;background:#FBFCFE}
   .ik-sec h3{font-size:19px;font-weight:800;margin:0 0 18px;color:var(--ink)}
   .ik-sub{font-size:14.5px;font-weight:800;margin:20px 0 12px;color:var(--ink)}
@@ -837,7 +841,12 @@ const faqJsonld = {
     if(doScroll){ var top = form.getBoundingClientRect().top + window.pageYOffset - 90; window.scrollTo({ top: top, behavior: 'smooth' }); }
   };
   var validateStep = function(){
-    if(step===1 && !val('b-make')){ alert('Kérlek, válaszd ki legalább a márkát.'); return false; }
+    if(step===1){
+      var req = ['b-make','b-model','b-year-from','b-year-to','b-km-from','b-km-to','b-fuel','b-gear'], miss = [];
+      req.forEach(function(id){ var e = document.getElementById(id); if(!e) return; var o = e.options[e.selectedIndex]; var ok = e.selectedIndex > 0 && o && !o.disabled; var f = e.closest('.sf-field'); if(f) f.classList.toggle('ik-err', !ok); if(!ok) miss.push(e); });
+      var em = document.getElementById('ikErr'); if(em) em.hidden = !miss.length;
+      if(miss.length){ try{ miss[0].focus({ preventScroll: true }); }catch(x){} return false; }
+    }
     if(step===TOTAL){
       var comp = radioVal('who')==='Cég';
       if(comp){ if(!val('b-cname') || !(val('b-cemail')||val('b-cphone'))){ alert('Kérlek add meg a cégnevet és egy elérhetőséget (e-mail vagy telefon).'); return false; } if(radioVal('vat')==='Cég — nettó, Németországból' && !val('b-euvat')){ alert('Nettó, németországi céges vásárláshoz kérjük add meg a közösségi (EU) adószámot.'); return false; } }
@@ -908,6 +917,7 @@ const faqJsonld = {
     window.location.href = 'mailto:sales@caradvance.hu?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
   });
 
+  form.addEventListener('change', function(e){ var f = e.target && e.target.closest ? e.target.closest('.sf-field.ik-err') : null; if(f && e.target.selectedIndex > 0) f.classList.remove('ik-err'); var em = document.getElementById('ikErr'); if(em && !form.querySelector('.ik-err')) em.hidden = true; });
   // ---- import-oldal kártya: fülek, "Autót keresek" gomb, üzemanyag-választó, származás-zászló, űrlap törlése ----
   var navBox = document.getElementById('kwNav');
   var goBtn = document.getElementById('kwGo');
@@ -929,7 +939,7 @@ const faqJsonld = {
     updateCompare();
   });
   form.querySelectorAll('[data-mf="ft"] input').forEach(function(i){ i.addEventListener('change', function(){
-    var on = chipVals('ft'); if(fuelSel) fuelSel.value = on.length === 1 ? on[0].code : '';
+    var on = chipVals('ft'); if(fuelSel) if(on.length === 1) fuelSel.value = on[0].code; else if(fuelSel.selectedIndex > 0) fuelSel.selectedIndex = 1;
   }); });
   var cnSel = document.getElementById('b-cn'), flag = document.getElementById('ikFlag');
   var setFlag = function(){ if(!flag || !cnSel) return; var c = (cnSel.value || 'eu').toLowerCase(); flag.style.backgroundImage = 'url(https://flagcdn.com/w40/' + c + '.png)'; };
