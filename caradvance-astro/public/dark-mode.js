@@ -20,6 +20,9 @@
     'html.ca-dark ::placeholder{color:#7D8796!important;opacity:1}',
     'html.ca-dark option,html.ca-dark optgroup{background-color:#12151B;color:#E8EBF0}',
     'html.ca-dark hr{border-color:#2B313C}',
+    'html.ca-dark .dm-inv{background-color:#F1F3F6!important;color:#0D0F13!important}',
+    'html.ca-dark .dm-nb{mix-blend-mode:normal!important}',
+    'html.ca-dark .dm-wb{background-color:#fff!important;border-radius:12px}',
     'html.ca-dark .dm-sk{stroke:#E8EBF0!important}',
     'html.ca-dark .dm-fl{fill:#E8EBF0!important}',
     'html.ca-dark .dm-in{background-color:transparent!important;border-color:transparent!important;box-shadow:none!important}',
@@ -85,12 +88,16 @@
     [/\/(brand-bmw\.png|bmw-hero-logo\.png)/, '/bl-bmw.webp'],
     [/\/(brand-mercedes\.png|mb-star\.webp)/, '/bl-mercedes.webp'],
     [/\/audi(\/audi)?-logo\.webp/, '/bl-audi.webp'],
-    [/\/(mini-logo\.webp|mini-hero-logo\.webp)/, '/bl-mini.webp']
+    [/\/(mini-logo\.webp|mini-hero-logo\.webp)/, '/bl-mini.webp'],
+    [/\/hasznaltauto-hu-dark\.png/, '/hasznaltauto-hu.png'],
+    [/\/mobile-de-mark\.png/, '/mobile-de.webp']
   ];
   function fixImg(img) {
     var s = img.getAttribute('src') || '';
     if (img.dataset.dm) return;
-    var flt = getComputedStyle(img).filter || '';
+    var ics = getComputedStyle(img);
+    if (ics.mixBlendMode === 'multiply' && img.parentElement && darkBehind(img.parentElement)) { img.classList.add('dm-nb'); var ip = img.parentElement; if (ip.offsetWidth * ip.offsetHeight <= img.offsetWidth * img.offsetHeight * 1.6) ip.classList.add('dm-wb'); else img.classList.add('dm-wb'); }
+    var flt = ics.filter || '';
     if (/brightness\(0\)/.test(flt) && !/invert/.test(flt) && darkBehind(img.parentElement || img)) { img.classList.add('dm-mono'); img.dataset.dm = 'mono'; return; }
     if (/\/caradvance-logo\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('caradvance-logo.webp', 'caradvance-logo-white.webp')); return; }
     if (/\/bl-[a-z0-9-]+-dark\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('-dark.webp', '.webp')); return; }
@@ -113,12 +120,14 @@
     var els = (root || document.body).querySelectorAll('*');
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
+      if (el.closest('.cstage')) continue;
       if (SKIP[el.tagName]) { if (el.tagName === 'IMG') fixImg(el); continue; }
       if (/dots/.test(typeof el.className === 'string' ? el.className : '')) { if (darkBehind(el)) el.classList.add('dm-dl'); else el.classList.remove('dm-dl'); }
       var inSvg = el instanceof SVGElement;
       if (inSvg) {
         var scs = getComputedStyle(el), host = el.ownerSVGElement || el;
         var sk = rgba(scs.stroke), fl = rgba(scs.fill);
+        if (el.tagName.toLowerCase() === 'svg') { var sbg = rgba(scs.backgroundColor); if (sbg && sbg.a > 0.35 && sat(sbg) < 40 && lum(sbg) > 0.82 && darkBehind(el.parentElement || el)) el.classList.add('dm-s2'); var scol = rgba(scs.color); if (scol && sat(scol) < 45 && lum(scol) < 0.45 && darkBehind(el)) el.classList.add('dm-t'); }
         var dk = function (x) { return x && x.a > 0.3 && sat(x) < 45 && lum(x) < 0.3; };
         if ((dk(sk) || dk(fl)) && darkBehind(host.parentElement || host)) { if (dk(sk)) el.classList.add('dm-sk'); if (dk(fl)) el.classList.add('dm-fl'); }
         continue;
@@ -130,6 +139,7 @@
       } else if (bg && bg.a > 0.5 && sat(bg) < 40 && lum(bg) < 0.3 && el.offsetWidth > 0 && el.offsetWidth <= 14 && el.offsetHeight <= 14 && darkBehind(el.parentElement || el)) {
         el.classList.add('dm-dot');
       }
+      if (bg && bg.a > 0.6 && sat(bg) < 40 && lum(bg) < 0.12 && el.offsetWidth > 16 && el.offsetWidth <= 90 && el.offsetHeight <= 90) { var tx = (el.textContent || '').trim(); if (tx.length >= 1 && tx.length <= 3 && darkBehind(el.parentElement || el)) el.classList.add('dm-inv'); }
       var bi = cs.backgroundImage;
       var solid = bi && bi.match(/linear-gradient\((rgb\(2[3-5]\d, 2[3-5]\d, 2[3-5]\d\)), \1\)/);
       if (solid && !el.hasAttribute('data-dmbi')) {
@@ -169,11 +179,12 @@
   function sheetPass() {
     if (sheetDone || !document.body) return; sheetDone = true;
     var rules = [];
-    function walk(list) { for (var i = 0; i < list.length; i++) { var r = list[i]; if (r.cssRules && !r.selectorText) { try { walk(r.cssRules); } catch (e) {} } else if (r.selectorText && STATE.test(r.selectorText)) rules.push(r); } }
+    function walk(list) { for (var i = 0; i < list.length; i++) { var r = list[i]; if (r.cssRules && !r.selectorText) { try { walk(r.cssRules); } catch (e) {} } else if (r.selectorText && (STATE.test(r.selectorText) || /::?(before|after)/.test(r.selectorText))) rules.push(r); } }
     for (var i = 0; i < document.styleSheets.length; i++) { var sh = document.styleSheets[i]; if (sh.ownerNode && sh.ownerNode.id && sh.ownerNode.id.indexOf('ca-dark') === 0) continue; try { walk(sh.cssRules); } catch (e) {} }
     var out = [];
     rules.forEach(function (r) {
       if (/dots?\b/i.test(r.selectorText)) return;
+      if (/::?(before|after)/.test(r.selectorText) && !STATE.test(r.selectorText.replace(/::?(before|after)/g, ''))) { var pb = resolve(r.style.getPropertyValue('background-color')); if (pb && pb.a > 0.35 && sat(pb) < 40 && lum(pb) > 0.82) out.push(splitSel(r.selectorText).map(pre).join(',') + '{background-color:#3A414D!important}'); return; }
       var st = r.style, decl = [];
       var bgv = st.getPropertyValue('background-color'), bgc = resolve(bgv);
       if (bgc && bgc.a > 0.35 && sat(bgc) < 40 && lum(bgc) > 0.82) decl.push('background-color:' + (lum(bgc) > 0.95 ? '#232833' : '#262C37') + '!important');
@@ -191,15 +202,24 @@
   var pending = null;
   var obs = new MutationObserver(function (muts) {
     if (!d.classList.contains('ca-dark')) return;
-    muts.forEach(function (m) { m.addedNodes && m.addedNodes.forEach(function (n) { if (n.nodeType === 1) (pending || (pending = [])).push(n); }); });
+    muts.forEach(function (m) {
+      if (m.type === 'attributes') {
+        var t = m.target;
+        if (m.attributeName === 'class') { var strip = function (v) { return (v || '').replace(/(^|\s)dm-\S+/g, ' ').replace(/\s+/g, ' ').trim(); }; if (strip(m.oldValue) === strip(t.getAttribute('class'))) return; }
+        if (m.attributeName === 'style' && (t.hasAttribute('data-dmc') || t.hasAttribute('data-dmbi'))) return;
+        if (t.nodeType === 1 && !(t instanceof SVGElement)) (pending || (pending = [])).push(t);
+        return;
+      }
+      m.addedNodes && m.addedNodes.forEach(function (n) { if (n.nodeType === 1) (pending || (pending = [])).push(n); });
+    });
     if (pending && !scan._raf) scan._raf = requestAnimationFrame(function () {
       scan._raf = 0; var list = pending; pending = null;
-      list.forEach(function (n) { if (n.isConnected) { if (n.tagName === 'IMG') fixImg(n); else { scan(n.parentElement || n); } } });
+      var seen = []; list.forEach(function (n) { if (!n.isConnected || seen.indexOf(n) >= 0) return; seen.push(n); if (n.tagName === 'IMG') fixImg(n); else scan(n); });
     });
   });
 
   function clearAll() {
-    ['dm-s', 'dm-s2', 'dm-g', 'dm-t', 'dm-t2', 'dm-b', 'dm-dl', 'dm-dot', 'dm-sk', 'dm-fl', 'dm-in'].forEach(function (k) {
+    ['dm-s', 'dm-s2', 'dm-g', 'dm-t', 'dm-t2', 'dm-b', 'dm-dl', 'dm-dot', 'dm-sk', 'dm-fl', 'dm-in', 'dm-inv', 'dm-nb', 'dm-wb'].forEach(function (k) {
       document.querySelectorAll('.' + k).forEach(function (e) { e.classList.remove(k); });
     });
     unfixImgs();
@@ -211,7 +231,7 @@
     if (mq.matches) {
       d.classList.add('ca-dark');
       var st3 = document.getElementById('ca-dark-states'); if (st3) st3.disabled = false;
-      if (document.body) { sheetPass(); scan(); obs.observe(document.body, { childList: true, subtree: true }); setTimeout(function () { scan(); }, 1200); }
+      if (document.body) { sheetPass(); scan(); obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden', 'open'], attributeOldValue: true }); setTimeout(function () { scan(); }, 1200); }
     } else {
       obs.disconnect(); d.classList.remove('ca-dark'); clearAll();
     }
