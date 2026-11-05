@@ -1,0 +1,834 @@
+---
+import '../styles/eladom.css';
+import type { Locale } from '../i18n/utils';
+
+const { lang } = Astro.props as { lang: Locale };
+
+const makesTop = ["Mercedes-Benz", "BMW", "Audi", "Volkswagen", "Porsche", "MINI", "Skoda", "Volvo", "Toyota", "Land Rover", "Tesla", "Cupra", "Ford", "Opel"];
+const makes = ["Abarth", "AC", "Acura", "Aiways", "Aixam", "Alfa Romeo", "ALPINA", "Alpine", "Alvis", "Ariel", "Artega", "Asia Motors", "Aston Martin", "Audi", "Austin", "Austin Healey", "Auto Union", "BAIC", "Barkas", "BAW", "Bentley", "Bizzarrini", "BMW", "Boldmen", "Borgward", "Bovensiepen", "Brilliance", "Bugatti", "Buick", "BYD", "Cadillac", "Casalini", "Caterham", "Cenntro", "Changan", "Chatenet", "Chevrolet", "Chrysler", "Citroën", "Cobra", "Corvette", "Cupra", "Dacia", "Daewoo", "Daihatsu", "Dallara", "Datsun", "Delahaye", "DeLorean", "DeTomaso", "DFM", "DFSK", "Dodge", "Dongfeng", "Donkervoort", "DS Automobiles", "e.GO", "Elaris", "Estrima", "Facel Vega", "Ferrari", "Fiat", "Fisker", "Ford", "Foton", "GAC Gonow", "Geely", "Gemballa", "Genesis", "GMC", "Grecav", "GWM", "Hamann", "Heinkel", "Holden", "Honda", "Hongqi", "Horch", "Hummer", "Hyundai", "INEOS", "Infiniti", "Invicta", "Isuzu", "Iveco", "JAC", "JAECOO", "Jaguar", "Jeep", "Jetour", "Jiayuan", "KGM", "Kia", "Koenigsegg", "KTM", "Lada", "Lamborghini", "Lancia", "Land Rover", "Landwind", "Leapmotor", "LEVC", "Lexus", "Ligier", "Lincoln", "Linktour", "Lotus", "Lucid", "Lynk&Co", "M-HERO", "Mahindra", "MAN", "Maserati", "Maxus", "Maybach", "Mazda", "McLaren", "Mercedes-Benz", "Messerschmitt", "MG", "Microcar", "Microlino", "MINI", "Mitsubishi", "Morgan", "NIO", "Nissan", "NSU", "Oldsmobile", "OMODA", "Opel", "Packard", "Pagani", "Peugeot", "Piaggio", "Plymouth", "Polestar", "Pontiac", "Porsche", "Proton", "Renault", "Riley", "Rimac", "Rolls-Royce", "Rover", "Ruf", "Saab", "Santana", "Seat", "Seres", "Silence", "Simca", "Skoda", "Smart", "speedART", "Spyker", "Ssangyong", "Studebaker", "Subaru", "Suzuki", "SWM", "Talbot", "Tata", "TECHART", "Tesla", "Togg", "Toyota", "Trabant", "Triumph", "TVR", "TYN-e", "Venucia", "Vincent", "VinFast", "Volkswagen", "Volvo", "Voyah", "Wartburg", "Westfield", "WEY", "Wiesmann", "XEV", "XPENG", "Zeekr", "Zhidou"];
+const years = Array.from({ length: 2026 - 2000 + 1 }, (_, i) => 2026 - i);
+
+// mobile.de szűrők (kódok a mobile.de keresőjéből, 2026-11) — az űrlap egy az egyben ezeket adja tovább
+const FUELS = [['PETROL','Benzin'],['DIESEL','Dízel'],['ELECTRICITY','Elektromos'],['HYBRID','Hibrid (benzin)'],['HYBRID_DIESEL','Hibrid (dízel)'],['HYBRID_PLUGIN','Plug-in hibrid'],['LPG','LPG'],['CNG','CNG (földgáz)'],['HYDROGENIUM','Hidrogén'],['ETHANOL','Etanol (E85)'],['OTHER','Egyéb']];
+const CATS = [['Limousine','Limuzin / Sedan'],['EstateCar','Kombi'],['OffRoad','Terepjáró / SUV / Pickup'],['SmallCar','Kisautó'],['SportsCar','Sportautó / Coupé'],['Cabrio','Kabrió / Roadster'],['Van','Egyterű / Kisbusz'],['OtherCar','Egyéb']];
+const COLORS = [['BLACK','Fekete'],['WHITE','Fehér'],['GREY','Szürke'],['SILVER','Ezüst'],['BLUE','Kék'],['RED','Piros'],['GREEN','Zöld'],['BROWN','Barna'],['BEIGE','Bézs'],['GOLD','Arany'],['YELLOW','Sárga'],['ORANGE','Narancs'],['PURPLE','Lila']];
+const ICOLORS = [['BLACK','Fekete'],['GREY','Szürke'],['BEIGE','Bézs'],['BROWN','Barna'],['RED','Piros'],['BLUE','Kék'],['WHITE','Fehér'],['OTHER_INTERIOR_COLOR','Egyéb']];
+const ITYPES = [['LEATHER','Bőr'],['PARTIAL_LEATHER','Részbőr'],['ALCANTARA','Alcantara'],['FABRIC','Szövet'],['IMITATION_LEATHER','Műbőr'],['VELOUR','Velúr']];
+const FEATS = [['PANORAMIC_GLASS_ROOF','Panorámatető'],['SUNROOF','Napfénytető'],['HEAD_UP_DISPLAY','Head-up display'],['NAVIGATION_SYSTEM','Navigáció'],['ELECTRIC_HEATED_SEATS','Ülésfűtés'],['ELECTRIC_HEATED_REAR_SEATS','Hátsó ülésfűtés'],['VENTILATED_SEATS','Ülésszellőzés'],['MASSAGE_SEATS','Masszázsülés'],['ELECTRIC_ADJUSTABLE_SEATS','Elektromos ülések'],['MEMORY_SEATS','Memóriás ülések'],['SPORT_SEATS','Sportülések'],['HEATED_STEERING_WHEEL','Kormányfűtés'],['AUXILIARY_HEATING','Állófűtés'],['DIGITAL_COCKPIT','Digitális műszerfal'],['CARPLAY','Apple CarPlay'],['ANDROID_AUTO','Android Auto'],['SOUND_SYSTEM','Prémium hangrendszer'],['WIRELESS_CHARGING','Vezeték nélküli töltés'],['AMBIENT_LIGHTING','Ambiente világítás'],['KEYLESS_ENTRY','Kulcs nélküli nyitás'],['ELECTRIC_TAILGATE','Elektromos csomagtérajtó'],['CAM_360_DEGREES','360°-os kamera'],['REAR_VIEW_CAM','Tolatókamera'],['FRONT_SENSORS','Parkolóradar elöl'],['REAR_SENSORS','Parkolóradar hátul'],['AUTOMATIC_PARKING','Önparkoló rendszer'],['BLIND_SPOT_MONITOR','Holttérfigyelő'],['LANE_DEPARTURE_WARNING','Sávváltó asszisztens'],['TRAFFIC_SIGN_RECOGNITION','Táblafelismerő'],['NIGHT_VISION_ASSIST','Éjjellátó'],['LED_HEADLIGHTS','LED fényszóró'],['LASER_HEADLIGHTS','Lézer fényszóró'],['GLARE_FREE_HIGH_BEAM','Nem vakító távfény (mátrix)'],['AIR_SUSPENSION','Légrugózás'],['DYNAMIC_CHASSIS_CONTROL','Adaptív futómű'],['PERFORMANCE_HANDLING_SYSTEM','Sportfutómű'],['SPORT_PACKAGE','Sportcsomag'],['ROOF_RAILS','Tetősín'],['TINTED_WINDOWS','Sötétített üvegek'],['WINTER_PACKAGE','Télicsomag']];
+const terms = ['12','24','36','48','60','72','84','96'];
+const BUDGETS = ['5 000 000','7 500 000','10 000 000','12 500 000','15 000 000','20 000 000','25 000 000','30 000 000','40 000 000','50 000 000','75 000 000','100 000 000'];
+const KMS = ['10000','20000','30000','50000','75000','100000','125000','150000','200000'];
+
+const faqJsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Autókeresés és beszerzés — Caradvance',
+  serviceType: 'Személyre szabott autókeresés és import Németországból',
+  areaServed: { '@type': 'Country', name: 'Magyarország' },
+  url: 'https://www.caradvance.hu/autot-keresek/',
+  provider: {
+    '@type': 'AutoDealer',
+    name: 'Caradvance Hungary (BH Group Zrt.)',
+    telephone: '+36 30 233 6060',
+    email: 'sales@caradvance.hu',
+  },
+};
+---
+<!-- WIZARD — Autó rendelés (import oldal): kártya a hero-videó alján, fülekkel -->
+<section class="ik" id="rendeles">
+  <div class="wrap">
+    <form class="kw ik-card" id="buyForm" novalidate>
+      <div class="ik-tabs" role="tablist" aria-label="Autó rendelés lépései">
+        <button type="button" class="kw-dot ik-tab active" data-dot="1" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3l2.2-5.1A2 2 0 0 1 7 5.7h10a2 2 0 0 1 1.8 1.2L21 12v3a2 2 0 0 1-2 2"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/><path d="M3.5 12h17"/></svg><span>Autót keresek</span></button>
+        <button type="button" class="kw-dot ik-tab" data-dot="2" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3l4 4-4 4"/><path d="M21 7H9"/><path d="M7 21l-4-4 4-4"/><path d="M3 17h12"/></svg><span>Beszámítás</span></button>
+        <button type="button" class="kw-dot ik-tab" data-dot="3" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.6-3.4 8.3-8 9-4.6-.7-8-4.4-8-9V6l8-3z"/><path d="M8.5 12l2.4 2.4L15.5 9.8"/></svg><span>Finanszírozás</span></button>
+        <button type="button" class="kw-dot ik-tab" data-dot="4" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h11v10H2z"/><path d="M13 9h4.5l3.5 3.6V16h-8"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><span>Kiszállítás</span></button>
+      </div>
+      <div class="kw-bar" hidden><i id="kwBar"></i></div>
+
+      <div class="ik-body">
+      <!-- STEP 1 — Autót keresek -->
+      <div class="kw-panel" data-step="1">
+        <div class="sf-grid ik-grid">
+          <label class="sf-field"><span>Márka</span>
+            <select id="b-make"><option value="" disabled selected>Válassz…</option><optgroup label="Népszerű">{makesTop.map((m) => <option>{m}</option>)}</optgroup><optgroup label="Összes márka (A–Z)">{makes.map((m) => <option>{m}</option>)}</optgroup><option>Egyéb</option></select>
+          </label>
+          <label class="sf-field"><span>Modell</span>
+            <select id="b-model" disabled><option value="" disabled selected>Előbb válassz márkát…</option></select>
+          </label>
+          <label class="sf-field"><span>Évjárat (tól)</span>
+            <select id="b-year-from"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
+          </label>
+          <label class="sf-field"><span>Költségvetés (max.)</span>
+            <select id="b-budget"><option value="" selected>Bármely</option>{BUDGETS.map((b) => <option value={b}>{b} Ft</option>)}</select>
+          </label>
+        </div>
+        <div class="sf-grid ik-grid">
+          <label class="sf-field"><span>Futásteljesítmény (max.)</span>
+            <select id="b-km-to"><option value="" selected>Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
+          </label>
+          <label class="sf-field"><span>Üzemanyag</span>
+            <select id="b-fuel"><option value="" selected>Bármely</option>{FUELS.map(([c, l]) => <option value={c}>{l}</option>)}</select>
+          </label>
+          <label class="sf-field"><span>Váltó</span>
+            <select id="b-gear"><option value="">Bármely</option><option value="AUTOMATIC_GEAR">Automata</option><option value="MANUAL_GEAR">Manuális</option><option value="SEMIAUTOMATIC_GEAR">Félautomata</option></select>
+          </label>
+          <label class="sf-field ik-origin"><span>Származás</span>
+            <i class="ik-flag" id="ikFlag" style="background-image:url(https://flagcdn.com/w40/de.png)" aria-hidden="true"></i>
+            <select id="b-cn"><option value="DE" selected>Németország</option><option value="">Bármely (Európa)</option><option value="AT">Ausztria</option><option value="NL">Hollandia</option><option value="BE">Belgium</option><option value="FR">Franciaország</option><option value="IT">Olaszország</option></select>
+          </label>
+        </div>
+        <input type="hidden" id="b-cur" value="Ft" />
+
+        <div class="ik-row">
+          <button type="button" class="ik-more-t" id="ikMoreT" aria-expanded="false" aria-controls="ikMore"><i class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></i><b>További szűrők</b> <span>(karosszéria, hajtás, felszereltség, szín, stb.)</span></button>
+          <button type="button" class="ik-reset" id="ikReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Űrlap törlése</button>
+        </div>
+
+        <div class="ik-more" id="ikMore" hidden>
+          <p class="kw-hint" style="margin-top:0">A szűrők ugyanazok, mint a <b>mobile.de</b> keresőjében — pontosan ezekkel a feltételekkel keresünk a teljes kínálatban.</p>
+          <div class="sf-grid">
+            <label class="sf-field"><span>Modell-leírás <small style="font-weight:600;color:var(--muted)">(opcionális)</small></span>
+              <input id="b-type" type="text" placeholder="pl. M Sport, Touring, AMG Line" />
+            </label>
+            <label class="sf-field"><span>Állapot</span>
+              <select id="b-con"><option value="">Bármely</option><option value="USED">Használt</option><option value="NEW">Új</option></select>
+            </label>
+            <label class="sf-field"><span>Évjárat (ig)</span>
+              <select id="b-year-to"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
+            </label>
+            <label class="sf-field"><span>Futásteljesítmény (min.)</span>
+              <select id="b-km-from"><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
+            </label>
+          </div>
+          <div class="sf-grid">
+            <label class="sf-field"><span>Hajtás</span>
+              <select id="b-drive"><option value="">Bármely</option><option value="ALL_WHEEL">Összkerékhajtás</option><option value="FRONT">Elsőkerék-hajtás</option><option value="REAR">Hátsókerék-hajtás</option></select>
+            </label>
+            <label class="sf-field"><span>Teljesítmény — tól (LE)</span>
+              <input id="b-hp-from" type="text" inputmode="numeric" placeholder="pl. 150" />
+            </label>
+            <label class="sf-field"><span>Teljesítmény — ig (LE)</span>
+              <input id="b-hp-to" type="text" inputmode="numeric" placeholder="Bármely" />
+            </label>
+            <label class="sf-field"><span>Ár rugalmassága</span>
+              <select id="b-flex"><option value="" selected>Bármely</option><option>Fix keret</option><option>Kicsit rugalmas</option><option>Rugalmas a megfelelő autóért</option></select>
+            </label>
+          </div>
+          <div class="kw-sub">Üzemanyag <small>(több is választható)</small></div>
+          <div class="kw-chips" data-mf="ft">{FUELS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          <div class="kw-sub">Karosszéria <small>(több is választható)</small></div>
+          <div class="kw-chips" data-mf="c">{CATS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          <div class="sf-grid" style="margin-top:18px">
+            <label class="sf-field"><span>Ajtók száma</span>
+              <select id="b-door"><option value="">Bármely</option><option value="TWO_OR_THREE">2/3</option><option value="FOUR_OR_FIVE">4/5</option><option value="SIX_OR_SEVEN">6/7</option></select>
+            </label>
+            <label class="sf-field"><span>Ülések — tól</span>
+              <select id="b-seat-from"><option value="">Bármely</option>{[2,3,4,5,6,7,8,9].map((n) => <option>{n}</option>)}</select>
+            </label>
+            <label class="sf-field"><span>Ülések — ig</span>
+              <select id="b-seat-to"><option value="">Bármely</option>{[2,3,4,5,6,7,8,9].map((n) => <option>{n}</option>)}</select>
+            </label>
+            <label class="sf-field"><span>Előző tulajdonosok (max.)</span>
+              <select id="b-owners"><option value="">Bármely</option><option value="1">legfeljebb 1</option><option value="2">legfeljebb 2</option><option value="3">legfeljebb 3</option><option value="4">legfeljebb 4</option></select>
+            </label>
+          </div>
+          <div class="sf-grid">
+            <label class="sf-field"><span>Emissziós osztály (min.)</span>
+              <select id="b-emc"><option value="">Bármely</option><option value="EURO4">Euro 4</option><option value="EURO5">Euro 5</option><option value="EURO6">Euro 6</option><option value="EURO6C">Euro 6c</option><option value="EURO6D_TEMP">Euro 6d-TEMP</option><option value="EURO6D">Euro 6d</option><option value="EURO6E">Euro 6e</option></select>
+            </label>
+            <label class="sf-field"><span>Klíma</span>
+              <select id="b-clim"><option value="">Bármely</option><option value="MANUAL_CLIMATISATION">Manuális vagy automata</option><option value="AUTOMATIC_CLIMATISATION">Automata</option><option value="AUTOMATIC_CLIMATISATION_2_ZONES">Automata, 2 zónás</option><option value="AUTOMATIC_CLIMATISATION_3_ZONES">Automata, 3 zónás</option><option value="AUTOMATIC_CLIMATISATION_4_ZONES">Automata, 4 zónás</option></select>
+            </label>
+            <label class="sf-field"><span>Tempomat</span>
+              <select id="b-cruise"><option value="">Bármely</option><option value="CRUISE_CONTROL">Tempomat</option><option value="ADAPTIVE_CRUISE_CONTROL">Adaptív tempomat (ACC)</option></select>
+            </label>
+            <label class="sf-field"><span>Vonóhorog</span>
+              <select id="b-tow"><option value="">Bármely</option><option value="TRAILER_COUPLING_FIX">Van (fix, levehető vagy behajtható)</option><option value="TRAILER_COUPLING_DETACHABLE">Levehető vagy behajtható</option><option value="TRAILER_COUPLING_SWIVELING">Behajtható</option></select>
+            </label>
+          </div>
+          <div class="kw-sub">Külső szín</div>
+          <div class="kw-chips" data-mf="ecol">{COLORS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          <label class="kw-chip kw-chip-solo"><input type="checkbox" id="b-metal" /><span>Csak metálfényezés</span></label>
+          <div class="kw-sub">Belső szín</div>
+          <div class="kw-chips" data-mf="icol">{ICOLORS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          <div class="kw-sub">Kárpit</div>
+          <div class="kw-chips" data-mf="it">{ITYPES.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          <div class="kw-sub">Felszereltség <small>(ami mindenképp legyen benne)</small></div>
+          <div class="kw-chips" data-mf="fe">{FEATS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
+          <label class="sf-field sf-full"><span>Mi még fontos? (felszereltség, extrák, kizárt dolgok)</span>
+            <textarea id="b-notes" rows="3" placeholder="pl. vonóhorog, panoráma tető, ülésfűtés, head-up, csak sérülésmentes, magyar papírok…"></textarea>
+          </label>
+          <div class="kw-compare" style="margin-top:18px">
+            <div class="kw-compare-t">Nézd meg a hasonló autókat és a piaci ársávot</div>
+            <div class="kw-pricelinks">
+              <div class="kw-pricerow"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" /><a id="cmp-mobile" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car" target="_blank" rel="noopener">Összes hasonló →</a><a id="cmp-mobile-lo" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=up" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-mobile-hi" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=down" target="_blank" rel="noopener">Legdrágábbak →</a></div>
+              <div class="kw-pricerow"><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" /><a id="cmp-as24" class="kw-cmp" href="https://www.autoscout24.de/lst" target="_blank" rel="noopener">Összes hasonló →</a><a id="cmp-as24-lo" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=0" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-as24-hi" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=1" target="_blank" rel="noopener">Legdrágábbak →</a></div>
+            </div>
+            <p class="kw-note">Kattints — máris a szűrt találatokat látod a piacon (a darabszámmal együtt), a legolcsóbbtól a legdrágábbig rendezve.</p>
+          </div>
+        </div>
+
+        <button type="button" class="ik-go" id="kwGo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>Autót keresek</button>
+        <p class="ik-free">Ingyenes és kötelezettségmentes — a következő lépésekben megadhatod a beszámítást, a finanszírozást és a kiszállítást.</p>
+      </div>
+
+      <!-- STEP 2 — Beszámítás -->
+      <div class="kw-panel" data-step="2" hidden>
+        <div class="sf-blocktitle">2. Beszámítás</div>
+        <div class="kw-opts">
+          <label class="kw-opt"><input type="radio" name="trade" value="Nincs beszámítandó autóm" checked /><span class="kw-opt-b"><b>Nincs beszámítandó autóm</b><small>Csak az új autót keressük.</small></span></label>
+          <label class="kw-opt"><input type="radio" name="trade" value="Van beszámítandó autóm" /><span class="kw-opt-b"><b>Van beszámítandó autóm</b><small>Felértékeljük, és az árát beszámítjuk az új autóba.</small></span></label>
+        </div>
+        <div id="tradeBox" hidden>
+          <div class="sf-grid" style="margin-top:18px">
+            <label class="sf-field"><span>Márka és modell</span><input id="b-ti-car" type="text" placeholder="pl. Volkswagen Golf" /></label>
+            <label class="sf-field"><span>Évjárat</span><select id="b-ti-year"><option value="" selected>Válassz…</option>{years.map((y) => <option>{y}</option>)}<option>2000 előtti</option></select></label>
+            <label class="sf-field"><span>Futásteljesítmény (km)</span><input id="b-ti-km" type="text" inputmode="numeric" placeholder="pl. 120 000" /></label>
+            <label class="sf-field"><span>Üzemanyag</span><select id="b-ti-fuel"><option value="" selected>Válassz…</option>{FUELS.map(([c, l]) => <option>{l}</option>)}</select></label>
+          </div>
+          <label class="sf-field sf-full"><span>Állapot, felszereltség, megjegyzés</span>
+            <textarea id="b-ti-note" rows="3" placeholder="pl. első tulajdonos, vezetett szervizkönyv, kisebb karc a lökhárítón…"></textarea>
+          </label>
+        </div>
+        <p class="kw-hint">A beszámítandó autódról a következő lépésben fotókat is küldhetsz e-mailben vagy WhatsAppon — így pontosabb ajánlatot adunk.</p>
+      </div>
+
+      <!-- STEP 3 — Finanszírozás -->
+      <div class="kw-panel" data-step="3" hidden>
+        <div class="sf-blocktitle">3. Vásárlás módja és finanszírozás</div>
+        <div class="kw-sub" style="margin-top:0">Hogyan vásárolnál? (ÁFA)</div>
+        <div class="kw-opts">
+          <label class="kw-opt"><input type="radio" name="vat" value="Magánszemély — 19% áfa (Caradvance GmbH, Németország)" checked /><span class="kw-opt-b"><b>Magánszemélyként — 19% áfa</b><small>A német Caradvance GmbH-tól. Kedvezőbb ár, ez a leggyakoribb választás.</small></span></label>
+          <label class="kw-opt"><input type="radio" name="vat" value="Cég — nettó, Németországból" /><span class="kw-opt-b"><b>Cégként — nettó, Németországból</b><small>Áfa-visszaigénylés lehetőségével, német számlával.</small></span></label>
+        </div>
+        <div class="kw-sub">Fizetés</div>
+        <div class="kw-opts kw-opts-3">
+          <label class="kw-opt"><input type="radio" name="pay" value="Készpénz / önerőből" checked /><span class="kw-opt-b"><b>Készpénz / önerőből</b><small>Nincs szükség finanszírozásra.</small></span></label>
+          <label class="kw-opt"><input type="radio" name="pay" value="Finanszírozás (hitel)" /><span class="kw-opt-b"><b>Finanszírozás</b><small>Autóhitel részletre.</small></span></label>
+          <label class="kw-opt"><input type="radio" name="pay" value="Lízing" /><span class="kw-opt-b"><b>Lízing</b><small>Nyílt vagy zárt végű lízing.</small></span></label>
+        </div>
+        <div id="finBox" hidden>
+          <div class="sf-grid sf-2" style="margin-top:18px">
+            <label class="sf-field"><span>Konstrukció</span>
+              <select id="b-fin-type">
+                <option value="" disabled selected>Válassz…</option>
+                <option>Zárt végű lízing</option>
+                <option>Nyílt végű lízing</option>
+                <option>Autóhitel</option>
+                <option>Még nem tudom — segítsetek</option>
+              </select>
+            </label>
+            <label class="sf-field"><span>Futamidő (hónap)</span>
+              <select id="b-fin-term"><option value="" disabled selected>Válassz…</option>{terms.map((x) => <option>{x}</option>)}</select>
+            </label>
+          </div>
+          <div class="sf-grid sf-2">
+            <label class="sf-field"><span>Önerő (kezdő befizetés)</span>
+              <input id="b-fin-down" type="text" inputmode="numeric" autocomplete="off" placeholder="pl. 3 000 000 Ft vagy 20%" />
+            </label>
+            <label class="sf-field"><span>Havi törlesztő keret <small style="font-weight:600;color:var(--muted)">(opcionális)</small></span>
+              <input id="b-fin-monthly" type="text" inputmode="numeric" autocomplete="off" placeholder="pl. 150 000 Ft/hó" />
+            </label>
+          </div>
+        </div>
+        <p class="kw-hint">Finanszírozó partnereink: Euroleasing és Merkantil Bank — a konkrét ajánlatot az autó kiválasztása után készítjük el.</p>
+      </div>
+
+      <!-- STEP 4 — Kiszállítás -->
+      <div class="kw-panel" data-step="4" hidden>
+        <div class="sf-blocktitle">4. Kiszállítás és időzítés</div>
+        <div class="kw-opts">
+          <label class="kw-opt"><input type="radio" name="dlv" value="Házhoz szállítás" checked /><span class="kw-opt-b"><b>Házhoz szállítás</b><small>Kulcsrakészen, a nevedre írt forgalmival a megadott címre szállítjuk.</small></span></label>
+          <label class="kw-opt"><input type="radio" name="dlv" value="Személyes átvétel" /><span class="kw-opt-b"><b>Személyes átvétel</b><small>Egyeztetett helyen és időpontban veheted át.</small></span></label>
+        </div>
+        <div class="sf-grid sf-3" style="margin-top:18px">
+          <label class="sf-field"><span>Szállítási cím / város</span><input id="b-dlv-city" type="text" placeholder="pl. 1117 Budapest" /></label>
+          <label class="sf-field"><span>Mikorra kell?</span>
+            <select id="b-when">
+              <option value="" disabled selected>Válassz…</option>
+              <option>Nagyon sürgős (2 héten belül)</option>
+              <option>Mielőbb</option>
+              <option>1–2 hónapon belül</option>
+              <option>Ráérek — a tökéletes autóra várok</option>
+            </select>
+          </label>
+          <label class="sf-field"><span>Meddig keressünk neked?</span>
+            <select id="b-howlong">
+              <option value="" disabled selected>Válassz…</option>
+              <option>2 hét</option>
+              <option>1 hónap</option>
+              <option>2–3 hónap</option>
+              <option>Ameddig meg nem találjuk a tökéleteset</option>
+            </select>
+          </label>
+        </div>
+        <p class="kw-hint">Profi szállítópartnerünkkel, magas értékű biztosítással hozzuk haza az autót. A kiválasztástól a kulcsrakész átadásig jellemzően 5–14 nap.</p>
+      </div>
+
+      <!-- STEP 5 — Kapcsolat -->
+      <div class="kw-panel" data-step="5" hidden>
+        <div class="sf-blocktitle">Utolsó lépés — hogyan érünk el?</div>
+        <div class="kw-opts kw-opts-2">
+          <label class="kw-opt"><input type="radio" name="who" value="Magánszemély" checked /><span class="kw-opt-b"><b>Magánszemély</b></span></label>
+          <label class="kw-opt"><input type="radio" name="who" value="Cég" /><span class="kw-opt-b"><b>Cég</b></span></label>
+        </div>
+
+        <div id="privBox" class="sf-grid" style="margin-top:18px">
+          <label class="sf-field"><span>Neved</span><input id="b-name" type="text" placeholder="Teljes név" /></label>
+          <label class="sf-field"><span>E-mail</span><input id="b-email" type="email" placeholder="pelda@email.hu" /></label>
+          <label class="sf-field"><span>Telefonszám</span><input id="b-phone" type="tel" placeholder="+36 …" /></label>
+          <label class="sf-field"><span>Irányítószám / város <small style="font-weight:600;color:var(--muted)">(opc.)</small></span><input id="b-city" type="text" placeholder="pl. 2083 Solymár" /></label>
+        </div>
+
+        <div id="compBox" class="sf-grid" hidden style="margin-top:18px">
+          <label class="sf-field"><span>Cégnév</span><input id="b-cname" type="text" placeholder="Kft. / Zrt. …" /></label>
+          <label class="sf-field"><span>Adószám</span><input id="b-tax" type="text" placeholder="pl. 12345678-2-13" /></label>
+          <label class="sf-field"><span>Közösségi (EU) adószám</span><input id="b-euvat" type="text" placeholder="pl. HU12345678" title="Nettó, EU-s céges vételhez szükséges" /></label>
+          <label class="sf-field"><span>Kapcsolattartó</span><input id="b-contact" type="text" placeholder="Név" /></label>
+          <label class="sf-field"><span>E-mail</span><input id="b-cemail" type="email" placeholder="ceg@pelda.hu" /></label>
+          <label class="sf-field"><span>Telefonszám</span><input id="b-cphone" type="tel" placeholder="+36 …" /></label>
+          <label class="sf-field"><span>Székhely / város <small style="font-weight:600;color:var(--muted)">(opc.)</small></span><input id="b-caddr" type="text" placeholder="Irányítószám, város" /></label>
+        </div>
+
+        <label class="ca-consent"><input type="checkbox" name="consent" id="kwConsent" required /><span>Elolvastam és elfogadom az <a href="/aszf/" target="_blank" rel="noopener">ÁSZF</a>-et és az <a href="/adatkezeles/" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. *</span></label>
+        <p class="kw-note" style="margin-top:16px">Az adatok elküldésével felveszed velünk a kapcsolatot — a keresés ingyenes és nem kötelez semmire.</p>
+      </div>
+
+      <!-- NAV -->
+      <div class="kw-nav" id="kwNav" hidden>
+        <button type="button" class="btn btn-ghost" id="kwPrev" style="visibility:hidden">← Vissza</button>
+        <span class="kw-count" id="kwCount">1 / 5</span>
+        <button type="button" class="btn btn-primary" id="kwNext">Tovább →</button>
+        <button type="submit" class="btn btn-primary" id="kwSubmit" hidden>Elküldöm a keresést →</button>
+      </div>
+      </div>
+    </form>
+  </div>
+<style>.ca-consent{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45;cursor:pointer;margin:14px 0 4px;color:inherit;text-align:left}.ca-consent input{width:18px;height:18px;accent-color:#E2001A;flex:0 0 auto;margin:1px 0 0}.ca-consent a{color:#E2001A;font-weight:700}.ca-consent.err span{color:#E2001A}</style>
+</section>
+
+<style>
+  [hidden]{display:none !important}
+  .kw{max-width:960px;margin:34px auto 0}
+  .kw-head{margin-bottom:26px}
+  .kw-steps{display:flex;gap:6px;margin-bottom:14px}
+  .kw-dot{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+  .kw-dot b{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:#EEF1F6;color:#9aa4b2;transition:.2s}
+  .kw-dot i{font-style:normal;font-size:11.5px;font-weight:700;color:#9aa4b2;letter-spacing:.01em}
+  .kw-dot.active b{background:var(--red);color:#fff}
+  .kw-dot.active i{color:var(--ink)}
+  .kw-dot.done b{background:#1a1d23;color:#fff}
+  .kw-dot.done i{color:var(--muted)}
+  .kw-bar{height:6px;background:#EEF1F6;border-radius:999px;overflow:hidden}
+  .kw-bar>i{display:block;height:100%;background:var(--red);border-radius:999px;transition:width .3s ease}
+  .kw-panel{animation:kwfade .25s ease}
+  .kw-sub{font-weight:800;font-size:13px;color:var(--ink);margin:18px 0 8px}
+  .kw-sub small{font-weight:600;color:var(--muted)}
+  .kw-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .kw-chip{display:inline-flex;align-items:center;cursor:pointer;user-select:none}
+  .kw-chip input{position:absolute;opacity:0;width:1px;height:1px}
+  .kw-chip span{display:inline-block;padding:8px 13px;border:1.5px solid var(--line);border-radius:999px;background:#F7F9FC;font-size:13.5px;font-weight:700;color:var(--ink);transition:.15s}
+  .kw-chip:hover span{border-color:#c9d2e0}
+  .kw-chip input:checked+span{border-color:var(--red);background:#fff;color:var(--red);box-shadow:0 0 0 3px rgba(226,0,26,.08)}
+  .kw-chip input:focus-visible+span{outline:2px solid var(--red);outline-offset:2px}
+  .kw-chip-solo{margin-top:10px}
+  .kw-more{margin-top:20px;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;background:#fff}
+  .kw-more summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--ink)}
+  .kw-more[open] summary{margin-bottom:4px}
+  @keyframes kwfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .kw-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .kw-opts-3{grid-template-columns:repeat(3,1fr)}
+  .kw-opts-2{grid-template-columns:1fr 1fr;max-width:420px}
+  .kw-opt{position:relative;display:flex;align-items:flex-start;gap:12px;background:#F7F9FC;border:1.5px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:.15s}
+  .kw-opt:hover{border-color:#c9d2e0}
+  .kw-opt input{margin-top:3px;accent-color:var(--red);width:18px;height:18px;flex:0 0 auto}
+  .kw-opt-b{display:flex;flex-direction:column;gap:3px}
+  .kw-opt-b b{font-size:15px;color:var(--ink)}
+  .kw-opt-b small{font-size:13px;color:var(--muted);line-height:1.45}
+  .kw-opt:has(input:checked){border-color:var(--red);background:#fff;box-shadow:0 0 0 3px rgba(226,0,26,.08)}
+  .kw-compare{margin-top:22px;background:#0B0B0D;border-radius:16px;padding:20px 22px;color:#fff}
+  .kw-compare-t{font-weight:800;font-size:15px;margin-bottom:14px}
+  .kw-compare-links{display:flex;gap:12px;flex-wrap:wrap}
+  .kw-cmp{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#141519;font-weight:700;font-size:14px;text-decoration:none;padding:11px 16px;border-radius:11px}
+  .kw-cmp img{height:18px;width:auto;border-radius:3px}
+  .kw-cmp:hover{filter:brightness(.96)}
+  .kw-pricelinks{display:flex;flex-direction:column;gap:10px}
+  .kw-pricerow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kw-pricerow>img{height:22px;width:auto;border-radius:4px}
+  .kw-note{font-size:12.5px;color:#9aa7b8;line-height:1.5;margin:14px 0 0}
+  .kw-hint{font-size:13px;color:var(--muted);background:#F7F9FC;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:16px}
+  .kw-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+  .kw-count{font-size:13px;font-weight:700;color:var(--muted)}
+  .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:#c9d2e0}
+  .kw-nav .btn{padding:13px 22px}
+  @media(max-width:640px){
+    .kw-dot i{display:none}
+    .kw-opts,.kw-opts-3,.kw-opts-2{grid-template-columns:1fr;max-width:none}
+    .kw-cmp{width:100%;justify-content:center}
+  }
+  /* Autó rendelés kártya (import oldal) — a hero-videó aljára csúszik */
+  .ik{position:relative;z-index:5;margin-top:-196px;padding:0}
+  .ik .kw.ik-card{max-width:1120px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 26px 70px rgba(8,8,10,.18);padding:0;overflow:hidden}
+  .ik-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);background:#fff}
+  .ik-tab{appearance:none;-webkit-appearance:none;border:0;background:none;font:inherit;display:flex;align-items:center;justify-content:center;gap:12px;padding:21px 12px 19px;font-size:15.5px;font-weight:800;color:var(--ink);cursor:pointer;position:relative;transition:background .15s}
+  .ik-tab:hover{background:#FAFBFD}
+  .ik-tab svg{width:26px;height:26px;color:var(--ink);flex:0 0 auto}
+  .ik-tab.active svg,.ik-tab.done svg{color:var(--red)}
+  .ik-tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--red);border-radius:3px 3px 0 0}
+  .ik-tab.done span::after{content:" ✓";color:var(--red)}
+  .ik-body{padding:28px 30px 30px}
+  .ik .sf-grid.ik-grid{grid-template-columns:repeat(4,1fr);gap:20px 26px}
+  .ik .sf-grid.ik-grid + .sf-grid.ik-grid{margin-top:22px}
+  .ik .sf-field>span{font-size:14px;font-weight:800}
+  .ik .sf-field input,.ik .sf-field select,.ik .sf-field textarea{background-color:#fff;border-radius:10px;font-weight:500}
+  .ik .sf-field input,.ik .sf-field select{height:48px}
+  .ik-origin{position:relative}
+  .ik-flag{position:absolute;left:14px;bottom:15px;width:24px;height:17px;border-radius:3px;background-size:cover;background-position:center;box-shadow:0 0 0 1px rgba(11,11,13,.1);pointer-events:none}
+  .ik-origin select{padding-left:48px}
+  .ik-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;flex-wrap:wrap}
+  .ik-more-t,.ik-reset{appearance:none;-webkit-appearance:none;border:0;background:none;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:10px;font-size:14.5px;color:var(--ink);padding:4px 0;text-align:left}
+  .ik-more-t b{font-weight:800}
+  .ik-more-t span{color:var(--ink)}
+  .ik-more-t .chev{width:24px;height:24px;border-radius:7px;background:#F1F3F7;display:inline-flex;align-items:center;justify-content:center;transition:transform .2s;flex:0 0 auto}
+  .ik-more-t .chev svg{width:15px;height:15px}
+  .ik-more-t[aria-expanded=true] .chev{transform:rotate(180deg)}
+  .ik-reset{font-weight:600}
+  .ik-reset svg{width:17px;height:17px}
+  .ik-reset:hover,.ik-more-t:hover b{color:var(--red)}
+  .ik-more{margin-top:16px;border-top:1px solid var(--line);padding-top:20px}
+  .ik-go{margin-top:24px;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--red);color:#fff;border:0;border-radius:12px;padding:17px 20px;font:inherit;font-size:19px;font-weight:800;cursor:pointer;box-shadow:0 12px 26px rgba(226,0,26,.24);transition:filter .15s,transform .15s}
+  .ik-go:hover{filter:brightness(.94);transform:translateY(-1px)}
+  .ik-go svg{width:24px;height:24px}
+  .ik-free{margin:12px 0 0;text-align:center;font-size:13px;color:var(--muted)}
+  .ik .kw-nav{margin-top:24px}
+  @media(max-width:900px){
+    .ik{margin-top:-150px}
+    .ik .sf-grid.ik-grid{grid-template-columns:1fr 1fr;gap:16px}
+    .ik-tab{font-size:14px;gap:8px}
+  }
+  @media(max-width:560px){
+    .ik{margin-top:-110px}
+    .ik .wrap{padding:0 12px}
+    .ik-tab{flex-direction:column;gap:5px;font-size:11.5px;padding:14px 4px 12px}
+    .ik-tab svg{width:22px;height:22px}
+    .ik-tab.done span::after{content:""}
+    .ik .sf-grid.ik-grid{grid-template-columns:1fr}
+    .ik-body{padding:20px 18px 22px}
+    .ik-more-t span{display:none}
+    .ik-go{font-size:17px}
+  }
+</style>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqJsonld)}></script>
+
+<script is:inline>
+(function(){
+  var SEARCH_ENDPOINT = "/api/lead";
+  var form = document.getElementById('buyForm');
+  if(!form) return;
+  var TOTAL = 5, step = 1;
+  var val = function(id){ var e=document.getElementById(id); return e? (e.value||'').trim() : ''; };
+  var radioVal = function(name){ var r=form.querySelector('input[name="'+name+'"]:checked'); return r? r.value : ''; };
+
+  var slug = function(s){ return (s||'').toLowerCase()
+    .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ö/g,'o').replace(/ő/g,'o').replace(/ú/g,'u').replace(/ü/g,'u').replace(/ű/g,'u').replace(/ä/g,'a')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); };
+
+  var MODELS = {
+    'Audi': {'A sorozat':['A1','A2','A3','A3 Sportback','A4','A4 Allroad','A5','A5 Sportback','A6','A6 Allroad','A7','A8'],'Q sorozat':['Q2','Q3','Q3 Sportback','Q4 e-tron','Q5','Q5 Sportback','Q7','Q8'],'Sport / elektromos':['TT','TTS','TT RS','R8','e-tron','e-tron GT','Q8 e-tron'],'S / RS':['S1','S3','S4','S5','S6','S7','S8','SQ5','SQ7','SQ8','RS3','RS4','RS5','RS6','RS7','RS Q3','RS Q8']},
+    'BMW': {'1-es / 2-es':['114','116','118','120','123','125','128','130','135','M135','214','216','218','220','225','228','230','235','240','M235','M240'],'3-as / 4-es':['316','318','320','323','325','328','330','335','340','M340','418','420','425','428','430','435','440','M440'],'5-ös / 6-os':['518','520','523','525','528','530','535','540','545','550','M550','620','628','630','635','640','645','650'],'7-es / 8-as':['725','728','730','735','740','745','750','760','840','850','M850'],'X (SUV)':['X1','X2','X3','X4','X5','X6','X7','XM'],'Z / i / M':['Z1','Z3','Z4','Z8','i3','i4','i5','i7','i8','iX','iX1','iX3','M2','M3','M4','M5','M8','X3 M','X4 M','X5 M','X6 M']},
+    'Mercedes-Benz': {'A / B-osztály':['A 140','A 150','A 160','A 170','A 180','A 190','A 200','A 210','A 220','A 250','A 35 AMG','A 45 AMG','B 150','B 160','B 170','B 180','B 200','B 220','B 250'],'C-osztály':['C 160','C 180','C 200','C 220','C 230','C 240','C 250','C 270','C 280','C 300','C 320','C 350','C 400','C 43 AMG','C 63 AMG'],'E-osztály':['E 200','E 220','E 240','E 250','E 260','E 270','E 280','E 300','E 320','E 350','E 400','E 420','E 430','E 450','E 500','E 53 AMG','E 63 AMG'],'S-osztály':['S 280','S 300','S 320','S 350','S 400','S 420','S 450','S 500','S 550','S 560','S 600','S 63 AMG','S 65 AMG'],'CLA / CLS / CLK':['CLA 180','CLA 200','CLA 220','CLA 250','CLA 45 AMG','CLS 250','CLS 350','CLS 400','CLS 500','CLK 200','CLK 240','CLK 320','CLK 500'],'GLA–GLS / ML / GLK / G':['GLA 200','GLA 220','GLA 250','GLB 200','GLB 220','GLC 200','GLC 220','GLC 250','GLC 300','GLC 350','GLE 300','GLE 350','GLE 400','GLE 450','GLS 350','GLS 400','GLS 450','ML 250','ML 320','ML 350','GLK 220','GLK 320','G 320','G 350','G 500','G 63 AMG'],'SL / SLK / SLC / GT':['SL 350','SL 500','SL 600','SLK 200','SLK 250','SLK 350','SLC 200','SLC 300','AMG GT'],'V / Vito / Sprinter':['V 220','V 250','V 300','Vito 110','Vito 111','Vito 114','Vito 116','Sprinter'],'EQ (elektromos)':['EQA','EQB','EQC','EQE','EQS','EQV'],'Klasszikus':['170S','170V','190','200','220','230','250','280','300','420 SE','500 SE','600']},
+    'Volkswagen': {'Kompakt':['up!','Fox','Lupo','Polo','Golf','Golf Plus','Golf Sportsvan','Scirocco','Beetle','New Beetle'],'Limuzin':['Jetta','Bora','Vento','Passat','Passat CC','CC','Arteon','Phaeton','Eos'],'SUV':['T-Cross','T-Roc','Taigo','Tiguan','Tiguan Allspace','Touareg'],'Egyterű / haszon':['Touran','Sharan','Caddy','Transporter','Multivan','Amarok'],'ID. (elektromos)':['ID.3','ID.4','ID.5','ID.7','ID. Buzz']},
+    'Porsche': ['911','718 Cayman','718 Boxster','Cayman','Boxster','Cayenne','Cayenne Coupé','Macan','Panamera','Taycan','924','928','944','968'],
+    'Toyota': ['Aygo','Aygo X','iQ','Yaris','Yaris Cross','Corolla','Corolla Verso','Corolla Cross','Auris','Avensis','Camry','C-HR','RAV4','Prius','Prius+','Land Cruiser','Hilux','Proace','Proace City','Highlander','bZ4X','Supra','GT86','GR86','Verso','Previa','MR2','Celica'],
+    'Ford': ['Ka','Ka+','Fiesta','Focus','Fusion','Mondeo','Puma','EcoSport','Kuga','Edge','Escort','Mustang','Mustang Mach-E','Galaxy','S-Max','C-Max','B-Max','Grand C-Max','Transit','Transit Custom','Transit Connect','Tourneo','Tourneo Custom','Tourneo Connect','Ranger','Explorer','Cougar'],
+    'Opel': ['Adam','Karl','Agila','Corsa','Corsa-e','Astra','Vectra','Insignia','Signum','Meriva','Zafira','Mokka','Mokka-e','Crossland','Grandland','Combo','Combo Life','Vivaro','Movano','Antara','Frontera','Tigra','Cascada','Ampera'],
+    'Škoda': ['Citigo','Fabia','Rapid','Scala','Octavia','Superb','Roomster','Kamiq','Karoq','Kodiaq','Enyaq','Yeti','Felicia','Favorit'],
+    'Volvo': ['S40','S60','S70','S80','S90','V40','V50','V60','V70','V90','C30','C40','C70','XC40','XC60','XC70','XC90','EX30','EX90','850','940','960'],
+    'Land Rover': ['Defender','Discovery','Discovery Sport','Discovery 3','Discovery 4','Freelander','Series'],
+    'Range Rover': ['Range Rover','Range Rover Sport','Range Rover Velar','Range Rover Evoque'],
+    'Lexus': ['CT','IS','ES','GS','LS','RC','LC','UX','NX','RX','GX','LX','RZ'],
+    'Tesla': ['Model 3','Model S','Model X','Model Y','Roadster','Cybertruck'],
+    'Hyundai': ['i10','i20','i30','i40','ix20','ix35','Accent','Getz','Elantra','Sonata','Bayon','Kona','Tucson','Santa Fe','Ioniq','Ioniq 5','Ioniq 6','Nexo','Matrix','Coupe','Terracan','H-1','Staria'],
+    'Kia': ['Picanto','Rio','Ceed','ProCeed','Stonic','XCeed','Sportage','Sorento','Niro','EV6','EV9','Soul','Venga','Carens','Carnival','Optima','Stinger','Cerato','Magentis'],
+    'Renault': ['Twingo','Clio','Modus','Megane','Fluence','Laguna','Talisman','Captur','Kadjar','Arkana','Austral','Scenic','Grand Scenic','Espace','Koleos','Kangoo','Trafic','Master','Zoe','Twizy','Latitude','Vel Satis','Avantime'],
+    'Peugeot': ['106','107','108','206','207','208','301','306','307','308','406','407','408','508','1007','2008','3008','4007','4008','5008','Partner','Rifter','Expert','Traveller','Boxer','RCZ','iOn','Bipper'],
+    'Citroën': ['C1','C2','C3','C3 Aircross','C3 Picasso','C4','C4 Cactus','C4 Picasso','C4 X','C5','C5 Aircross','C5 X','C6','C8','C-Elysée','Berlingo','Jumpy','SpaceTourer','Nemo','Xsara','Xsara Picasso','Saxo','DS3','DS4','DS5'],
+    'Mazda': ['2','3','5','6','323','626','MX-3','MX-5','MX-30','RX-8','CX-3','CX-30','CX-5','CX-7','CX-60','CX-9','Premacy','Tribute','BT-50'],
+    'Nissan': ['Micra','Note','Leaf','Juke','Qashqai','Qashqai+2','X-Trail','Murano','Ariya','Pulsar','Almera','Primera','Maxima','370Z','350Z','GT-R','Navara','Pathfinder','Patrol','Townstar','NV200','Terrano','Pixo'],
+    'Honda': ['Jazz','Civic','Accord','Insight','HR-V','CR-V','ZR-V','CR-Z','e','e:Ny1','Legend','Prelude','S2000','NSX','FR-V','Stream','Logo'],
+    'Suzuki': ['Alto','Celerio','Swift','Splash','Ignis','Baleno','SX4','SX4 S-Cross','S-Cross','Vitara','Grand Vitara','Across','Jimny','Wagon R+','Liana','Kizashi','Samurai'],
+    'Fiat': ['500','500C','500X','500L','500e','Panda','Punto','Grande Punto','Tipo','Bravo','Stilo','Doblo','Qubo','Fiorino','Freemont','Multipla','Sedici','Croma','Ducato','Talento','Scudo','Idea','Linea','Seicento','Marea'],
+    'SEAT': ['Mii','Ibiza','Cordoba','Leon','Toledo','Arona','Ateca','Tarraco','Alhambra','Altea','Altea XL','Exeo'],
+    'Cupra': ['Leon','Formentor','Born','Ateca','Tavascan','Terramar'],
+    'Mini': ['One','Cooper','Cooper S','Clubman','Countryman','Paceman','Cabrio','Coupe','Roadster','Electric'],
+    'Jaguar': ['XE','XF','XJ','XK','S-Type','X-Type','E-Pace','F-Pace','I-Pace','F-Type'],
+    'Alfa Romeo': ['MiTo','Giulietta','147','156','159','166','Giulia','Brera','Spider','GT','GTV','Stelvio','Tonale','Junior','4C','8C'],
+    'Dacia': ['Sandero','Logan','Duster','Jogger','Spring','Lodgy','Dokker','Nova'],
+    'Jeep': ['Renegade','Compass','Cherokee','Grand Cherokee','Wrangler','Avenger','Commander','Patriot','Gladiator'],
+    'Subaru': ['Impreza','Legacy','Outback','Forester','XV','Crosstrek','BRZ','Levorg','Justy','Tribeca','WRX','Trezia'],
+    'Maserati': ['Ghibli','Quattroporte','Levante','GranTurismo','GranCabrio','Grecale','MC20','3200 GT','Coupé'],
+    'Mitsubishi': ['Colt','Lancer','Space Star','Mirage','ASX','Eclipse Cross','Outlander','Pajero','Pajero Pinin','L200','Grandis','Galant','Carisma','Space Runner','i-MiEV'],
+    'Abarth': ['500','595','695','124 Spider','Punto','Grande Punto'],
+    'Aston Martin': ['DB7','DB9','DB11','DB12','DBS','Vantage','Vanquish','Rapide','Virage','DBX','Valkyrie','Valour'],
+    'Bentley': ['Continental','Continental GT','Continental GTC','Flying Spur','Bentayga','Arnage','Mulsanne','Azure','Brooklands','Turbo R'],
+    'BYD': ['Atto 3','Atto 2','Dolphin','Dolphin Surf','Seal','Seal U','Seal U DM-i','Sealion 7','Han','Tang','Song Plus'],
+    'Cadillac': ['ATS','CTS','STS','CT6','SRX','XT4','XT5','XT6','Escalade','BLS','Eldorado','Seville','Lyriq','Optiq'],
+    'Chevrolet': ['Spark','Matiz','Aveo','Kalos','Cruze','Lacetti','Malibu','Epica','Captiva','Orlando','Trax','Camaro','Corvette','Trailblazer','Tahoe','Suburban'],
+    'Chrysler': ['300C','300M','PT Cruiser','Voyager','Grand Voyager','Sebring','Crossfire','Pacifica','Neon'],
+    'Dodge': ['Caliber','Nitro','Journey','Avenger','Charger','Challenger','Durango','RAM','Viper'],
+    'DS': ['DS 3','DS 3 Crossback','DS 4','DS 5','DS 7','DS 7 Crossback','DS 9'],
+    'Ferrari': ['California','Portofino','Roma','812','488','458','F8','SF90','296','Purosangue','599','612','FF','F12','Testarossa'],
+    'Infiniti': ['Q30','Q50','Q60','Q70','QX30','QX50','QX70','FX','EX','G37','M'],
+    'Isuzu': ['D-Max','Trooper','Rodeo'],
+    'Lada': ['Niva','Niva Legend','4x4','Vesta','Granta','Kalina','Priora','Samara','110','2107','Largus'],
+    'Lamborghini': ['Huracán','Aventador','Gallardo','Urus','Murciélago','Revuelto','Countach','Temerario'],
+    'Lancia': ['Ypsilon','Delta','Musa','Thema','Thesis','Lybra','Phedra','Kappa'],
+    'MG': ['MG3','MG3 Hybrid+','MG4','MG5','ZS','HS','EHS','Marvel R','Cyberster','TF','ZR','ZT'],
+    'Rover': ['25','45','75','200','400','600','Streetwise','City Rover'],
+    'Saab': ['9-3','9-5','900','9000','9-4X','9-7X','90','96','99'],
+    'Smart': ['ForTwo','ForFour','Roadster','Crossblade','#1','#3','#5'],
+    'SsangYong': ['Tivoli','Korando','Rexton','Musso','Torres','XLV','Kyron','Actyon','Rodius']
+  };
+
+  var makeSel = document.getElementById('b-make');
+  var modelSel = document.getElementById('b-model');
+  var fillModels = function(){
+    var data = MODELS[mkKey(makeSel.value)] || MODELS[makeSel.value];
+    var has = !!data && (Array.isArray(data) ? data.length : Object.keys(data).length);
+    modelSel.innerHTML = '';
+    var ph = document.createElement('option');
+    ph.value=''; ph.disabled=true; ph.selected=true;
+    ph.textContent = has ? 'Válassz modellt…' : 'Nincs lista — írd a Típusjelbe';
+    modelSel.appendChild(ph);
+    var addOpt = function(parent,m){ var o=document.createElement('option'); o.textContent=m; parent.appendChild(o); };
+    if(Array.isArray(data)){ data.forEach(function(m){ addOpt(modelSel,m); }); }
+    else if(data){ Object.keys(data).forEach(function(grp){ var og=document.createElement('optgroup'); og.label=grp; data[grp].forEach(function(m){ addOpt(og,m); }); modelSel.appendChild(og); }); }
+    var other=document.createElement('option'); other.textContent='Egyéb (nincs a listában)'; modelSel.appendChild(other);
+    modelSel.disabled=false;
+  };
+
+  var EURHUF = 400;
+  var toEur = function(amountStr, cur){
+    var n = parseInt((amountStr||'').replace(/\D/g,''),10)||0;
+    if(!n) return 0;
+    return cur === '€' ? n : Math.round(n / EURHUF);
+  };
+  var MOBILE_MAKE = {"Abarth":"140","Alfa Romeo":"900","Aston Martin":"1700","Audi":"1900","Bentley":"3100","BMW":"3500","BYD":"31953","Cadillac":"4700","Chevrolet":"5600","Chrysler":"5700","Citroën":"5900","Cupra":"3","Dacia":"6600","Dodge":"7700","DS":"235","Ferrari":"8600","Fiat":"8800","Ford":"9000","Honda":"11000","Hyundai":"11600","Infiniti":"11650","Isuzu":"11900","Jaguar":"12400","Jeep":"12600","Kia":"13200","Lada":"14400","Lamborghini":"14600","Lancia":"14700","Land Rover":"14800","Lexus":"15200","Maserati":"16600","Mazda":"16800","Mercedes-Benz":"17200","MG":"17300","Mini":"17500","Mitsubishi":"17700","Nissan":"18700","Opel":"19000","Peugeot":"19300","Porsche":"20100","Range Rover":"14800","Renault":"20700","Rover":"21700","Saab":"21800","SEAT":"22500","Škoda":"22900","Smart":"23000","Subaru":"23500","Suzuki":"23600","Tesla":"135","Toyota":"24100","Volkswagen":"25200","Volvo":"25100","Skoda":"22900","AC":"203","Acura":"375","Aiways":"31930","Aixam":"800","ALPINA":"1100","Alpine":"5","Alvis":"32315","Ariel":"31876","Artega":"121","Asia Motors":"1750","Austin":"2000","Austin Healey":"1950","Auto Union":"32323","BAIC":"31863","Barkas":"2600","BAW":"32363","Bizzarrini":"32316","Boldmen":"32411","Borgward":"3850","Bovensiepen":"32398","Brilliance":"4025","Bugatti":"4350","Buick":"4400","Casalini":"112","Caterham":"5300","Cenntro":"31944","Changan":"32359","Chatenet":"83","Cobra":"6200","Corvette":"6325","Daewoo":"6800","Daihatsu":"7000","Dallara":"32357","Datsun":"30002","Delahaye":"32317","DeLorean":"32324","DeTomaso":"7400","DFM":"32395","DFSK":"31864","Dongfeng":"32407","Donkervoort":"255","DS Automobiles":"235","e.GO":"31931","Elaris":"31932","Estrima":"32142","Facel Vega":"32318","Fisker":"172","Foton":"117","GAC Gonow":"205","Geely":"30005","Gemballa":"204","Genesis":"270","GMC":"9900","Grecav":"122","GWM":"30006","Hamann":"186","Heinkel":"32141","Holden":"10850","Hongqi":"32228","Horch":"32319","Hummer":"11050","INEOS":"32033","Invicta":"32320","Iveco":"12100","JAC":"30708","JAECOO":"32381","Jetour":"32394","Jiayuan":"32305","KGM":"32332","Koenigsegg":"13450","KTM":"13900","Landwind":"14845","Leapmotor":"32303","LEVC":"31933","Ligier":"15400","Lincoln":"15500","Linktour":"32410","Lotus":"15900","Lucid":"32172","Lynk&Co":"31934","Mahindra":"16200","MAN":"16500","Maxus":"31896","Maybach":"16700","McLaren":"137","Messerschmitt":"32321","M-HERO":"32408","Microcar":"30011","Microlino":"32044","MINI":"17500","Morgan":"17900","NIO":"31954","NSU":"18875","Oldsmobile":"18975","OMODA":"32380","Packard":"32021","Pagani":"149","Piaggio":"19600","Plymouth":"19800","Polestar":"4","Pontiac":"20000","Proton":"20200","Riley":"32322","Rimac":"32368","Rolls-Royce":"21600","Ruf":"125","Santana":"22000","Seat":"22500","Seres":"32144","Silence":"31920","Simca":"293","speedART":"188","Spyker":"100","Ssangyong":"23100","Studebaker":"296","SWM":"247","Talbot":"23800","Tata":"23825","TECHART":"189","Togg":"32369","Trabant":"24200","Triumph":"24400","TVR":"24500","TYN-e":"32336","Venucia":"32406","Vincent":"31389","VinFast":"32207","Voyah":"32375","Wartburg":"25300","Westfield":"113","WEY":"31956","Wiesmann":"25650","XEV":"32034","XPENG":"32208","Zeekr":"32331","Zhidou":"32032"};
+  // a mobile.de márkanevek → a modell-listák kulcsa
+  var MK_ALIAS = {'MINI':'Mini','Skoda':'Škoda','Seat':'SEAT','DS Automobiles':'DS','Ssangyong':'SsangYong'};
+  var mkKey = function(m){ return MK_ALIAS[m] || m; };
+  var MOBILE_MODEL = {
+    "Audi":{"A1":"25","A2":"7","A3":"8","A4":"9","A4 Allroad":"33","A5":"31","A6":"10","A6 Allroad":"12","A7":"34","A8":"11","Q2":"45","Q3":"37","Q4 e-tron":"61","Q5":"32","Q7":"15","Q8":"46","TT":"23","TTS":"4","TT RS":"35","R8":"29","e-tron":"50","e-tron GT":"58","Q8 e-tron":"65","S1":"42","S3":"19","S4":"20","S5":"30","S6":"21","S7":"38","S8":"22","SQ5":"39","SQ7":"44","SQ8":"54","RS3":"36","RS4":"27","RS5":"17","RS6":"28","RS7":"40","RS Q3":"41","RS Q8":"55"},
+    "BMW":{"114":"73","116":"2","118":"3","120":"4","123":"59","125":"61","128":"328","130":"5","135":"58","M135":"69","216":"106","218":"90","220":"84","225":"91","228":"104","230":"125","M235":"85","316":"8","318":"9","320":"10","323":"11","325":"13","328":"14","330":"15","335":"56","340":"118","418":"115","420":"80","425":"102","428":"81","430":"83","435":"82","440":"120","M440":"335","518":"16","520":"17","523":"18","525":"20","528":"21","530":"22","535":"23","540":"24","545":"25","550":"26","M550":"86","628":"27","630":"28","635":"30","640":"68","645":"31","650":"32","725":"33","728":"34","730":"35","735":"37","740":"38","745":"39","750":"40","760":"41","840":"42","850":"43","X1":"6","X2":"129","X3":"48","X4":"92","X5":"49","X6":"60","X7":"143","XM":"338","Z1":"50","Z3":"51","Z4":"52","Z8":"54","i3":"79","i4":"330","i5":"341","i7":"336","i8":"89","iX":"331","iX1":"337","iX3":"329","M2":"117","M3":"45","M4":"93","M5":"46","M8":"154","X3 M":"145","X4 M":"146","X5 M":"53","X6 M":"62"},
+    "Mercedes-Benz":{"A 140":"2","A 150":"3","A 160":"4","A 170":"5","A 180":"6","A 190":"7","A 200":"8","A 210":"9","A 220":"221","A 250":"220","A 35 AMG":"298","A 45 AMG":"229","B 150":"12","B 160":"11","B 170":"13","B 180":"14","B 200":"15","B 220":"222","B 250":"223","C 160":"16","C 180":"17","C 200":"18","C 220":"19","C 230":"20","C 240":"21","C 250":"22","C 270":"23","C 280":"24","C 300":"44","C 320":"27","C 350":"28","C 400":"245","C 43 AMG":"30","C 63 AMG":"198","E 200":"47","E 220":"48","E 240":"50","E 250":"51","E 260":"52","E 270":"53","E 280":"54","E 300":"56","E 320":"57","E 350":"58","E 400":"60","E 420":"61","E 430":"62","E 450":"321","E 500":"64","E 53 AMG":"296","E 63 AMG":"179","S 280":"83","S 300":"84","S 320":"85","S 350":"86","S 400":"87","S 420":"88","S 450":"191","S 500":"90","S 550":"193","S 560":"285","S 600":"93","S 63 AMG":"194","S 65 AMG":"94","CLA 180":"225","CLA 200":"226","CLA 220":"227","CLA 250":"228","CLA 45 AMG":"230","CLS 250":"212","CLS 350":"148","CLS 400":"239","CLS 500":"149","CLK 200":"168","CLK 240":"187","CLK 320":"171","CLK 500":"174","GLA 200":"231","GLA 220":"232","GLA 250":"233","GLB 200":"328","GLB 220":"336","GLC 200":"325","GLC 220":"253","GLC 250":"254","GLC 300":"284","GLC 350":"278","GLE 300":"324","GLE 350":"251","GLE 400":"252","GLE 450":"243","GLS 350":"268","GLS 400":"269","GLS 450":"340","ML 250":"215","ML 320":"74","ML 350":"75","GLK 220":"206","GLK 320":"208","G 320":"158","G 350":"160","G 500":"161","G 63 AMG":"218","SL 350":"98","SL 500":"102","SL 600":"105","SLK 200":"108","SLK 250":"214","SLK 350":"113","SLC 200":"275","SLC 300":"276","AMG GT":"242","V 220":"119","V 250":"235","V 300":"323","Sprinter":"116","EQA":"346","EQB":"350","EQC":"322","EQE":"352","EQS":"351","EQV":"344","190":"126","200":"127","220":"128","230":"129","250":"131","280":"134","300":"136","600":"146"},
+    "Volkswagen":{"up!":"11","Fox":"13","Lupo":"21","Polo":"27","Golf":"14","Golf Plus":"55","Golf Sportsvan":"40","Scirocco":"29","Beetle":"10","New Beetle":"24","Jetta":"16","Bora":"6","Vento":"39","Passat":"25","Passat CC":"4","CC":"19","Arteon":"64","Phaeton":"26","Eos":"41","T-Cross":"75","T-Roc":"65","Taigo":"86","Tiguan":"54","Tiguan Allspace":"66","Touareg":"36","Touran":"37","Sharan":"30","Caddy":"9","Amarok":"5","ID.3":"81","ID.4":"82","ID.5":"93","ID.7":"97","ID. Buzz":"94"},
+    "Porsche":{"Cayman":"19","Boxster":"16","Cayenne":"18","Macan":"22","Panamera":"4","Taycan":"30","924":"10","928":"11","944":"12","968":"15"},
+    "Toyota":{"Aygo X":"5","iQ":"41","Yaris":"36","Yaris Cross":"78","Corolla":"9","Corolla Verso":"40","Corolla Cross":"88","Auris":"39","Avensis":"4","Camry":"6","C-HR":"48","RAV4":"28","Prius":"27","Prius+":"42","Land Cruiser":"19","Hilux":"17","Proace City":"76","Highlander":"15","bZ4X":"87","Supra":"33","GT86":"31","GR86":"92","Verso":"20","Previa":"26","MR2":"22","Celica":"8"},
+    "Ford":{"Fiesta":"19","Focus":"20","Fusion":"22","Mondeo":"29","Puma":"33","EcoSport":"56","Kuga":"49","Edge":"48","Escort":"11","Mustang":"30","Mustang Mach-E":"118","Galaxy":"23","S-Max":"47","C-Max":"52","B-Max":"54","Grand C-Max":"50","Transit":"42","Transit Custom":"57","Transit Connect":"51","Tourneo":"41","Tourneo Custom":"62","Tourneo Connect":"61","Ranger":"34","Explorer":"14","Cougar":"5"},
+    "Opel":{"Adam":"38","Karl":"41","Agila":"2","Corsa":"10","Astra":"5","Vectra":"29","Insignia":"35","Signum":"24","Meriva":"16","Zafira":"31","Mokka":"37","Mokka-e":"49","Combo":"8","Combo Life":"47","Vivaro":"30","Movano":"19","Antara":"34","Frontera":"12","Tigra":"27","Cascada":"39","Ampera":"28"},
+    "Škoda":{"Citigo":"17","Fabia":"6","Rapid":"18","Scala":"21","Octavia":"10","Superb":"12","Roomster":"13","Kamiq":"24","Karoq":"20","Kodiaq":"19","Enyaq":"25","Yeti":"15","Felicia":"8","Favorit":"7"},
+    "Volvo":{"S40":"27","S60":"28","S70":"29","S80":"30","S90":"31","V40":"32","V50":"33","V60":"16","V70":"34","V90":"35","C30":"39","C40":"47","C70":"25","XC40":"45","XC60":"40","XC70":"36","XC90":"37","EX30":"49","EX90":"48","850":"18","940":"20","960":"23"},
+    "Land Rover":{"Defender":"2","Discovery":"3","Discovery Sport":"11","Freelander":"4"},
+    "Range Rover":{"Range Rover":"5","Range Rover Sport":"6","Range Rover Velar":"12","Range Rover Evoque":"10"},
+    "Lexus":{"UX":"49","RZ":"65"},
+    "Tesla":{"Model 3":"5","Model S":"3","Model X":"4","Model Y":"6","Roadster":"2"},
+    "Hyundai":{"i10":"31","i20":"32","i30":"30","i40":"33","ix20":"36","ix35":"12","Accent":"2","Getz":"8","Elantra":"5","Sonata":"23","Bayon":"56","Kona":"41","Tucson":"27","Santa Fe":"19","Ioniq":"40","Ioniq 5":"58","Ioniq 6":"60","Nexo":"49","Matrix":"17","Coupe":"4","Terracan":"25","H-1":"13","Staria":"59"},
+    "Kia":{"Picanto":"15","Rio":"19","Ceed":"26","ProCeed":"27","Stonic":"36","XCeed":"49","Sportage":"25","Sorento":"24","Niro":"34","EV6":"52","EV9":"61","Soul":"29","Venga":"32","Carens":"3","Carnival":"4","Optima":"33","Stinger":"35","Cerato":"5","Magentis":"12"},
+    "Renault":{"Twingo":"38","Clio":"6","Modus":"18","Megane":"17","Fluence":"36","Laguna":"14","Talisman":"49","Captur":"47","Kadjar":"48","Arkana":"64","Austral":"65","Scenic":"34","Grand Scenic":"12","Espace":"8","Koleos":"41","Kangoo":"13","Trafic":"37","Master":"16","Zoe":"46","Twizy":"45","Latitude":"44","Vel Satis":"39","Avantime":"5"},
+    "Peugeot":{"106":"4","107":"5","108":"47","206":"8","207":"30","208":"43","301":"45","306":"11","307":"12","308":"32","406":"16","407":"17","408":"37","508":"42","1007":"2","2008":"46","3008":"26","4007":"31","4008":"44","5008":"35","Partner":"29","Rifter":"49","Expert":"27","Traveller":"48","Boxer":"25","RCZ":"36","iOn":"38","Bipper":"33"},
+    "Citroën":{"C1":"7","C2":"9","C3":"11","C3 Aircross":"41","C3 Picasso":"8","C4":"12","C4 Cactus":"37","C4 Picasso":"32","C4 X":"49","C5":"13","C5 Aircross":"44","C5 X":"48","C6":"14","C8":"15","C-Elysée":"38","Berlingo":"5","Jumpy":"21","SpaceTourer":"39","Nemo":"3","Xsara":"28","Xsara Picasso":"29","Saxo":"23","DS3":"20","DS4":"22","DS5":"35"},
+    "Mazda":{"2":"3","3":"4","5":"6","6":"7","323":"5","626":"8","MX-3":"14","MX-5":"15","MX-30":"60","RX-8":"20","CX-3":"34","CX-30":"42","CX-5":"33","CX-60":"63","CX-9":"27","Premacy":"17","Tribute":"21","BT-50":"28"},
+    "Nissan":{"Micra":"20","Note":"23","Leaf":"53","Juke":"52","Qashqai":"47","Qashqai+2":"50","X-Trail":"41","Murano":"21","Ariya":"87","Pulsar":"58","Almera":"7","Primera":"29","Maxima":"19","370Z":"26","350Z":"6","GT-R":"49","Navara":"22","Pathfinder":"24","Patrol":"25","Townstar":"86","NV200":"54","Terrano":"35","Pixo":"36"},
+    "Honda":{"Jazz":"12","Civic":"3","Accord":"2","Insight":"10","HR-V":"9","CR-V":"5","ZR-V":"558","CR-Z":"24","e":"39","e:Ny1":"557","Legend":"13","Prelude":"17","S2000":"18","NSX":"15","FR-V":"8","Stream":"20","Logo":"14"},
+    "Suzuki":{"Alto":"2","Celerio":"13","Swift":"19","Splash":"24","Ignis":"7","Baleno":"3","SX4":"23","Vitara":"20","Grand Vitara":"6","Across":"342","Jimny":"8","Wagon R+":"21","Liana":"9","Kizashi":"11"},
+    "Fiat":{"500":"9","500C":"49","500X":"53","500L":"48","500e":"74","Panda":"28","Punto":"30","Grande Punto":"44","Tipo":"40","Bravo":"12","Stilo":"36","Doblo":"18","Qubo":"13","Fiorino":"21","Freemont":"47","Multipla":"26","Sedici":"45","Croma":"16","Ducato":"19","Talento":"56","Scudo":"33","Idea":"22","Linea":"46","Seicento":"34","Marea":"23"},
+    "SEAT":{"Mii":"12","Ibiza":"7","Cordoba":"5","Leon":"9","Toledo":"15","Arona":"16","Ateca":"13","Tarraco":"17","Alhambra":"2","Altea":"3","Exeo":"6"},
+    "Cupra":{"Leon":"6","Formentor":"5","Born":"7","Ateca":"2","Tavascan":"8","Terramar":"9"},
+    "Mini":{"One":"6","Cooper":"4","Cooper S":"7"},
+    "Jaguar":{"XE":"4","XF":"24","XJ":"9","XK":"23","S-Type":"7","X-Type":"19","E-Pace":"8","F-Pace":"6","I-Pace":"18","F-Type":"3"},
+    "Alfa Romeo":{"MiTo":"28","Giulietta":"17","147":"7","156":"9","159":"10","166":"12","Giulia":"16","Brera":"15","Spider":"21","GT":"18","GTV":"19","Stelvio":"30","Tonale":"34","Junior":"27","4C":"29","8C":"25"},
+    "Dacia":{"Sandero":"24","Logan":"6","Duster":"2","Jogger":"26","Spring":"25","Lodgy":"3","Dokker":"5"},
+    "Jeep":{"Renegade":"8","Compass":"13","Cherokee":"2","Grand Cherokee":"7","Wrangler":"11","Avenger":"18","Commander":"12","Patriot":"14","Gladiator":"16"},
+    "Subaru":{"Impreza":"8","Legacy":"10","Outback":"13","Forester":"7","XV":"6","Crosstrek":"37","BRZ":"12","Levorg":"17","Justy":"9","Tribeca":"2","Trezia":"3"},
+    "Maserati":{"Ghibli":"14","Quattroporte":"20","Levante":"21","GranTurismo":"24","GranCabrio":"13","Grecale":"35","MC20":"34"},
+    "Mitsubishi":{"Colt":"6","Lancer":"16","Space Star":"28","Mirage":"34","ASX":"21","Eclipse Cross":"36","Outlander":"18","Pajero":"19","Pajero Pinin":"20","L200":"13","Grandis":"12","Galant":"10","Carisma":"5","Space Runner":"27","i-MiEV":"25"},
+    "Abarth":{"500":"2","595":"6","695":"8","124 Spider":"10","Grande Punto":"5"},
+    "Aston Martin":{"DB7":"4","DB9":"5","DB11":"17","DB12":"23","DBS":"14","Vanquish":"7","Rapide":"12","Virage":"10","DBX":"21"},
+    "Bentley":{"Continental":"5","Continental GT":"11","Continental GTC":"12","Flying Spur":"15","Bentayga":"16","Arnage":"2","Mulsanne":"7","Azure":"3","Brooklands":"4","Turbo R":"8"},
+    "BYD":{"Atto 3":"2","Atto 2":"10","Dolphin":"6","Dolphin Surf":"13","Seal":"5","Seal U":"7","Sealion 7":"8","Han":"3","Tang":"4"},
+    "Cadillac":{"ATS":"13","CTS":"4","STS":"11","CT6":"14","SRX":"10","XT4":"23","XT5":"15","XT6":"24","Escalade":"7","BLS":"3","Seville":"9","Lyriq":"34","Optiq":"36"},
+    "Chevrolet":{"Spark":"13","Matiz":"30","Aveo":"45","Kalos":"26","Cruze":"51","Lacetti":"27","Malibu":"29","Epica":"49","Captiva":"47","Orlando":"17","Trax":"31","Camaro":"10","Trailblazer":"41","Tahoe":"39","Suburban":"37"},
+    "Chrysler":{"300C":"3","300M":"2","PT Cruiser":"14","Voyager":"21","Grand Voyager":"7","Sebring":"16","Crossfire":"4","Pacifica":"13","Neon":"11"},
+    "Dodge":{"Caliber":"14","Nitro":"16","Journey":"19","Avenger":"18","Charger":"2","Challenger":"8","Durango":"4","RAM":"13","Viper":"12"},
+    "DS":{"DS 3":"2","DS 3 Crossback":"7","DS 4":"3","DS 5":"4","DS 7 Crossback":"6","DS 9":"8"},
+    "Ferrari":{"California":"38","Portofino":"44","Roma":"50","812":"42","458":"2","F8":"48","SF90":"52","Purosangue":"54","FF":"3","F12":"13","Testarossa":"36"},
+    "Infiniti":{"Q30":"18","Q50":"13","Q60":"14","Q70":"15","QX30":"19","QX50":"16","QX70":"17","FX":"2","G37":"4"},
+    "Isuzu":{"D-Max":"10","Trooper":"9"},
+    "Lada":{"Niva":"12","Vesta":"18","Granta":"17","Kalina":"15","Priora":"16","Samara":"14","110":"2","2107":"6"},
+    "Lamborghini":{"Huracán":"12","Aventador":"11","Gallardo":"5","Urus":"13","Murciélago":"9","Revuelto":"19","Countach":"2","Temerario":"20"},
+    "Lancia":{"Ypsilon":"18","Delta":"4","Musa":"11","Thema":"15","Thesis":"16","Lybra":"10","Phedra":"12","Kappa":"9"},
+    "MG":{"MG3":"15","MG4":"23","MG5":"21","ZS":"8","HS":"17","EHS":"19","Marvel R":"22","Cyberster":"24","TF":"6","ZR":"7","ZT":"9"},
+    "Rover":{"25":"10","45":"16","75":"21","200":"5","400":"11","600":"17","Streetwise":"32","City Rover":"36"},
+    "Saab":{"9-3":"5","9-5":"6","900":"3","9000":"4","9-4X":"10","9-7X":"8","90":"2","96":"7","99":"9"},
+    "Smart":{"ForTwo":"4","ForFour":"3","Roadster":"5","Crossblade":"2","#1":"6","#3":"7","#5":"8"}
+  };
+  // ---- mobile.de szűrők (egy az egyben a mobile.de keresőjének paraméterei) ----
+  var chipVals = function(key){ return [].slice.call(form.querySelectorAll('[data-mf="'+key+'"] input:checked')).map(function(i){ return {code:i.value, hu:i.getAttribute('data-hu')}; }); };
+  var selText = function(id){ var e=document.getElementById(id); return e && e.value ? e.options[e.selectedIndex].text : ''; };
+  var hpKw = function(id){ var n=parseInt((val(id)||'').replace(/\D/g,''),10); return n ? Math.round(n*0.7355) : ''; };
+  var mobileUrl = function(withPrice){
+    var q = ['dam=false','isSearchRequest=true','s=Car','vc=Car'];
+    var add = function(k,v){ if(v!=='' && v!=null) q.push(k+'='+encodeURIComponent(v)); };
+    var mkRaw = val('b-make'), md = val('b-model'), desc = val('b-type');
+    if(md.indexOf('Egyéb')===0) md='';
+    var makeId = mkRaw && mkRaw!=='Egyéb' ? MOBILE_MAKE[mkRaw] : '';
+    if(makeId){
+      var modelId = (MOBILE_MODEL[mkKey(mkRaw)]||MOBILE_MODEL[mkRaw]||{})[md] || '';
+      var d2 = desc || (!modelId && md ? md : '');
+      add('ms', makeId+';'+modelId+';;'+d2);
+    } else {
+      var qq = [mkRaw==='Egyéb'?'':mkRaw, md, desc].filter(Boolean).join(' ').trim(); if(qq) add('q', qq);
+    }
+    var yf = val('b-year-from'), yt = val('b-year-to');
+    var kf = (val('b-km-from')||'').replace(/\D/g,''), kt = (val('b-km-to')||'').replace(/\D/g,'');
+    if(yf||yt) add('fr', (yf||'')+':'+(yt||''));
+    if(kf||kt) add('ml', (kf||'')+':'+(kt||''));
+    var pf = hpKw('b-hp-from'), pt = hpKw('b-hp-to'); if(pf||pt) add('pw', pf+':'+pt);
+    chipVals('c').forEach(function(x){ add('c', x.code); });
+    chipVals('ft').forEach(function(x){ add('ft', x.code); });
+    add('tr', val('b-gear')); add('dt', val('b-drive')); add('con', val('b-con'));
+    add('door', val('b-door'));
+    var sf = val('b-seat-from'), st = val('b-seat-to'); if(sf||st) add('sc', (sf||'')+':'+(st||''));
+    add('pvo', val('b-owners')); add('emc', val('b-emc')); add('clim', val('b-clim')); add('spc', val('b-cruise')); add('tct', val('b-tow'));
+    chipVals('ecol').forEach(function(x){ add('ecol', x.code); });
+    var met = document.getElementById('b-metal'); if(met && met.checked) add('fe', 'METALLIC');
+    chipVals('icol').forEach(function(x){ add('icol', x.code); });
+    chipVals('it').forEach(function(x){ add('it', x.code); });
+    chipVals('fe').forEach(function(x){ add('fe', x.code); });
+    add('cn', val('b-cn'));
+    if(/nettó/.test(radioVal('vat')||'')) add('vat', '1');
+    if(withPrice){ var be = toEur(val('b-budget'), val('b-cur')); if(be) add('p', ':'+be); }
+    return 'https://suchen.mobile.de/fahrzeuge/search.html?' + q.join('&');
+  };
+  var updateCompare = function(){
+    var mk = val('b-make'); if(mk==='Egyéb') mk='';
+    var md = val('b-model'); if(md.indexOf('Egyéb')===0) md='';
+    var yf = val('b-year-from'), yt = val('b-year-to');
+    var kf = (val('b-km-from')||'').replace(/\D/g,''), kt = (val('b-km-to')||'').replace(/\D/g,'');
+    var fuel = (chipVals('ft')[0]||{}).hu || '';
+    var budgetEur = toEur(val('b-budget'), val('b-cur'));
+
+    // mobile.de — ugyanaz a keresés, amit az ajánlatmotor is használ
+    var mo = document.getElementById('cmp-mobile');
+    if(mo){
+      var mp = mobileUrl(true);
+      mo.href = mp;
+      var mlo=document.getElementById('cmp-mobile-lo'); if(mlo) mlo.href = mp + '&sb=p&od=up';
+      var mhi=document.getElementById('cmp-mobile-hi'); if(mhi) mhi.href = mp + '&sb=p&od=down';
+    }
+    // AutoScout24
+    var as = document.getElementById('cmp-as24');
+    if(as){
+      var base = 'https://www.autoscout24.de/lst';
+      if(mk) base += '/' + slug(mk);
+      if(mk && md) base += '/' + slug(md);
+      var p = [];
+      p.push('cy=D'); p.push('atype=C');
+      if(yf) p.push('fregfrom=' + yf);
+      if(yt) p.push('fregto=' + yt);
+      if(kf) p.push('kmfrom=' + kf);
+      if(kt) p.push('kmto=' + kt);
+      if(budgetEur) p.push('priceto=' + budgetEur);
+      var af = {'Benzin':'B','Dízel':'D','Elektromos':'E','LPG':'L','Hibrid (benzin)':'2','Hibrid (dízel)':'3','Plug-in hibrid':'2'};
+      if(af[fuel]) p.push('fuel=' + af[fuel]);
+      as.href = base + '?' + p.concat(['sort=standard','desc=0']).join('&');
+      var alo=document.getElementById('cmp-as24-lo'); if(alo) alo.href = base + '?' + p.concat(['sort=price','desc=0']).join('&');
+      var ahi=document.getElementById('cmp-as24-hi'); if(ahi) ahi.href = base + '?' + p.concat(['sort=price','desc=1']).join('&');
+    }
+  };
+
+  makeSel.addEventListener('change', function(){ fillModels(); updateCompare(); });
+  form.addEventListener('change', updateCompare);
+  ['b-type','b-hp-from','b-hp-to','b-budget'].forEach(function(id){ var e=document.getElementById(id); if(e) e.addEventListener('input', updateCompare); });
+
+  // Range constraints: "ig" >= "tól" (and vice versa) for évjárat and km
+  function onFromChange(fromId,toId){
+    var f=document.getElementById(fromId), t=document.getElementById(toId); if(!f||!t) return;
+    var fv=f.value?Number(f.value):null;
+    [].slice.call(t.options).forEach(function(o){ if(o.value==='') return; var bad=(fv!=null && Number(o.value)<fv); o.hidden=bad; o.disabled=bad; });
+    if(fv!=null && t.value && Number(t.value)<fv) t.value='';
+  }
+  function onToChange(fromId,toId){
+    var f=document.getElementById(fromId), t=document.getElementById(toId); if(!f||!t) return;
+    var tv=t.value?Number(t.value):null;
+    [].slice.call(f.options).forEach(function(o){ if(o.value==='') return; var bad=(tv!=null && Number(o.value)>tv); o.hidden=bad; o.disabled=bad; });
+    if(tv!=null && f.value && Number(f.value)>tv) f.value='';
+  }
+  var yf2=document.getElementById('b-year-from'); if(yf2) yf2.addEventListener('change',function(){ onFromChange('b-year-from','b-year-to'); });
+  var yt2=document.getElementById('b-year-to'); if(yt2) yt2.addEventListener('change',function(){ onToChange('b-year-from','b-year-to'); });
+  var kf2=document.getElementById('b-km-from'); if(kf2) kf2.addEventListener('change',function(){ onFromChange('b-km-from','b-km-to'); });
+  var kt2=document.getElementById('b-km-to'); if(kt2) kt2.addEventListener('change',function(){ onToChange('b-km-from','b-km-to'); });
+  fetch('https://open.er-api.com/v6/latest/EUR').then(function(r){return r.json();}).then(function(d){ if(d&&d.rates&&d.rates.HUF) EURHUF=d.rates.HUF; updateCompare(); }).catch(function(){ updateCompare(); });
+
+  // thousand separators
+  var groupInput = function(id){
+    var e=document.getElementById(id); if(!e) return;
+    e.addEventListener('input', function(){
+      var d=(e.value||'').replace(/\D/g,'');
+      e.value = d ? d.replace(/\B(?=(\d{3})+(?!\d))/g,' ') : '';
+      if(id==='b-budget') updateCompare();
+    });
+  };
+  groupInput('b-budget');
+
+  // financing show/hide
+  form.querySelectorAll('input[name="pay"]').forEach(function(r){
+    r.addEventListener('change', function(){
+      var cash = radioVal('pay') === 'Készpénz / önerőből';
+      document.getElementById('finBox').hidden = cash;
+    });
+  });
+  // private/company toggle
+  form.querySelectorAll('input[name="who"]').forEach(function(r){
+    r.addEventListener('change', function(){
+      var comp = radioVal('who') === 'Cég';
+      document.getElementById('privBox').hidden = comp;
+      document.getElementById('compBox').hidden = !comp;
+    });
+  });
+
+  // wizard nav
+  var panels = form.querySelectorAll('.kw-panel');
+  var dots = form.querySelectorAll('.kw-dot');
+  var bar = document.getElementById('kwBar');
+  var prevBtn = document.getElementById('kwPrev');
+  var nextBtn = document.getElementById('kwNext');
+  var subBtn = document.getElementById('kwSubmit');
+  var count = document.getElementById('kwCount');
+  var render = function(doScroll){
+    panels.forEach(function(p){ p.hidden = (parseInt(p.getAttribute('data-step'),10) !== step); });
+    dots.forEach(function(d){ var n=parseInt(d.getAttribute('data-dot'),10); d.classList.toggle('active', n===step); d.classList.toggle('done', n<step); });
+    bar.style.width = (step/TOTAL*100) + '%';
+    count.textContent = step + ' / ' + TOTAL;
+    prevBtn.style.visibility = step===1 ? 'hidden' : 'visible';
+    nextBtn.hidden = step===TOTAL;
+    subBtn.hidden = step!==TOTAL;
+    if(doScroll){ var top = form.getBoundingClientRect().top + window.pageYOffset - 90; window.scrollTo({ top: top, behavior: 'smooth' }); }
+  };
+  var validateStep = function(){
+    if(step===1 && !val('b-make')){ alert('Kérlek, válaszd ki legalább a márkát.'); return false; }
+    if(step===5){
+      var comp = radioVal('who')==='Cég';
+      if(comp){ if(!val('b-cname') || !(val('b-cemail')||val('b-cphone'))){ alert('Kérlek add meg a cégnevet és egy elérhetőséget (e-mail vagy telefon).'); return false; } if(radioVal('vat')==='Cég — nettó, Németországból' && !val('b-euvat')){ alert('Nettó, németországi céges vásárláshoz kérjük add meg a közösségi (EU) adószámot.'); return false; } }
+      else { if(!val('b-name') || !(val('b-email')||val('b-phone'))){ alert('Kérlek add meg a neved és egy elérhetőséget (e-mail vagy telefon).'); return false; } }
+    }
+    return true;
+  };
+  nextBtn.addEventListener('click', function(){ if(!validateStep()) return; if(step<TOTAL){ step++; render(true); } });
+  prevBtn.addEventListener('click', function(){ if(step>1){ step--; render(true); } });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!validateStep()) return;
+    var kc=document.getElementById('kwConsent'); if(kc&&!kc.checked){ kc.closest('label').classList.add('err'); kc.focus(); alert('Kérlek fogadd el az ÁSZF-et és az adatkezelési tájékoztatót.'); return; }
+    var comp = radioVal('who')==='Cég';
+    var yrs = (val('b-year-from')||val('b-year-to')) ? ((val('b-year-from')||'?')+' – '+(val('b-year-to')||'?')) : '';
+    var kms = (val('b-km-from')||val('b-km-to')) ? ((val('b-km-from')||'0')+' – '+(val('b-km-to')||'?')+' km') : '';
+    var rows = [
+      ['Márka', val('b-make')], ['Modell', val('b-model')], ['Típusjel', val('b-type')],
+      ['Állapot', selText('b-con')], ['Évjárat', yrs], ['Futásteljesítmény', kms],
+      ['Üzemanyag', chipVals('ft').map(function(x){return x.hu;}).join(', ')], ['Váltó', selText('b-gear')], ['Hajtás', selText('b-drive')],
+      ['Teljesítmény', (val('b-hp-from')||val('b-hp-to')) ? ((val('b-hp-from')||'?')+' – '+(val('b-hp-to')||'?')+' LE') : ''],
+      ['Karosszéria', chipVals('c').map(function(x){return x.hu;}).join(', ')],
+      ['Külső szín', chipVals('ecol').map(function(x){return x.hu;}).join(', ') + ((document.getElementById('b-metal')||{}).checked ? ' (metál)' : '')],
+      ['Belső szín', chipVals('icol').map(function(x){return x.hu;}).join(', ')], ['Kárpit', chipVals('it').map(function(x){return x.hu;}).join(', ')],
+      ['Felszereltség', chipVals('fe').map(function(x){return x.hu;}).join(', ')],
+      ['Ajtók', selText('b-door')], ['Ülések', (val('b-seat-from')||val('b-seat-to')) ? ((val('b-seat-from')||'?')+' – '+(val('b-seat-to')||'?')) : ''],
+      ['Előző tulajdonosok', selText('b-owners')], ['Emissziós osztály', selText('b-emc') ? selText('b-emc')+' vagy jobb' : ''], ['Klíma', selText('b-clim')], ['Tempomat', selText('b-cruise')], ['Vonóhorog', selText('b-tow')],
+      ['Keresés helye', selText('b-cn')], ['mobile.de keresés', mobileUrl(false)],
+      ['Megjegyzés', val('b-notes')],
+      ['Költségkeret (max)', val('b-budget') ? (val('b-budget')+' '+val('b-cur')) : ''], ['Ár rugalmassága', val('b-flex')],
+      ['Mikorra kell', val('b-when')], ['Meddig keressünk', val('b-howlong')],
+      ['Vásárlás módja (ÁFA)', radioVal('vat')],
+      ['Beszámítás', radioVal('trade')], ['Beszámítandó autó', val('b-ti-car')], ['Beszámítandó — évjárat', val('b-ti-year')], ['Beszámítandó — km', val('b-ti-km')], ['Beszámítandó — üzemanyag', val('b-ti-fuel')], ['Beszámítandó — megjegyzés', val('b-ti-note')],
+      ['Kiszállítás', radioVal('dlv')], ['Szállítási cím', val('b-dlv-city')], ['Forrás', 'Autó rendelés — import oldal'],
+      ['Fizetés', radioVal('pay')], ['Finanszírozás konstrukció', val('b-fin-type')], ['Futamidő (hó)', val('b-fin-term')],
+      ['Önerő', val('b-fin-down')], ['Havi keret', val('b-fin-monthly')],
+      ['Vásárló típusa', radioVal('who')],
+      ['Adatkezelés', 'ÁSZF és adatkezelési tájékoztató elfogadva']
+    ];
+    if(comp){
+      rows.push(['Cégnév', val('b-cname')], ['Adószám', val('b-tax')], ['Közösségi (EU) adószám', val('b-euvat')], ['Kapcsolattartó', val('b-contact')], ['E-mail', val('b-cemail')], ['Telefon', val('b-cphone')], ['Székhely', val('b-caddr')]);
+    } else {
+      rows.push(['Név', val('b-name')], ['E-mail', val('b-email')], ['Telefon', val('b-phone')], ['Város', val('b-city')]);
+    }
+    var clean = rows.filter(function(r){ return r[1]; });
+    var payload = {};
+    clean.forEach(function(r){ payload[r[0]] = r[1]; });
+
+    if(SEARCH_ENDPOINT){
+      fetch(SEARCH_ENDPOINT, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)})
+        .then(function(){ alert('Köszönjük! A keresésed megérkezett — hamarosan jelentkezünk személyre szabott ajánlattal.'); form.reset(); step=1; render(); })
+        .catch(function(){ alert('Küldés sikertelen — kérjük írj a sales@caradvance.hu címre.'); });
+      return;
+    }
+    var title = (val('b-make')+' '+val('b-model')).trim() || 'autókeresés';
+    var subject = 'Autót keresek – ' + title;
+    var body = 'Szeretnék autót vásárolni a CarAdvance-en keresztül. A keresési adataim:\n\n'
+      + clean.map(function(r){ return r[0]+': '+r[1]; }).join('\n')
+      + '\n\nKérlek, keressetek nekem a fentiek alapján, és küldjetek ajánlatot. Köszönöm!';
+    window.location.href = 'mailto:sales@caradvance.hu?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  });
+
+  // ---- import-oldal kártya: fülek, "Autót keresek" gomb, üzemanyag-választó, származás-zászló, űrlap törlése ----
+  var navBox = document.getElementById('kwNav');
+  var goBtn = document.getElementById('kwGo');
+  var renderBase = render;
+  render = function(doScroll){
+    renderBase(doScroll);
+    if(navBox) navBox.hidden = (step === 1);
+    dots.forEach(function(d){ var n=parseInt(d.getAttribute('data-dot'),10); d.classList.toggle('done', n<step || (step===5 && n===4)); d.setAttribute('aria-selected', n===step ? 'true' : 'false'); });
+    if(count) count.textContent = step===5 ? 'Utolsó lépés' : (step + ' / 4');
+  };
+  if(goBtn) goBtn.addEventListener('click', function(){ if(!validateStep()) return; step = 2; render(true); });
+  dots.forEach(function(d){ d.addEventListener('click', function(){
+    var n = parseInt(d.getAttribute('data-dot'),10);
+    if(n > 1 && step === 1 && !validateStep()) return;
+    step = n; render(true);
+  }); });
+  var fuelSel = document.getElementById('b-fuel');
+  if(fuelSel) fuelSel.addEventListener('change', function(){
+    form.querySelectorAll('[data-mf="ft"] input').forEach(function(i){ i.checked = (fuelSel.value !== '' && i.value === fuelSel.value); });
+    updateCompare();
+  });
+  form.querySelectorAll('[data-mf="ft"] input').forEach(function(i){ i.addEventListener('change', function(){
+    var on = chipVals('ft'); if(fuelSel) fuelSel.value = on.length === 1 ? on[0].code : '';
+  }); });
+  var cnSel = document.getElementById('b-cn'), flag = document.getElementById('ikFlag');
+  var setFlag = function(){ if(!flag || !cnSel) return; var c = (cnSel.value || 'eu').toLowerCase(); flag.style.backgroundImage = 'url(https://flagcdn.com/w40/' + c + '.png)'; };
+  if(cnSel) cnSel.addEventListener('change', setFlag);
+  var moreT = document.getElementById('ikMoreT'), more = document.getElementById('ikMore');
+  if(moreT && more) moreT.addEventListener('click', function(){ var open = more.hidden; more.hidden = !open; moreT.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+  var resetBtn = document.getElementById('ikReset');
+  if(resetBtn) resetBtn.addEventListener('click', function(){
+    form.reset();
+    modelSel.innerHTML = '<option value="" disabled selected>Előbb válassz márkát…</option>'; modelSel.disabled = true;
+    ['b-year-to','b-year-from','b-km-to','b-km-from'].forEach(function(id){ var e=document.getElementById(id); if(e) [].slice.call(e.options).forEach(function(o){ o.hidden=false; o.disabled=false; }); });
+    document.getElementById('finBox').hidden = true; var tb=document.getElementById('tradeBox'); if(tb) tb.hidden = true;
+    document.getElementById('privBox').hidden = false; document.getElementById('compBox').hidden = true;
+    setFlag(); updateCompare(); step = 1; render();
+  });
+  form.querySelectorAll('input[name="trade"]').forEach(function(r){
+    r.addEventListener('change', function(){ var tb=document.getElementById('tradeBox'); if(tb) tb.hidden = radioVal('trade') !== 'Van beszámítandó autóm'; });
+  });
+  var tiKm = document.getElementById('b-ti-km');
+  if(tiKm) tiKm.addEventListener('input', function(){ var d=(tiKm.value||'').replace(/\D/g,''); tiKm.value = d ? d.replace(/\B(?=(\d{3})+(?!\d))/g,' ') : ''; });
+  var hashGo = function(){ if(location.hash === '#rendeles'){ var t = form.getBoundingClientRect().top + window.pageYOffset - 110; window.scrollTo({ top: t }); } };
+  setTimeout(hashGo, 60);
+
+  render();
+})();
+</script>
