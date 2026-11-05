@@ -123,7 +123,7 @@ const faqJsonld = {
               </label>
             </div>
             <div class="ik-sub">Karosszéria</div>
-            <div class="ik-checks ik-bodies" data-mf="c">{BODIES.map(([c, l, d]) => <label class="ik-check ik-body"><input type="checkbox" value={c} data-hu={l} />{d ? <svg viewBox="0 0 64 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={d} /><circle cx="15" cy="22" r="4.5" /><circle cx="49" cy="22" r="4.5" /></svg> : null}<span>{l}</span></label>)}</div>
+            <div class="ik-checks ik-bodies" data-mf="c">{BODIES.map(([c, l, d]) => <label class="ik-check ik-btype"><input type="checkbox" value={c} data-hu={l} />{d ? <svg viewBox="0 0 64 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={d} /><circle cx="15" cy="22" r="4.5" /><circle cx="49" cy="22" r="4.5" /></svg> : null}<span>{l}</span></label>)}</div>
             <div class="sf-grid ik-grid" style="margin-top:20px">
               <label class="sf-field"><span>Ülések — tól</span>
                 <select id="b-seat-from"><option value="">Bármely</option>{[2,3,4,5,6,7,8,9,10].map((n) => <option>{n}</option>)}</select>
@@ -203,10 +203,10 @@ const faqJsonld = {
               <label class="sf-field"><span>Vonóhorog</span>
                 <select id="b-tow"><option value="">Bármely</option><option value="TRAILER_COUPLING_FIX">Fix, levehető vagy behajtható</option><option value="TRAILER_COUPLING_DETACHABLE">Levehető vagy behajtható</option><option value="TRAILER_COUPLING_SWIVELING">Behajtható</option></select>
               </label>
-              <label class="sf-field"><span>Fékezett vontatható tömeg (min.)</span>
+              <label class="sf-field"><span>Fékezett vontatás (min.)</span>
                 <input id="b-tl-braked" type="text" inputmode="numeric" placeholder="kg" data-lead="Fékezett vontatható tömeg (min., kg)" />
               </label>
-              <label class="sf-field"><span>Fékezetlen vontatható tömeg (min.)</span>
+              <label class="sf-field"><span>Fékezetlen vontatás (min.)</span>
                 <input id="b-tl-unbraked" type="text" inputmode="numeric" placeholder="kg" data-lead="Fékezetlen vontatható tömeg (min., kg)" />
               </label>
               <label class="sf-field"><span>Támaszterhelés (min.)</span>
@@ -492,8 +492,9 @@ const faqJsonld = {
   .ik-checks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 20px}
   .ik-check{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.3;cursor:pointer;color:var(--ink)}
   .ik-check input{width:20px;height:20px;margin:0;flex:0 0 auto;accent-color:var(--red);cursor:pointer}
-  .ik-body svg{width:58px;height:28px;flex:0 0 auto;color:#5b6472}
-  .ik-body input:checked ~ svg{color:var(--red)}
+  .ik-btype svg{width:58px;height:28px;flex:0 0 auto;color:#5b6472}
+  .ik-btype input:checked ~ svg{color:var(--red)}
+  .ik .sf-grid.ik-grid{align-items:end}
   .ik-sw{width:18px;height:18px;border-radius:50%;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(11,11,13,.18)}
   .ik .sf-span2{grid-column:span 2}
   .ik-go{margin-top:24px;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--red);color:#fff;border:0;border-radius:12px;padding:17px 20px;font:inherit;font-size:19px;font-weight:800;cursor:pointer;box-shadow:0 12px 26px rgba(226,0,26,.24);transition:filter .15s,transform .15s}
