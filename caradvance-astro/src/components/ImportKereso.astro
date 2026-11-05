@@ -138,7 +138,7 @@ const faqJsonld = {
               <select id="b-emc"><option value="">Bármely</option><option value="EURO4">Euro 4</option><option value="EURO5">Euro 5</option><option value="EURO6">Euro 6</option><option value="EURO6C">Euro 6c</option><option value="EURO6D_TEMP">Euro 6d-TEMP</option><option value="EURO6D">Euro 6d</option><option value="EURO6E">Euro 6e</option></select>
             </label>
             <label class="sf-field"><span>Klíma</span>
-              <select id="b-clim"><option value="">Bármely</option><option value="MANUAL_CLIMATISATION">Manuális vagy automata</option><option value="AUTOMATIC_CLIMATISATION">Automata</option><option value="AUTOMATIC_CLIMATISATION_2_ZONES">Automata, 2 zónás</option><option value="AUTOMATIC_CLIMATISATION_3_ZONES">Automata, 3 zónás</option><option value="AUTOMATIC_CLIMATISATION_4_ZONES">Automata, 4 zónás</option></select>
+              <select id="b-clim"><option value="">Bármely</option><option value="MANUAL_CLIMATISATION">Manuális vagy automata</option><option value="AUTOMATIC_CLIMATISATION">Automata klíma</option><option value="AUTOMATIC_CLIMATISATION_2_ZONES">Automata, 2 zónás</option><option value="AUTOMATIC_CLIMATISATION_3_ZONES">Automata, 3 zónás</option><option value="AUTOMATIC_CLIMATISATION_4_ZONES">Automata, 4 zónás</option></select>
             </label>
             <label class="sf-field"><span>Tempomat</span>
               <select id="b-cruise"><option value="">Bármely</option><option value="CRUISE_CONTROL">Tempomat</option><option value="ADAPTIVE_CRUISE_CONTROL">Adaptív tempomat (ACC)</option></select>
@@ -797,6 +797,22 @@ const faqJsonld = {
   });
   var hashGo = function(){ if(location.hash === '#rendeles'){ var t = form.getBoundingClientRect().top + window.pageYOffset - 110; window.scrollTo({ top: t }); } };
   setTimeout(hashGo, 60);
+  // nem forintos piacokon (átváltott ár) kerek összegek a költségvetés-listában
+  var roundBudget = function(){
+    var bs = document.getElementById('b-budget'); if(!bs || !bs.options[1]) return false;
+    if(/Ft\s*$/.test(bs.options[1].textContent)) return false;
+    [].slice.call(bs.options).forEach(function(o, i){
+      if(i === 0 || o.getAttribute('data-r')) return;
+      var t = o.textContent.replace(/\s*\(≈[^)]*\)/, '');
+      var m = t.match(/\d[\d\s  ’'.,]*\d/); if(!m) return;
+      var sep = (m[0].match(/[\s  ’'.,]/) || [' '])[0];
+      var n = parseInt(m[0].replace(/\D/g, ''), 10); if(!n) return;
+      var p = Math.pow(10, Math.max(0, String(n).length - 2)); n = Math.round(n / p) * p;
+      o.textContent = t.replace(m[0], String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep)); o.setAttribute('data-r', '1');
+    });
+    return true;
+  };
+  var rbTry = 0, rbT = setInterval(function(){ if(roundBudget() || ++rbTry > 40) clearInterval(rbT); }, 150);
 
   render();
 })();
