@@ -20,6 +20,7 @@
     'html.ca-dark ::placeholder{color:#7D8796!important;opacity:1}',
     'html.ca-dark option,html.ca-dark optgroup{background-color:#12151B;color:#E8EBF0}',
     'html.ca-dark hr{border-color:#2B313C}',
+    'html.ca-dark .cstage{background-color:#B4BAC2!important}',
     'html.ca-dark .dm-inv{background-color:#F1F3F6!important;color:#0D0F13!important}',
     'html.ca-dark .dm-nb{mix-blend-mode:normal!important}',
     'html.ca-dark .dm-wb{background-color:#fff!important;border-radius:12px}',
@@ -67,6 +68,13 @@
     var src = im.getAttribute('src') || '';
     if (/logo|brand-|bl-|badge|icon|flag/i.test(src)) return false;
     return (el.textContent || '').replace(/\s+/g, '').length <= 3;
+  }
+  // ha az oldal saját CSS-e !important-tal felülírja az osztályainkat, inline !important-tal érvényesítjük
+  function enforce(el) {
+    var cl = el.classList, cs2 = getComputedStyle(el), want = null;
+    if (cl.contains('dm-s') || cl.contains('dm-s2')) { var b2 = rgba(cs2.backgroundColor); if (b2 && lum(b2) > 0.5) { if (!el.hasAttribute('data-dmbg')) el.setAttribute('data-dmbg', el.style.getPropertyValue('background-color') || ''); el.style.setProperty('background-color', cl.contains('dm-s') ? '#161A21' : '#1C2129', 'important'); } }
+    if (cl.contains('dm-t') || cl.contains('dm-t2')) { var c2 = rgba(cs2.color); if (c2 && lum(c2) < 0.5) { if (!el.hasAttribute('data-dmc')) el.setAttribute('data-dmc', el.style.getPropertyValue('color') || ''); el.style.setProperty('color', cl.contains('dm-t') ? '#E8EBF0' : '#A3ADBC', 'important'); el.style.setProperty('-webkit-text-fill-color', 'currentColor', 'important'); } }
+    if (cl.contains('dm-b')) { var d2 = rgba(cs2.borderTopColor); if (d2 && lum(d2) > 0.6 && sat(d2) < 40) el.style.setProperty('border-color', '#2B313C', 'important'); }
   }
   var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, LINK: 1, META: 1, TEMPLATE: 1, BR: 1, IMG: 1, VIDEO: 1, SOURCE: 1, PICTURE: 1, IFRAME: 1, CANVAS: 1 };
 
@@ -117,7 +125,7 @@
 
   function scan(root) {
     if (!d.classList.contains('ca-dark')) return;
-    var els = (root || document.body).querySelectorAll('*');
+    var els = root ? [root].concat([].slice.call(root.querySelectorAll('*'))) : document.body.querySelectorAll('*');
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
       if (el.closest('.cstage')) continue;
@@ -153,6 +161,7 @@
       }
       var bc = rgba(cs.borderTopColor);
       if (bc && parseFloat(cs.borderTopWidth) > 0 && lum(bc) > 0.78 && sat(bc) < 40) el.classList.add('dm-b');
+      enforce(el);
       var c = rgba(cs.color);
       if (c && c.a > 0.3 && sat(c) < 45) {
         var L = lum(c);
@@ -161,6 +170,7 @@
         el.setAttribute('data-dmc', el.style.getPropertyValue('color') || '');
         el.style.setProperty('color', lighten(c), 'important');
       }
+      if (el.classList.contains('dm-t') || el.classList.contains('dm-t2')) enforce(el);
     }
   }
 
@@ -206,7 +216,7 @@
       if (m.type === 'attributes') {
         var t = m.target;
         if (m.attributeName === 'class') { var strip = function (v) { return (v || '').replace(/(^|\s)dm-\S+/g, ' ').replace(/\s+/g, ' ').trim(); }; if (strip(m.oldValue) === strip(t.getAttribute('class'))) return; }
-        if (m.attributeName === 'style' && (t.hasAttribute('data-dmc') || t.hasAttribute('data-dmbi'))) return;
+        if (m.attributeName === 'style' && (t.hasAttribute('data-dmc') || t.hasAttribute('data-dmbi') || t.hasAttribute('data-dmbg') || /dm-/.test(t.getAttribute('class') || ''))) return;
         if (t.nodeType === 1 && !(t instanceof SVGElement)) (pending || (pending = [])).push(t);
         return;
       }
@@ -224,6 +234,7 @@
     });
     unfixImgs();
     document.querySelectorAll('[data-dmc]').forEach(function (e) { var o = e.getAttribute('data-dmc'); e.style.removeProperty('color'); if (o) e.style.setProperty('color', o); e.removeAttribute('data-dmc'); });
+    document.querySelectorAll('[data-dmbg]').forEach(function (e) { var o = e.getAttribute('data-dmbg'); e.style.removeProperty('background-color'); e.style.removeProperty('border-color'); if (o) e.style.setProperty('background-color', o); e.removeAttribute('data-dmbg'); });
     document.querySelectorAll('[data-dmbi]').forEach(function (e) { var o = e.getAttribute('data-dmbi'); e.style.removeProperty('background-image'); if (o) e.style.setProperty('background-image', o); e.removeAttribute('data-dmbi'); });
     var st2 = document.getElementById('ca-dark-states'); if (st2) st2.disabled = true;
   }
