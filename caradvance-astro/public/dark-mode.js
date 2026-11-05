@@ -25,7 +25,9 @@
     'html.ca-dark .dm-mono{filter:brightness(0) invert(1)!important}',
     'html.ca-dark .card.charity{background:linear-gradient(135deg,#2B1017 0%,#1B1E26 55%,#1B1E26 100%)!important;border:1px solid rgba(226,0,26,.35)!important;box-shadow:0 24px 60px rgba(0,0,0,.45)!important}',
     'html.ca-dark .card.charity .org-logo{background-color:#fff!important;border-color:#fff!important}',
-    'html.ca-dark .card.charity .org-logo.org-sos{background-color:#009DE0!important}'
+    'html.ca-dark .card.charity .org-logo.org-sos{background-color:#009DE0!important}',
+    'html.ca-dark [class*="dots"] > i,html.ca-dark [class*="dots"] > span,html.ca-dark [class*="dots"] > button{background-color:rgba(255,255,255,.5)!important}',
+    'html.ca-dark [class*="dots"] > .on,html.ca-dark [class*="dots"] > .active,html.ca-dark [class*="dots"] > [aria-current="true"]{background-color:#E2001A!important}'
   ].join('\n');
 
   var style = document.createElement('style');
@@ -149,6 +151,7 @@
     for (var i = 0; i < document.styleSheets.length; i++) { var sh = document.styleSheets[i]; if (sh.ownerNode && sh.ownerNode.id && sh.ownerNode.id.indexOf('ca-dark') === 0) continue; try { walk(sh.cssRules); } catch (e) {} }
     var out = [];
     rules.forEach(function (r) {
+      if (/dots?\b/i.test(r.selectorText)) return;
       var st = r.style, decl = [];
       var bgv = st.getPropertyValue('background-color'), bgc = resolve(bgv);
       if (bgc && bgc.a > 0.35 && sat(bgc) < 40 && lum(bgc) > 0.82) decl.push('background-color:' + (lum(bgc) > 0.95 ? '#232833' : '#262C37') + '!important');
