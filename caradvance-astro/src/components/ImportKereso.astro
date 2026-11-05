@@ -54,16 +54,13 @@ const faqJsonld = {
 <section class="ik" id="rendeles">
   <div class="wrap">
     <form class="kw ik-card" id="buyForm" novalidate>
-      <div class="kw-head ik-head">
-        <div class="kw-steps">
-          <span class="kw-dot active" data-dot="1"><b>1</b><i>Az autó</i></span>
-          <span class="kw-dot" data-dot="2"><b>2</b><i>Ár &amp; időzítés</i></span>
-          <span class="kw-dot" data-dot="3"><b>3</b><i>Vásárlás módja</i></span>
-          <span class="kw-dot" data-dot="4"><b>4</b><i>Finanszírozás</i></span>
-          <span class="kw-dot" data-dot="5"><b>5</b><i>Kapcsolat</i></span>
-        </div>
-        <div class="kw-bar"><i id="kwBar" style="width:20%"></i></div>
+      <div class="ik-tabs" role="tablist" aria-label="Autó rendelés lépései">
+        <button type="button" class="kw-dot ik-tab active" data-dot="1" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3l2.2-5.1A2 2 0 0 1 7 5.7h10a2 2 0 0 1 1.8 1.2L21 12v3a2 2 0 0 1-2 2"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/><path d="M3.5 12h17"/></svg><span>Az autó</span></button>
+        <button type="button" class="kw-dot ik-tab" data-dot="2" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17.5h6"/></svg><span>Ár &amp; időzítés</span></button>
+        <button type="button" class="kw-dot ik-tab" data-dot="3" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></svg><span>Vásárlás &amp; finanszírozás</span></button>
+        <button type="button" class="kw-dot ik-tab" data-dot="4" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Kapcsolat</span></button>
       </div>
+      <div class="kw-bar" hidden><i id="kwBar"></i></div>
 
       <div class="ik-body">
       <!-- STEP 1 — Autót keresek -->
@@ -317,16 +314,13 @@ const faqJsonld = {
 
       <!-- STEP 3 — Vásárlás módja -->
       <div class="kw-panel" data-step="3" hidden>
-        <div class="sf-blocktitle">3. Hogyan vásárolnál? (ÁFA)</div>
+        <div class="sf-blocktitle">3. Vásárlás módja és finanszírozás</div>
+        <div class="kw-sub" style="margin-top:0">Hogyan vásárolnál? (ÁFA)</div>
         <div class="kw-opts">
           <label class="kw-opt"><input type="radio" name="vat" value="Magánszemély — 19% áfa (Caradvance GmbH, Németország)" checked /><span class="kw-opt-b"><b>Magánszemélyként — 19% áfa</b><small>A német Caradvance GmbH-tól. Kedvezőbb ár, ez a leggyakoribb választás.</small></span></label>
           <label class="kw-opt"><input type="radio" name="vat" value="Cég — nettó, Németországból" /><span class="kw-opt-b"><b>Cégként — nettó, Németországból</b><small>Áfa-visszaigénylés lehetőségével, német számlával.</small></span></label>
         </div>
-      </div>
-
-      <!-- STEP 4 — Finanszírozás -->
-      <div class="kw-panel" data-step="4" hidden>
-        <div class="sf-blocktitle">4. Finanszírozás</div>
+      <div class="kw-sub">Fizetés</div>
         <div class="kw-opts kw-opts-3">
           <label class="kw-opt"><input type="radio" name="pay" value="Készpénz / önerőből" checked /><span class="kw-opt-b"><b>Készpénz / önerőből</b><small>Nincs szükség finanszírozásra.</small></span></label>
           <label class="kw-opt"><input type="radio" name="pay" value="Finanszírozás (hitel)" /><span class="kw-opt-b"><b>Finanszírozás</b><small>Autóhitel részletre.</small></span></label>
@@ -358,9 +352,9 @@ const faqJsonld = {
         </div>
       </div>
 
-      <!-- STEP 5 — Kapcsolat -->
-      <div class="kw-panel" data-step="5" hidden>
-        <div class="sf-blocktitle">5. Kapcsolat</div>
+      <!-- STEP 4 — Kapcsolat -->
+      <div class="kw-panel" data-step="4" hidden>
+        <div class="sf-blocktitle">4. Kapcsolat</div>
         <div class="kw-opts kw-opts-2">
           <label class="kw-opt"><input type="radio" name="who" value="Magánszemély" checked /><span class="kw-opt-b"><b>Magánszemély</b></span></label>
           <label class="kw-opt"><input type="radio" name="who" value="Cég" /><span class="kw-opt-b"><b>Cég</b></span></label>
@@ -390,7 +384,7 @@ const faqJsonld = {
       <!-- NAV -->
       <div class="kw-nav" id="kwNav" hidden>
         <button type="button" class="btn btn-ghost" id="kwPrev" style="visibility:hidden">← Vissza</button>
-        <span class="kw-count" id="kwCount">1 / 5</span>
+        <span class="kw-count" id="kwCount">1 / 4</span>
         <button type="button" class="btn btn-primary" id="kwNext">Tovább →</button>
         <button type="submit" class="btn btn-primary" id="kwSubmit" hidden>Elküldöm a keresést →</button>
       </div>
@@ -485,6 +479,13 @@ const faqJsonld = {
   .ik-reset svg{width:17px;height:17px}
   .ik-reset:hover,.ik-more-t:hover b{color:var(--red)}
   .ik-more{margin-top:16px;border-top:1px solid var(--line);padding-top:4px}
+  .ik-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);background:#fff}
+  .ik .kw-dot.ik-tab{appearance:none;-webkit-appearance:none;border:0;background:none;font:inherit;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:12px;padding:21px 12px 19px;font-size:15.5px;font-weight:800;line-height:1.2;color:var(--ink);cursor:pointer;position:relative;transition:background .15s;text-align:center}
+  .ik .kw-dot.ik-tab:hover{background:#FAFBFD}
+  .ik-tab svg{width:26px;height:26px;color:var(--ink);flex:0 0 auto}
+  .ik-tab.active svg,.ik-tab.done svg{color:var(--red)}
+  .ik-tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--red);border-radius:3px 3px 0 0}
+  .ik-tab.done span::after{content:" ✓";color:var(--red)}
   .ik-sec{border:1px solid var(--line);border-radius:16px;padding:22px 24px 24px;margin-top:16px;background:#FBFCFE}
   .ik-sec h3{font-size:19px;font-weight:800;margin:0 0 18px;color:var(--ink)}
   .ik-sub{font-size:14.5px;font-weight:800;margin:20px 0 12px;color:var(--ink)}
@@ -503,20 +504,27 @@ const faqJsonld = {
   .ik-free{margin:12px 0 0;text-align:center;font-size:13px;color:var(--muted)}
   .ik .kw-nav{margin-top:24px}
   @media(max-width:900px){
+    .ik .kw-dot.ik-tab{font-size:14px;gap:8px;padding:18px 8px 16px}
     .ik-checks{grid-template-columns:repeat(2,minmax(0,1fr))}
     .ik{margin-top:-150px}
     .ik .sf-grid.ik-grid{grid-template-columns:1fr 1fr;gap:16px}
   }
   @media(max-width:560px){
     .ik-sec{padding:18px 16px 20px}
-    .ik-checks{grid-template-columns:1fr}
+    .ik-checks{grid-template-columns:1fr 1fr;gap:10px 12px}
+    .ik-check{font-size:13px}
+    .ik-btype svg{width:40px;height:20px}
     .ik-checks.ik-bodies{grid-template-columns:1fr 1fr}
-    .ik .sf-span2{grid-column:auto}
     .ik{margin-top:-110px}
     .ik .wrap{padding:0 12px}
-    .ik .sf-grid.ik-grid{grid-template-columns:1fr}
+    .ik .sf-grid.ik-grid{grid-template-columns:1fr 1fr;gap:14px 12px}
+    .ik .sf-field>span{font-size:13px}
+    .ik .sf-field input,.ik .sf-field select{height:44px;font-size:14px}
+    .ik .kw-dot.ik-tab{flex-direction:column;gap:5px;font-size:11.5px;padding:13px 4px 11px}
+    .ik-tab svg{width:22px;height:22px}
+    .ik-tab.done span::after{content:""}
     .ik .kw-head.ik-head{padding:20px 18px 0}
-    .ik-body{padding:20px 18px 22px}
+    .ik-body{padding:18px 14px 22px}
     .ik-more-t span{display:none}
     .ik-go{font-size:17px}
   }
@@ -529,7 +537,7 @@ const faqJsonld = {
   var SEARCH_ENDPOINT = "/api/lead";
   var form = document.getElementById('buyForm');
   if(!form) return;
-  var TOTAL = 5, step = 1;
+  var TOTAL = 4, step = 1;
   var val = function(id){ var e=document.getElementById(id); return e? (e.value||'').trim() : ''; };
   var radioVal = function(name){ var r=form.querySelector('input[name="'+name+'"]:checked'); return r? r.value : ''; };
 
@@ -824,7 +832,7 @@ const faqJsonld = {
   };
   var validateStep = function(){
     if(step===1 && !val('b-make')){ alert('Kérlek, válaszd ki legalább a márkát.'); return false; }
-    if(step===5){
+    if(step===TOTAL){
       var comp = radioVal('who')==='Cég';
       if(comp){ if(!val('b-cname') || !(val('b-cemail')||val('b-cphone'))){ alert('Kérlek add meg a cégnevet és egy elérhetőséget (e-mail vagy telefon).'); return false; } if(radioVal('vat')==='Cég — nettó, Németországból' && !val('b-euvat')){ alert('Nettó, németországi céges vásárláshoz kérjük add meg a közösségi (EU) adószámot.'); return false; } }
       else { if(!val('b-name') || !(val('b-email')||val('b-phone'))){ alert('Kérlek add meg a neved és egy elérhetőséget (e-mail vagy telefon).'); return false; } }
