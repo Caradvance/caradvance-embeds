@@ -75,13 +75,16 @@ const faqJsonld = {
           <label class="sf-field"><span>Évjárat (tól)</span>
             <select id="b-year-from"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
           </label>
-          <label class="sf-field"><span>Futásteljesítmény (max.)</span>
-            <select id="b-km-to"><option value="" selected>Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
-          </label>
+          <label class="sf-field"><span>Évjárat (ig)</span>
+                <select id="b-year-to"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
+              </label>
         </div>
         <div class="sf-grid ik-grid">
-          <label class="sf-field"><span>Üzemanyag</span>
-            <select id="b-fuel"><option value="" selected>Bármely</option>{FUELS.map(([c, l]) => <option value={c}>{l}</option>)}</select>
+          <label class="sf-field"><span>Futásteljesítmény (min.)</span>
+                <select id="b-km-from"><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
+              </label>
+          <label class="sf-field"><span>Futásteljesítmény (max.)</span>
+            <select id="b-km-to"><option value="" selected>Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
           </label>
           <label class="sf-field"><span>Költségvetés (max.)</span>
             <select id="b-budget"><option value="" selected>Bármely</option>{BUDGETS.map((b) => <option value={b}>{b} Ft</option>)}</select>
@@ -89,15 +92,16 @@ const faqJsonld = {
           <label class="sf-field"><span>Váltó</span>
             <select id="b-gear"><option value="">Bármely</option><option value="AUTOMATIC_GEAR">Automata</option><option value="MANUAL_GEAR">Manuális</option><option value="SEMIAUTOMATIC_GEAR">Félautomata</option></select>
           </label>
+        </div>
+        <div class="sf-grid ik-grid">
+          <label class="sf-field"><span>Üzemanyag</span>
+            <select id="b-fuel"><option value="" selected>Bármely</option>{FUELS.map(([c, l]) => <option value={c}>{l}</option>)}</select>
+          </label>
+          <div class="ik-row ik-linkcell"><button type="button" class="ik-reset" id="ikReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Űrlap törlése</button><button type="button" class="ik-more-t" id="ikMoreT" aria-expanded="false" aria-controls="ikMore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><b>További szűrők</b></button></div>
           <div class="sf-field ik-gocell"><button type="button" class="ik-go" id="kwGo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>Autót keresek</button></div>
         </div>
         <input type="hidden" id="b-cn" value="DE" />
         <input type="hidden" id="b-cur" value="Ft" />
-
-        <div class="ik-row">
-          <button type="button" class="ik-reset" id="ikReset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Űrlap törlése</button>
-          <button type="button" class="ik-more-t" id="ikMoreT" aria-expanded="false" aria-controls="ikMore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><b>További szűrők</b></button>
-        </div>
 
         <div class="ik-more" id="ikMore" hidden>
           <!-- Részletes keresés — a mobile.de részletes keresőjének felépítése szerint -->
@@ -136,12 +140,6 @@ const faqJsonld = {
             <div class="sf-grid ik-grid">
               <label class="sf-field"><span>Költségvetés (min.)</span>
                 <select id="b-budget-from" data-lead="Költségkeret (min)"><option value="" selected>Bármely</option>{BUDGETS.map((b) => <option value={b}>{b} Ft</option>)}</select>
-              </label>
-              <label class="sf-field"><span>Évjárat (ig)</span>
-                <select id="b-year-to"><option value="" selected>Bármely</option>{years.map((y) => <option>{y}</option>)}</select>
-              </label>
-              <label class="sf-field"><span>Futásteljesítmény (min.)</span>
-                <select id="b-km-from"><option value="">Bármely</option>{KMS.map((k) => <option value={k}>{k.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} km</option>)}</select>
               </label>
               <label class="sf-field"><span>Műszaki vizsga érvényes</span>
                 <select id="b-tuv" data-lead="Műszaki vizsga érvényes"><option value="">Bármely</option><option>Új vizsga</option><option>legalább 3 hónap</option><option>legalább 6 hónap</option><option>legalább 9 hónap</option><option>legalább 12 hónap</option><option>legalább 18 hónap</option></select>
@@ -486,6 +484,7 @@ const faqJsonld = {
   .ik .ik-gocell .ik-go{margin-top:0;height:48px;padding:0 14px;font-size:16px;border-radius:10px;box-shadow:0 8px 18px rgba(226,0,26,.22)}
   .ik .ik-gocell .ik-go svg{width:20px;height:20px}
   .ik .ik-row{justify-content:flex-end;gap:10px 30px;margin-top:18px}
+  .ik .ik-row.ik-linkcell{grid-column:span 2;margin-top:0;min-height:48px;align-self:end;flex-wrap:nowrap}
   .ik-more-t svg{width:20px;height:20px;flex:0 0 auto}
   .ik-more-t[aria-expanded=true] b,.ik-more-t[aria-expanded=true] svg{color:var(--red)}
   .ik-sec{border:1px solid var(--line);border-radius:16px;padding:22px 24px 24px;margin-top:16px;background:#FBFCFE}
