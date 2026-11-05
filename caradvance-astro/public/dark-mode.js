@@ -20,6 +20,11 @@
     'html.ca-dark ::placeholder{color:#7D8796!important;opacity:1}',
     'html.ca-dark option,html.ca-dark optgroup{background-color:#12151B;color:#E8EBF0}',
     'html.ca-dark hr{border-color:#2B313C}',
+    'html.ca-dark .dm-sk{stroke:#E8EBF0!important}',
+    'html.ca-dark .dm-fl{fill:#E8EBF0!important}',
+    'html.ca-dark .dm-in{background-color:transparent!important;border-color:transparent!important;box-shadow:none!important}',
+    'html.ca-dark .cs-in{background-image:linear-gradient(#12151B,#12151B),linear-gradient(120deg,#E2001A,#FF8A3D 50%,#7C5CFF)!important}',
+    'html.ca-dark .cs-in input{background-color:transparent!important;border-color:transparent!important}',
     'html.ca-dark .dm-dot{background-color:rgba(255,255,255,.55)!important}',
     'html.ca-dark .burger span,html.ca-dark .burger i{background-color:#fff!important}',
     'html.ca-dark .dm-mono{filter:brightness(0) invert(1)!important}',
@@ -85,6 +90,8 @@
   function fixImg(img) {
     var s = img.getAttribute('src') || '';
     if (img.dataset.dm) return;
+    var flt = getComputedStyle(img).filter || '';
+    if (/brightness\(0\)/.test(flt) && !/invert/.test(flt) && darkBehind(img.parentElement || img)) { img.classList.add('dm-mono'); img.dataset.dm = 'mono'; return; }
     if (/\/caradvance-logo\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('caradvance-logo.webp', 'caradvance-logo-white.webp')); return; }
     if (/\/bl-[a-z0-9-]+-dark\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('-dark.webp', '.webp')); return; }
     if (!darkBehind(img.parentElement || img)) return;
@@ -108,7 +115,14 @@
       var el = els[i];
       if (SKIP[el.tagName]) { if (el.tagName === 'IMG') fixImg(el); continue; }
       if (/dots/.test(typeof el.className === 'string' ? el.className : '')) { if (darkBehind(el)) el.classList.add('dm-dl'); else el.classList.remove('dm-dl'); }
-      if (el.closest('svg') && el.tagName.toLowerCase() !== 'svg') continue;
+      var inSvg = el instanceof SVGElement;
+      if (inSvg) {
+        var scs = getComputedStyle(el), host = el.ownerSVGElement || el;
+        var sk = rgba(scs.stroke), fl = rgba(scs.fill);
+        var dk = function (x) { return x && x.a > 0.3 && sat(x) < 45 && lum(x) < 0.3; };
+        if ((dk(sk) || dk(fl)) && darkBehind(host.parentElement || host)) { if (dk(sk)) el.classList.add('dm-sk'); if (dk(fl)) el.classList.add('dm-fl'); }
+        continue;
+      }
       var cs = getComputedStyle(el);
       var bg = rgba(cs.backgroundColor);
       if (bg && bg.a > 0.35 && sat(bg) < 40 && lum(bg) > 0.82) {
@@ -117,6 +131,12 @@
         el.classList.add('dm-dot');
       }
       var bi = cs.backgroundImage;
+      var solid = bi && bi.match(/linear-gradient\((rgb\(2[3-5]\d, 2[3-5]\d, 2[3-5]\d\)), \1\)/);
+      if (solid && !el.hasAttribute('data-dmbi')) {
+        el.setAttribute('data-dmbi', el.style.getPropertyValue('background-image') || '');
+        el.style.setProperty('background-image', bi.replace(solid[0], 'linear-gradient(#12151B, #12151B)'), 'important');
+        el.querySelectorAll('input,textarea').forEach(function (x) { x.classList.add('dm-in'); });
+      }
       if (bi && bi.indexOf('gradient') >= 0 && bi.indexOf('url(') < 0) {
         var cols = bi.match(/rgba?\([^)]+\)/g) || [];
         if (cols.length && cols.every(function (c) { var x = rgba(c); return x && (x.a < 0.2 || (lum(x) > 0.82 && sat(x) < 40)); })) el.classList.add('dm-g');
@@ -179,11 +199,12 @@
   });
 
   function clearAll() {
-    ['dm-s', 'dm-s2', 'dm-g', 'dm-t', 'dm-t2', 'dm-b', 'dm-dl', 'dm-dot'].forEach(function (k) {
+    ['dm-s', 'dm-s2', 'dm-g', 'dm-t', 'dm-t2', 'dm-b', 'dm-dl', 'dm-dot', 'dm-sk', 'dm-fl', 'dm-in'].forEach(function (k) {
       document.querySelectorAll('.' + k).forEach(function (e) { e.classList.remove(k); });
     });
     unfixImgs();
     document.querySelectorAll('[data-dmc]').forEach(function (e) { var o = e.getAttribute('data-dmc'); e.style.removeProperty('color'); if (o) e.style.setProperty('color', o); e.removeAttribute('data-dmc'); });
+    document.querySelectorAll('[data-dmbi]').forEach(function (e) { var o = e.getAttribute('data-dmbi'); e.style.removeProperty('background-image'); if (o) e.style.setProperty('background-image', o); e.removeAttribute('data-dmbi'); });
     var st2 = document.getElementById('ca-dark-states'); if (st2) st2.disabled = true;
   }
   function apply() {
