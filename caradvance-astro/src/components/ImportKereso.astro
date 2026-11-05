@@ -38,13 +38,16 @@ const faqJsonld = {
 <section class="ik" id="rendeles">
   <div class="wrap">
     <form class="kw ik-card" id="buyForm" novalidate>
-      <div class="ik-tabs" role="tablist" aria-label="Autó rendelés lépései">
-        <button type="button" class="kw-dot ik-tab active" data-dot="1" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3l2.2-5.1A2 2 0 0 1 7 5.7h10a2 2 0 0 1 1.8 1.2L21 12v3a2 2 0 0 1-2 2"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/><path d="M3.5 12h17"/></svg><span>Autót keresek</span></button>
-        <button type="button" class="kw-dot ik-tab" data-dot="2" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3l4 4-4 4"/><path d="M21 7H9"/><path d="M7 21l-4-4 4-4"/><path d="M3 17h12"/></svg><span>Beszámítás</span></button>
-        <button type="button" class="kw-dot ik-tab" data-dot="3" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.6-3.4 8.3-8 9-4.6-.7-8-4.4-8-9V6l8-3z"/><path d="M8.5 12l2.4 2.4L15.5 9.8"/></svg><span>Finanszírozás</span></button>
-        <button type="button" class="kw-dot ik-tab" data-dot="4" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h11v10H2z"/><path d="M13 9h4.5l3.5 3.6V16h-8"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><span>Kiszállítás</span></button>
+      <div class="kw-head ik-head">
+        <div class="kw-steps">
+          <span class="kw-dot active" data-dot="1"><b>1</b><i>Az autó</i></span>
+          <span class="kw-dot" data-dot="2"><b>2</b><i>Ár &amp; időzítés</i></span>
+          <span class="kw-dot" data-dot="3"><b>3</b><i>Vásárlás módja</i></span>
+          <span class="kw-dot" data-dot="4"><b>4</b><i>Finanszírozás</i></span>
+          <span class="kw-dot" data-dot="5"><b>5</b><i>Kapcsolat</i></span>
+        </div>
+        <div class="kw-bar"><i id="kwBar" style="width:20%"></i></div>
       </div>
-      <div class="kw-bar" hidden><i id="kwBar"></i></div>
 
       <div class="ik-body">
       <!-- STEP 1 — Autót keresek -->
@@ -111,9 +114,6 @@ const faqJsonld = {
             <label class="sf-field"><span>Teljesítmény — ig (LE)</span>
               <input id="b-hp-to" type="text" inputmode="numeric" placeholder="Bármely" />
             </label>
-            <label class="sf-field"><span>Ár rugalmassága</span>
-              <select id="b-flex"><option value="" selected>Bármely</option><option>Fix keret</option><option>Kicsit rugalmas</option><option>Rugalmas a megfelelő autóért</option></select>
-            </label>
           </div>
           <div class="kw-sub">Üzemanyag <small>(több is választható)</small></div>
           <div class="kw-chips" data-mf="ft">{FUELS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
@@ -159,50 +159,66 @@ const faqJsonld = {
           <label class="sf-field sf-full"><span>Mi még fontos? (felszereltség, extrák, kizárt dolgok)</span>
             <textarea id="b-notes" rows="3" placeholder="pl. vonóhorog, panoráma tető, ülésfűtés, head-up, csak sérülésmentes, magyar papírok…"></textarea>
           </label>
-          <div class="kw-compare" style="margin-top:18px">
-            <div class="kw-compare-t">Nézd meg a hasonló autókat és a piaci ársávot</div>
-            <div class="kw-pricelinks">
-              <div class="kw-pricerow"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" /><a id="cmp-mobile" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car" target="_blank" rel="noopener">Összes hasonló →</a><a id="cmp-mobile-lo" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=up" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-mobile-hi" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=down" target="_blank" rel="noopener">Legdrágábbak →</a></div>
-              <div class="kw-pricerow"><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" /><a id="cmp-as24" class="kw-cmp" href="https://www.autoscout24.de/lst" target="_blank" rel="noopener">Összes hasonló →</a><a id="cmp-as24-lo" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=0" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-as24-hi" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=1" target="_blank" rel="noopener">Legdrágábbak →</a></div>
-            </div>
-            <p class="kw-note">Kattints — máris a szűrt találatokat látod a piacon (a darabszámmal együtt), a legolcsóbbtól a legdrágábbig rendezve.</p>
-          </div>
         </div>
 
         <button type="button" class="ik-go" id="kwGo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>Autót keresek</button>
-        <p class="ik-free">Ingyenes és kötelezettségmentes — a következő lépésekben megadhatod a beszámítást, a finanszírozást és a kiszállítást.</p>
+        <p class="ik-free">Ingyenes és kötelezettségmentes — a következő lépésekben megadhatod az árat és az időzítést, a vásárlás módját és a finanszírozást.</p>
       </div>
 
-      <!-- STEP 2 — Beszámítás -->
+      <!-- STEP 2 — Ár & időzítés -->
       <div class="kw-panel" data-step="2" hidden>
-        <div class="sf-blocktitle">2. Beszámítás</div>
-        <div class="kw-opts">
-          <label class="kw-opt"><input type="radio" name="trade" value="Nincs beszámítandó autóm" checked /><span class="kw-opt-b"><b>Nincs beszámítandó autóm</b><small>Csak az új autót keressük.</small></span></label>
-          <label class="kw-opt"><input type="radio" name="trade" value="Van beszámítandó autóm" /><span class="kw-opt-b"><b>Van beszámítandó autóm</b><small>Felértékeljük, és az árát beszámítjuk az új autóba.</small></span></label>
-        </div>
-        <div id="tradeBox" hidden>
-          <div class="sf-grid" style="margin-top:18px">
-            <label class="sf-field"><span>Márka és modell</span><input id="b-ti-car" type="text" placeholder="pl. Volkswagen Golf" /></label>
-            <label class="sf-field"><span>Évjárat</span><select id="b-ti-year"><option value="" selected>Válassz…</option>{years.map((y) => <option>{y}</option>)}<option>2000 előtti</option></select></label>
-            <label class="sf-field"><span>Futásteljesítmény (km)</span><input id="b-ti-km" type="text" inputmode="numeric" placeholder="pl. 120 000" /></label>
-            <label class="sf-field"><span>Üzemanyag</span><select id="b-ti-fuel"><option value="" selected>Válassz…</option>{FUELS.map(([c, l]) => <option>{l}</option>)}</select></label>
-          </div>
-          <label class="sf-field sf-full"><span>Állapot, felszereltség, megjegyzés</span>
-            <textarea id="b-ti-note" rows="3" placeholder="pl. első tulajdonos, vezetett szervizkönyv, kisebb karc a lökhárítón…"></textarea>
+        <div class="sf-blocktitle">2. Ár és időzítés</div>
+        <div class="sf-grid sf-3">
+          <label class="sf-field"><span>Ár rugalmassága</span>
+            <select id="b-flex">
+              <option value="" disabled selected>Válassz…</option>
+              <option>Fix keret</option>
+              <option>Kicsit rugalmas</option>
+              <option>Rugalmas a megfelelő autóért</option>
+            </select>
+          </label>
+          <label class="sf-field"><span>Mikorra kell?</span>
+            <select id="b-when">
+              <option value="" disabled selected>Válassz…</option>
+              <option>Nagyon sürgős (2 héten belül)</option>
+              <option>Mielőbb</option>
+              <option>1–2 hónapon belül</option>
+              <option>Ráérek — a tökéletes autóra várok</option>
+            </select>
+          </label>
+          <label class="sf-field"><span>Meddig keressünk neked?</span>
+            <select id="b-howlong">
+              <option value="" disabled selected>Válassz…</option>
+              <option>2 hét</option>
+              <option>1 hónap</option>
+              <option>2–3 hónap</option>
+              <option>Ameddig meg nem találjuk a tökéleteset</option>
+            </select>
           </label>
         </div>
-        <p class="kw-hint">A beszámítandó autódról a következő lépésben fotókat is küldhetsz e-mailben vagy WhatsAppon — így pontosabb ajánlatot adunk.</p>
+        <p class="kw-hint">Tipp: minél rugalmasabb a keret és az időzítés, annál jobb ár-érték arányú autót tudunk találni.</p>
+        <div class="kw-compare" style="margin-top:18px">
+          <div class="kw-compare-t">Nézd meg a hasonló autókat és a piaci ársávot</div>
+          <div class="kw-pricelinks">
+            <div class="kw-pricerow"><img src="https://www.caradvance.hu/mobile-de.webp" alt="mobile.de" /><a id="cmp-mobile" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car" target="_blank" rel="noopener">Összes hasonló →</a><a id="cmp-mobile-lo" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=up" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-mobile-hi" class="kw-cmp" href="https://suchen.mobile.de/fahrzeuge/search.html?s=Car&vc=Car&sb=p&od=down" target="_blank" rel="noopener">Legdrágábbak →</a></div>
+            <div class="kw-pricerow"><img src="https://www.caradvance.hu/autoscout24.webp" alt="AutoScout24" /><a id="cmp-as24" class="kw-cmp" href="https://www.autoscout24.de/lst" target="_blank" rel="noopener">Összes hasonló →</a><a id="cmp-as24-lo" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=0" target="_blank" rel="noopener">Legolcsóbbak →</a><a id="cmp-as24-hi" class="kw-cmp" href="https://www.autoscout24.de/lst?sort=price&desc=1" target="_blank" rel="noopener">Legdrágábbak →</a></div>
+          </div>
+          <p class="kw-note">Kattints — máris a szűrt találatokat látod a piacon (a darabszámmal együtt), a legolcsóbbtól a legdrágábbig rendezve.</p>
+        </div>
       </div>
 
-      <!-- STEP 3 — Finanszírozás -->
+      <!-- STEP 3 — Vásárlás módja -->
       <div class="kw-panel" data-step="3" hidden>
-        <div class="sf-blocktitle">3. Vásárlás módja és finanszírozás</div>
-        <div class="kw-sub" style="margin-top:0">Hogyan vásárolnál? (ÁFA)</div>
+        <div class="sf-blocktitle">3. Hogyan vásárolnál? (ÁFA)</div>
         <div class="kw-opts">
           <label class="kw-opt"><input type="radio" name="vat" value="Magánszemély — 19% áfa (Caradvance GmbH, Németország)" checked /><span class="kw-opt-b"><b>Magánszemélyként — 19% áfa</b><small>A német Caradvance GmbH-tól. Kedvezőbb ár, ez a leggyakoribb választás.</small></span></label>
           <label class="kw-opt"><input type="radio" name="vat" value="Cég — nettó, Németországból" /><span class="kw-opt-b"><b>Cégként — nettó, Németországból</b><small>Áfa-visszaigénylés lehetőségével, német számlával.</small></span></label>
         </div>
-        <div class="kw-sub">Fizetés</div>
+      </div>
+
+      <!-- STEP 4 — Finanszírozás -->
+      <div class="kw-panel" data-step="4" hidden>
+        <div class="sf-blocktitle">4. Finanszírozás</div>
         <div class="kw-opts kw-opts-3">
           <label class="kw-opt"><input type="radio" name="pay" value="Készpénz / önerőből" checked /><span class="kw-opt-b"><b>Készpénz / önerőből</b><small>Nincs szükség finanszírozásra.</small></span></label>
           <label class="kw-opt"><input type="radio" name="pay" value="Finanszírozás (hitel)" /><span class="kw-opt-b"><b>Finanszírozás</b><small>Autóhitel részletre.</small></span></label>
@@ -232,43 +248,11 @@ const faqJsonld = {
             </label>
           </div>
         </div>
-        <p class="kw-hint">Finanszírozó partnereink: Euroleasing és Merkantil Bank — a konkrét ajánlatot az autó kiválasztása után készítjük el.</p>
-      </div>
-
-      <!-- STEP 4 — Kiszállítás -->
-      <div class="kw-panel" data-step="4" hidden>
-        <div class="sf-blocktitle">4. Kiszállítás és időzítés</div>
-        <div class="kw-opts">
-          <label class="kw-opt"><input type="radio" name="dlv" value="Házhoz szállítás" checked /><span class="kw-opt-b"><b>Házhoz szállítás</b><small>Kulcsrakészen, a nevedre írt forgalmival a megadott címre szállítjuk.</small></span></label>
-          <label class="kw-opt"><input type="radio" name="dlv" value="Személyes átvétel" /><span class="kw-opt-b"><b>Személyes átvétel</b><small>Egyeztetett helyen és időpontban veheted át.</small></span></label>
-        </div>
-        <div class="sf-grid sf-3" style="margin-top:18px">
-          <label class="sf-field"><span>Szállítási cím / város</span><input id="b-dlv-city" type="text" placeholder="pl. 1117 Budapest" /></label>
-          <label class="sf-field"><span>Mikorra kell?</span>
-            <select id="b-when">
-              <option value="" disabled selected>Válassz…</option>
-              <option>Nagyon sürgős (2 héten belül)</option>
-              <option>Mielőbb</option>
-              <option>1–2 hónapon belül</option>
-              <option>Ráérek — a tökéletes autóra várok</option>
-            </select>
-          </label>
-          <label class="sf-field"><span>Meddig keressünk neked?</span>
-            <select id="b-howlong">
-              <option value="" disabled selected>Válassz…</option>
-              <option>2 hét</option>
-              <option>1 hónap</option>
-              <option>2–3 hónap</option>
-              <option>Ameddig meg nem találjuk a tökéleteset</option>
-            </select>
-          </label>
-        </div>
-        <p class="kw-hint">Profi szállítópartnerünkkel, magas értékű biztosítással hozzuk haza az autót. A kiválasztástól a kulcsrakész átadásig jellemzően 5–14 nap.</p>
       </div>
 
       <!-- STEP 5 — Kapcsolat -->
       <div class="kw-panel" data-step="5" hidden>
-        <div class="sf-blocktitle">Utolsó lépés — hogyan érünk el?</div>
+        <div class="sf-blocktitle">5. Kapcsolat</div>
         <div class="kw-opts kw-opts-2">
           <label class="kw-opt"><input type="radio" name="who" value="Magánszemély" checked /><span class="kw-opt-b"><b>Magánszemély</b></span></label>
           <label class="kw-opt"><input type="radio" name="who" value="Cég" /><span class="kw-opt-b"><b>Cég</b></span></label>
@@ -371,13 +355,8 @@ const faqJsonld = {
   /* Autó rendelés kártya (import oldal) — a hero-videó aljára csúszik */
   .ik{position:relative;z-index:5;margin-top:-196px;padding:0}
   .ik .kw.ik-card{max-width:1120px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 26px 70px rgba(8,8,10,.18);padding:0;overflow:hidden}
-  .ik-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);background:#fff}
-  .ik-tab{appearance:none;-webkit-appearance:none;border:0;background:none;font:inherit;display:flex;align-items:center;justify-content:center;gap:12px;padding:21px 12px 19px;font-size:15.5px;font-weight:800;color:var(--ink);cursor:pointer;position:relative;transition:background .15s}
-  .ik-tab:hover{background:#FAFBFD}
-  .ik-tab svg{width:26px;height:26px;color:var(--ink);flex:0 0 auto}
-  .ik-tab.active svg,.ik-tab.done svg{color:var(--red)}
-  .ik-tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--red);border-radius:3px 3px 0 0}
-  .ik-tab.done span::after{content:" ✓";color:var(--red)}
+  .ik .kw-head.ik-head{padding:30px 34px 0;margin:0}
+  .ik .kw-dot{cursor:pointer}
   .ik-body{padding:28px 30px 30px}
   .ik .sf-grid.ik-grid{grid-template-columns:repeat(4,1fr);gap:20px 26px}
   .ik .sf-grid.ik-grid + .sf-grid.ik-grid{margin-top:22px}
@@ -406,15 +385,12 @@ const faqJsonld = {
   @media(max-width:900px){
     .ik{margin-top:-150px}
     .ik .sf-grid.ik-grid{grid-template-columns:1fr 1fr;gap:16px}
-    .ik-tab{font-size:14px;gap:8px}
   }
   @media(max-width:560px){
     .ik{margin-top:-110px}
     .ik .wrap{padding:0 12px}
-    .ik-tab{flex-direction:column;gap:5px;font-size:11.5px;padding:14px 4px 12px}
-    .ik-tab svg{width:22px;height:22px}
-    .ik-tab.done span::after{content:""}
     .ik .sf-grid.ik-grid{grid-template-columns:1fr}
+    .ik .kw-head.ik-head{padding:20px 18px 0}
     .ik-body{padding:20px 18px 22px}
     .ik-more-t span{display:none}
     .ik-go{font-size:17px}
@@ -753,8 +729,7 @@ const faqJsonld = {
       ['Költségkeret (max)', val('b-budget') ? (val('b-budget')+' '+val('b-cur')) : ''], ['Ár rugalmassága', val('b-flex')],
       ['Mikorra kell', val('b-when')], ['Meddig keressünk', val('b-howlong')],
       ['Vásárlás módja (ÁFA)', radioVal('vat')],
-      ['Beszámítás', radioVal('trade')], ['Beszámítandó autó', val('b-ti-car')], ['Beszámítandó — évjárat', val('b-ti-year')], ['Beszámítandó — km', val('b-ti-km')], ['Beszámítandó — üzemanyag', val('b-ti-fuel')], ['Beszámítandó — megjegyzés', val('b-ti-note')],
-      ['Kiszállítás', radioVal('dlv')], ['Szállítási cím', val('b-dlv-city')], ['Forrás', 'Autó rendelés — import oldal'],
+      ['Forrás', 'Autó rendelés — import oldal'],
       ['Fizetés', radioVal('pay')], ['Finanszírozás konstrukció', val('b-fin-type')], ['Futamidő (hó)', val('b-fin-term')],
       ['Önerő', val('b-fin-down')], ['Havi keret', val('b-fin-monthly')],
       ['Vásárló típusa', radioVal('who')],
@@ -788,10 +763,9 @@ const faqJsonld = {
   var goBtn = document.getElementById('kwGo');
   var renderBase = render;
   render = function(doScroll){
-    renderBase(doScroll);
+    renderBase(false);
     if(navBox) navBox.hidden = (step === 1);
-    dots.forEach(function(d){ var n=parseInt(d.getAttribute('data-dot'),10); d.classList.toggle('done', n<step || (step===5 && n===4)); d.setAttribute('aria-selected', n===step ? 'true' : 'false'); });
-    if(count) count.textContent = step===5 ? 'Utolsó lépés' : (step + ' / 4');
+    if(doScroll){ var t = form.getBoundingClientRect().top + window.pageYOffset - 120; window.scrollTo({ top: t, behavior: 'smooth' }); }
   };
   if(goBtn) goBtn.addEventListener('click', function(){ if(!validateStep()) return; step = 2; render(true); });
   dots.forEach(function(d){ d.addEventListener('click', function(){
@@ -817,15 +791,10 @@ const faqJsonld = {
     form.reset();
     modelSel.innerHTML = '<option value="" disabled selected>Előbb válassz márkát…</option>'; modelSel.disabled = true;
     ['b-year-to','b-year-from','b-km-to','b-km-from'].forEach(function(id){ var e=document.getElementById(id); if(e) [].slice.call(e.options).forEach(function(o){ o.hidden=false; o.disabled=false; }); });
-    document.getElementById('finBox').hidden = true; var tb=document.getElementById('tradeBox'); if(tb) tb.hidden = true;
+    document.getElementById('finBox').hidden = true;
     document.getElementById('privBox').hidden = false; document.getElementById('compBox').hidden = true;
     setFlag(); updateCompare(); step = 1; render();
   });
-  form.querySelectorAll('input[name="trade"]').forEach(function(r){
-    r.addEventListener('change', function(){ var tb=document.getElementById('tradeBox'); if(tb) tb.hidden = radioVal('trade') !== 'Van beszámítandó autóm'; });
-  });
-  var tiKm = document.getElementById('b-ti-km');
-  if(tiKm) tiKm.addEventListener('input', function(){ var d=(tiKm.value||'').replace(/\D/g,''); tiKm.value = d ? d.replace(/\B(?=(\d{3})+(?!\d))/g,' ') : ''; });
   var hashGo = function(){ if(location.hash === '#rendeles'){ var t = form.getBoundingClientRect().top + window.pageYOffset - 110; window.scrollTo({ top: t }); } };
   setTimeout(hashGo, 60);
 
