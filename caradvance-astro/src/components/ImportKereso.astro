@@ -157,7 +157,7 @@ const faqJsonld = {
           <div class="kw-sub">Felszereltség <small>(ami mindenképp legyen benne)</small></div>
           <div class="kw-chips" data-mf="fe">{FEATS.map(([c, l]) => <label class="kw-chip"><input type="checkbox" value={c} data-hu={l} /><span>{l}</span></label>)}</div>
           <label class="sf-field sf-full"><span>Mi még fontos? (felszereltség, extrák, kizárt dolgok)</span>
-            <textarea id="b-notes" rows="3" placeholder="pl. vonóhorog, panoráma tető, ülésfűtés, head-up, csak sérülésmentes, magyar papírok…"></textarea>
+            <textarea id="b-notes" rows="3" placeholder="pl. vonóhorog, panoráma tető, ülésfűtés, head-up, csak sérülésmentes…"></textarea>
           </label>
         </div>
 
@@ -797,22 +797,22 @@ const faqJsonld = {
   });
   var hashGo = function(){ if(location.hash === '#rendeles'){ var t = form.getBoundingClientRect().top + window.pageYOffset - 110; window.scrollTo({ top: t }); } };
   setTimeout(hashGo, 60);
-  // nem forintos piacokon (átváltott ár) kerek összegek a költségvetés-listában
+  // nem forintos piacokon (átváltott ár) kerek összegek a költségvetés-listában — a futásidejű átváltás után is
   var roundBudget = function(){
-    var bs = document.getElementById('b-budget'); if(!bs || !bs.options[1]) return false;
-    if(/Ft\s*$/.test(bs.options[1].textContent)) return false;
+    var bs = document.getElementById('b-budget'); if(!bs || !bs.options[1]) return;
     [].slice.call(bs.options).forEach(function(o, i){
-      if(i === 0 || o.getAttribute('data-r')) return;
-      var t = o.textContent.replace(/\s*\(≈[^)]*\)/, '');
+      var cur = o.textContent;
+      if(i === 0 || cur === o.getAttribute('data-r') || /Ft\s*$/.test(cur)) return;
+      var t = cur.replace(/\s*\(≈[^)]*\)/, '');
       var m = t.match(/\d[\d\s  ’'.,]*\d/); if(!m) return;
       var sep = (m[0].match(/[\s  ’'.,]/) || [' '])[0];
       var n = parseInt(m[0].replace(/\D/g, ''), 10); if(!n) return;
       var p = Math.pow(10, Math.max(0, String(n).length - 2)); n = Math.round(n / p) * p;
-      o.textContent = t.replace(m[0], String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep)); o.setAttribute('data-r', '1');
+      t = t.replace(m[0], String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep));
+      o.textContent = t; o.setAttribute('data-r', t);
     });
-    return true;
   };
-  var rbTry = 0, rbT = setInterval(function(){ if(roundBudget() || ++rbTry > 40) clearInterval(rbT); }, 150);
+  var rbTry = 0, rbT = setInterval(function(){ roundBudget(); if(++rbTry > 50) clearInterval(rbT); }, 200);
 
   render();
 })();
