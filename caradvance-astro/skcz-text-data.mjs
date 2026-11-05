@@ -451,6 +451,7 @@ export const M = [
   // ---- egyéb ----
   ['Megjegyzés, kívánt felszereltség…', 'Poznámka, požadovaná výbava…', 'Poznámka, požadovaná výbava…'],
   ['pl. vonóhorog, panoráma tető, ülésfűtés, head-up, csak sérülésmentes, magyar papírok…', 'napr. ťažné zariadenie, panoramatická strecha, vyhrievané sedadlá, head-up, len nehavarované, slovenské doklady…', 'např. tažné zařízení, panoramatická střecha, vyhřívaná sedadla, head-up, jen nehavarované, české doklady…'],
+  ['pl. vonóhorog, panoráma tető, ülésfűtés, head-up, csak sérülésmentes…', 'napr. ťažné zariadenie, panoramatická strecha, vyhrievané sedadlá, head-up, len nehavarované…', 'např. tažné zařízení, panoramatická střecha, vyhřívaná sedadla, head-up, jen nehavarované…'],
   ['pl. vezetett szervizkönyv, téli-nyári gumi, tetőablak, sérülésmentes…', 'napr. servisná knižka, letné a zimné pneumatiky, strešné okno, nehavarované…', 'např. servisní knížka, letní a zimní pneumatiky, střešní okno, nehavarované…'],
   ['1400 cm³-ig vagy elektromos — eredetvizsga 62 €', 'do 1400 cm³ alebo elektrické — kontrola originality 62 €', 'do 1400 cm³ nebo elektrické — kontrola originality 62 €'],
   ['/hó-tól', '/mes.', '/měs.'],
