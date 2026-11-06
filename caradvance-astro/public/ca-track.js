@@ -104,6 +104,30 @@
     });
   })();
 
+  /* ---------- 2c. Microsoft Clarity (munkamenet-felvétel, hőtérkép) — csak statisztikai hozzájárulással ---------- */
+  var clarityOn = false;
+  function loadClarity() {
+    if (clarityOn || !CFG.CLARITY_ID || /^\/(belso|ajanlat)(\/|$)/.test(location.pathname)) return;
+    clarityOn = true;
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+      t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, 'clarity', 'script', CFG.CLARITY_ID);
+    window.clarity('consent');
+    try { window.clarity('set', 'piac', location.hostname.replace(/^www\./, '')); window.clarity('set', 'nyelv', document.documentElement.lang || ''); } catch (e) {}
+    log('clarity betöltve:', CFG.CLARITY_ID);
+  }
+  (function () {
+    var st = consentState();
+    if (st && st.analytics) loadClarity();
+    document.addEventListener('ca:consent', function (e) {
+      var s = e.detail && e.detail.state;
+      if (s && s.analytics) loadClarity();
+      else if (clarityOn && window.clarity) window.clarity('consent', false);
+    });
+  })();
+
   /* ---------- 3. Eseményküldés ---------- */
   function uuid() {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -113,6 +137,7 @@
     params = params || {};
     params.ca_page = location.pathname;
     gtag('event', name, params);
+    if (window.clarity) { try { window.clarity('event', name); } catch (e) {} }
     window.dataLayer.push(Object.assign({ event: name }, params));
     if (meta && window.fbq) window.fbq(meta.track ? 'track' : 'trackCustom', meta.name, meta.params || {}, meta.opts || {});
     log('esemény:', name, params, meta ? '+meta:' + meta.name : '');
