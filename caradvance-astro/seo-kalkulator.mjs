@@ -444,7 +444,7 @@ function szorzo(h){let s=1;for(const[k,v]of SZORZOK) if(h>=k) s=v; return s;}
 
 function init(){
   $('osztaly').innerHTML=OSZTALYOK.map(o=>\`<option value="\${o.kod}">\${o.cimke}</option>\`).join('');
-  $('osztaly').value='3';
+  $('osztaly').value='0';
   const most=new Date(), evNow=most.getFullYear();
   const evOpt=(a,b)=>{let s='';for(let y=b;y>=a;y--)s+=\`<option value="\${y}">\${y}</option>\`;return s;};
   const hoOpt=HONAPNEV.map((n,i)=>\`<option value="\${i+1}">\${n}</option>\`).join('');
