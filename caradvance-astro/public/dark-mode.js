@@ -20,7 +20,7 @@
     'html.ca-dark ::placeholder{color:#7D8796;opacity:1}','html.ca-dark .caf-f:not(:focus-within) input::placeholder,html.ca-dark .caf-f:not(:focus-within) textarea::placeholder{color:transparent}',
     'html.ca-dark option,html.ca-dark optgroup{background-color:#12151B;color:#E8EBF0}',
     'html.ca-dark hr{border-color:#2B313C}',
-    'html.ca-dark .cstage{background-color:#B4BAC2!important}',
+    'html.ca-dark .cstage{background-color:#B4BAC2!important}','html.ca-dark .caf-aseg,html.ca-dark .caf-cseg,html.ca-dark .caf-aseg.dm-s,html.ca-dark .caf-cseg.dm-s{background-color:#0E1116!important}','html.ca-dark .caf-aseg>button.on,html.ca-dark .caf-cseg>button.on,html.ca-dark .caf-aseg>button.on.dm-s,html.ca-dark .caf-cseg>button.on.dm-s{background-color:#2B313C!important}','html.ca-dark .caf-reqp,html.ca-dark .caf-reqp.dm-s{background-color:#2C1A1F!important}',
     'html.ca-dark .dm-inv{background-color:#F1F3F6!important;color:#0D0F13!important}',
     'html.ca-dark .dm-nb{mix-blend-mode:normal!important}',
     'html.ca-dark .dm-wb{background-color:#fff!important;border-radius:12px}',
