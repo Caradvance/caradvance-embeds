@@ -17,7 +17,10 @@ import path from 'node:path';
 const DIST = 'dist';
 const HOSTS = { '': 'www.caradvance.hu', sk: 'www.caradvance.sk', cs: 'www.caradvance.cz', pl: 'www.caradvance.pl', ch: 'www.caradvance.ch', eu: 'www.caradvance.eu' };
 const DIR_OF_HOST = Object.fromEntries(Object.entries(HOSTS).map(([d, h]) => [h, d]));
-const SKIP = new Set(['auto-foto', '_astro', 'i18n', 'node_modules', 'belso', 'ajanlat', 'belso-api']);
+const SKIP = new Set(['auto-foto', '_astro', 'i18n', 'node_modules', 'belso-api']);
+// Belső / technikai oldalak (admin, ajánlat-válasz, aláírás, partner, adatlap, fiók, teszt): sosem indexelhetők,
+// nem kerülnek sitemapbe, nem kapnak hreflangot. Minden nyelvi előtaggal.
+export const INTERNAL = /^\/(?:(?:en|de|fr|uk|zh|sk|cs|hu|pl|it|es)\/)?(?:belso|ajanlat|alairas|adatok|partner|teszt-mega-menu|fiok|account|konto|compte|kabinet|ucet)(?:\/|$)/;
 const PLACEHOLDER = '/auto-foto-nincs.webp';
 const LANG_ROOTS = new Set(['en', 'de', 'fr', 'uk', 'zh', 'hu', 'it', 'es', 'pl', 'cs', 'sk']);
 const DEADLINE = Date.now() + 4 * 60 * 1000;
@@ -176,7 +179,7 @@ async function main() {
       const h = fs.readFileSync(f, 'utf8');
       const alts = altLinks(h);
       pages.set(loc.url, {
-        noindex: isNoindex(h),
+        noindex: isNoindex(h) || INTERNAL.test(loc.path),
         canonical: normUrl(canonicalOf(h) || loc.url),
         alts: new Set(alts.map((a) => normUrl(a.href)).filter(Boolean)),
       });
@@ -207,6 +210,16 @@ async function main() {
     h = h0;
     const loc = locate(f);
     const siteDir = loc ? loc.siteDir : (() => { const r = path.relative(DIST, f).split(path.sep); const i = r[0] === '_np' ? 1 : 0; return HOSTS[r[i]] && r.length > i + 1 ? r[i] : ''; })();
+
+    // 0. belső oldalak: csak noindex,nofollow + hreflang nélkül, más átalakítás nincs
+    if (loc && INTERNAL.test(loc.path)) {
+      try {
+        if (!isNoindex(h)) { h = /<\/head>/i.test(h) ? h.replace(/<\/head>/i, '<meta name="robots" content="noindex,nofollow">\n</head>') : h; stat.internal = (stat.internal || 0) + 1; }
+        for (const a of altLinks(h)) h = h.split(a.raw).join('');
+        if (h !== h0) fs.writeFileSync(f, h);
+      } catch (e) { stat.errors++; }
+      continue;
+    }
 
     // 1. JSON-LD
     try {
@@ -284,7 +297,9 @@ async function main() {
       const s0 = fs.readFileSync(f, 'utf8');
       if (!/<urlset/i.test(s0)) continue;
       const s = s0.replace(/\s*<url>\s*<loc>([^<]+)<\/loc>[\s\S]*?<\/url>/g, (m, u) => {
-        const n = normUrl(u.trim().replace(/&amp;/g, '&')); const pg = n && pages.get(n);
+        const n = normUrl(u.trim().replace(/&amp;/g, '&'));
+        if (n && INTERNAL.test(new URL(n).pathname)) { stat.sm++; return ''; }
+        const pg = n && pages.get(n);
         if (!pg) return m;
         if (pg.noindex || (pg.canonical && pg.canonical !== n)) { stat.sm++; return ''; }
         return m;
