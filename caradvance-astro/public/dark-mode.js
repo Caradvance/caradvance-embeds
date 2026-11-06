@@ -19,7 +19,7 @@
     'html.ca-dark select:disabled{color:#7D8796!important}',
     'html.ca-dark ::placeholder{color:#7D8796;opacity:1}','html.ca-dark .caf-f:not(:focus-within) input::placeholder,html.ca-dark .caf-f:not(:focus-within) textarea::placeholder{color:transparent}',
     'html.ca-dark option,html.ca-dark optgroup{background-color:#12151B;color:#E8EBF0}',
-    'html.ca-dark hr{border-color:#2B313C}',
+    'html.ca-dark hr{border-color:#2B313C}','html.ca-dark .dm-nt,html.ca-dark .dm-nt *{transition:none!important}',
     'html.ca-dark .cstage{background-color:#B4BAC2!important}','html.ca-dark .caf-aseg,html.ca-dark .caf-cseg,html.ca-dark .caf-aseg.dm-s,html.ca-dark .caf-cseg.dm-s{background-color:#0E1116!important}','html.ca-dark .caf-aseg>button.on,html.ca-dark .caf-cseg>button.on,html.ca-dark .caf-aseg>button.on.dm-s,html.ca-dark .caf-cseg>button.on.dm-s{background-color:#2B313C!important}','html.ca-dark .caf-reqp,html.ca-dark .caf-reqp.dm-s{background-color:#2C1A1F!important}',
     'html.ca-dark .dm-inv{background-color:#F1F3F6!important;color:#0D0F13!important}',
     'html.ca-dark .dm-nb{mix-blend-mode:normal!important}',
@@ -74,7 +74,7 @@
     var cl = el.classList, cs2 = getComputedStyle(el), want = null;
     if (cl.contains('dm-s') || cl.contains('dm-s2')) { var b2 = rgba(cs2.backgroundColor); if (b2 && lum(b2) > 0.5) { if (!el.hasAttribute('data-dmbg')) el.setAttribute('data-dmbg', el.style.getPropertyValue('background-color') || ''); el.style.setProperty('background-color', cl.contains('dm-s') ? '#161A21' : '#1C2129', 'important'); } }
     if (cl.contains('dm-t') || cl.contains('dm-t2')) { var c2 = rgba(cs2.color); if (c2 && lum(c2) < 0.5) { if (!el.hasAttribute('data-dmc')) el.setAttribute('data-dmc', el.style.getPropertyValue('color') || ''); el.style.setProperty('color', cl.contains('dm-t') ? '#E8EBF0' : '#A3ADBC', 'important'); el.style.setProperty('-webkit-text-fill-color', 'currentColor', 'important'); } }
-    if (cl.contains('dm-b')) { var d2 = rgba(cs2.borderTopColor); if (d2 && lum(d2) > 0.6 && sat(d2) < 40) el.style.setProperty('border-color', '#2B313C', 'important'); }
+    if (cl.contains('dm-b')) { var d2 = rgba(cs2.borderTopColor); if (d2 && lum(d2) > 0.6 && sat(d2) < 40) { el.setAttribute('data-dmbd', ''); el.style.setProperty('border-color', '#2B313C', 'important'); } }
   }
   var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, LINK: 1, META: 1, TEMPLATE: 1, BR: 1, IMG: 1, VIDEO: 1, SOURCE: 1, PICTURE: 1, IFRAME: 1, CANVAS: 1 };
 
@@ -121,6 +121,26 @@
       if (o === 'mono') img.classList.remove('dm-mono'); else img.setAttribute('src', o);
       delete img.dataset.dm;
     });
+  }
+
+  // állapotváltáskor (kijelölés, fül, .on/.active) a régi besorolást töröljük és újra felmérjük
+  var RESETK = ['dm-s', 'dm-s2', 'dm-g', 'dm-t', 'dm-t2', 'dm-b', 'dm-inv', 'dm-dot'];
+  function reset(root) {
+    var els = [root].concat([].slice.call(root.querySelectorAll('*')));
+    els.forEach(function (e) {
+      if (!e.classList || e.closest('.cstage')) return;
+      RESETK.forEach(function (k) { e.classList.remove(k); });
+      var o;
+      if (e.hasAttribute('data-dmc')) { o = e.getAttribute('data-dmc'); e.style.removeProperty('color'); e.style.removeProperty('-webkit-text-fill-color'); if (o) e.style.setProperty('color', o); e.removeAttribute('data-dmc'); }
+      if (e.hasAttribute('data-dmbg')) { o = e.getAttribute('data-dmbg'); e.style.removeProperty('background-color'); if (o) e.style.setProperty('background-color', o); e.removeAttribute('data-dmbg'); }
+      if (e.hasAttribute('data-dmbd')) { e.style.removeProperty('border-color'); e.removeAttribute('data-dmbd'); }
+    });
+  }
+  function rescan(root) {
+    if (!root || !root.isConnected || !d.classList.contains('ca-dark')) return;
+    root.classList.add('dm-nt');
+    reset(root); scan(root);
+    requestAnimationFrame(function () { root.classList.remove('dm-nt'); });
   }
 
   function scan(root) {
@@ -209,22 +229,22 @@
     var st2 = document.createElement('style'); st2.id = 'ca-dark-states'; st2.textContent = out.join('\n'); document.head.appendChild(st2);
   }
 
-  var pending = null;
+  var pending = null, resets = null;
   var obs = new MutationObserver(function (muts) {
     if (!d.classList.contains('ca-dark')) return;
     muts.forEach(function (m) {
       if (m.type === 'attributes') {
         var t = m.target;
         if (m.attributeName === 'class') { var strip = function (v) { return (v || '').replace(/(^|\s)dm-\S+/g, ' ').replace(/\s+/g, ' ').trim(); }; if (strip(m.oldValue) === strip(t.getAttribute('class'))) return; }
-        if (m.attributeName === 'style' && (t.hasAttribute('data-dmc') || t.hasAttribute('data-dmbi') || t.hasAttribute('data-dmbg') || /dm-/.test(t.getAttribute('class') || ''))) return;
-        if (t.nodeType === 1 && !(t instanceof SVGElement)) (pending || (pending = [])).push(t);
+        if (m.attributeName === 'style' && (t.hasAttribute('data-dmc') || t.hasAttribute('data-dmbd') || t.hasAttribute('data-dmbi') || t.hasAttribute('data-dmbg') || /dm-/.test(t.getAttribute('class') || ''))) return;
+        if (t.nodeType === 1 && !(t instanceof SVGElement)) { (pending || (pending = [])).push(t); if (m.attributeName === 'class' && t !== document.body && t !== d) (resets || (resets = [])).push(t); }
         return;
       }
       m.addedNodes && m.addedNodes.forEach(function (n) { if (n.nodeType === 1) (pending || (pending = [])).push(n); });
     });
     if (pending && !scan._raf) scan._raf = requestAnimationFrame(function () {
-      scan._raf = 0; var list = pending; pending = null;
-      var seen = []; list.forEach(function (n) { if (!n.isConnected || seen.indexOf(n) >= 0) return; seen.push(n); if (n.tagName === 'IMG') fixImg(n); else scan(n); });
+      scan._raf = 0; var list = pending; pending = null; var rs = resets || []; resets = null;
+      var seen = []; list.forEach(function (n) { if (!n.isConnected || seen.indexOf(n) >= 0) return; seen.push(n); if (n.tagName === 'IMG') fixImg(n); else if (rs.indexOf(n) >= 0) { rescan(n); setTimeout(function () { rescan(n); }, 450); } else scan(n); });
     });
   });
 
@@ -236,6 +256,7 @@
     document.querySelectorAll('[data-dmc]').forEach(function (e) { var o = e.getAttribute('data-dmc'); e.style.removeProperty('color'); if (o) e.style.setProperty('color', o); e.removeAttribute('data-dmc'); });
     document.querySelectorAll('[data-dmbg]').forEach(function (e) { var o = e.getAttribute('data-dmbg'); e.style.removeProperty('background-color'); e.style.removeProperty('border-color'); if (o) e.style.setProperty('background-color', o); e.removeAttribute('data-dmbg'); });
     document.querySelectorAll('[data-dmbi]').forEach(function (e) { var o = e.getAttribute('data-dmbi'); e.style.removeProperty('background-image'); if (o) e.style.setProperty('background-image', o); e.removeAttribute('data-dmbi'); });
+    document.querySelectorAll('[data-dmbd]').forEach(function (e) { e.style.removeProperty('border-color'); e.removeAttribute('data-dmbd'); });
     var st2 = document.getElementById('ca-dark-states'); if (st2) st2.disabled = true;
   }
   function apply() {
@@ -247,6 +268,15 @@
       obs.disconnect(); d.classList.remove('ca-dark'); clearAll();
     }
   }
+  // rádiógomb / jelölőnégyzet váltás: a csoport összes kártyáját újra felmérjük
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (!d.classList.contains('ca-dark') || !t || !/^(radio|checkbox)$/.test(t.type)) return;
+    var group = t.name && t.form ? [].slice.call(t.form.querySelectorAll('input')).filter(function (x) { return x.name === t.name; }) : (t.name ? [].slice.call(document.querySelectorAll('input')).filter(function (x) { return x.name === t.name; }) : [t]);
+    var roots = [];
+    group.forEach(function (x) { var r = x.closest('label') || x.parentElement; if (r && roots.indexOf(r) < 0) roots.push(r); });
+    requestAnimationFrame(function () { roots.forEach(function (r) { rescan(r); }); setTimeout(function () { roots.forEach(function (r) { rescan(r); }); }, 450); });
+  }, true);
   if (mq.matches) d.classList.add('ca-dark');
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply();
   window.addEventListener('load', function () { if (mq.matches) { sheetDone = false; var o = document.getElementById('ca-dark-states'); if (o) o.remove(); sheetPass(); scan(); } });
