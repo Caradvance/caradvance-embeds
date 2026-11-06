@@ -337,6 +337,8 @@ function run() {
       if (rtEn) { const a = part(rtEn, 'var M=', ';var G='), b2 = part(rtEn, 'var G=', ';var GN='); try { Men = JSON.parse(rtEn.slice(a[0] + 6, a[1])); Gen = JSON.parse(rtEn.slice(b2[0] + 6, b2[1])); } catch (e) {} }
       const M = {}, G = {};
       for (const k of Object.keys(Msk)) { const v = PLR.M[k] ?? Men[k]; if (v != null) M[k] = localize(v, 'pl'); }
+      // a szlovák oldalon szlovákul beégetett szövegek (pl. textarea-placeholder, opciók) lengyel kulcsai — ezek nincsenek a szlovák runtime-ban
+      for (const [k, v] of Object.entries(PLR.M)) if (M[k] == null && v && v !== k) M[k] = localize(v, 'pl');
       for (const k of Object.keys(Gsk)) { const v = PLR.G[k] ?? Gen[k]; if (v != null) G[k] = localize(v, 'pl'); }
       let b = rtSk.slice(0, mR[0]) + 'var M=' + JSON.stringify(M) + ';var G=' + JSON.stringify(G) + rtSk.slice(gR[1]);
       b = b.replace('var LG="sk"', 'var LG="pl"').replace(/var GN=\d+/, 'var GN=' + Object.keys(G).length);
