@@ -681,7 +681,7 @@ const _rebuild='rebuild-nudge-3';
     }
     var hasDisc = !!(c.from && dpct(c) && priceHtml.indexOf('egl-net') > -1);
     var wasHtml = hasDisc ? '<div class="egl-was"><s>'+HUF(net(c.from))+'</s><s>'+EUR(net(c.from))+'</s></div>' : '<div class="egl-was" aria-hidden="true">&nbsp;</div>';
-    var href = '/egyedi-auto-rendeles/'+slug(c);
+    var href = '/egyedi-auto-rendeles/'+slug(c)+'/';
     var newBadge = (!isMini && !isMB && NEW.indexOf(slug(c))>-1) ? '<span class="egl-new">ÚJ</span>' : '';
     var fuelList = c.fuels || [c.fuel];
     var fuelBadges = fuelList.map(function(fu){ return '<span class="egl-fuel" style="background:'+(FUELC[fu]||'#5A6B82')+'">'+fu+'</span>'; }).join('');
