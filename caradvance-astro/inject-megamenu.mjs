@@ -14,6 +14,10 @@ const v = crypto.createHash('sha1').update(fs.readFileSync(FILE)).digest('hex').
 const TAG = '<script src="/mega-menu.js?v=' + v + '" defer></script>';
 // belső (munkatársi) oldalak, tesztoldalak és API kimarad
 const SKIP = /(^|\/)(belso|_ttest|teszt-mega-menu|api)(\/|$)/;
+// a menü nélküli 404-oldalak (minden piac és nyelv) a sötét módot közvetlenül kapják (dark-mode.js)
+const DMF = path.join(DIST, 'dark-mode.js');
+const DMTAG = fs.existsSync(DMF) ? '<script src="/dark-mode.js?v=' + crypto.createHash('sha1').update(fs.readFileSync(DMF)).digest('hex').slice(0, 10) + '" defer></script>' : '';
+let dm404 = 0;
 
 let done = 0, skipped = 0;
 function walk(dir) {
@@ -24,6 +28,7 @@ function walk(dir) {
     const rel = path.relative(DIST, p).split(path.sep).join('/');
     if (SKIP.test(rel)) { skipped++; continue; }
     let h = fs.readFileSync(p, 'utf8');
+    if (h.indexOf('class="ca-navwrap"') < 0 && DMTAG && /(^|\/)404[^/]*\.html$/i.test(rel) && h.indexOf('/dark-mode.js') < 0 && /<\/head>/i.test(h)) { const j = h.search(/<\/head>/i); fs.writeFileSync(p, h.slice(0, j) + DMTAG + h.slice(j)); dm404++; continue; }
     if (h.indexOf('class="ca-navwrap"') < 0 || h.indexOf('/mega-menu.js') >= 0) { skipped++; continue; }
     const i = h.search(/<\/head>/i);
     if (i < 0) { skipped++; continue; }
@@ -33,4 +38,4 @@ function walk(dir) {
   }
 }
 walk(DIST);
-console.log('[megamenu] beillesztve: ' + done + ' oldal, kihagyva: ' + skipped + ' (v=' + v + ')');
+console.log('[megamenu] beillesztve: ' + done + ' oldal, kihagyva: ' + skipped + ', sötét mód a 404-oldalakon: ' + dm404 + ' (v=' + v + ')');
