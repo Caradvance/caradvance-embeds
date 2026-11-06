@@ -1,8 +1,8 @@
-/* CarAdvance — automatikus sötét mód (a készülék beállítását követi). Teszt: csak caradvance.hu /en/ oldalak. */
+/* CarAdvance — automatikus sötét mód (a készülék beállítását követi). Minden piac (hu, sk, cz, pl, ch, eu) és nyelv; a belső admin oldalak kivételével. */
 (function () {
   var d = document.documentElement;
   var host = location.hostname.replace(/^www\./, '');
-  if (host !== 'caradvance.hu' || !/^\/en(\/|$)/.test(location.pathname)) return;
+  if (!/(^|\.)caradvance\.(hu|sk|cz|pl|ch|eu)$/.test(location.hostname) || /^\/(belso|ajanlat)(\/|$)/.test(location.pathname)) return;
   if (!window.matchMedia) return;
   var mq = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -32,6 +32,7 @@
     'html.ca-dark .dm-dot{background-color:rgba(255,255,255,.55)!important}',
     'html.ca-dark .burger span,html.ca-dark .burger i{background-color:#fff!important}',
     'html.ca-dark .dm-mono{filter:brightness(0) invert(1)!important}',
+    'html.ca-dark .dm-lgi{filter:invert(1) hue-rotate(180deg)!important;mix-blend-mode:screen}',
     'html.ca-dark .card.charity{background:linear-gradient(135deg,#2B1017 0%,#1B1E26 55%,#1B1E26 100%)!important;border:1px solid rgba(226,0,26,.35)!important;box-shadow:0 24px 60px rgba(0,0,0,.45)!important}',
     'html.ca-dark .card.charity .org-logo{background-color:#fff!important;border-color:#fff!important}',
     'html.ca-dark .card.charity .org-logo.org-sos{background-color:#009DE0!important}',
@@ -108,6 +109,9 @@
     var flt = ics.filter || '';
     if (/brightness\(0\)/.test(flt) && !/invert/.test(flt) && darkBehind(img.parentElement || img)) { img.classList.add('dm-mono'); img.dataset.dm = 'mono'; return; }
     if (/\/caradvance-logo\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('caradvance-logo.webp', 'caradvance-logo-white.webp')); return; }
+    // piaci logók (sk, pl, ch-de …): fehér változat; ha nincs ilyen fájl, invertált színekkel
+    var lg = s.match(/\/caradvance-logo-([a-z]{2}(?:-[a-z]{2})?)\.webp/);
+    if (lg) { img.dataset.dm = s; img.addEventListener('error', function f() { img.removeEventListener('error', f); if (img.dataset.dm) { img.setAttribute('src', img.dataset.dm); img.classList.add('dm-lgi'); } }); img.setAttribute('src', s.replace(lg[0], '/caradvance-logo-white-' + lg[1] + '.webp')); return; }
     if (/\/bl-[a-z0-9-]+-dark\.webp/.test(s)) { img.dataset.dm = s; img.setAttribute('src', s.replace('-dark.webp', '.webp')); return; }
     if (!darkBehind(img.parentElement || img)) return;
     for (var i = 0; i < WHITE.length; i++) {
@@ -118,7 +122,7 @@
   function unfixImgs() {
     document.querySelectorAll('img[data-dm]').forEach(function (img) {
       var o = img.dataset.dm;
-      if (o === 'mono') img.classList.remove('dm-mono'); else img.setAttribute('src', o);
+      img.classList.remove('dm-lgi'); if (o === 'mono') img.classList.remove('dm-mono'); else img.setAttribute('src', o);
       delete img.dataset.dm;
     });
   }
