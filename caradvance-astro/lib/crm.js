@@ -455,7 +455,7 @@ const SPEC_L = {
 export function specLine(it, lang) {
   const tr = (v) => (lang && SPEC_L[lang] && v ? String(v).split(' / ').map((x) => SPEC_L[lang][x.trim()] || x).join(' / ') : v);
   const pw = lang && lang !== 'hu' && it.power ? String(it.power).replace(/\bLE\b/g, 'k') : it.power;
-  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : it.km + ' km') : '', tr(it.fuel), pw, tr(it.gearbox), it.color].filter(Boolean).join(' · ');
+  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : String(it.km).replace(/^\s*(\d{4,})\s*$/, (x, n) => n.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')) + ' km') : '', tr(it.fuel), pw, tr(it.gearbox), it.color].filter(Boolean).join(' · ');
 }
 /** Az ajánlott autó azonosítói (mobile.de hirdetés-azonosító, gyári konfigurációs kód) — e-mailben és a válaszoldalon. */
 export function idLine(it, lang) {
@@ -498,7 +498,7 @@ export function offerEmailHtml({ clientName, items, message, link, attached, lan
   const cards = items.map((it, i) => {
     const img = it.mail_img || it.image;
     const chips = specLine(it, L === 'hu' ? undefined : L).split(' · ').filter(Boolean)
-      .map((t) => `<span style="${F};display:inline-block;background:#f2f4f8;color:#374151;border-radius:999px;padding:5px 11px;margin:6px 6px 0 0;font-size:12px;line-height:14px">${esc(t)}</span>`).join('');
+      .map((t) => `<span style="${F};display:inline-block;background:#f2f4f8;color:#374151;border-radius:999px;padding:5px 11px;margin:6px 6px 0 0;font-size:12px;line-height:14px">${esc(t)}</span>`).join(' ');
     const rent = isRent(it);
     const vat = L === 'hu' ? (VAT_MODES[it.vat_mode] ? VAT_MODES[it.vat_mode].long : '') : vatLong(L, it.vat_mode);
     const kmN = parseInt(String(it.km_keret || '').replace(/\D/g, ''), 10) || 0;
@@ -513,7 +513,7 @@ export function offerEmailHtml({ clientName, items, message, link, attached, lan
       it.file_id ? `<div style="${F};font-size:12px;color:#6b7280;margin-top:8px">${T.pdf}</div>` : '',
       it.config_url ? `<div style="margin-top:8px"><a href="${esc(it.config_url)}" style="${F};font-size:13px;font-weight:bold;color:#22447d;text-decoration:none">${T.config}</a></div>` : ''
     ].join('');
-    const btns = (many ? btnA(esc(link) + '&amp;v=' + i, T.pickBtn, 'dark') : '') + (it.url ? btnA(esc(it.url), T.carBtn, 'ghost') : '');
+    const btns = (many ? btnA(esc(link) + '&amp;v=' + i, T.pickBtn, 'dark') : '') + ' ' + (it.url ? btnA(esc(it.url), T.carBtn, 'ghost') : '');
     return `<tr><td style="padding:0 0 22px">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:16px;border-collapse:separate;overflow:hidden">
     ${img ? `<tr><td style="padding:0;line-height:0;font-size:0">${it.url ? `<a href="${esc(it.url)}">` : ''}<img src="${esc(img)}" alt="${esc(it.title)}" width="542" style="display:block;width:100%;max-width:542px;height:auto;border:0;border-radius:15px 15px 0 0">${it.url ? '</a>' : ''}</td></tr>` : ''}
@@ -547,7 +547,7 @@ ${message ? `<table role="presentation" width="100%" cellpadding="0" cellspacing
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${cards}</table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#141519;border-radius:16px;border-collapse:separate;margin:4px 0 24px"><tr><td style="padding:22px 22px 14px">
   <div style="${F};font-size:15px;line-height:22px;color:#ffffff;font-weight:bold;margin:0 0 14px">${T.ask}</div>
-  ${btnA(esc(link) + '&amp;a=elfogad', T.accept, 'red')}<a href="${esc(link)}&amp;a=modosit" style="${F};display:inline-block;text-decoration:none;font-weight:bold;font-size:14px;line-height:18px;border-radius:999px;padding:12px 22px;margin:0 8px 8px 0;background:transparent;color:#ffffff;border:1px solid #5b616e">${T.modify}</a>
+  ${btnA(esc(link) + '&amp;a=elfogad', T.accept, 'red')} <a href="${esc(link)}&amp;a=modosit" style="${F};display:inline-block;text-decoration:none;font-weight:bold;font-size:14px;line-height:18px;border-radius:999px;padding:12px 22px;margin:0 8px 8px 0;background:transparent;color:#ffffff;border:1px solid #5b616e">${T.modify}</a>
 </td></tr></table>
 <div style="${F};font-size:16px;line-height:22px;font-weight:bold;color:#141519;margin:0 0 12px">${esc(X.next)}</div>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 22px">${steps}</table>
