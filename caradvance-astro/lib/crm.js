@@ -417,7 +417,8 @@ const SPEC_L = {
 };
 export function specLine(it, lang) {
   const tr = (v) => (lang && SPEC_L[lang] && v ? String(v).split(' / ').map((x) => SPEC_L[lang][x.trim()] || x).join(' / ') : v);
-  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : it.km + ' km') : '', tr(it.fuel), it.power, tr(it.gearbox), it.color].filter(Boolean).join(' · ');
+  const pw = lang && lang !== 'hu' && it.power ? String(it.power).replace(/\bLE\b/g, 'k') : it.power;
+  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : it.km + ' km') : '', tr(it.fuel), pw, tr(it.gearbox), it.color].filter(Boolean).join(' · ');
 }
 /** Az ajánlott autó azonosítói (mobile.de hirdetés-azonosító, gyári konfigurációs kód) — e-mailben és a válaszoldalon. */
 export function idLine(it, lang) {
@@ -779,9 +780,9 @@ export function contractPdfFromText(filled, meta) {
 export function emailShell(inner, lang) {
   return `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
-    <div style="background:#0b0b0d;padding:18px 24px"><img src="${SITE}/caradvance-logo-email.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
+    <div style="background:#0b0b0d;padding:18px 24px"><img src="${SITE}/caradvance-logo-email${lang === 'sk' || lang === 'cs' ? '-' + lang : ''}.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
     <div style="padding:26px 24px 22px">${inner}</div>
-    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px;line-height:1.55"><b style="color:#141519">CarAdvance</b> · ${esc(LESSOR.helper)} · ${esc(LESSOR.helperOffice)}<br>${shellFooter(lang || 'hu')}</div>
+    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px;line-height:1.55"><b style="color:#141519">CarAdvance</b> · ${lang === 'sk' ? 'Caradvance GmbH · obchodný sprostredkovateľ: Mr. Job SK s.r.o., Cesta na Senec 2/A, 821 04 Bratislava' : lang === 'cs' ? 'Caradvance GmbH · obchodní zprostředkovatel: Mr. Job SK s.r.o., Cesta na Senec 2/A, 821 04 Bratislava' : esc(LESSOR.helper) + ' · ' + esc(LESSOR.helperOffice)}<br>${shellFooter(lang || 'hu')}</div>
   </div></div>`;
 }
 /** to: string vagy tömb. attachments: [{ filename, content(base64) }]. Visszatér: { ok, error } */
@@ -801,6 +802,14 @@ export async function sendCrmMail(env, to, subject, inner, attachments, opts) {
   const toList = body.to.map((x) => x.toLowerCase());
   if (copy && !(opts && opts.noCopy) && !toList.includes(copy.toLowerCase()) && !toList.includes(notifyTo(env).toLowerCase())) body.bcc = [copy];
   const post = () => fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  // SK / CZ: a helyi címről (info@caradvance.sk / .cz), ha a domain a Resendben hitelesítve van; különben a szokásos küldő, helyi névvel
+  const ml = opts && (opts.lang === 'sk' || opts.lang === 'cs') ? opts.lang : '';
+  if (ml && !env.CRM_EMAIL_FROM) {
+    const local = ml === 'sk' ? (env.CRM_EMAIL_FROM_SK || 'CarAdvance <info@caradvance.sk>') : (env.CRM_EMAIL_FROM_CZ || 'CarAdvance <info@caradvance.cz>');
+    const def = body.from; body.from = local;
+    const r0 = await post(); if (r0.ok) return { ok: true };
+    body.from = def;
+  }
   let r = await post();
   if (r.ok) return { ok: true };
   let err = String(await r.text().catch(() => r.status));
