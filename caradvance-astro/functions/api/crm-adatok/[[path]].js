@@ -103,7 +103,7 @@ async function submit(env, r, b, ip, lang) {
     try { await autoTick(env, r.deal_id, [key], 'az ügyfél beküldte az adatait és az okmánymásolatokat'); } catch (e) { console.error('autotick', e); }
     try {
       await sendCrmMail(env, notifyTo(env), `Ügyféladatok beérkeztek: ${P.name}`,
-        `<p><b>${esc(P.name)}</b> kitöltötte az adatbekérő űrlapot és feltöltött ${saved.length} okmánymásolatot:</p><ul>${saved.map((s) => `<li>${esc(s.name)}</li>`).join('')}</ul><p>Az adatok és a fájlok az ügyfél adatlapján vannak; az „Igazolvány másolatok” feladat kipipálva.</p><p><a href="${SITE}/belso/ugyfel/?id=${r.deal_id}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:11px 20px;border-radius:999px;display:inline-block">Ügyfél adatlap megnyitása</a></p>`);
+        `<p><b>${esc(P.name)}</b> kitöltötte az adatbekérő űrlapot és feltöltött ${saved.length} okmánymásolatot:</p><ul>${saved.map((s) => `<li>${esc(s.name)}</li>`).join('')}</ul><p>Az adatok és a fájlok az ügyfél adatlapján vannak; az „Igazolvány másolatok” feladat kipipálva.</p><p><a href="${SITE}/admin/ugyfel/?id=${r.deal_id}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:11px 20px;border-radius:999px;display:inline-block">Ügyfél adatlap megnyitása</a></p>`);
     } catch (e) { /* nem kritikus */ }
     return J({ ok: true });
   } catch (e) {
