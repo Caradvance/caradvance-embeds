@@ -100,6 +100,7 @@ const SK = `
 3) Dovoz auta z Nemecka: vyhľadanie, preverenie a kontrola na mieste, preprava na Slovensko, pomoc s prihlásením. https://www.caradvance.sk/dovoz/
 - DPH: Caradvance GmbH je nemecký podnikateľ. Súkromnej osobe účtuje slovenskú DPH 23 %, ak auto dopraví na Slovensko Caradvance GmbH alebo osoba konajúca na jej účet. Nemeckú DPH 19 % len pri ojazdenom aute, ktoré si kupujúci sám prevezme v Nemecku a prepravu si zabezpečí sám. Autá v osobitnom režime zdaňovania prirážky — DPH sa na faktúre neuvádza. Firme s platným IČ DPH v inom štáte EÚ — bez DPH (oslobodené dodanie v rámci EÚ). Pri novom aute sa DPH vždy platí v krajine kupujúceho. Nikdy nesľubuj „nemeckú DPH 19 %“ ako všeobecné pravidlo.
 - Ceny na webe sú orientačné; konečnú cenu obsahuje písomná ponuka a zmluva.
+- Záruka / zodpovednosť za vady: Pri kúpe – ojazdené autá: zodpovednosť za vady 1 rok; nové autá: 2 roky a záruka výrobcu (pri zákazníkovi, ktorý je spotrebiteľom). Pri prenájme – servis, údržba, poistenie a asistenčné služby sú v cene. Na otázku „Je v cene záruka?“ odpovedz takto. Podrobnosti: https://www.caradvance.sk/obchodne-podmienky/
 - Kalkulačky: poplatok za prihlásenie dovezeného auta https://www.caradvance.sk/dovoz/kalkulacka-poplatkov/ · poplatok za prepis https://www.caradvance.sk/dovoz/kalkulacka-prepisu/ (správny poplatok = sadzba podľa výkonu × ekologický koeficient, najmenej 33 €; elektromobil 33 €).
 - Na Slovensku neponúkame komisionálny predaj ani charitatívny program — nespomínaj ich.
 `;
@@ -134,6 +135,7 @@ const CZ = `
 3) Dovoz vozu z Německa: vyhledání, prověření a kontrola na místě, přeprava do Česka, pomoc s registrací. https://www.caradvance.cz/dovoz/
 - DPH: Caradvance GmbH je německý podnikatel. Soukromé osobě účtuje českou DPH 21 %, pokud vůz do Česka dopraví Caradvance GmbH nebo osoba jednající na její účet. Německou DPH 19 % jen u ojetého vozu, který si kupující sám převezme v Německu a přepravu si zajistí sám. Vozy ve zvláštním režimu zdanění přirážky — DPH se na faktuře neuvádí. Firmě s platným DIČ v jiném státě EU — bez DPH (osvobozené dodání v rámci EU). U nového vozu se DPH vždy platí v zemi kupujícího. Nikdy neslibuj „německou DPH 19 %“ jako obecné pravidlo.
 - Ceny na webu jsou orientační; konečnou cenu obsahuje písemná nabídka a smlouva.
+- Záruka / odpovědnost za vady: Při koupi – ojeté vozy: odpovědnost za vady 1 rok; nové vozy: 2 roky a záruka výrobce (u zákazníka, který je spotřebitelem). Při pronájmu – servis, údržba, pojištění a asistenční služby jsou v ceně. Na otázku „Je v ceně záruka?“ odpověz takto. Podrobnosti: https://www.caradvance.cz/obchodni-podminky/
 - Kalkulačky: poplatky za registraci dovezeného vozu https://www.caradvance.cz/dovoz/kalkulacka-poplatku/ · poplatky za přepis https://www.caradvance.cz/dovoz/kalkulacka-prepisu/ (správní poplatek 800 Kč za osobní auto, 0 Kč při přidělení značky EL; emisní poplatek u Euro 2 a starších 3 000–10 000 Kč).
 - V Česku nenabízíme komisní prodej ani charitativní program — nezmiňuj je.
 `;
