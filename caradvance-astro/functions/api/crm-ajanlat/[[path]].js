@@ -86,7 +86,7 @@ async function handleRespond(request, env, token) {
       `<p><b>${esc(row.client_name || 'Az ügyfél')}</b> ${action === 'elfogad' ? 'elfogadta az ajánlatot.' : 'módosítást kért az ajánlaton.'}</p>
        ${it ? `<p>Választott autó: <b>${esc(it.title)}</b><br>${esc(priceLabel(it))}</p>` : ''}
        ${msg ? `<p>Üzenet:<br><i style="white-space:pre-line">${esc(msg)}</i></p>` : ''}
-       <p><a href="${SITE}/belso/ugyfel/?id=${row.deal_id}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:11px 20px;border-radius:999px;display:inline-block">Ügyfél adatlap megnyitása</a></p>`);
+       <p><a href="${SITE}/admin/ugyfel/?id=${row.deal_id}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:11px 20px;border-radius:999px;display:inline-block">Ügyfél adatlap megnyitása</a></p>`);
   } catch (e) { /* az értesítés hibája nem akadályozza az ügyfél válaszát */ }
   return json({ ok: true, action, choice });
 }
