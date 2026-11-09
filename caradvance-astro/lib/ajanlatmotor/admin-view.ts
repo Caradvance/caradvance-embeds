@@ -57,7 +57,7 @@ export function adminLayout(title: string, body: string, opts: LayoutOpts) {
   const B = "/admin/ajanlatmotor";
   const nav: [string, string, string][] = [["igenyek", `${B}/`, "Igények"], ["uj", `${B}/uj`, "Új igény"], ["bovitmeny", `${B}/bovitmeny`, "Chrome bővítmény"]];
   if (opts.user.role === "admin") nav.splice(2, 0, ["dijak", `${B}/dijak`, "Díjak és beállítások"]);
-  return `<!doctype html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!doctype html><html lang="hu"><head><meta charset="utf-8"><script src="/admin/admin-i18n.js"></script><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>${esc(title)} · Ajánlatmotor · CarAdvance</title>
 <link rel="icon" href="https://www.caradvance.hu/favicon.ico?v=2">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap&subset=latin-ext" rel="stylesheet">
