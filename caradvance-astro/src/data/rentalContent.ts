@@ -65,7 +65,7 @@ export const CONTENT: Record<string, RentalContent> = {
       'sDrive18d': { fuel: 'Dízel', power: '150 LE (110 kW)', torque: '360 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', vmax: '211 km/h', rec: 'Takarékos dízel', note: 'takarékos dízel a sokat autózóknak', img: P('bmw-x2', 's1') },
       'sDrive20i': { fuel: 'Benzin (mild-hybrid)', power: '170 LE (125 kW)', torque: '240 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', vmax: '220 km/h', rec: 'Kiegyensúlyozott benzines', note: 'mild-hybrid benzines, kiegyensúlyozott választás', img: P('bmw-x2', 's1') },
       'sDrive20d': { fuel: 'Dízel (mild-hybrid)', power: '163 LE (120 kW)', torque: '360 Nm', drive: 'Elsőkerék / 7 fok. Steptronic', rec: 'Erősebb dízel', note: 'erősebb mild-hybrid dízel', img: P('bmw-x2', 's1') },
-      'M35i xDrive': { fuel: 'Benzin', power: '300 LE (221 kW)', torque: '400 Nm', drive: 'xDrive összkerék / 7 fok. Steptronic', accel: '5,4 mp', vmax: '250 km/h', rec: 'Sportos csúcsmodell', note: 'az M Performance csúcsmodell, összkerékhajtással', img: P('bmw-x2', 'v1') },
+      'M35i xDrive': { fuel: 'Benzin', power: '300 LE (221 kW)', torque: '400 Nm', drive: 'xDrive összkerék / 7 fok. Steptronic', accel: '5,4 mp', vmax: '250 km/h', rec: 'Sportos csúcsmodell', note: 'az M Performance csúcsmodell, összkerékhajtással', img: P('bmw-x2', 's1') },
     },
     gallery: G('bmw-x2', 'BMW X2', [['s1', 'bérlés — sportos SUV Coupé tartós bérletben'], ['g6', 'csomagtartó'], ['g7', 'BMW Curved Display'], ['g8', 'hátsó ülések']]),
     faqExtra: [
