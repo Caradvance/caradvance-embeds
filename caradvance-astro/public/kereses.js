@@ -380,7 +380,7 @@
       if (CHX) { var e = o.ep || o.p / ((DATA && DATA.eur) || 390), ce = ' (≈ ' + fmt(e) + ' €)'; if (o.k === 'berles') return L.netto + ' ' + chf(e) + L.ho + ce; if (o.k === 'rendeles') return L.netto + ' ' + chf(e) + L.tol + ce; return chf(e) + ce; }
       if (EUX) { var e2 = o.ep || o.p / ((DATA && DATA.eur) || 390); if (o.k === 'berles') return fmt(e2) + ' €' + L.ho + ' · ' + L.netto; if (o.k === 'rendeles') return L.tol.trim() + ' ' + fmt(e2) + ' € · ' + L.netto; return fmt(e2) + ' €'; }
       var SKCZ = DOM === 'sk' || DOM === 'cz';
-      if (SKCZ) { var e3 = o.ep || o.p / ((DATA && DATA.eur) || 390), u3 = /€/.test(L.ho) ? L.ho : '€' + String(L.ho).replace(/^\s*(HUF|Ft)/, ''); if (o.k === 'berles') return L.netto + ' ' + fmt(e3) + ' ' + u3; if (o.k === 'rendeles') return (L.from || String(L.tol).trim()) + ' ' + fmt(e3) + ' € ' + L.netto; return fmt(e3) + ' €'; }
+      if (SKCZ) { var f3 = function (n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0'); }; if (DOM === 'cz' && o.k === 'keszlet' && !o.ep) return f3(o.p) + '\u00a0Kč'; var e3 = o.ep || o.p / ((DATA && DATA.eur) || 390), u3 = /€/.test(L.ho) ? L.ho : '€' + String(L.ho).replace(/^\s*(HUF|Ft)/, ''); if (o.k === 'berles') return L.netto + ' ' + f3(e3) + '\u00a0' + u3; if (o.k === 'rendeles') return (L.from || String(L.tol).trim()) + ' ' + f3(e3) + '\u00a0€ ' + L.netto; return f3(e3) + '\u00a0€'; }
       if (o.k === 'berles') return L.netto + ' ' + fmt(o.p) + ' ' + L.ho;
       if (o.k === 'rendeles') return o.ep ? L.netto + ' ' + fmt(o.ep) + ' €' + L.tol : L.netto + ' ' + (o.p / 1e6).toFixed(1).replace('.', ',') + ' M Ft' + L.tol;
       return fmt(o.p) + ' Ft';
