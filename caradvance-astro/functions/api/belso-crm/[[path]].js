@@ -6,11 +6,12 @@ import {
   ensureCrm, statusFromDeal, addEvent, listEvents, json, parseJ, clean, cleanMulti, randomHex, getCard, saveCard, inventory, STATUSES, CHECKLIST, checklistFor, checklistItems, checklistProgress, MAX_FILE, eurHuf, syncSignStatus, finSummary, vehiclesOf,
   offerEmailHtml, sendCrmMail, notifyTo, TEMPLATES, VAR_LABELS, varsFor, defaultVars, fillTemplate, contractPdfFromText,
   bytesToB64, b64ToBytes, sha256hex, priceLabel, priceVatLabel, VAT_MODES, specLine, esc, SITE,
-  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket
+  VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket, siteOf, langOf
   , IMPORT_CX, importAuto, COUNTRY_HU
 } from '../../../lib/crm.js';
 import { jpegInfo, renderOfferPdf, renderRentOfferPdf, renderPayReqPdf, groupRentEquipment } from '../../../lib/docpdf.js';
 import { qrMatrix, epcPayload } from '../../../lib/qr.js';
+import { offerSubject, dataReqMail, signReqMail } from '../../../lib/crmi18n.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
 // címre megy az ügyfél helyett (a tárgyban ott a valódi címzett). Éles üzemhez állítsd null-ra,
@@ -110,8 +111,8 @@ async function handleCron(request, env) {
 async function handleGetCard(env, user, id) {
   const { deal, error } = await loadDeal(env, user, id); if (error) return error;
   const card = await getCard(env, id);
-  const offers = ((await env.DB.prepare(`SELECT token, items, message, sent_to, sent, created_at, responded_at, action, choice, client_msg FROM crm_offers WHERE deal_id = ? ORDER BY created_at DESC`).bind(id).all()).results || [])
-    .map((o) => ({ ...o, items: parseJ(o.items, []), link: `${SITE}/ajanlat/valasz/?t=${o.token}` }));
+  const offers = ((await env.DB.prepare(`SELECT token, items, message, sent_to, sent, created_at, responded_at, action, choice, client_msg, market FROM crm_offers WHERE deal_id = ? ORDER BY created_at DESC`).bind(id).all()).results || [])
+    .map((o) => ({ ...o, items: parseJ(o.items, []), link: `${siteOf(o.market)}/ajanlat/valasz/?t=${o.token}` }));
   const files = (await env.DB.prepare(`SELECT id, name, mime, size, created_at FROM crm_files WHERE deal_id = ? AND substr(name, 1, 8) <> '__media_' AND id NOT IN (SELECT file_id FROM crm_fin WHERE deal_id = ? AND file_id IS NOT NULL) ORDER BY id`).bind(id, id).all()).results || [];
   const fin = await finList(env, id);
   const events = await listEvents(env, id);
@@ -340,12 +341,13 @@ async function handleSendOffer(request, env, user, id) {
   items.forEach((it, i) => { it.offer_no = offerNo(id, i, items.length) + (prevN ? '/' + (prevN + 1) : ''); it.offer_date = today; if (fxNow) it.fx = Math.round(fxNow * 100) / 100; });
   const message = cleanMulti(b.message, 2000).trim();
   const token = randomHex(20);
-  const link = `${SITE}/ajanlat/valasz/?t=${token}`;
+  const market = marketOf(new URL(request.url).hostname); // SK / CZ felületről küldve: szlovák / cseh ügyféloldal, e-mail és link
+  const link = `${siteOf(market)}/ajanlat/valasz/?t=${token}`;
   const clientName = (card.data.kind === 'ceg' && card.data.contact_differs && card.data.contact && card.data.contact.name) || (card.data.person && card.data.person.name) || deal.name;
   const fwd = testForward(env);
-  const r = await mailOffer(env, id, deal, user, items, token, clientName, message, to, fwd);
-  await env.DB.prepare(`INSERT INTO crm_offers (token, deal_id, line, client_name, items, message, sent_to, sent, created_by) VALUES (?,?,?,?,?,?,?,?,?)`)
-    .bind(token, id, deal.line || '', clientName || '', JSON.stringify(items), message, fwd || to, r.ok ? 1 : 0, user.id).run();
+  const r = await mailOffer(env, id, deal, user, items, token, clientName, message, to, fwd, false, market);
+  await env.DB.prepare(`INSERT INTO crm_offers (token, deal_id, line, client_name, items, message, sent_to, sent, created_by, market) VALUES (?,?,?,?,?,?,?,?,?,?)`)
+    .bind(token, id, deal.line || '', clientName || '', JSON.stringify(items), message, fwd || to, r.ok ? 1 : 0, user.id, market).run();
   const carList = items.map((it) => `${it.title} (${priceVatLabel(it)}${it.ad_id ? ', mobile.de: ' + it.ad_id : ''}${it.config_code ? ', konfig.: ' + it.config_code : ''})`).join('; ');
   if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat küldése sikertelen — ${items.length} autó: ${carList}`, user.name); return json({ ok: false, error: r.error + ' — az ajánlat-link elkészült, kézzel is elküldheted.', link }, 502); }
   await addEvent(env, id, 'offer', `Ajánlat elküldve e-mailben (${fwd ? 'TESZT → ' + fwd : to}) — ${items.length} autó: ${carList}`, user.name);
@@ -354,9 +356,10 @@ async function handleSendOffer(request, env, user, id) {
 }
 
 /** Az ajánlat e-mailje (PDF-mellékletekkel) — első küldésnél és újraküldésnél is ez megy ki, ugyanazzal a linkkel. */
-async function mailOffer(env, id, deal, user, items, token, clientName, message, to, fwd, again) {
-  const link = `${SITE}/ajanlat/valasz/?t=${token}`;
-  const subject = `${fwd ? '[TESZT — ' + to + '] ' : ''}${again ? 'Emlékeztető: ' : ''}Ajánlatunk — ${items.length > 1 ? items.length + ' autó' : items[0].title}`;
+async function mailOffer(env, id, deal, user, items, token, clientName, message, to, fwd, again, market) {
+  const lang = langOf(market);
+  const link = `${siteOf(market)}/ajanlat/valasz/?t=${token}`;
+  const subject = `${fwd ? '[TESZT — ' + to + '] ' : ''}${offerSubject(lang, items, again)}`;
   // gyári konfigurátoros autók: CarAdvance-arculatú ajánlat PDF (adatok + képek + felszereltség); a gyári PDF csak kérésre megy
   const att = [];
   for (const [i, it] of items.entries()) {
@@ -379,7 +382,7 @@ async function mailOffer(env, id, deal, user, items, token, clientName, message,
     const f = await env.DB.prepare(`SELECT id, name, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(it.file_id, id).first();
     if (f) att.push({ filename: f.name, content: await fileData(env, f) }); else it.file_id = null;
   }
-  return sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link, attached: att.length > 0 }), att);
+  return sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link, attached: att.length > 0, lang }), att, { lang });
 }
 /** Már kiküldött ajánlat újraküldése (ugyanaz a link és tartalom) — pl. ha nem érkezett meg, vagy új e-mail címre. */
 async function handleResendOffer(request, env, user, id, token) {
@@ -393,7 +396,7 @@ async function handleResendOffer(request, env, user, id, token) {
   const items = parseJ(o.items, []);
   const message = b.message !== undefined ? cleanMulti(b.message, 2000).trim() : (o.message || '');
   const fwd = testForward(env);
-  const r = await mailOffer(env, id, deal, user, items, token, o.client_name || deal.name, message, to, fwd, true);
+  const r = await mailOffer(env, id, deal, user, items, token, o.client_name || deal.name, message, to, fwd, true, o.market || 'HU');
   const carList = items.map((it) => it.title).join('; ');
   if (!r.ok) { await addEvent(env, id, 'offer', `Ajánlat újraküldése sikertelen (${fwd ? 'TESZT → ' + fwd : to}) — ${carList}: ${r.error}`, user.name); return json({ ok: false, error: r.error }, 502); }
   await env.DB.prepare(`UPDATE crm_offers SET sent = 1, sent_to = ? WHERE token = ?`).bind(fwd || to, token).run();
@@ -1270,9 +1273,11 @@ async function handleSignCreate(request, env, user, id) {
     .bind(await sha256hex('crmsign|' + token), id, role, signerName, email, JSON.stringify(docs), msg, user.name, exp, market).run();
   const sid = ins.meta.last_row_id;
   for (const d of docs) await env.DB.prepare(`UPDATE crm_docs SET sign_status = 'pending', sign_id = ? WHERE id = ?`).bind(sid, d.doc_id).run();
-  const link = `${SITE}/alairas/#${token}`;
+  const link = `${siteOf(market)}/alairas/#${token}`;
   const fwd = testForward(env);
-  const r = await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}Aláírásra váró dokumentumok — CarAdvance`,
+  const L = signReqMail(langOf(market), { name: esc(signerName), docsHtml: `<ul>${docs.map((d) => `<li>${esc(d.name)}</li>`).join('')}</ul>`, msgHtml: msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : '', link: esc(link), exp });
+  const r = L ? await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}${L.subject}`, L.html, null, { lang: langOf(market) }) :
+    await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}Aláírásra váró dokumentumok — CarAdvance`,
     `<p>Kedves ${esc(signerName)}!</p><p>Az alábbi dokumentumokat elektronikus aláírásra küldjük:</p><ul>${docs.map((d) => `<li>${esc(d.name)}</li>`).join('')}</ul>
      ${msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : ''}
      <p>A dokumentumokat a lenti gombbal tudja átolvasni és aláírni. Az aláíráshoz egy egyszeri kódot küldünk erre az e-mail címre.</p>
@@ -1340,10 +1345,12 @@ async function handleDataReqCreate(request, env, user, id) {
   await env.DB.prepare(`UPDATE crm_datareq SET status = 'revoked' WHERE deal_id = ? AND role = ? AND status = 'pending'`).bind(id, role).run();
   const token = randomHex(32); const exp = Math.floor(Date.now() / 1000) + 14 * 86400;
   const msg = cleanMulti(b.message, 2000).trim();
-  const ins = await env.DB.prepare(`INSERT INTO crm_datareq (token_hash, deal_id, role, email, name, message, created_by, expires_at) VALUES (?,?,?,?,?,?,?,?)`)
-    .bind(await sha256hex('crmdata|' + token), id, role, email, name, msg, user.name, exp).run();
-  const link = `${SITE}/adatok/#${token}`; const fwd = testForward(env);
-  const r = await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}Kérjük, adja meg adatait — CarAdvance`,
+  const market = marketOf(new URL(request.url).hostname); const lang = langOf(market);
+  const ins = await env.DB.prepare(`INSERT INTO crm_datareq (token_hash, deal_id, role, email, name, message, created_by, expires_at, market) VALUES (?,?,?,?,?,?,?,?,?)`)
+    .bind(await sha256hex('crmdata|' + token), id, role, email, name, msg, user.name, exp, market).run();
+  const link = `${siteOf(market)}/adatok/#${token}`; const fwd = testForward(env);
+  const DL = dataReqMail(lang, { name: esc(name), msgHtml: msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : '', link: esc(link), exp });
+  const r = DL ? await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}${DL.subject}`, DL.html, null, { lang }) : await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}Kérjük, adja meg adatait — CarAdvance`,
     `<p>Kedves ${esc(name || 'Ügyfelünk')}!</p><p>A szerződések elkészítéséhez kérjük, adja meg személyes adatait, és töltse fel a <b>személyazonosító igazolványa</b> és a <b>lakcímkártyája</b> másolatát (fénykép vagy PDF).</p>
      ${msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : ''}
      <p style="margin:18px 0"><a href="${esc(link)}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:999px;display:inline-block">Adatok megadása és feltöltés</a></p>
