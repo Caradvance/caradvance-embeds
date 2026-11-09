@@ -138,3 +138,18 @@ try {
   }
   console.log('[skcz-fix1110] keresőindex: ' + idxFiles.length + ' fájl · eladott autó kivéve: ' + sold + ' · régi bérlési oldal kivéve: ' + gi + ' · CZ euróár: ' + ep);
 } catch (e) { console.log('[skcz-fix1110] index hiba:', e && e.stack || e); }
+
+// 6  Belső linkek piaci előtaggal (pl. href="/sk/prenajom/proces/" a caradvance.sk-n) → előtag nélkül, hogy ne átirányításra mutassanak
+try {
+  let nl = 0, nf = 0;
+  for (const c of ['sk', 'cs', 'pl', 'ch', 'eu']) {
+    const re = new RegExp('(href=\\\\?["\'])/' + c + '/', 'g');
+    for (const f of walk(path.join(DIST, c), [])) {
+      if (!/\.html$/i.test(f)) continue;
+      const s = fs.readFileSync(f, 'utf8'); if (s.indexOf('/' + c + '/') < 0) continue;
+      let k = 0; const h = s.replace(re, (m, a) => { k++; return a + '/'; });
+      if (k) { fs.writeFileSync(f, h); nl += k; nf++; }
+    }
+  }
+  console.log('[skcz-fix1110] piaci előtagos belső link javítva: ' + nl + ' (' + nf + ' oldal)');
+} catch (e) { console.log('[skcz-fix1110] link hiba:', e && e.stack || e); }
