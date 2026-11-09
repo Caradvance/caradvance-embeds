@@ -32,10 +32,10 @@ const WORDS = {
   cs: [['Vászontető', 'Plátěná střecha']],
 };
 const HLADAM = {
-  sk: [[/A szűrők ugyanazok, mint a <b>mobile\.de<\/b> keresőjében — pontosan ezekkel a feltételekkel keresünk Németország teljes kínálatában\./g, 'Filtre sú rovnaké ako vo vyhľadávači <b>mobile.de</b> — presne podľa týchto podmienok hľadáme v celej ponuke Nemecka.'],
+  sk: [[/A szűrők ugyanazok, mint a (<b\b[^>]*>)mobile\.de<\/b> keresőjében — pontosan ezekkel a feltételekkel keresünk Németország teljes kínálatában\./g, 'Filtre sú rovnaké ako vo vyhľadávači $1mobile.de</b> — presne podľa týchto podmienok hľadáme v celej ponuke Nemecka.'],
        ['A szűrők ugyanazok, mint a mobile.de keresőjében — pontosan ezekkel a feltételekkel keresünk Németország teljes kínálatában.', 'Filtre sú rovnaké ako vo vyhľadávači mobile.de — presne podľa týchto podmienok hľadáme v celej ponuke Nemecka.'],
        ['További szűrők — szín, kárpit, felszereltség, ajtók, tulajdonosok…', 'Ďalšie filtre — farba, čalúnenie, výbava, dvere, počet majiteľov…']],
-  cs: [[/A szűrők ugyanazok, mint a <b>mobile\.de<\/b> keresőjében — pontosan ezekkel a feltételekkel keresünk Németország teljes kínálatában\./g, 'Filtry jsou stejné jako ve vyhledávači <b>mobile.de</b> — přesně podle těchto podmínek hledáme v celé nabídce Německa.'],
+  cs: [[/A szűrők ugyanazok, mint a (<b\b[^>]*>)mobile\.de<\/b> keresőjében — pontosan ezekkel a feltételekkel keresünk Németország teljes kínálatában\./g, 'Filtry jsou stejné jako ve vyhledávači $1mobile.de</b> — přesně podle těchto podmínek hledáme v celé nabídce Německa.'],
        ['A szűrők ugyanazok, mint a mobile.de keresőjében — pontosan ezekkel a feltételekkel keresünk Németország teljes kínálatában.', 'Filtry jsou stejné jako ve vyhledávači mobile.de — přesně podle těchto podmínek hledáme v celé nabídce Německa.'],
        ['További szűrők — szín, kárpit, felszereltség, ajtók, tulajdonosok…', 'Další filtry — barva, čalounění, výbava, dveře, počet majitelů…']],
 };
@@ -94,7 +94,7 @@ const RQ = {
   cs: { show: 'Zobrazit i prodejní cenu', name: 'Jméno a příjmení', email: 'E-mail', phone: 'Telefon', company: 'Firma (nepovinné)', km: 'Měsíční limit km', msg: 'Poznámka (nepovinné)', send: 'Odeslat poptávku pronájmu', sending: 'Odesílá se…',
         consent: 'Souhlasím se zpracováním osobních údajů podle <a href="/ochrana-osobnich-udaju/" target="_blank" rel="noopener">zásad ochrany osobních údajů</a>.', ok: 'Děkujeme! Vaši poptávku jsme obdrželi — brzy se vám ozveme s nabídkou.', err: 'Odeslání se nezdařilo. Zavolejte nám na +420 604 313 136 nebo napište na info@caradvance.cz.', need: 'Vyplňte jméno, e-mail a telefon a potvrďte souhlas.', type: 'Pronájem' },
 };
-const RQ_CSS = '<style id="ca-rq-css">#ca-rent .ca-rq-btn{display:block;width:100%;text-align:center;background:#00806A;color:#fff;font:inherit;font-weight:800;border:0;border-radius:10px;padding:12px 14px;cursor:pointer}#ca-rent .ca-rq-btn:hover{background:#006b59}' +
+const RQ_CSS = '<style id="ca-rq-css">#ca-rent .ca-rq-btn{display:block;width:100%;text-align:center;background:#00806A;color:#fff;font:inherit;font-weight:800;border:0;border-radius:10px;padding:12px 14px;cursor:pointer}#ca-rent .ca-rq-btn:hover{background:#006b59}#ca-rent .ca-rq-btn[hidden]{display:none}#ca-rent{scroll-margin-top:96px}' +
   '#ca-rent form.ca-rq{display:grid;gap:8px;margin-top:12px}#ca-rent form.ca-rq[hidden]{display:none}#ca-rent .ca-rq input,#ca-rent .ca-rq select,#ca-rent .ca-rq textarea{width:100%;box-sizing:border-box;font:inherit;font-size:14px;border:1px solid #d5dbe5;border-radius:9px;padding:10px 11px;background:#fff;color:#141519}' +
   '#ca-rent .ca-rq textarea{min-height:64px;resize:vertical}#ca-rent .ca-rq label.ca-rq-c{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#5a6b82;line-height:1.4}#ca-rent .ca-rq label.ca-rq-c input{width:auto;margin-top:2px}#ca-rent .ca-rq label.ca-rq-c a{display:inline;background:none;color:#00806A;padding:0;font-weight:700;text-decoration:underline}' +
   '#ca-rent .ca-rq .ca-rq-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}#ca-rent .ca-rq-msg{font-size:13.5px;line-height:1.45;margin:10px 0 0;padding:10px 12px;border-radius:9px}#ca-rent .ca-rq-msg.ok{background:#e3f5f0;color:#00594a}#ca-rent .ca-rq-msg.err{background:#fde8ea;color:#a3001a}' +
