@@ -5,6 +5,7 @@
 (function () {
   'use strict';
   var KEY = 'ca_admin_lang', H = location.hostname;
+  var VER = ''; try { VER = (new URL(document.currentScript.src)).searchParams.get('v') || ''; } catch (e) {}
   var def = /caradvance\.sk$/.test(H) ? 'sk' : /caradvance\.cz$/.test(H) ? 'cs' : 'hu';
   var lang = def;
   try { var s = localStorage.getItem(KEY); if (s === 'hu' || s === 'sk' || s === 'cs') lang = s; } catch (e) {}
@@ -126,5 +127,5 @@
     };
     if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
   }
-  fetch('/admin/i18n-' + lang + '.json', { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).then(start).catch(function () { unhide(); });
+  fetch('/admin/i18n-' + lang + '.json' + (VER ? '?v=' + VER : ''), VER ? { cache: 'force-cache' } : {}).then(function (r) { return r.ok ? r.json() : {}; }).then(start).catch(function () { unhide(); });
 })();
