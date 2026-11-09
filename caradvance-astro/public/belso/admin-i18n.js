@@ -33,11 +33,12 @@
   var unhide = function () { var x = document.getElementById('ca-i18n-wait'); if (x) x.remove(); };
   setTimeout(unhide, 1800);
 
-  var D = null, T = {}, RE = null;
+  var D = null, T = {}, RE = null, TOK = null, TRE = null;
   var HU_CH = /[áéíóöőúüű]/i;
   var EDGE = /^([\s\d.,:;·•\-–—→←↗↘▸▾▴›»«()[\]"„“”'+%€$#|/*!?…]*)([\s\S]*?)([\s\d.,:;·•\-–—→←↗↘▸▾▴›»«()[\]"„“”'+%€$#|/*!?…]*)$/;
   var NUM = /\d+(?:[.,  ]\d+)*/g;
   function prep(d) {
+    if (d.__tokens) { TOK = d.__tokens; delete d.__tokens; var tk = Object.keys(TOK).map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }); TRE = new RegExp('(?<![A-Za-zÀ-ž])(' + tk.join('|') + ')(?![A-Za-zÀ-ž])', 'g'); }
     var keys = Object.keys(d);
     keys.forEach(function (k) {
       if (/\d/.test(k)) { var v = d[k], kn = k.match(NUM) || [], vn = v.match(NUM) || []; if (kn.length && kn.length === vn.length) T[k.replace(NUM, '#')] = { v: v.replace(NUM, '#'), n: kn.length }; }
@@ -63,6 +64,8 @@
     var lead = raw.match(/^\s*/)[0], tail = raw.match(/\s*$/)[0], s = raw.trim().replace(/\s+/g, ' ');
     var r = look(s);
     if (r == null && RE && HU_CH.test(s) && s.length <= 400) { var x = s.replace(RE, function (p) { return D[p] != null ? D[p] : p; }); if (x !== s) r = x; }
+    // rövid szavak (üzemanyag, váltó, „hó”, „LE”) csak tagolt sorokban: „2026 · 0 km · Benzin · 150 LE · Automata · 6 hó”
+    if (TRE && /·|:|\(/.test(r == null ? s : r)) { var y = (r == null ? s : r).replace(TRE, function (p) { return TOK[p] != null ? TOK[p] : p; }); if (y !== (r == null ? s : r)) r = y; }
     return r == null ? raw : lead + r + tail;
   }
   window.caT = function (s) { return D ? tr(String(s)) : s; };
