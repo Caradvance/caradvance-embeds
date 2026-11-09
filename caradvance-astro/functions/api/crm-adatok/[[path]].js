@@ -5,8 +5,12 @@
 // Biztonság: 256 bites egyszeri token (csak SHA-256 lenyomata tárolva, az URL #-részében utazik), 14 nap, egyszer küldhető be;
 // csak JPEG / PNG / WEBP / PDF (tartalom alapján ellenőrizve), fájlonként max. 8 MB, max. 8 fájl; IP-alapú rate limit.
 import {
-  ensureCrm, json, parseJ, clean, addEvent, sendCrmMail, notifyTo, esc, sha256hex, b64ToBytes, putFile, getCard, saveCard, rateOk, autoTick, SITE
+  ensureCrm, json, parseJ, clean, addEvent, sendCrmMail, notifyTo, esc, sha256hex, b64ToBytes, putFile, getCard, saveCard, rateOk, autoTick, SITE, langOf
 } from '../../../lib/crm.js';
+// nyelv / ország: a domain (caradvance.sk → sk, .cz → cs), magyar domainen az adatbekérő piaca szerint.
+// SK / CZ: nincs lakcímkártya és anyja neve (ott nem létező / nem használt adat — GDPR adattakarékosság), csak a személyi igazolvány kötelező.
+const hostLang = (request) => { const h = new URL(request.url).hostname; return /\.sk$/.test(h) ? 'sk' : /\.cz$/.test(h) ? 'cs' : 'hu'; };
+const langFor = (hl, r) => (hl !== 'hu' ? hl : langOf(r && r.market));
 
 const TOKEN_RE = /^[a-f0-9]{64}$/;
 const SEC = { 'cache-control': 'no-store', 'referrer-policy': 'no-referrer', 'x-robots-tag': 'noindex, nofollow', 'x-content-type-options': 'nosniff' };
@@ -15,6 +19,7 @@ const now = () => Math.floor(Date.now() / 1000);
 const FILE_MAX = 8 * 1024 * 1024;
 const P_FIELDS = ['name', 'address', 'phone', 'email', 'birth_place', 'birth_date', 'mother_name', 'id_number', 'address_card', 'licence', 'tax', 'bank', 'residence'];
 const P_REQ = ['name', 'address', 'phone', 'email', 'birth_place', 'birth_date', 'mother_name', 'id_number', 'address_card', 'licence'];
+const P_REQ_INT = ['name', 'address', 'phone', 'email', 'birth_place', 'birth_date', 'id_number', 'licence'];
 const C_FIELDS = ['name', 'address', 'reg', 'tax'];
 
 async function load(env, t) {
@@ -26,15 +31,15 @@ async function load(env, t) {
 }
 function target(data, role) { return role === 'buyer' ? (data.buyer = data.buyer || {}) : data; }
 
-async function view(env, r) {
-  if (r.status !== 'pending') return J({ ok: true, status: r.status });
+async function view(env, r, lang) {
+  if (r.status !== 'pending') return J({ ok: true, status: r.status, lang });
   if (!r.opened_at) {
     await env.DB.prepare(`UPDATE crm_datareq SET opened_at = datetime('now') WHERE id = ?`).bind(r.id).run();
     await addEvent(env, r.deal_id, 'datareq', `Az ügyfél megnyitotta az adatbekérő oldalt (#${r.id})`, 'Ügyfél');
   }
   const card = await getCard(env, r.deal_id); const T = target(card.data || {}, r.role); const p = T.person || {}; const c = T.company || {};
   // csak az alapadatok előtöltése (a meglévő okmányadatokat nem adjuk vissza)
-  return J({ ok: true, status: 'pending', message: r.message || '', kind: T.kind === 'ceg' ? 'ceg' : 'magan',
+  return J({ ok: true, status: 'pending', lang, message: r.message || '', kind: T.kind === 'ceg' ? 'ceg' : 'magan',
     prefill: { name: p.name || r.name || '', email: p.email || r.email || '', phone: p.phone || '', address: p.address || '', company: { name: c.name || '', address: c.address || '', reg: c.reg || '', tax: c.tax || '' } } });
 }
 
@@ -47,15 +52,16 @@ function sniff(u) { // tartalom alapján
 }
 const CAT = { id: 'Szemelyi_igazolvany', addr: 'Lakcimkartya', company: 'Cegkivonat' };
 
-async function submit(env, r, b, ip) {
+async function submit(env, r, b, ip, lang) {
+  const huForm = lang === 'hu';
   if (r.status !== 'pending') return J({ ok: false, error: 'locked' }, 409);
   const kind = b.kind === 'ceg' ? 'ceg' : 'magan';
   const P = {}; for (const k of P_FIELDS) P[k] = clean((b.person || {})[k], k === 'address' || k === 'residence' ? 300 : 160);
   if (P.birth_date && !/^\d{4}-\d{2}-\d{2}$/.test(P.birth_date)) return J({ ok: false, error: 'bad_date' }, 400);
   P.email = P.email.toLowerCase();
-  const miss = P_REQ.filter((k) => !P[k]);
+  const miss = (huForm ? P_REQ : P_REQ_INT).filter((k) => !P[k]);
   const C = {}; for (const k of C_FIELDS) C[k] = clean((b.company || {})[k], k === 'address' ? 300 : 160);
-  if (kind === 'ceg') for (const k of C_FIELDS) if (!C[k]) miss.push('company.' + k);
+  if (kind === 'ceg') for (const k of (huForm ? C_FIELDS : ['name', 'address', 'reg'])) if (!C[k]) miss.push('company.' + k); // SK / CZ: IČ DPH / DIČ csak DPH-platiteľnél
   if (b.consent !== true) miss.push('consent');
   if (miss.length) return J({ ok: false, error: 'missing', fields: miss }, 400);
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(P.email)) return J({ ok: false, error: 'bad_email', fields: ['email'] }, 400);
@@ -70,7 +76,7 @@ async function submit(env, r, b, ip) {
     const head = b64ToBytes(b64.slice(0, 64)); const t = sniff(head); if (!t) return J({ ok: false, error: 'bad_type' }, 400);
     parsed.push({ cat, b64, mime: t[0], ext: t[1] });
   }
-  if (!parsed.some((f) => f.cat === 'id') || !parsed.some((f) => f.cat === 'addr')) return J({ ok: false, error: 'files_missing' }, 400);
+  if (!parsed.some((f) => f.cat === 'id') || (huForm && !parsed.some((f) => f.cat === 'addr'))) return J({ ok: false, error: 'files_missing' }, 400);
   // lefoglalás (egyszeri beküldés)
   const claim = await env.DB.prepare(`UPDATE crm_datareq SET status = 'saving' WHERE id = ? AND status = 'pending'`).bind(r.id).run();
   if (!claim.meta || !claim.meta.changes) return J({ ok: false, error: 'locked' }, 409);
@@ -117,8 +123,9 @@ export async function onRequest(context) {
     if (!(await rateOk(env, 'dip:' + ip, 60, 600))) return J({ ok: false, error: 'rate' }, 429);
     const b = await request.json().catch(() => ({}));
     const { r, err } = await load(env, b.t); if (err) return err;
-    if (path === '/view') return await view(env, r);
-    if (path === '/submit') return await submit(env, r, b, ip);
+    const lang = langFor(hostLang(request), r);
+    if (path === '/view') return await view(env, r, lang);
+    if (path === '/submit') return await submit(env, r, b, ip, lang);
     return J({ ok: false, error: 'not_found' }, 404);
   } catch (e) {
     console.error('crm-adatok', e && e.stack || e);
