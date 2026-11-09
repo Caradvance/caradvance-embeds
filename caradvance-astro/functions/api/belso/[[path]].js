@@ -620,7 +620,7 @@ async function handleGoogleCallback(request, env) {
     await env.DB.prepare(`INSERT INTO oauth_accounts (provider,email,access_token,refresh_token,expires_at,scope,connected_by) VALUES ('google',?,?,?,?,?,?)`)
       .bind(email, tokenJ.access_token, refreshToken, expiresAt, tokenJ.scope || '', user.id).run();
   }
-  return new Response(null, { status: 302, headers: { Location: '/belso/?integracio=google_ok', 'Set-Cookie': clearOauthStateCookie() } });
+  return new Response(null, { status: 302, headers: { Location: '/admin/?integracio=google_ok', 'Set-Cookie': clearOauthStateCookie() } });
 }
 
 async function handleMicrosoftStart(request, env) {
@@ -665,7 +665,7 @@ async function handleMicrosoftCallback(request, env) {
     await env.DB.prepare(`INSERT INTO oauth_accounts (provider,email,access_token,refresh_token,expires_at,scope,connected_by) VALUES ('microsoft',?,?,?,?,?,?)`)
       .bind(email, tokenJ.access_token, refreshToken, expiresAt, tokenJ.scope || '', user.id).run();
   }
-  return new Response(null, { status: 302, headers: { Location: '/belso/?integracio=microsoft_ok', 'Set-Cookie': clearOauthStateCookie() } });
+  return new Response(null, { status: 302, headers: { Location: '/admin/?integracio=microsoft_ok', 'Set-Cookie': clearOauthStateCookie() } });
 }
 
 async function handleListIntegrations(request, env) {
