@@ -118,7 +118,7 @@ export async function onRequest(context) {
       await env.DB.prepare(`UPDATE rc_contracts SET status = 'review', docs_at = datetime('now'), review_note = '', updated_at = datetime('now') WHERE id = ?`).bind(c.id).run();
       await addEvent(env, c.id, `Az ügyfél beküldte az adatait és ${files.length} okmányt. IP: ${ip}`);
       await sendMailX(env, notifyTo(env), `Okmányok ellenőrzésre: ${c.number} – ${c.cust.company_name || c.cust.name || c.name}`,
-        `<p>A(z) <b>${esc(c.number)}</b> szerződés ügyfele beküldte az adatait és az okmányait (${files.length} fájl).</p><p>Kérjük, ellenőrizd és hagyd jóvá, vagy kérj javítást.</p>${btn(SITE + '/belso/szerzodesek/#' + c.id, 'Ellenőrzés')}`);
+        `<p>A(z) <b>${esc(c.number)}</b> szerződés ügyfele beküldte az adatait és az okmányait (${files.length} fájl).</p><p>Kérjük, ellenőrizd és hagyd jóvá, vagy kérj javítást.</p>${btn(SITE + '/admin/szerzodesek/#' + c.id, 'Ellenőrzés')}`);
       c.status = 'review';
       return json(await state(env, c));
     }
