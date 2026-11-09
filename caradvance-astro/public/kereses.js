@@ -48,6 +48,16 @@
     T.fr = T.fr || { ph: 'Rechercher une voiture, une marque ou autre… p. ex. « SUV 7 places »', pop: 'Recherches populaires', rec: 'Recherches récentes', quick: 'Liens rapides', none: 'Aucun résultat', noneTx: 'Essayez d’autres mots ou demandez-nous une offre personnalisée.', relaxed: 'Pas de correspondance exacte — voici les résultats les plus proches :', did: 'Vouliez-vous dire :', more: 'Plus', und: 'Nous avons compris :', load: 'Chargement…', err: 'La recherche n’est pas disponible pour le moment. Veuillez réessayer plus tard.', esc: 'fermer', nav: 'naviguer', open: 'ouvrir', offer: 'Demander une offre', contact: 'Contact', call: 'Appelez-nous', mail: 'Écrivez-nous', ho: '/mois', netto: 'HT', tol: ' dès', seats: 'places', km: 'km', le: 'ch', lit: 'l de coffre', awd: '4x4', res: 'résultats', k: { berles: 'Voitures à louer', keszlet: 'Voitures à vendre — en stock', rendeles: 'Voitures neuves sur commande', eszkoz: 'Calculateurs', blog: 'Articles', oldal: 'Pages', abo: 'Abonnement voiture neuve' }, chips: ['BMW X5', 'Mercedes GLC', '7 places', 'Électrique', 'SUV', 'Audi break'], links: [], fac: { berles: 'location', vasarlas: 'achat', keszlet: 'occasion / en stock', rendeles: 'neuve, sur commande', ev: 'électrique', hybrid: 'hybride', diesel: 'diesel', petrol: 'essence', suv: 'SUV', kombi: 'break', limo: 'berline', cabrio: 'cabriolet', coupe: 'coupé', van: 'monospace / van', hatch: 'compacte', awd: '4x4', cheap: 'moins cher d’abord', lux: 'premium d’abord', family: 'famille', blog: 'articles', calc: 'calculateur' } };
     T.it = { ph: 'Cerca auto, marchi o altro… p. es. «SUV 7 posti»', pop: 'Ricerche popolari', rec: 'Ricerche recenti', quick: 'Link rapidi', none: 'Nessun risultato', noneTx: 'Provi con altre parole o ci chieda un’offerta su misura.', relaxed: 'Nessuna corrispondenza esatta — ecco i risultati più vicini:', did: 'Forse cercava:', more: 'Altro', und: 'Abbiamo capito:', load: 'Caricamento…', err: 'La ricerca non è disponibile al momento. Riprovi più tardi.', esc: 'chiudi', nav: 'naviga', open: 'apri', offer: 'Richiedi un’offerta', contact: 'Contatto', call: 'Ci chiami', mail: 'Ci scriva', ho: '/mese', netto: 'netto', tol: ' da', seats: 'posti', km: 'km', le: 'CV', lit: 'l bagagliaio', awd: '4x4', res: 'risultati', k: { berles: 'Auto a noleggio', keszlet: 'Auto in vendita — disponibili', rendeles: 'Auto nuove su ordinazione', eszkoz: 'Calcolatori', blog: 'Articoli', oldal: 'Pagine', abo: 'Abbonamento auto nuova' }, chips: ['BMW X5', 'Mercedes GLC', '7 posti', 'Elettrica', 'SUV', 'Audi station wagon'], links: [], fac: { berles: 'noleggio', vasarlas: 'acquisto', keszlet: 'usata / disponibile', rendeles: 'nuova, su ordinazione', ev: 'elettrica', hybrid: 'ibrida', diesel: 'diesel', petrol: 'benzina', suv: 'SUV', kombi: 'station wagon', limo: 'berlina', cabrio: 'cabriolet', coupe: 'coupé', van: 'monovolume / van', hatch: 'compatta', awd: '4x4', cheap: 'prima i più economici', lux: 'prima i premium', family: 'famiglia', blog: 'articoli', calc: 'calcolatore' } };
     T.es = { ph: 'Busque coches, marcas o lo que quiera… p. ej. «SUV de 7 plazas»', pop: 'Búsquedas populares', rec: 'Búsquedas recientes', quick: 'Enlaces rápidos', none: 'Sin resultados', noneTx: 'Pruebe con otras palabras o pídanos una oferta personalizada.', relaxed: 'No hay coincidencias exactas — estos son los resultados más parecidos:', did: '¿Quería decir?', more: 'Más', und: 'Hemos entendido:', load: 'Cargando…', err: 'La búsqueda no está disponible en este momento. Inténtelo más tarde.', esc: 'cerrar', nav: 'navegar', open: 'abrir', offer: 'Solicitar oferta', contact: 'Contacto', call: 'Llámenos', mail: 'Escríbanos', ho: '/mes', netto: 'sin IVA', tol: ' desde', seats: 'plazas', km: 'km', le: 'CV', lit: 'l de maletero', awd: '4x4', res: 'resultados', k: { berles: 'Coches de renting', keszlet: 'Coches en venta — en stock', rendeles: 'Coches nuevos por encargo', eszkoz: 'Calculadoras', blog: 'Artículos', oldal: 'Páginas', abo: 'Suscripción de coche nuevo' }, chips: ['BMW X5', 'Mercedes GLC', '7 plazas', 'Eléctrico', 'SUV', 'Audi familiar'], links: [], fac: { berles: 'renting', vasarlas: 'compra', keszlet: 'de ocasión / en stock', rendeles: 'nuevo, por encargo', ev: 'eléctrico', hybrid: 'híbrido', diesel: 'diésel', petrol: 'gasolina', suv: 'SUV', kombi: 'familiar', limo: 'berlina', cabrio: 'descapotable', coupe: 'coupé', van: 'monovolumen / furgoneta', hatch: 'compacto', awd: '4x4', cheap: 'primero los más baratos', lux: 'primero los premium', family: 'familia', blog: 'artículos', calc: 'calculadora' } };
+
+    // caradvance.sk / .cz: saját szlovák és cseh felirat (Mr. JOB SK, 2026-11-06, 9. pont)
+    T.sk = { ph: 'Hľadajte auto, značku alebo čokoľvek… napr. „SUV so 7 miestami“', pop: 'Populárne vyhľadávania', rec: 'Posledné vyhľadávania', quick: 'Rýchle odkazy', none: 'Žiadne výsledky', noneTx: 'Skúste iné slová alebo nás požiadajte o ponuku na mieru — nájdeme akékoľvek auto.', relaxed: 'Presná zhoda nie je — tieto sú najbližšie vašej požiadavke:', did: 'Mysleli ste:', more: 'Viac', und: 'Rozumeli sme:', load: 'Načítava sa…', err: 'Vyhľadávanie momentálne nie je dostupné. Skúste to neskôr.', esc: 'zavrieť', nav: 'pohyb', open: 'otvoriť', offer: 'Požiadať o ponuku', contact: 'Kontakt', call: 'Zavolajte nám', mail: 'Napíšte nám', ho: '€/mes.', netto: 'bez DPH', tol: '', from: 'od', seats: 'miest', km: 'km', le: 'k', lit: 'l', litPre: 'kufor', awd: '4x4', res: 'výsledkov', child: 'detská sedačka', trunk: 'veľký kufor',
+      k: { berles: 'Autá na prenájom', keszlet: 'Autá na predaj — skladom', rendeles: 'Nové autá na objednávku', eszkoz: 'Kalkulačky', blog: 'Články', oldal: 'Stránky', abo: 'Predplatné nového auta' },
+      chips: ['BMW X5', 'Mercedes GLC', 'Audi Q5', 'BMW X3', 'SUV', '7 miest'], links: [],
+      fac: { berles: 'prenájom', vasarlas: 'kúpa', keszlet: 'ojazdené / skladom', rendeles: 'nové, na objednávku', ev: 'elektrické', hybrid: 'hybrid', diesel: 'diesel', petrol: 'benzín', suv: 'SUV', kombi: 'kombi', limo: 'sedan', cabrio: 'kabriolet', coupe: 'kupé', van: 'van / MPV', hatch: 'hatchback', awd: '4x4', cheap: 'najlacnejšie prvé', lux: 'prémiové prvé', family: 'rodinné', blog: 'články', calc: 'kalkulačka' } };
+    T.cs = { ph: 'Hledejte vůz, značku nebo cokoli… např. „SUV se 7 místy“', pop: 'Oblíbená vyhledávání', rec: 'Poslední vyhledávání', quick: 'Rychlé odkazy', none: 'Žádné výsledky', noneTx: 'Zkuste jiná slova nebo nás požádejte o nabídku na míru — najdeme jakýkoli vůz.', relaxed: 'Přesná shoda není — tyto jsou nejblíže vašemu požadavku:', did: 'Mysleli jste:', more: 'Více', und: 'Rozuměli jsme:', load: 'Načítá se…', err: 'Vyhledávání teď není dostupné. Zkuste to později.', esc: 'zavřít', nav: 'pohyb', open: 'otevřít', offer: 'Požádat o nabídku', contact: 'Kontakt', call: 'Zavolejte nám', mail: 'Napište nám', ho: '€/měs.', netto: 'bez DPH', tol: '', from: 'od', seats: 'míst', km: 'km', le: 'k', lit: 'l', litPre: 'kufr', awd: '4x4', res: 'výsledků', child: 'dětská sedačka', trunk: 'velký kufr',
+      k: { berles: 'Vozy k pronájmu', keszlet: 'Vozy na prodej — skladem', rendeles: 'Nové vozy na objednávku', eszkoz: 'Kalkulačky', blog: 'Články', oldal: 'Stránky', abo: 'Předplatné nového vozu' },
+      chips: ['BMW X5', 'Mercedes GLC', 'Audi Q5', 'BMW X3', 'SUV', '7 míst'], links: [],
+      fac: { berles: 'pronájem', vasarlas: 'koupě', keszlet: 'ojeté / skladem', rendeles: 'nové, na objednávku', ev: 'elektrické', hybrid: 'hybrid', diesel: 'diesel', petrol: 'benzín', suv: 'SUV', kombi: 'kombi', limo: 'sedan', cabrio: 'kabriolet', coupe: 'kupé', van: 'van / MPV', hatch: 'hatchback', awd: '4x4', cheap: 'nejlevnější první', lux: 'prémiové první', family: 'rodinné', blog: 'články', calc: 'kalkulačka' } };
     if (!CHX && !EUX) { delete T.it; delete T.es; }
     var L = T[LANG] || T.en;
     if (CHX) L = Object.assign({}, L, LANG === 'de' ? { esc: 'schliessen', ho: '/Monat' } : LANG === 'en' ? { ho: '/month' } : {});
@@ -369,6 +379,8 @@
       if (NP || !o.p) return '';
       if (CHX) { var e = o.ep || o.p / ((DATA && DATA.eur) || 390), ce = ' (≈ ' + fmt(e) + ' €)'; if (o.k === 'berles') return L.netto + ' ' + chf(e) + L.ho + ce; if (o.k === 'rendeles') return L.netto + ' ' + chf(e) + L.tol + ce; return chf(e) + ce; }
       if (EUX) { var e2 = o.ep || o.p / ((DATA && DATA.eur) || 390); if (o.k === 'berles') return fmt(e2) + ' €' + L.ho + ' · ' + L.netto; if (o.k === 'rendeles') return L.tol.trim() + ' ' + fmt(e2) + ' € · ' + L.netto; return fmt(e2) + ' €'; }
+      var SKCZ = DOM === 'sk' || DOM === 'cz';
+      if (SKCZ) { var e3 = o.ep || o.p / ((DATA && DATA.eur) || 390), u3 = /€/.test(L.ho) ? L.ho : '€' + String(L.ho).replace(/^\s*(HUF|Ft)/, ''); if (o.k === 'berles') return L.netto + ' ' + fmt(e3) + ' ' + u3; if (o.k === 'rendeles') return (L.from || String(L.tol).trim()) + ' ' + fmt(e3) + ' € ' + L.netto; return fmt(e3) + ' €'; }
       if (o.k === 'berles') return L.netto + ' ' + fmt(o.p) + ' ' + L.ho;
       if (o.k === 'rendeles') return o.ep ? L.netto + ' ' + fmt(o.ep) + ' €' + L.tol : L.netto + ' ' + (o.p / 1e6).toFixed(1).replace('.', ',') + ' M Ft' + L.tol;
       return fmt(o.p) + ' Ft';
@@ -377,7 +389,7 @@
     function metaTxt(o) {
       var a = [];
       if (o.k === 'keszlet') { if (o.y) a.push(o.y); if (o.km != null) a.push(fmt(o.km) + ' ' + L.km); if (o.kw) a.push(Math.round(o.kw / 0.7355) + ' ' + L.le); a.push(fuelTxt(o)); }
-      else if (CARK[o.k]) { if (o.bt) a.push(o.bt); a.push(fuelTxt(o)); var s = Math.max(o.s || 0, o.so || 0); if (s) a.push((o.so > o.s ? o.s + '–' + o.so : s) + ' ' + L.seats); if (o.tr) a.push(o.tr + ' ' + L.lit); if (o.aw) a.push(L.awd); }
+      else if (CARK[o.k]) { if (o.bt) a.push(o.bt); a.push(fuelTxt(o)); var s = Math.max(o.s || 0, o.so || 0); if (s) a.push((o.so > o.s ? o.s + '–' + o.so : s) + ' ' + L.seats); if (o.tr) a.push(L.litPre ? L.litPre + ' ' + o.tr + ' ' + L.lit : o.tr + ' ' + L.lit); if (o.aw) a.push(L.awd); }
       return a.filter(Boolean).join(' · ');
     }
     function hl(text, P) {
@@ -470,8 +482,8 @@
       Object.keys(P.fuel).forEach(function (k) { c.push(L.fac[k]); });
       Object.keys(P.body).forEach(function (k) { c.push(L.fac[k]); });
       if (P.seats) c.push(P.seats + '+ ' + L.seats);
-      if (!NP && !CHX && !EUX && P.pmax) c.push('≤ ' + fmt(P.pmax) + ' Ft');
-      if (!NP && !CHX && !EUX && P.pmin) c.push('≥ ' + fmt(P.pmin) + ' Ft');
+      if (!NP && !CHX && !EUX && P.pmax) c.push('≤ ' + ((DOM === 'sk' || DOM === 'cz') ? fmt(P.pmax / ((DATA && DATA.eur) || 390)) + ' €' : fmt(P.pmax) + ' Ft'));
+      if (!NP && !CHX && !EUX && P.pmin) c.push('≥ ' + ((DOM === 'sk' || DOM === 'cz') ? fmt(P.pmin / ((DATA && DATA.eur) || 390)) + ' €' : fmt(P.pmin) + ' Ft'));
       if (P.kmmax) c.push('≤ ' + fmt(P.kmmax) + ' km');
       if (P.kwmin) c.push('≥ ' + Math.round(P.kwmin / 0.7355) + ' ' + L.le);
       if (P.kwmax) c.push('≤ ' + Math.round(P.kwmax / 0.7355) + ' ' + L.le);
@@ -479,8 +491,8 @@
       if (P.ymax) c.push('–' + P.ymax);
       if (P.awd) c.push(L.fac.awd);
       if (P.family) c.push(L.fac.family);
-      if (P.child) c.push(P.child + '× ' + (LANG === 'hu' ? 'gyerekülés' : 'child seat'));
-      if (P.trunk) c.push(LANG === 'hu' ? 'nagy csomagtartó' : LANG === 'de' ? (CHX ? 'grosser Kofferraum' : 'großer Kofferraum') : LANG === 'fr' ? 'grand coffre' : LANG === 'it' ? 'bagagliaio grande' : LANG === 'es' ? 'maletero grande' : 'big boot');
+      if (P.child) c.push(P.child + '× ' + (LANG === 'hu' ? 'gyerekülés' : L.child || 'child seat'));
+      if (P.trunk) c.push(L.trunk ? L.trunk : LANG === 'hu' ? 'nagy csomagtartó' : LANG === 'de' ? (CHX ? 'grosser Kofferraum' : 'großer Kofferraum') : LANG === 'fr' ? 'grand coffre' : LANG === 'it' ? 'bagagliaio grande' : LANG === 'es' ? 'maletero grande' : 'big boot');
       if (P.sort) c.push(L.fac[P.sort]);
       return c.filter(Boolean);
     }
@@ -509,7 +521,7 @@
       else if (!R.list.length) {
         h += '<div class="cs-none"><b>' + esc(L.none) + '</b><p>' + esc(L.noneTx) + '</p><div class="cs-cl">' +
           (LANG === 'hu' ? '<a class="cs-btn" href="/autot-keresek/">' + esc(L.offer) + '</a>' : '') +
-          '<a class="cs-btn cs-btn2" href="' + (EUX ? ({"de": "/de/kontakt/", "fr": "/fr/contact/", "it": "/it/contatti/", "es": "/es/contacto/"}[LANG] || '/de/kontakt/') : CHX ? (LANG === 'de' ? '' : '/' + LANG) + '/kontakt/' : LANG === 'hu' || DOM_PRE ? '/kapcsolat/' : '/' + LANG + '/contact/') + '">' + esc(L.contact) + '</a></div></div>';
+          '<a class="cs-btn cs-btn2" href="' + (EUX ? ({"de": "/de/kontakt/", "fr": "/fr/contact/", "it": "/it/contatti/", "es": "/es/contacto/"}[LANG] || '/de/kontakt/') : CHX ? (LANG === 'de' ? '' : '/' + LANG) + '/kontakt/' : (DOM === 'sk' || DOM === 'cz') ? '/kontakt/' : LANG === 'hu' || DOM_PRE ? '/kapcsolat/' : '/' + LANG + '/contact/') + '">' + esc(L.contact) + '</a></div></div>';
       } else {
         if (R.relaxed) h += '<div class="cs-did">' + esc(L.relaxed) + '</div>';
         // csoportosítás típus szerint, a csoport legjobb találata szerinti sorrendben
