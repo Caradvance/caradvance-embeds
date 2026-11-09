@@ -1365,7 +1365,7 @@ async function handleSignCreate(request, env, user, id) {
   for (const d of docs) await env.DB.prepare(`UPDATE crm_docs SET sign_status = 'pending', sign_id = ? WHERE id = ?`).bind(sid, d.doc_id).run();
   const link = `${siteOf(market)}/alairas/#${token}`;
   const fwd = testForward(env);
-  const L = signReqMail(langOf(market), { name: esc(signerName), docsHtml: `<ul>${docs.map((d) => `<li>${esc(d.name)}</li>`).join('')}</ul>`, msgHtml: msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : '', link: esc(link), exp });
+  const L = signReqMail(langOf(market), { name: esc(signerName), docs: docs.map((d) => esc(d.name)), docsHtml: `<ul>${docs.map((d) => `<li>${esc(d.name)}</li>`).join('')}</ul>`, msgHtml: msg ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(msg)}</p>` : '', link: esc(link), exp });
   const r = L ? await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}${L.subject}`, L.html, null, { lang: langOf(market) }) :
     await sendCrmMail(env, fwd || email, `${fwd ? '[TESZT — ' + email + '] ' : ''}Aláírásra váró dokumentumok — CarAdvance`,
     `<p>Kedves ${esc(signerName)}!</p><p>Az alábbi dokumentumokat elektronikus aláírásra küldjük:</p><ul>${docs.map((d) => `<li>${esc(d.name)}</li>`).join('')}</ul>
