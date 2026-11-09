@@ -105,7 +105,7 @@ async function serveDomain(context, url, l) {
   const { request, env, next } = context;
   const p = url.pathname;
   if (!url.hostname.startsWith('www.')) { url.hostname = 'www.' + url.hostname; return Response.redirect(url.toString(), 301); }
-  if (p.startsWith('/api/')) return next();
+  if (p.startsWith('/api/') || p.startsWith('/admin/ajanlatmotor')) return next();
   if ((l === 'ch' || l === 'eu') && !(await chReady(env, url.origin, l))) {
     if (p === '/robots.txt') return new Response('User-agent: *\nDisallow: /\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
     if (/\.[a-z0-9]{1,5}$/i.test(p)) return next();
@@ -177,6 +177,12 @@ async function handle(context) {
   const { request, env, next } = context;
   const url = new URL(request.url);
   const p = url.pathname;
+
+  // A munkatársi felület új címe: /admin/ (a régi /belso/ címek — könyvjelzők, régi e-mailek, a böngésző-bővítmény — 301-gyel ide visznek), minden domainen
+  if (p === '/belso' || p.startsWith('/belso/')) {
+    const to = new URL('/admin' + (p.slice(6) || '/') + url.search.replace(/(next=)(%2F|\/)belso/gi, '$1$2admin'), url.origin);
+    return new Response(null, { status: request.method === 'GET' || request.method === 'HEAD' ? 301 : 308, headers: { Location: to.toString(), 'Cache-Control': 'no-store' } });
+  }
 
   const dl = DOMAINS[url.hostname];
   if (dl) return serveDomain(context, url, dl);
