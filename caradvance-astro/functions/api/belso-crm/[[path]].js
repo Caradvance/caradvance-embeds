@@ -8,6 +8,7 @@ import {
   bytesToB64, b64ToBytes, sha256hex, priceLabel, priceVatLabel, VAT_MODES, specLine, esc, SITE,
   VAR_GROUPS, PERSON_ROLES, DOC_KINDS, getSetting, setSetting, docVars, DOC_MAX, putFile, fileData, deleteFile, maskEmail, SIGN_STATEMENT, deriveVars, DERIVED, partnerSignKeys, hashPass, marketOf, partnerTakesMarket, siteOf, langOf
   , IMPORT_CX, importAuto, COUNTRY_HU
+, fetchJpegs, rentPhotoUrls, salePhotoUrls
 } from '../../../lib/crm.js';
 import { jpegInfo, renderOfferPdf, renderRentOfferPdf, renderPayReqPdf, groupRentEquipment } from '../../../lib/docpdf.js';
 import { qrMatrix, epcPayload } from '../../../lib/qr.js';
@@ -370,7 +371,15 @@ async function mailOffer(env, id, deal, user, items, token, clientName, message,
         it.offer_pdf = true;
       } catch (e) { console.error('rent offer pdf', e); }
     }
-    if (it.src === 'config' && (it.images.length || it.equipment.length)) {
+    if (isRentItem(it, deal.line) && !it.mail_img) { const u = (await rentPhotoUrls(it).catch(() => []))[0]; if (u) it.mail_img = u; }
+    if (!isRentItem(it, deal.line) && (it.src === 'inv' || (it.src === 'manual' && it.image))) {
+      try {
+        const pdf = await buildOfferPdf(env, id, { ...it, images: [] }, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user, lang });
+        att.push({ filename: offerFileName(it, lang), content: bytesToB64(pdf) });
+        it.offer_pdf = true;
+      } catch (e) { console.error('stock offer pdf', e); }
+    }
+    if (it.src === 'config' && ((it.images || []).length || (it.equipment || []).length)) {
       try {
         const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user, lang });
         att.push({ filename: offerFileName(it, lang), content: bytesToB64(pdf) });
@@ -382,7 +391,7 @@ async function mailOffer(env, id, deal, user, items, token, clientName, message,
     const f = await env.DB.prepare(`SELECT id, name, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(it.file_id, id).first();
     if (f) att.push({ filename: f.name, content: await fileData(env, f) }); else it.file_id = null;
   }
-  return sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link, attached: att.length > 0, lang }), att, { lang });
+  return sendCrmMail(env, fwd || to, subject, offerEmailHtml({ clientName, items, message, link, attached: att.length > 0, lang, sender: user }), att, { lang });
 }
 /** Már kiküldött ajánlat újraküldése (ugyanaz a link és tartalom) — pl. ha nem érkezett meg, vagy új e-mail címre. */
 async function handleResendOffer(request, env, user, id, token) {
@@ -578,6 +587,12 @@ async function aboFeatures(name, variant, lang) {
     return loc.length === hu.length ? hu.map((h, i) => ({ hu: h, t: loc[i] })) : hu;
   } catch (e) { return []; }
 }
+/** A bérleti ajánlat PDF fotói: a build által készített JPEG-ek (fő kép + galéria); tartaléknak az autó képe, ha JPEG. */
+async function rentImages(it) {
+  const urls = await rentPhotoUrls(it).catch(() => []);
+  const imgs = await fetchJpegs(urls.length ? urls : [it.image], 5).catch(() => []);
+  return imgs;
+}
 async function buildRentOfferPdf(env, dealId, it, o) {
   if (o && RENT_T[o.lang]) return buildRentOfferPdfL(env, dealId, it, o);
   const fmtN = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -597,8 +612,9 @@ async function buildRentOfferPdf(env, dealId, it, o) {
   if (!feats.length) feats = (Array.isArray(it.equipment) ? it.equipment : []).filter((x) => x && x !== variant);
   const overKm = await getSetting(env, 'berles_km_tulfutas', '');
   const title = [it.title, variant && String(it.title || '').indexOf(variant) < 0 ? variant : ''].filter(Boolean).join(' ');
+  const images = await rentImages(it);
   return renderRentOfferPdf({
-    offerNo: o.number, date: hd(today), client: o.client || '', lessor: de ? 'Caradvance GmbH' : 'BH Group Zrt.', title,
+    images, offerNo: o.number, date: hd(today), client: o.client || '', lessor: de ? 'Caradvance GmbH' : 'BH Group Zrt.', title,
     tagline: [isNew ? 'Új jármű' : '', it.color, de ? 'Német rendszám' : ''].filter(Boolean).join(' · '),
     strip: [[isNew ? '0 km' : (it.km || '—'), 'Kilométeróra'], [variant || '—', 'Kivitel'], [String(it.fuel || '—').split(' / ')[0], 'Üzemanyag'], [it.gearbox || '—', 'Váltó'], [isNew ? 'Új' : (it.condition || 'Használt'), 'Állapot'], [de ? 'Német' : 'Magyar', 'Rendszám']],
     price: { main: fmtN(gross) + sym, unit: '/ hó', sub: (it.currency === 'EUR' ? 'nettó ' + fmtN(net) + ' € + 19% ÁFA' : '') + (huf(gross) ? ' · ' + huf(gross) : '') },
@@ -642,8 +658,9 @@ async function buildRentOfferPdfL(env, dealId, it, o) {
   const title = [it.title, variant && String(it.title || '').indexOf(variant) < 0 ? variant : ''].filter(Boolean).join(' ');
   const c = contactOf(lang); const web = lang === 'sk' ? 'www.caradvance.sk' : 'www.caradvance.cz';
   const netTxt = it.currency === 'EUR' ? T.net(fmtN(net)) : '';
+  const images = await rentImages(it);
   return renderRentOfferPdf({
-    lang, offerNo: o.number, date: hd(today), client: o.client || '', lessor: 'Caradvance GmbH', title,
+    images, lang, offerNo: o.number, date: hd(today), client: o.client || '', lessor: 'Caradvance GmbH', title,
     tagline: [isNew ? T.newCar : '', it.color, de ? T.dePlate : ''].filter(Boolean).join(' · '),
     strip: [[isNew ? '0 km' : (it.km || '—'), T.km], [powerL(lang, variant) || '—', T.variant], [tr(String(it.fuel || '—').split(' / ')[0]), T.fuel], [tr(it.gearbox) || '—', T.gear], [isNew ? T.isNew : T.used, T.cond], [de ? T.de : T.hu, T.plate]],
     price: { main: fmtN(gross) + sym, unit: T.per, sub: netTxt },
@@ -676,6 +693,8 @@ async function buildOfferPdf(env, dealId, it, o) {
     const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(z.id, dealId).first();
     if (f) { const b = b64ToBytes(await fileData(env, f)); if (jpegInfo(b)) eqImages.push({ jpeg: b, caption: (it.equipment || [])[z.idx] || z.label || '' }); }
   }
+  // nincs feltöltött kép (pl. készletautó): a kártyakép + a weboldali autóoldal galériája
+  if (!images.length) { for (const b of await fetchJpegs(await salePhotoUrls(it).catch(() => []), 8).catch(() => [])) images.push(b); }
   // ár + ÁFA: nettó / bruttó (27% magyar vagy 19% német ÁFA) — bruttónál a nettó összeg is
   const V = VAT_MODES[it.vat_mode]; const sym = it.currency === 'EUR' ? ' €' : ' Ft';
   const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + sym;
