@@ -21,6 +21,7 @@
 //   „ // ” a szövegen / táblázatcellán belül = sortörés
 import { DOC_FONTS } from './docpdf-font.js';
 import { LOGO_JPG, LOGO_W, LOGO_H } from './docpdf-logo.js';
+import { PDF_T } from './crmi18n.js';
 
 const PW = 595.28, PH = 841.89, ML = 34, MR = 34, CW = PW - ML - MR;
 const C = { ink: '0.086 0.098 0.133', txt: '0.16 0.17 0.2', mut: '0.42 0.45 0.5', lab: '0.5 0.53 0.58', line: '0.86 0.88 0.91', soft: '0.93 0.94 0.95', red: '0.886 0 0.102', note: '0.957 0.961 0.969', blank: '0.45 0.47 0.52' };
@@ -410,7 +411,7 @@ function decorate(L, meta) {
       d.line(ML, PH - 31, PW - MR, PH - 31, C.line, 0.7, pg);
     }
     // lábléc
-    const pgTxt = (meta.bilingual ? 'Seite / Oldal ' : 'Oldal ') + (i + 1) + ' / ' + total;
+    const pgTxt = (meta.pageWord ? meta.pageWord + ' ' : meta.bilingual ? 'Seite / Oldal ' : 'Oldal ') + (i + 1) + ' / ' + total;
     if (meta.footer) {
       const ft = meta.footer; const top = 76;
       d.line(ML, top, PW - MR, top, '0.8 0.82 0.86', 0.8, pg);
@@ -530,10 +531,13 @@ export function renderDocPdf(filled, meta) {
  */
 export function renderOfferPdf(o) {
   o = o || {};
+  const X = PDF_T[o.lang] || null; const ct = o.contact || {};
   const imgs = (o.images || []).map((b) => { const inf = b && jpegInfo(b); return inf ? { bytes: b, ...inf } : null; }).filter(Boolean);
   const meta2 = {
-    header: ['Ajánlat / ' + (o.title || ''), 'CarAdvance · ' + (o.number || '')], bilingual: false, number: o.number || '', hash: '',
-    footer: { title: 'CarAdvance — BH Group Zrt.', cols: [['~Kapcsolat', 'E-mail:: ' + ((o.contact && o.contact.email) || 'sales@caradvance.hu'), 'Tel.:: ' + ((o.contact && o.contact.phone) || '+36 30 233 6060')],
+    header: [(X ? X.offer : 'Ajánlat') + ' / ' + (o.title || ''), 'CarAdvance · ' + (o.number || '')], bilingual: false, pageWord: X ? 'Strana' : '', number: o.number || '', hash: '',
+    footer: X ? { title: 'CarAdvance — ' + X.co, cols: [['~' + X.contactCol, 'E-mail:: ' + (ct.email || ''), 'Tel.:: ' + (ct.phone || '')],
+      ['~Web', X.web, X.addr], ['~' + X.offer, X.number + ':: ' + (o.number || '—'), X.date + ':: ' + (o.date || '')], ['~' + X.person, ct.name || 'CarAdvance', ct.email || '']] }
+      : { title: 'CarAdvance — BH Group Zrt.', cols: [['~Kapcsolat', 'E-mail:: ' + ((o.contact && o.contact.email) || 'sales@caradvance.hu'), 'Tel.:: ' + ((o.contact && o.contact.phone) || '+36 30 233 6060')],
       ['~Web', 'www.caradvance.hu', 'Solymár, Ibolya utca 18.'], ['~Ajánlat', 'Szám:: ' + (o.number || '—'), 'Kelt:: ' + (o.date || '')], ['~Kapcsolattartó', (o.contact && o.contact.name) || 'CarAdvance', (o.contact && o.contact.email) || 'sales@caradvance.hu']] }
   };
   const L = new Layout(meta2); const d = L.d; L.bottom = 92;
@@ -545,22 +549,23 @@ export function renderOfferPdf(o) {
   const room = () => L.y - L.bottom;
   // fej: logó + címke + cím
   const lh = 30; const lw = lh * LOGO_W / LOGO_H; d.image(PW - MR - lw, L.y - lh + 6, lw, lh);
-  L.tag(o.brand ? 'Ajánlat · ' + o.brand : 'Ajánlat');
-  L.title(o.title || 'Autó ajánlat', [o.subtitle, o.client ? 'Készült: ' + o.client + ' részére' : ''].filter(Boolean).join(' · '));
+  const offW = X ? X.offer : 'Ajánlat';
+  L.tag(o.brand ? offW + ' · ' + o.brand : offW);
+  L.title(o.title || (X ? X.offerCar : 'Autó ajánlat'), [o.subtitle, o.client ? (X ? X.madeFor(o.client) : 'Készült: ' + o.client + ' részére') : ''].filter(Boolean).join(' · '));
   L.y += 4;
   // fő kép: teljes szélesség, 16:8 arány (max. 250 pt), kitöltve
   if (imgs[0]) { const h = Math.min(imgs.length > 1 ? 215 : 250, CW * 0.5); cover(imgs[0], ML, L.y - h, CW, h); L.y -= h + 10; }
   // ár-doboz
   const bh = 44;
   d.fill(ML, L.y - bh, CW, bh, '0.08 0.09 0.11'); d.fill(ML, L.y - bh, 4, bh, C.red);
-  d.text('Ajánlati ár', ML + 16, L.y - 18, 'R', 9, '0.78 0.8 0.84');
-  if (o.code) d.text('Konfigurációs kód: ' + o.code, ML + 16, L.y - 32, 'L', 7.6, '0.62 0.65 0.7');
+  d.text(X ? X.price : 'Ajánlati ár', ML + 16, L.y - 18, 'R', 9, '0.78 0.8 0.84');
+  if (o.code) d.text((X ? X.code : 'Konfigurációs kód: ') + o.code, ML + 16, L.y - 32, 'L', 7.6, '0.62 0.65 0.7');
   const pt = o.price || ''; const ps = 20; d.text(pt, PW - MR - 16 - d.width(pt, 'B', ps), L.y - (o.priceNote ? 24 : 28), 'B', ps, '1 1 1');
   if (o.priceNote) d.text(o.priceNote, PW - MR - 16 - d.width(o.priceNote, 'L', 7.2), L.y - 37, 'L', 7.2, '0.78 0.8 0.84');
   L.y -= bh + 12;
   // főbb adatok (kéthasábos táblázat)
   const specs = (o.specs || []).filter((s) => s && s[1]);
-  if (specs.length) { L.heading('Főbb adatok', null, 3); for (let i = 0; i < specs.length; i += 2) L.row(specs.slice(i, i + 2).map((s) => [s[0], String(s[1])])); L.y -= 6; }
+  if (specs.length) { L.heading(X ? X.main : 'Főbb adatok', null, 3); for (let i = 0; i < specs.length; i += 2) L.row(specs.slice(i, i + 2).map((s) => [s[0], String(s[1])])); L.y -= 6; }
   if (o.note) L.note(o.note);
   // további képek: egy sorban max. 3, a hely kitöltésével; ha az oldalon kevés a hely, kisebb képekkel még ide fér
   const rest = imgs.slice(1, 12);
@@ -584,7 +589,7 @@ export function renderOfferPdf(o) {
   const eqImgBlock = () => {
     if (!eqi.length) return;
     const gap = 16; const cw = (CW - gap) / 2; const tw = 74, th = 42; const size = 7.9;
-    L.ensure(th + 40); L.heading(eqTxt.length ? 'Felszereltség — kiemelt tételek' : 'Felszereltség', null, 3);
+    L.ensure(th + 40); L.heading(eqTxt.length ? (X ? X.eqHi : 'Felszereltség — kiemelt tételek') : (X ? X.eq : 'Felszereltség'), null, 3);
     for (let i = 0; i < eqi.length; i += 2) {
       const pair = eqi.slice(i, i + 2);
       const ms = pair.map((z) => L.measure(z.cap, { w: cw - tw - 10, size, f: 'R', num: false, bullets: false, lh: 1.32 }));
@@ -601,7 +606,7 @@ export function renderOfferPdf(o) {
   };
   const eqBlock = () => {
     if (!eqTxt.length) return;
-    L.heading(eqi.length ? 'További felszereltség' : 'Felszereltség', null, 3);
+    L.heading(eqi.length ? (X ? X.eqMore : 'További felszereltség') : (X ? X.eq : 'Felszereltség'), null, 3);
     const gap = 20; const cw = (CW - gap) / 2; const size = 7.8;
     const rows = []; for (let i = 0; i < eqTxt.length; i += 2) rows.push([eqTxt[i], eqTxt[i + 1]]);
     for (const [a, b] of rows) {
@@ -617,8 +622,9 @@ export function renderOfferPdf(o) {
   const reserve = eqEst && eqEst < 230 && !eqi.length ? eqEst + 48 : 36;
   imageRows(rest); eqImgBlock(); eqBlock();
   L.ensure(24); L.y -= 2;
+  if (X) L.para(X.closing(o.contact), { size: 7.2, color: C.mut }); else
   L.para('Az ajánlat a feltüntetett konfiguráció alapján készült; a képek illusztrációk. Az ajánlat elfogadásáról vagy módosításáról az e-mailben kapott gombokkal tud visszajelezni.' + (o.contact && o.contact.name ? ' Kapcsolattartó: **' + o.contact.name + '**' + (o.contact.email ? ' · ' + o.contact.email : '') + (o.contact.phone ? ' · ' + o.contact.phone : '') : ''), { size: 7.2, color: C.mut });
-  return d.build({ title: 'Ajánlat — ' + (o.title || ''), author: 'CarAdvance' }, decorate(L, meta2));
+  return d.build({ title: offW + ' — ' + (o.title || ''), author: 'CarAdvance' }, decorate(L, meta2));
 }
 
 /* ============================== bérleti árajánlat PDF (egy konkrét autóra, a bérleti szerződés fő pontjaival) ============================== */
@@ -628,6 +634,7 @@ export function renderOfferPdf(o) {
  */
 export function renderRentOfferPdf(o) {
   o = o || {};
+  const X = PDF_T[o.lang] || null;
   const L = new Layout({ header: ['', ''] }); const d = L.d; L.bottom = 56; L.top = PH - 34;
   const RED = C.red, INK = C.ink, MUT = C.mut, LAB = C.lab;
   const spaced = (t, x, y, f, s, col, sp) => { let cx = x; for (const ch of String(t)) { d.text(ch, cx, y, f, s, col); cx += d.width(ch, f, s) + sp; } return cx - x; };
@@ -636,9 +643,9 @@ export function renderRentOfferPdf(o) {
   // ---- fej: logó balra, „BÉRLETI ÁRAJÁNLAT” jobbra, ajánlatszám / dátum, bérbeadó / címzett, piros vonal
   let y = PH - 40;
   const lh = 34, lw = lh * LOGO_W / LOGO_H; d.image(ML, y - lh + 4, lw, lh);
-  const ttl = 'BÉRLETI ÁRAJÁNLAT'; const tw = spacedW(ttl, 'B', 17, 1.6); spaced(ttl, PW - MR - tw, y - 12, 'B', 17, '0.33 0.35 0.4', 1.6);
-  const l2 = `Ajánlat száma: ${o.offerNo || '—'}  ·  Dátum: ${o.date || ''}`; right(l2, y - 29, 'L', 8, LAB);
-  const l3a = 'Bérbeadó: ', l3b = o.lessor || 'Caradvance GmbH', l3c = '   ·   Ajánlat címzettje: ', l3d = o.client || '';
+  const ttl = X ? X.rentTitle : 'BÉRLETI ÁRAJÁNLAT'; const tw = spacedW(ttl, 'B', 17, 1.6); spaced(ttl, PW - MR - tw, y - 12, 'B', 17, '0.33 0.35 0.4', 1.6);
+  const l2 = X ? `${X.offerNo}: ${o.offerNo || '—'}  ·  ${X.dateL}: ${o.date || ''}` : `Ajánlat száma: ${o.offerNo || '—'}  ·  Dátum: ${o.date || ''}`; right(l2, y - 29, 'L', 8, LAB);
+  const l3a = X ? X.lessor : 'Bérbeadó: ', l3b = o.lessor || 'Caradvance GmbH', l3c = '   ·   ' + (X ? X.to : 'Ajánlat címzettje: '), l3d = o.client || '';
   const w3 = d.width(l3a, 'L', 8) + d.width(l3b, 'S', 8) + d.width(l3c, 'L', 8) + d.width(l3d, 'S', 8); let x = PW - MR - w3;
   for (const [t, f] of [[l3a, 'L'], [l3b, 'S'], [l3c, 'L'], [l3d, 'S']]) { d.text(t, x, y - 43, f, 8, f === 'S' ? INK : LAB); x += d.width(t, f, 8); }
   y -= 54; d.fill(ML, y, CW, 2.2, RED); y -= 30;
@@ -659,7 +666,7 @@ export function renderRentOfferPdf(o) {
   // ---- ár-dobozok: havi díj (sötét, széles) + 3 fehér
   const bh = 74, gap = 8; const w0 = CW * 0.36; const wr = (CW - w0 - 3 * gap) / 3;
   d.fill(ML, y - bh, w0, bh, '0.2 0.21 0.24');
-  const pl = 'HAVI BÉRLETI DÍJ (BRUTTÓ)'; spaced(pl, ML + 14, y - 17, 'L', 6.4, '0.78 0.8 0.84', 0.9);
+  const pl = X ? X.monthly : 'HAVI BÉRLETI DÍJ (BRUTTÓ)'; spaced(pl, ML + 14, y - 17, 'L', 6.4, '0.78 0.8 0.84', 0.9);
   const pm = (o.price && o.price.main) || ''; d.text(pm, ML + 14, y - 42, 'B', 20, '1 1 1');
   if (o.price && o.price.unit) d.text(o.price.unit, ML + 14 + d.width(pm, 'B', 20) + 5, y - 42, 'L', 9, '0.85 0.86 0.9');
   if (o.price && o.price.sub) d.text(o.price.sub, ML + 14, y - 58, 'L', 7.4, '0.85 0.86 0.9');
@@ -675,7 +682,7 @@ export function renderRentOfferPdf(o) {
   // ---- jármű adatai (kéthasábos, zebra)
   const veh = (o.vehicle || []).filter((r) => r && r[1]);
   if (veh.length) {
-    section('Jármű adatai');
+    section(X ? X.secVeh : 'Jármű adatai');
     const half = Math.ceil(veh.length / 2); const cg = 18; const cw2 = (CW - cg) / 2; const rh = 17;
     for (let i = 0; i < half; i++) {
       L.ensure(rh);
@@ -693,7 +700,7 @@ export function renderRentOfferPdf(o) {
   // ---- felszereltség: kategóriák három hasábban (kiegyensúlyozva)
   const eq = (o.equipment || []).filter((g) => g && g[1] && g[1].length);
   if (eq.length) {
-    section('Felszereltség');
+    section(X ? X.secEq : 'Felszereltség');
     const cols = 3, cg = 16, cw3 = (CW - cg * (cols - 1)) / cols, size = 6.5;
     const blocks = eq.map(([cat, items]) => { const m = L.measure(items.join(' · '), { w: cw3, size, f: 'L', num: false, bullets: false, lh: 1.42 }); return { cat, m, h: 11 + m.lines.length * m.lh + 7 }; });
     const total = blocks.reduce((a, b) => a + b.h, 0); const target = total / cols;
@@ -716,7 +723,7 @@ export function renderRentOfferPdf(o) {
   // ---- bérleti feltételek (felsorolás, kiemelésekkel)
   const terms = (o.terms || []).filter(Boolean);
   if (terms.length) {
-    section('Bérleti feltételek');
+    section(X ? X.secTerms : 'Bérleti feltételek');
     for (const t of terms) L.para('- ' + t, { size: 8.2, f: 'L', bf: 'S', lh: 1.45, after: 1.5, color: C.txt });
   }
   // ---- lábléc
@@ -724,11 +731,11 @@ export function renderRentOfferPdf(o) {
   const deco = (pg, i, total) => {
     d.line(ML, 40, PW - MR, 40, C.line, 0.6, pg);
     d.text(ft.left || 'caradvance — the automotive people', ML, 27, 'S', 6.8, INK, pg);
-    const r = ft.right || 'www.caradvance.hu · Tel.: +36 30 233 6060 · E-mail: info@caradvance.hu';
+    const r = ft.right || (X ? '' : 'www.caradvance.hu · Tel.: +36 30 233 6060 · E-mail: info@caradvance.hu');
     d.text(r, PW - MR - d.width(r, 'L', 6.8), 27, 'L', 6.8, LAB, pg);
     if (total > 1) { const p = (i + 1) + ' / ' + total; d.text(p, PW - MR - d.width(p, 'L', 6.4), 15, 'L', 6.4, LAB, pg); }
   };
-  return d.build({ title: 'Bérleti árajánlat — ' + (o.title || ''), author: 'CarAdvance' }, deco);
+  return d.build({ title: (X ? X.rentDoc : 'Bérleti árajánlat — ') + (o.title || ''), author: 'CarAdvance' }, deco);
 }
 
 /** Felszereltség-lista kategóriákba (a weboldal „•”-vel elválasztott listájából). */

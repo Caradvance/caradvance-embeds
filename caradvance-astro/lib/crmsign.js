@@ -81,7 +81,7 @@ export async function completeSign(env, r, o) {
   else await afterClientSign(env, r, result, att, cos, partners, name, when, fwd, sigB64);
   try {
     await sendCrmMail(env, notifyTo(env), `${de ? 'ELLENJEGYEZVE' : 'ALÁÍRVA'}: ${de ? (parseJ(r.prior, {}).client || '') + ' — ' + name + ' (' + r.signer_name + ')' : (r.signer_name || name)} — ${result.length} dokumentum`,
-      `<p><b>${esc(name)}</b> (${esc(r.email)}) elektronikusan ${de ? 'ellenjegyezte (partner: ' + esc(r.signer_name) + ')' : 'aláírta'}:</p><ul>${result.map((x) => `<li>${esc(x.name)}${x.cosign ? ' — <i>a partner ellenjegyzésére vár</i>' : ''}</li>`).join('')}</ul><p>IP: ${esc(ip)} · ${esc(when)}</p><p><a href="${SITE}/belso/ugyfel/?id=${r.deal_id}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:11px 20px;border-radius:999px;display:inline-block">Ügyfél adatlap megnyitása</a></p>`);
+      `<p><b>${esc(name)}</b> (${esc(r.email)}) elektronikusan ${de ? 'ellenjegyezte (partner: ' + esc(r.signer_name) + ')' : 'aláírta'}:</p><ul>${result.map((x) => `<li>${esc(x.name)}${x.cosign ? ' — <i>a partner ellenjegyzésére vár</i>' : ''}</li>`).join('')}</ul><p>IP: ${esc(ip)} · ${esc(when)}</p><p><a href="${SITE}/admin/ugyfel/?id=${r.deal_id}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:11px 20px;border-radius:999px;display:inline-block">Ügyfél adatlap megnyitása</a></p>`);
   } catch (e) { /* nem kritikus */ }
   try { await syncDocChecklist(env, r.deal_id); } catch (e) { console.error('checklist', e); } // szerződések / meghatalmazások pipái
   await syncSignStatus(env, r.deal_id); // Aláírásra vár partner / Szerződés aláírva
@@ -172,6 +172,6 @@ async function finishCosign(env, r, result, att, name, when, fwd) {
   } catch (e) { /* nem kritikus */ }
   try {
     if (sales) await sendCrmMail(env, sales, `Mindkét fél által aláírva: ${client} — ${result.length} dokumentum`,
-      `<p>A(z) <b>${esc(client)}</b> ügyfél és a(z) ${esc(r.signer_name)} (${esc(name)}) is aláírta az alábbi dokumentumokat (${esc(when)}):</p>${li}<p>A végleges PDF-ek csatolva, és az ügyfél adatlapján a feltöltött fájlok között is megtalálhatók.</p><p><a href="${SITE}/belso/ugyfel/?id=${r.deal_id}">Ügyfél adatlap megnyitása</a></p>`, files, { noCopy: true });
+      `<p>A(z) <b>${esc(client)}</b> ügyfél és a(z) ${esc(r.signer_name)} (${esc(name)}) is aláírta az alábbi dokumentumokat (${esc(when)}):</p>${li}<p>A végleges PDF-ek csatolva, és az ügyfél adatlapján a feltöltött fájlok között is megtalálhatók.</p><p><a href="${SITE}/admin/ugyfel/?id=${r.deal_id}">Ügyfél adatlap megnyitása</a></p>`, files, { noCopy: true });
   } catch (e) { /* nem kritikus */ }
 }

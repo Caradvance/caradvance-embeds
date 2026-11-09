@@ -153,3 +153,71 @@ export const CERT_LB = {
   'Aláíráskép SHA-256': { sk: 'Obrázok podpisu SHA-256', cs: 'Obrázek podpisu SHA-256' }
 };
 export const certIdent = (lang) => (lang === 'sk' ? 'jednorazový kód (OTP) zaslaný na e-mailovú adresu overený' : lang === 'cs' ? 'jednorázový kód (OTP) zaslaný na e-mailovou adresu ověřen' : null);
+
+/* ---------- ajánlat PDF-ek (eladási + bérleti) — 2026-11-09, Marc ---------- */
+// A HU szöveg az alapértelmezés (docpdf.js); SK / CZ esetén ezek a feliratok mennek a PDF-be.
+const PDF_CO = {
+  sk: { co: 'Caradvance GmbH · Mr. Job SK s.r.o.', web: 'www.caradvance.sk', addr: 'Cesta na Senec 2/A, 821 04 Bratislava' },
+  cs: { co: 'Caradvance GmbH · Mr. Job SK s.r.o.', web: 'www.caradvance.cz', addr: 'Cesta na Senec 2/A, 821 04 Bratislava' }
+};
+export const PDF_T = {
+  sk: {
+    offer: 'Ponuka', offerCar: 'Ponuka auta', madeFor: (c) => 'Pripravené pre: ' + c, price: 'Cena ponuky', code: 'Konfiguračný kód: ', main: 'Hlavné údaje',
+    eqHi: 'Výbava — hlavné položky', eq: 'Výbava', eqMore: 'Ďalšia výbava', contactCol: 'Kontakt', web: 'Web', number: 'Číslo', date: 'Dátum', person: 'Kontaktná osoba',
+    closing: (c) => 'Ponuka bola pripravená na základe uvedenej konfigurácie; obrázky sú ilustračné. Ponuku môžete prijať alebo požiadať o zmenu tlačidlami v e-maile.' + (c && c.name ? ' Kontaktná osoba: **' + c.name + '**' + (c.email ? ' · ' + c.email : '') + (c.phone ? ' · ' + c.phone : '') : ''),
+    rentTitle: 'PONUKA PRENÁJMU', offerNo: 'Číslo ponuky', dateL: 'Dátum', lessor: 'Prenajímateľ: ', to: 'Adresát ponuky: ', monthly: 'MESAČNÉ NÁJOMNÉ (S DPH)',
+    secVeh: 'Údaje o vozidle', secEq: 'Výbava', secTerms: 'Podmienky prenájmu', rentDoc: 'Ponuka prenájmu — ',
+    ...PDF_CO.sk, phoneL: 'Tel.', mailL: 'E-mail'
+  },
+  cs: {
+    offer: 'Nabídka', offerCar: 'Nabídka vozu', madeFor: (c) => 'Připraveno pro: ' + c, price: 'Nabídková cena', code: 'Konfigurační kód: ', main: 'Hlavní údaje',
+    eqHi: 'Výbava — hlavní položky', eq: 'Výbava', eqMore: 'Další výbava', contactCol: 'Kontakt', web: 'Web', number: 'Číslo', date: 'Datum', person: 'Kontaktní osoba',
+    closing: (c) => 'Nabídka byla připravena na základě uvedené konfigurace; obrázky jsou ilustrační. Nabídku můžete přijmout nebo požádat o změnu tlačítky v e-mailu.' + (c && c.name ? ' Kontaktní osoba: **' + c.name + '**' + (c.email ? ' · ' + c.email : '') + (c.phone ? ' · ' + c.phone : '') : ''),
+    rentTitle: 'NABÍDKA PRONÁJMU', offerNo: 'Číslo nabídky', dateL: 'Datum', lessor: 'Pronajímatel: ', to: 'Adresát nabídky: ', monthly: 'MĚSÍČNÍ NÁJEMNÉ (S DPH)',
+    secVeh: 'Údaje o vozidle', secEq: 'Výbava', secTerms: 'Podmínky pronájmu', rentDoc: 'Nabídka pronájmu — ',
+    ...PDF_CO.cs, phoneL: 'Tel.', mailL: 'E-mail'
+  }
+};
+/* bérleti ajánlat: a builder (belso-crm) szövegei */
+const MON = { január: 0, február: 1, március: 2, április: 3, május: 4, június: 5, július: 6, augusztus: 7, szeptember: 8, október: 9, november: 10, december: 11 };
+const MON_L = { sk: ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'], cs: ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'] };
+export const RENT_T = {
+  sk: {
+    newCar: 'Nové vozidlo', dePlate: 'Nemecké EČV', km: 'Stav km', variant: 'Verzia', fuel: 'Palivo', gear: 'Prevodovka', cond: 'Stav', plate: 'EČV',
+    isNew: 'Nové', used: 'Ojazdené', de: 'Nemecké', hu: 'Maďarské', per: '/ mes.', net: (n) => 'bez DPH ' + n + ' € + 19 % DPH',
+    term: 'Doba prenájmu', months: (m) => m + (m >= 5 ? ' mesiacov' : m >= 2 ? ' mesiace' : ' mesiac'), start: 'začiatok: ', kmL: 'Limit km', monthly: 'mesačne', dep: 'Kaucia',
+    make: 'Značka / model', body: 'Kategória', color: 'Farba (výrobná)', avail: 'Dostupnosť', rentStart: 'Začiatok prenájmu', deliv: 'Poplatok za dopravu', once: ' (jednorazovo)',
+    tTerm: (m, s, e) => `Doba prenájmu: **${m}**${s ? ' (začiatok: ' + s + (e ? ', koniec: ' + e : '') + ')' : ''}.`,
+    tRent: (p, net) => `Mesačné nájomné: **${p} s DPH**${net ? ' (' + net + ')' : ''}, splatné mesačne vopred, vždy na začiatku mesiaca.`,
+    tDep: (d) => `Kaucia: **${d}**, splatná pri začiatku prenájmu; vracia sa po vrátení nepoškodeného vozidla.`,
+    tDeliv: (d) => `Poplatok za dopravu: **${d}** (jednorazovo), splatný pri odovzdaní vozidla.`,
+    tKm: (k, tot, over) => `Mesačný limit kilometrov: **${k} km / mes.**${tot ? ' (za celú dobu prenájmu ' + tot + ' km)' : ''}${over ? '; nad limit sa účtuje **' + over + '**' : ''}.`,
+    tNew: (de) => `Vozidlo sa odovzdáva nové, s 0 km${de ? ', **s nemeckým EČV**' : ''}.`,
+    tValid: (d) => `Platnosť ponuky: **${d}**.`,
+    cats: { 'Külső felszereltség': 'Exteriér', 'Komfort / belső tér': 'Komfort / interiér', 'Biztonság / asszisztensek': 'Bezpečnosť / asistenti', 'Sport': 'Šport', 'Connectivity / egyéb': 'Konektivita / ostatné' },
+    file: 'Ponuka_prenajmu_', fileSale: 'CarAdvance_ponuka_', locale: 'sk-SK', now: 'Ihneď'
+  },
+  cs: {
+    newCar: 'Nový vůz', dePlate: 'Německá SPZ', km: 'Stav km', variant: 'Verze', fuel: 'Palivo', gear: 'Převodovka', cond: 'Stav', plate: 'SPZ',
+    isNew: 'Nový', used: 'Ojetý', de: 'Německá', hu: 'Maďarská', per: '/ měs.', net: (n) => 'bez DPH ' + n + ' € + 19 % DPH',
+    term: 'Doba pronájmu', months: (m) => m + (m >= 5 ? ' měsíců' : m >= 2 ? ' měsíce' : ' měsíc'), start: 'začátek: ', kmL: 'Limit km', monthly: 'měsíčně', dep: 'Kauce',
+    make: 'Značka / model', body: 'Kategorie', color: 'Barva (výrobní)', avail: 'Dostupnost', rentStart: 'Začátek pronájmu', deliv: 'Poplatek za dopravu', once: ' (jednorázově)',
+    tTerm: (m, s, e) => `Doba pronájmu: **${m}**${s ? ' (začátek: ' + s + (e ? ', konec: ' + e : '') + ')' : ''}.`,
+    tRent: (p, net) => `Měsíční nájemné: **${p} s DPH**${net ? ' (' + net + ')' : ''}, splatné měsíčně předem, vždy na začátku měsíce.`,
+    tDep: (d) => `Kauce: **${d}**, splatná při zahájení pronájmu; vrací se po vrácení nepoškozeného vozu.`,
+    tDeliv: (d) => `Poplatek za dopravu: **${d}** (jednorázově), splatný při předání vozu.`,
+    tKm: (k, tot, over) => `Měsíční limit kilometrů: **${k} km / měs.**${tot ? ' (za celou dobu pronájmu ' + tot + ' km)' : ''}${over ? '; nad limit se účtuje **' + over + '**' : ''}.`,
+    tNew: (de) => `Vůz se předává nový, s 0 km${de ? ', **s německou SPZ**' : ''}.`,
+    tValid: (d) => `Platnost nabídky: **${d}**.`,
+    cats: { 'Külső felszereltség': 'Exteriér', 'Komfort / belső tér': 'Komfort / interiér', 'Biztonság / asszisztensek': 'Bezpečnost / asistenti', 'Sport': 'Sport', 'Connectivity / egyéb': 'Konektivita / ostatní' },
+    file: 'Nabidka_pronajmu_', fileSale: 'CarAdvance_nabidka_', locale: 'cs-CZ', now: 'Ihned'
+  }
+};
+/** Elérhetőség (pl. „Azonnal”, „December”, „2026. december”) a piac nyelvén. */
+export function availL(lang, v) {
+  const s = String(v || '').trim(); const T = RENT_T[lang]; if (!T || !s) return s;
+  if (/^azonnal/i.test(s)) return T.now;
+  return s.replace(/[a-záéíóöőúüű]+/gi, (w) => { const k = MON[w.toLowerCase()]; return k == null ? w : MON_L[lang][k]; });
+}
+/** Teljesítmény „LE” → „k” (kone / koně). */
+export const powerL = (lang, v) => (lang && lang !== 'hu' && v ? String(v).replace(/\bLE\b/g, 'k') : v);

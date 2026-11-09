@@ -607,7 +607,7 @@ export async function chargeNow(env, c, ch) {
       .bind(st, attempts, next, String(msg).slice(0, 300), (e.stripe && e.stripe.payment_intent && e.stripe.payment_intent.id) || null, ch.id).run();
     await addEvent(env, c.id, `Sikertelen terhelés (${attempts}. próba): ${ch.title} – ${msg}`);
     if (attempts === 1 || !next) await mailChargeFailed(env, c, ch, !next);
-    if (!next) await sendMailX(env, notifyTo(env), `Sikertelen terhelés – ${c.number}`, `<p>A(z) <b>${esc(c.number)}</b> szerződés terhelése 4 próbálkozás után sem sikerült.</p><p>${esc(ch.title)} – <b>${esc(money(ch.amount, ch.currency))}</b><br>Hiba: ${esc(msg)}</p>${btn(SITE + '/belso/szerzodesek/#' + c.id, 'Megnyitás')}`);
+    if (!next) await sendMailX(env, notifyTo(env), `Sikertelen terhelés – ${c.number}`, `<p>A(z) <b>${esc(c.number)}</b> szerződés terhelése 4 próbálkozás után sem sikerült.</p><p>${esc(ch.title)} – <b>${esc(money(ch.amount, ch.currency))}</b><br>Hiba: ${esc(msg)}</p>${btn(SITE + '/admin/szerzodesek/#' + c.id, 'Megnyitás')}`);
     return { ok: false, error: msg };
   }
 }
@@ -711,14 +711,14 @@ export async function sendSignedMails(env, row) {
       ? (c.status === 'signed' ? `<p>Utolsó lépés: az első fizetés (<b>${amt}</b>) bankkártyával.</p>${btn(linkFor(c), 'Tovább a fizetéshez')}` : btn(linkFor(c), 'Szerződésem'))
       : `<p>Az első fizetésről (<b>${amt}</b>) díjbekérőt küldünk, átutalással kell rendezni.</p>`}<p style="color:#5a6b82;font-size:13px">Thank you for signing the rental agreement. The signed copy is attached (PDF).</p>`, { attachments: att });
   await sendMailX(env, notifyTo(env), `Aláírva: ${c.number} – ${c.cust.company_name || c.cust.name || c.name}`,
-    `<p>A(z) <b>${esc(c.number)}</b> szerződést az ügyfél aláírta (${esc(row.sign_name || '')}${row.co_sign_name ? ' és ' + esc(row.co_sign_name) : ''}). Az aláírt PDF csatolva.</p>${t.billing === 'card' ? '<p>Az ügyfél most fizet kártyával.</p>' : '<p><b>Átutalásos fizetés:</b> küldd ki a díjbekérőt, és a befizetés után jelöld fizetettnek az első fizetést.</p>'}${btn(SITE + '/belso/szerzodesek/#' + c.id, 'Megnyitás')}`, { attachments: att });
+    `<p>A(z) <b>${esc(c.number)}</b> szerződést az ügyfél aláírta (${esc(row.sign_name || '')}${row.co_sign_name ? ' és ' + esc(row.co_sign_name) : ''}). Az aláírt PDF csatolva.</p>${t.billing === 'card' ? '<p>Az ügyfél most fizet kártyával.</p>' : '<p><b>Átutalásos fizetés:</b> küldd ki a díjbekérőt, és a befizetés után jelöld fizetettnek az első fizetést.</p>'}${btn(SITE + '/admin/szerzodesek/#' + c.id, 'Megnyitás')}`, { attachments: att });
   if (ok) await env.DB.prepare(`UPDATE rc_contracts SET signed_mail_at = datetime('now') WHERE id = ?`).bind(c.id).run();
   return ok;
 }
 export async function mailFirstPaid(env, c, ch) {
   await sendMailX(env, c.email, `Fizetés megérkezett – ${c.number}`,
     `${hi(c)}<p>Megkaptuk az első fizetést, a szerződésed aktív.</p><p style="font-size:18px"><b>${esc(money(ch.amount, ch.currency))}</b><br><span style="color:#5a6b82">${esc(ch.title)}</span></p><p>Kollégánk hamarosan egyeztet veled az átadás pontos időpontjáról.</p>${btn(linkFor(c), 'Szerződésem')}`);
-  await sendMailX(env, notifyTo(env), `Fizetve: ${c.number} – ${c.company || c.name}`, `<p>A(z) <b>${esc(c.number)}</b> szerződés első fizetése megérkezett (${esc(money(ch.amount, ch.currency))}). A szerződés aktív; az átadás után add meg az átadás napját, ettől indulnak a havi terhelések.</p>${btn(SITE + '/belso/szerzodesek/#' + c.id, 'Megnyitás')}`);
+  await sendMailX(env, notifyTo(env), `Fizetve: ${c.number} – ${c.company || c.name}`, `<p>A(z) <b>${esc(c.number)}</b> szerződés első fizetése megérkezett (${esc(money(ch.amount, ch.currency))}). A szerződés aktív; az átadás után add meg az átadás napját, ettől indulnak a havi terhelések.</p>${btn(SITE + '/admin/szerzodesek/#' + c.id, 'Megnyitás')}`);
 }
 export { randomHex };
 // A CRM (lib/crm.js) ugyanezzel a PDF-motorral (beágyazott magyar betűkészlet) készíti a szerződéstervezeteket.
