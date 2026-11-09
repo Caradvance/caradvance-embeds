@@ -51,17 +51,30 @@
 </head>
 <body>
 <header><img src="/caradvance-logo-white.webp" alt="CarAdvance"></header>
-<main id="app"><div class="box muted">Ajánlat betöltése…</div></main>
-<div class="foot">CarAdvance · +36 30 233 6060 · <a href="mailto:info@caradvance.hu">info@caradvance.hu</a></div>
+<main id="app"><div class="box muted" id="ld">Ajánlat betöltése…</div></main>
+<div class="foot" id="foot">CarAdvance · +36 30 233 6060 · <a href="mailto:info@caradvance.hu">info@caradvance.hu</a></div>
 <script>
 (function(){
+  /* nyelv: caradvance.sk → szlovák, caradvance.cz → cseh; magyar domainen az ajánlat piaca szerint (az API „lang” mezője) */
+  var H=location.hostname,LG=/\.sk$/.test(H)?'sk':/\.cz$/.test(H)?'cs':'hu';
+  var D={
+    hu:{title:'CarAdvance — Az Ön ajánlata',load:'Ajánlat betöltése…',hello:function(n){return 'Kedves '+(n||'Ügyfelünk')+'!';},many:'Válassza ki, melyik autó érdekli — mindegyiknél látja a pontos árat. Ezután egy kattintással elfogadhatja az ajánlatot, vagy módosítást kérhet.',one:'Itt elfogadhatja az ajánlatot, vagy módosítást kérhet.',sup:'Figyelem: időközben újabb ajánlatot is küldtünk Önnek — kérjük, a legfrissebb e-mailben szereplőt nézze meg.',cfg:'A konfiguráció megtekintése a gyártó oldalán ↗',more:'Részletek a weboldalon ↗',pick:'Ezt választom',picked:'Kiválasztva',msg:'Üzenet (módosítási kérésnél kötelező)',ph:'Pl. más szín, más futamidő, eltérő átadási időpont…',acc:'Ajánlat elfogadása',mod:'Módosítást kérek',conf:function(t,p){return 'Elfogadja a(z) '+t+' ajánlatát ('+p+')?';},needCar:'Kérjük, előbb válassza ki a kívánt autót.',needMsg:'Kérjük, írja le röviden, mit módosítanánk.',okAcc:'Köszönjük, az ajánlatot elfogadta!',okAccTxt:'Kollégánk hamarosan felveszi Önnel a kapcsolatot a következő lépésekkel (szerződés, átadás).',okMod:'Köszönjük, megkaptuk a módosítási kérését!',okModTxt:'Átnézzük, és hamarosan módosított ajánlatot küldünk.',earlier:'(Erre az ajánlatra korábban már válaszolt.)',failH:'Az ajánlat nem nyitható meg',bad:'Hibás vagy hiányos hivatkozás. Kérjük, nyissa meg újra az e-mailben kapott linket.',err:'Hiba',tel:'+36 30 233 6060',mail:'info@caradvance.hu'},
+    sk:{title:'CarAdvance — Vaša ponuka',load:'Načítava sa ponuka…',hello:function(n){return n?'Dobrý deň, '+n+',':'Vážený zákazník,';},many:'Vyberte si auto, ktoré vás zaujíma — pri každom vidíte presnú cenu. Potom môžete jedným kliknutím ponuku prijať alebo požiadať o zmenu.',one:'Tu môžete ponuku prijať alebo požiadať o zmenu.',sup:'Upozornenie: medzitým sme vám poslali aj novšiu ponuku — pozrite si, prosím, tú z najnovšieho e-mailu.',cfg:'Pozrieť konfiguráciu na stránke výrobcu ↗',more:'Podrobnosti na webe ↗',pick:'Vyberám toto',picked:'Vybrané',msg:'Správa (pri žiadosti o zmenu povinná)',ph:'Napr. iná farba, iná doba prenájmu, iný termín odovzdania…',acc:'Prijať ponuku',mod:'Žiadam o zmenu',conf:function(t,p){return 'Prijímate ponuku '+t+' ('+p+')?';},needCar:'Najprv, prosím, vyberte požadované auto.',needMsg:'Napíšte, prosím, stručne, čo máme zmeniť.',okAcc:'Ďakujeme, ponuku ste prijali!',okAccTxt:'Náš kolega vás čoskoro bude kontaktovať s ďalšími krokmi (zmluva, odovzdanie).',okMod:'Ďakujeme, vašu žiadosť o zmenu sme prijali!',okModTxt:'Pozrieme sa na ňu a čoskoro vám pošleme upravenú ponuku.',earlier:'(Na túto ponuku ste už odpovedali.)',failH:'Ponuku nemožno otvoriť',bad:'Chybný alebo neúplný odkaz. Otvorte, prosím, znova odkaz z e-mailu.',err:'Chyba',tel:'+421 915 410 555',mail:'info@caradvance.sk'},
+    cs:{title:'CarAdvance — Vaše nabídka',load:'Načítá se nabídka…',hello:function(n){return n?'Dobrý den, '+n+',':'Vážený zákazníku,';},many:'Vyberte si vůz, který vás zajímá — u každého vidíte přesnou cenu. Poté můžete jedním kliknutím nabídku přijmout nebo požádat o změnu.',one:'Zde můžete nabídku přijmout nebo požádat o změnu.',sup:'Upozornění: mezitím jsme vám zaslali i novější nabídku — podívejte se prosím na tu z nejnovějšího e-mailu.',cfg:'Zobrazit konfiguraci na stránce výrobce ↗',more:'Podrobnosti na webu ↗',pick:'Vybírám toto',picked:'Vybráno',msg:'Zpráva (u žádosti o změnu povinná)',ph:'Např. jiná barva, jiná doba pronájmu, jiný termín předání…',acc:'Přijmout nabídku',mod:'Žádám o změnu',conf:function(t,p){return 'Přijímáte nabídku '+t+' ('+p+')?';},needCar:'Nejprve prosím vyberte požadovaný vůz.',needMsg:'Napište prosím stručně, co máme změnit.',okAcc:'Děkujeme, nabídku jste přijali!',okAccTxt:'Náš kolega vás brzy bude kontaktovat s dalšími kroky (smlouva, předání).',okMod:'Děkujeme, vaši žádost o změnu jsme přijali!',okModTxt:'Podíváme se na ni a brzy vám zašleme upravenou nabídku.',earlier:'(Na tuto nabídku jste již odpověděli.)',failH:'Nabídku nelze otevřít',bad:'Chybný nebo neúplný odkaz. Otevřete prosím znovu odkaz z e-mailu.',err:'Chyba',tel:'+420 604 313 136',mail:'info@caradvance.cz'}
+  };
+  var T=D[LG];
+  function setLang(l){if(!D[l])return;LG=l;T=D[l];document.documentElement.lang=l;document.title=T.title;
+    document.getElementById('foot').innerHTML='CarAdvance · '+T.tel+' · <a href="mailto:'+T.mail+'">'+T.mail+'</a>';
+    var ld=document.getElementById('ld');if(ld)ld.textContent=T.load;}
+  setLang(LG);
   var qs=new URLSearchParams(location.search),token=qs.get('t')||'',pre=parseInt(qs.get('v'),10),wantAction=qs.get('a');
   var app=document.getElementById('app'),S=null,choice=-1;
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  function fail(t){app.innerHTML='<div class="box"><h1>Az ajánlat nem nyitható meg</h1><div class="muted">'+esc(t)+'</div></div>';}
-  if(!/^[a-f0-9]{40}$/.test(token))return fail('Hibás vagy hiányos hivatkozás. Kérjük, nyissa meg újra az e-mailben kapott linket.');
-  fetch('/api/crm-ajanlat/'+token).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'Hiba');return j;});}).then(function(j){
+  function fail(t){app.innerHTML='<div class="box"><h1>'+esc(T.failH)+'</h1><div class="muted">'+esc(t)+'</div></div>';}
+  if(!/^[a-f0-9]{40}$/.test(token))return fail(T.bad);
+  fetch('/api/crm-ajanlat/'+token).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||T.err);return j;});}).then(function(j){
     S=j;
+    if(LG==='hu'&&j.lang&&D[j.lang])setLang(j.lang);
     if(S.items.length===1)choice=0;
     if(!isNaN(pre)&&pre>=0&&pre<S.items.length)choice=pre;
     if(S.responded)return renderDone(S.action,S.choice,true);
@@ -70,9 +83,9 @@
 
   function render(){
     var many=S.items.length>1;
-    var h='<div class="box"><h1>Kedves '+esc(S.clientName||'Ügyfelünk')+'!</h1><div class="muted">'
-      +(many?'Válassza ki, melyik autó érdekli — mindegyiknél látja a pontos árat. Ezután egy kattintással elfogadhatja az ajánlatot, vagy módosítást kérhet.':'Itt elfogadhatja az ajánlatot, vagy módosítást kérhet.')+'</div>'
-      +(S.superseded?'<div class="msg" style="background:#fff6e5">Figyelem: időközben újabb ajánlatot is küldtünk Önnek — kérjük, a legfrissebb e-mailben szereplőt nézze meg.</div>':'')
+    var h='<div class="box"><h1>'+esc(T.hello(S.clientName))+'</h1><div class="muted">'
+      +(many?T.many:T.one)+'</div>'
+      +(S.superseded?'<div class="msg" style="background:#fff6e5">'+esc(T.sup)+'</div>':'')
       +(S.message?'<div class="msg">'+esc(S.message)+'</div>':'')+'</div>';
     h+=S.items.map(function(it,i){
       return '<div class="car'+(i===choice?' on':'')+'" data-i="'+i+'">'
@@ -80,16 +93,16 @@
         +'<div class="bd"><div class="t">'+esc(it.title)+'</div>'
         +(it.spec?'<div class="s">'+esc(it.spec)+'</div>':'')
         +(it.ids?'<div class="s" style="margin-top:4px;color:#374151;font-weight:600">'+esc(it.ids)+'</div>':'')
-        +(it.config_url&&/^https:\/\//.test(it.config_url)?'<div class="s" style="margin-top:4px"><a href="'+esc(it.config_url)+'" target="_blank" rel="noopener noreferrer">A konfiguráció megtekintése a gyártó oldalán ↗</a></div>':'')
+        +(it.config_url&&/^https:\/\//.test(it.config_url)?'<div class="s" style="margin-top:4px"><a href="'+esc(it.config_url)+'" target="_blank" rel="noopener noreferrer">'+esc(T.cfg)+'</a></div>':'')
         +(it.note?'<div class="n">'+esc(it.note)+'</div>':'')
-        +(it.url?'<div style="margin-top:4px"><a class="more" href="'+esc(it.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Részletek a weboldalon ↗</a></div>':'')
+        +(it.url?'<div style="margin-top:4px"><a class="more" href="'+esc(it.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+esc(T.more)+'</a></div>':'')
         +'<div class="p">'+esc(it.priceLabel)+'</div>'+(it.delivery?'<div class="muted" style="font-size:13px;margin-top:2px">+ '+esc(it.delivery)+'</div>':'')
-        +(many?'<div class="rd"><i></i>'+(i===choice?'Kiválasztva':'Ezt választom')+'</div>':'')
+        +(many?'<div class="rd"><i></i>'+esc(i===choice?T.picked:T.pick)+'</div>':'')
         +'</div></div>';
     }).join('');
-    h+='<div class="box"><label for="cmsg">Üzenet (módosítási kérésnél kötelező)</label>'
-      +'<textarea id="cmsg" placeholder="Pl. más szín, más futamidő, eltérő átadási időpont…"></textarea>'
-      +'<div class="btns"><button class="btn red" id="bAcc">Ajánlat elfogadása</button><button class="btn ghost" id="bMod">Módosítást kérek</button></div>'
+    h+='<div class="box"><label for="cmsg">'+esc(T.msg)+'</label>'
+      +'<textarea id="cmsg" placeholder="'+esc(T.ph)+'"></textarea>'
+      +'<div class="btns"><button class="btn red" id="bAcc">'+esc(T.acc)+'</button><button class="btn ghost" id="bMod">'+esc(T.mod)+'</button></div>'
       +'<div class="err" id="err"></div></div>';
     app.innerHTML=h;
     app.querySelectorAll('.car').forEach(function(el){el.addEventListener('click',function(){choice=parseInt(el.getAttribute('data-i'),10);var m=document.getElementById('cmsg').value;render();document.getElementById('cmsg').value=m;});});
@@ -99,12 +112,12 @@
   }
   function send(action){
     var err=document.getElementById('err'),msg=document.getElementById('cmsg').value.trim();err.textContent='';
-    if(action==='elfogad'&&choice<0){err.textContent='Kérjük, előbb válassza ki a kívánt autót.';return;}
-    if(action==='modosit'&&!msg){err.textContent='Kérjük, írja le röviden, mit módosítanánk.';document.getElementById('cmsg').focus();return;}
-    if(action==='elfogad'&&!confirm('Elfogadja a(z) '+S.items[choice].title+' ajánlatát ('+S.items[choice].priceLabel+')?'))return;
+    if(action==='elfogad'&&choice<0){err.textContent=T.needCar;return;}
+    if(action==='modosit'&&!msg){err.textContent=T.needMsg;document.getElementById('cmsg').focus();return;}
+    if(action==='elfogad'&&!confirm(T.conf(S.items[choice].title,S.items[choice].priceLabel)))return;
     var b1=document.getElementById('bAcc'),b2=document.getElementById('bMod');b1.disabled=b2.disabled=true;
     fetch('/api/crm-ajanlat/'+token+'/valasz',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:action,choice:choice,message:msg})})
-      .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'Hiba');return j;});})
+      .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||T.err);return j;});})
       .then(function(j){renderDone(j.action,j.choice,false);})
       .catch(function(e){err.textContent=e.message;b1.disabled=b2.disabled=false;});
   }
@@ -112,9 +125,9 @@
     var it=(ch!=null&&S.items[ch])?S.items[ch]:null;
     app.innerHTML='<div class="box done"><div class="ic">✓</div>'
       +(action==='elfogad'
-        ?'<h1>Köszönjük, az ajánlatot elfogadta!</h1>'+(it?'<div class="muted" style="margin-top:6px"><b style="color:var(--ink)">'+esc(it.title)+'</b><br>'+esc(it.priceLabel)+'</div>':'')+'<p class="muted">Kollégánk hamarosan felveszi Önnel a kapcsolatot a következő lépésekkel (szerződés, átadás).</p>'
-        :'<h1>Köszönjük, megkaptuk a módosítási kérését!</h1><p class="muted">Átnézzük, és hamarosan módosított ajánlatot küldünk.</p>')
-      +(earlier?'<p class="muted" style="font-size:13px">(Erre az ajánlatra korábban már válaszolt.)</p>':'')
+        ?'<h1>'+esc(T.okAcc)+'</h1>'+(it?'<div class="muted" style="margin-top:6px"><b style="color:var(--ink)">'+esc(it.title)+'</b><br>'+esc(it.priceLabel)+'</div>':'')+'<p class="muted">'+esc(T.okAccTxt)+'</p>'
+        :'<h1>'+esc(T.okMod)+'</h1><p class="muted">'+esc(T.okModTxt)+'</p>')
+      +(earlier?'<p class="muted" style="font-size:13px">'+esc(T.earlier)+'</p>':'')
       +'</div>';
   }
 })();
