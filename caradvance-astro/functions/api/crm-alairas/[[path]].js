@@ -12,7 +12,11 @@ import {
   rateOk, randomDigits, maskEmail, huDateTime, SIGN_STATEMENT, SIGN_STATEMENT_DE
 } from '../../../lib/crm.js';
 import { jpegInfo } from '../../../lib/docpdf.js';
-import { completeSign, pdfFor, priorSigns, fwdOf, isPartnerReq as isDe, nowSec as now } from '../../../lib/crmsign.js';
+import { completeSign, pdfFor, priorSigns, fwdOf, isPartnerReq as isDe, nowSec as now, clientLang } from '../../../lib/crmsign.js';
+import { statementOf, otpMail } from '../../../lib/crmi18n.js';
+// ügyfél nyelve: a domain (caradvance.sk → sk, .cz → cs), magyar domainen a kérelem piaca szerint; partner: német
+const hostLang = (request) => { const h = new URL(request.url).hostname; return /\.sk$/.test(h) ? 'sk' : /\.cz$/.test(h) ? 'cs' : 'hu'; };
+const langFor = (hl, r) => (isDe(r) ? 'de' : hl !== 'hu' ? hl : clientLang(r));
 
 const TOKEN_RE = /^[a-f0-9]{64}$/;
 const SEC = { 'cache-control': 'no-store', 'referrer-policy': 'no-referrer', 'x-robots-tag': 'noindex, nofollow', 'x-content-type-options': 'nosniff' };
@@ -25,29 +29,31 @@ async function load(env, t) {
   if (r.status === 'pending' && r.expires_at < now()) { await env.DB.prepare(`UPDATE crm_sign SET status = 'expired' WHERE id = ? AND status = 'pending'`).bind(r.id).run(); r.status = 'expired'; }
   return { r };
 }
-async function view(env, r) {
+async function view(env, r, lang) {
   const docs = parseJ(r.docs, []); const res = parseJ(r.result, []);
   if (!r.opened_at && r.status === 'pending') {
     await env.DB.prepare(`UPDATE crm_sign SET opened_at = datetime('now') WHERE id = ?`).bind(r.id).run();
     await addEvent(env, r.deal_id, 'sign', `Az aláíró megnyitotta az aláírási oldalt (#${r.id}: ${docs.length} dokumentum)`, 'Ügyfél');
   }
   return J({
-    ok: true, id: r.id, status: r.status, signer: r.signer_name, email: maskEmail(r.email), message: r.message || '', lang: isDe(r) ? 'de' : 'hu',
+    ok: true, id: r.id, status: r.status, signer: r.signer_name, email: maskEmail(r.email), message: r.message || '', lang,
     prior: isDe(r) ? ((docs[0] && docs[0].prior) ? { name: docs[0].prior.name || '', when: docs[0].prior.when || '' } : null) : null,
-    expires: new Date(r.expires_at * 1000).toISOString(), statement: isDe(r) ? SIGN_STATEMENT_DE : SIGN_STATEMENT,
+    expires: new Date(r.expires_at * 1000).toISOString(), statement: isDe(r) ? SIGN_STATEMENT_DE : (statementOf(lang) || SIGN_STATEMENT),
     signed_at: r.signed_at ? huDateTime(r.signed_at) : null, sign_name: r.sign_name || null,
     docs: docs.map((d, i) => ({ i, name: d.name, kind: d.kind, text: r.status === 'pending' || r.status === 'signed' ? d.text : '', hash: d.hash, signed: !!(res[i] && res[i].file_id), cosign: !!(res[i] && res[i].cosign), sigs: r.status === 'pending' ? (d.sigs || []).map((z) => ({ names: z.names, src: 'data:image/jpeg;base64,' + z.b64 })).concat(d.prior && parseJ(r.prior, {}).jpeg ? [{ names: [].concat(d.prior.match || []), src: 'data:image/jpeg;base64,' + parseJ(r.prior, {}).jpeg }] : []) : [] }))
   });
 }
 
-async function sendCode(env, r) {
+async function sendCode(env, r, lang) {
   if (r.status !== 'pending') return J({ ok: false, error: 'locked' }, 409);
   if (!(await rateOk(env, 'sc:' + r.id, 5, 3600))) return J({ ok: false, error: 'too_many_codes' }, 429);
   const code = randomDigits(6);
   await env.DB.prepare(`UPDATE crm_sign SET code_hash = ?, code_exp = ?, code_attempts = 0 WHERE id = ?`).bind(await sha256hex('crmotp|' + r.id + '|' + code), now() + 600, r.id).run();
   const fwd = fwdOf(env);
   const big = `<p style="font:bold 34px/1 'Courier New',monospace;letter-spacing:6px;margin:18px 0">${code}</p>`;
-  const m = isDe(r)
+  const LM = !isDe(r) && otpMail(lang, { name: esc(r.signer_name || ''), code, big });
+  const m = LM ? await sendCrmMail(env, fwd || r.email, `${fwd ? '[TESZT — ' + r.email + '] ' : ''}${LM.subject}`, LM.html, null, { noCopy: true, lang })
+    : isDe(r)
     ? await sendCrmMail(env, fwd || r.email, `${fwd ? '[TESZT — ' + r.email + '] ' : ''}Bestätigungscode für die Unterschrift: ${code}`,
       `<p>Sehr geehrte Damen und Herren,</p><p>bitte geben Sie zur Gegenzeichnung der von CarAdvance übermittelten Dokumente diesen Code ein:</p>${big}
        <p style="color:#6b7280;font-size:13px">Der Code ist 10 Minuten gültig und nur einmal verwendbar. Falls Sie ihn nicht angefordert haben, ignorieren Sie diese E-Mail bitte und informieren Sie uns.</p>`, null, { noCopy: true })
@@ -114,8 +120,9 @@ export async function onRequest(context) {
     if (!(await rateOk(env, 'ip:' + ip, 120, 600))) return J({ ok: false, error: 'rate' }, 429);
     const b = await request.json().catch(() => ({}));
     const { r, err } = await load(env, b.t); if (err) return err;
-    if (path === '/view') return await view(env, r);
-    if (path === '/code') return await sendCode(env, r);
+    const lang = langFor(hostLang(request), r);
+    if (path === '/view') return await view(env, r, lang);
+    if (path === '/code') return await sendCode(env, r, lang);
     if (path === '/sign') return await sign(request, env, r, b, ip);
     if (path === '/pdf') return await pdf(env, r, Number(b.i));
     return J({ ok: false, error: 'not_found' }, 404);
