@@ -21,6 +21,7 @@ function withHeaders(res, extra) {
 // illetve az autók listájára — minden domainen és nyelven. Ha a modell visszatér, az oldal újra él (nincs 404, nincs átirányítás).
 const GONE_HUB = { hu: 'autoink', sk: 'auta', cs: 'vozy', pl: 'samochody', ch: 'fahrzeuge', eu: { de: 'fahrzeuge', fr: 'vehicules', it: 'veicoli', es: 'vehiculos' } };
 const GONE_BRAND = [['mercedes', 'mercedes'], ['volkswagen', 'volkswagen'], ['vw-', 'volkswagen'], ['bmw', 'bmw'], ['audi', 'audi'], ['mini', 'mini'], ['cupra', 'cupra'], ['seat', 'seat'], ['hyundai', 'hyundai'], ['kia', 'kia'], ['volvo', 'volvo'], ['man-', 'man']];
+let GONE_P = null;
 function goneRedirect(request) {
   if (request.method !== 'GET' && request.method !== 'HEAD') return null;
   const url = new URL(request.url);
@@ -177,6 +178,16 @@ async function handle(context) {
   const { request, env, next } = context;
   const url = new URL(request.url);
   const p = url.pathname;
+
+  // kivezetett (a kínálatban már nem szereplő) bérlési modelloldalak: azonnal 301 a márkára szűrt listára (lista: /gone-paths.json, skcz-fix1110.mjs)
+  if ((request.method === 'GET' || request.method === 'HEAD') && /\/[a-z0-9-]+\/?$/.test(p)) {
+    try {
+      if (!GONE_P) GONE_P = env.ASSETS.fetch(new Request(new URL('/gone-paths.json', url.origin).toString())).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+      const gl = (await GONE_P)[DOMAINS[url.hostname] || 'hu'];
+      const pp = p.endsWith('/') ? p : p + '/';
+      if (gl && gl.includes(pp)) { const g = goneRedirect(new Request(new URL(pp, url.origin).toString(), { method: request.method })); if (g) return g; }
+    } catch (e) {}
+  }
 
   // A munkatársi felület új címe: /admin/ (a régi /belso/ címek — könyvjelzők, régi e-mailek, a böngésző-bővítmény — 301-gyel ide visznek), minden domainen
   if (p === '/belso' || p.startsWith('/belso/')) {
