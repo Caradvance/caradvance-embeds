@@ -82,7 +82,7 @@ const gone = [];
 try {
   for (const f of walk(DIST, [])) {
     const rel = path.relative(DIST, f).split(path.sep).join('/');
-    if (!/\/index\.html$/.test(rel) || /^(_np|admin|i18n)\//.test(rel)) continue;
+    if (!/\/index\.html$/.test(rel) || /^(admin|i18n)\//.test(rel)) continue; // az ár nélküli (_np) változatok is
     const h = fs.readFileSync(f, 'utf8');
     // bérlési modelloldal sablon (cd-hero + cd-lead, magyar megfelelője /berelheto-auto/…), de bérlési ablak (sub-rent) nélkül = már nincs kínálatban
     if (h.indexOf('cd-hero') < 0 || h.indexOf('cd-lead') < 0 || h.indexOf('sub-rent') > -1 || h.indexOf('/berelheto-auto/') < 0) continue;
@@ -90,7 +90,7 @@ try {
     fs.rmSync(path.dirname(f), { recursive: true, force: true });
   }
   // sitemapek és keresőindexek
-  const goneSet = new Set(gone.map((u) => u.replace(/^\/(sk|cs|pl|ch|eu)(?=\/)/, '')));
+  const goneSet = new Set(gone.map((u) => u.replace(/^\/_np(?=\/)/, '').replace(/^\/(sk|cs|pl|ch|eu)(?=\/)/, '')));
   const isGone = (u) => { try { const p = new URL(u, 'https://x').pathname; return gone.includes(p) || goneSet.has(p); } catch (e) { return false; } };
   let smN = 0;
   for (const f of walk(DIST, [])) {
