@@ -218,3 +218,38 @@ try {
   }
   console.log('[skcz-fix1109] PL / CH / EU bérlési gomb: ' + n + ' (' + p + ' oldal)');
 } catch (e) { console.log('[skcz-fix1109] PL / CH / EU hiba:', e && e.message); }
+
+// GDPR 6. pont (adatfeldolgozók): a BH Group Zrt. minden piac adatkezelési tájékoztatójában — a CRM-hez (ajánlatok, szerződések,
+// okmánymásolatok, elektronikus aláírás) a magyar kollégák is hozzáférnek (Marc, 2026-11-09). A magyar oldalon már szerepel.
+try {
+  const BHG = 'BH Group Zrt. — 4143 Vekerd, Petőfi utca 23.';
+  const ROW = {
+    sk: ['Maďarsko', 'podpora pri vybavovaní dopytov, ponúk a zmlúv; prevádzka systému správy zákazníkov (CRM) vrátane kópií dokladov a elektronického podpisu (z poverenia spoločnosti Caradvance GmbH)'],
+    cs: ['Maďarsko', 'podpora při vyřizování poptávek, nabídek a smluv; provoz systému pro správu zákazníků (CRM) včetně kopií dokladů a elektronického podpisu (z pověření společnosti Caradvance GmbH)'],
+    en: ['Hungary', 'support in handling enquiries, offers and contracts; operation of the customer management system (CRM), including document copies and electronic signatures (on behalf of Caradvance GmbH)'],
+    de: ['Ungarn', 'Unterstützung bei der Bearbeitung von Anfragen, Angeboten und Verträgen; Betrieb des Kundenverwaltungssystems (CRM) einschließlich Ausweiskopien und elektronischer Signatur (im Auftrag der Caradvance GmbH)'],
+    hu: ['Magyarország', 'az ajánlatkérések, ajánlatok és szerződések kezelésének támogatása; az ügyfélnyilvántartás (CRM) üzemeltetése, beleértve az okmánymásolatokat és az elektronikus aláírást (a Caradvance GmbH megbízásából)'],
+    pl: ['Węgry', 'wsparcie w obsłudze zapytań, ofert i umów; obsługa systemu zarządzania klientami (CRM), w tym kopii dokumentów i podpisu elektronicznego (na zlecenie Caradvance GmbH)'],
+    fr: ['Hongrie', 'assistance dans le traitement des demandes, des offres et des contrats ; exploitation du système de gestion des clients (CRM), y compris les copies de documents et la signature électronique (pour le compte de Caradvance GmbH)'],
+    it: ['Ungheria', 'supporto nella gestione di richieste, offerte e contratti; gestione del sistema di gestione clienti (CRM), incluse le copie dei documenti e la firma elettronica (per conto di Caradvance GmbH)'],
+    es: ['Hungría', 'apoyo en la gestión de solicitudes, ofertas y contratos; gestión del sistema de gestión de clientes (CRM), incluidas las copias de documentos y la firma electrónica (por encargo de Caradvance GmbH)'],
+  };
+  let n = 0;
+  for (const d of ['sk', 'cs', 'pl', 'ch', 'eu']) {
+    for (const f of walk(path.join(DIST, d), [])) {
+      if (!/\.html$/.test(f)) continue;
+      let h = fs.readFileSync(f, 'utf8'); const i = h.indexOf('id="feldolgozok"'); if (i < 0) continue;
+      const tb = h.indexOf('<tbody', i), te = h.indexOf('</tbody>', i); if (tb < 0 || te < 0 || te < tb) continue;
+      if (h.slice(i, te).indexOf('BH Group') > -1) continue;
+      const lg = ((h.match(/<html[^>]*\slang="([a-z]{2})/i) || [])[1] || '').toLowerCase();
+      const R0 = ROW[lg]; if (!R0) continue;
+      let txt = R0[1]; if (d === 'ch' && lg === 'de') txt = txt.replace(/ß/g, 'ss');
+      const tr1 = h.indexOf('</tr>', tb); if (tr1 < 0 || tr1 > te) continue;
+      const m = h.slice(tb, tr1).match(/<td([^>]*)>/); const at = m ? m[1] : '';
+      const row = '<tr><td' + at + '>' + BHG + '</td><td' + at + '>' + txt + '</td><td' + at + '>' + R0[0] + '</td></tr>';
+      h = h.slice(0, tr1 + 5) + ' ' + row + h.slice(tr1 + 5);
+      fs.writeFileSync(f, h); n++;
+    }
+  }
+  console.log('[skcz-fix1109] GDPR: BH Group Zrt. adatfeldolgozóként ' + n + ' adatkezelési oldalon');
+} catch (e) { console.log('[skcz-fix1109] GDPR BH Group hiba:', e && e.message); }
