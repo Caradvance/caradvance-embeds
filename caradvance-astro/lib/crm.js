@@ -405,9 +405,46 @@ export async function aboFleet() {
   return (j.cars || []).filter((c) => c.price > 0).map((c) => ({
     key: c.key, title: c.title, brand: c.brand, body: c.body || '', km: '0 km', power: c.psMin ? (c.psMin === c.psMax || !c.psMax ? c.psMin : c.psMin + '–' + c.psMax) + ' LE' : '',
     gearbox: (c.gears || []).join(' / '), fuel: (c.fuels || []).join(' / '), year: '2026', drive: '',
-    image: c.image || '', active: true, price: c.price, currency: 'EUR', period: 'hó', deposit: 0, url: c.url || '',
+    image: c.image || '', pdf: Array.isArray(c.pdf) ? c.pdf : [], active: true, price: c.price, currency: 'EUR', period: 'hó', deposit: 0, url: c.url || '',
     abo: { now: c.now || 0, count: c.count || 0, months: c.months || [], km: c.km || [], colors: c.colors || [], variants: c.variants || [], cfg: c.cfg || null, mark, name: c.name || '' }
   }));
+}
+
+/* ============================== fotók az ajánlat-PDF-hez és az e-mailhez (JPEG) ============================== */
+const abs = (u) => (/^https?:\/\//.test(u || '') ? u : SITE + (String(u || '').startsWith('/') ? '' : '/') + u);
+const isJpeg = (b) => b && b.length > 4 && b[0] === 0xff && b[1] === 0xd8;
+/** JPEG-képek letöltése (max. db), a nem JPEG / hibás címek kimaradnak. */
+export async function fetchJpegs(urls, max) {
+  const out = []; const seen = new Set();
+  for (const u0 of urls || []) {
+    if (out.length >= (max || 6)) break;
+    if (!u0) continue; const u = abs(u0); if (seen.has(u)) continue; seen.add(u);
+    try {
+      const r = await fetch(u, { cf: { cacheTtl: 86400, cacheEverything: true }, headers: { Accept: 'image/jpeg,image/*;q=0.8' } });
+      if (!r.ok) continue; const b = new Uint8Array(await r.arrayBuffer()); if (isJpeg(b)) out.push(b);
+    } catch (e) {}
+  }
+  return out;
+}
+/** Bérelhető autó JPEG-fotói (a build pdf-photos.mjs lépése készíti: /pdf-img/…, az abo-fleet.json „pdf” mezője). */
+export async function rentPhotoUrls(it) {
+  if (!it) return [];
+  try {
+    const fleet = await aboFleet();
+    const c = fleet.find((x) => x.key === it.key) || fleet.find((x) => it.image && x.image === it.image) || fleet.find((x) => it.abo_name && x.abo && x.abo.name === it.abo_name);
+    return c && c.pdf && c.pdf.length ? c.pdf.map(abs) : [];
+  } catch (e) { return []; }
+}
+/** Eladó (készlet) autó fotói: a kártyakép + a weboldali autóoldal galériája (/auto-foto/…jpg). */
+export async function salePhotoUrls(it) {
+  const list = []; if (it && it.image) list.push(it.image);
+  if (it && /^https:\/\/www\.caradvance\.(hu|sk|cz)\//.test(it.url || '')) {
+    try {
+      const r = await fetch(it.url, { cf: { cacheTtl: 3600, cacheEverything: true } });
+      if (r.ok) { const h = await r.text(); for (const m of h.matchAll(/(?:https:\/\/www\.caradvance\.(?:hu|sk|cz))?\/auto-foto\/[^"'\s)<>]+?\.jpe?g/gi)) list.push(m[0]); }
+    } catch (e) {}
+  }
+  return [...new Set(list.map(abs))];
 }
 
 /* ============================== ajánlat e-mail ============================== */
@@ -434,67 +471,92 @@ export const VAT_MODES = { net: { short: 'nettó', long: 'nettó ár (ÁFA nélk
 export function vatText(it, lang) { const v = VAT_MODES[it && it.vat_mode]; return !v ? '' : lang && lang !== 'hu' ? vatShort(lang, it.vat_mode) : v.short; }
 export function priceVatLabel(it, lang) { const v = vatText(it, lang); return priceLabel(it, lang) + (v ? ' (' + v + ')' : ''); }
 
-export function offerEmailHtml({ clientName, items, message, link, attached, lang }) {
-  if (lang && OFFER_MAIL[lang]) return offerEmailHtmlL(lang, { clientName, items, message, link, attached });
-  const cards = items.map((it, i) => `
-  <tr><td style="padding:0 0 14px">
-    <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;overflow:hidden">
-      ${it.image ? `<tr><td>${it.url ? `<a href="${esc(it.url)}">` : ''}<img src="${esc(it.image)}" alt="" width="472" style="display:block;width:100%;max-width:472px;height:auto;border:0">${it.url ? '</a>' : ''}</td></tr>` : ''}
-      <tr><td style="padding:14px 16px">
-        <div style="font-size:16px;font-weight:bold;color:#141519">${esc(it.title)}</div>
-        ${specLine(it) ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">${esc(specLine(it))}</div>` : ''}
-        ${idLine(it) ? `<div style="font-size:12px;color:#374151;margin-top:5px;background:#f4f7fb;border-radius:6px;padding:5px 8px;display:inline-block">${esc(idLine(it))}</div>` : ''}
-        ${it.file_id ? `<div style="font-size:12px;color:#6b7280;margin-top:5px">A gyári konfigurátoros ajánlatot csatoltan küldjük (PDF).</div>` : ''}
-        ${it.config_url ? `<div style="margin-top:6px"><a href="${esc(it.config_url)}" style="font-size:13px;font-weight:bold;color:#22447d">A konfiguráció megtekintése a gyártó oldalán ↗</a></div>` : ''}
-        ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
-        <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it))}${vatText(it) ? `<span style="font-size:12px;font-weight:normal;color:#6b7280"> · ${esc(VAT_MODES[it.vat_mode].long)}</span>` : ''}</div>
-        ${deliveryLabel(it) ? `<div style="font-size:13px;color:#374151;margin-top:3px">+ ${esc(deliveryLabel(it))}</div>` : ''}
-        <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block;margin:0 6px 6px 0">Ezt választom</a>${it.url ? `<a href="${esc(it.url)}" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;font-size:13px;padding:9px 17px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 6px">Az autó adatlapja ↗</a>` : ''}</div>
-      </td></tr>
-    </table>
-  </td></tr>`).join('');
-  return `<p>Kedves ${esc(clientName || 'Ügyfelünk')}!</p>
-<p>Köszönjük megkeresését! Az Ön igényei alapján az alábbi ${items.length > 1 ? 'ajánlatokat' : 'ajánlatot'} állítottuk össze.${attached ? ` A részletes ${items.length > 1 ? 'ajánlatokat' : 'ajánlatot'} (felszereltséggel, képekkel) a <b>mellékletben</b> találja.` : ''}${items.length > 1 ? ' Válassza ki, melyik autó érdekli – mindegyiknél látja, mennyibe kerül.' : ''}</p>
-${message ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(message)}</p>` : ''}
-<table width="100%" cellpadding="0" cellspacing="0">${cards}</table>
-<p style="margin:18px 0 8px">A kiválasztott autóra vonatkozó ajánlatot egy kattintással elfogadhatja, vagy módosítást kérhet:</p>
-<p style="margin:0 0 6px">
-  <a href="${esc(link)}&amp;a=elfogad" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:999px;display:inline-block;margin:0 6px 8px 0">Ajánlat elfogadása</a>
-  <a href="${esc(link)}&amp;a=modosit" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;padding:11px 21px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 8px">Módosítást kérek</a>
-</p>
-<p style="color:#9aa2ad;font-size:12px">Ha a gombok nem működnek, nyissa meg ezt a linket: ${esc(link)}</p>`;
-}
-
-/** Az ajánlat e-mailje szlovákul / csehül (SK / CZ piac) — ugyanaz a felépítés, mint a magyar változaté. */
-function offerEmailHtmlL(lang, { clientName, items, message, link, attached }) {
-  const T = OFFER_MAIL[lang]; const many = items.length > 1;
-  const cards = items.map((it, i) => `
-  <tr><td style="padding:0 0 14px">
-    <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;overflow:hidden">
-      ${it.image ? `<tr><td>${it.url ? `<a href="${esc(it.url)}">` : ''}<img src="${esc(it.image)}" alt="" width="472" style="display:block;width:100%;max-width:472px;height:auto;border:0">${it.url ? '</a>' : ''}</td></tr>` : ''}
-      <tr><td style="padding:14px 16px">
-        <div style="font-size:16px;font-weight:bold;color:#141519">${esc(it.title)}</div>
-        ${specLine(it, lang) ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">${esc(specLine(it, lang))}</div>` : ''}
-        ${idLine(it, lang) ? `<div style="font-size:12px;color:#374151;margin-top:5px;background:#f4f7fb;border-radius:6px;padding:5px 8px;display:inline-block">${esc(idLine(it, lang))}</div>` : ''}
-        ${it.file_id ? `<div style="font-size:12px;color:#6b7280;margin-top:5px">${T.pdf}</div>` : ''}
-        ${it.config_url ? `<div style="margin-top:6px"><a href="${esc(it.config_url)}" style="font-size:13px;font-weight:bold;color:#22447d">${T.config}</a></div>` : ''}
-        ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
-        <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it, lang))}${vatLong(lang, it.vat_mode) ? `<span style="font-size:12px;font-weight:normal;color:#6b7280"> · ${esc(vatLong(lang, it.vat_mode))}</span>` : ''}</div>
-        ${deliveryLabel(it, lang) ? `<div style="font-size:13px;color:#374151;margin-top:3px">+ ${esc(deliveryLabel(it, lang))}</div>` : ''}
-        <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block;margin:0 6px 6px 0">${T.pickBtn}</a>${it.url ? `<a href="${esc(it.url)}" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;font-size:13px;padding:9px 17px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 6px">${T.carBtn}</a>` : ''}</div>
-      </td></tr>
-    </table>
-  </td></tr>`).join('');
-  return `<p>${esc(hello(lang, clientName))}</p>
-<p>${T.intro(many, attached)}</p>
-${message ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(message)}</p>` : ''}
-<table width="100%" cellpadding="0" cellspacing="0">${cards}</table>
-<p style="margin:18px 0 8px">${T.ask}</p>
-<p style="margin:0 0 6px">
-  <a href="${esc(link)}&amp;a=elfogad" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:999px;display:inline-block;margin:0 6px 8px 0">${T.accept}</a>
-  <a href="${esc(link)}&amp;a=modosit" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;padding:11px 21px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 8px">${T.modify}</a>
-</p>
-<p style="color:#9aa2ad;font-size:12px">${T.fallback} ${esc(link)}</p>`;
+/* ---------- ajánlat e-mail (HU / SK / CZ, egy közös dizájn) — 2026-11-09 ---------- */
+const OM_HU = {
+  intro: (many, attached) => `Köszönjük megkeresését! Az Ön igényei alapján az alábbi ${many ? 'ajánlatokat' : 'ajánlatot'} állítottuk össze.` + (attached ? ` A részletes ${many ? 'ajánlatokat' : 'ajánlatot'} (fotókkal, felszereltséggel) a <b>mellékelt PDF-ben</b> találja.` : '') + (many ? ' Válassza ki, melyik autó érdekli.' : ''),
+  pdf: 'A gyári konfigurátoros ajánlatot csatoltan küldjük (PDF).', config: 'A konfiguráció megtekintése a gyártó oldalán ↗', pickBtn: 'Ezt választom', carBtn: 'Az autó adatlapja ↗',
+  ask: 'A kiválasztott autóra vonatkozó ajánlatot egy kattintással elfogadhatja, vagy módosítást kérhet:', accept: 'Ajánlat elfogadása', modify: 'Módosítást kérek', fallback: 'Ha a gombok nem működnek, nyissa meg ezt a linket:'
+};
+const OM_X = {
+  hu: { tag: 'Személyre szóló ajánlat', rent: 'Havi bérleti díj', sale: 'Ajánlati ár', term: 'Futamidő', km: 'Km-keret', dep: 'Kaució', months: (m) => m + ' hónap', perMonth: '/ hó', kmMo: 'km / hó',
+    next: 'Hogyan tovább?', steps: ['Elfogadja az ajánlatot egy kattintással', 'Online megadja az adatait és aláírja a szerződést', 'Átveszi az autót — mi intézünk mindent'],
+    contact: 'Kapcsolattartója', pre: (t) => 'Ajánlatunk: ' + t, attach: 'Részletes ajánlat PDF-ben csatolva' },
+  sk: { tag: 'Ponuka na mieru', rent: 'Mesačný poplatok', sale: 'Cena ponuky', term: 'Doba prenájmu', km: 'Limit km', dep: 'Kaucia', months: (m) => m + (m >= 5 ? ' mesiacov' : m >= 2 ? ' mesiace' : ' mesiac'), perMonth: '/ mes.', kmMo: 'km / mes.',
+    next: 'Ako ďalej?', steps: ['Prijmete ponuku jedným kliknutím', 'Online zadáte údaje a podpíšete zmluvu', 'Prevezmete auto — o všetko sa postaráme'],
+    contact: 'Váš kontakt', pre: (t) => 'Naša ponuka: ' + t, attach: 'Podrobná ponuka v prílohe (PDF)' },
+  cs: { tag: 'Nabídka na míru', rent: 'Měsíční poplatek', sale: 'Cena nabídky', term: 'Doba pronájmu', km: 'Limit km', dep: 'Kauce', months: (m) => m + (m >= 5 ? ' měsíců' : m >= 2 ? ' měsíce' : ' měsíc'), perMonth: '/ měs.', kmMo: 'km / měs.',
+    next: 'Jak dál?', steps: ['Přijmete nabídku jedním kliknutím', 'Online zadáte údaje a podepíšete smlouvu', 'Převezmete vůz — o vše se postaráme'],
+    contact: 'Váš kontakt', pre: (t) => 'Naše nabídka: ' + t, attach: 'Podrobná nabídka v příloze (PDF)' }
+};
+const F = 'font-family:Arial,Helvetica,sans-serif';
+const btnA = (href, text, kind) => `<a href="${href}" style="${F};display:inline-block;text-decoration:none;font-weight:bold;font-size:14px;line-height:18px;border-radius:999px;padding:${kind === 'ghost' ? '12px 22px' : '13px 24px'};margin:0 8px 8px 0;${kind === 'red' ? 'background:#e2001a;color:#ffffff;border:1px solid #e2001a' : kind === 'dark' ? 'background:#141519;color:#ffffff;border:1px solid #141519' : 'background:#ffffff;color:#141519;border:1px solid #c9ced8'}">${text}</a>`;
+export function offerEmailHtml({ clientName, items, message, link, attached, lang, sender }) {
+  const L = lang === 'sk' || lang === 'cs' ? lang : 'hu';
+  const T = L === 'hu' ? OM_HU : OFFER_MAIL[L]; const X = OM_X[L]; const many = items.length > 1;
+  const c = contactOf(L);
+  const isRent = (it) => it.period === 'hó' && (Number(it.months) > 0 || /^abo-/.test(it.key || '') || Number(it.deposit) > 0 || it.km_keret);
+  const cards = items.map((it, i) => {
+    const img = it.mail_img || it.image;
+    const chips = specLine(it, L === 'hu' ? undefined : L).split(' · ').filter(Boolean)
+      .map((t) => `<span style="${F};display:inline-block;background:#f2f4f8;color:#374151;border-radius:999px;padding:5px 11px;margin:6px 6px 0 0;font-size:12px;line-height:14px">${esc(t)}</span>`).join('');
+    const rent = isRent(it);
+    const vat = L === 'hu' ? (VAT_MODES[it.vat_mode] ? VAT_MODES[it.vat_mode].long : '') : vatLong(L, it.vat_mode);
+    const kmN = parseInt(String(it.km_keret || '').replace(/\D/g, ''), 10) || 0;
+    const facts = rent ? [[X.term, Number(it.months) > 0 ? X.months(Number(it.months)) : ''], [X.km, kmN ? kmN.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ' + X.kmMo : ''], [X.dep, Number(it.deposit) > 0 ? fmtPrice(it.deposit, it.currency) : '']].filter((f) => f[1]) : [];
+    const priceMain = fmtPrice(it.price, it.currency);
+    const unit = it.period ? (rent ? X.perMonth : ' / ' + (L === 'hu' ? it.period : periodText(L, it.period))) : '';
+    const factCells = facts.map((f, k) => `<td valign="top" width="${Math.floor(100 / facts.length)}%" style="${F};padding:11px 16px 12px;${k ? 'border-left:1px solid #e6eaf1;' : ''}"><div style="font-size:10px;line-height:13px;color:#6b7280;text-transform:uppercase;letter-spacing:.6px">${esc(f[0])}</div><div style="font-size:14px;line-height:19px;font-weight:bold;color:#141519;margin-top:3px;white-space:nowrap">${esc(f[1])}</div></td>`).join('');
+    const extra = [
+      idLine(it, L === 'hu' ? undefined : L) ? `<div style="${F};font-size:12px;color:#6b7280;margin-top:10px">${esc(idLine(it, L === 'hu' ? undefined : L))}</div>` : '',
+      it.note ? `<div style="${F};font-size:13px;line-height:19px;color:#374151;margin-top:10px">${esc(it.note)}</div>` : '',
+      deliveryLabel(it, L) ? `<div style="${F};font-size:13px;color:#374151;margin-top:8px">+ ${esc(deliveryLabel(it, L))}</div>` : '',
+      it.file_id ? `<div style="${F};font-size:12px;color:#6b7280;margin-top:8px">${T.pdf}</div>` : '',
+      it.config_url ? `<div style="margin-top:8px"><a href="${esc(it.config_url)}" style="${F};font-size:13px;font-weight:bold;color:#22447d;text-decoration:none">${T.config}</a></div>` : ''
+    ].join('');
+    const btns = (many ? btnA(esc(link) + '&amp;v=' + i, T.pickBtn, 'dark') : '') + (it.url ? btnA(esc(it.url), T.carBtn, 'ghost') : '');
+    return `<tr><td style="padding:0 0 22px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:16px;border-collapse:separate;overflow:hidden">
+    ${img ? `<tr><td style="padding:0;line-height:0;font-size:0">${it.url ? `<a href="${esc(it.url)}">` : ''}<img src="${esc(img)}" alt="${esc(it.title)}" width="542" style="display:block;width:100%;max-width:542px;height:auto;border:0;border-radius:15px 15px 0 0">${it.url ? '</a>' : ''}</td></tr>` : ''}
+    <tr><td style="padding:20px 22px 4px">
+      ${it.brand ? `<div style="${F};font-size:11px;line-height:14px;font-weight:bold;color:#e2001a;text-transform:uppercase;letter-spacing:1.2px">${esc(it.brand)}${many ? ' · ' + (i + 1) + '/' + items.length : ''}</div>` : ''}
+      <div style="${F};font-size:21px;line-height:27px;font-weight:bold;color:#141519;margin-top:4px">${esc(it.title)}</div>
+      ${chips ? `<div style="margin-top:4px">${chips}</div>` : ''}
+    </td></tr>
+    <tr><td style="padding:14px 22px 4px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f8fb;border-radius:12px;border-collapse:separate">
+        <tr><td valign="top" style="${F};padding:12px 16px">
+          <div style="font-size:11px;line-height:14px;color:#6b7280;text-transform:uppercase;letter-spacing:.6px">${esc(rent ? X.rent : X.sale)}</div>
+          <div style="font-size:26px;line-height:32px;font-weight:bold;color:#141519;margin-top:2px;white-space:nowrap">${esc(priceMain)}<span style="font-size:14px;font-weight:normal;color:#6b7280"> ${esc(unit)}</span></div>
+          ${vat ? `<div style="font-size:12px;line-height:16px;color:#6b7280;margin-top:2px">${esc(vat)}</div>` : ''}
+        </td></tr>
+        ${factCells ? `<tr><td style="padding:0;border-top:1px solid #e6eaf1"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${factCells}</tr></table></td></tr>` : ''}
+      </table>
+      ${extra}
+    </td></tr>
+    ${btns ? `<tr><td style="padding:16px 22px 12px">${btns}</td></tr>` : '<tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>'}
+  </table>
+</td></tr>`;
+  }).join('');
+  const steps = X.steps.map((s, k) => `<tr><td width="34" valign="top" style="padding:0 0 10px"><div style="${F};width:26px;height:26px;line-height:26px;border-radius:13px;background:#e2001a;color:#ffffff;font-size:13px;font-weight:bold;text-align:center">${k + 1}</div></td><td valign="middle" style="${F};padding:0 0 10px;font-size:14px;line-height:20px;color:#374151">${esc(s)}</td></tr>`).join('');
+  const who = sender && sender.name ? sender.name : 'CarAdvance';
+  return `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#ffffff">${esc(X.pre(many ? items.map((x) => x.title).join(', ') : items[0].title))}</div>
+<p style="${F};margin:0 0 6px;font-size:22px;line-height:28px;font-weight:bold;color:#141519">${esc(L === 'hu' ? 'Kedves ' + (clientName || 'Ügyfelünk') + '!' : hello(L, clientName))}</p>
+<p style="${F};margin:0 0 18px;font-size:15px;line-height:23px;color:#374151">${T.intro(many, attached)}</p>
+${attached ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px"><tr><td style="${F};background:#fff4f5;border:1px solid #f6c9cf;border-radius:999px;padding:7px 14px;font-size:12px;font-weight:bold;color:#b0001a">📎 ${esc(X.attach)}</td></tr></table>` : ''}
+${message ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td style="${F};background:#f7f8fb;border-left:3px solid #e2001a;border-radius:0 10px 10px 0;padding:14px 16px;font-size:14px;line-height:21px;color:#374151;white-space:pre-line">${esc(message)}</td></tr></table>` : ''}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${cards}</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#141519;border-radius:16px;border-collapse:separate;margin:4px 0 24px"><tr><td style="padding:22px 22px 14px">
+  <div style="${F};font-size:15px;line-height:22px;color:#ffffff;font-weight:bold;margin:0 0 14px">${T.ask}</div>
+  ${btnA(esc(link) + '&amp;a=elfogad', T.accept, 'red')}<a href="${esc(link)}&amp;a=modosit" style="${F};display:inline-block;text-decoration:none;font-weight:bold;font-size:14px;line-height:18px;border-radius:999px;padding:12px 22px;margin:0 8px 8px 0;background:transparent;color:#ffffff;border:1px solid #5b616e">${T.modify}</a>
+</td></tr></table>
+<div style="${F};font-size:16px;line-height:22px;font-weight:bold;color:#141519;margin:0 0 12px">${esc(X.next)}</div>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 22px">${steps}</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e6eaf1"><tr><td style="${F};padding:18px 0 0;font-size:14px;line-height:21px;color:#374151">
+  <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.8px">${esc(X.contact)}</div>
+  <div style="font-weight:bold;color:#141519;font-size:15px;margin-top:3px">${esc(who)}</div>
+  <a href="tel:${c.phone.replace(/\s/g, '')}" style="color:#141519;text-decoration:none">${esc(c.phone)}</a> · <a href="mailto:${c.email}" style="color:#22447d;text-decoration:none">${esc(c.email)}</a>
+</td></tr></table>
+<p style="${F};color:#9aa2ad;font-size:11px;line-height:16px;margin:18px 0 0">${T.fallback} <a href="${esc(link)}" style="color:#9aa2ad">${esc(link)}</a></p>`;
 }
 
 /* ============================== szerződéssablonok ============================== */
@@ -778,12 +840,33 @@ export function contractPdfFromText(filled, meta) {
 
 /* ============================== e-mail (Resend) ============================== */
 export function emailShell(inner, lang) {
-  return `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
-  <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
-    <div style="background:#0b0b0d;padding:18px 24px"><img src="${SITE}/caradvance-logo-email${lang === 'sk' || lang === 'cs' ? '-' + lang : ''}.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
-    <div style="padding:26px 24px 22px">${inner}</div>
-    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px;line-height:1.55"><b style="color:#141519">CarAdvance</b> · ${lang === 'sk' ? 'Caradvance GmbH · obchodný sprostredkovateľ: Mr. Job SK s.r.o., Cesta na Senec 2/A, 821 04 Bratislava' : lang === 'cs' ? 'Caradvance GmbH · obchodní zprostředkovatel: Mr. Job SK s.r.o., Cesta na Senec 2/A, 821 04 Bratislava' : esc(LESSOR.helper) + ' · ' + esc(LESSOR.helperOffice)}<br>${shellFooter(lang || 'hu')}</div>
-  </div></div>`;
+  // 600 px széles, táblázatos (Outlook-biztos) keret: fekete fejléc logóval, piros sáv, fehér tartalom, sötét lábléc
+  const L = lang === 'sk' || lang === 'cs' ? lang : 'hu'; const c = contactOf(L);
+  const web = L === 'sk' ? 'www.caradvance.sk' : L === 'cs' ? 'www.caradvance.cz' : 'www.caradvance.hu';
+  const co = L === 'sk' ? 'Caradvance GmbH · obchodný sprostredkovateľ: Mr. Job SK s.r.o., Cesta na Senec 2/A, 821 04 Bratislava' : L === 'cs' ? 'Caradvance GmbH · obchodní zprostředkovatel: Mr. Job SK s.r.o., Cesta na Senec 2/A, 821 04 Bratislava' : esc(LESSOR.helper) + ' · ' + esc(LESSOR.helperOffice);
+  const tag = L === 'sk' ? 'Prenájom · Dovoz · Predaj' : L === 'cs' ? 'Pronájem · Dovoz · Prodej' : 'Bérlés · Import · Értékesítés';
+  const F = 'font-family:Arial,Helvetica,sans-serif';
+  return `<!DOCTYPE html><html lang="${L === 'cs' ? 'cs' : L}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"><title>CarAdvance</title></head>
+<body style="margin:0;padding:0;background:#eef1f5;-webkit-text-size-adjust:100%">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef1f5"><tr><td align="center" style="padding:28px 12px">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px">
+    <tr><td style="background:#0b0b0d;border-radius:18px 18px 0 0;padding:20px 28px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+        <td valign="middle"><a href="https://${web}" style="text-decoration:none"><img src="${SITE}/caradvance-logo-email${L === 'hu' ? '' : '-' + L}.png" alt="CarAdvance" width="150" height="50" style="display:block;width:150px;height:50px;border:0"></a></td>
+        <td valign="middle" align="right" style="${F};font-size:11px;line-height:15px;color:#9aa2ad;letter-spacing:1px;text-transform:uppercase">${tag}</td>
+      </tr></table>
+    </td></tr>
+    <tr><td style="height:4px;line-height:4px;font-size:0;background:#e2001a">&nbsp;</td></tr>
+    <tr><td style="${F};background:#ffffff;padding:32px 28px 30px;font-size:15px;line-height:23px;color:#141519">${inner}</td></tr>
+    <tr><td style="${F};background:#141519;border-radius:0 0 18px 18px;padding:22px 28px;color:#9aa2ad;font-size:12px;line-height:18px">
+      <div style="color:#ffffff;font-weight:bold;font-size:13px;margin-bottom:4px">CarAdvance — the automotive people</div>
+      <div>${co}</div>
+      <div style="margin-top:8px"><a href="https://${web}" style="color:#ffffff;text-decoration:none">${web}</a> &nbsp;·&nbsp; <a href="tel:${c.phone.replace(/\s/g, '')}" style="color:#ffffff;text-decoration:none">${c.phone}</a> &nbsp;·&nbsp; <a href="mailto:${c.email}" style="color:#ffffff;text-decoration:none">${c.email}</a></div>
+    </td></tr>
+    <tr><td style="${F};padding:16px 20px 0;text-align:center;color:#8a919c;font-size:11px;line-height:16px">${shellFooter(L)}</td></tr>
+  </table>
+</td></tr></table>
+</body></html>`;
 }
 /** to: string vagy tömb. attachments: [{ filename, content(base64) }]. Visszatér: { ok, error } */
 export async function sendCrmMail(env, to, subject, inner, attachments, opts) {

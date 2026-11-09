@@ -652,7 +652,15 @@ export function renderRentOfferPdf(o) {
   // ---- cím + alcím (piros, ritkított)
   d.text(o.title || '', ML, y, 'B', 19, INK); y -= 18;
   if (o.tagline) spaced(String(o.tagline).toUpperCase(), ML, y, 'S', 8.6, RED, 0.9);
-  y -= 14; d.line(ML, y, PW - MR, y, INK, 1.1);
+  y -= 14;
+  // ---- fotók (JPEG): nagy fő kép a cím alatt, a többi a jármű adatai után egy sorban — kitöltve (cover), levágva
+  const pics = (o.images || []).map((u) => { const inf = u && jpegInfo(u); return inf ? { bytes: u, ...inf } : null; }).filter(Boolean);
+  const cover = (im, cx, cy, cw, ch) => {
+    const sc = Math.max(cw / im.w, ch / im.h); const dw = im.w * sc, dh = im.h * sc;
+    d.cur.push(`q ${n2(cx)} ${n2(cy)} ${n2(cw)} ${n2(ch)} re W n`); d.image(cx + (cw - dw) / 2, cy + (ch - dh) / 2, dw, dh, null, im); d.cur.push('Q');
+  };
+  if (pics[0]) { const ph = Math.round(CW * 0.42); y -= 2; cover(pics[0], ML, y - ph, CW, ph); y -= ph + 4; }
+  else d.line(ML, y, PW - MR, y, INK, 1.1);
   // ---- adat-sáv (6 cella, piros jel felül)
   const strip = (o.strip || []).slice(0, 6); const sw = CW / Math.max(1, strip.length); const sh = 44;
   strip.forEach(([v, lbl], i) => {
@@ -696,6 +704,13 @@ export function renderRentOfferPdf(o) {
       L.y -= rh;
     }
     L.y -= 10;
+  }
+  // ---- további fotók (max. 4, egy sorban)
+  const more = pics.slice(1, 5);
+  if (more.length) {
+    const g = 8; const w = (CW - g * (more.length - 1)) / more.length; const h = Math.round(Math.min(more.length < 3 ? 150 : 104, w * 0.66));
+    L.ensure(h + 30); section(X ? X.secPhotos || 'Fotografie' : 'Fotók');
+    more.forEach((im, k) => cover(im, ML + k * (w + g), L.y - h, w, h)); L.y -= h + 14;
   }
   // ---- felszereltség: kategóriák három hasábban (kiegyensúlyozva)
   const eq = (o.equipment || []).filter((g) => g && g[1] && g[1].length);
