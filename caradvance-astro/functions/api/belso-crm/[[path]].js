@@ -11,7 +11,7 @@ import {
 } from '../../../lib/crm.js';
 import { jpegInfo, renderOfferPdf, renderRentOfferPdf, renderPayReqPdf, groupRentEquipment } from '../../../lib/docpdf.js';
 import { qrMatrix, epcPayload } from '../../../lib/qr.js';
-import { offerSubject, dataReqMail, signReqMail } from '../../../lib/crmi18n.js';
+import { offerSubject, dataReqMail, signReqMail, RENT_T, availL, powerL, vatLong, contactOf, periodText } from '../../../lib/crmi18n.js';
 
 // TESZT-ÜZEM: amíg ez ki van töltve, minden ügyfélnek szóló CRM e-mail (ajánlat, szerződés) erre a
 // címre megy az ügyfél helyett (a tárgyban ott a valódi címzett). Éles üzemhez állítsd null-ra,
@@ -99,7 +99,7 @@ async function handleCron(request, env) {
   for (const x of due) await addEvent(env, x.deal_id, 'rent', `Figyelmeztetés: bérlet lejár — ${x.car}${x.end ? ' (' + x.end + (x.days != null ? ', ' + (x.days < 0 ? Math.abs(x.days) + ' napja lejárt' : x.days + ' nap múlva') : '') + ')' : ''}${x.note ? ' · ' + x.note : ''}`, 'Rendszer');
   let mailed = false;
   if (due.length) {
-    const rowsHtml = due.map((x) => `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee"><b>${esc(x.name || '')}</b><br><span style="color:#6b7280;font-size:12px">${esc(x.line)}</span></td><td style="padding:6px 8px;border-bottom:1px solid #eee">${esc(x.car)}${x.note ? '<br><span style="color:#6b7280;font-size:12px">' + esc(x.note) + '</span>' : ''}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;white-space:nowrap"><b>${esc(x.end || '—')}</b><br><span style="color:${x.days != null && x.days < 0 ? '#c0392b' : '#a2660b'};font-size:12px">${x.days == null ? '' : x.days < 0 ? Math.abs(x.days) + ' napja lejárt' : x.days + ' nap van hátra'}</span></td><td style="padding:6px 8px;border-bottom:1px solid #eee"><a href="${SITE}/belso/ugyfel/?id=${x.deal_id}#s2">Adatlap</a></td></tr>`).join('');
+    const rowsHtml = due.map((x) => `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee"><b>${esc(x.name || '')}</b><br><span style="color:#6b7280;font-size:12px">${esc(x.line)}</span></td><td style="padding:6px 8px;border-bottom:1px solid #eee">${esc(x.car)}${x.note ? '<br><span style="color:#6b7280;font-size:12px">' + esc(x.note) + '</span>' : ''}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;white-space:nowrap"><b>${esc(x.end || '—')}</b><br><span style="color:${x.days != null && x.days < 0 ? '#c0392b' : '#a2660b'};font-size:12px">${x.days == null ? '' : x.days < 0 ? Math.abs(x.days) + ' napja lejárt' : x.days + ' nap van hátra'}</span></td><td style="padding:6px 8px;border-bottom:1px solid #eee"><a href="${SITE}/admin/ugyfel/?id=${x.deal_id}#s2">Adatlap</a></td></tr>`).join('');
     const r = await sendCrmMail(env, notifyTo(env), `Lejáró bérletek — ${due.length} figyelmeztetés (${today})`,
       `<p>Az alábbi bérletekhez ma esedékes figyelmeztetés tartozik:</p><table cellpadding="0" cellspacing="0" style="width:100%;font-size:13px;border-collapse:collapse">${rowsHtml}</table>`);
     mailed = r.ok;
@@ -365,15 +365,15 @@ async function mailOffer(env, id, deal, user, items, token, clientName, message,
   for (const [i, it] of items.entries()) {
     if (isRentItem(it, deal.line)) {
       try {
-        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user, line: deal.line });
-        att.push({ filename: ('Berleti_arajanlat_' + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').slice(0, 80) + '.pdf', content: bytesToB64(pdf) });
+        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user, line: deal.line, lang });
+        att.push({ filename: (((RENT_T[lang] || {}).file || 'Berleti_arajanlat_') + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').slice(0, 80) + '.pdf', content: bytesToB64(pdf) });
         it.offer_pdf = true;
       } catch (e) { console.error('rent offer pdf', e); }
     }
     if (it.src === 'config' && (it.images.length || it.equipment.length)) {
       try {
-        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user });
-        att.push({ filename: offerFileName(it), content: bytesToB64(pdf) });
+        const pdf = await buildOfferPdf(env, id, it, { client: clientName, number: it.offer_no || offerNo(id, i, items.length), user, lang });
+        att.push({ filename: offerFileName(it, lang), content: bytesToB64(pdf) });
         if (!it.image && it.images.length) it.image = `${SITE}/api/crm-ajanlat/${token}/kep/${it.images[0]}`;
         it.offer_pdf = true;
       } catch (e) { console.error('offer pdf', e); }
@@ -559,19 +559,27 @@ ${p.note ? `<p style="white-space:pre-line">${esc(p.note)}</p>` : ''}<p>Kérdés
 /* ---------------- CarAdvance-ajánlat PDF (gyári konfigurátor adataiból és képeiből) ---------------- */
 function eqImgs(a) { return (Array.isArray(a) ? a : []).filter((z) => z && Number.isInteger(z.id) && z.id > 0).slice(0, 40).map((z) => ({ id: z.id, idx: Number.isInteger(z.idx) ? z.idx : -1, label: clean(z.label, 160) })); }
 function offerNo(id, i, n) { const d = new Date(); return `AJ-${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}-${String(id).padStart(4, '0')}${n > 1 ? '-' + (i + 1) : ''}`; }
-function offerFileName(it) { return ('CarAdvance_ajanlat_' + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 80) + '.pdf'; }
+function offerFileName(it, lang) { return (((RENT_T[lang] || {}).fileSale || 'CarAdvance_ajanlat_') + (it.title || 'auto')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 80) + '.pdf'; }
 /* ---------------- bérleti árajánlat PDF (egy konkrét autóra, a bérleti szerződés fő pontjaival) ---------------- */
 function isRentItem(it, line) { return it && it.period === 'hó' && (line === 'Bérlés' || Number(it.months) > 0 || /^abo-/.test(it.key || '')); }
-async function aboFeatures(name, variant) {
+async function aboFeatures(name, variant, lang) {
   if (!name) return [];
-  try {
-    const r = await fetch(SITE + '/abo-feat-hu.json', { cf: { cacheTtl: 600, cacheEverything: true } }); if (!r.ok) return [];
+  const get = async (lg) => {
+    const r = await fetch(SITE + '/abo-feat-' + lg + '.json', { cf: { cacheTtl: 600, cacheEverything: true } }); if (!r.ok) return [];
     const j = await r.json(); const m = j[name] || {};
     const txt = (variant && m[variant]) || Object.values(m)[0] || '';
     return String(txt).split(/\s*•\s*/).map((x) => x.trim()).filter(Boolean);
+  };
+  try {
+    const hu = await get('hu');
+    if (!lang || lang === 'hu') return hu;
+    // SK / CZ: a magyar lista adja a kategóriákat, a tétel neve a piac nyelvén (azonos sorrendű lista)
+    const loc = await get(lang).catch(() => []);
+    return loc.length === hu.length ? hu.map((h, i) => ({ hu: h, t: loc[i] })) : hu;
   } catch (e) { return []; }
 }
 async function buildRentOfferPdf(env, dealId, it, o) {
+  if (o && RENT_T[o.lang]) return buildRentOfferPdfL(env, dealId, it, o);
   const fmtN = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   const sym = it.currency === 'EUR' ? ' €' : ' Ft';
   const fx = Number(it.fx) > 0 ? Number(it.fx) : (await eurHuf().catch(() => null)) || 0;
@@ -610,8 +618,54 @@ async function buildRentOfferPdf(env, dealId, it, o) {
     ].filter(Boolean),
   });
 }
+/** Bérleti ajánlat PDF szlovákul / csehül (SK / CZ felületről küldött ajánlat) — ugyanazok az adatok és számítások, mint a magyarban. */
+async function buildRentOfferPdfL(env, dealId, it, o) {
+  const lang = o.lang; const T = RENT_T[lang]; const SL = { sk: { 'Benzin': 'Benzín', 'Dízel': 'Diesel', 'Elektromos': 'Elektrické', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in hybrid', 'Automata': 'Automat', 'Manuális': 'Manuál', 'Kézi': 'Manuál' }, cs: { 'Benzin': 'Benzín', 'Dízel': 'Diesel', 'Elektromos': 'Elektrický', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in hybrid', 'Automata': 'Automat', 'Manuális': 'Manuál', 'Kézi': 'Manuál' } }[lang];
+  const tr = (v) => (v ? String(v).split(' / ').map((x) => SL[x.trim()] || x).join(' / ') : v);
+  const fmtN = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const sym = it.currency === 'EUR' ? ' €' : ' Ft';
+  const V = VAT_MODES[it.vat_mode]; const rate = V && V.rate ? V.rate : (it.vat_mode === 'net' ? 0 : 0.19);
+  const gross = it.vat_mode === 'net' ? it.price * 1.19 : it.price; const net = it.vat_mode === 'net' ? it.price : it.price / (1 + (rate || 0.19));
+  const variant = (Array.isArray(it.equipment) && it.equipment[0]) || it.power || '';
+  const km = parseInt(String(it.km_keret || '').replace(/\D/g, ''), 10) || 0; const months = Number(it.months) || 0;
+  const isNew = /^új$/i.test(it.condition || '') || /^0\s*km$/i.test(String(it.km || '').trim()) || /^abo-/.test(it.key || '');
+  const de = /^abo-/.test(it.key || '') || it.vat_mode === 'de19';
+  const today = new Date(); const valid = new Date(today.getTime() + 30 * 864e5);
+  const hd = (d) => d.toLocaleDateString(T.locale, { timeZone: 'Europe/Bratislava', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const isoL = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '') ? hd(new Date(s + 'T12:00:00Z')) : '';
+  let feats = await aboFeatures(it.abo_name, variant, lang);
+  if (!feats.length) feats = (Array.isArray(it.equipment) ? it.equipment : []).filter((x) => x && x !== variant);
+  // kategorizálás a magyar név alapján, megjelenítés a piac nyelvén
+  const huNames = feats.map((f) => (typeof f === 'string' ? f : f.hu)); const locOf = new Map(feats.map((f) => (typeof f === 'string' ? [f, f] : [f.hu, f.t])));
+  const equipment = groupRentEquipment(huNames).map(([cat, list]) => [T.cats[cat] || cat, list.map((x) => locOf.get(x) || x)]);
+  const overKm = await getSetting(env, 'berles_km_tulfutas', '');
+  const title = [it.title, variant && String(it.title || '').indexOf(variant) < 0 ? variant : ''].filter(Boolean).join(' ');
+  const c = contactOf(lang); const web = lang === 'sk' ? 'www.caradvance.sk' : 'www.caradvance.cz';
+  const netTxt = it.currency === 'EUR' ? T.net(fmtN(net)) : '';
+  return renderRentOfferPdf({
+    lang, offerNo: o.number, date: hd(today), client: o.client || '', lessor: 'Caradvance GmbH', title,
+    tagline: [isNew ? T.newCar : '', it.color, de ? T.dePlate : ''].filter(Boolean).join(' · '),
+    strip: [[isNew ? '0 km' : (it.km || '—'), T.km], [powerL(lang, variant) || '—', T.variant], [tr(String(it.fuel || '—').split(' / ')[0]), T.fuel], [tr(it.gearbox) || '—', T.gear], [isNew ? T.isNew : T.used, T.cond], [de ? T.de : T.hu, T.plate]],
+    price: { main: fmtN(gross) + sym, unit: T.per, sub: netTxt },
+    boxes: [[T.term, months ? T.months(months) : '—', it.rent_start ? T.start + isoL(it.rent_start) : ''], [T.kmL, km ? fmtN(km) + ' km' : '—', km ? T.monthly : ''], [T.dep, it.deposit ? fmtN(it.deposit) + sym : '—', '', true]],
+    vehicle: [[T.make, it.title], [T.variant, powerL(lang, variant)], [T.body, it.body], [T.color, it.color], [T.fuel, tr(it.fuel)], [T.gear, tr(it.gearbox)], [T.avail, availL(lang, it.avail)], [T.rentStart, isoL(it.rent_start)], [T.deliv, Number(it.delivery) > 0 ? fmtN(it.delivery) + sym + T.once : '']],
+    equipment,
+    terms: [
+      months ? T.tTerm(T.months(months), isoL(it.rent_start), isoL(it.rent_end)) : '',
+      T.tRent(fmtN(gross) + sym, netTxt),
+      it.deposit ? T.tDep(fmtN(it.deposit) + sym) : '',
+      Number(it.delivery) > 0 ? T.tDeliv(fmtN(it.delivery) + sym) : '',
+      km ? T.tKm(fmtN(km), months ? fmtN(km * months) : '', overKm) : '',
+      isNew ? T.tNew(de) : '',
+      it.note && !/^(Elérhetőség|Futamidő|Km-keret|Szín|Kivitel):/.test(it.note) ? it.note : '',
+      T.tValid(hd(valid)),
+    ].filter(Boolean),
+    footer: { left: 'caradvance — the automotive people', right: `${web} · Tel.: ${c.phone} · E-mail: ${c.email}` },
+  });
+}
 async function buildOfferPdf(env, dealId, it, o) {
   if (isRentItem(it, o && o.line)) return buildRentOfferPdf(env, dealId, it, o);
+  const lang = o && RENT_T[o.lang] ? o.lang : '';
   const images = [];
   for (const fid of (it.images || []).slice(0, 12)) {
     const f = await env.DB.prepare(`SELECT id, data FROM crm_files WHERE id = ? AND deal_id = ?`).bind(fid, dealId).first();
@@ -625,6 +679,22 @@ async function buildOfferPdf(env, dealId, it, o) {
   // ár + ÁFA: nettó / bruttó (27% magyar vagy 19% német ÁFA) — bruttónál a nettó összeg is
   const V = VAT_MODES[it.vat_mode]; const sym = it.currency === 'EUR' ? ' €' : ' Ft';
   const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + sym;
+  if (lang) {
+    // SK / CZ: ugyanaz a PDF a piac nyelvén, a szlovák / cseh kapcsolattal
+    const LB = lang === 'sk' ? ['Značka', 'Rok výroby', 'Palivo', 'Výkon', 'Prevodovka', 'Farba', 'Najazdené km', 'Konfiguračný kód'] : ['Značka', 'Rok výroby', 'Palivo', 'Výkon', 'Převodovka', 'Barva', 'Najeto km', 'Konfigurační kód'];
+    const per = it.period ? ' / ' + periodText(lang, it.period) : '';
+    const priceNoteL = !V ? '' : V.rate ? vatLong(lang, it.vat_mode) + ' · bez DPH: ' + fmt(it.price / (1 + V.rate)) + per : vatLong(lang, it.vat_mode);
+    const sp = specLine(it, lang); const vals = [it.brand, it.year, null, powerL(lang, it.power), null, it.color, it.km, it.config_code];
+    const trS = (v) => specLine({ fuel: v }, lang);
+    vals[2] = it.fuel ? trS(it.fuel) : ''; vals[4] = it.gearbox ? specLine({ gearbox: it.gearbox }, lang) : '';
+    const c = contactOf(lang);
+    return renderOfferPdf({
+      lang, title: it.title, brand: it.brand, subtitle: sp.replace(/\bLE\b/g, 'k'), price: priceLabel(it, lang), priceNote: priceNoteL,
+      eqImages, code: it.config_code, number: o.number, date: new Date().toLocaleDateString(lang === 'sk' ? 'sk-SK' : 'cs-CZ', { timeZone: 'Europe/Bratislava' }),
+      client: o.client || '', note: it.note || '', specs: LB.map((l, i) => [l, vals[i]]), equipment: it.equipment || [], images,
+      contact: { name: o.user && o.user.name, email: c.email, phone: c.phone }
+    });
+  }
   const priceNote = !V ? '' : V.rate ? V.long + ' · nettó: ' + fmt(it.price / (1 + V.rate)) + (it.period ? ' / ' + it.period : '') : V.long;
   const specs = [['Márka', it.brand], ['Évjárat', it.year], ['Üzemanyag', it.fuel], ['Teljesítmény', it.power], ['Váltó', it.gearbox], ['Szín', it.color], ['Km', it.km], ['Konfigurációs kód', it.config_code]];
   const d = new Date();
@@ -646,8 +716,9 @@ async function handleOfferPdfPreview(request, env, user, id) {
     key: clean(it.key, 120), abo_name: clean(it.abo_name || (it.abo && it.abo.name), 120), condition: clean(it.condition, 40), body: clean(it.body, 60), deposit: Math.max(0, Number(it.deposit) || 0),
     km_keret: clean(it.km_keret, 60), months: Math.max(0, Math.min(120, parseInt(it.months, 10) || 0)), rent_start: isoDate(it.rent_start), rent_end: isoDate(it.rent_end), avail: clean(it.avail, 80), fx: Math.max(0, Number(it.fx) || 0), delivery: Math.max(0, Math.min(100000, Number(it.delivery) || 0)) };
   const card = await getCard(env, id);
-  const pdf = await buildOfferPdf(env, id, item, { client: (card.data.person && card.data.person.name) || deal.name, number: offerNo(id, 0, 1) + ' (előnézet)', user, line: deal.line });
-  return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${offerFileName(item)}"`, 'cache-control': 'no-store' } });
+  const pLang = langOf(marketOf(new URL(request.url).hostname));
+  const pdf = await buildOfferPdf(env, id, item, { client: (card.data.person && card.data.person.name) || deal.name, number: offerNo(id, 0, 1) + (pLang === 'sk' ? ' (náhľad)' : pLang === 'cs' ? ' (náhled)' : ' (előnézet)'), user, line: deal.line, lang: pLang });
+  return new Response(pdf, { headers: { 'content-type': 'application/pdf', 'content-disposition': `inline; filename="${offerFileName(item, pLang)}"`, 'cache-control': 'no-store' } });
 }
 /** Konfigurátor-kép mentése (JPEG, a böngészőben kicsinyítve) — rejtett fájlként, a feltöltött fájlok között nem látszik. */
 async function handleMediaUpload(request, env, user, id) {
