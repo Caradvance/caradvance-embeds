@@ -86,7 +86,7 @@ export async function processRequest(env: Env, dealId: number, actor = "system",
   const req: Requirements = JSON.parse(row.requirements_json);
   const deal = await getDeal(env, dealId);
   const who = req.customer.name || deal?.name || row.from_email || `#${dealId}`;
-  const link = `${origin || "https://www.caradvance.hu"}/belso/ajanlatmotor/igeny/${dealId}`;
+  const link = `${origin || "https://www.caradvance.hu"}/admin/ajanlatmotor/igeny/${dealId}`;
 
   if (req.missing_critical_fields.length) {
     await env.DB.prepare("UPDATE am_requests SET clarify_draft = ?, search_note = ?, updated_at = ? WHERE deal_id = ?")

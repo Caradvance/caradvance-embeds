@@ -54,7 +54,7 @@ table.costs{table-layout:fixed}table.costs td{padding:6px 6px}table.costs input{
 export interface LayoutOpts { test: boolean; msg?: string | null; err?: string | null; user: { name: string; role: string }; active?: string }
 
 export function adminLayout(title: string, body: string, opts: LayoutOpts) {
-  const B = "/belso/ajanlatmotor";
+  const B = "/admin/ajanlatmotor";
   const nav: [string, string, string][] = [["igenyek", `${B}/`, "Igények"], ["uj", `${B}/uj`, "Új igény"], ["bovitmeny", `${B}/bovitmeny`, "Chrome bővítmény"]];
   if (opts.user.role === "admin") nav.splice(2, 0, ["dijak", `${B}/dijak`, "Díjak és beállítások"]);
   return `<!doctype html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -63,9 +63,9 @@ export function adminLayout(title: string, body: string, opts: LayoutOpts) {
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap&subset=latin-ext" rel="stylesheet">
 <style>${CSS}</style></head><body>
 ${opts.test ? `<div style="background:#ffd84d;color:#111;font-weight:800;font-size:12.5px;text-align:center;padding:5px">TESZT KÖRNYEZET · külön teszt-adatbázis, kitalált hirdetések, nem éles díjak</div>` : ""}
-<header><div class="w"><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><strong>Ajánlatmotor</strong>
+<header><div class="w"><a href="/admin/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><strong>Ajánlatmotor</strong>
 <nav>${nav.map(([k, h, t]) => `<a href="${h}" class="${opts.active === k ? "on" : ""}">${t}</a>`).join("")}</nav>
-<span style="flex:1"></span><span class="me">${esc(opts.user.name)}</span><a class="back" href="/belso/">← Belső felület</a></div></header>
+<span style="flex:1"></span><span class="me">${esc(opts.user.name)}</span><a class="back" href="/admin/">← Belső felület</a></div></header>
 <main class="w">${opts.msg ? `<div class="msg">${esc(opts.msg)}</div>` : ""}${opts.err ? `<div class="msg err">${esc(opts.err)}</div>` : ""}${body}</main></body></html>`;
 }
 
@@ -78,14 +78,14 @@ export type InboxRow = RequestRow & { deal_name: string | null; deal_email: stri
 
 export function inboxPage(rows: InboxRow[], test: boolean) {
   return `<h1>Ajánlatmotor · igények</h1><p class="muted">Import-érdeklődések, amelyekhez a motor a mobile.de-ről és az AutoScout24-ről a három legjobb autót keresi. Válaszidő-cél: 24 óra; a piros időpontú igényeknél még nincs kiküldött ajánlat.</p>
-  ${test ? `<form method="post" action="/belso/ajanlatmotor/teszt/demo" class="row" style="margin:12px 0"><button class="btn dark">Demó e-mail szimulálása (BMW i5 Touring)</button>
+  ${test ? `<form method="post" action="/admin/ajanlatmotor/teszt/demo" class="row" style="margin:12px 0"><button class="btn dark">Demó e-mail szimulálása (BMW i5 Touring)</button>
   <span class="muted small">Teszt: egy valósághű ügyfél-e-mailt visz végig a teljes folyamaton (ügyfél + adatlap + top 3).</span></form>` : ""}
   <div class="card" style="padding:0;overflow-x:auto"><table><thead><tr><th>Állapot</th><th>Ügyfél</th><th>Igény</th><th>Adatlap státusz</th><th>Felelős</th><th>Érkezett</th></tr></thead><tbody>
   ${rows.length ? rows.map((r) => {
     const req: Requirements | null = r.requirements_json ? JSON.parse(r.requirements_json) : null;
     const late = ["NEW", "SEARCHING", "NEEDS_REVIEW", "NO_MATCH", "READY"].includes(r.status) && Date.now() - Date.parse(r.created_at) > 864e5;
     return `<tr><td><span class="chip ${r.status}">${STATUS_LABEL[r.status as Status] || r.status}</span></td>
-    <td><a href="/belso/ajanlatmotor/igeny/${r.deal_id}"><strong>${esc(r.deal_name || req?.customer.name || r.from_email || "ismeretlen")}</strong></a><div class="muted small">${esc(r.deal_email || r.from_email || "")} · <a href="/belso/ugyfel/?id=${r.deal_id}">adatlap</a></div></td>
+    <td><a href="/admin/ajanlatmotor/igeny/${r.deal_id}"><strong>${esc(r.deal_name || req?.customer.name || r.from_email || "ismeretlen")}</strong></a><div class="muted small">${esc(r.deal_email || r.from_email || "")} · <a href="/admin/ugyfel/?id=${r.deal_id}">adatlap</a></div></td>
     <td>${esc(req?.raw_summary?.slice(0, 140) || r.subject || "")}</td><td class="small">${esc(r.card_status || "")}</td><td class="small">${esc(r.assigned_name || "—")}</td>
     <td style="${late ? "color:var(--red);font-weight:700" : ""}">${ago(r.created_at)}</td></tr>`;
   }).join("") : `<tr><td colspan="6" class="muted" style="padding:24px">Még nincs igény. E-mailből automatikusan érkeznek, vagy az „Új igény” menüben rögzíthetsz egyet.</td></tr>`}
@@ -94,7 +94,7 @@ export function inboxPage(rows: InboxRow[], test: boolean) {
 
 export function newLeadPage() {
   return `<h1>Új igény kézzel</h1><p class="muted">Telefonos, WhatsApp-os vagy személyes megkereséshez. Ugyanazon a folyamaton megy végig, mint az e-mail.</p>
-  <form method="post" action="/belso/ajanlatmotor/uj" class="card" style="max-width:760px">
+  <form method="post" action="/admin/ajanlatmotor/uj" class="card" style="max-width:760px">
   <label>Ügyfél neve</label><input name="name"><br><br>
   <label>E-mail</label><input name="email" type="email"><br><br>
   <label>Megkeresés szövege / jegyzet</label><textarea name="text" rows="10" required style="font-family:inherit;font-size:14px"></textarea><br><br>
@@ -127,7 +127,7 @@ function imagePicker(cid: string, l: any, published: boolean) {
   if (all.length < 2) return "";
   const shown = new Set<string>(l.images || []); const cover = (l.images || [])[0];
   return `<details class="imgpick" style="flex-basis:100%;margin:4px 0"><summary class="small" style="cursor:pointer;font-weight:700">Képek kiválasztása (${shown.size} / ${all.length}) — borítókép</summary>
-  <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/images" style="margin:8px 0 0">
+  <form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/images" style="margin:8px 0 0">
    <div class="muted small" style="margin-bottom:6px">Pipáld be, mely képek jelenjenek meg az ajánlatban; a ★ a borítókép.</div>
    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px">${all.map((u, i) => `<div style="border:1px solid var(--line,#e3e7ee);border-radius:8px;padding:4px;background:#fff">
     <img src="${esc(u)}" alt="" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;display:block">
@@ -149,9 +149,9 @@ function slotCard(cv: CarView, published: boolean) {
    <span class="muted small">pont: <strong>${c.score ?? "–"}</strong> · forrás: ${esc(c.source)}</span></div>
   <img class="thumb" src="${esc(l.images[0] || "")}" alt="" style="margin:10px 0 4px">
   ${mock ? "" : `<div class="row" style="gap:6px;margin:0 0 8px;align-items:center">
-   ${l.images.length > 1 ? `<form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/cover" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Másik borítókép ↻</button></form>` : ""}
-   <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/delete" style="margin:0;display:inline" onsubmit="return confirm('Biztosan törlöd ezt az autót az ajánlatmotor listájából?')"><button class="btn" style="padding:4px 10px;font-size:12px;color:#b8000f" title="Autó törlése a listából">🗑 Törlés</button></form>
-   <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/photos" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Fotók szűrése</button></form>
+   ${l.images.length > 1 ? `<form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/cover" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Másik borítókép ↻</button></form>` : ""}
+   <form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/delete" style="margin:0;display:inline" onsubmit="return confirm('Biztosan törlöd ezt az autót az ajánlatmotor listájából?')"><button class="btn" style="padding:4px 10px;font-size:12px;color:#b8000f" title="Autó törlése a listából">🗑 Törlés</button></form>
+   <form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/photos" style="margin:0"><button class="btn" style="padding:4px 10px;font-size:12px" type="submit">Fotók szűrése</button></form>
    ${imagePicker(cid, l, published)}
    <span class="muted small">${l.images.length} kép · ${(l as any).photos_checked ? `<span class="ok">✓ csak autófotó</span>${(l as any).photos_removed ? ` (${(l as any).photos_removed} kiszűrve)` : ""}` : `<span style="color:var(--red)">fotók nincsenek ellenőrizve</span>`}</span></div>`}
   <h3>${esc(l.title)}</h3>
@@ -161,19 +161,19 @@ function slotCard(cv: CarView, published: boolean) {
    <dt>Felszereltség</dt><dd>${l.equipment.length} tétel</dd></dl>
   <div class="small">${esc(c.rationale || "")}</div>
   ${cv.costs.warnings.map((w) => `<div class="flag">${esc(w)}</div>`).join("")}
-  <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/overrides" style="margin-top:10px">${costTable(cv)}
+  <form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/overrides" style="margin-top:10px">${costTable(cv)}
    <div class="lockbar"><div><div class="muted small">Ügyfél végösszeg</div><div class="total">≈ ${fmtHuf(cv.costs.customer_total_huf)}</div>
    <div class="muted small">≈ ${fmtEur(cv.costs.customer_total_eur)} · 1 € = ${cv.costs.fx.rate.toFixed(2)} Ft (${esc(cv.costs.fx.date)})</div></div>
    <button class="btn" ${published ? "disabled" : ""}>Díjak mentése</button></div></form>
   <details style="margin-top:10px"><summary>Ügyfélnek látható bontás</summary><table class="small">${cv.costs.customer_lines.map((x) => `<tr><td>${esc(x.label)}</td><td style="text-align:right">${fmtHuf(x.amount_huf)}</td></tr>`).join("")}</table></details>
   <details style="margin-top:10px" ${sections ? "" : "open"}><summary>Leírás (${sections ? "kész" : "hiányzik"})</summary>
-   ${sections ? `<form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/sections">${sections.map((s, i) => `<label class="small"><strong>${esc(sectionLabel(s.key, "hu"))}</strong> · kép #${s.image_index + 1}</label>
+   ${sections ? `<form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/sections">${sections.map((s, i) => `<label class="small"><strong>${esc(sectionLabel(s.key, "hu"))}</strong> · kép #${s.image_index + 1}</label>
      <input name="h_${i}" value="${esc(s.headline)}"><textarea name="b_${i}" rows="4" style="font-family:inherit;font-size:13px;margin:4px 0 10px">${esc(s.body)}</textarea>
      <input type="hidden" name="k_${i}" value="${esc(s.key)}"><input type="hidden" name="i_${i}" value="${s.image_index}">`).join("")}
      <div class="row"><button class="btn" ${published ? "disabled" : ""}>Leírás mentése</button></div></form>` : ""}
-   <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/describe" style="margin-top:8px"><button class="btn" ${published ? "disabled" : ""}>${sections ? "Újragenerálás" : "Leírás generálása"}</button></form>
+   <form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/describe" style="margin-top:8px"><button class="btn" ${published ? "disabled" : ""}>${sections ? "Újragenerálás" : "Leírás generálása"}</button></form>
   </details>
-  <form method="post" action="/belso/ajanlatmotor/jelolt/${cid}/lock" class="lockbar"><span>${c.locked ? `<span class="ok">✓ Zárolva</span>` : `<span class="muted">Nincs zárolva</span>`}</span>
+  <form method="post" action="/admin/ajanlatmotor/jelolt/${cid}/lock" class="lockbar"><span>${c.locked ? `<span class="ok">✓ Zárolva</span>` : `<span class="muted">Nincs zárolva</span>`}</span>
    <button class="btn ${c.locked ? "" : "dark"}" name="locked" value="${c.locked ? 0 : 1}" ${published ? "disabled" : ""}>${c.locked ? "Feloldás" : "Zárolás"}</button></form>
   </div>`;
 }
@@ -196,17 +196,17 @@ export function requestPage(o: {
     const l: Listing = JSON.parse(c.listing_json);
     return `<tr><td><strong>${esc(l.title)}</strong><div class="muted small">${esc(l.seller.city)} · ${l.first_registration} · ${l.km.toLocaleString("hu-HU")} km · ${fmtEur(l.price_gross_eur)}</div></td>
     <td>${c.score ?? "–"}</td><td class="small">${esc(c.rationale || "")}</td>
-    <td>${published ? "" : `<form method="post" action="/belso/ajanlatmotor/jelolt/${c.id}/slot" class="row">${[1, 2, 3].map((n) => `<button class="btn" name="slot" value="${n}">→ ${n}</button>`).join("")}</form>`}<form method="post" action="/belso/ajanlatmotor/jelolt/${c.id}/delete" style="margin:0;display:inline" onsubmit="return confirm('Biztosan törlöd ezt az autót az ajánlatmotor listájából?')"><button class="btn" style="padding:4px 10px;font-size:12px;color:#b8000f" title="Autó törlése a listából">🗑 Törlés</button></form></td></tr>`;
+    <td>${published ? "" : `<form method="post" action="/admin/ajanlatmotor/jelolt/${c.id}/slot" class="row">${[1, 2, 3].map((n) => `<button class="btn" name="slot" value="${n}">→ ${n}</button>`).join("")}</form>`}<form method="post" action="/admin/ajanlatmotor/jelolt/${c.id}/delete" style="margin:0;display:inline" onsubmit="return confirm('Biztosan törlöd ezt az autót az ajánlatmotor listájából?')"><button class="btn" style="padding:4px 10px;font-size:12px;color:#b8000f" title="Autó törlése a listából">🗑 Törlés</button></form></td></tr>`;
   };
   const ready = !o.blockers.length;
   const flags = [...(req?.flags || []), ...(req?.missing_critical_fields.length ? ["Hiányzó adatok: " + req.missing_critical_fields.join(", ")] : [])];
 
   const d = o.deal;
-  const B = `/belso/ajanlatmotor/igeny/${row.deal_id}`;
+  const B = `/admin/ajanlatmotor/igeny/${row.deal_id}`;
   const answer = (of: (typeof o.offers)[number]) => of.action === "elfogad" ? `<b>választott: ${of.choice != null ? of.choice + 1 : "?"}. autó</b>` : of.action === "modosit" ? "<b>egyik sem tetszett</b>" : of.first_viewed_at ? "megnyitotta" : "még nem nyitotta meg";
   return `<div class="row" style="justify-content:space-between;align-items:flex-end">
   <div><h1>${esc(d.name || req?.customer.name || row.from_email || "Ismeretlen ügyfél")} <span class="chip ${row.status}">${STATUS_LABEL[row.status as Status] || row.status}</span></h1>
-  <div class="muted">${esc(d.email || row.from_email || "")}${d.phone ? " · " + esc(d.phone) : ""} · adatlap: <b>${esc(o.cardStatus)}</b> · <a href="/belso/ugyfel/?id=${row.deal_id}" target="_blank">Ügyfél adatlap ↗</a> · forrás: ${esc(row.source)} · ${new Date(row.created_at).toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })} · kinyerés: ${esc(o.extraction?.engine || "–")}</div></div>
+  <div class="muted">${esc(d.email || row.from_email || "")}${d.phone ? " · " + esc(d.phone) : ""} · adatlap: <b>${esc(o.cardStatus)}</b> · <a href="/admin/ugyfel/?id=${row.deal_id}" target="_blank">Ügyfél adatlap ↗</a> · forrás: ${esc(row.source)} · ${new Date(row.created_at).toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })} · kinyerés: ${esc(o.extraction?.engine || "–")}</div></div>
   <div class="row">
    ${o.searchUrl && !published ? `<a class="btn red" href="#mdSearch" title="A keresési adatok ellenőrzése / módosítása, majd a mobile.de vagy AutoScout24 keresés megnyitása.">mobile.de / AutoScout24 keresés ↓</a>` : ""}
    <form method="post" action="${B}/search"><button class="btn" ${published ? "disabled" : ""}>Keresés újrafuttatása</button></form>
@@ -237,14 +237,14 @@ export function requestPage(o: {
    ${row.search_note ? `<div class="card small"><strong>Keresés:</strong> ${esc(row.search_note)}</div>` : ""}
    ${row.clarify_draft ? `<div class="card"><h2>Pontosító válasz (tervezet)</h2><div class="pre">${esc(row.clarify_draft)}</div></div>` : ""}
    <div class="card"><h2>Kinyert igény</h2><p class="small muted">Szerkeszthető. Mentés után a keresés újra lefut (zárolt autók maradnak).</p>
-    <form method="post" action="/belso/ajanlatmotor/igeny/${row.deal_id}/requirements"><textarea name="json" rows="22">${esc(JSON.stringify(req, null, 2))}</textarea>
+    <form method="post" action="/admin/ajanlatmotor/igeny/${row.deal_id}/requirements"><textarea name="json" rows="22">${esc(JSON.stringify(req, null, 2))}</textarea>
     <div class="row" style="margin-top:8px"><button class="btn dark" ${published ? "disabled" : ""}>Mentés és keresés</button></div></form></div>
    <div class="card"><h2>Napló</h2><table class="small">${o.events.map((e) => `<tr><td class="muted">${new Date(e.at).toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })}</td><td>${esc(e.actor)}</td><td>${esc(e.type)}${e.to_status ? ` ${esc(e.from_status || "")} → <strong>${esc(e.to_status)}</strong>` : ""}</td></tr>`).join("")}</table></div>
   </div>
   <div>
    <div class="slots">${slotHtml}</div>
    ${published ? "" : `<div class="card"><h2>Autó hozzáadása mobile.de linkkel</h2>
-   <form method="post" action="/belso/ajanlatmotor/igeny/${row.deal_id}/add" class="row"><input name="url" placeholder="https://suchen.mobile.de/fahrzeuge/details.html?id=… (tesztben: 1001…3001)" style="flex:1;min-width:280px">
+   <form method="post" action="/admin/ajanlatmotor/igeny/${row.deal_id}/add" class="row"><input name="url" placeholder="https://suchen.mobile.de/fahrzeuge/details.html?id=… (tesztben: 1001…3001)" style="flex:1;min-width:280px">
    <select name="target" style="width:auto"><option value="runner">Tartalék</option><option value="1">1. hely</option><option value="2">2. hely</option><option value="3">3. hely</option></select>
    <button class="btn dark">Hozzáadás</button></form><p class="small muted">A Chrome bővítmény ugyanide küldi az autókat, egy kattintással a mobile.de oldaláról.</p></div>`}
    <div class="card"><h2>Tartalékok (${o.runners.length})</h2><table><thead><tr><th>Autó</th><th>Pont</th><th>Indoklás</th><th></th></tr></thead><tbody>
@@ -261,7 +261,7 @@ export function settingsPage(o: { version: number; rates: RateConfig; history: {
    <td>${unv.has(path) ? `<label class="row small"><input type="checkbox" name="confirm" value="${path}" style="width:auto"> megerősítem</label>` : `<span class="ok">✓ megerősítve</span>`}</td></tr>`;
   return `<h1>Díjak és beállítások</h1><p class="muted">Aktuális verzió: v${o.version}. Minden mentés új verziót hoz létre; a kiküldött ajánlatok a saját verziójukat tartják meg.
   Sárga = ELLENŐRIZNI 2026. Megerősítetlen díjjal nem lehet ajánlatot közzétenni.</p>
-  <form method="post" action="/belso/ajanlatmotor/dijak" class="card"><h2>Ellenőrzendő tételek</h2><table><tbody>
+  <form method="post" action="/admin/ajanlatmotor/dijak" class="card"><h2>Ellenőrzendő tételek</h2><table><tbody>
   ${item("regado", "Regisztrációs adó tábla", "NAV 2026.01.01 tábla, 7 kW-sáv × 5 osztály, korkedvezménnyel", r.regado.source)}
   ${item("illetek", "Vagyonszerzési illeték (Ft/kW)", r.illetek.huf_per_kw.map((x) => x.join(" / ")).join(" · "), r.illetek.note)}
   ${item("illetek.electric_exempt", "Elektromos autó illetékmentes", r.illetek.electric_exempt.v ? "igen" : "nem", r.illetek.electric_exempt.note)}
@@ -273,7 +273,7 @@ export function settingsPage(o: { version: number; rates: RateConfig; history: {
   <h2 style="margin-top:20px">Teljes konfiguráció (JSON)</h2><p class="small muted">Itt írhatod át a számokat. Ha egy értéket módosítasz, az megerősítetlen marad, amíg fent nem pipálod.</p>
   <textarea name="json" rows="24">${esc(JSON.stringify(r, null, 2))}</textarea>
   <div class="row" style="margin-top:10px"><input name="note" placeholder="Mi változott? (kötelező)" required style="max-width:420px"><button class="btn red">Mentés új verzióként</button></div></form>
-  <form method="post" action="/belso/ajanlatmotor/dijak/kapcsolat" class="card"><h2>Kapcsolattartó az ajánlatokon</h2>
+  <form method="post" action="/admin/ajanlatmotor/dijak/kapcsolat" class="card"><h2>Kapcsolattartó az ajánlatokon</h2>
   <div class="row">${["name", "title", "phone", "whatsapp", "email"].map((k) => `<label style="flex:1;min-width:180px" class="small">${k}<input name="${k}" value="${esc(o.contact[k] || "")}"></label>`).join("")}</div>
   <div class="row" style="margin-top:10px"><button class="btn">Mentés</button></div></form>
   <div class="card"><h2>Verziók</h2><table class="small">${o.history.map((h) => `<tr><td>v${h.version}</td><td>${esc(h.author)}</td><td>${esc(h.note || "")}</td><td class="muted">${new Date(h.created_at).toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })}</td></tr>`).join("")}</table></div>`;
@@ -283,12 +283,12 @@ export function extensionPage(tokens: { id: string; user_name: string; label: st
   return `<h1>Chrome bővítmény (Caradvance Sourcing)</h1>
   <p class="muted">A bővítménnyel egy kattintással küldhetsz autót egy mobile.de vagy AutoScout24 hirdetésről az ügyfél ajánlatába. Ha ebben a Chrome-ban be vagy lépve a belső felületre, a bővítmény token nélkül működik, és azt látja, amit te. Token csak más böngészőhöz kell.${isAdminUser ? " Adminként mindenki tokenjét látod." : ""}</p>
   ${newToken ? `<div class="msg">Új token (most másold ki, többet nem látszik):<br><code style="font-size:15px;user-select:all">${esc(newToken)}</code><br>Szerver címe a bővítményben: <code style="user-select:all">${esc(baseUrl)}</code></div>` : ""}
-  <form method="post" action="/belso/ajanlatmotor/bovitmeny" class="card row"><input name="label" placeholder="Melyik gép? (pl. irodai laptop)" style="max-width:320px"><button class="btn red">Saját token létrehozása</button></form>
+  <form method="post" action="/admin/ajanlatmotor/bovitmeny" class="card row"><input name="label" placeholder="Melyik gép? (pl. irodai laptop)" style="max-width:320px"><button class="btn red">Saját token létrehozása</button></form>
   <div class="card" style="padding:0"><table><thead><tr><th>Felhasználó</th><th>Megjegyzés</th><th>Létrehozva</th><th>Utoljára használva</th><th></th></tr></thead><tbody>
   ${tokens.map((t) => `<tr><td>${esc(t.user_name)}</td><td>${esc(t.label || "")}</td><td>${new Date(t.created_at).toLocaleString("hu-HU")}</td><td>${t.last_used_at ? new Date(t.last_used_at).toLocaleString("hu-HU") : "–"}</td>
-  <td>${t.revoked_at ? `<span class="muted">visszavonva</span>` : `<form method="post" action="/belso/ajanlatmotor/bovitmeny/${t.id}/visszavon"><button class="btn">Visszavonás</button></form>`}</td></tr>`).join("") || `<tr><td colspan="5" class="muted" style="padding:20px">Még nincs token.</td></tr>`}
+  <td>${t.revoked_at ? `<span class="muted">visszavonva</span>` : `<form method="post" action="/admin/ajanlatmotor/bovitmeny/${t.id}/visszavon"><button class="btn">Visszavonás</button></form>`}</td></tr>`).join("") || `<tr><td colspan="5" class="muted" style="padding:20px">Még nincs token.</td></tr>`}
   </tbody></table></div>
-  <div class="card"><h2>Telepítés</h2><ol><li>Töltsd le a bővítményt: <a href="/belso/ajanlatmotor-bovitmeny.zip">ajanlatmotor-bovitmeny.zip</a>, és csomagold ki.</li>
+  <div class="card"><h2>Telepítés</h2><ol><li>Töltsd le a bővítményt: <a href="/admin/ajanlatmotor-bovitmeny.zip">ajanlatmotor-bovitmeny.zip</a>, és csomagold ki.</li>
   <li>Chrome → <code>chrome://extensions</code> → Fejlesztői mód be → „Kicsomagolt bővítmény betöltése” → a kicsomagolt mappa.</li>
   <li>Maradj belépve a belső felületre ugyanebben a Chrome-ban (token nem kell).</li><li>Nyiss meg egy mobile.de vagy AutoScout24 hirdetést → „Küldés az ajánlatba”.</li></ol></div>`;
 }
@@ -296,10 +296,10 @@ export function extensionPage(tokens: { id: string; user_name: string; label: st
 export function startPage(deal: DealRow) {
   return `<h1>Ajánlatmotor indítása · ${esc(deal.name || "ügyfél #" + deal.id)}</h1>
   <p class="muted">Ehhez az ügyfélhez még nincs Ajánlatmotor-igény. Írd le, mit keres (vagy másold be az e-mailt / a jegyzetet), és a motor kikeresi a három legjobb autót. Az ügyfél adatai az adatlapról jönnek.</p>
-  <form method="post" action="/belso/ajanlatmotor/igeny/${deal.id}/inditas" class="card" style="max-width:760px">
+  <form method="post" action="/admin/ajanlatmotor/igeny/${deal.id}/inditas" class="card" style="max-width:760px">
   <label class="small"><b>Mit keres az ügyfél?</b></label>
   <textarea name="text" rows="8" required style="font-family:inherit;font-size:14px" placeholder="Pl. BMW i5 Touring, elektromos, max. 2 éves, 50 ezer km alatt, panorámatető és vonóhorog kell. Keret kb. 25 millió Ft Budapesten forgalomba helyezve.">${esc([deal.car, deal.note].filter(Boolean).join("\n"))}</textarea>
-  <div class="row" style="margin-top:12px"><button class="btn red">Igény rögzítése és keresés</button><a class="btn" href="/belso/ugyfel/?id=${deal.id}">Vissza az adatlapra</a></div></form>`;
+  <div class="row" style="margin-top:12px"><button class="btn red">Igény rögzítése és keresés</button><a class="btn" href="/admin/ugyfel/?id=${deal.id}">Vissza az adatlapra</a></div></form>`;
 }
 
 export function equipLabel(e: string) { return equipHu(e).hu; }
@@ -329,7 +329,7 @@ export function searchEditor(req: Requirements, dealId: number, maxEur?: number)
   .mds-c{display:inline-flex;gap:6px;align-items:center;border:1px solid #e6e9ef;border-radius:999px;padding:5px 11px;cursor:pointer;background:#fff}.mds-c input{width:auto;margin:0;accent-color:#e2001a}
   .mds-url{font:12px ui-monospace,Menlo,monospace;color:#6b7280;word-break:break-all;margin-top:10px;background:#f6f7fb;border-radius:8px;padding:8px 10px}
   </style>
-  <form class="card mds" id="mdSearch" method="post" action="/belso/ajanlatmotor/igeny/${dealId}/kereses">
+  <form class="card mds" id="mdSearch" method="post" action="/admin/ajanlatmotor/igeny/${dealId}/kereses">
    <h2>Keresés: mobile.de · AutoScout24</h2><div class="small muted">Az igényből kitöltve — módosítsd, ha kell, majd nyisd meg valamelyik portálon. A „Mentés” az igénybe is beírja a változtatásokat.</div>
    <div class="mds-g">
     <label class="mds-f"><span>Márka</span><select name="make" id="mdsMake"><option value="">— bármely —</option>${makes.map((m) => `<option${m === mk ? " selected" : ""}>${esc(m)}</option>`).join("")}</select></label>

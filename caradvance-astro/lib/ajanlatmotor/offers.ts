@@ -222,7 +222,7 @@ export async function markViewed(env: Env, o: OfferRecord, origin: string) {
   try { await transition(env, o.deal_id, "VIEWED", "customer"); } catch { /* already further */ }
   const pub = (JSON.parse(o.snapshot_json) as { public: PublicOffer }).public;
   await notifyStaff(env, `Megnyitotta az ajánlatot: ${pub.customer_name}`,
-    `<p>${pub.offer_no}</p><p><a href="${origin}/belso/ajanlatmotor/igeny/${o.deal_id}">Megnyitás az Ajánlatmotorban</a></p>`, o.deal_id);
+    `<p>${pub.offer_no}</p><p><a href="${origin}/admin/ajanlatmotor/igeny/${o.deal_id}">Megnyitás az Ajánlatmotorban</a></p>`, o.deal_id);
 }
 
 const CC_HU: Record<string, string> = { DE: "Németország", AT: "Ausztria", IT: "Olaszország", NL: "Hollandia", BE: "Belgium", FR: "Franciaország", ES: "Spanyolország", LU: "Luxemburg", CH: "Svájc", CZ: "Csehország", PL: "Lengyelország", DK: "Dánia" };
@@ -292,7 +292,7 @@ export async function chooseCar(env: Env, o: OfferRecord, choice: { cid: string;
   await notifyStaff(env, `VÁLASZTOTT: ${choice.name} – ${car.title}`,
     `<p><b>${choice.name}</b> a(z) <b>${car.title}</b> autót választotta (${car.slot}. hely).</p>
      <p>Végösszeg: ≈ ${car.total_huf.toLocaleString("hu-HU")} Ft<br>${msg.replace(/\n/g, "<br>")}</p>
-     <p><a href="${origin}/belso/ugyfel/?id=${o.deal_id}">Ügyfél adatlap</a> · <a href="${origin}/belso/ajanlatmotor/igeny/${o.deal_id}">Ajánlatmotor</a></p>`, o.deal_id);
+     <p><a href="${origin}/admin/ugyfel/?id=${o.deal_id}">Ügyfél adatlap</a> · <a href="${origin}/admin/ajanlatmotor/igeny/${o.deal_id}">Ajánlatmotor</a></p>`, o.deal_id);
   return { already: false, car };
 }
 
@@ -305,6 +305,6 @@ export async function noneFits(env: Env, o: OfferRecord, message: string, ip: st
   await saveCard(env, o.deal_id, { status: "Ajánlat módosítva" }, null);
   try { await transition(env, o.deal_id, "NEEDS_REVIEW", "customer", { none_fit: true }); } catch { /* ignore */ }
   await logEvent(env, o.deal_id, "customer", "none_fit", { message: message.slice(0, 500) });
-  await notifyStaff(env, "Egyik autó sem tetszett", `<p>${message.replace(/</g, "&lt;")}</p><p><a href="${origin}/belso/ajanlatmotor/igeny/${o.deal_id}">Megnyitás az Ajánlatmotorban</a></p>`, o.deal_id);
+  await notifyStaff(env, "Egyik autó sem tetszett", `<p>${message.replace(/</g, "&lt;")}</p><p><a href="${origin}/admin/ajanlatmotor/igeny/${o.deal_id}">Megnyitás az Ajánlatmotorban</a></p>`, o.deal_id);
   return { already: false };
 }

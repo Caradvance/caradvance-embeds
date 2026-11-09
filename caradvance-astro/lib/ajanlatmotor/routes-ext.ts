@@ -116,7 +116,7 @@ ext.post("/ext/listings", async (c) => {
   }
   const target = b.slot === "runner" ? "runner" : Number(b.slot);
   if (target !== "runner" && ![1, 2, 3].includes(target)) return c.json({ error: "bad slot" }, 400);
-  const adminUrl = `${baseUrl(c.env, c.req.raw)}/belso/ajanlatmotor/igeny/${dealId}`;
+  const adminUrl = `${baseUrl(c.env, c.req.raw)}/admin/ajanlatmotor/igeny/${dealId}`;
   try {
     const r = await addListing(c.env, dealId, listing, target as any, "extension", `ext:${u.name}`);
     await logEvent(c.env, dealId, `ext:${u.name}`, "ext_push", { ad_id: listing.ad_id, parser_version: b.parser_version, hash: b.page_snapshot_hash });

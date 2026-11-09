@@ -22,14 +22,14 @@ import { DEMO_EMAIL } from "./demo";
 import { ensureCrm, getCard } from "../crm.js";
 
 type H = { Bindings: Env; Variables: { user: Staff } };
-const B = "/belso/ajanlatmotor";
+const B = "/admin/ajanlatmotor";
 export const staff = new Hono<H>({ strict: false }).basePath(B);
 
 staff.use("*", async (c, next) => {
   await ensureAm(c.env);
   const user = await sessionUser(c.env, c.req.raw);
   if (!user) {
-    if (c.req.method === "GET") return c.redirect(`/belso/?next=${encodeURIComponent(new URL(c.req.url).pathname)}`, 302);
+    if (c.req.method === "GET") return c.redirect(`/admin/?next=${encodeURIComponent(new URL(c.req.url).pathname)}`, 302);
     return c.text("Nincs bejelentkezve.", 401);
   }
   if (c.req.method === "POST") {
