@@ -83,34 +83,49 @@ export const OFFER_MAIL = {
   }
 };
 
-/* ---------- adatbekérő e-mail ---------- */
+/* ---------- adatbekérő és aláírási e-mail (HU / SK / CZ) — közös dizájn az ajánlat-e-maillel (2026-11-10) ---------- */
+const FF = 'font-family:Arial,Helvetica,sans-serif';
+const mailH1 = (t) => `<p style="${FF};margin:0 0 6px;font-size:22px;line-height:28px;font-weight:bold;color:#141519">${t}</p>`;
+const mailP = (t) => `<p style="${FF};margin:0 0 18px;font-size:15px;line-height:23px;color:#374151">${t}</p>`;
+const mailBtn = (link, t) => `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 20px"><tr><td style="background:#e2001a;border-radius:999px"><a href="${link}" style="${FF};display:inline-block;padding:15px 28px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:15px;line-height:18px">${t}</a></td></tr></table>`;
+const mailBox = (title, rows, icon) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f8fb;border-radius:14px;border-collapse:separate;margin:0 0 20px"><tr><td style="padding:16px 18px 6px">
+  ${title ? `<div style="${FF};font-size:11px;line-height:14px;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">${title}</div>` : ''}
+  <table role="presentation" cellpadding="0" cellspacing="0">${rows.map((r) => `<tr><td width="30" valign="top" style="padding:0 0 10px"><div style="${FF};width:22px;height:22px;line-height:22px;border-radius:11px;background:#e2001a;color:#ffffff;font-size:12px;font-weight:bold;text-align:center">${icon === 'n' ? '' : '✓'}</div></td><td valign="top" style="${FF};padding:1px 0 10px;font-size:14px;line-height:20px;color:#141519">${r}</td></tr>`).join('')}</table>
+</td></tr></table>`;
+const mailSteps = (title, steps) => `<div style="${FF};font-size:16px;line-height:22px;font-weight:bold;color:#141519;margin:0 0 12px">${title}</div><table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px">${steps.map((s, k) => `<tr><td width="34" valign="top" style="padding:0 0 10px"><div style="${FF};width:26px;height:26px;line-height:26px;border-radius:13px;background:#141519;color:#ffffff;font-size:13px;font-weight:bold;text-align:center">${k + 1}</div></td><td valign="middle" style="${FF};padding:0 0 10px;font-size:14px;line-height:20px;color:#374151">${s}</td></tr>`).join('')}</table>`;
+const mailMsg = (msgHtml) => (msgHtml ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td style="${FF};background:#ffffff;border:1px solid #e6eaf1;border-left:3px solid #e2001a;border-radius:0 10px 10px 0;padding:12px 16px;font-size:14px;line-height:21px;color:#374151">${String(msgHtml).replace(/^<p[^>]*>|<\/p>$/g, '')}</td></tr></table>` : '');
+const mailNote = (t) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 14px"><tr><td style="${FF};background:#f2f7f2;border-radius:10px;padding:11px 14px;font-size:13px;line-height:19px;color:#2f4f3a">🔒 ${t}</td></tr></table>`;
+const mailSmall = (t) => `<p style="${FF};color:#8a919c;font-size:12px;line-height:17px;margin:0 0 4px">${t}</p>`;
+const DR = {
+  hu: { subject: 'Kérjük, adja meg adatait — CarAdvance', intro: 'A szerződések elkészítéséhez néhány adatra és dokumentumra van szükségünk. Az egész kb. <b>3 percet</b> vesz igénybe — telefonról is.',
+    need: 'Amire szükség lesz', items: ['Személyes adatok (név, cím, születési adatok)', '<b>Személyazonosító igazolvány</b> — mindkét oldal (fénykép vagy PDF)', '<b>Lakcímkártya</b> — címoldal'], btn: 'Adatok megadása és feltöltés',
+    sec: 'Az adatok titkosított kapcsolaton keresztül, közvetlenül hozzánk kerülnek, és kizárólag a szerződéskötéshez és a hatósági ügyintézéshez használjuk fel őket.', valid: (d) => `A link személyes, kérjük, ne továbbítsa. Érvényes: ${String(d).replace(/\.$/, '')}-ig.` },
+  sk: { subject: 'Prosíme o zadanie vašich údajov — CarAdvance', intro: 'Na prípravu zmlúv potrebujeme niekoľko údajov a dokladov. Zaberie to asi <b>3 minúty</b> — aj z telefónu.',
+    need: 'Čo budete potrebovať', items: ['Osobné údaje (meno, adresa, dátum narodenia)', '<b>Občiansky preukaz</b> — obe strany (fotografia alebo PDF)'], btn: 'Zadať údaje a nahrať doklady',
+    sec: 'Údaje sa k nám dostanú šifrovaným spojením a použijeme ich výlučne na uzavretie zmluvy a súvisiace úradné úkony.', valid: (d) => `Odkaz je osobný, nepreposielajte ho. Platí do ${d}.` },
+  cs: { subject: 'Prosíme o zadání vašich údajů — CarAdvance', intro: 'K přípravě smluv potřebujeme několik údajů a dokladů. Zabere to asi <b>3 minuty</b> — i z telefonu.',
+    need: 'Co budete potřebovat', items: ['Osobní údaje (jméno, adresa, datum narození)', '<b>Občanský průkaz</b> — obě strany (fotografie nebo PDF)'], btn: 'Zadat údaje a nahrát doklady',
+    sec: 'Údaje se k nám dostanou šifrovaným spojením a použijeme je výhradně k uzavření smlouvy a souvisejícím úředním úkonům.', valid: (d) => `Odkaz je osobní, nepřeposílejte ho. Platí do ${d}.` }
+};
 export function dataReqMail(lang, { name, msgHtml, link, exp }) {
-  const btn = (t) => `<p style="margin:18px 0"><a href="${link}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:999px;display:inline-block">${t}</a></p>`;
-  if (lang === 'sk') return {
-    subject: 'Prosíme o zadanie vašich údajov — CarAdvance',
-    html: `<p>${hello(lang, name)}</p><p>na prípravu zmlúv vás prosíme o zadanie osobných údajov a nahratie kópie <b>občianskeho preukazu</b> (obe strany, fotografia alebo PDF).</p>${msgHtml}${btn('Zadať údaje a nahrať doklady')}
-      <p>Údaje sa k nám dostanú šifrovaným spojením a použijeme ich výlučne na uzavretie zmluvy a súvisiace úradné úkony.</p>
-      <p style="color:#6b7280;font-size:12px">Odkaz je osobný, nepreposielajte ho. Platí do ${dateFmt(lang, exp)}.</p><p>${regards(lang)}</p>`
-  };
-  if (lang === 'cs') return {
-    subject: 'Prosíme o zadání vašich údajů — CarAdvance',
-    html: `<p>${hello(lang, name)}</p><p>pro přípravu smluv vás prosíme o zadání osobních údajů a nahrání kopie <b>občanského průkazu</b> (obě strany, fotografie nebo PDF).</p>${msgHtml}${btn('Zadat údaje a nahrát doklady')}
-      <p>Údaje se k nám dostanou šifrovaným spojením a použijeme je výhradně k uzavření smlouvy a souvisejícím úředním úkonům.</p>
-      <p style="color:#6b7280;font-size:12px">Odkaz je osobní, nepřeposílejte ho. Platí do ${dateFmt(lang, exp)}.</p><p>${regards(lang)}</p>`
-  };
-  return null; // magyar: a régi szöveg marad
+  const L = DR[lang] ? lang : 'hu'; const T = DR[L];
+  return { subject: T.subject, html: mailH1(hello(L, name)) + mailP(T.intro) + mailBox(T.need, T.items) + mailMsg(msgHtml) + mailBtn(link, T.btn) + mailNote(T.sec) + mailSmall(T.valid(dateFmt(L, exp))) + `<p style="${FF};margin:16px 0 0;font-size:14px;color:#374151">${regards(L)}</p>` };
 }
-
-/* ---------- aláírás: kérelem, kód, aláírt példány ---------- */
-export function signReqMail(lang, { name, docsHtml, msgHtml, link, exp }) {
-  const btn = (t) => `<p style="margin:18px 0"><a href="${link}" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:999px;display:inline-block">${t}</a></p>`;
-  if (lang === 'sk') return { subject: 'Dokumenty na podpis — CarAdvance', html: `<p>${hello(lang, name)}</p><p>posielame vám na elektronický podpis tieto dokumenty:</p>${docsHtml}${msgHtml}
-    <p>Dokumenty si môžete prečítať a podpísať tlačidlom nižšie. Na podpis vám na túto e-mailovú adresu pošleme jednorazový kód.</p>${btn('Zobraziť a podpísať dokumenty')}
-    <p style="color:#6b7280;font-size:12px">Odkaz je osobný, nepreposielajte ho. Platí do ${dateFmt(lang, exp)}. Ak sa vás to netýka, dajte nám, prosím, vedieť.</p>` };
-  if (lang === 'cs') return { subject: 'Dokumenty k podpisu — CarAdvance', html: `<p>${hello(lang, name)}</p><p>zasíláme vám k elektronickému podpisu tyto dokumenty:</p>${docsHtml}${msgHtml}
-    <p>Dokumenty si můžete přečíst a podepsat tlačítkem níže. K podpisu vám na tuto e-mailovou adresu zašleme jednorázový kód.</p>${btn('Zobrazit a podepsat dokumenty')}
-    <p style="color:#6b7280;font-size:12px">Odkaz je osobní, nepřeposílejte ho. Platí do ${dateFmt(lang, exp)}. Pokud se vás to netýká, dejte nám prosím vědět.</p>` };
-  return null;
+const SR = {
+  hu: { subject: 'Aláírásra váró dokumentumok — CarAdvance', intro: 'Az alábbi dokumentumokat elektronikus aláírásra küldjük. Az aláírás pár perc, nyomtatás és szkennelés nélkül.', docs: 'Aláírandó dokumentumok',
+    how: 'Így működik', steps: ['Megnyitja és átolvassa a dokumentumokat', 'Megadja az e-mailben kapott egyszeri kódot', 'Aláír — az aláírt példányt e-mailben megkapja'], btn: 'Dokumentumok megtekintése és aláírása',
+    sec: 'Az aláírást egyszeri kóddal (OTP) azonosítjuk; a dokumentumok tartalmát ellenőrzőkód védi.', valid: (d) => `A link személyes, ne továbbítsa. Érvényes: ${String(d).replace(/\.$/, '')}-ig. Ha nem Ön az érintett, kérjük, jelezze nekünk.` },
+  sk: { subject: 'Dokumenty na podpis — CarAdvance', intro: 'Posielame vám na elektronický podpis tieto dokumenty. Podpis trvá pár minút, bez tlače a skenovania.', docs: 'Dokumenty na podpis',
+    how: 'Ako to funguje', steps: ['Otvoríte a prečítate si dokumenty', 'Zadáte jednorazový kód, ktorý vám pošleme e-mailom', 'Podpíšete — podpísané vyhotovenie dostanete e-mailom'], btn: 'Zobraziť a podpísať dokumenty',
+    sec: 'Podpis overujeme jednorazovým kódom (OTP); obsah dokumentov chráni kontrolný kód.', valid: (d) => `Odkaz je osobný, nepreposielajte ho. Platí do ${d}. Ak sa vás to netýka, dajte nám, prosím, vedieť.` },
+  cs: { subject: 'Dokumenty k podpisu — CarAdvance', intro: 'Zasíláme vám k elektronickému podpisu tyto dokumenty. Podpis trvá pár minut, bez tisku a skenování.', docs: 'Dokumenty k podpisu',
+    how: 'Jak to funguje', steps: ['Otevřete a přečtete si dokumenty', 'Zadáte jednorázový kód, který vám zašleme e-mailem', 'Podepíšete — podepsané vyhotovení dostanete e-mailem'], btn: 'Zobrazit a podepsat dokumenty',
+    sec: 'Podpis ověřujeme jednorázovým kódem (OTP); obsah dokumentů chrání kontrolní kód.', valid: (d) => `Odkaz je osobní, nepřeposílejte ho. Platí do ${d}. Pokud se vás to netýká, dejte nám prosím vědět.` }
+};
+export function signReqMail(lang, { name, docsHtml, docs, msgHtml, link, exp }) {
+  const L = SR[lang] ? lang : 'hu'; const T = SR[L];
+  const names = Array.isArray(docs) && docs.length ? docs : [...String(docsHtml || '').matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]);
+  return { subject: T.subject, html: mailH1(hello(L, name)) + mailP(T.intro) + mailBox(T.docs, names.map((n) => '📄 ' + n), 'n') + mailMsg(msgHtml) + mailSteps(T.how, T.steps) + mailBtn(link, T.btn) + mailNote(T.sec) + mailSmall(T.valid(dateFmt(L, exp))) };
 }
 export function otpMail(lang, { name, code, big }) {
   if (lang === 'sk') return { subject: `Kód na podpis: ${code}`, html: `<p>${hello(lang, name)}</p><p>na podpis dokumentov, ktoré vám poslala spoločnosť CarAdvance, zadajte tento kód:</p>${big}

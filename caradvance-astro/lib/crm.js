@@ -884,12 +884,16 @@ export async function sendCrmMail(env, to, subject, inner, attachments, opts) {
   const copy = !env.CRM_BCC || env.CRM_BCC === 'off' ? '' : env.CRM_BCC;
   const toList = body.to.map((x) => x.toLowerCase());
   if (copy && !(opts && opts.noCopy) && !toList.includes(copy.toLowerCase()) && !toList.includes(notifyTo(env).toLowerCase())) body.bcc = [copy];
-  const post = () => fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  // SK / CZ: a helyi címről (info@caradvance.sk / .cz), ha a domain a Resendben hitelesítve van; különben a szokásos küldő, helyi névvel
+  const post = (key) => fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + (key || env.RESEND_API_KEY), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  // SK / CZ: a helyi címről (info@caradvance.sk / .cz). Ha a piacnak saját Resend-fiókja van (RESEND_API_KEY_SK / RESEND_API_KEY_CZ —
+  // pl. a caradvance.cz külön ingyenes fiókban, info@caradvance.cz), azzal megy; különben a közös fiókkal, ha ott a domain hitelesítve van;
+  // ha egyik sem, a szokásos küldő marad (a válaszcím így is a helyi info@ cím)
   const ml = opts && (opts.lang === 'sk' || opts.lang === 'cs') ? opts.lang : '';
   if (ml && !env.CRM_EMAIL_FROM) {
     const local = ml === 'sk' ? (env.CRM_EMAIL_FROM_SK || 'CarAdvance <info@caradvance.sk>') : (env.CRM_EMAIL_FROM_CZ || 'CarAdvance <info@caradvance.cz>');
+    const own = ml === 'sk' ? env.RESEND_API_KEY_SK : env.RESEND_API_KEY_CZ;
     const def = body.from; body.from = local;
+    if (own) { const r1 = await post(own); if (r1.ok) return { ok: true }; }
     const r0 = await post(); if (r0.ok) return { ok: true };
     body.from = def;
   }
