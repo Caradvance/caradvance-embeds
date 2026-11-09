@@ -7,6 +7,7 @@
 // Hiba esetén logol, a buildet nem állítja meg. Idempotens.
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 const DIST = 'dist';
 const TEXT = /\.(html?|js|mjs|css|json|txt|xml|webmanifest)$/i;
@@ -35,10 +36,26 @@ try {
     const dst = path.join(path.dirname(src), 'admin');
     for (const f of walk(src, [])) {
       const t = path.join(dst, path.relative(src, f)); fs.mkdirSync(path.dirname(t), { recursive: true });
-      if (TEXT.test(f)) fs.writeFileSync(t, fix(fs.readFileSync(f, 'utf8'))); else fs.copyFileSync(f, t);
+      if (TEXT.test(f) && !/i18n-[a-z]{2}\.json$/.test(f)) fs.writeFileSync(t, fix(fs.readFileSync(f, 'utf8'))); else fs.copyFileSync(f, t);
       nf++;
     }
     fs.rmSync(src, { recursive: true, force: true }); nd++;
+    // felület nyelve (SK / CZ): a fordító szkript minden admin oldal <head> elejére, a legelső renderelés előtt
+    const js = path.join(dst, 'admin-i18n.js');
+    if (fs.existsSync(js)) {
+      const ver = crypto.createHash('md5').update(fs.readFileSync(js)).update(fs.existsSync(path.join(dst, 'i18n-sk.json')) ? fs.readFileSync(path.join(dst, 'i18n-sk.json')) : '').update(fs.existsSync(path.join(dst, 'i18n-cs.json')) ? fs.readFileSync(path.join(dst, 'i18n-cs.json')) : '').digest('hex').slice(0, 8);
+      for (const f of walk(dst, [])) {
+        if (!/\.html$/.test(f)) continue;
+        let h = fs.readFileSync(f, 'utf8'); if (h.indexOf('admin-i18n.js') > -1) continue;
+        const tag = '<script src="/admin/admin-i18n.js?v=' + ver + '"></script>';
+        const m = h.match(/<head[^>]*>/i); if (!m) continue;
+        const at = h.indexOf(m[0]) + m[0].length;
+        const cs = h.slice(at).match(/^\s*<meta charset[^>]*>/i);
+        const pos = at + (cs ? cs[0].length : 0);
+        h = h.slice(0, pos) + tag + h.slice(pos); fs.writeFileSync(f, h);
+      }
+      // a fordítás fájljai a magyar „Belső irányítópult” kulcsot is tartalmazhatják — azokat érintetlenül hagyjuk
+    }
   }
   // 2) a többi oldal hivatkozásai (pl. /alairas/ → /admin/doc-render.js)
   for (const f of walk(DIST, [])) {
