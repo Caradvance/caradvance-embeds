@@ -100,6 +100,14 @@ try {
       if (h !== s) fs.writeFileSync(f, h);
     }
   }
+  // a middleware ebből a listából 301-gyel irányít (nem a 404-re vár — az elő-gyorsítótárazott régi oldal se jöhessen vissza)
+  const GL = {};
+  for (const u of gone) {
+    let x = u.replace(/^\/_np(?=\/)/, ''); let d = 'hu';
+    const m = x.match(/^\/(sk|cs|pl|ch|eu)(\/.*)$/); if (m) { d = m[1]; x = m[2]; }
+    (GL[d] = GL[d] || []); if (!GL[d].includes(x)) GL[d].push(x);
+  }
+  fs.writeFileSync(path.join(DIST, 'gone-paths.json'), JSON.stringify(GL));
   console.log('[skcz-fix1110] régi bérlési oldal törölve: ' + gone.length + ' (pl. ' + gone.slice(0, 4).join(', ') + ') · sitemapből kivéve: ' + smN);
 } catch (e) { console.log('[skcz-fix1110] régi oldalak hiba:', e && e.stack || e); }
 
