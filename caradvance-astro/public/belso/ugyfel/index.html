@@ -412,7 +412,7 @@ var TAB=(function(){var h=(location.hash||'').replace('#','');if(h==='s3'||h==='
 function deleteClient(){
   var nm=(S.card.data.kind==='ceg'&&S.card.data.company.name)||S.card.data.person.name||S.deal.name||'';
   var x=prompt('Az ügyfél VÉGLEGES törlése: '+nm+'\n\nMinden adata törlődik (adatlap, feltöltött fájlok, ajánlatok, dokumentumok, aláírások, pénzügy, napló, Ajánlatmotor). Ez nem vonható vissza.\n\nA megerősítéshez írd be: TÖRLÉS');
-  if(x==null)return;if(String(x).trim().toUpperCase()!=='TÖRLÉS')return toast('Nem törlődött — a megerősítéshez a TÖRLÉS szót kell beírni.',4000);
+  if(x==null)return;if(['TÖRLÉS','TORLES','ZMAZAŤ','ZMAZAT','SMAZAT'].indexOf(String(x).trim().toUpperCase())<0)return toast('Nem törlődött — a megerősítéshez a TÖRLÉS szót kell beírni.',4000);
   api('/card/'+ID,{method:'DELETE'}).then(function(){toast('Ügyfél törölve.');setTimeout(function(){location.href=$('backLink').href||'/belso/';},800);}).catch(function(e){toast(e.message,5000);});
 }
 function renderAll(){
