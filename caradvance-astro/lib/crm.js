@@ -11,6 +11,8 @@
  */
 import { renderDocPdf } from './docpdf.js';
 import { LESSOR } from './szerzodes-tpl.js';
+import { shellFooter, contactOf, idLineL, deliveryL, vatShort, vatLong, periodText, OFFER_MAIL, hello } from './crmi18n.js';
+export { siteOf, langOf } from './crmi18n.js';
 
 export const SITE = 'https://www.caradvance.hu';
 
@@ -195,6 +197,8 @@ export async function ensureCrm(env) {
     id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, deal_id INTEGER NOT NULL, role TEXT NOT NULL DEFAULT 'client', email TEXT NOT NULL DEFAULT '', name TEXT DEFAULT '',
     message TEXT DEFAULT '', status TEXT NOT NULL DEFAULT 'pending', created_by TEXT DEFAULT '', created_at TEXT DEFAULT (datetime('now')), expires_at INTEGER NOT NULL,
     opened_at TEXT, submitted_at TEXT, ip TEXT, files TEXT DEFAULT '[]')`).run();
+  // piac (HU / SK / CZ …): a kiküldő munkatárs domainje alapján — ebből jön az ügyféloldal és az e-mail nyelve, valamint a link domainje
+  for (const q of [`ALTER TABLE crm_offers ADD COLUMN market TEXT DEFAULT 'HU'`, `ALTER TABLE crm_datareq ADD COLUMN market TEXT DEFAULT 'HU'`]) { try { await env.DB.prepare(q).run(); } catch (e) { /* már létezik */ } }
   READY = true;
 }
 
@@ -407,23 +411,30 @@ export async function aboFleet() {
 }
 
 /* ============================== ajánlat e-mail ============================== */
-export function specLine(it) {
-  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : it.km + ' km') : '', it.fuel, it.power, it.gearbox, it.color].filter(Boolean).join(' · ');
+const SPEC_L = {
+  sk: { 'Benzin': 'Benzín', 'Dízel': 'Diesel', 'Elektromos': 'Elektrické', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in hybrid', 'Automata': 'Automat', 'Manuális': 'Manuál', 'Kézi': 'Manuál' },
+  cs: { 'Benzin': 'Benzín', 'Dízel': 'Diesel', 'Elektromos': 'Elektrický', 'Hibrid': 'Hybrid', 'Plug-in hibrid': 'Plug-in hybrid', 'Automata': 'Automat', 'Manuális': 'Manuál', 'Kézi': 'Manuál' }
+};
+export function specLine(it, lang) {
+  const tr = (v) => (lang && SPEC_L[lang] && v ? String(v).split(' / ').map((x) => SPEC_L[lang][x.trim()] || x).join(' / ') : v);
+  return [it.year, it.km ? (String(it.km).match(/km/i) ? it.km : it.km + ' km') : '', tr(it.fuel), it.power, tr(it.gearbox), it.color].filter(Boolean).join(' · ');
 }
 /** Az ajánlott autó azonosítói (mobile.de hirdetés-azonosító, gyári konfigurációs kód) — e-mailben és a válaszoldalon. */
-export function idLine(it) {
+export function idLine(it, lang) {
+  if (lang && lang !== 'hu') return idLineL(lang, it);
   return [it.ad_id ? 'mobile.de hirdetés-azonosító: ' + it.ad_id : '', it.config_code ? (it.brand ? it.brand + ' ' : '') + 'konfigurációs kód: ' + it.config_code : ''].filter(Boolean).join(' · ');
 }
 /** Bérlés: az autó egyszeri szállítási díja (alapból 300 €). */
 export const RENT_DELIVERY_EUR = 300;
-export function deliveryLabel(it) { return it && Number(it.delivery) > 0 ? 'Szállítási díj: ' + fmtPrice(it.delivery, it.currency) + ' (egyszeri)' : ''; }
-export function priceLabel(it) { return fmtPrice(it.price, it.currency) + (it.period ? ' / ' + it.period : ''); }
+export function deliveryLabel(it, lang) { return it && Number(it.delivery) > 0 ? deliveryL(lang || 'hu', fmtPrice(it.delivery, it.currency)) : ''; }
+export function priceLabel(it, lang) { return fmtPrice(it.price, it.currency) + (it.period ? ' / ' + (lang && lang !== 'hu' ? periodText(lang, it.period) : it.period) : ''); }
 /** Az ajánlati ár ÁFA-típusa: nettó / bruttó 27% magyar ÁFA / bruttó 19% német ÁFA. */
 export const VAT_MODES = { net: { short: 'nettó', long: 'nettó ár (ÁFA nélkül)', rate: 0 }, hu27: { short: 'bruttó, 27% ÁFA', long: 'bruttó ár, 27% magyar ÁFA-val', rate: 0.27 }, de19: { short: 'bruttó, 19% német ÁFA', long: 'bruttó ár, 19% német ÁFA-val', rate: 0.19 } };
-export function vatText(it) { const v = VAT_MODES[it && it.vat_mode]; return v ? v.short : ''; }
-export function priceVatLabel(it) { const v = vatText(it); return priceLabel(it) + (v ? ' (' + v + ')' : ''); }
+export function vatText(it, lang) { const v = VAT_MODES[it && it.vat_mode]; return !v ? '' : lang && lang !== 'hu' ? vatShort(lang, it.vat_mode) : v.short; }
+export function priceVatLabel(it, lang) { const v = vatText(it, lang); return priceLabel(it, lang) + (v ? ' (' + v + ')' : ''); }
 
-export function offerEmailHtml({ clientName, items, message, link, attached }) {
+export function offerEmailHtml({ clientName, items, message, link, attached, lang }) {
+  if (lang && OFFER_MAIL[lang]) return offerEmailHtmlL(lang, { clientName, items, message, link, attached });
   const cards = items.map((it, i) => `
   <tr><td style="padding:0 0 14px">
     <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;overflow:hidden">
@@ -451,6 +462,38 @@ ${message ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;w
   <a href="${esc(link)}&amp;a=modosit" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;padding:11px 21px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 8px">Módosítást kérek</a>
 </p>
 <p style="color:#9aa2ad;font-size:12px">Ha a gombok nem működnek, nyissa meg ezt a linket: ${esc(link)}</p>`;
+}
+
+/** Az ajánlat e-mailje szlovákul / csehül (SK / CZ piac) — ugyanaz a felépítés, mint a magyar változaté. */
+function offerEmailHtmlL(lang, { clientName, items, message, link, attached }) {
+  const T = OFFER_MAIL[lang]; const many = items.length > 1;
+  const cards = items.map((it, i) => `
+  <tr><td style="padding:0 0 14px">
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e6eaf1;border-radius:12px;overflow:hidden">
+      ${it.image ? `<tr><td>${it.url ? `<a href="${esc(it.url)}">` : ''}<img src="${esc(it.image)}" alt="" width="472" style="display:block;width:100%;max-width:472px;height:auto;border:0">${it.url ? '</a>' : ''}</td></tr>` : ''}
+      <tr><td style="padding:14px 16px">
+        <div style="font-size:16px;font-weight:bold;color:#141519">${esc(it.title)}</div>
+        ${specLine(it, lang) ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">${esc(specLine(it, lang))}</div>` : ''}
+        ${idLine(it, lang) ? `<div style="font-size:12px;color:#374151;margin-top:5px;background:#f4f7fb;border-radius:6px;padding:5px 8px;display:inline-block">${esc(idLine(it, lang))}</div>` : ''}
+        ${it.file_id ? `<div style="font-size:12px;color:#6b7280;margin-top:5px">${T.pdf}</div>` : ''}
+        ${it.config_url ? `<div style="margin-top:6px"><a href="${esc(it.config_url)}" style="font-size:13px;font-weight:bold;color:#22447d">${T.config}</a></div>` : ''}
+        ${it.note ? `<div style="font-size:13px;color:#374151;margin-top:6px">${esc(it.note)}</div>` : ''}
+        <div style="font-size:18px;font-weight:bold;color:#e2001a;margin-top:10px">${esc(priceLabel(it, lang))}${vatLong(lang, it.vat_mode) ? `<span style="font-size:12px;font-weight:normal;color:#6b7280"> · ${esc(vatLong(lang, it.vat_mode))}</span>` : ''}</div>
+        ${deliveryLabel(it, lang) ? `<div style="font-size:13px;color:#374151;margin-top:3px">+ ${esc(deliveryLabel(it, lang))}</div>` : ''}
+        <div style="margin-top:12px"><a href="${esc(link)}&amp;v=${i}" style="background:#141519;color:#fff;text-decoration:none;font-weight:bold;font-size:13px;padding:10px 18px;border-radius:999px;display:inline-block;margin:0 6px 6px 0">${T.pickBtn}</a>${it.url ? `<a href="${esc(it.url)}" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;font-size:13px;padding:9px 17px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 6px">${T.carBtn}</a>` : ''}</div>
+      </td></tr>
+    </table>
+  </td></tr>`).join('');
+  return `<p>${esc(hello(lang, clientName))}</p>
+<p>${T.intro(many, attached)}</p>
+${message ? `<p style="background:#f4f7fb;border-radius:10px;padding:12px 14px;white-space:pre-line">${esc(message)}</p>` : ''}
+<table width="100%" cellpadding="0" cellspacing="0">${cards}</table>
+<p style="margin:18px 0 8px">${T.ask}</p>
+<p style="margin:0 0 6px">
+  <a href="${esc(link)}&amp;a=elfogad" style="background:#e2001a;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:999px;display:inline-block;margin:0 6px 8px 0">${T.accept}</a>
+  <a href="${esc(link)}&amp;a=modosit" style="background:#fff;color:#141519;text-decoration:none;font-weight:bold;padding:11px 21px;border-radius:999px;display:inline-block;border:1px solid #c9ced8;margin:0 0 8px">${T.modify}</a>
+</p>
+<p style="color:#9aa2ad;font-size:12px">${T.fallback} ${esc(link)}</p>`;
 }
 
 /* ============================== szerződéssablonok ============================== */
@@ -733,12 +776,12 @@ export function contractPdfFromText(filled, meta) {
 }
 
 /* ============================== e-mail (Resend) ============================== */
-export function emailShell(inner) {
+export function emailShell(inner, lang) {
   return `<div style="background:#f4f7fb;padding:24px 12px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#141519">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e6eaf1">
     <div style="background:#0b0b0d;padding:18px 24px"><img src="${SITE}/caradvance-logo-email.png" alt="CarAdvance" width="180" height="60" style="width:180px;height:60px;display:block;border:0"></div>
     <div style="padding:26px 24px 22px">${inner}</div>
-    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px;line-height:1.55"><b style="color:#141519">CarAdvance</b> · ${esc(LESSOR.helper)} · ${esc(LESSOR.helperOffice)}<br>Kérdés esetén válaszoljon erre az e-mailre, vagy hívjon: +36 30 233 6060.</div>
+    <div style="padding:14px 24px;background:#f4f7fb;color:#6b7280;font-size:12px;line-height:1.55"><b style="color:#141519">CarAdvance</b> · ${esc(LESSOR.helper)} · ${esc(LESSOR.helperOffice)}<br>${shellFooter(lang || 'hu')}</div>
   </div></div>`;
 }
 /** to: string vagy tömb. attachments: [{ filename, content(base64) }]. Visszatér: { ok, error } */
@@ -748,7 +791,7 @@ export async function sendCrmMail(env, to, subject, inner, attachments, opts) {
     // a CRM (ajánlatok, szerződések, aláírás) levelei a sales@ címről mennek; env-ben felülírható
     from: env.CRM_EMAIL_FROM || 'CarAdvance <sales@caradvance.hu>',
     to: (Array.isArray(to) ? to : String(to).split(',')).map((s) => s.trim()).filter(Boolean),
-    reply_to: env.CRM_REPLY_TO || 'sales@caradvance.hu', subject, html: emailShell(inner),
+    reply_to: (opts && opts.lang && opts.lang !== 'hu') ? contactOf(opts.lang).email : (env.CRM_REPLY_TO || 'sales@caradvance.hu'), subject, html: emailShell(inner, opts && opts.lang),
     text: inner.replace(/<br\s*\/?>/g, '\n').replace(/<\/(p|tr|div)>/g, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\n{3,}/g, '\n\n').trim()
   };
   if (attachments && attachments.length) body.attachments = attachments;

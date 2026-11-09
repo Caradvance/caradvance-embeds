@@ -342,7 +342,7 @@ class Layout {
       if (es) {
         const im = es.img; const ih = 34; const iw = Math.min(cw - 10, ih * im.w / im.h);
         this.d.image(x + 2, lineY + 1.5, iw, iw * im.h / im.w, null, im);
-        const lb = (es.de ? 'elektronisch unterschrieben · ' : 'elektronikusan aláírva · ') + es.when;
+        const lb = (es.de ? 'elektronisch unterschrieben · ' : es.lang === 'sk' ? 'elektronicky podpísané · ' : es.lang === 'cs' ? 'elektronicky podepsáno · ' : 'elektronikusan aláírva · ') + es.when;
         this.d.text(lb, x + cw - 6 - this.d.width(lb, 'L', 5.6), lineY + 2.5, 'L', 5.6, C.red);
       } else if (this.meta.specimens && this.meta.specimens.length) {
         // tárolt aláírásminta (személyek / céges aláírók): a hasáb neve (~~) vagy címe alapján
@@ -358,9 +358,33 @@ class Layout {
   }
 }
 
+/** Tanúsítvány-oldal szlovák / cseh ügyfélnek (SK / CZ piac) — ugyanaz a tartalom, a helyi nyelven. */
+const CERT_TXT = {
+  sk: { tag: 'Elektronický podpis · Protokol o podpise', title: 'Protokol o podpise', sub: 'Údaje a kontrolné kódy elektronického podpisu',
+    note: 'Tento list je neoddeliteľnou súčasťou dokumentu. Kontrolný kód SHA-256 obsahu dokumentu bol zaznamenaný pri podpise; akákoľvek dodatočná zmena kód zmení. Jednoduchý elektronický podpis (nariadenie eIDAS, čl. 3 bod 10); podpisujúci bol overený jednorazovým kódom (OTP) zaslaným na jeho e-mailovú adresu.',
+    hand: 'Vlastnoručný (digitálne nakreslený) podpis podpisujúceho:', stmt: 'Vyhlásenie podpisujúceho: „' },
+  cs: { tag: 'Elektronický podpis · Protokol o podpisu', title: 'Protokol o podpisu', sub: 'Údaje a kontrolní kódy elektronického podpisu',
+    note: 'Tento list je nedílnou součástí dokumentu. Kontrolní kód SHA-256 obsahu dokumentu byl zaznamenán při podpisu; jakákoli dodatečná změna kód změní. Prostý elektronický podpis (nařízení eIDAS, čl. 3 bod 10); podepisující byl ověřen jednorázovým kódem (OTP) zaslaným na jeho e-mailovou adresu.',
+    hand: 'Vlastnoruční (digitálně nakreslený) podpis podepisujícího:', stmt: 'Prohlášení podepisujícího: „' }
+};
+function certificatePageL(L, sg, img, k, n, T) {
+  const d = L.d;
+  L.tag(T.tag + (n > 1 ? ' · ' + k + '/' + n : ''));
+  L.title(T.title, (sg.title ? sg.title + ' — ' : '') + T.sub);
+  L.note(T.note);
+  for (const [kk, v] of sg.rows || []) L.row([[kk, String(v == null ? '' : v)]]);
+  if (img) {
+    L.ensure(120); L.y -= 14; d.text(T.hand, L.x0, L.y, 'R', 8, C.mut); L.y -= 8;
+    const h = 80; const w = Math.min(260, h * img.w / img.h);
+    d.stroke(L.x0, L.y - h - 8, w + 16, h + 8, C.line, 0.6); d.image(L.x0 + 8, L.y - h - 4, w, w * img.h / img.w > h ? h : w * img.h / img.w, null, img); L.y -= h + 20;
+  }
+  if (sg.statement) { L.y -= 6; L.para(T.stmt + sg.statement + '”', { size: 7.6, color: C.mut }); }
+}
+
 /** Az elektronikus aláírás tanúsítvány-oldala (audit-napló) a dokumentum végén. */
 function certificatePage(L, sg, img, k, n) {
   const d = L.d; L.newPage();
+  const CL = CERT_TXT[sg.lang]; if (CL && !sg.de) return certificatePageL(L, sg, img, k, n, CL);
   L.tag('Elektronikus aláírás · Signaturprotokoll' + (n > 1 ? ' · ' + k + '/' + n : ''));
   L.title(sg.de ? 'Signaturprotokoll / Aláírási tanúsítvány' : 'Aláírási tanúsítvány', (sg.title ? sg.title + ' — ' : '') + (sg.de ? 'Daten und Prüfwerte der elektronischen Unterschrift' : 'Az elektronikus aláírás adatai és ellenőrző kódjai'));
   L.note('Ez a lap a dokumentum elválaszthatatlan része. A dokumentum tartalmának SHA-256 ellenőrzőkódja az aláíráskor rögzítésre került; bármilyen utólagos módosítás megváltoztatja a kódot. Egyszerű elektronikus aláírás (eIDAS-rendelet 3. cikk 10. pont), az aláíró azonosítása az e-mail címére küldött egyszeri kóddal (OTP) történt.');
@@ -445,7 +469,7 @@ export function renderDocPdf(filled, meta) {
     const inf = sg.jpeg && jpegInfo(sg.jpeg);
     return { sg, img: inf ? { bytes: sg.jpeg, ...inf } : null };
   });
-  meta2.sigs = signs.filter((x) => x.img).map(({ sg, img }) => ({ img, de: !!sg.de, when: sg.when || '', keys: (Array.isArray(sg.match) ? sg.match : [sg.match]).map(normName).filter(Boolean) }));
+  meta2.sigs = signs.filter((x) => x.img).map(({ sg, img }) => ({ img, de: !!sg.de, lang: sg.lang || '', when: sg.when || '', keys: (Array.isArray(sg.match) ? sg.match : [sg.match]).map(normName).filter(Boolean) }));
   // tárolt aláírásminták: [{ names: [...], jpeg: Uint8Array }]
   meta2.specimens = (meta.specimens || []).map((z) => { const inf = z.jpeg && jpegInfo(z.jpeg); return inf ? { img: { bytes: z.jpeg, ...inf }, keys: (z.names || []).map(normName).filter(Boolean) } : null; }).filter(Boolean);
   const L = new Layout(meta2);

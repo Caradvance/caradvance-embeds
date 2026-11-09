@@ -6,10 +6,13 @@ import {
   huDateTime, SIGN_STATEMENT, SIGN_STATEMENT_DE, SITE, syncDocChecklist, syncSignStatus
 } from './crm.js';
 import { renderDocPdf } from './docpdf.js';
+import { langOf, statementOf, CERT_LB, certIdent, signedMail, bothSignedMail } from './crmi18n.js';
 
 export const KIND_SUB = { szerzodes: 'Szerződés', meghatalmazas: 'Meghatalmazás', nyilatkozat: 'Nyilatkozat', melleklet: 'Melléklet', egyeb: 'Dokumentum' };
 export const nowSec = () => Math.floor(Date.now() / 1000);
 export const isPartnerReq = (r) => r.signer_role === 'partner';
+/** Az ügyfél (nem partner) nyelve a kérelem piaca szerint: SK → sk, CZ → cs, egyébként magyar. */
+export const clientLang = (r) => langOf(r && r.market);
 export const fwdOf = (env) => (env.CRM_TEST_FORWARD === 'off' ? null : (env.CRM_TEST_FORWARD || 'marc.nemethy@bhgeu.com'));
 export const randomHex = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map((x) => x.toString(16).padStart(2, '0')).join('');
 const fileBase = (name) => (name.split(' — ')[0]).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9_.-]+/g, '_').replace(/_+/g, '_').slice(0, 80);
@@ -38,9 +41,10 @@ export async function completeSign(env, r, o) {
   const { name, sigBytes, sigB64, ip, ua } = o;
   const atIso = new Date().toISOString(); const when = huDateTime(atIso);
   const sigSha = await sha256hex(sigBytes);
-  const statement = de ? SIGN_STATEMENT_DE : SIGN_STATEMENT;
-  const lb = (hu, g) => (de ? g + ' / ' + hu : hu);
-  const ident = o.ident || (de ? 'Einmalcode (OTP) an die E-Mail-Adresse geprüft' : 'az e-mail címre küldött egyszeri kód (OTP) ellenőrizve');
+  const lang = de ? 'de' : clientLang(r); // SK / CZ ügyfél: szlovák / cseh tanúsítvány és nyilatkozat
+  const statement = de ? SIGN_STATEMENT_DE : (statementOf(lang) || SIGN_STATEMENT);
+  const lb = (hu, g) => (de ? g + ' / ' + hu : (CERT_LB[hu] && CERT_LB[hu][lang]) || hu);
+  const ident = o.ident || (de ? 'Einmalcode (OTP) an die E-Mail-Adresse geprüft' : certIdent(lang) || 'az e-mail címre küldött egyszeri kód (OTP) ellenőrizve');
   // ellenjegyzés: az ügyfél aláírása után a kétnyelvű dokumentumok az illetékes partnerhez kerülnek (crm_partners)
   const partners = de ? [] : await activePartners(env);
   const docs = parseJ(r.docs, []); const result = []; const att = []; const cos = [];
@@ -55,7 +59,7 @@ export async function completeSign(env, r, o) {
       [lb('Aláírás időpontja', 'Zeitpunkt der Unterschrift'), when + ' (Europe/Budapest) · ' + atIso + ' (UTC)'],
       [lb('IP-cím', 'IP-Adresse'), ip || '—'], [lb('Eszköz / böngésző', 'Gerät / Browser'), ua || '—'], [lb('Aláíráskép SHA-256', 'Unterschriftsbild SHA-256'), sigSha]
     ];
-    const mine = { jpeg: sigBytes, match: de ? (d.match || []) : (d.match || r.signer_name), when, statement, rows, de, title: de ? 'Gegenzeichnung / Ellenjegyzés' : '' };
+    const mine = { jpeg: sigBytes, match: de ? (d.match || []) : (d.match || r.signer_name), when, statement, rows, de, lang: de ? '' : lang, title: de ? 'Gegenzeichnung / Ellenjegyzés' : '' };
     // melyik partner jegyzi ellen (a kiküldéskor rögzített hasábnevek alapján; régi kérelmeknél az első partner)
     const P = !de && Array.isArray(d.cosign) && d.cosign.length ? (partners.find((p) => p.id === d.cosign_pid) || (!d.cosign_pid && partners[0]) || null) : null;
     const pdf = pdfFor(d, priorSigns(r, d).concat([mine]));
@@ -67,7 +71,7 @@ export async function completeSign(env, r, o) {
     result.push({ doc_id: d.doc_id, name: d.name, file_id: f.id, pdf_sha: pdfSha, cosign: !!P });
     att.push({ filename: fname, content: b64, cosign: !!P, pid: P ? P.id : null });
     if (P) cos.push({ pid: P.id, doc: { doc_id: d.doc_id, name: d.name, kind: d.kind, text: d.text, hash: d.hash, number: d.number || '', match: d.cosign, sigs: d.sigs || [],
-      prior: { match: mine.match, when, statement, rows, name }, client_file_id: f.id } });
+      prior: { match: mine.match, when, statement, rows, name, lang: mine.lang }, client_file_id: f.id } });
   }
   await env.DB.prepare(`UPDATE crm_sign SET status = 'signed', signed_at = datetime('now'), sign_name = ?, sign_ip = ?, sign_ua = ?, sig_sha = ?, result = ? WHERE id = ?`)
     .bind(name, ip, ua, sigSha, JSON.stringify(result), r.id).run();
@@ -108,7 +112,9 @@ async function afterClientSign(env, r, result, att, cos, partners, name, when, f
   const done = result.filter((x) => !x.cosign); const wait = result.filter((x) => x.cosign);
   const li = (a) => `<ul>${a.map((x) => `<li>${esc(x.name)}</li>`).join('')}</ul>`;
   const coNames = [...new Set(cos.map((c) => (partners.find((p) => p.id === c.pid) || {}).company).filter(Boolean))].join(', ') || 'a partner';
-  try {
+  const SM = signedMail(clientLang(r), { name: esc(r.signer_name || name), when: esc(when), list: li(result), doneCount: done.length, waitNames: wait.length ? wait.map((x) => esc(x.name)).join(', ') : '', coNames: esc(coNames === 'a partner' ? 'Caradvance GmbH' : coNames) });
+  if (SM) { try { await sendCrmMail(env, fwd || r.email, `${fwd ? '[TESZT — ' + r.email + '] ' : ''}${SM.subject}`, SM.html, att.filter((a) => !a.cosign).map(({ filename, content }) => ({ filename, content })), { lang: clientLang(r) }); } catch (e) { /* a levél hibája nem érvényteleníti az aláírást */ } }
+  else try {
     await sendCrmMail(env, fwd || r.email, `${fwd ? '[TESZT — ' + r.email + '] ' : ''}Aláírt dokumentumok — CarAdvance`,
       `<p>Kedves ${esc(r.signer_name || name)}!</p><p>Köszönjük, az alábbi dokumentumokat elektronikusan aláírta (${esc(when)}):</p>${li(result)}`
       + (done.length ? `<p>${wait.length ? 'A már végleges' : 'Az aláírt'} példányokat (PDF, aláírási tanúsítvánnyal) csatoltan küldjük — kérjük, őrizze meg őket.</p>` : '')
@@ -155,7 +161,9 @@ async function finishCosign(env, r, result, att, name, when, fwd) {
   const sales = env.CRM_BCC && env.CRM_BCC !== 'off' ? env.CRM_BCC : ''; // a sales@ címre alapból nem megy
   const T = pT(P ? P.lang : 'de');
   try {
-    if (cEmail) await sendCrmMail(env, fwd || cEmail, `${fwd ? '[TESZT — ' + cEmail + '] ' : ''}Mindkét fél által aláírt dokumentumok — CarAdvance`,
+    const BM = parent && bothSignedMail(clientLang(parent), { name: esc(client), partner: esc(r.signer_name), when: esc(when), list: li });
+    if (cEmail && BM) await sendCrmMail(env, fwd || cEmail, `${fwd ? '[TESZT — ' + cEmail + '] ' : ''}${BM.subject}`, BM.html, files, { noCopy: true, lang: clientLang(parent) });
+    else if (cEmail) await sendCrmMail(env, fwd || cEmail, `${fwd ? '[TESZT — ' + cEmail + '] ' : ''}Mindkét fél által aláírt dokumentumok — CarAdvance`,
       `<p>Kedves ${esc(client)}!</p><p>A(z) ${esc(r.signer_name)} is aláírta az alábbi dokumentumokat (${esc(when)}):</p>${li}<p>A mindkét fél által aláírt végleges példányokat (PDF, aláírási tanúsítványokkal) csatoltan küldjük — kérjük, őrizze meg őket.</p><p>Üdvözlettel:<br>CarAdvance</p>`, files, { noCopy: true });
   } catch (e) { /* nem kritikus */ }
   try {
