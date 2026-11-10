@@ -614,6 +614,7 @@ const faqJsonld = {
 
   var makeSel = document.getElementById('b-make');
   var modelSel = document.getElementById('b-model');
+  var MODEL_PH = modelSel ? modelSel.innerHTML : '';
   var fillModels = function(){
     var data = MODELS[mkKey(makeSel.value)] || MODELS[makeSel.value];
     var has = !!data && (Array.isArray(data) ? data.length : Object.keys(data).length);
@@ -773,6 +774,8 @@ const faqJsonld = {
   };
 
   makeSel.addEventListener('change', function(){ fillModels(); updateCompare(); });
+  // sikeres küldés / törlés után (form.reset) a modell-lista is álljon vissza „Előbb válassz márkát…”-ra (a lap saját, lefordított szövegével)
+  form.addEventListener('reset', function(){ setTimeout(function(){ if(!makeSel.value){ modelSel.innerHTML = MODEL_PH; modelSel.disabled = true; } }, 0); });
   form.addEventListener('change', updateCompare);
   ['b-type','b-hp-from','b-hp-to','b-budget'].forEach(function(id){ var e=document.getElementById(id); if(e) e.addEventListener('input', updateCompare); });
 
@@ -949,7 +952,7 @@ const faqJsonld = {
   var resetBtn = document.getElementById('ikReset');
   if(resetBtn) resetBtn.addEventListener('click', function(){
     form.reset();
-    modelSel.innerHTML = '<option value="" disabled selected>Előbb válassz márkát…</option>'; modelSel.disabled = true;
+    modelSel.innerHTML = MODEL_PH; modelSel.disabled = true;
     ['b-year-to','b-year-from','b-km-to','b-km-from'].forEach(function(id){ var e=document.getElementById(id); if(e) [].slice.call(e.options).forEach(function(o){ o.hidden=false; o.disabled=false; }); });
     document.getElementById('finBox').hidden = true;
     document.getElementById('privBox').hidden = false; document.getElementById('compBox').hidden = true;
