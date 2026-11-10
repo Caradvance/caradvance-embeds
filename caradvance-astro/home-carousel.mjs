@@ -37,6 +37,7 @@ const escH = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '
 const CSS = '<style id="ca-cf3d-css">'
   // fejléc: balra cím + fülek, jobbra márkák
   + '#autoink .autok-head{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap}'
+  + '#autoink .ah-t{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}#autoink .autok-head{align-items:center}'
   + '#autoink .ah-l{display:flex;flex-direction:column;gap:14px;min-width:0}#autoink .ah-l .autok-tabs{align-self:flex-start;margin:0}'
   + '#autoink .ah-r{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center;flex:1 1 420px}'
   + '#autoink .cf-br{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;min-width:44px;padding:0 11px;border-radius:999px;border:1px solid rgba(127,127,127,.25);background:#fff;cursor:pointer;font:inherit;font-weight:700;font-size:13.5px;color:#141519;transition:.15s;box-shadow:0 2px 8px rgba(8,8,10,.05)}'
@@ -318,7 +319,7 @@ try {
     BR = O.filter((b) => +T0[b] > 0).map(bkey).filter((k, i, a) => LOGO[k] && a.indexOf(k) === i);
   } catch (e) { console.log('[home-carousel] márkák:', e.message); }
   if (!BR.length) BR = ['volkswagen', 'bmw', 'mercedes', 'mini', 'audi', 'hyundai', 'man', 'cupra'];
-  let n = 0, miss = 0, tb = 0; const tbHubs = {}, tbMiss = [];
+  let n = 0, miss = 0, tb = 0, moved = 0; const tbHubs = {}, tbMiss = [];
   for (const f of walk(DIST, [])) {
     let h = fs.readFileSync(f, 'utf8');
     if (h.indexOf('id="cw-elado"') < 0 || h.indexOf('function coverflow(root){') < 0 || h.indexOf('id="ca-cf3d-css"') > -1) continue;
@@ -332,13 +333,24 @@ try {
     // 3) fejléc: balra cím + fülek, jobbra márkák
     const chips = '<button type="button" class="cf-br on" data-b="" aria-pressed="true">' + escH(T.all) + '</button>'
       + BR.map((k) => { const [file, name] = LOGO[k]; return '<button type="button" class="cf-br" data-b="' + k + '" aria-pressed="false" title="' + escH(name) + '"><img class="cf-d" src="/bl-' + file + '-dark.webp" alt="' + escH(name) + '" width="48" height="24" loading="lazy"><img class="cf-l" src="/bl-' + file + '.webp" alt="" width="48" height="24" loading="lazy"></button>'; }).join('');
-    h = h.replace(/<div class="autok-head">\s*<div>([\s\S]*?)<\/div>\s*(<div class="autok-tabs"[^>]*>[\s\S]*?<\/div>)\s*<\/div>/, (m, left, tabs) => '<div class="autok-head"><div class="ah-l"><div>' + left + '</div>' + tabs + '</div><div class="ah-r" role="group" aria-label="' + escH(T.brands) + '">' + chips + '</div></div>');
+    // a „Kínálat / Autóink” cím egyelőre nem látszik (csak képernyőolvasónak marad meg a címsor)
+    h = h.replace(/<div class="autok-head">\s*<div>([\s\S]*?)<\/div>\s*(<div class="autok-tabs"[^>]*>[\s\S]*?<\/div>)\s*<\/div>/, (m, left, tabs) => '<div class="autok-head"><div class="ah-l"><div class="ah-t">' + left + '</div>' + tabs + '</div><div class="ah-r" role="group" aria-label="' + escH(T.brands) + '">' + chips + '</div></div>');
+    // a blokk közvetlenül a fő fejléc (hero) után, a statisztika-sáv elé
+    try {
+      const a0 = h.indexOf('<section class="wrap" id="autoink">'), a1 = a0 > -1 ? h.indexOf('</section>', a0) : -1;
+      const h0 = h.indexOf('<section class="hero"'), h1 = h0 > -1 ? h.indexOf('</section>', h0) : -1;
+      if (a0 > -1 && a1 > -1 && h1 > -1 && h1 < a0) {
+        const blk = h.slice(a0, a1 + 10); h = h.slice(0, a0) + h.slice(a1 + 10);
+        h = h.slice(0, h1 + 10) + '\n' + blk + h.slice(h1 + 10); moved++;
+      }
+    } catch (e) { console.log('[home-carousel] áthelyezés:', e.message); }
     // 4) CSS + kliens
     h = h.replace('</head>', CSS + '<script id="ca-cf3d-js">window.__CA_CF_T=' + JSON.stringify(TX) + ';(' + CLIENT.toString() + ')();</script></head>');
     // 5) Bérelhető fül = tartós bérlet (a /autoink/ #berelheto kártyái)
     try { const [h2, hub] = addTartos(f, h); if (hub) { h = h2; tb++; tbHubs[hub] = (tbHubs[hub] || 0) + 1; } else tbMiss.push(path.relative(DIST, f)); } catch (e) { console.log('[home-carousel] tartós bérlet hiba:', f, e.message); }
     fs.writeFileSync(f, h); n++;
   }
+  console.log('[home-carousel] a hero után áthelyezve: ' + moved + ' oldal');
   console.log('[home-carousel] 3D körhinta + márkaválasztó: ' + n + ' oldal' + (miss ? ' · kimaradt: ' + miss : '') + ' · márkák: ' + BR.join(','));
   console.log('[home-carousel] tartós bérlet a Bérelhető fülön: ' + tb + ' oldal ' + JSON.stringify(tbHubs) + (tbMiss.length ? ' · nincs hub: ' + tbMiss.join(', ') : ''));
 } catch (e) { console.log('[home-carousel] hiba:', e && e.stack || e); }
