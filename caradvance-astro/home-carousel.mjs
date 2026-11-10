@@ -66,6 +66,15 @@ const CSS = '<style id="ca-cf3d-css">'
   // tartós bérlet kártyák (a /autoink/ #berelheto kártyái) a körhintában
   + '#autoink .cw.cf3d .cw-item.cw-tb>.sub-card{width:100%;border-radius:20px;transition:box-shadow .45s}#autoink .cw.cf3d .cw-item.cw-tb>.sub-card:hover{transform:none}'
   + '#autoink .cw.cf3d .cw-item.cw-tb.cw-c>.sub-card{box-shadow:0 26px 60px rgba(226,0,26,.16),0 0 0 2px rgba(226,0,26,.38)!important}'
+  // a középső (fő) kártya mindig „aktív”: színes gombok + fekete árdoboz
+  + '#autoink .cw-tb.cw-c .sub-det,#autoink .cw-tb.cw-c .sub-actions .ca-cmp{background:#0b0b0d!important;color:#fff!important}'
+  + '#autoink .cw-tb.cw-c .sub-btn{background:#e2001a!important;color:#fff!important}'
+  + '#autoink #cw-berelheto .cw-track:empty{min-height:640px}'
+  + '#autoink .cw-tb .ca-pbox{transition:background .35s,border-color .35s}'
+  + '#autoink .cw-tb.cw-c .ca-pbox{background:#0b0b0d!important;border-color:#0b0b0d!important}'
+  + '#autoink .cw-tb.cw-c .ca-pbox *:not(.ca-pt):not(.ca-seg):not(.ca-seg *):not(.sub-tip):not(.sub-tip *){color:rgba(255,255,255,.74)!important;border-color:rgba(255,255,255,.16)!important}'
+  + '#autoink .cw-tb.cw-c .ca-pbox .ca-pv,#autoink .cw-tb.cw-c .ca-pbox .ca-pv *{color:#fff!important}'
+  + '#autoink .cw-tb.cw-c .ca-seg{background:rgba(255,255,255,.14)!important}#autoink .cw-tb.cw-c .ca-seg button{color:rgba(255,255,255,.82)!important}#autoink .cw-tb.cw-c .ca-seg button.on{background:#fff!important;color:#0b0b0d!important}'
   + '#autoink .cw.cf3d .cw-item.cw-tb.cf-side .sub-card{cursor:pointer}#autoink .ca-tbsrc{display:none!important}'
   + '#autoink .cf-ctl{display:flex;justify-content:center;gap:14px;margin:6px 0 4px;position:relative;z-index:5}'
   + '#autoink .cf-btn{width:52px;height:52px;border-radius:50%;border:1px solid rgba(127,127,127,.22);background:#fff;color:#141519;font-size:26px;line-height:1;cursor:pointer;box-shadow:0 10px 26px rgba(8,8,10,.14);display:flex;align-items:center;justify-content:center;transition:.15s}'
@@ -244,6 +253,7 @@ const TB_CLIENT = function () {
   window.__caTBrun = run;
   function arm() {
     var a = document.getElementById('autoink'); if (!a) return;
+    var pb = document.getElementById('panel-berelheto'); if (pb && pb.classList.contains('on')) { run(); return; }
     if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (es) { if (es.some(function (x) { return x.isIntersecting; })) { io.disconnect(); run(); } }, { rootMargin: '900px 0px' }); io.observe(a); }
     else run();
     var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 2500); };
@@ -300,10 +310,13 @@ function addTartos(f, h) {
   const extra = [...new Set([...hh.matchAll(/\sid="(sub-[a-z0-9-]+)"/g)].map((x) => x[1]))].filter((x) => seg.indexOf('id="' + x + '"') < 0 && h.indexOf('id="' + x + '"') < 0);
   const mount = '<div class="ca-tbsrc" aria-hidden="true">' + seg + extra.map((x) => '<span id="' + x + '" hidden></span>').join('') + '<span class="sub-rate" hidden></span></div>';
   h = h.replace('<div class="autok-panel" id="panel-berelheto">', '<div class="autok-panel" id="panel-berelheto">' + mount);
+  // alapból a Bérelhető (első) fül aktív, utána Eladó, Bizományos
+  h = h.replace(/class="autok-tab on"(\s+data-tab="elado")/, 'class="autok-tab"$1').replace(/class="autok-tab"(\s+data-tab="berelheto")/, 'class="autok-tab on"$1')
+    .replace('class="autok-panel on" id="panel-elado"', 'class="autok-panel" id="panel-elado"').replace('class="autok-panel" id="panel-berelheto"', 'class="autok-panel on" id="panel-berelheto"');
   h = h.replace(/function build\(id,html\)\{/, "function build(id,html){if(id==='cw-berelheto'&&window.__caTB){window.__caTBfb=html;return;}");
   // „Összes bérelhető autónk” → a tartós bérlet kínálat
   const rel = '/' + path.relative(DIST, path.join(dir, hub)).split(path.sep).join('/') + '/#berelheto';
-  h = h.replace(/(<div class="autok-panel" id="panel-berelheto">[\s\S]*?<div class="autok-more"><a\b[^>]*?href=")[^"]*(")/, '$1' + rel + '$2');
+  h = h.replace(/(<div class="autok-panel(?: on)?" id="panel-berelheto">[\s\S]*?<div class="autok-more"><a\b[^>]*?href=")[^"]*(")/, '$1' + rel + '$2');
   const tpl = '<template id="ca-tb-tpl">' + css + js + '</template><script id="ca-tb-js">(' + TB_CLIENT.toString() + ')();</script>';
   h = h.replace(/<\/body>(?![\s\S]*<\/body>)/i, tpl + '</body>').replace('</head>', '<script>window.__caTB=1;</script></head>');
   return [h, hub];
