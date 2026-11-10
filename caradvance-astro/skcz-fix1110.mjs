@@ -97,7 +97,7 @@ const NA = {
 };
 const naLang = (h) => { const l = ((h.match(/<html[^>]*\slang="([a-zA-Z-]+)"/) || [])[1] || 'hu').toLowerCase().slice(0, 2); return NA[l] ? l : 'en'; };
 const escH = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const NA_CSS = '<style id="ca-na-css">.ca-na .ca-pbox,.ca-na .cd-note{display:none!important}.ca-na-chip{background:#e2001a!important;color:#fff!important;border-color:#e2001a!important}'
+const NA_CSS = '<style id="ca-na-css">.ca-na .ca-pbox,.ca-na .cd-note,.ca-na .cd-nav-price,.ca-na #arak,.ca-na a[href="#arak"]{display:none!important}.ca-na-chip{background:#e2001a!important;color:#fff!important;border-color:#e2001a!important}'
   + '.ca-na-box{margin:14px 0 16px;padding:16px 18px;border-radius:14px;background:rgba(226,0,26,.07);border:1px solid rgba(226,0,26,.28)}.ca-na-box b{display:block;font-size:17px;margin-bottom:4px}.ca-na-box span{opacity:.85;font-size:14.5px;line-height:1.5}'
   + '.ca-wl-m{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(10,10,12,.62);padding:16px}.ca-wl-m.on{display:flex}'
   + '.ca-wl-d{position:relative;width:100%;max-width:440px;background:#fff;color:#141519;border-radius:18px;padding:22px 22px 18px;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit;max-height:92vh;overflow:auto}'
@@ -203,6 +203,9 @@ try {
       const box = '<div class="ca-na-box"><b>' + escH(T.box) + '</b><span>' + escH(T.boxTx) + '</span></div>';
       if (/<div class="ca-pbox/.test(h)) h = h.replace(/(<div class="ca-pbox)/, box + '$1');
       h = h.replace(/<div class="cd-cta">[\s\S]*?<\/div>/g, () => '<div class="cd-cta"><a class="cd-btn cd-btn-red ca-wl-open" href="#" data-car="' + escH(car) + '">' + escH(T.want) + '</a><a class="cd-btn cd-btn-white" href="' + escH(hubUrl) + '">' + escH(T.avail) + '</a></div>');
+      // az információs blokk második gombsora (cd-cta2) és minden további bérlési gomb (?berles=… — sticky menü, alsó sáv)
+      h = h.replace(/<div class="cd-cta2">[\s\S]*?<\/div>/g, () => '<div class="cd-cta2"><a class="cd-btn cd-btn-red ca-wl-open" href="#" data-car="' + escH(car) + '">' + escH(T.want) + '</a><a class="cd-btn cd-btn-dark" href="' + escH(hubUrl) + '">' + escH(T.avail) + '</a></div>');
+      h = h.replace(/<a class="([^"]*)" href="[^"]*[?&]berles=[^"]*">[\s\S]*?<\/a>/g, (m0, cls) => '<a class="' + cls + ' ca-wl-open" href="#" data-car="' + escH(car) + '">' + escH(T.want) + '</a>');
       if (h.indexOf('ca-na-box') < 0) h = h.replace(/<div class="cd-cta">/, box + '<div class="cd-cta">');
       h = h.replace(/<body([^>]*)>/, (a, at) => (/class="/.test(at) ? '<body' + at.replace(/class="/, 'class="ca-na ') + '>' : '<body' + at + ' class="ca-na">'));
       h = h.replace('</head>', NA_CSS + '</head>');
