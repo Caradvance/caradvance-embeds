@@ -88,6 +88,7 @@ export async function ensureFin(env) {
   const n = await env.DB.prepare(`SELECT COUNT(*) AS n FROM fin_lines`).first();
   if (!n || !n.n) await seed(env);
   await migrateLinesV2(env);
+  await migrateRulesV3(env);
   READY = true;
 }
 
@@ -150,6 +151,21 @@ const SEED_CATS = [
   ['EX_KIZART', 'Kizárt tétel (nem tartozik a kimutatásba)', 'excl', 'Nem eredményhatású', 'none', 0]
 ];
 /* ---- alap szabályok: [prio, név, regex (a normalizált „TÍPUS | PARTNER | KÖZLEMÉNY | IBAN” szövegen), irány, kategória, üzletág-kód(ok), doc_mode] ---- */
+/* Revolut-import (v3) szabályai — friss telepítésnél a SEED_RULES része, meglévő adatbázisban a migrateRulesV3 veszi fel. */
+const RULES_V3 = [
+  [11, 'Kölcsön (szerződés / LOAN)', 'KOLCSON|\\bLOAN\\b', 'any', 'EX_HITEL', null],
+  [12, 'Pénzváltás saját devizaszámlák között', '^PENZVALTAS', 'any', 'EX_ATVEZ', null],
+  [16, 'Kizárva: cukor beszerzés (Krajowa Grupa Spożywcza)', 'KRAJOWA GRUPA SPOZYWCZA', 'any', 'EX_KIZART', null],
+  [49, 'Parkolás (Parkl, MCC 7523)', 'PARKL|MCC 7523', 'out', 'VEH_UTDIJ', 'KOZOS'],
+  [55, 'Üzemanyag (benzinkút MCC-kód, Avia)', 'MCC (5541|5542|5983)|\\bAVIA\\b', 'out', 'VEH_UZEM', 'KOZOS'],
+  [56, 'Repülőjegy, utazási iroda (eDreams…)', 'EDREAMS|MCC (4511|4722)', 'out', 'TRAVEL', null],
+  [66, 'Számlázó program (Billingo, Számlázz.hu)', 'BILLINGO|SZAMLAZZ', 'out', 'IT_SW', 'KOZOS']
+];
+const RULE_FIX_V3 = [ // [név, régi minta, új minta, új irány]
+  ['Vadnai Zsombor – megbízási díj', 'VADNAI ZSOMBOR', 'VADNAI ZSOMBOR|ZSOMBOR VADNAI', null],
+  ['Google Workspace – caradvance.hu', 'GOOGLE WORKSPACE CARAD', 'GOOGLE.?WORKSPACE.?CARAD', null],
+  ['Szoftver-előfizetések (közös)', null, null, 'any'] // visszatérítés (refund) is ide menjen
+];
 const SEED_RULES = [
   [10, 'Átvezetés a BH Group-tól', '\\bBH GROUP ZRT', 'any', 'EX_ATVEZ', null],
   [11, 'BH Capital kölcsön', 'BH CAPITAL', 'any', 'EX_HITEL', null],
@@ -181,7 +197,8 @@ const SEED_RULES = [
   [15, 'Kizárva: Brit-Magyar Oktatásért Alapítvány', 'BRIT-MAGYAR OKTATASERT', 'any', 'EX_KIZART', null],
   [42, 'Stadler István EV – rendszám', 'STADLER ISTVAN', 'out', 'COGS_REG', 'IMPORT'],
   [43, 'Caradvance GmbH – autóbérlés (saját és továbbbérelt autók)', 'CARADVANCE GMBH', 'out', 'VEH_BERLES', 'BERLES'],
-  [44, 'Caradvance GmbH – jóváírás', 'CARADVANCE GMBH', 'in', 'REV_BERLES', 'BERLES']
+  [44, 'Caradvance GmbH – jóváírás', 'CARADVANCE GMBH', 'in', 'REV_BERLES', 'BERLES'],
+  ...RULES_V3
 ];
 
 async function seed(env) {
@@ -198,7 +215,30 @@ async function seed(env) {
     .bind(prio, name, pat, dir, cat ? C[cat] : null, line ? JSON.stringify([{ l: L[line], p: 100 }]) : null));
   rs.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('alloc', ?)`).bind(JSON.stringify({ mode: 'fixed', key: Object.fromEntries(LINE_CODES.map((c) => [L[c], 25])) })));
   rs.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('lines_v2', '1')`));
+  rs.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('rules_v3', '1')`));
+  for (const [name, , pat, dir] of RULE_FIX_V3) if (pat || dir) rs.push(env.DB.prepare(`UPDATE fin_rules SET pattern = COALESCE(?, pattern), dir = COALESCE(?, dir) WHERE name = ?`).bind(pat, dir, name));
   await env.DB.batch(rs);
+}
+
+/** Egyszeri bővítés (Revolut import): új szabályok név szerint (ha még nincsenek), pár minta javítása, majd újrafuttatás. */
+async function migrateRulesV3(env) {
+  if (await getSetting(env, 'rules_v3', null)) return;
+  const lines = (await env.DB.prepare(`SELECT id, code FROM fin_lines`).all()).results;
+  const cats = (await env.DB.prepare(`SELECT id, code FROM fin_cats`).all()).results;
+  const have = new Set((await env.DB.prepare(`SELECT name FROM fin_rules`).all()).results.map((r) => r.name));
+  const L = Object.fromEntries(lines.map((r) => [r.code, r.id])), C = Object.fromEntries(cats.map((r) => [r.code, r.id]));
+  const st = [];
+  for (const [prio, name, pat, dir, cat, line] of RULES_V3) {
+    if (have.has(name)) continue;
+    st.push(env.DB.prepare(`INSERT INTO fin_rules (prio,name,pattern,dir,cat_id,split) VALUES (?,?,?,?,?,?)`).bind(prio, name, pat, dir, cat ? C[cat] || null : null, line && L[line] ? JSON.stringify([{ l: L[line], p: 100 }]) : null));
+  }
+  for (const [name, oldPat, pat, dir] of RULE_FIX_V3) {
+    if (pat) st.push(env.DB.prepare(`UPDATE fin_rules SET pattern = ? WHERE name = ? AND pattern = ?`).bind(pat, name, oldPat));
+    if (dir) st.push(env.DB.prepare(`UPDATE fin_rules SET dir = ? WHERE name = ?`).bind(dir, name));
+  }
+  st.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('rules_v3', '1')`));
+  await env.DB.batch(st);
+  await applyRules(env);
 }
 
 /**

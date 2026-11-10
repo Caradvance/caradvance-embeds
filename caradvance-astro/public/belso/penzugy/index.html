@@ -82,7 +82,7 @@ code{background:#F1F4F9;border-radius:6px;padding:1px 5px;font-size:12px}
 <body>
 <header><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><b>Pénzügy</b><span class="sp"></span><span id="sys"></span><a href="/belso/">← Belső felület</a></header>
 <main id="app"><div class="card">Betöltés…</div></main>
-<script src="/belso/penzugy/kivonat.js?v=1"></script>
+<script src="/belso/penzugy/kivonat.js?v=2"></script>
 <script src="/belso/penzugy/ugyletek.js?v=1"></script>
 <script>
 (function () {
@@ -564,61 +564,114 @@ function uploadDoc(t, after) {
 }
 
 /* =================== IMPORT =================== */
-var XLSXP = null;
-function loadXlsx() {
-  if (window.XLSX) return Promise.resolve(window.XLSX);
-  if (XLSXP) return XLSXP;
-  XLSXP = new Promise(function (res, rej) { var s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = function () { res(window.XLSX); }; s.onerror = function () { XLSXP = null; rej(new Error('Az XLS-olvasó nem töltődött be.')); }; document.head.appendChild(s); });
-  return XLSXP;
+var XLSXP = null, ZIPP = null;
+function loadScript(src, glob) {
+  return new Promise(function (res, rej) { if (window[glob]) return res(window[glob]); var s = document.createElement('script'); s.src = src; s.onload = function () { res(window[glob]); }; s.onerror = function () { rej(new Error('Nem töltődött be: ' + src)); }; document.head.appendChild(s); });
 }
+function loadXlsx() { if (!XLSXP) XLSXP = loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'XLSX').catch(function (e) { XLSXP = null; throw e; }); return XLSXP; }
+function loadZip() { if (!ZIPP) ZIPP = loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', 'JSZip').catch(function (e) { ZIPP = null; throw e; }); return ZIPP; }
 var PENDING = [];
+function impFrom() { var i = $('#iFrom'); return (i && i.value) || S.impFrom || ''; }
+function bankRows(s) { var f = impFrom(); return f ? s.rows.filter(function (o) { return window.CAKivonat.rowDate(o) >= f; }) : s.rows; }
+function recRows(s) { var f = impFrom(); return f ? s.receipts.filter(function (r) { return r.date >= f; }) : s.receipts; }
 function renderImp() {
   document.getElementById('tab').innerHTML = '<div class="card"><h2>Banki kivonat importálása</h2>'
-    + '<label class="drop" id="iz"><input type="file" id="iFile" multiple accept=".xls,.xlsx,.csv" style="display:none"><b>Húzd ide a bank exportját (XLS / XLSX / CSV)</b><br><span class="small">Több fájl is mehet egyszerre. A már importált tételeket a rendszer felismeri és kihagyja, így átfedő időszakot is nyugodtan feltölthetsz.</span></label>'
+    + '<label class="drop" id="iz"><input type="file" id="iFile" multiple accept=".xls,.xlsx,.csv,.zip" style="display:none"><b>Húzd ide a bank exportját (XLS / XLSX / CSV) vagy a Revolut bizonylat-ZIP-et</b><br><span class="small">Több fájl is mehet egyszerre. A már importált tételeket és bizonylatokat a rendszer felismeri és kihagyja, így átfedő időszakot is nyugodtan feltölthetsz.</span></label>'
+    + '<div class="row" style="margin:10px 0 0"><label class="small"><b>Csak ettől a naptól:</b> <input class="in" type="date" id="iFrom" value="' + esc(S.impFrom || '') + '"></label><span class="small muted">üresen hagyva a teljes fájl bekerül</span></div>'
     + '<div id="iPrev"></div>'
-    + '<p class="small muted">Támogatott: Raiffeisen „Könyvelt tételek” XLS (forint és deviza számla). A „Könyvelésre váró tételek” (zárolások) kimaradnak — a könyvelés után a következő exporttal jönnek be. Más bank CSV-je is működik, ha az oszlopnevek: <code>Típus, Könyvelés dátuma, Értéknap, Azonosító, Összeg, Közlemény/1…</code></p></div>'
-    + '<div class="card"><h2>Számlák</h2><table><thead><tr><th>Név</th><th>Azonosító</th><th>Deviza</th><th>Cég</th><th class="n">Tételek</th><th>Utolsó tétel</th><th></th></tr></thead><tbody>'
+    + '<p class="small muted">Támogatott: Raiffeisen „Könyvelt tételek” XLS (forint és deviza számla) · Revolut Business „Account statement” CSV (minden devizaszámla külön, a díjak külön sorban) · Revolut „Expenses” ZIP (a benne lévő számlák/nyugták a tranzakcióhoz kötve — előbb a kivonatot importáld). Más bank CSV-je is működik, ha az oszlopnevek: <code>Típus, Könyvelés dátuma, Értéknap, Azonosító, Összeg, Közlemény/1…</code></p></div>'
+    + '<div class="card"><h2>Számlák</h2><div style="overflow:auto"><table><thead><tr><th>Név</th><th>Azonosító</th><th>Deviza</th><th>Cég</th><th class="n">Tételek</th><th>Utolsó tétel</th><th></th></tr></thead><tbody>'
     + S.meta.accounts.map(function (a) { return '<tr><td><input class="in" data-an="' + a.id + '" value="' + esc(a.name) + '"></td><td class="small muted">' + esc(a.ext_id) + '</td><td>' + a.currency + '</td><td><input class="in" data-ae="' + a.id + '" value="' + esc(a.entity || '') + '" placeholder="pl. cégnév / adószám"></td><td class="n">' + a.n + '</td><td class="small">' + hd(a.last) + '</td><td><button class="btn sm ghost" data-asv="' + a.id + '">Mentés</button></td></tr>'; }).join('')
-    + '</tbody></table></div>';
+    + '</tbody></table></div></div>';
   var iz = $('#iz');
   $('#iFile').onchange = function () { readImports(this.files); };
   iz.ondragover = function (e) { e.preventDefault(); iz.classList.add('over'); }; iz.ondragleave = function () { iz.classList.remove('over'); };
   iz.ondrop = function (e) { e.preventDefault(); iz.classList.remove('over'); readImports(e.dataTransfer.files); };
+  $('#iFrom').onchange = function () { S.impFrom = this.value; if (PENDING.length) showPending(); };
   $$('[data-asv]').forEach(function (b) { b.onclick = function () { var id = b.dataset.asv; api('accounts/' + id, { name: $('[data-an="' + id + '"]').value, entity: $('[data-ae="' + id + '"]').value }).then(must).then(function () { toast('Mentve'); refreshMeta(); }); }; });
   if (PENDING.length) showPending();
 }
-function readImports(files) {
-  $('#iPrev').innerHTML = '<p>Feldolgozás…</p>';
-  loadXlsx().then(function (X) {
-    return Promise.all([].map.call(files, function (f) {
-      return f.arrayBuffer().then(function (buf) {
-        var wb = X.read(buf, { type: 'array', raw: true });
-        return window.CAKivonat.parseWorkbook(X, wb).map(function (s) { s.file = f.name; if (wb.SheetNames.length === 1 && /^Sheet\d*$|^Munka\d*$/i.test(s.sheet)) s.ext_id = f.name.replace(/\.\w+$/, ''); return s; });
+function readOne(f) {
+  var K = window.CAKivonat, low = f.name.toLowerCase();
+  if (/\.zip$/.test(low)) {
+    return loadZip().then(function (JSZip) { return JSZip.loadAsync(f); }).then(function (zip) {
+      var csv = zip.file(/(^|\/)expenses\.csv$/i)[0];
+      if (!csv) throw new Error(f.name + ': nem Revolut „expenses” ZIP (nincs benne expenses.csv).');
+      return csv.async('string').then(function (t) {
+        var names = Object.keys(zip.files).filter(function (n) { return !zip.files[n].dir; });
+        return [{ kind: 'rec', file: f.name, zip: zip, receipts: K.parseRevolutExpenses(t, names) }];
       });
-    }));
-  }).then(function (arr) { PENDING = [].concat.apply([], arr); showPending(); }).catch(function (e) { $('#iPrev').innerHTML = '<div class="note err">' + esc(e.message) + '</div>'; });
-}
-function showPending() {
-  if (!PENDING.length) { $('#iPrev').innerHTML = '<div class="note warn">Nem találtam importálható „Könyvelt tételek” blokkot.</div>'; return; }
-  $('#iPrev').innerHTML = PENDING.map(function (s, i) {
-    var acc = S.meta.accounts.filter(function (a) { return a.ext_id === s.ext_id; })[0];
-    return '<div class="card" style="background:#FAFBFD;box-shadow:none;border:1px solid var(--line)"><div class="row"><b>' + esc(s.file) + '</b><span class="muted small">munkalap: ' + esc(s.sheet) + '</span><span class="sp"></span>'
-      + (acc ? '<span class="badge ok">ismert számla: ' + esc(acc.name) + ' (' + acc.currency + ')</span>' : '<span class="badge warn">új számla</span> <input class="in" data-pn="' + i + '" value="' + esc(s.ext_id) + '" style="width:220px"> <select class="in" data-pc="' + i + '">' + ['HUF', 'EUR', 'USD', 'GBP', 'CZK', 'PLN'].map(function (c) { return '<option' + (c === s.currency ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select>') + '</div>'
-      + '<div class="small" style="margin:6px 0">' + s.rows.length + ' könyvelt tétel' + (s.pending ? ' · ' + s.pending + ' zárolás kihagyva' : '') + '</div>'
-      + '<button class="btn red sm" data-go="' + i + '"' + (s.rows.length ? '' : ' disabled') + '>Importálás</button> <span class="small" id="ir' + i + '"></span></div>';
-  }).join('') + (PENDING.length > 1 ? '<button class="btn navy" id="goAll">Mind importálása</button>' : '');
-  function go(i) {
-    var s = PENDING[i]; if (!s || s.done) return Promise.resolve();
-    var acc = { ext_id: s.ext_id, name: $('[data-pn="' + i + '"]') ? $('[data-pn="' + i + '"]').value : s.ext_id, currency: $('[data-pc="' + i + '"]') ? $('[data-pc="' + i + '"]').value : s.currency };
-    $('#ir' + i).textContent = 'Importálás…';
-    return api('import', { account: acc, rows: s.rows }).then(must).then(function (j) {
-      s.done = 1; $('#ir' + i).innerHTML = '✓ <b>' + j.inserted + ' új</b>, ' + j.skipped + ' már megvolt' + (j.fxMissing ? ', ' + j.fxMissing + ' árfolyam nélkül' : '') + (j.matched ? ', ' + j.matched + ' bizonylat párosítva' : '');
-      var b = $('[data-go="' + i + '"]'); if (b) b.disabled = true;
     });
   }
+  return f.arrayBuffer().then(function (buf) {
+    if (/\.csv$/.test(low)) {
+      var text = new TextDecoder('utf-8').decode(buf);
+      if (K.isRevolut(text)) return K.parseRevolut(text, f.name).map(function (s) { s.kind = 'bank'; return s; });
+    }
+    return loadXlsx().then(function (X) {
+      var wb = X.read(buf, { type: 'array', raw: true });
+      return K.parseWorkbook(X, wb).map(function (s) { s.kind = 'bank'; s.file = f.name; if (wb.SheetNames.length === 1 && /^Sheet\d*$|^Munka\d*$/i.test(s.sheet)) s.ext_id = f.name.replace(/\.\w+$/, ''); return s; });
+    });
+  });
+}
+function readImports(files) {
+  $('#iPrev').innerHTML = '<p>Feldolgozás…</p>';
+  Promise.all([].map.call(files, readOne)).then(function (arr) {
+    PENDING = [].concat.apply([], arr);
+    PENDING.sort(function (a, b) { return (a.kind === 'rec') - (b.kind === 'rec'); }); // a bizonylatok a kivonat után
+    showPending();
+  }).catch(function (e) { $('#iPrev').innerHTML = '<div class="note err">' + esc(e.message) + '</div>'; });
+}
+function showPending() {
+  if (!PENDING.length) { $('#iPrev').innerHTML = '<div class="note warn">Nem találtam importálható tételt.</div>'; return; }
+  var CUR = ['HUF', 'EUR', 'USD', 'GBP', 'CZK', 'PLN', 'CHF'];
+  $('#iPrev').innerHTML = PENDING.map(function (s, i) {
+    if (s.kind === 'rec') {
+      var rr = recRows(s);
+      return '<div class="card" style="background:#FAFBFD;box-shadow:none;border:1px solid var(--line)"><div class="row"><b>' + esc(s.file) + '</b><span class="badge navy">Revolut bizonylatok</span></div>'
+        + '<div class="small" style="margin:6px 0">' + rr.length + ' bizonylat' + (rr.length !== s.receipts.length ? ' (a ' + s.receipts.length + '-ből, a dátumszűrő szerint)' : '') + (rr.length ? ': ' + rr.slice(0, 6).map(function (r) { return esc(r.desc) + ' ' + money(r.amount, r.currency); }).join(' · ') + (rr.length > 6 ? ' …' : '') : '') + '</div>'
+        + '<button class="btn red sm" data-go="' + i + '"' + (rr.length && !s.done ? '' : ' disabled') + '>Bizonylatok feltöltése</button> <span class="small" id="ir' + i + '">' + (s.res || '') + '</span></div>';
+    }
+    var acc = S.meta.accounts.filter(function (a) { return a.ext_id === s.ext_id; })[0], rows = bankRows(s);
+    var ds = rows.map(function (o) { return window.CAKivonat.rowDate(o); }).sort();
+    return '<div class="card" style="background:#FAFBFD;box-shadow:none;border:1px solid var(--line)"><div class="row"><b>' + esc(s.file) + '</b><span class="muted small">' + esc(s.sheet) + '</span><span class="sp"></span>'
+      + (acc ? '<span class="badge ok">ismert számla: ' + esc(acc.name) + ' (' + acc.currency + ')</span>' : '<span class="badge warn">új számla</span> <input class="in" data-pn="' + i + '" value="' + esc(s.name || s.ext_id) + '" style="width:230px"> <select class="in" data-pc="' + i + '">' + CUR.map(function (c) { return '<option' + (c === s.currency ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select>') + '</div>'
+      + '<div class="small" style="margin:6px 0">' + rows.length + ' könyvelt tétel' + (rows.length !== s.rows.length ? ' (a ' + s.rows.length + '-ből, a dátumszűrő szerint)' : '') + (ds.length ? ' · ' + hd(ds[0]) + ' – ' + hd(ds[ds.length - 1]) : '') + (s.pending ? ' · ' + s.pending + ' nem könyvelt / zárolt kihagyva' : '') + '</div>'
+      + '<button class="btn red sm" data-go="' + i + '"' + (rows.length && !s.done ? '' : ' disabled') + '>Importálás</button> <span class="small" id="ir' + i + '">' + (s.res || '') + '</span></div>';
+  }).join('') + (PENDING.length > 1 ? '<button class="btn navy" id="goAll">Mind importálása</button>' : '');
+  function goBank(i) {
+    var s = PENDING[i], rows = bankRows(s);
+    var acc = { ext_id: s.ext_id, name: $('[data-pn="' + i + '"]') ? $('[data-pn="' + i + '"]').value : (s.name || s.ext_id), currency: $('[data-pc="' + i + '"]') ? $('[data-pc="' + i + '"]').value : s.currency, entity: s.entity || '' };
+    $('#ir' + i).textContent = 'Importálás…';
+    return api('import', { account: acc, rows: rows }).then(must).then(function (j) {
+      s.done = 1; s.res = '✓ <b>' + j.inserted + ' új</b>, ' + j.skipped + ' már megvolt' + (j.fxMissing ? ', ' + j.fxMissing + ' árfolyam nélkül' : '') + (j.matched ? ', ' + j.matched + ' bizonylat párosítva' : '');
+      $('#ir' + i).innerHTML = s.res; var b = $('[data-go="' + i + '"]'); if (b) b.disabled = true;
+      return refreshMeta();
+    });
+  }
+  function goRec(i) {
+    var s = PENDING[i], list = recRows(s), n = 0, linked = 0, dup = 0, k = 0;
+    var p = Promise.resolve();
+    list.forEach(function (r) {
+      p = p.then(function () {
+        $('#ir' + i).textContent = 'Feltöltés ' + (++k) + '/' + list.length + '…';
+        return s.zip.file(r.entry).async('base64').then(function (b64) {
+          var ext = (r.entry.split('.').pop() || '').toLowerCase(), mime = ext === 'pdf' ? 'application/pdf' : /jpe?g/.test(ext) ? 'image/jpeg' : ext === 'png' ? 'image/png' : 'application/octet-stream';
+          var g = r.amount, v = r.vat || 0, net = g != null ? Math.round(g / (1 + v / 100) * 100) / 100 : null;
+          return api('docs', { dir: 'in', kind: 'szamla', partner: r.desc, number: r.note || '', issue_date: r.date, currency: r.currency, gross: g, net: net, vat: g != null ? Math.round((g - net) * 100) / 100 : null,
+            note: 'Revolut bizonylat' + (r.category ? ' · ' + r.category : ''), ext_key: 'revolut-exp|' + r.expense_id, link_ref: r.tx_id, file: { name: r.entry.split('/').pop(), mime: mime, b64: b64 } });
+        }).then(must).then(function (j) { if (j.dup) dup++; else { n++; if (j.linked) linked++; } });
+      });
+    });
+    return p.then(function () {
+      s.done = 1; s.res = '✓ <b>' + n + ' új bizonylat</b>, ebből ' + linked + ' tranzakcióhoz kötve' + (dup ? ', ' + dup + ' már megvolt' : '') + (n - linked ? ' — a többi párosításra vár (importáld a kivonatot is)' : '');
+      $('#ir' + i).innerHTML = s.res; var b = $('[data-go="' + i + '"]'); if (b) b.disabled = true;
+    });
+  }
+  function go(i) { var s = PENDING[i]; if (!s || s.done) return Promise.resolve(); return (s.kind === 'rec' ? goRec(i) : goBank(i)).catch(function (e) { $('#ir' + i).textContent = 'Hiba: ' + e.message; }); }
   $$('[data-go]').forEach(function (b) { b.onclick = function () { go(Number(b.dataset.go)).then(after); }; });
   if ($('#goAll')) $('#goAll').onclick = function () { var p = Promise.resolve(); PENDING.forEach(function (_, i) { p = p.then(function () { return go(i); }); }); p.then(after); };
-  function after() { if (PENDING.every(function (s) { return s.done; })) { PENDING = []; toast('Import kész'); refreshMeta().then(function () { initPeriod(); return reload(); }); } }
+  function after() { if (PENDING.every(function (s) { return s.done; })) { toast('Import kész'); refreshMeta().then(function () { initPeriod(); return reload(); }).then(function () { if (S.tab !== 'imp') return; }); } }
 }
 
 /* =================== BEÁLLÍTÁSOK =================== */

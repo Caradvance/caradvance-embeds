@@ -253,6 +253,14 @@ export async function onRequest(context) {
     if (m === 'POST' && p0 === 'docs' && !p1) {
       const f = body.file && body.file.b64 ? body.file : null;
       if (f && f.b64.length > 11000000) return json({ error: 'A fájl túl nagy (max. ~8 MB).' }, 400);
+      // külső azonosító (pl. Revolut expense ID): ugyanazt a bizonylatot ne vegyük fel kétszer
+      const extKey = body.ext_key ? clean(body.ext_key, 120) : null;
+      if (extKey && !body.id) { const ex = await DB.prepare(`SELECT id FROM fin_docs WHERE nav_key = ?`).bind(extKey).first(); if (ex) return json({ id: ex.id, dup: true, matched: 0 }); }
+      // tranzakció a bank saját azonosítója alapján (Revolut Transaction ID); díj-sor helyett a fő tétel
+      if (!body.link_tx && body.link_ref) {
+        const t = await DB.prepare(`SELECT id FROM fin_tx WHERE bank_ref = ? AND doc_id IS NULL ORDER BY (ttype LIKE 'Díj%'), ABS(amount) DESC LIMIT 1`).bind(clean(body.link_ref, 80)).first();
+        if (t) body.link_tx = t.id;
+      }
       const cur = /^[A-Z]{3}$/.test(body.currency || '') ? body.currency : 'HUF';
       const gross = num(body.gross), net = num(body.net), vat = num(body.vat);
       const vals = [body.dir === 'out' ? 'out' : 'in', ['szamla', 'nyugta', 'egyeb'].includes(body.kind) ? body.kind : 'szamla', clean(body.number, 80), clean(body.partner, 160), clean(body.partner_tax, 20),
@@ -260,13 +268,14 @@ export async function onRequest(context) {
       let id = Number(body.id) || null;
       if (id) await DB.prepare(`UPDATE fin_docs SET dir = ?, kind = ?, number = ?, partner = ?, partner_tax = ?, issue_date = ?, currency = ?, net = ?, vat = ?, gross = ?, gross_huf = ?, net_huf = ?, note = ? WHERE id = ?`).bind(...vals, id).run();
       else id = (await DB.prepare(`INSERT INTO fin_docs (dir, kind, number, partner, partner_tax, issue_date, currency, net, vat, gross, gross_huf, net_huf, note, source, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'upload', ?)`).bind(...vals, who).run()).meta.last_row_id;
+      if (extKey) await DB.prepare(`UPDATE fin_docs SET nav_key = ? WHERE id = ?`).bind(extKey, id).run();
       if (f) {
         await saveFile(env, id, String(f.b64).replace(/^data:[^,]*,/, ''));
         await DB.prepare(`UPDATE fin_docs SET file_name = ?, file_mime = ?, file_size = ? WHERE id = ?`).bind(clean(f.name, 120) || 'bizonylat', clean(f.mime, 80) || 'application/octet-stream', Math.round(f.b64.length * 0.75), id).run();
       }
       if (body.link_tx) await DB.prepare(`UPDATE fin_tx SET doc_id = ?, match_kind = 'manual' WHERE id = ?`).bind(id, Number(body.link_tx)).run();
       const matched = body.link_tx ? 0 : await autoMatch(env);
-      return json({ id, matched });
+      return json({ id, matched, linked: body.link_tx ? Number(body.link_tx) : null });
     }
 
     /* ---------- párosítás, NAV, árfolyam ---------- */
