@@ -90,6 +90,7 @@ export async function ensureFin(env) {
   await migrateLinesV2(env);
   await migrateRulesV3(env);
   await migrateBlockV4(env);
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS fin_deleted (uid TEXT PRIMARY KEY, bdate TEXT, partner TEXT, amount REAL, currency TEXT, account_id INTEGER, deleted_at TEXT DEFAULT (datetime('now')), deleted_by TEXT)`).run();
   READY = true;
 }
 
@@ -263,6 +264,31 @@ export async function purgeBlocked(env) {
     await env.DB.prepare(`DELETE FROM fin_tx WHERE id IN (${ch.map(() => '?').join(',')})`).bind(...ch).run();
   }
   return list.length;
+}
+
+/* ============================== kézi törlés ==============================
+ * Bármely tétel törölhető. A banki tételek azonosítója (uid) a fin_deleted listára kerül, így újraimportáláskor
+ * sem jönnek vissza. A törölt utalás banki díj-sorai (azonos számla + banki azonosító) vele együtt törlődnek. */
+export async function deleteTxs(env, ids, who) {
+  ids = [...new Set(ids.map(Number).filter(Boolean))];
+  if (!ids.length) return 0;
+  const all = new Map();
+  for (let i = 0; i < ids.length; i += 90) {
+    const ch = ids.slice(i, i + 90);
+    for (const t of (await env.DB.prepare(`SELECT * FROM fin_tx WHERE id IN (${ch.map(() => '?').join(',')})`).bind(...ch).all()).results) all.set(t.id, t);
+  }
+  for (const t of [...all.values()]) {
+    if (!t.bank_ref || /^D[ií]j/i.test(t.ttype)) continue;
+    const fees = (await env.DB.prepare(`SELECT * FROM fin_tx WHERE account_id = ? AND bank_ref = ? AND id <> ? AND ttype LIKE 'D%j%'`).bind(t.account_id, t.bank_ref, t.id).all()).results;
+    fees.forEach((f) => all.set(f.id, f));
+  }
+  const st = [];
+  for (const t of all.values()) {
+    if (t.src !== 'manual') st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_deleted (uid, bdate, partner, amount, currency, account_id, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(t.uid, t.bdate, t.partner || t.ttype, t.amount, t.currency, t.account_id, who || ''));
+    st.push(env.DB.prepare(`DELETE FROM fin_tx WHERE id = ?`).bind(t.id));
+  }
+  for (let i = 0; i < st.length; i += 80) await env.DB.batch(st.slice(i, i + 80));
+  return all.size;
 }
 
 /** Egyszeri bővítés (Revolut import): új szabályok név szerint (ha még nincsenek), pár minta javítása, majd újrafuttatás. */
@@ -500,6 +526,7 @@ export async function importRows(env, account, rows, who) {
   }
   const seen = {}, st = [], uids = [];
   let bad = 0, blocked = 0;
+  const deleted = new Set((await env.DB.prepare(`SELECT uid FROM fin_deleted WHERE account_id = ?`).bind(acc.id).all()).results.map((r) => r.uid));
   // tiltólista: a tiltott tételek és az azonos banki azonosítójú díj-soraik kimaradnak
   const block = await loadBlock(env);
   const parsed = rows.map(parseBankRow);
@@ -510,6 +537,7 @@ export async function importRows(env, account, rows, who) {
     const base = [acc.id, t.bdate, t.vdate, t.bank_ref, t.amount, t.ttype, t.raw].join('|');
     seen[base] = (seen[base] || 0) + 1;
     const uid = await sha256Hex(base + '#' + seen[base]);
+    if (deleted.has(uid)) { blocked++; continue; } // kézzel törölt tétel: nem jön vissza
     uids.push(uid);
     const huf = acc.currency === 'HUF' ? t.amount : null;
     st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, bank_ref, amount, currency, fx, amount_huf, partner, iban, memo, updated_by)

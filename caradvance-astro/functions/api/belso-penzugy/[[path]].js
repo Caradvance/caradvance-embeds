@@ -17,7 +17,7 @@
  */
 import {
   json, ensureFin, clean, isDate, addDays, normSplit, nowIso, importRows, applyRules, autoMatch, suggestDocs, saveFile, loadFile,
-  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked
+  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs
 } from '../../../lib/penzugy.js';
 
 async function staffUser(request, env) {
@@ -111,6 +111,13 @@ export async function onRequest(context) {
       if (cur !== 'HUF') await fillFx(env);
       return json({ id: res.meta.last_row_id });
     }
+    if (m === 'POST' && p0 === 'tx' && p1 === 'bulk-delete') {
+      const ids = (Array.isArray(body.ids) ? body.ids : []).map(Number).filter(Boolean).slice(0, 2000);
+      if (!ids.length) return json({ error: 'Nincs kijelölt tétel.' }, 400);
+      return json({ ok: true, deleted: await deleteTxs(env, ids, who) });
+    }
+    if (m === 'GET' && p0 === 'deleted') return json({ items: (await DB.prepare(`SELECT d.*, a.name AS account_name FROM fin_deleted d LEFT JOIN fin_accounts a ON a.id = d.account_id ORDER BY d.deleted_at DESC LIMIT 500`).all()).results });
+    if (m === 'POST' && p0 === 'deleted' && p1 === 'restore') { await DB.prepare(`DELETE FROM fin_deleted WHERE uid = ?`).bind(clean(body.uid, 80)).run(); return json({ ok: true }); }
     if (m === 'POST' && p0 === 'tx' && p1 === 'bulk') {
       const ids = (Array.isArray(body.ids) ? body.ids : []).map(Number).filter(Boolean).slice(0, 2000);
       if (!ids.length) return json({ error: 'Nincs kijelölt tétel.' }, 400);
@@ -128,9 +135,14 @@ export async function onRequest(context) {
       const t = await DB.prepare(`SELECT * FROM fin_tx WHERE id = ?`).bind(id).first();
       if (!t) return json({ error: 'Nem található.' }, 404);
       if (p2 === 'delete') {
-        if (t.src !== 'manual') return json({ error: 'Banki tétel nem törölhető (a kivonat része). Sorold „Nem eredményhatású” kategóriába, ha nem kell.' }, 400);
-        await DB.prepare(`DELETE FROM fin_tx WHERE id = ?`).bind(id).run();
-        return json({ ok: true });
+        let purged = 0;
+        if (body.block_partner && t.partner && t.partner !== 'Bank') { // a partner minden tétele is, a jövőben is
+          const pat = norm(t.partner).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          await DB.prepare(`INSERT INTO fin_block (name, pattern) VALUES (?, ?)`).bind(t.partner, pat).run();
+          purged = await purgeBlocked(env);
+        }
+        const n = (await DB.prepare(`SELECT id FROM fin_tx WHERE id = ?`).bind(id).first()) ? await deleteTxs(env, [id], who) : 0;
+        return json({ ok: true, deleted: n + purged });
       }
       if (p2 === 'reset') {
         await DB.prepare(`UPDATE fin_tx SET manual = 0, updated_at = ?, updated_by = ? WHERE id = ?`).bind(nowIso(), who, id).run();

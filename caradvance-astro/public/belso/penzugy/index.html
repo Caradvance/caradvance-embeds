@@ -397,7 +397,7 @@ function renderTx() {
     + '<span class="sp"></span><button class="btn sm ghost" id="txCsv">CSV a könyvelőnek</button><button class="btn sm red" id="txNew">+ Kézi tétel</button></div>'
     + '<div class="small muted" style="margin-bottom:6px">' + list.length + ' tétel · egyenleg: <b class="' + nc(sum) + '">' + ft(sum) + ' Ft</b> (bruttó)</div>'
     + txTable(list, true) + '</div>'
-    + '<div class="bulk" id="bulk"><b id="bulkN"></b> kijelölve · <select class="in" id="bCat"><option value="">Kategória…</option>' + catOptions(null) + '</select><select class="in" id="bLine">' + lineOptions(null, '<option value="">Üzletág (100%)…</option>') + '</select><button class="btn sm red" id="bGo">Alkalmaz</button><button class="btn sm" id="bClr">Mégse</button></div>';
+    + '<div class="bulk" id="bulk"><b id="bulkN"></b> kijelölve · <select class="in" id="bCat"><option value="">Kategória…</option>' + catOptions(null) + '</select><select class="in" id="bLine">' + lineOptions(null, '<option value="">Üzletág (100%)…</option>') + '</select><button class="btn sm red" id="bGo">Alkalmaz</button><button class="btn sm" id="bDelSel" style="background:#fff;color:var(--neg)">Törlés</button><button class="btn sm" id="bClr">Mégse</button></div>';
   var t0; $('#fq').oninput = function () { var v = this.value; clearTimeout(t0); t0 = setTimeout(function () { S.f.q = v; renderTx(); var i = $('#fq'); i.focus(); i.setSelectionRange(v.length, v.length); }, 250); };
   $('#fst').onchange = function () { S.f.st = this.value; renderTx(); };
   $('#fcat').onchange = function () { S.f.cat = this.value; renderTx(); };
@@ -414,6 +414,11 @@ function renderTx() {
   $$('.sel').forEach(function (cb) { cb.onchange = function () { S.sel[cb.dataset.id] = cb.checked; syncBulk(); }; });
   if ($('#selAll')) $('#selAll').onchange = function () { var on = this.checked; $$('.sel').forEach(function (cb) { cb.checked = on; S.sel[cb.dataset.id] = on; }); syncBulk(); };
   $('#bClr').onclick = function () { S.sel = {}; renderTx(); };
+  $('#bDelSel').onclick = function () {
+    var ids = Object.keys(S.sel).filter(function (k) { return S.sel[k]; }).map(Number);
+    if (!ids.length || !confirm(ids.length + ' tételt törölsz (a hozzájuk tartozó banki díjakkal). Újraimportáláskor sem jönnek vissza. Mehet?')) return;
+    api('tx/bulk-delete', { ids: ids }).then(must).then(function (j) { S.sel = {}; toast(j.deleted + ' tétel törölve'); reload(); });
+  };
   $('#bGo').onclick = function () {
     var ids = Object.keys(S.sel).filter(function (k) { return S.sel[k]; }).map(Number), body = { ids: ids };
     if ($('#bCat').value) body.cat_id = Number($('#bCat').value);
@@ -461,7 +466,7 @@ function editTx(id, after) {
     + '<label class="f" style="grid-column:span 2">Megjegyzés<input class="in" id="eNote" value="' + esc(t.note || '') + '"></label></div>'
     + (!isNew && !man ? '<div class="note info" style="margin-top:12px"><label><input type="checkbox" id="eRule"> <b>Szabály mentése:</b> a jövőben minden ilyen tétel automatikusan így legyen besorolva</label><div class="row" style="margin-top:6px"><span class="small">Minta (a partner/közlemény szövegében):</span><input class="in" id="ePat" style="flex:1;min-width:180px" value="' + esc(normPartner(t.partner)) + '"><select class="in" id="eDir"><option value="' + (t.amount < 0 ? 'out' : 'in') + '">csak ' + (t.amount < 0 ? 'terhelés' : 'jóváírás') + '</option><option value="any">mindkét irány</option></select></div></div>' : '')
     + docBox
-    + '<div class="row" style="margin-top:16px"><button class="btn red" id="eSave">Mentés</button>' + (t.manual && !man ? '<button class="btn ghost" id="eReset">Vissza a szabály szerinti besorolásra</button>' : '') + (man && !isNew ? '<button class="btn ghost" id="eDel">Törlés</button>' : '') + '<span class="sp"></span>' + (t.rule_id && !t.manual ? '<span class="small muted">Szabály: ' + esc((S.meta.rules.filter(function (r) { return r.id === t.rule_id; })[0] || {}).name || '') + '</span>' : '') + '</div>');
+    + '<div class="row" style="margin-top:16px"><button class="btn red" id="eSave">Mentés</button>' + (t.manual && !man ? '<button class="btn ghost" id="eReset">Vissza a szabály szerinti besorolásra</button>' : '') + (!isNew ? '<button class="btn ghost" id="eDel" style="color:var(--neg)">Törlés</button>' + (!man && t.partner && t.partner !== 'Bank' ? '<label class="small"><input type="checkbox" id="eDelAll"> + a partner összes tétele, a jövőben is (tiltólista)</label>' : '') : '') + '<span class="sp"></span>' + (t.rule_id && !t.manual ? '<span class="small muted">Szabály: ' + esc((S.meta.rules.filter(function (r) { return r.id === t.rule_id; })[0] || {}).name || '') + '</span>' : '') + '</div>');
   bindSplit(m);
   function done(msg) { m.remove(); toast(msg); (after || function () {})(); reload().then(refreshMeta); }
   $('#eSave', m).onclick = function () {
@@ -471,7 +476,11 @@ function editTx(id, after) {
     api(isNew ? 'tx' : 'tx/' + t.id, body).then(must).then(function (j) { done(j.rule_id ? 'Mentve + szabály létrehozva (' + (j.applied || 0) + ' további tétel besorolva)' : 'Mentve'); });
   };
   if ($('#eReset', m)) $('#eReset', m).onclick = function () { api('tx/' + t.id + '/reset', {}).then(must).then(function () { done('Visszaállítva'); }); };
-  if ($('#eDel', m)) $('#eDel', m).onclick = function () { if (confirm('Törlöd a kézi tételt?')) api('tx/' + t.id + '/delete', {}).then(must).then(function () { done('Törölve'); }); };
+  if ($('#eDel', m)) $('#eDel', m).onclick = function () {
+    var all = $('#eDelAll', m) && $('#eDelAll', m).checked;
+    if (!confirm(all ? 'Törlöd „' + t.partner + '” ÖSSZES tételét, és tiltólistára teszed? A jövőbeli importokból is kimarad.' : 'Törlöd ezt a tételt' + (man ? '' : ' (a hozzá tartozó banki díjakkal együtt)? Újraimportáláskor sem jön vissza') + '?')) return;
+    api('tx/' + t.id + '/delete', { block_partner: !!all }).then(must).then(function (j) { done(j.deleted + ' tétel törölve'); });
+  };
   if ($('#unlink', m)) $('#unlink', m).onclick = function () { api('tx/' + t.id + '/link', { doc_id: null }).then(must).then(function () { done('Bizonylat leválasztva'); }); };
   if ($('#upl', m)) $('#upl', m).onclick = function () { m.remove(); uploadDoc(t, after); };
   if ($('#sug', m)) $('#sug', m).onclick = function () {
@@ -683,6 +692,7 @@ function renderSet() {
     '<div class="card"><h2>Tiltólista — soha nem kerül a pénzügyekbe</h2><p class="small muted" style="margin-top:0">Ezek a partnerek / minták tételei importkor kimaradnak, a már bent lévők törlődnek — a hozzájuk tartozó banki díjakkal (azonos tranzakció-azonosító) együtt.</p>'
     + (bl.length ? '<table><tbody>' + bl.map(function (b) { return '<tr><td><b>' + esc(b.name) + '</b></td><td><code>' + esc(b.pattern) + '</code></td><td class="small muted">' + hd(b.created_at) + '</td><td><button class="btn sm ghost" data-bdel="' + b.id + '">Levétel</button></td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted small">Üres.</p>')
     + '<div class="row" style="margin-top:10px"><input class="in" id="bName" placeholder="Név (pl. XY Kft.)" style="min-width:180px"><input class="in" id="bPat" placeholder="Minta: partner neve ékezet nélkül, NAGYBETŰVEL" style="flex:1;min-width:220px"><button class="btn sm red" id="bAdd">Hozzáadás és törlés</button></div></div>'
+    + '<div class="card"><h2>Törölt tételek</h2><p class="small muted" style="margin-top:0">Kézzel törölt banki tételek — újraimportáláskor kimaradnak. „Visszaengedés” után a következő importtal újra bekerülnek.</p><div id="delList" class="small muted">Betöltés…</div></div>'
     + '<div class="card"><h2>Közös költségek felosztása</h2><p class="small muted" style="margin-top:0">A „' + esc((S.meta.lines.filter(function (l) { return l.shared; })[0] || {}).name || 'Közös') + '” üzletágra sorolt tételek (bankdíj, könyvelés, szoftver, TAO…) a kimutatásban így terhelődnek rá a többi üzletágra. Árbevétel-arányos módban havonta a tényleges árbevétel arányában; ha egy hónapban nincs árbevétel, a fix kulcs érvényes.</p>'
     + '<div class="row"><label><input type="radio" name="am" value="fixed"' + (al.mode === 'fixed' ? ' checked' : '') + '> fix kulcs</label><label><input type="radio" name="am" value="revenue"' + (al.mode === 'revenue' ? ' checked' : '') + '> árbevétel-arányos</label><label><input type="radio" name="am" value="none"' + (al.mode === 'none' ? ' checked' : '') + '> nincs felosztás</label></div>'
     + '<div class="split" style="margin-top:10px">' + S.meta.lines.filter(function (l) { return !l.shared && l.active; }).map(function (l) { return '<label><span class="ldot" style="background:' + l.color + '"></span><span style="flex:1">' + esc(l.name) + '</span><input type="number" min="0" max="100" data-k="' + l.id + '" value="' + (al.key[l.id] || '') + '">%</label>'; }).join('') + '</div>'
@@ -697,6 +707,11 @@ function renderSet() {
     + '</tbody></table></div>'
     + '<div class="card"><div class="row"><h2 style="margin:0">Kategóriák</h2><span class="sp"></span><button class="btn sm red" id="cNew">+ Új kategória</button></div><p class="small muted">ÁFA-kulcs = a bruttó összegben lévő levonható (költség) / fizetendő (bevétel) ÁFA. 0% = a bruttó a költség: személyautó üzemanyaga és bérlése, külföldi fordított adózású szolgáltatás, alanyi adómentes vállalkozó, magánszemély bérbeadó.</p><div style="overflow:auto"><table><thead><tr><th>Név</th><th>Típus</th><th>Csoport</th><th>ÁFA</th><th>Bizonylat</th><th>Sorrend</th><th>Aktív</th><th></th></tr></thead><tbody>'
     + S.meta.cats.map(function (c) { return catRowHtml(c); }).join('') + '</tbody></table></div></div>';
+  api('deleted').then(must).then(function (j) {
+    var el = $('#delList'); if (!el) return;
+    el.innerHTML = j.items.length ? '<table><tbody>' + j.items.map(function (d) { return '<tr><td class="small">' + hd(d.bdate) + '</td><td>' + esc(d.partner) + '<div class="small muted">' + esc(d.account_name || '') + '</div></td><td class="n ' + nc(d.amount) + '">' + money(d.amount, d.currency) + '</td><td class="small muted">törölve ' + hd(d.deleted_at) + '</td><td><button class="btn sm ghost" data-rest="' + esc(d.uid) + '">Visszaengedés</button></td></tr>'; }).join('') + '</tbody></table>' : 'Nincs törölt tétel.';
+    $$('[data-rest]').forEach(function (b) { b.onclick = function () { api('deleted/restore', { uid: b.dataset.rest }).then(must).then(function () { toast('Visszaengedve — a következő importtal újra bekerül'); renderSet(); }); }; });
+  });
   $('#bAdd').onclick = function () { var pat = $('#bPat').value.trim(); if (!pat) return toast('Adj meg mintát.'); api('block', { name: $('#bName').value, pattern: pat }).then(must).then(function (j) { toast('Tiltólistára téve, ' + j.purged + ' tétel törölve'); refreshMeta().then(reload); }); };
   $$('[data-bdel]').forEach(function (b) { b.onclick = function () { api('block/' + b.dataset.bdel + '/delete', {}).then(must).then(function () { toast('Levéve — a következő importtól újra bekerülhet'); refreshMeta().then(render); }); }; });
   $('#alSave').onclick = function () { var key = {}; $$('[data-k]').forEach(function (i) { if (Number(i.value) > 0) key[i.dataset.k] = Number(i.value); }); var mode = ($('[name=am]:checked') || {}).value || 'fixed'; api('alloc', { mode: mode, key: key }).then(must).then(function () { S.view.alloc = mode; toast('Felosztás mentve'); refreshMeta().then(reload); }); };
