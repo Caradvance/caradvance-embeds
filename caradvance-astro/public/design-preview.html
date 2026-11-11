@@ -44,7 +44,8 @@ h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.02em}
 .burger{display:none}
 /* hero */
 .hero{position:relative;overflow:hidden;padding:40px 0 28px}
-.hero .wrap{display:grid;grid-template-columns:1.02fr 1fr;gap:20px;align-items:center;min-height:440px}
+footer.cafoot{display:none!important}
+.hero .hero-grid{display:grid;grid-template-columns:1.02fr 1fr;gap:20px;align-items:center;min-height:440px}
 .eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-bottom:14px}
 .hero h1{font-size:clamp(38px,5.2vw,64px);line-height:1.02;font-weight:800}
 .hero p{font-size:17px;color:var(--mut);max-width:520px;margin:18px 0 26px}
@@ -58,8 +59,8 @@ h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.02em}
 .svc{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .svc a{position:relative;border-radius:20px;overflow:hidden;min-height:200px;padding:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:.2s}
 .svc a:hover{transform:translateY(-3px)}
-.svc .bgimg{position:absolute;right:0;top:0;width:62%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 55%);mask-image:linear-gradient(90deg,transparent,#000 55%);opacity:.95}
-.svc .in{position:relative;z-index:1;max-width:62%}
+.svc .bgimg{position:absolute;right:0;top:0;width:55%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.25) 30%,#000 80%);mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.25) 30%,#000 80%)}
+.svc .in{position:relative;z-index:1;max-width:56%}
 .svc .ico{width:30px;height:30px;color:var(--ink);margin-bottom:14px}
 .svc h3{font-size:19px;font-weight:800;margin-bottom:6px}
 .svc p{font-size:13px;color:var(--mut);margin:0}
@@ -146,7 +147,7 @@ h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.02em}
 .legal{border-top:1px solid var(--line);margin-top:28px;padding-top:16px;font-size:12px;color:var(--mut)}
 /* responsive */
 @media(max-width:1100px){.nav{display:none}.burger{display:inline-flex}.svc{grid-template-columns:repeat(2,1fr)}.ctrack{grid-auto-columns:calc((100% - 32px)/3)}.sgrid{grid-template-columns:1fr 1fr}.import-band{grid-template-columns:1fr 1fr}.import-band .img{grid-column:1/-1}.fgrid{grid-template-columns:1fr 1fr 1fr}}
-@media(max-width:760px){.hero .wrap{grid-template-columns:1fr;min-height:0}.hero-img{min-height:240px;order:-1}.hero-img img{-webkit-mask-image:none;mask-image:none}.trust{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}.ctrack{grid-auto-columns:82%}.split,.import-band{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.step::after{display:none}.stats{grid-template-columns:1fr 1fr}.revs{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr 1fr}.sec-h h2{font-size:24px}.split h2{font-size:28px}.hdr .btn-red span{display:none}.lang{display:none}.arrow{display:none}}
+@media(max-width:760px){.hero .hero-grid{grid-template-columns:1fr;min-height:0}.hero-img{min-height:240px;order:-1}.hero-img img{-webkit-mask-image:none;mask-image:none}.trust{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}.ctrack{grid-auto-columns:82%}.split,.import-band{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.step::after{display:none}.stats{grid-template-columns:1fr 1fr}.revs{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr 1fr}.sec-h h2{font-size:24px}.split h2{font-size:28px}.hdr .btn-red span{display:none}.lang{display:none}.arrow{display:none}}
 .mnav{display:none;position:fixed;inset:72px 0 0;background:var(--bg);z-index:49;padding:16px 24px}.mnav.open{display:block}.mnav a{display:block;padding:14px 0;border-bottom:1px solid var(--line);font-weight:700;color:var(--ink)}
 </style>
 </head>
@@ -200,7 +201,7 @@ h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.02em}
 <div class="mnav" id="mnav"><a href="/auto-rendeles/">Autóimport</a><a href="/autoink/">Vétel</a><a href="/tartos-berlet/">Bérlet</a><a href="/eladom/">Értékesítés</a><a href="/finanszirozas-lizing/">Finanszírozás</a><a href="/miert-mi/">Rólunk</a><a href="/kapcsolat/">Kapcsolat</a></div>
 
 <main>
-<section class="hero"><div class="wrap">
+<section class="hero"><div class="wrap hero-grid">
 <div>
 <div class="eyebrow">Autóimport • Vétel • Bérlet • Értékesítés</div>
 <h1>Prémium autó<br><span class="red">Németországból.</span></h1>
@@ -271,7 +272,7 @@ h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.02em}
 <section class="sec sec-alt"><div class="wrap">
 <div class="split" style="grid-template-columns:1fr .9fr">
 <div><h2>Rólunk – Car<span class="red">Advance</span></h2><p class="sub" style="max-width:560px">A Caradvance GmbH 2003 óta foglalkozik prémium autókkal Németországban. Magyarországi ügyfeleinknek bérlést, vásárlást, egyedi rendelést, importot és bizományos értékesítést kínálunk — átlátható feltételekkel, egy helyen.</p><a class="btn btn-red btn-sm" href="/miert-mi/">Ismerjen meg minket<svg class="ico"><use href="#i-arrow"/></svg></a></div>
-<div class="img" style="aspect-ratio:4/3"><img src="/caradvance-iroda.webp" alt="A CarAdvance irodája" loading="lazy" style="object-position:center 40%"></div>
+<div class="img" style="aspect-ratio:16/10;max-height:330px"><img src="/caradvance-iroda.webp" alt="A CarAdvance irodája" loading="lazy" style="object-position:center 40%"></div>
 </div>
 <div class="stats">
 <div class="stat"><svg class="ico"><use href="#i-cal"/></svg><div><b>2003 óta</b><span>német céges háttér</span></div></div>
@@ -331,7 +332,7 @@ h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.02em}
     return '<a class="car" href="/auto/'+k+'/" data-i="'+i+'"><div class="ph">'+media+'<button class="heart'+on+'" type="button" data-k="'+k+'" aria-label="Kedvenc"><svg class="ico"><use href="#i-heart"/></svg></button></div>'
       +'<div class="bd"><h3>'+esc(c.modell)+'</h3><div class="pr" data-pr>'+ft(huf(c))+'<small>'+(CT==='b2c'?'bruttó':'nettó')+'</small></div>'
       +'<div class="bb"><button type="button" data-ct="b2c" class="'+(CT==='b2c'?'on':'')+'"><b>B2C</b><span>Magánszemély</span></button><button type="button" data-ct="b2b" class="'+(CT==='b2b'?'on':'')+'"><b>B2B</b><span>Cég / Flotta</span></button></div>'
-      +'<div class="sp">'+sp('i-cal',c.evjarat)+sp('i-gauge',c.km)+sp('i-fuel',c.uzemanyag)+sp('i-gear',c.valto)+'</div></div></a>';
+      +'<div class="sp">'+sp('i-cal',c.evjarat)+sp('i-gauge',c.km?(/km/i.test(c.km)?c.km:(+String(c.km).replace(/\D/g,'')).toLocaleString('hu-HU')+' km'):'')+sp('i-fuel',c.uzemanyag)+sp('i-gear',c.valto)+'</div></div></a>';
   }
   var track=document.getElementById('ctrack');
   function filtered(){
