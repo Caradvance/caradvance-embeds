@@ -616,48 +616,51 @@ export async function pnl(env, from, to) {
 /* ============================== bizonylat-párosítás ============================== */
 function tokens(s) { return new Set(norm(s).replace(/[^A-Z0-9 ]/g, ' ').split(' ').filter((w) => w.length >= 4 && !/^(KFT|ZRT|GMBH|BT|LTD|SRO|SPOLKA|S\.A|HUNGARY|MAGYARORSZAG|SZOLGALTATO|KERESKEDELMI)$/.test(w))); }
 function numKey(s) { return norm(s).replace(/[^A-Z0-9]/g, ''); }
-export function scoreMatch(tx, doc) {
+/** Bizonylat ↔ tétel illeszkedés: { s: pontszám, exact: pontos összeg-egyezés } vagy null. */
+export function matchInfo(tx, doc) {
   const txOut = Number(tx.amount) < 0;
-  if ((doc.dir === 'in') !== txOut) return -1;
-  if (doc.op && doc.op !== 'CREATE') return -1;
-  const amt = Math.abs(Number(tx.amount));
-  let amountOk = false;
-  if (doc.currency === tx.currency && doc.gross != null) amountOk = Math.abs(Math.abs(Number(doc.gross)) - amt) <= (tx.currency === 'HUF' ? 1.5 : 0.011);
-  else if (tx.currency === 'HUF' && doc.gross_huf != null) amountOk = Math.abs(Math.abs(Number(doc.gross_huf)) - amt) <= Math.max(2, amt * 0.025);
-  if (!amountOk) return -1;
+  if ((doc.dir === 'in') !== txOut) return null;
+  if (doc.op && doc.op !== 'CREATE') return null;
+  const amt = Math.abs(Number(tx.amount)), huf = tx.amount_huf != null ? Math.abs(Number(tx.amount_huf)) : (tx.currency === 'HUF' ? amt : null);
+  let ok = false, exact = false;
+  if (doc.currency === tx.currency && doc.gross != null) { const d = Math.abs(Math.abs(Number(doc.gross)) - amt); ok = exact = d <= (tx.currency === 'HUF' ? 1.5 : 0.011); }
+  if (!ok && huf != null && doc.gross_huf != null) { const d = Math.abs(Math.abs(Number(doc.gross_huf)) - huf); exact = d <= 1.5; ok = exact || d <= Math.max(2, huf * 0.025); }
+  if (!ok) return null;
   const dd = doc.issue_date ? daysBetween(doc.issue_date, tx.bdate) : 0; // + = fizetés a kiállítás után
-  if (dd < -20 || dd > 90) return -1;
+  if (dd < -20 || dd > 90) return null;
   let s = 20 - Math.min(15, Math.abs(dd) / 3);
+  if (exact && dd >= -3 && dd <= 10) s += 15; // kártyás fizetés: a számla pár napon belül, fillérre egyezik
   const nk = numKey(doc.number);
   if (nk.length >= 4 && numKey(tx.memo + ' ' + tx.partner).includes(nk)) s += 100;
   const a = tokens(tx.partner), b = tokens(doc.partner);
   let common = false;
-  for (const w of a) if (b.has(w)) { common = true; break; }
-  if (common) s += 40; else if (a.size && b.size) s -= 10; // eltérő partnernév: csak javaslat, automatikus kötés nem
-  return s;
+  for (const w of a) { for (const v of b) if (w === v || (w.length >= 4 && v.startsWith(w)) || (v.length >= 4 && w.startsWith(v))) { common = true; break; } if (common) break; }
+  if (common) s += 40; else if (a.size && b.size && !exact) s -= 10; // eltérő név (a kártyán gyakran a márkanév szerepel): csak pontos összegnél engedjük
+  return { s, exact };
 }
-/** Automatikus párosítás: csak egyértelmű találatnál köt (összeg + szám vagy összeg + partner, vagy egyetlen összeg-egyezés 10 napon belül). */
+export function scoreMatch(tx, doc) { const m = matchInfo(tx, doc); return m ? m.s : -1; }
+/** Automatikus párosítás, globálisan a legjobb párokkal kezdve: összeg + szám/partner, vagy fillérre egyező összeg néhány napon belül,
+ *  vagy egyetlen lehetséges összeg-egyezés. */
 export async function autoMatch(env) {
-  const txs = (await env.DB.prepare(`SELECT t.id, t.amount, t.currency, t.bdate, t.partner, t.memo, t.doc_mode, c.doc_mode AS cdoc, c.kind
+  const txs = (await env.DB.prepare(`SELECT t.id, t.amount, t.amount_huf, t.currency, t.bdate, t.partner, t.memo, t.doc_mode, c.doc_mode AS cdoc, c.kind
     FROM fin_tx t LEFT JOIN fin_cats c ON c.id = t.cat_id WHERE t.doc_id IS NULL`).all()).results
     .filter((t) => (t.doc_mode || t.cdoc || 'invoice') !== 'none' && t.kind !== 'excl');
   if (!txs.length) return 0;
   const docs = (await env.DB.prepare(`SELECT d.* FROM fin_docs d WHERE NOT EXISTS (SELECT 1 FROM fin_tx t WHERE t.doc_id = d.id)`).all()).results;
   if (!docs.length) return 0;
-  const used = new Set(), st = [];
-  const cands = [];
+  const pairs = [];
   for (const t of txs) {
-    const sc = docs.map((d) => ({ d, s: scoreMatch(t, d) })).filter((x) => x.s >= 0).sort((a, b) => b.s - a.s);
-    if (!sc.length) continue;
-    const best = sc[0], second = sc[1];
-    const strong = best.s >= 50 && (!second || second.s < best.s - 10);
-    const lone = sc.length === 1 && best.s >= 17;
-    if (strong || lone) cands.push({ t, d: best.d, s: best.s });
+    const sc = docs.map((d) => ({ d, m: matchInfo(t, d) })).filter((x) => x.m);
+    for (const x of sc) {
+      const acc = x.m.s >= 50 || (x.m.exact && x.m.s >= 30) || (sc.length === 1 && x.m.s >= 17);
+      if (acc) pairs.push({ t, d: x.d, s: x.m.s });
+    }
   }
-  cands.sort((a, b) => b.s - a.s);
-  for (const c of cands) {
-    if (used.has(c.d.id) || used.has('t' + c.t.id)) continue;
-    used.add(c.d.id); used.add('t' + c.t.id);
+  pairs.sort((a, b) => b.s - a.s);
+  const used = new Set(), st = [];
+  for (const c of pairs) {
+    if (used.has('d' + c.d.id) || used.has('t' + c.t.id)) continue;
+    used.add('d' + c.d.id); used.add('t' + c.t.id);
     st.push(env.DB.prepare(`UPDATE fin_tx SET doc_id = ?, match_kind = 'auto' WHERE id = ? AND doc_id IS NULL`).bind(c.d.id, c.t.id));
   }
   for (let i = 0; i < st.length; i += 80) await env.DB.batch(st.slice(i, i + 80));
