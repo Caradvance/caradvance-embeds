@@ -4,7 +4,7 @@
   const burger = document.getElementById('burger');
   const shade = document.getElementById('menuShade');
   const menus = Array.from(nav.querySelectorAll('details'));
-  const desktop = window.matchMedia('(min-width:1101px)');
+  const desktop = window.matchMedia('(min-width:961px)');
   const hover = window.matchMedia('(hover:hover) and (pointer:fine)');
   let hoverTimer;
   function syncNavigation() {
