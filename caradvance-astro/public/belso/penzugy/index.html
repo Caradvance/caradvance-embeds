@@ -59,7 +59,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:18px;font-size:10.5px;color:var(--mut);position:relative;height:100%}
 .bars i{display:block;width:70%;border-radius:4px 4px 0 0}
 .tx td{font-size:13px}.tx tr:hover td{background:#F7F9FC}.tx tr{cursor:pointer}
-.tx .p{font-weight:600}.tx .m{color:var(--mut);font-size:12px;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx .p{font-weight:600}.tx tr.par td{background:#FAFBFD;color:var(--mut)}.tx tr.kid td:nth-child(n+2){border-bottom-color:#F1F4F9}.tx tr.kid .p{font-weight:500}.chip.plate{background:#EEF4FF;color:var(--navy);font-weight:600}.chip.plate .muted{font-weight:500}.tx .m{color:var(--mut);font-size:12px;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
 .modal{background:#fff;border-radius:18px;max-width:760px;width:100%;padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .modal.wide{max-width:1050px}
@@ -88,7 +88,7 @@ code{background:#F1F4F9;border-radius:6px;padding:1px 5px;font-size:12px}
 (function () {
 'use strict';
 var A = '/api/belso-penzugy/', app = document.getElementById('app');
-var S = { tab: 'pl', meta: null, pnl: null, tx: [], docs: [], from: '', to: '', view: { lines: 'all', cols: 'months', basis: 'net', alloc: null, empty: false, collapsed: {} }, f: { q: '', st: 'all', cat: '', line: '', acc: '' }, sel: {} };
+var S = { tab: 'pl', meta: null, pnl: null, tx: [], docs: [], from: '', to: '', view: { lines: 'all', cols: 'months', basis: 'net', alloc: null, empty: false, collapsed: {} }, f: { q: '', st: 'all', cat: '', line: '', acc: '', plate: '' }, sel: {}, carSel: '' };
 var KIND = { rev: 'Árbevétel', cogs: 'Közvetlen költség', opex: 'Működési költség', below: 'Adó / pénzügyi', excl: 'Nem eredményhatású' };
 var MON = ['jan', 'feb', 'márc', 'ápr', 'máj', 'jún', 'júl', 'aug', 'szept', 'okt', 'nov', 'dec'];
 
@@ -121,7 +121,21 @@ function txNet(t) {
   return g / (1 + v / 100);
 }
 function txDocMode(t) { var c = t.cat_id ? catBy(t.cat_id) : null; return t.doc_mode || (c && c.doc_mode) || 'invoice'; }
-function needsDoc(t) { var c = t.cat_id ? catBy(t.cat_id) : null; return !t.doc_id && txDocMode(t) !== 'none' && !(c && c.kind === 'excl'); }
+function needsDoc(t) { var c = t.cat_id ? catBy(t.cat_id) : null; return !t.is_split && !t.doc_id && txDocMode(t) !== 'none' && !(c && c.kind === 'excl'); }
+/* ---------- autók (rendszám) ---------- */
+function vehName(p) { return (S.meta.vehicles || {})[p] || ''; }
+function plateChip(p) { return p ? '<span class="chip plate" title="' + esc(vehName(p)) + '">🚗 ' + esc(p) + (vehName(p) ? ' <span class="muted">' + esc(vehName(p)) + '</span>' : '') + '</span>' : ''; }
+function knownPlates() {
+  var m = {}; Object.keys(S.meta.vehicles || {}).forEach(function (p) { m[p] = 1; });
+  S.tx.forEach(function (t) { if (t.plate) m[t.plate] = 1; }); S.docs.forEach(function (d) { if (d.plate) m[d.plate] = 1; });
+  return Object.keys(m).sort();
+}
+function plateList() { return '<datalist id="plList">' + knownPlates().map(function (p) { return '<option value="' + esc(p) + '">' + esc(vehName(p)) + '</option>'; }).join('') + '</datalist>'; }
+function orderTx(list) { // felbontott tétel részei közvetlenül a szülő alatt
+  var kids = {}, ids = {}; list.forEach(function (t) { ids[t.id] = 1; if (t.parent_id) (kids[t.parent_id] = kids[t.parent_id] || []).push(t); });
+  var out = []; list.forEach(function (t) { if (t.parent_id && ids[t.parent_id]) return; out.push(t); (kids[t.id] || []).sort(function (a, b) { return a.id - b.id; }).forEach(function (k) { out.push(k); }); });
+  return out;
+}
 function splitChips(s) {
   var a = parseSplit(s); if (!a) return '<span class="badge warn">nincs üzletág</span>';
   return a.map(function (x) { var l = lineBy(x.l); return l ? '<span class="chip"><span class="ldot" style="background:' + l.color + '"></span>' + esc(l.name) + (x.p !== 100 ? ' ' + x.p + '%' : '') + '</span>' : ''; }).join('');
@@ -164,15 +178,15 @@ function boot() {
 function reload() {
   var q = '?from=' + S.from + '-01&to=' + lastDay(S.to);
   return Promise.all([api('pnl' + q), api('tx' + q), api('docs' + q)]).then(function (r) {
-    S.pnl = must(r[0]); S.tx = must(r[1]).tx; S.docs = must(r[2]).docs; render();
+    S.pnl = must(r[0]); S.tx = orderTx(must(r[1]).tx); S.docs = must(r[2]).docs; render();
   });
 }
 function refreshMeta() { return api('meta').then(function (j) { S.meta = must(j); }); }
 
 /* ---------- váz ---------- */
 function render() {
-  var unc = S.tx.filter(function (t) { return !t.cat_id; }).length;
-  var nol = S.tx.filter(function (t) { var c = t.cat_id && catBy(t.cat_id); return !parseSplit(t.split) && !(c && c.kind === 'excl'); }).length;
+  var unc = S.tx.filter(function (t) { return !t.cat_id && !t.is_split; }).length;
+  var nol = S.tx.filter(function (t) { var c = t.cat_id && catBy(t.cat_id); return !t.is_split && !parseSplit(t.split) && !(c && c.kind === 'excl'); }).length;
   var miss = S.tx.filter(needsDoc).length;
   var presets = [['ytd', 'Idei év'], ['3m', 'Elmúlt 3 hónap'], ['12m', 'Elmúlt 12 hónap'], ['py', 'Előző év']];
   app.innerHTML = '<div class="row" style="margin:4px 0 2px">'
@@ -181,7 +195,7 @@ function render() {
     + '<span class="small muted">' + (S.meta.stats.n || 0) + ' tétel összesen · utolsó: ' + hd(S.meta.stats.max) + '</span></div>'
     + '<div class="tabs">'
     + tabBtn('pl', 'Eredménykimutatás') + tabBtn('tx', 'Tételek', unc + nol ? '<span class="cnt" title="besorolásra vár / üzletág nélkül">' + (unc + nol) + '</span>' : '')
-    + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('crm', 'Ügyletek') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
+    + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('cars', 'Autók') + tabBtn('crm', 'Ügyletek') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
   $$('.tabs button').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; render(); }; });
   $('#pFrom').onchange = $('#pTo').onchange = function () { S.from = $('#pFrom').value || S.from; S.to = $('#pTo').value || S.to; if (S.from > S.to) S.to = S.from; reload(); };
   $$('[data-pre]').forEach(function (b) {
@@ -193,7 +207,7 @@ function render() {
       reload();
     };
   });
-  ({ pl: renderPL, tx: renderTx, docs: renderDocs, crm: function () { window.CA_renderUgyletek(document.getElementById('tab'), S.from, S.to); }, imp: renderImp, set: renderSet })[S.tab]();
+  ({ pl: renderPL, tx: renderTx, docs: renderDocs, cars: renderCars, crm: function () { window.CA_renderUgyletek(document.getElementById('tab'), S.from, S.to); }, imp: renderImp, set: renderSet })[S.tab]();
 }
 function tabBtn(k, t, extra) { return '<button data-t="' + k + '" class="' + (S.tab === k ? 'on' : '') + '">' + t + (extra || '') + '</button>'; }
 
@@ -336,6 +350,7 @@ function download(name, rows) {
 function drillDown(ck, col, colsMode) {
   var selL = S.view.lines;
   var list = S.tx.filter(function (t) {
+    if (t.is_split) return false;
     if (ck === 'UNCAT' ? t.cat_id : String(t.cat_id) !== ck) return false;
     var sp = parseSplit(t.split) || [{ l: 'NA', p: 100 }];
     var lk = sp.map(function (x) { return String(x.l); });
@@ -354,8 +369,9 @@ function filteredTx() {
   var f = S.f, q = f.q.trim().toLowerCase();
   return S.tx.filter(function (t) {
     var c = t.cat_id && catBy(t.cat_id);
-    if (f.st === 'uncat' && t.cat_id) return false;
-    if (f.st === 'noline' && (parseSplit(t.split) || (c && c.kind === 'excl'))) return false;
+    if (f.st === 'uncat' && (t.cat_id || t.is_split)) return false;
+    if (f.plate && (f.plate === '-' ? (t.plate || t.is_split) : t.plate !== f.plate)) return false;
+    if (f.st === 'noline' && (t.is_split || parseSplit(t.split) || (c && c.kind === 'excl'))) return false;
     if (f.st === 'nodoc' && !needsDoc(t)) return false;
     if (f.st === 'manual' && !t.manual) return false;
     if (f.st === 'in' && t.amount < 0) return false;
@@ -363,7 +379,7 @@ function filteredTx() {
     if (f.cat && String(t.cat_id) !== f.cat) return false;
     if (f.line && !(parseSplit(t.split) || []).some(function (x) { return String(x.l) === f.line; })) return false;
     if (f.acc && String(t.account_id) !== f.acc) return false;
-    if (q && (t.partner + ' ' + t.memo + ' ' + t.ttype + ' ' + (t.note || '') + ' ' + t.amount).toLowerCase().indexOf(q) === -1) return false;
+    if (q && (t.partner + ' ' + t.memo + ' ' + t.ttype + ' ' + (t.note || '') + ' ' + (t.plate || '') + ' ' + vehName(t.plate) + ' ' + t.amount).toLowerCase().indexOf(q) === -1) return false;
     return true;
   });
 }
@@ -372,12 +388,12 @@ function txTable(list, withSel) {
   return '<div style="overflow:auto"><table class="tx"><thead><tr>' + (withSel ? '<th><input type="checkbox" id="selAll"></th>' : '') + '<th>Dátum</th><th>Partner / közlemény</th><th class="n">Összeg</th><th class="n">Ft (nettó)</th><th>Kategória</th><th>Üzletág</th><th>Bizonylat</th></tr></thead><tbody>'
     + list.map(function (t) {
       var c = t.cat_id && catBy(t.cat_id), net = txNet(t);
-      var doc = t.doc_id ? '<span class="badge ok" title="' + esc(t.doc_number || '') + '">✓ ' + esc((t.doc_number || 'csatolva').slice(0, 16)) + '</span>' : (needsDoc(t) ? '<span class="badge warn">hiányzik</span>' : '<span class="muted small">nem kell</span>');
-      return '<tr data-id="' + t.id + '">' + (withSel ? '<td onclick="event.stopPropagation()"><input type="checkbox" class="sel" data-id="' + t.id + '"' + (S.sel[t.id] ? ' checked' : '') + '></td>' : '')
+      var doc = t.is_split ? '<span class="badge navy">felbontva ↓</span>' : t.doc_id ? '<span class="badge ok" title="' + esc(t.doc_number || '') + '">✓ ' + esc((t.doc_number || 'csatolva').slice(0, 16)) + '</span>' : (needsDoc(t) ? '<span class="badge warn">hiányzik</span>' : '<span class="muted small">nem kell</span>');
+      return '<tr data-id="' + t.id + '" class="' + (t.is_split ? 'par' : t.parent_id ? 'kid' : '') + '">' + (withSel ? '<td onclick="event.stopPropagation()"><input type="checkbox" class="sel" data-id="' + t.id + '"' + (S.sel[t.id] ? ' checked' : '') + '></td>' : '')
         + '<td class="small" style="white-space:nowrap">' + hd(t.bdate) + '</td>'
-        + '<td><div class="p">' + esc(t.partner || t.ttype) + (t.manual ? ' <span class="badge navy" title="kézzel besorolva">kézi</span>' : '') + (t.src === 'manual' ? ' <span class="badge">kézi tétel</span>' : '') + '</div><div class="m" title="' + esc(t.memo) + '">' + esc(t.ttype) + (t.memo ? ' · ' + esc(t.memo) : '') + '</div></td>'
+        + '<td><div class="p">' + (t.parent_id ? '↳ ' : '') + esc(t.partner || t.ttype) + ' ' + plateChip(t.plate) + (t.is_split ? ' <span class="badge" title="A részei számítanak az eredménybe">felbontott tétel</span>' : '') + (t.manual && !t.parent_id ? ' <span class="badge navy" title="kézzel besorolva">kézi</span>' : '') + (t.src === 'manual' ? ' <span class="badge">kézi tétel</span>' : '') + '</div><div class="m" title="' + esc(t.memo) + '">' + esc(t.ttype) + (t.memo ? ' · ' + esc(t.memo) : '') + '</div></td>'
         + '<td class="n ' + nc(t.amount) + '">' + money(t.amount, t.currency) + '</td>'
-        + '<td class="n ' + nc(net) + '">' + (net == null ? '<span class="badge err">nincs árfolyam</span>' : ft(net)) + '</td>'
+        + '<td class="n ' + (t.is_split ? 'muted' : nc(net)) + '">' + (net == null ? '<span class="badge err">nincs árfolyam</span>' : t.is_split ? '<s title="A részei számítanak">' + ft(net) + '</s>' : ft(net)) + '</td>'
         + '<td>' + (c ? esc(c.name) : '<span class="badge err">besorolásra vár</span>') + '</td>'
         + '<td>' + (c && c.kind === 'excl' ? '<span class="muted small">—</span>' : splitChips(t.split)) + '</td><td>' + doc + '</td></tr>';
     }).join('') + '</tbody></table></div>';
@@ -387,7 +403,8 @@ function bindTxRows(root, after) {
 }
 function renderTx() {
   var f = S.f, list = filteredTx();
-  var sum = list.reduce(function (a, t) { return a + (Number(t.amount_huf) || 0); }, 0);
+  var sum = list.reduce(function (a, t) { return a + (t.is_split ? 0 : Number(t.amount_huf) || 0); }, 0);
+  var pls = knownPlates();
   var sts = [['all', 'Mind'], ['uncat', 'Besorolásra vár'], ['noline', 'Üzletág nélkül'], ['nodoc', 'Hiányzó bizonylat'], ['manual', 'Kézzel módosított'], ['in', 'Jóváírás'], ['out', 'Terhelés']];
   document.getElementById('tab').innerHTML = '<div class="card"><div class="row" style="margin-bottom:10px">'
     + '<input class="in" id="fq" placeholder="Keresés: partner, közlemény, összeg…" value="' + esc(f.q) + '" style="min-width:230px">'
@@ -395,6 +412,7 @@ function renderTx() {
     + '<select class="in" id="fcat"><option value="">Minden kategória</option>' + catOptions(Number(f.cat) || null) + '</select>'
     + '<select class="in" id="fline">' + lineOptions(Number(f.line) || null, '<option value="">Minden üzletág</option>') + '</select>'
     + '<select class="in" id="facc"><option value="">Minden számla</option>' + S.meta.accounts.map(function (a) { return '<option value="' + a.id + '"' + (String(a.id) === f.acc ? ' selected' : '') + '>' + esc(a.name) + ' (' + a.currency + ')</option>'; }).join('') + '</select>'
+    + (pls.length ? '<select class="in" id="fpl"><option value="">Minden autó</option><option value="-"' + (f.plate === '-' ? ' selected' : '') + '>rendszám nélkül</option>' + pls.map(function (p) { return '<option value="' + esc(p) + '"' + (f.plate === p ? ' selected' : '') + '>' + esc(p) + (vehName(p) ? ' – ' + esc(vehName(p)) : '') + '</option>'; }).join('') + '</select>' : '')
     + '<span class="sp"></span><button class="btn sm ghost" id="txCsv">CSV a könyvelőnek</button><button class="btn sm red" id="txNew">+ Kézi tétel</button></div>'
     + '<div class="small muted" style="margin-bottom:6px">' + list.length + ' tétel · egyenleg: <b class="' + nc(sum) + '">' + ft(sum) + ' Ft</b> (bruttó)</div>'
     + txTable(list, true) + '</div>'
@@ -404,10 +422,11 @@ function renderTx() {
   $('#fcat').onchange = function () { S.f.cat = this.value; renderTx(); };
   $('#fline').onchange = function () { S.f.line = this.value; renderTx(); };
   $('#facc').onchange = function () { S.f.acc = this.value; renderTx(); };
+  if ($('#fpl')) $('#fpl').onchange = function () { S.f.plate = this.value; renderTx(); };
   $('#txNew').onclick = function () { editTx(null); };
   $('#txCsv').onclick = function () {
-    var rows = [['Dátum', 'Számla', 'Típus', 'Partner', 'Közlemény', 'Összeg', 'Deviza', 'Ft bruttó', 'Ft nettó', 'ÁFA %', 'Kategória', 'Üzletág', 'Bizonylat', 'Megjegyzés']];
-    list.forEach(function (t) { var c = t.cat_id && catBy(t.cat_id); rows.push([t.bdate, t.account_name, t.ttype, t.partner, t.memo, String(t.amount).replace('.', ','), t.currency, Math.round(t.amount_huf || 0), Math.round(txNet(t) || 0), txVat(t), c ? c.name : '', (parseSplit(t.split) || []).map(function (x) { var l = lineBy(x.l); return (l ? l.name : '') + ' ' + x.p + '%'; }).join(', '), t.doc_number || (needsDoc(t) ? 'HIÁNYZIK' : 'nem kell'), t.note || '']); });
+    var rows = [['Dátum', 'Számla', 'Típus', 'Partner', 'Közlemény', 'Rendszám', 'Összeg', 'Deviza', 'Ft bruttó', 'Ft nettó', 'ÁFA %', 'Kategória', 'Üzletág', 'Bizonylat', 'Megjegyzés']];
+    list.forEach(function (t) { if (t.is_split) return; var c = t.cat_id && catBy(t.cat_id); rows.push([t.bdate, t.account_name, t.ttype, t.partner, t.memo, t.plate || '', String(t.amount).replace('.', ','), t.currency, Math.round(t.amount_huf || 0), Math.round(txNet(t) || 0), txVat(t), c ? c.name : '', (parseSplit(t.split) || []).map(function (x) { var l = lineBy(x.l); return (l ? l.name : '') + ' ' + x.p + '%'; }).join(', '), t.doc_number || (needsDoc(t) ? 'HIÁNYZIK' : 'nem kell'), t.note || '']); });
     download('tetelek_' + S.from + '_' + S.to + '.csv', rows);
   };
   bindTxRows(document.getElementById('tab'));
@@ -462,16 +481,17 @@ function editTx(id, after) {
       + '<label class="f">Partner<input class="in" id="ePartner" value="' + esc(t.partner) + '"></label><label class="f" style="grid-column:span 2">Leírás<input class="in" id="eMemo" value="' + esc(t.memo) + '"></label></div>' : '')
     + '<div class="grid"><label class="f" style="grid-column:span 2">Kategória<select class="in" id="eCat">' + catOptions(t.cat_id, true) + '</select></label>'
     + '<label class="f">ÁFA-kulcs (nettósítás)<select class="in" id="eVat"><option value="">kategória szerint' + (c ? ' (' + c.vat + '%)' : '') + '</option>' + [0, 5, 18, 27].map(function (v) { return '<option value="' + v + '"' + (t.vat === v ? ' selected' : '') + '>' + v + '%' + (v === 0 ? ' – nem levonható / nincs' : '') + '</option>'; }).join('') + '</select></label></div>'
+    + '<div class="grid" style="margin-top:8px"><label class="f">Autó (rendszám)<input class="in" id="ePlate" list="plList" placeholder="pl. M-AO 1230" value="' + esc(t.plate || '') + '"></label><div class="small muted" style="grid-column:span 2;align-self:end">Az Autók fülön autónként összesíthető (bérleti díj, útdíj, üzemanyag, bevétel).</div></div>' + plateList()
     + '<h3>Üzletág</h3>' + splitEditor(t.split)
     + '<div class="grid" style="margin-top:10px"><label class="f">Bizonylat kell?<select class="in" id="eDoc"><option value="">kategória szerint</option><option value="invoice"' + (t.doc_mode === 'invoice' ? ' selected' : '') + '>igen, számla / nyugta</option><option value="none"' + (t.doc_mode === 'none' ? ' selected' : '') + '>nem kell</option></select></label>'
     + '<label class="f" style="grid-column:span 2">Megjegyzés<input class="in" id="eNote" value="' + esc(t.note || '') + '"></label></div>'
-    + (!isNew && !man ? '<div class="note info" style="margin-top:12px"><label><input type="checkbox" id="eRule"> <b>Szabály mentése:</b> a jövőben minden ilyen tétel automatikusan így legyen besorolva</label><div class="row" style="margin-top:6px"><span class="small">Minta (a partner/közlemény szövegében):</span><input class="in" id="ePat" style="flex:1;min-width:180px" value="' + esc(normPartner(t.partner)) + '"><select class="in" id="eDir"><option value="' + (t.amount < 0 ? 'out' : 'in') + '">csak ' + (t.amount < 0 ? 'terhelés' : 'jóváírás') + '</option><option value="any">mindkét irány</option></select></div></div>' : '')
-    + docBox
-    + '<div class="row" style="margin-top:16px"><button class="btn red" id="eSave">Mentés</button>' + (t.manual && !man ? '<button class="btn ghost" id="eReset">Vissza a szabály szerinti besorolásra</button>' : '') + (!isNew ? '<button class="btn ghost" id="eDel" style="color:var(--neg)">Törlés</button>' + (!man && t.partner && t.partner !== 'Bank' ? '<label class="small"><input type="checkbox" id="eDelAll"> + a partner összes tétele, a jövőben is (tiltólista)</label>' : '') : '') + '<span class="sp"></span>' + (t.rule_id && !t.manual ? '<span class="small muted">Szabály: ' + esc((S.meta.rules.filter(function (r) { return r.id === t.rule_id; })[0] || {}).name || '') + '</span>' : '') + '</div>');
+    + (!isNew && !man && !t.parent_id ? '<div class="note info" style="margin-top:12px"><label><input type="checkbox" id="eRule"> <b>Szabály mentése:</b> a jövőben minden ilyen tétel automatikusan így legyen besorolva</label><div class="row" style="margin-top:6px"><span class="small">Minta (a partner/közlemény szövegében):</span><input class="in" id="ePat" style="flex:1;min-width:180px" value="' + esc(normPartner(t.partner)) + '"><select class="in" id="eDir"><option value="' + (t.amount < 0 ? 'out' : 'in') + '">csak ' + (t.amount < 0 ? 'terhelés' : 'jóváírás') + '</option><option value="any">mindkét irány</option></select></div></div>' : '')
+    + docBox + splitBox(t, isNew)
+    + '<div class="row" style="margin-top:16px"><button class="btn red" id="eSave">Mentés</button>' + (t.manual && !man && !t.parent_id ? '<button class="btn ghost" id="eReset">Vissza a szabály szerinti besorolásra</button>' : '') + (!isNew ? '<button class="btn ghost" id="eDel" style="color:var(--neg)">Törlés</button>' + (!man && t.partner && t.partner !== 'Bank' ? '<label class="small"><input type="checkbox" id="eDelAll"> + a partner összes tétele, a jövőben is (tiltólista)</label>' : '') : '') + '<span class="sp"></span>' + (t.rule_id && !t.manual ? '<span class="small muted">Szabály: ' + esc((S.meta.rules.filter(function (r) { return r.id === t.rule_id; })[0] || {}).name || '') + '</span>' : '') + '</div>');
   bindSplit(m);
   function done(msg) { m.remove(); toast(msg); (after || function () {})(); reload().then(refreshMeta); }
   $('#eSave', m).onclick = function () {
-    var body = { cat_id: Number($('#eCat', m).value) || null, split: readSplit(m), vat: $('#eVat', m).value === '' ? null : Number($('#eVat', m).value), doc_mode: $('#eDoc', m).value || null, note: $('#eNote', m).value };
+    var body = { cat_id: Number($('#eCat', m).value) || null, split: readSplit(m), vat: $('#eVat', m).value === '' ? null : Number($('#eVat', m).value), doc_mode: $('#eDoc', m).value || null, note: $('#eNote', m).value, plate: $('#ePlate', m).value };
     if (isNew || man) { body.bdate = $('#eDate', m).value; body.amount = Number($('#eAmt', m).value); body.partner = $('#ePartner', m).value; body.memo = $('#eMemo', m).value; body.currency = $('#eCur', m).value; if (!body.amount) return toast('Add meg az összeget.'); }
     if ($('#eRule', m) && $('#eRule', m).checked) body.make_rule = { pattern: $('#ePat', m).value.trim(), dir: $('#eDir', m).value, name: t.partner };
     api(isNew ? 'tx' : 'tx/' + t.id, body).then(must).then(function (j) { done(j.rule_id ? 'Mentve + szabály létrehozva (' + (j.applied || 0) + ' további tétel besorolva)' : 'Mentve'); });
@@ -482,6 +502,9 @@ function editTx(id, after) {
     if (!confirm(all ? 'Törlöd „' + t.partner + '” ÖSSZES tételét, és tiltólistára teszed? A jövőbeli importokból is kimarad.' : 'Törlöd ezt a tételt' + (man ? '' : ' (a hozzá tartozó banki díjakkal együtt)? Újraimportáláskor sem jön vissza') + '?')) return;
     api('tx/' + t.id + '/delete', { block_partner: !!all }).then(must).then(function (j) { done(j.deleted + ' tétel törölve'); });
   };
+  if ($('#spGo', m)) $('#spGo', m).onclick = function () { m.remove(); openSplit(t, after); };
+  if ($('#spUndo', m)) $('#spUndo', m).onclick = function () { if (confirm('Visszavonod a felbontást? A részek törlődnek, a tétel ismét egyben számít.')) api('tx/' + t.id + '/unsplit', {}).then(must).then(function () { done('Felbontás visszavonva'); }); };
+  if ($('#spParent', m)) $('#spParent', m).onclick = function () { m.remove(); editTx(t.parent_id, after); };
   if ($('#unlink', m)) $('#unlink', m).onclick = function () { api('tx/' + t.id + '/link', { doc_id: null }).then(must).then(function () { done('Bizonylat leválasztva'); }); };
   if ($('#upl', m)) $('#upl', m).onclick = function () { m.remove(); uploadDoc(t, after); };
   if ($('#sug', m)) $('#sug', m).onclick = function () {
@@ -489,6 +512,95 @@ function editTx(id, after) {
       $('#sugBox', m).innerHTML = j.docs.length ? '<table style="margin-top:8px"><tbody>' + j.docs.map(function (d) { return '<tr><td class="small">' + hd(d.issue_date) + '</td><td>' + esc(d.partner) + '<div class="small muted">' + esc(d.number) + (d.used ? ' · már párosítva' : '') + '</div></td><td class="n">' + money(d.gross, d.currency) + '</td><td><button class="btn sm" data-link="' + d.id + '">Párosít</button></td></tr>'; }).join('') + '</tbody></table>' : '<p class="small muted">Nincs közeli bizonylat. Töltsd fel, vagy futtasd a NAV szinkront.</p>';
       $$('[data-link]', m).forEach(function (b) { b.onclick = function () { api('tx/' + t.id + '/link', { doc_id: Number(b.dataset.link) }).then(must).then(function () { done('Párosítva'); }); }; });
     });
+  };
+}
+
+/* ---------- tétel felbontása (pl. egy átutalás több autó / számla) ---------- */
+function splitBox(t, isNew) {
+  if (isNew) return '';
+  if (t.parent_id) return '<div class="note info" style="margin-top:12px">Ez egy rész egy felbontott banki tételből. <button class="btn sm ghost" id="spParent">A teljes tétel megnyitása</button></div>';
+  if (t.is_split) {
+    var kids = S.tx.filter(function (k) { return k.parent_id === t.id; });
+    return '<h3>Felbontás</h3><p class="small muted" style="margin-top:0">Az eredménybe a részek számítanak (saját rendszámmal, bizonylattal), ez a teljes tétel nem.</p><table class="tx"><tbody>' + kids.map(function (k) { return '<tr><td>' + plateChip(k.plate) + '</td><td class="small">' + esc(k.memo) + '</td><td class="n">' + money(k.amount, k.currency) + '</td><td>' + (k.doc_id ? '<span class="badge ok">✓ ' + esc((k.doc_number || '').slice(0, 16)) + '</span>' : '') + '</td></tr>'; }).join('') + '</tbody></table>'
+      + '<div class="row" style="margin-top:8px"><button class="btn sm navy" id="spGo">Felbontás módosítása</button><button class="btn sm ghost" id="spUndo">Felbontás visszavonása</button></div>';
+  }
+  return '<h3>Felbontás</h3><div class="row"><button class="btn sm navy" id="spGo">Felbontás részekre (autónként / számlánként)</button><span class="small muted">ha egy utalás több számlát vagy autót fizet</span></div>';
+}
+function norm2(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10); }
+function openSplit(t, after) {
+  var kids = S.tx.filter(function (k) { return k.parent_id === t.id; });
+  var rows = kids.length ? kids.map(function (k) { return { amount: k.amount, plate: k.plate, memo: k.memo, doc_id: k.doc_id }; }) : [{ amount: t.amount, plate: t.plate || '', memo: '', doc_id: null }, { amount: '', plate: '', memo: '', doc_id: null }];
+  var dir = t.amount < 0 ? 'in' : 'out';
+  var docs = S.docs.filter(function (d) { return d.dir === dir; }).sort(function (a, b) { var pa = norm2(a.partner) === norm2(t.partner) ? 0 : 1, pb = norm2(b.partner) === norm2(t.partner) ? 0 : 1; return (pa - pb) || String(b.issue_date).localeCompare(String(a.issue_date)); });
+  function docOpts(sel) { return '<option value="">— nincs —</option>' + docs.map(function (d) { return '<option value="' + d.id + '"' + (d.id === sel ? ' selected' : '') + '>' + esc((d.number || '') + ' · ' + (d.partner || '').slice(0, 28) + ' · ' + (d.gross != null ? money(d.gross, d.currency) : '') + (d.plate ? ' · ' + d.plate : '')) + '</option>'; }).join(''); }
+  var m = modal('<h2>Felbontás: ' + esc(t.partner || t.ttype) + '</h2><p class="small muted">' + hd(t.bdate) + ' · ' + money(t.amount, t.currency) + ' · ' + esc(t.memo || '') + '</p>'
+    + '<p class="small muted" style="margin-top:0">Adj meg részeket (azonos előjellel, ' + esc(t.currency) + '-ban); az összegük egyezzen a tétellel. Ha bizonylatot választasz, az összeg és a rendszám onnan töltődik.</p>'
+    + plateList() + '<div style="overflow:auto"><table class="tx" id="spT"><thead><tr><th class="n">Összeg</th><th>Rendszám</th><th>Leírás</th><th>Bizonylat</th><th></th></tr></thead><tbody></tbody></table></div>'
+    + '<div class="row" style="margin-top:8px"><button class="btn sm ghost" id="spAdd">+ sor</button><span class="sp"></span><span id="spRest" class="small"></span></div>'
+    + '<div class="row" style="margin-top:14px"><button class="btn red" id="spSave">Felbontás mentése</button></div>', true);
+  function rest() { var s = rows.reduce(function (a, r) { return a + (Number(r.amount) || 0); }, 0), d = Math.round((t.amount - s) * 100) / 100; $('#spRest', m).innerHTML = Math.abs(d) < 0.011 ? '<span class="pos">✓ A részek összege egyezik</span>' : 'Még szétosztandó: <b class="neg">' + money(d, t.currency) + '</b>'; }
+  function draw() {
+    $('#spT tbody', m).innerHTML = rows.map(function (r, i) {
+      return '<tr style="cursor:default"><td style="width:130px"><input class="in" type="number" step="0.01" data-k="amount" data-i="' + i + '" value="' + esc(r.amount) + '" style="width:120px;text-align:right"></td>'
+        + '<td style="width:150px"><input class="in" list="plList" data-k="plate" data-i="' + i + '" value="' + esc(r.plate || '') + '" style="width:140px"></td>'
+        + '<td><input class="in" data-k="memo" data-i="' + i + '" value="' + esc(r.memo || '') + '" style="width:100%"></td>'
+        + '<td><select class="in" data-k="doc_id" data-i="' + i + '" style="max-width:300px">' + docOpts(r.doc_id) + '</select></td>'
+        + '<td><button class="btn sm ghost" data-rm="' + i + '">✕</button></td></tr>';
+    }).join('');
+    $$('#spT [data-k]', m).forEach(function (el) {
+      el.oninput = el.onchange = function () {
+        var r = rows[Number(el.dataset.i)], k = el.dataset.k;
+        r[k] = k === 'doc_id' ? (Number(el.value) || null) : el.value;
+        if (k === 'doc_id' && r.doc_id && el.tagName === 'SELECT') { var d = docs.filter(function (x) { return x.id === r.doc_id; })[0]; if (d) { if (d.currency === t.currency && d.gross != null) r.amount = Math.sign(t.amount) * Math.abs(d.gross); if (d.plate) r.plate = d.plate; if (!r.memo) r.memo = d.number || ''; } draw(); return; }
+        rest();
+      };
+    });
+    $$('[data-rm]', m).forEach(function (b) { b.onclick = function () { rows.splice(Number(b.dataset.rm), 1); draw(); }; });
+    rest();
+  }
+  $('#spAdd', m).onclick = function () { var s = rows.reduce(function (a, r) { return a + (Number(r.amount) || 0); }, 0); rows.push({ amount: Math.round((t.amount - s) * 100) / 100 || '', plate: '', memo: '', doc_id: null }); draw(); };
+  $('#spSave', m).onclick = function () {
+    var parts = rows.filter(function (r) { return Number(r.amount); }).map(function (r) { return { amount: Number(r.amount), plate: r.plate, memo: r.memo, doc_id: r.doc_id }; });
+    api('tx/' + t.id + '/split', { parts: parts }).then(must).then(function (j) { m.remove(); toast(j.parts + ' részre bontva'); (after || function () {})(); reload(); });
+  };
+  draw();
+}
+
+/* =================== AUTÓK =================== */
+function renderCars() {
+  var G = [['rev', 'Bevétel'], ['VEH_BERLES', 'Bérleti díj'], ['VEH_UTDIJ', 'Útdíj, parkolás'], ['VEH_UZEM', 'Üzemanyag'], ['VEH_SZERVIZ', 'Szerviz, mosás'], ['other', 'Egyéb költség']];
+  function grpOf(t) { var c = t.cat_id && catBy(t.cat_id); if (!c) return 'other'; if (c.kind === 'excl') return null; if (c.kind === 'rev') return 'rev'; return G.some(function (g) { return g[0] === c.code; }) ? c.code : 'other'; }
+  function res(r) { return G.reduce(function (a, g) { return a + (r[g[0]] || 0); }, 0); }
+  var P = {}, tot = {};
+  S.tx.forEach(function (t) {
+    if (t.is_split || !t.plate) return; var g = grpOf(t); if (!g) return; var v = txNet(t); if (v == null) return;
+    var r = P[t.plate] = P[t.plate] || { n: 0, openList: [] }; r[g] = (r[g] || 0) + v; r.n++; tot[g] = (tot[g] || 0) + v;
+  });
+  var linked = {}; S.tx.forEach(function (t) { if (t.doc_id) linked[t.doc_id] = 1; });
+  S.docs.filter(function (d) { return d.plate && d.dir === 'in' && !linked[d.id] && d.gross != null; }).forEach(function (d) { var r = P[d.plate] = P[d.plate] || { n: 0, openList: [] }; r.openList.push(d); });
+  var plates = Object.keys(P).sort(function (a, b) { return res(P[a]) - res(P[b]); });
+  var noPlate = S.tx.filter(function (t) { var c = t.cat_id && catBy(t.cat_id); return !t.is_split && !t.plate && c && /^VEH_(BERLES|UTDIJ|UZEM|SZERVIZ)$/.test(c.code); });
+  var V = S.meta.vehicles || {};
+  document.getElementById('tab').innerHTML = '<div class="card"><div class="row"><h2 style="margin:0">Autónként</h2><span class="small muted">Ft · nettó · pénzforgalmi · a tételek rendszáma alapján (egy átutalás több autóra a tételnél bontható fel)</span></div>'
+    + (plates.length ? '<div style="overflow:auto"><table class="tx" style="margin-top:8px"><thead><tr><th>Autó</th>' + G.map(function (g) { return '<th class="n">' + g[1] + '</th>'; }).join('') + '<th class="n">Eredmény</th><th class="n">Nyitott számla</th></tr></thead><tbody>'
+      + plates.map(function (p) { var r = P[p]; return '<tr data-car="' + esc(p) + '"><td>' + plateChip(p) + '<div class="small muted">' + r.n + ' tétel</div></td>' + G.map(function (g) { var v = r[g[0]] || 0; return '<td class="n ' + nc(v) + '">' + ft(v, true) + '</td>'; }).join('') + '<td class="n ' + nc(res(r)) + '"><b>' + ft(res(r), true) + '</b></td><td class="n small">' + (r.openList.length ? r.openList.map(function (d) { return money(d.gross, d.currency); }).join(', ') : '–') + '</td></tr>'; }).join('')
+      + '<tr style="background:#F8FAFC;cursor:default"><td><b>Összesen</b></td>' + G.map(function (g) { return '<td class="n ' + nc(tot[g[0]] || 0) + '"><b>' + ft(tot[g[0]] || 0, true) + '</b></td>'; }).join('') + '<td class="n"><b>' + ft(res(tot), true) + '</b></td><td></td></tr></tbody></table></div>'
+      : '<p class="muted">Még nincs rendszámmal jelölt tétel ebben az időszakban. A Tételeknél egy tételre kattintva adható meg a rendszám.</p>')
+    + '<div id="carDet"></div></div>'
+    + (noPlate.length ? '<div class="card" id="carNo"><h2>Járműköltség rendszám nélkül <span class="cnt grey">' + noPlate.length + '</span></h2><p class="small muted" style="margin-top:0">Bérleti díj, útdíj, üzemanyag vagy szerviz, amelyhez még nincs autó megadva (kattints a tételre a rendszám megadásához).</p>' + txTable(noPlate, false) + '</div>' : '')
+    + '<div class="card"><h2>Autók megnevezése</h2><p class="small muted" style="margin-top:0">Soronként: <code>RENDSZÁM = megnevezés</code></p><textarea class="in" id="vehTxt" rows="5" style="width:100%;font-family:inherit">' + esc(Object.keys(V).map(function (k) { return k + ' = ' + V[k]; }).join('\n')) + '</textarea><div class="row" style="margin-top:8px"><button class="btn sm red" id="vehSave">Mentés</button></div></div>';
+  function det(p) {
+    S.carSel = p; var list = S.tx.filter(function (t) { return !t.is_split && t.plate === p; }), r = P[p] || { openList: [] };
+    $('#carDet').innerHTML = '<h3 style="margin-top:16px">' + plateChip(p) + ' tételei</h3>' + txTable(list, false)
+      + (r.openList.length ? '<h3>Nyitott (még nem fizetett) számlák</h3><table class="tx"><tbody>' + r.openList.map(function (d) { return '<tr style="cursor:default"><td class="small">' + hd(d.issue_date) + '</td><td>' + esc(d.partner) + '<div class="small muted">' + esc(d.number) + '</div></td><td class="n">' + money(d.gross, d.currency) + '</td><td>' + (d.file_size ? '<a target="_blank" href="' + A + 'docs/' + d.id + '/file">fájl</a>' : '') + '</td></tr>'; }).join('') + '</tbody></table>' : '');
+    bindTxRows($('#carDet'));
+  }
+  $$('[data-car]').forEach(function (tr) { tr.onclick = function () { det(tr.dataset.car); }; });
+  if ($('#carNo')) bindTxRows($('#carNo'));
+  if (S.carSel && P[S.carSel]) det(S.carSel);
+  $('#vehSave').onclick = function () {
+    var map = {}; $('#vehTxt').value.split('\n').forEach(function (l) { var i = l.indexOf('='); if (i > 0) map[l.slice(0, i).trim()] = l.slice(i + 1).trim(); });
+    api('vehicles', { map: map }).then(must).then(function () { toast('Mentve'); refreshMeta().then(renderCars); });
   };
 }
 
@@ -515,7 +627,7 @@ function renderDocs() {
     }).join('') + '</tbody></table></div>' : '<p class="note ok">Minden bizonylat megvan ebben az időszakban.</p>') + '</div>'
     + '<div class="card"><div class="row"><h2 style="margin:0">Bizonylatok</h2><span class="sp"></span><button class="btn sm red" id="dNew">+ Bizonylat feltöltése</button></div>'
     + (S.docs.length ? '<div style="overflow:auto"><table class="tx" style="margin-top:8px"><thead><tr><th>Kelt</th><th>Partner / szám</th><th class="n">Bruttó</th><th class="n">Nettó</th><th>Forrás</th><th>Állapot</th><th></th></tr></thead><tbody>' + S.docs.map(function (d) {
-      return '<tr><td class="small">' + hd(d.issue_date) + '</td><td><div class="p">' + esc(d.partner) + '</div><div class="m">' + esc(d.number) + (d.dir === 'out' ? ' · kimenő' : '') + (d.op && d.op !== 'CREATE' ? ' · ' + esc(d.op) : '') + '</div></td><td class="n">' + (d.gross != null ? money(d.gross, d.currency) : '–') + '</td><td class="n">' + (d.net != null ? money(d.net, d.currency) : '–') + '</td>'
+      return '<tr><td class="small">' + hd(d.issue_date) + '</td><td><div class="p">' + esc(d.partner) + ' ' + plateChip(d.plate) + '</div><div class="m">' + esc(d.number) + (d.dir === 'out' ? ' · kimenő' : '') + (d.op && d.op !== 'CREATE' ? ' · ' + esc(d.op) : '') + '</div></td><td class="n">' + (d.gross != null ? money(d.gross, d.currency) : '–') + '</td><td class="n">' + (d.net != null ? money(d.net, d.currency) : '–') + '</td>'
         + '<td class="small">' + (d.source === 'nav' ? 'NAV' : d.source === 'gmail' ? 'e-mail' : 'feltöltés') + (d.file_size ? ' · <a target="_blank" href="' + A + 'docs/' + d.id + '/file">fájl</a>' : '') + mailLink(d.note) + '</td><td>' + (linked[d.id] ? '<span class="badge ok">párosítva</span>' : '<span class="badge">párosítatlan</span>') + '</td><td><button class="btn sm ghost" data-ddel="' + d.id + '">Törlés</button></td></tr>';
     }).join('') + '</tbody></table></div>' : '<p class="muted">Még nincs bizonylat.</p>') + '</div>';
   bindTxRows(document.getElementById('tab'));
@@ -553,6 +665,7 @@ function uploadDoc(t, after) {
     + '<label class="f">Kelt<input class="in" type="date" id="dDate" value="' + (t ? t.bdate : todayIso()) + '"></label>'
     + '<label class="f" style="grid-column:span 2">Kiállító / partner<input class="in" id="dPartner" value="' + esc(t ? t.partner : '') + '"></label><label class="f">Számlaszám<input class="in" id="dNum"></label>'
     + '<label class="f">Bruttó<input class="in" type="number" step="0.01" id="dGross" value="' + gross + '"></label><label class="f">Deviza<select class="in" id="dCur">' + ['HUF', 'EUR', 'USD', 'GBP', 'CZK', 'PLN'].map(function (x) { return '<option' + (x === cur ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>'
+    + '<label class="f">Autó (rendszám)<input class="in" id="dPlate" list="plList" value="' + esc(t && t.plate || '') + '"></label>' + plateList()
     + '<label class="f">ÁFA-kulcs<select class="in" id="dVat">' + [27, 18, 5, 0].map(function (v) { return '<option value="' + v + '"' + (v === vat ? ' selected' : '') + '>' + v + '%' + (v === 0 ? ' (AAM / külföldi / fordított)' : '') + '</option>'; }).join('') + '</select></label></div>'
     + '<div class="small muted" id="dNet" style="margin-top:4px"></div>'
     + '<div class="row" style="margin-top:14px"><button class="btn red" id="dSave">Mentés</button><span class="small muted" id="dMsg"></span></div>');
@@ -566,7 +679,7 @@ function uploadDoc(t, after) {
   dz.ondrop = function (e) { e.preventDefault(); dz.classList.remove('over'); take(e.dataTransfer.files[0]); };
   $('#dSave', m).onclick = function () {
     var g = Number($('#dGross', m).value), net = calc();
-    var body = { dir: $('#dDir', m).value, kind: $('#dKind', m).value, issue_date: $('#dDate', m).value, partner: $('#dPartner', m).value, number: $('#dNum', m).value, gross: g || null, net: g ? net : null, vat: g ? Math.round((g - net) * 100) / 100 : null, currency: $('#dCur', m).value, file: file, link_tx: t ? t.id : null };
+    var body = { dir: $('#dDir', m).value, kind: $('#dKind', m).value, issue_date: $('#dDate', m).value, partner: $('#dPartner', m).value, number: $('#dNum', m).value, gross: g || null, net: g ? net : null, vat: g ? Math.round((g - net) * 100) / 100 : null, currency: $('#dCur', m).value, plate: $('#dPlate', m).value, file: file, link_tx: t ? t.id : null };
     if (!file && !body.number) return toast('Csatolj fájlt vagy add meg a számlaszámot.');
     this.disabled = true; $('#dMsg', m).textContent = 'Feltöltés…';
     api('docs', body).then(must).then(function (j) { m.remove(); toast(t ? 'Bizonylat csatolva' : 'Mentve' + (j.matched ? ', ' + j.matched + ' párosítás' : '')); (after || function () {})(); reload(); }).catch(function () { $('#dSave', m).disabled = false; $('#dMsg', m).textContent = ''; });

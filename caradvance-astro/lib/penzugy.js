@@ -92,7 +92,58 @@ export async function ensureFin(env) {
   await migrateBlockV4(env);
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS fin_recurring (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, partner TEXT DEFAULT '', amount REAL NOT NULL, currency TEXT DEFAULT 'HUF', cat_id INTEGER, split TEXT, vat INTEGER, doc_mode TEXT, day INTEGER DEFAULT 1, start TEXT NOT NULL, end_month TEXT DEFAULT '', active INTEGER DEFAULT 1, created_at TEXT DEFAULT (datetime('now')))`).run();
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS fin_deleted (uid TEXT PRIMARY KEY, bdate TEXT, partner TEXT, amount REAL, currency TEXT, account_id INTEGER, deleted_at TEXT DEFAULT (datetime('now')), deleted_by TEXT)`).run();
+  await migrateVehV5(env);
   READY = true;
+}
+
+/* ---- v5: autónkénti (rendszám) bontás ----
+ * fin_tx.plate / fin_docs.plate: rendszám; fin_tx.parent_id + is_split: egy banki tétel több részre bontható
+ * (pl. egy átutalás több bérleti számlát / autót fizet). A felbontott szülő-tétel kimarad az eredményből,
+ * helyette a részei számítanak (saját rendszámmal, bizonylattal). */
+async function migrateVehV5(env) {
+  const cols = async (t) => new Set((await env.DB.prepare(`PRAGMA table_info(${t})`).all()).results.map((c) => c.name));
+  const tx = await cols('fin_tx'), dc = await cols('fin_docs');
+  const st = [];
+  if (!tx.has('plate')) st.push(env.DB.prepare(`ALTER TABLE fin_tx ADD COLUMN plate TEXT DEFAULT ''`));
+  if (!tx.has('parent_id')) st.push(env.DB.prepare(`ALTER TABLE fin_tx ADD COLUMN parent_id INTEGER`));
+  if (!tx.has('is_split')) st.push(env.DB.prepare(`ALTER TABLE fin_tx ADD COLUMN is_split INTEGER DEFAULT 0`));
+  if (!dc.has('plate')) st.push(env.DB.prepare(`ALTER TABLE fin_docs ADD COLUMN plate TEXT DEFAULT ''`));
+  for (const s of st) await s.run();
+  if (st.length) await env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_fin_tx_parent ON fin_tx (parent_id)`).run();
+}
+/** Rendszám egységes alakja: nagybetű, egy szóköz, max. 20 karakter (pl. „m-ao  1230” → „M-AO 1230”). */
+export function normPlate(s) { return String(s || '').toUpperCase().replace(/\s+/g, ' ').trim().slice(0, 20); }
+
+/** Banki tétel felbontása részekre: parts = [{ amount, plate, memo, doc_id, cat_id, split, note }]. A részek összege = a tétel összege. */
+export async function splitTx(env, id, parts, who, lineIds) {
+  const t = await env.DB.prepare(`SELECT * FROM fin_tx WHERE id = ?`).bind(id).first();
+  if (!t) throw new Error('Nem található.');
+  if (t.parent_id) throw new Error('Egy rész nem bontható tovább.');
+  parts = (Array.isArray(parts) ? parts : []).map((p) => ({ ...p, amount: r2(p.amount) })).filter((p) => p.amount);
+  if (parts.length < 2) throw new Error('Legalább két rész kell.');
+  const sum = r2(parts.reduce((a, p) => a + p.amount, 0));
+  if (Math.abs(sum - r2(t.amount)) > 0.011) throw new Error(`A részek összege (${sum}) nem egyezik a tétellel (${r2(t.amount)}).`);
+  if (parts.some((p) => Math.sign(p.amount) !== Math.sign(t.amount))) throw new Error('Minden rész előjele egyezzen a tételével.');
+  const st = [env.DB.prepare(`DELETE FROM fin_tx WHERE parent_id = ?`).bind(id)];
+  parts.forEach((p, i) => {
+    const huf = t.amount_huf != null ? r2(Number(t.amount_huf) * p.amount / Number(t.amount)) : null;
+    const sp = p.split ? normSplit(p.split, lineIds) : null;
+    const did = Number(p.doc_id) || null;
+    st.push(env.DB.prepare(`INSERT INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, bank_ref, amount, currency, fx, amount_huf, partner, iban, memo, cat_id, split, vat, doc_mode, doc_id, match_kind, manual, note, plate, parent_id, is_split, updated_at, updated_by)
+      VALUES (?, ?, 'split', ?, ?, ?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, 0, ?, ?)`)
+      .bind(`split-${id}-${i + 1}`, t.account_id, t.bdate, t.vdate || t.bdate, t.ttype, p.amount, t.currency, t.fx, huf, t.partner, t.iban || '',
+        String(p.memo || '').slice(0, 400) || t.memo, Number(p.cat_id) || t.cat_id, sp ? JSON.stringify(sp) : t.split, t.vat, t.doc_mode, did, did ? 'manual' : null,
+        String(p.note || '').slice(0, 400), normPlate(p.plate), id, nowIso(), who || ''));
+  });
+  st.push(env.DB.prepare(`UPDATE fin_tx SET is_split = 1, updated_at = ?, updated_by = ? WHERE id = ?`).bind(nowIso(), who || '', id));
+  await env.DB.batch(st);
+  return parts.length;
+}
+export async function unsplitTx(env, id, who) {
+  await env.DB.batch([
+    env.DB.prepare(`DELETE FROM fin_tx WHERE parent_id = ?`).bind(id),
+    env.DB.prepare(`UPDATE fin_tx SET is_split = 0, updated_at = ?, updated_by = ? WHERE id = ?`).bind(nowIso(), who || '', id)
+  ]);
 }
 
 /* ---- alap üzletágak ---- */
@@ -286,9 +337,13 @@ export async function deleteTxs(env, ids, who) {
     const fees = (await env.DB.prepare(`SELECT * FROM fin_tx WHERE account_id = ? AND bank_ref = ? AND id <> ? AND ttype LIKE 'D%j%'`).bind(t.account_id, t.bank_ref, t.id).all()).results;
     fees.forEach((f) => all.set(f.id, f));
   }
+  for (const t of [...all.values()]) { // felbontott tétel részei vele együtt törlődnek
+    if (!t.is_split) continue;
+    (await env.DB.prepare(`SELECT * FROM fin_tx WHERE parent_id = ?`).bind(t.id).all()).results.forEach((c) => all.set(c.id, c));
+  }
   const st = [];
   for (const t of all.values()) {
-    if (t.src !== 'manual' || /^rec-/.test(t.uid || '')) st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_deleted (uid, bdate, partner, amount, currency, account_id, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(t.uid, t.bdate, t.partner || t.ttype, t.amount, t.currency, t.account_id, who || ''));
+    if ((t.src !== 'manual' && t.src !== 'split') || /^rec-/.test(t.uid || '')) st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_deleted (uid, bdate, partner, amount, currency, account_id, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(t.uid, t.bdate, t.partner || t.ttype, t.amount, t.currency, t.account_id, who || ''));
     st.push(env.DB.prepare(`DELETE FROM fin_tx WHERE id = ?`).bind(t.id));
   }
   for (let i = 0; i < st.length; i += 80) await env.DB.batch(st.slice(i, i + 80));
@@ -527,6 +582,10 @@ export function rateOn(map, date) {
 }
 /** A HUF-érték nélküli deviza-tételek forintosítása. */
 export async function fillFx(env) {
+  // felbontott tétel részei: a szülő forintértékének arányos része (ugyanazzal az árfolyammal)
+  await env.DB.prepare(`UPDATE fin_tx SET fx = (SELECT p.fx FROM fin_tx p WHERE p.id = fin_tx.parent_id),
+    amount_huf = ROUND((SELECT p.amount_huf * 1.0 / p.amount FROM fin_tx p WHERE p.id = fin_tx.parent_id) * amount, 2)
+    WHERE parent_id IS NOT NULL AND amount_huf IS NULL AND (SELECT p.amount_huf FROM fin_tx p WHERE p.id = fin_tx.parent_id) IS NOT NULL`).run();
   const rows = (await env.DB.prepare(`SELECT id, currency, bdate, amount, memo FROM fin_tx WHERE amount_huf IS NULL`).all()).results;
   const st = [];
   const byCur = {};
@@ -619,7 +678,7 @@ export async function pnl(env, from, to) {
     getSetting(env, 'alloc', { mode: 'fixed', key: {} })
   ]);
   const txs = (await env.DB.prepare(`SELECT t.id, t.bdate, t.amount, t.amount_huf, t.cat_id, t.split, t.vat, d.net AS dnet, d.gross AS dgross
-    FROM fin_tx t LEFT JOIN fin_docs d ON d.id = t.doc_id WHERE t.bdate BETWEEN ? AND ? ORDER BY t.bdate`).bind(from, to).all()).results;
+    FROM fin_tx t LEFT JOIN fin_docs d ON d.id = t.doc_id WHERE t.bdate BETWEEN ? AND ? AND COALESCE(t.is_split, 0) = 0 ORDER BY t.bdate`).bind(from, to).all()).results;
   const C = Object.fromEntries(cats.map((c) => [c.id, c]));
   const lineIds = new Set(lines.map((l) => l.id));
   const cells = {}; // catKey → month → lineKey → [net, gross, n]
@@ -676,7 +735,7 @@ export function scoreMatch(tx, doc) { const m = matchInfo(tx, doc); return m ? m
  *  vagy egyetlen lehetséges összeg-egyezés. */
 export async function autoMatch(env) {
   const txs = (await env.DB.prepare(`SELECT t.id, t.amount, t.amount_huf, t.currency, t.bdate, t.partner, t.memo, t.doc_mode, c.doc_mode AS cdoc, c.kind
-    FROM fin_tx t LEFT JOIN fin_cats c ON c.id = t.cat_id WHERE t.doc_id IS NULL`).all()).results
+    FROM fin_tx t LEFT JOIN fin_cats c ON c.id = t.cat_id WHERE t.doc_id IS NULL AND COALESCE(t.is_split, 0) = 0`).all()).results
     .filter((t) => (t.doc_mode || t.cdoc || 'invoice') !== 'none' && t.kind !== 'excl');
   if (!txs.length) return 0;
   const docs = (await env.DB.prepare(`SELECT d.* FROM fin_docs d WHERE NOT EXISTS (SELECT 1 FROM fin_tx t WHERE t.doc_id = d.id)`).all()).results;

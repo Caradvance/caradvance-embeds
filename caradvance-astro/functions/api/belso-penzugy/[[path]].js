@@ -17,7 +17,8 @@
  */
 import {
   json, ensureFin, clean, isDate, addDays, normSplit, nowIso, importRows, applyRules, autoMatch, suggestDocs, saveFile, loadFile,
-  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs, genRecurring
+  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs, genRecurring,
+  normPlate, splitTx, unsplitTx
 } from '../../../lib/penzugy.js';
 
 async function staffUser(request, env) {
@@ -69,17 +70,18 @@ export async function onRequest(context) {
 
     /* ---------- meta ---------- */
     if (m === 'GET' && p0 === 'meta') {
-      const [lines, cats, rules, accounts, alloc, navLast, stats] = await Promise.all([
+      const [lines, cats, rules, accounts, alloc, navLast, stats, vehicles] = await Promise.all([
         DB.prepare(`SELECT * FROM fin_lines ORDER BY sort, id`).all().then((r) => r.results),
         DB.prepare(`SELECT * FROM fin_cats ORDER BY sort, id`).all().then((r) => r.results),
         DB.prepare(`SELECT * FROM fin_rules ORDER BY prio, id`).all().then((r) => r.results),
         DB.prepare(`SELECT a.*, (SELECT COUNT(*) FROM fin_tx t WHERE t.account_id = a.id) AS n, (SELECT MAX(bdate) FROM fin_tx t WHERE t.account_id = a.id) AS last FROM fin_accounts a ORDER BY a.id`).all().then((r) => r.results),
         getSetting(env, 'alloc', { mode: 'fixed', key: {} }),
         getSetting(env, 'nav_last', null),
-        DB.prepare(`SELECT MIN(bdate) AS min, MAX(bdate) AS max, COUNT(*) AS n FROM fin_tx`).first()
+        DB.prepare(`SELECT MIN(bdate) AS min, MAX(bdate) AS max, COUNT(*) AS n FROM fin_tx`).first(),
+        getSetting(env, 'vehicles', {})
       ]);
       const block = (await loadBlock(env)).map((b) => ({ id: b.id, name: b.name, pattern: b.pattern, created_at: b.created_at }));
-      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, block, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats });
+      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, block, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats, vehicles });
     }
 
     /* ---------- P&L ---------- */
@@ -124,10 +126,10 @@ export async function onRequest(context) {
       if (!acc) acc = ((await DB.prepare(`SELECT id FROM fin_accounts WHERE ext_id = 'CASH'`).first()) || {}).id || null;
       const split = normSplit(body.split, await lineSet(env));
       const uid = 'manual-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-      const res = await DB.prepare(`INSERT INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, updated_at, updated_by)
-        VALUES (?, ?, 'manual', ?, ?, 'Kézi tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`)
+      const res = await DB.prepare(`INSERT INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, plate, updated_at, updated_by)
+        VALUES (?, ?, 'manual', ?, ?, 'Kézi tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)`)
         .bind(uid, acc, bdate, bdate, amount, cur, cur === 'HUF' ? 1 : null, cur === 'HUF' ? amount : null, clean(body.partner, 160), clean(body.memo, 400),
-          Number(body.cat_id) || null, split ? JSON.stringify(split) : null, vatOk(body.vat), docModeOk(body.doc_mode), clean(body.note, 400), nowIso(), who).run();
+          Number(body.cat_id) || null, split ? JSON.stringify(split) : null, vatOk(body.vat), docModeOk(body.doc_mode), clean(body.note, 400), normPlate(body.plate), nowIso(), who).run();
       if (cur !== 'HUF') await fillFx(env);
       return json({ id: res.meta.last_row_id });
     }
@@ -169,6 +171,11 @@ export async function onRequest(context) {
         await applyRules(env, new Set([id]));
         return json({ ok: true });
       }
+      if (p2 === 'split') {
+        try { return json({ ok: true, parts: await splitTx(env, id, body.parts, who, await lineSet(env)) }); }
+        catch (e) { return json({ error: e.message }, 400); }
+      }
+      if (p2 === 'unsplit') { await unsplitTx(env, id, who); return json({ ok: true }); }
       if (p2 === 'link') {
         const did = body.doc_id ? Number(body.doc_id) : null;
         if (did && !(await DB.prepare(`SELECT id FROM fin_docs WHERE id = ?`).bind(did).first())) return json({ error: 'Nincs ilyen bizonylat.' }, 404);
@@ -183,6 +190,8 @@ export async function onRequest(context) {
       const doc = Object.prototype.hasOwnProperty.call(body, 'doc_mode') ? docModeOk(body.doc_mode) : t.doc_mode;
       const note = Object.prototype.hasOwnProperty.call(body, 'note') ? clean(body.note, 400) : t.note;
       const extra = [];
+      if (Object.prototype.hasOwnProperty.call(body, 'plate')) extra.push(['plate', normPlate(body.plate)]);
+      if (t.src === 'split' && body.memo != null) extra.push(['memo', clean(body.memo, 400)]);
       if (t.src === 'manual') {
         if (isDate(body.bdate)) extra.push(['bdate', body.bdate]);
         if (num(body.amount)) { extra.push(['amount', num(body.amount)]); if (t.currency === 'HUF') extra.push(['amount_huf', num(body.amount)]); else extra.push(['amount_huf', null]); }
@@ -191,7 +200,7 @@ export async function onRequest(context) {
       }
       await DB.prepare(`UPDATE fin_tx SET cat_id = ?, split = ?, vat = ?, doc_mode = ?, note = ?, manual = 1, updated_at = ?, updated_by = ?${extra.map((e) => `, ${e[0]} = ?`).join('')} WHERE id = ?`)
         .bind(cat, split ? JSON.stringify(split) : null, vat, doc, note, nowIso(), who, ...extra.map((e) => e[1]), id).run();
-      if (extra.length && t.currency !== 'HUF') await fillFx(env);
+      if (extra.some((e) => e[0] === 'amount') && t.currency !== 'HUF') await fillFx(env);
       let ruleId = null, applied = 0;
       if (body.make_rule) {
         const pat = clean(body.make_rule.pattern, 200) || escRe(norm(t.partner));
@@ -263,6 +272,12 @@ export async function onRequest(context) {
       else await DB.prepare(`INSERT INTO fin_cats (code, name, kind, grp, doc_mode, vat, sort, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).bind('C' + Date.now().toString(36).toUpperCase(), ...vals).run();
       return json({ ok: true });
     }
+    if (m === 'POST' && p0 === 'vehicles') { // rendszám → megnevezés (pl. „M-AO 1230” → „BMW X5 xDrive30d”)
+      const out = {};
+      for (const [k, v] of Object.entries(body.map || {})) { const pl = normPlate(k); if (pl) out[pl] = clean(v, 80); }
+      await setSetting(env, 'vehicles', out);
+      return json({ ok: true, vehicles: out });
+    }
     if (m === 'POST' && p0 === 'alloc') {
       const mode = ['fixed', 'revenue', 'none'].includes(body.mode) ? body.mode : 'fixed';
       const ls = await lineSet(env); const key = {};
@@ -312,6 +327,7 @@ export async function onRequest(context) {
       if (id) await DB.prepare(`UPDATE fin_docs SET dir = ?, kind = ?, number = ?, partner = ?, partner_tax = ?, issue_date = ?, currency = ?, net = ?, vat = ?, gross = ?, gross_huf = ?, net_huf = ?, note = ? WHERE id = ?`).bind(...vals, id).run();
       else id = (await DB.prepare(`INSERT INTO fin_docs (dir, kind, number, partner, partner_tax, issue_date, currency, net, vat, gross, gross_huf, net_huf, note, source, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals, body.source === 'gmail' ? 'gmail' : 'upload', who).run()).meta.last_row_id;
       if (extKey) await DB.prepare(`UPDATE fin_docs SET nav_key = ? WHERE id = ?`).bind(extKey, id).run();
+      if (body.plate != null) await DB.prepare(`UPDATE fin_docs SET plate = ? WHERE id = ?`).bind(normPlate(body.plate), id).run();
       if (f) {
         await saveFile(env, id, String(f.b64).replace(/^data:[^,]*,/, ''));
         await DB.prepare(`UPDATE fin_docs SET file_name = ?, file_mime = ?, file_size = ? WHERE id = ?`).bind(clean(f.name, 120) || 'bizonylat', clean(f.mime, 80) || 'application/octet-stream', Math.round(f.b64.length * 0.75), id).run();
