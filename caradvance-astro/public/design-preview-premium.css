@@ -9,3 +9,12 @@ html{scroll-padding-top:100px}button,a,summary,input,select{-webkit-tap-highligh
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 
 .image-note{display:block;color:var(--mut);font-size:9px;text-align:right;margin-top:-6px}
+/* The existing build adds FAQ rules to every details element. Keep navigation isolated. */
+#mainNav .mega{background:transparent!important;border:0!important;border-radius:6px!important;margin:0!important;padding:0!important;overflow:visible!important}
+#mainNav .mega>summary{padding:18px 12px!important;color:var(--ink)!important;font-size:13px!important;font-weight:700!important;line-height:1.55!important;gap:8px}
+#mainNav .mega>summary:hover,#mainNav .mega[open]>summary{background:var(--chip)!important}
+#mainNav .mega>summary>span{display:inline!important}
+#mainNav .mega>summary::after{content:none!important;display:none!important}
+#mainNav .mega>.mega-panel{padding:36px max(40px,calc((100vw - 1280px)/2))!important;color:var(--txt)!important}
+#mainNav .mega-panel a,#mainNav .mega-panel b{color:var(--ink)!important}
+@media(max-width:1100px){#mainNav .mega>summary{padding:16px 8px!important}#mainNav .mega>.mega-panel{padding:18px 0!important}}
