@@ -644,7 +644,7 @@ function showPending() {
     var acc = { ext_id: s.ext_id, name: $('[data-pn="' + i + '"]') ? $('[data-pn="' + i + '"]').value : (s.name || s.ext_id), currency: $('[data-pc="' + i + '"]') ? $('[data-pc="' + i + '"]').value : s.currency, entity: s.entity || '' };
     $('#ir' + i).textContent = 'Importálás…';
     return api('import', { account: acc, rows: rows }).then(must).then(function (j) {
-      s.done = 1; s.res = '✓ <b>' + j.inserted + ' új</b>, ' + j.skipped + ' már megvolt' + (j.fxMissing ? ', ' + j.fxMissing + ' árfolyam nélkül' : '') + (j.matched ? ', ' + j.matched + ' bizonylat párosítva' : '');
+      s.done = 1; s.res = '✓ <b>' + j.inserted + ' új</b>, ' + j.skipped + ' már megvolt' + (j.blocked ? ', ' + j.blocked + ' tiltólistás kihagyva' : '') + (j.fxMissing ? ', ' + j.fxMissing + ' árfolyam nélkül' : '') + (j.matched ? ', ' + j.matched + ' bizonylat párosítva' : '');
       $('#ir' + i).innerHTML = s.res; var b = $('[data-go="' + i + '"]'); if (b) b.disabled = true;
       return refreshMeta();
     });
@@ -678,8 +678,12 @@ function showPending() {
 function renderSet() {
   var al = S.meta.alloc || { mode: 'fixed', key: {} };
   var ruleCat = function (r) { var c = r.cat_id && catBy(r.cat_id); return c ? esc(c.name) : '<span class="muted">—</span>'; };
+  var bl = S.meta.block || [];
   document.getElementById('tab').innerHTML =
-    '<div class="card"><h2>Közös költségek felosztása</h2><p class="small muted" style="margin-top:0">A „' + esc((S.meta.lines.filter(function (l) { return l.shared; })[0] || {}).name || 'Közös') + '” üzletágra sorolt tételek (bankdíj, könyvelés, szoftver, TAO…) a kimutatásban így terhelődnek rá a többi üzletágra. Árbevétel-arányos módban havonta a tényleges árbevétel arányában; ha egy hónapban nincs árbevétel, a fix kulcs érvényes.</p>'
+    '<div class="card"><h2>Tiltólista — soha nem kerül a pénzügyekbe</h2><p class="small muted" style="margin-top:0">Ezek a partnerek / minták tételei importkor kimaradnak, a már bent lévők törlődnek — a hozzájuk tartozó banki díjakkal (azonos tranzakció-azonosító) együtt.</p>'
+    + (bl.length ? '<table><tbody>' + bl.map(function (b) { return '<tr><td><b>' + esc(b.name) + '</b></td><td><code>' + esc(b.pattern) + '</code></td><td class="small muted">' + hd(b.created_at) + '</td><td><button class="btn sm ghost" data-bdel="' + b.id + '">Levétel</button></td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted small">Üres.</p>')
+    + '<div class="row" style="margin-top:10px"><input class="in" id="bName" placeholder="Név (pl. XY Kft.)" style="min-width:180px"><input class="in" id="bPat" placeholder="Minta: partner neve ékezet nélkül, NAGYBETŰVEL" style="flex:1;min-width:220px"><button class="btn sm red" id="bAdd">Hozzáadás és törlés</button></div></div>'
+    + '<div class="card"><h2>Közös költségek felosztása</h2><p class="small muted" style="margin-top:0">A „' + esc((S.meta.lines.filter(function (l) { return l.shared; })[0] || {}).name || 'Közös') + '” üzletágra sorolt tételek (bankdíj, könyvelés, szoftver, TAO…) a kimutatásban így terhelődnek rá a többi üzletágra. Árbevétel-arányos módban havonta a tényleges árbevétel arányában; ha egy hónapban nincs árbevétel, a fix kulcs érvényes.</p>'
     + '<div class="row"><label><input type="radio" name="am" value="fixed"' + (al.mode === 'fixed' ? ' checked' : '') + '> fix kulcs</label><label><input type="radio" name="am" value="revenue"' + (al.mode === 'revenue' ? ' checked' : '') + '> árbevétel-arányos</label><label><input type="radio" name="am" value="none"' + (al.mode === 'none' ? ' checked' : '') + '> nincs felosztás</label></div>'
     + '<div class="split" style="margin-top:10px">' + S.meta.lines.filter(function (l) { return !l.shared && l.active; }).map(function (l) { return '<label><span class="ldot" style="background:' + l.color + '"></span><span style="flex:1">' + esc(l.name) + '</span><input type="number" min="0" max="100" data-k="' + l.id + '" value="' + (al.key[l.id] || '') + '">%</label>'; }).join('') + '</div>'
     + '<div class="row" style="margin-top:10px"><button class="btn red sm" id="alSave">Mentés</button><span class="small muted">Fix kulcsnál a 100%-ból hiányzó rész a közös soron marad.</span></div></div>'
@@ -693,6 +697,8 @@ function renderSet() {
     + '</tbody></table></div>'
     + '<div class="card"><div class="row"><h2 style="margin:0">Kategóriák</h2><span class="sp"></span><button class="btn sm red" id="cNew">+ Új kategória</button></div><p class="small muted">ÁFA-kulcs = a bruttó összegben lévő levonható (költség) / fizetendő (bevétel) ÁFA. 0% = a bruttó a költség: személyautó üzemanyaga és bérlése, külföldi fordított adózású szolgáltatás, alanyi adómentes vállalkozó, magánszemély bérbeadó.</p><div style="overflow:auto"><table><thead><tr><th>Név</th><th>Típus</th><th>Csoport</th><th>ÁFA</th><th>Bizonylat</th><th>Sorrend</th><th>Aktív</th><th></th></tr></thead><tbody>'
     + S.meta.cats.map(function (c) { return catRowHtml(c); }).join('') + '</tbody></table></div></div>';
+  $('#bAdd').onclick = function () { var pat = $('#bPat').value.trim(); if (!pat) return toast('Adj meg mintát.'); api('block', { name: $('#bName').value, pattern: pat }).then(must).then(function (j) { toast('Tiltólistára téve, ' + j.purged + ' tétel törölve'); refreshMeta().then(reload); }); };
+  $$('[data-bdel]').forEach(function (b) { b.onclick = function () { api('block/' + b.dataset.bdel + '/delete', {}).then(must).then(function () { toast('Levéve — a következő importtól újra bekerülhet'); refreshMeta().then(render); }); }; });
   $('#alSave').onclick = function () { var key = {}; $$('[data-k]').forEach(function (i) { if (Number(i.value) > 0) key[i.dataset.k] = Number(i.value); }); var mode = ($('[name=am]:checked') || {}).value || 'fixed'; api('alloc', { mode: mode, key: key }).then(must).then(function () { S.view.alloc = mode; toast('Felosztás mentve'); refreshMeta().then(reload); }); };
   $('#rRun').onclick = function () { api('rules/run', {}).then(must).then(function (j) { toast(j.changed + ' tétel átsorolva, ' + j.matched + ' párosítás'); refreshMeta().then(reload); }); };
   $('#rNew').onclick = function () { editRule(null); };

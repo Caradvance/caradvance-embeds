@@ -17,7 +17,7 @@
  */
 import {
   json, ensureFin, clean, isDate, addDays, normSplit, nowIso, importRows, applyRules, autoMatch, suggestDocs, saveFile, loadFile,
-  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf
+  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked
 } from '../../../lib/penzugy.js';
 
 async function staffUser(request, env) {
@@ -78,7 +78,8 @@ export async function onRequest(context) {
         getSetting(env, 'nav_last', null),
         DB.prepare(`SELECT MIN(bdate) AS min, MAX(bdate) AS max, COUNT(*) AS n FROM fin_tx`).first()
       ]);
-      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats });
+      const block = (await loadBlock(env)).map((b) => ({ id: b.id, name: b.name, pattern: b.pattern, created_at: b.created_at }));
+      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, block, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats });
     }
 
     /* ---------- P&L ---------- */
@@ -202,6 +203,16 @@ export async function onRequest(context) {
       const hit = rows.filter((t) => re.test(subjectOf(t)) && (!body.dir || body.dir === 'any' || (body.dir === 'in') === (t.amount >= 0)));
       return json({ n: hit.length, sample: hit.slice(0, 15) });
     }
+
+    /* ---------- tiltólista ---------- */
+    if (m === 'POST' && p0 === 'block' && !p1) {
+      const pat = String(body.pattern || '').trim().slice(0, 300);
+      if (pat.length < 3) return json({ error: 'Adj meg legalább 3 karakteres mintát (pl. a partner nevét ékezet nélkül, nagybetűvel).' }, 400);
+      try { new RegExp(pat, 'i'); } catch (e) { return json({ error: 'Hibás minta (regex): ' + e.message }, 400); }
+      await DB.prepare(`INSERT INTO fin_block (name, pattern) VALUES (?, ?)`).bind(clean(body.name, 120) || pat, pat).run();
+      return json({ ok: true, purged: await purgeBlocked(env) });
+    }
+    if (m === 'POST' && p0 === 'block' && p1 && p2 === 'delete') { await DB.prepare(`DELETE FROM fin_block WHERE id = ?`).bind(Number(p1)).run(); return json({ ok: true }); }
 
     /* ---------- üzletágak, kategóriák, felosztás, számlák ---------- */
     if (m === 'POST' && p0 === 'lines') {

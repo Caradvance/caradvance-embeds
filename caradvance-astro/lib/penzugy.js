@@ -89,6 +89,7 @@ export async function ensureFin(env) {
   if (!n || !n.n) await seed(env);
   await migrateLinesV2(env);
   await migrateRulesV3(env);
+  await migrateBlockV4(env);
   READY = true;
 }
 
@@ -218,6 +219,50 @@ async function seed(env) {
   rs.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('rules_v3', '1')`));
   for (const [name, , pat, dir] of RULE_FIX_V3) if (pat || dir) rs.push(env.DB.prepare(`UPDATE fin_rules SET pattern = COALESCE(?, pattern), dir = COALESCE(?, dir) WHERE name = ?`).bind(pat, dir, name));
   await env.DB.batch(rs);
+}
+
+/* ============================== tiltólista ==============================
+ * A tiltólistás minta (regex a „TÍPUS | PARTNER | KÖZLEMÉNY | IBAN” szövegen) tételei NEM kerülnek a pénzügyekbe:
+ * importkor kimaradnak, a már bent lévők törlődnek — az azonos banki azonosítójú díj-sorokkal együtt
+ * (pl. a Krajowa-utalás „Díj, jutalék” sorai). Marc kérése, 2026-11-11. */
+const BLOCK_V4 = [
+  ['Krajowa Grupa Spożywcza (cukor)', 'KRAJOWA GRUPA SPOZYWCZA'],
+  ['Designyourdrink GmbH', 'DESIGNYOURDRINK'],
+  ['UNR Sales GmbH', 'UNR SALES'],
+  ['BH Capital Ltd (kölcsön)', 'BH CAPITAL'],
+  ['Dima Srl', 'DIMA SRL']
+];
+async function migrateBlockV4(env) {
+  if (await getSetting(env, 'block_v4', null)) return;
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS fin_block (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT DEFAULT '', pattern TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now')))`).run();
+  const have = new Set((await env.DB.prepare(`SELECT pattern FROM fin_block`).all()).results.map((r) => r.pattern));
+  const st = BLOCK_V4.filter(([, pat]) => !have.has(pat)).map(([name, pat]) => env.DB.prepare(`INSERT INTO fin_block (name, pattern) VALUES (?, ?)`).bind(name, pat));
+  // a korábbi „kizárva” szabályok feleslegesek: ezek a tételek már be sem kerülnek
+  st.push(env.DB.prepare(`DELETE FROM fin_rules WHERE pattern IN ('DESIGNYOURDRINK', 'UNR SALES', 'KRAJOWA GRUPA SPOZYWCZA', 'BH CAPITAL') OR pattern LIKE 'KRAJOWA GRUPA SPOZYWCZA|%'`));
+  st.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('block_v4', '1')`));
+  await env.DB.batch(st);
+  await purgeBlocked(env);
+}
+export async function loadBlock(env) {
+  let rows = [];
+  try { rows = (await env.DB.prepare(`SELECT * FROM fin_block ORDER BY id`).all()).results; } catch (e) { rows = []; }
+  return rows.map((r) => { try { return { ...r, re: new RegExp(r.pattern, 'i') }; } catch (e) { return null; } }).filter(Boolean);
+}
+export function isBlocked(block, tx) { if (!block.length) return false; const s = subjectOf(tx); return block.some((b) => b.re.test(s)); }
+/** A tiltólistás tételek és a hozzájuk tartozó (azonos számla + banki azonosító) díj-sorok törlése. */
+export async function purgeBlocked(env) {
+  const block = await loadBlock(env);
+  if (!block.length) return 0;
+  const txs = (await env.DB.prepare(`SELECT id, account_id, bank_ref, ttype, partner, memo, iban, amount FROM fin_tx`).all()).results;
+  const refs = new Set(), ids = new Set();
+  for (const t of txs) if (isBlocked(block, t)) { ids.add(t.id); if (t.bank_ref) refs.add(t.account_id + '|' + t.bank_ref); }
+  for (const t of txs) if (t.bank_ref && refs.has(t.account_id + '|' + t.bank_ref)) ids.add(t.id);
+  const list = [...ids];
+  for (let i = 0; i < list.length; i += 90) {
+    const ch = list.slice(i, i + 90);
+    await env.DB.prepare(`DELETE FROM fin_tx WHERE id IN (${ch.map(() => '?').join(',')})`).bind(...ch).run();
+  }
+  return list.length;
 }
 
 /** Egyszeri bővítés (Revolut import): új szabályok név szerint (ha még nincsenek), pár minta javítása, majd újrafuttatás. */
@@ -454,10 +499,14 @@ export async function importRows(env, account, rows, who) {
     acc = await env.DB.prepare(`SELECT * FROM fin_accounts WHERE id = ?`).bind(res.meta.last_row_id).first();
   }
   const seen = {}, st = [], uids = [];
-  let bad = 0;
-  for (const raw of rows) {
-    const t = parseBankRow(raw);
+  let bad = 0, blocked = 0;
+  // tiltólista: a tiltott tételek és az azonos banki azonosítójú díj-soraik kimaradnak
+  const block = await loadBlock(env);
+  const parsed = rows.map(parseBankRow);
+  const bRefs = new Set(parsed.filter((t) => t.bank_ref && isBlocked(block, t)).map((t) => t.bank_ref));
+  for (const t of parsed) {
     if (!t.bdate || !isFinite(t.amount) || t.amount === 0) { bad++; continue; }
+    if (isBlocked(block, t) || (t.bank_ref && bRefs.has(t.bank_ref))) { blocked++; continue; }
     const base = [acc.id, t.bdate, t.vdate, t.bank_ref, t.amount, t.ttype, t.raw].join('|');
     seen[base] = (seen[base] || 0) + 1;
     const uid = await sha256Hex(base + '#' + seen[base]);
@@ -481,7 +530,7 @@ export async function importRows(env, account, rows, who) {
   const fxMissing = await fillFx(env);
   if (newIds.size) await applyRules(env, newIds);
   const matched = await autoMatch(env);
-  return { account: acc, inserted, skipped: rows.length - inserted - bad, bad, fxMissing, matched };
+  return { account: acc, inserted, skipped: rows.length - inserted - bad - blocked, bad, blocked, fxMissing, matched };
 }
 
 /* ============================== nettósítás ============================== */
