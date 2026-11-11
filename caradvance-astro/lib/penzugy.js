@@ -90,6 +90,7 @@ export async function ensureFin(env) {
   await migrateLinesV2(env);
   await migrateRulesV3(env);
   await migrateBlockV4(env);
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS fin_recurring (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, partner TEXT DEFAULT '', amount REAL NOT NULL, currency TEXT DEFAULT 'HUF', cat_id INTEGER, split TEXT, vat INTEGER, doc_mode TEXT, day INTEGER DEFAULT 1, start TEXT NOT NULL, end_month TEXT DEFAULT '', active INTEGER DEFAULT 1, created_at TEXT DEFAULT (datetime('now')))`).run();
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS fin_deleted (uid TEXT PRIMARY KEY, bdate TEXT, partner TEXT, amount REAL, currency TEXT, account_id INTEGER, deleted_at TEXT DEFAULT (datetime('now')), deleted_by TEXT)`).run();
   READY = true;
 }
@@ -287,11 +288,43 @@ export async function deleteTxs(env, ids, who) {
   }
   const st = [];
   for (const t of all.values()) {
-    if (t.src !== 'manual') st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_deleted (uid, bdate, partner, amount, currency, account_id, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(t.uid, t.bdate, t.partner || t.ttype, t.amount, t.currency, t.account_id, who || ''));
+    if (t.src !== 'manual' || /^rec-/.test(t.uid || '')) st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_deleted (uid, bdate, partner, amount, currency, account_id, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(t.uid, t.bdate, t.partner || t.ttype, t.amount, t.currency, t.account_id, who || ''));
     st.push(env.DB.prepare(`DELETE FROM fin_tx WHERE id = ?`).bind(t.id));
   }
   for (let i = 0; i < st.length; i += 80) await env.DB.batch(st.slice(i, i + 80));
   return all.size;
+}
+
+/* ============================== ismétlődő tételek ==============================
+ * Havi fix költségek (pl. mobil, internet), amelyekhez nincs banki tétel ezekben a számlákban.
+ * Minden hónapra külön kézi tétel készül (uid: rec-<id>-<YYYY-MM>), a kezdő hónaptól az aktuálisig.
+ * Az egyes havi tételek egyenként szerkeszthetők/törölhetők; a törölt hónap nem jön vissza. */
+export async function genRecurring(env) {
+  const recs = (await env.DB.prepare(`SELECT * FROM fin_recurring WHERE active = 1`).all()).results;
+  if (!recs.length) return 0;
+  const now = new Date(), cur = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+  const del = new Set((await env.DB.prepare(`SELECT uid FROM fin_deleted WHERE uid LIKE 'rec-%'`).all()).results.map((r) => r.uid));
+  const acc = await env.DB.prepare(`SELECT id FROM fin_accounts WHERE ext_id = 'CASH'`).first();
+  const st = [];
+  for (const r of recs) {
+    const last = r.end_month && r.end_month < cur ? r.end_month : cur;
+    for (let ym = r.start; ym <= last;) {
+      const uid = `rec-${r.id}-${ym}`;
+      if (!del.has(uid)) {
+        const day = String(Math.min(28, Math.max(1, r.day || 1))).padStart(2, '0');
+        st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, updated_by)
+          VALUES (?, ?, 'manual', ?, ?, 'Ismétlődő tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 'ismétlődő')`)
+          .bind(uid, acc ? acc.id : null, `${ym}-${day}`, `${ym}-${day}`, r.amount, r.currency, r.currency === 'HUF' ? 1 : null, r.currency === 'HUF' ? r.amount : null,
+            r.partner || r.name, r.name, r.cat_id, r.split, r.vat, r.doc_mode, 'Ismétlődő: ' + r.name));
+      }
+      const [y, m] = ym.split('-').map(Number);
+      ym = m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`;
+    }
+  }
+  let n = 0;
+  for (let i = 0; i < st.length; i += 80) (await env.DB.batch(st.slice(i, i + 80))).forEach((x) => { n += (x && x.meta && x.meta.changes) || 0; });
+  if (n && recs.some((r) => r.currency !== 'HUF')) await fillFx(env);
+  return n;
 }
 
 /** Egyszeri bővítés (Revolut import): új szabályok név szerint (ha még nincsenek), pár minta javítása, majd újrafuttatás. */

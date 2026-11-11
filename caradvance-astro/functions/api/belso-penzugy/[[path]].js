@@ -17,7 +17,7 @@
  */
 import {
   json, ensureFin, clean, isDate, addDays, normSplit, nowIso, importRows, applyRules, autoMatch, suggestDocs, saveFile, loadFile,
-  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs
+  pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs, genRecurring
 } from '../../../lib/penzugy.js';
 
 async function staffUser(request, env) {
@@ -83,7 +83,27 @@ export async function onRequest(context) {
     }
 
     /* ---------- P&L ---------- */
-    if (m === 'GET' && p0 === 'pnl') { const [from, to] = period(url); return json(await pnl(env, from, to)); }
+    if (m === 'GET' && p0 === 'pnl') { await genRecurring(env); const [from, to] = period(url); return json(await pnl(env, from, to)); }
+    if (m === 'GET' && p0 === 'recurring') return json({ items: (await DB.prepare(`SELECT r.*, (SELECT COUNT(*) FROM fin_tx t WHERE t.uid LIKE 'rec-' || r.id || '-%') AS n FROM fin_recurring r ORDER BY r.active DESC, r.id`).all()).results });
+    if (m === 'POST' && p0 === 'recurring' && p1 && p2 === 'delete') {
+      await DB.prepare(`UPDATE fin_recurring SET active = 0 WHERE id = ?`).bind(Number(p1)).run();
+      let removed = 0;
+      if (body.remove_future) { const now = new Date().toISOString().slice(0, 7); removed = (await DB.prepare(`DELETE FROM fin_tx WHERE uid LIKE ? AND substr(bdate, 1, 7) > ?`).bind(`rec-${Number(p1)}-%`, now).run()).meta.changes; }
+      return json({ ok: true, removed });
+    }
+    if (m === 'POST' && p0 === 'recurring' && !p1) {
+      const name = clean(body.name, 120), amount = num(body.amount);
+      if (!name || !amount) return json({ error: 'Név és (előjeles) havi összeg kötelező.' }, 400);
+      const start = /^\d{4}-\d{2}$/.test(body.start || '') ? body.start : new Date().toISOString().slice(0, 7);
+      const endM = /^\d{4}-\d{2}$/.test(body.end_month || '') ? body.end_month : '';
+      const cur = /^[A-Z]{3}$/.test(body.currency || '') ? body.currency : 'HUF';
+      const split = normSplit(body.split, await lineSet(env));
+      const vals = [name, clean(body.partner, 160), amount, cur, Number(body.cat_id) || null, split ? JSON.stringify(split) : null, vatOk(body.vat), docModeOk(body.doc_mode), Math.min(28, Math.max(1, Math.round(num(body.day) || 1))), start, endM, body.active === false || body.active === 0 ? 0 : 1];
+      let id = Number(body.id) || null;
+      if (id) await DB.prepare(`UPDATE fin_recurring SET name = ?, partner = ?, amount = ?, currency = ?, cat_id = ?, split = ?, vat = ?, doc_mode = ?, day = ?, start = ?, end_month = ?, active = ? WHERE id = ?`).bind(...vals, id).run();
+      else id = (await DB.prepare(`INSERT INTO fin_recurring (name, partner, amount, currency, cat_id, split, vat, doc_mode, day, start, end_month, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals).run()).meta.last_row_id;
+      return json({ id, generated: await genRecurring(env) });
+    }
 
     /* ---------- tranzakciók ---------- */
     if (m === 'GET' && p0 === 'tx' && !p1) {
