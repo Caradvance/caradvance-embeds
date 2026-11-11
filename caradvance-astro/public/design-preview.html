@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="hu" data-theme="light">
+<html lang="hu" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,7 +8,7 @@
 <link rel="icon" href="/favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script>(function(){try{var t=localStorage.getItem('dp-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('dp-theme');if(t!=='light'&&t!=='dark')t='dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <style>
 :root{--red:#E2001A;--red-d:#c40017;--bg:#ffffff;--bg2:#f5f6f8;--card:#ffffff;--ink:#0b0b0d;--txt:#2a2c31;--mut:#6b7079;--line:#e6e8ec;--chip:#f1f2f5;--shadow:0 10px 30px rgba(10,12,16,.08);--hdr:rgba(255,255,255,.92)}
 [data-theme="dark"]{--bg:#0b0c0f;--bg2:#121318;--card:#16171c;--ink:#ffffff;--txt:#d9dbe0;--mut:#9a9ea8;--line:#26282f;--chip:#1e2026;--shadow:0 10px 30px rgba(0,0,0,.45);--hdr:rgba(11,12,15,.9)}
@@ -188,28 +188,31 @@ footer.cafoot{display:none!important}
 
 <header class="hdr"><div class="wrap">
 <a class="logo" href="/" aria-label="CarAdvance"><img class="lb" src="/caradvance-logo.webp" alt="CarAdvance" width="150" height="34"><img class="lw" src="/caradvance-logo-white.webp" alt="CarAdvance" width="150" height="34"></a>
-<nav class="nav" aria-label="Fő menü">
-<a href="/auto-rendeles/">Autóimport</a><a href="/autoink/">Vétel</a><a href="/tartos-berlet/">Bérlet</a><a href="/eladom/">Értékesítés</a><a href="/finanszirozas-lizing/">Finanszírozás</a><a href="/miert-mi/">Rólunk</a><a href="/kapcsolat/">Kapcsolat</a>
-</nav>
+<nav class="nav" id="mainNav" aria-label="Főmenü"><details class="mega"><summary>Bérlés<span aria-hidden="true">⌄</span></summary><div class="mega-panel"><div class="mega-intro"><span class="eyebrow">CARADVANCE</span><h2>Prémium autó. Saját ritmusban.</h2><p>Szakértelem és személyes támogatás, az első kérdéstől az autó átadásáig.</p></div><div class="mega-links"><a href="/autoink/#berelheto"><b>Bérelhető autóink <span aria-hidden="true">↗</span></b><small>Válassz a kínálatból</small></a><a href="/tartos-berlet/"><b>Tartós bérlet <span aria-hidden="true">↗</span></b><small>Ismerd meg a lehetőségeket</small></a><a href="/berlesi-folyamat/"><b>A bérlés menete <span aria-hidden="true">↗</span></b><small>A kiválasztástól az átadásig</small></a><a href="/berlesi-feltetelek/"><b>Feltételek és kaució <span aria-hidden="true">↗</span></b><small>Minden részlet egy helyen</small></a></div></div></details><details class="mega"><summary>Vásárlás és import<span aria-hidden="true">⌄</span></summary><div class="mega-panel"><div class="mega-intro"><span class="eyebrow">CARADVANCE</span><h2>A következő autód itt kezdődik.</h2><p>Szakértelem és személyes támogatás, az első kérdéstől az autó átadásáig.</p></div><div class="mega-links"><a href="/autoink/"><b>Készleten lévő autók <span aria-hidden="true">↗</span></b><small>Fedezd fel aktuális kínálatunkat</small></a><a href="/auto-rendeles/"><b>Autóimport Németországból <span aria-hidden="true">↗</span></b><small>Beszerzés teljes ügyintézéssel</small></a><a href="/egyedi-auto-rendeles/"><b>Egyedi autórendelés <span aria-hidden="true">↗</span></b><small>Autó a saját elképzeléseid szerint</small></a><a href="/finanszirozas-lizing/"><b>Finanszírozás <span aria-hidden="true">↗</span></b><small>Ismerd meg a lehetőségeket</small></a></div></div></details><details class="mega"><summary>Eladás<span aria-hidden="true">⌄</span></summary><div class="mega-panel"><div class="mega-intro"><span class="eyebrow">CARADVANCE</span><h2>Bízd ránk az értékesítést.</h2><p>Szakértelem és személyes támogatás, az első kérdéstől az autó átadásáig.</p></div><div class="mega-links"><a href="/eladom/"><b>Eladom az autómat <span aria-hidden="true">↗</span></b><small>Bizományos értékesítés</small></a><a href="/kapcsolat/"><b>Kapcsolat <span aria-hidden="true">↗</span></b><small>Beszéljük át az elképzeléseidet</small></a></div></div></details><details class="mega"><summary>CarAdvance<span aria-hidden="true">⌄</span></summary><div class="mega-panel"><div class="mega-intro"><span class="eyebrow">CARADVANCE</span><h2>Autók iránti szenvedély. Személyes figyelem.</h2><p>Szakértelem és személyes támogatás, az első kérdéstől az autó átadásáig.</p></div><div class="mega-links"><a href="/miert-mi/"><b>Miért mi? <span aria-hidden="true">↗</span></b><small>Ismerd meg a CarAdvance csapatát</small></a><a href="/referenciak/"><b>Referenciák <span aria-hidden="true">↗</span></b><small>Ügyfeleink autói és történetei</small></a><a href="/blog/"><b>Blog <span aria-hidden="true">↗</span></b><small>Tudnivalók autózásról</small></a><a href="/kapcsolat/"><b>Kapcsolat <span aria-hidden="true">↗</span></b><small>Segítünk a következő lépésben</small></a></div></div></details></nav>
 <div class="hdr-r">
 <button class="iconbtn" id="themeBtn" type="button" aria-label="Világos / sötét mód"><svg class="ico"><use href="#i-moon"/></svg></button>
 <span class="lang"><i class="flag"></i>HU</span>
 <a class="iconbtn" href="tel:+36302336060" aria-label="Telefon"><svg class="ico"><use href="#i-phone"/></svg></a>
 <a class="btn btn-red btn-sm" href="/kapcsolat/"><span>Ajánlatkérés</span><svg class="ico"><use href="#i-arrow"/></svg></a>
-<button class="iconbtn burger" id="burger" type="button" aria-label="Menü"><svg class="ico"><use href="#i-menu"/></svg></button>
+<button class="iconbtn burger" id="burger" type="button" aria-label="Menü" aria-controls="mainNav" aria-expanded="false"><svg class="ico"><use href="#i-menu"/></svg></button>
 </div></div></header>
-<div class="mnav" id="mnav"><a href="/auto-rendeles/">Autóimport</a><a href="/autoink/">Vétel</a><a href="/tartos-berlet/">Bérlet</a><a href="/eladom/">Értékesítés</a><a href="/finanszirozas-lizing/">Finanszírozás</a><a href="/miert-mi/">Rólunk</a><a href="/kapcsolat/">Kapcsolat</a></div>
+
 
 <main>
-<section class="hero"><div class="wrap hero-grid">
-<div>
-<div class="eyebrow">Autóimport • Vétel • Bérlet • Értékesítés</div>
-<h1>Prémium autó<br><span class="red">Németországból.</span></h1>
-<p>Prémium autóbérlés és -eladás, autóimport Németországból — a te autódat pedig bizományban eladjuk. Magánszemélyeknek és cégeknek.</p>
-<div class="hero-btns"><a class="btn btn-red" href="#kereses"><svg class="ico"><use href="#i-car"/></svg>Autót keresek<svg class="ico"><use href="#i-arrow"/></svg></a><a class="btn btn-ghost" href="#hogyan"><svg class="ico"><use href="#i-play"/></svg>Hogyan működik?</a></div>
+<section class="hero" aria-labelledby="rentalTitle"><div class="wrap hero-grid">
+<div class="rental-copy"><div class="eyebrow"><span class="status-dot"></span> CARADVANCE · PRÉMIUM AUTÓBÉRLÉS</div>
+<h1 id="rentalTitle">Az élmény a tiéd.<br><span class="red">A többit ránk bízhatod.</span></h1>
+<p>Prémium autó, kiszámítható havidíjjal. Válassz autót magadnak vagy a cégednek, mi pedig segítünk megtalálni a megfelelő bérleti megoldást.</p>
+<div class="rental-mode" role="group" aria-label="Bérlő típusa"><button type="button" data-mode="b2c" aria-pressed="true">Magánszemély</button><button type="button" data-mode="b2b" aria-pressed="false">Cég / flotta</button></div>
+<p class="mode-description" id="modeDescription">Magánszemélyként a bruttó bérleti díjakat mutatjuk.</p>
+<div class="hero-btns"><a class="btn btn-red" id="rentalCta" href="/autoink/#berelheto">Bérelhető autóink <span aria-hidden="true">↗</span></a><a class="btn btn-ghost" href="/berlesi-folyamat/">Így működik a bérlés</a></div>
 </div>
-<div class="hero-img"><img src="/cover-bmw-x5-vasarlas-behozatal.webp" alt="BMW X5 a hegyek között" fetchpriority="high"></div>
-</div>
+<div class="rental-stage"><div class="stage-top"><span>VÁLASZD KI A KÖVETKEZŐ AUTÓD</span><span id="rentalIndex">01 / 03</span></div>
+<div class="vehicle-image"><img id="rentalImage" src="/berles/bmw-x5.webp" alt="BMW X5" width="800" height="500" fetchpriority="high"></div>
+<small class="image-note">Modellillusztráció</small><div class="vehicle-caption"><div><span class="eyebrow">PRÉMIUM SUV</span><h2 id="rentalName">BMW X5</h2></div><span class="stage-mark" aria-hidden="true">↗</span></div>
+<div class="vehicle-select" role="group" aria-label="Autó kiválasztása"><button type="button" data-model="X5" aria-pressed="true">BMW X5</button><button type="button" data-model="X6" aria-pressed="false">BMW X6</button><button type="button" data-model="X3" aria-pressed="false">BMW X3</button></div>
+<div class="rental-offer" aria-live="polite" aria-atomic="true"><span id="rentalPrice">Aktuális bérleti ajánlatok betöltése…</span><small id="rentalTerms">A havidíj és a kaució a kiválasztott autótól függ.</small></div>
+</div></div>
 <div class="wrap"><div class="trust">
 <div><svg class="ico"><use href="#i-shield"/></svg>Biztonságos vásárlás</div>
 <div><svg class="ico"><use href="#i-bolt"/></svg>Gyors ügyintézés</div>
@@ -232,7 +235,7 @@ footer.cafoot{display:none!important}
 <div class="sgrid">
 <div class="fld"><label for="sMake">Márka</label><select id="sMake"><option value="">Válassz márkát</option></select></div>
 <div class="fld"><label for="sModel">Modell</label><select id="sModel"><option value="">Válassz modellt</option></select></div>
-<div class="fld"><label>Ár (HUF)</label><div class="rng"><input id="sMin" inputmode="numeric" placeholder="Min"><span>–</span><input id="sMax" inputmode="numeric" placeholder="Max"></div></div>
+<div class="fld"><label for="sMin">Ár (HUF)</label><div class="rng"><input id="sMin" aria-label="Minimum ár forintban" inputmode="numeric" placeholder="Min"><span>–</span><input id="sMax" aria-label="Maximum ár forintban" inputmode="numeric" placeholder="Max"></div></div>
 <button class="iconbtn" type="button" id="sReset" aria-label="Szűrők törlése" style="width:46px;height:46px;border-radius:12px"><svg class="ico"><use href="#i-filter"/></svg></button>
 <button class="btn btn-red" type="button" id="sGo" style="height:46px">Keresés (<span id="sCnt">…</span> találat)</button>
 </div>
@@ -249,7 +252,7 @@ footer.cafoot{display:none!important}
 
 <section class="sec"><div class="wrap"><div class="import-band">
 <div class="img"><img src="/caradvance-hero-beszerzesi-poster.jpg" alt="Autószállítás Németországból" loading="lazy"></div>
-<div><h2>Professzionális<br><span class="red">autóimport</span></h2><p style="color:var(--mut);margin:8px 0 16px">Németországból, teljes ügyintézéssel.</p><a class="btn btn-red btn-sm" href="/auto-rendeles/">Tudjon meg többet<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+<div><h2>Professzionális<br><span class="red">autóimport</span></h2><p style="color:var(--mut);margin:8px 0 16px">Németországból, teljes ügyintézéssel.</p><a class="btn btn-red btn-sm" href="/auto-rendeles/">Tudj meg többet<svg class="ico"><use href="#i-arrow"/></svg></a></div>
 <ul class="checks" style="margin:0"><li><svg class="ico"><use href="#i-check"/></svg>Autóbeszerzés teljes ügyintézéssel</li><li><svg class="ico"><use href="#i-check"/></svg>Szállítás Magyarországra</li><li><svg class="ico"><use href="#i-check"/></svg>Honosítás, forgalomba helyezés</li><li><svg class="ico"><use href="#i-check"/></svg>Céges és magánügyfeleknek</li></ul>
 </div></div></section>
 
@@ -264,14 +267,14 @@ footer.cafoot{display:none!important}
 
 <section class="sec"><div class="wrap split">
 <div class="img"><img src="/cover-ceges-auto-operativ-lizing-tartos-berlet.webp" alt="Tartós bérlet" loading="lazy"></div>
-<div><h2>Tartós autóbérlet<br><span class="red">rugalmas</span> feltételekkel.</h2><p class="sub">Vadonatúj prémium autók 6 hónaptól — casco, szerviz és gumi a havidíjban.</p>
-<ul class="checks"><li><svg class="ico"><use href="#i-check"/></svg>Fix, kiszámítható havidíj</li><li><svg class="ico"><use href="#i-check"/></svg>Céges és magánügyfeleknek</li><li><svg class="ico"><use href="#i-check"/></svg>0 km-es, gyári garanciás autók</li><li><svg class="ico"><use href="#i-check"/></svg>Visszajáró kaució, nincs önerő</li></ul>
+<div><h2>Tartós autóbérlet<br><span class="red">rugalmas</span> feltételekkel.</h2><p class="sub">Prémium autók rugalmas bérleti megoldásokkal. A futamidőt, a szolgáltatásokat és a kauciót az egyedi ajánlat tartalmazza.</p>
+<ul class="checks"><li><svg class="ico"><use href="#i-check"/></svg>Fix, kiszámítható havidíj</li><li><svg class="ico"><use href="#i-check"/></svg>Céges és magánügyfeleknek</li><li><svg class="ico"><use href="#i-check"/></svg>Aktuális készletből választható autók</li><li><svg class="ico"><use href="#i-check"/></svg>Átlátható szerződés és kaució</li></ul>
 <a class="btn btn-red" href="/autoink/#berelheto">Bérelhető autóink<svg class="ico"><use href="#i-arrow"/></svg></a></div>
 </div></section>
 
 <section class="sec sec-alt"><div class="wrap">
 <div class="split" style="grid-template-columns:1fr .9fr">
-<div><h2>Rólunk – Car<span class="red">Advance</span></h2><p class="sub" style="max-width:560px">A Caradvance GmbH 2003 óta foglalkozik prémium autókkal Németországban. Magyarországi ügyfeleinknek bérlést, vásárlást, egyedi rendelést, importot és bizományos értékesítést kínálunk — átlátható feltételekkel, egy helyen.</p><a class="btn btn-red btn-sm" href="/miert-mi/">Ismerjen meg minket<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+<div><h2>Rólunk – Car<span class="red">Advance</span></h2><p class="sub" style="max-width:560px">A Caradvance GmbH 2003 óta foglalkozik prémium autókkal Németországban. Magyarországi ügyfeleinknek bérlést, vásárlást, egyedi rendelést, importot és bizományos értékesítést kínálunk — átlátható feltételekkel, egy helyen.</p><a class="btn btn-red btn-sm" href="/miert-mi/">Ismerj meg minket<svg class="ico"><use href="#i-arrow"/></svg></a></div>
 <div class="img" style="aspect-ratio:16/10;max-height:330px"><img src="/caradvance-iroda.webp" alt="A CarAdvance irodája" loading="lazy" style="object-position:center 40%"></div>
 </div>
 <div class="stats">
@@ -290,7 +293,7 @@ footer.cafoot{display:none!important}
 </div></div></section>
 
 <section class="sec" style="padding-top:0"><div class="wrap"><div class="cta">
-<div><h2>Kérdése van? <span class="red">Segítünk!</span></h2><p>Írjon vagy hívjon minket — kollégáink rövid időn belül válaszolnak.</p></div>
+<div><h2>Kérdésed van? <span class="red">Segítünk!</span></h2><p>Írj vagy hívj minket — kollégáink rövid időn belül válaszolnak.</p></div>
 <div class="cta-r"><a class="btn btn-ghost" href="tel:+36302336060"><svg class="ico"><use href="#i-phone"/></svg>+36 30 233 6060</a><a class="btn btn-ghost" href="mailto:info@caradvance.hu"><svg class="ico"><use href="#i-mail"/></svg>info@caradvance.hu</a><a class="btn btn-red" href="/kapcsolat/">Kapcsolatfelvétel<svg class="ico"><use href="#i-arrow"/></svg></a></div>
 </div></div></section>
 </main>
@@ -301,23 +304,26 @@ footer.cafoot{display:none!important}
 <div><h4>Tartós bérlet</h4><a href="/autoink/#berelheto">Bérelhető autóink</a><a href="/berles-elonyei/">A bérlés előnyei</a><a href="/berlesi-folyamat/">Bérlési folyamat</a><a href="/berlesi-feltetelek/">Feltételek és kaució</a></div>
 <div><h4>Vásárlás és import</h4><a href="/autoink/">Megvásárolható autóink</a><a href="/egyedi-auto-rendeles/">Egyedi autó rendelés</a><a href="/auto-rendeles/">Autó rendelés Németországból</a><a href="/honositas-kalkulator/">Honosítás kalkulátor</a><a href="/finanszirozas-lizing/">Finanszírozás – lízing</a></div>
 <div><h4>Eladás és cégünk</h4><a href="/eladom/">Eladom az autómat</a><a href="/miert-mi/">Miért mi?</a><a href="/blog/">Blog</a><a href="/kapcsolat/">Kapcsolat</a></div>
-<div><h4>Kövessen minket</h4><a href="https://www.facebook.com/caradvancehungary/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/caradvance_hungary/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw" target="_blank" rel="noopener">YouTube</a></div>
+<div><h4>Kövess minket</h4><a href="https://www.facebook.com/caradvancehungary/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/caradvance_hungary/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw" target="_blank" rel="noopener">YouTube</a></div>
 </div>
 <div class="legal">© 2026 Caradvance GmbH · Bgm-Graf-Ring 21, 82538 Geretsried · Amtsgericht München HRB 151009 · USt-IdNr. DE232664616 · Magyarországi képviselet: BH Group Zrt.</div>
 </div></footer>
 
+<link rel="stylesheet" href="/design-preview-premium.css">
 <script src="/rent-data.js"></script>
+<script src="/design-preview-premium.js" defer></script>
 <script>
 (function(){
   var root=document.documentElement;
   function setIcon(){var d=root.getAttribute('data-theme')==='dark';document.querySelector('#themeBtn use').setAttribute('href',d?'#i-sun':'#i-moon');}
   setIcon();
   document.getElementById('themeBtn').onclick=function(){var t=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',t);try{localStorage.setItem('dp-theme',t);}catch(e){}setIcon();};
-  document.getElementById('burger').onclick=function(){document.getElementById('mnav').classList.toggle('open');};
+  
 
   // keresés fülek
   [].forEach.call(document.querySelectorAll('.tab'),function(b){b.onclick=function(){[].forEach.call(document.querySelectorAll('.tab'),function(x){x.classList.toggle('on',x===b);});var imp=b.dataset.p==='imp';document.getElementById('paneStock').style.display=imp?'none':'';document.getElementById('paneImp').style.display=imp?'flex':'none';};});
 
+  window.addEventListener('dp-rental-mode',function(e){setCT(e.detail);});
   var CT='b2c', CARS=[], RATE=362, VAT=1.27, FAV={};
   try{FAV=JSON.parse(localStorage.getItem('dp-fav')||'{}');}catch(e){}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -345,11 +351,11 @@ footer.cafoot{display:none!important}
   ['sMake','sModel','sMin','sMax'].forEach(function(id){var el=document.getElementById(id);el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){if(id==='sMake')fillModels();render();});});
   document.getElementById('sReset').onclick=function(){['sMake','sMin','sMax'].forEach(function(id){document.getElementById(id).value='';});fillModels();render();};
   document.getElementById('sGo').onclick=function(){var mk=document.getElementById('sMake').value;location.href='/autoink/'+(mk?'?marka='+encodeURIComponent(slug(mk)):'');};
-  function setCT(v){CT=v;[].forEach.call(document.querySelectorAll('.ct'),function(b){b.classList.toggle('on',b.dataset.ct===v);});render();}
-  [].forEach.call(document.querySelectorAll('.ct'),function(b){b.onclick=function(){setCT(b.dataset.ct);};});
+  function setCT(v){CT=v;[].forEach.call(document.querySelectorAll('.ct'),function(b){b.classList.toggle('on',b.dataset.ct===v);b.setAttribute('aria-pressed',String(b.dataset.ct===v));});render();}
+  [].forEach.call(document.querySelectorAll('.ct'),function(b){b.onclick=function(){setCT(b.dataset.ct);window.dispatchEvent(new CustomEvent('dp-client-change',{detail:b.dataset.ct}));};});
   track.addEventListener('click',function(e){
     var h=e.target.closest('.heart');if(h){e.preventDefault();var k=h.dataset.k;FAV[k]=!FAV[k];h.classList.toggle('on',!!FAV[k]);try{localStorage.setItem('dp-fav',JSON.stringify(FAV));}catch(x){}return;}
-    var b=e.target.closest('.bb button');if(b){e.preventDefault();setCT(b.dataset.ct);}
+    var b=e.target.closest('.bb button');if(b){e.preventDefault();setCT(b.dataset.ct);window.dispatchEvent(new CustomEvent('dp-client-change',{detail:b.dataset.ct}));}
     if(drag.moved){e.preventDefault();}
   });
   // nyilak + húzás egérrel
