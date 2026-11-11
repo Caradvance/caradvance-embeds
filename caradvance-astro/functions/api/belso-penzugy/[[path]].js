@@ -88,7 +88,7 @@ export async function onRequest(context) {
     /* ---------- tranzakciók ---------- */
     if (m === 'GET' && p0 === 'tx' && !p1) {
       const [from, to] = period(url);
-      const rows = (await DB.prepare(`SELECT t.*, a.name AS account_name, d.number AS doc_number, d.partner AS doc_partner, d.source AS doc_source, d.file_size AS doc_file, d.net AS doc_net, d.gross AS doc_gross
+      const rows = (await DB.prepare(`SELECT t.*, a.name AS account_name, d.number AS doc_number, d.partner AS doc_partner, d.source AS doc_source, d.file_size AS doc_file, d.note AS doc_note, d.net AS doc_net, d.gross AS doc_gross
         FROM fin_tx t LEFT JOIN fin_accounts a ON a.id = t.account_id LEFT JOIN fin_docs d ON d.id = t.doc_id
         WHERE t.bdate BETWEEN ? AND ? ORDER BY t.bdate DESC, t.id DESC LIMIT 10000`).bind(from, to).all()).results;
       return json({ tx: rows });
@@ -290,7 +290,7 @@ export async function onRequest(context) {
         isDate(body.issue_date) ? body.issue_date : '', cur, net, vat, gross, cur === 'HUF' ? gross : null, cur === 'HUF' ? net : null, clean(body.note, 400)];
       let id = Number(body.id) || null;
       if (id) await DB.prepare(`UPDATE fin_docs SET dir = ?, kind = ?, number = ?, partner = ?, partner_tax = ?, issue_date = ?, currency = ?, net = ?, vat = ?, gross = ?, gross_huf = ?, net_huf = ?, note = ? WHERE id = ?`).bind(...vals, id).run();
-      else id = (await DB.prepare(`INSERT INTO fin_docs (dir, kind, number, partner, partner_tax, issue_date, currency, net, vat, gross, gross_huf, net_huf, note, source, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'upload', ?)`).bind(...vals, who).run()).meta.last_row_id;
+      else id = (await DB.prepare(`INSERT INTO fin_docs (dir, kind, number, partner, partner_tax, issue_date, currency, net, vat, gross, gross_huf, net_huf, note, source, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals, body.source === 'gmail' ? 'gmail' : 'upload', who).run()).meta.last_row_id;
       if (extKey) await DB.prepare(`UPDATE fin_docs SET nav_key = ? WHERE id = ?`).bind(extKey, id).run();
       if (f) {
         await saveFile(env, id, String(f.b64).replace(/^data:[^,]*,/, ''));
