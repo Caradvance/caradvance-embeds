@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="hu" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>CarAdvance – új dizájn (teszt, nem élő)</title>
+<link rel="icon" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('dp-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<style>
+:root{--red:#E2001A;--red-d:#c40017;--bg:#ffffff;--bg2:#f5f6f8;--card:#ffffff;--ink:#0b0b0d;--txt:#2a2c31;--mut:#6b7079;--line:#e6e8ec;--chip:#f1f2f5;--shadow:0 10px 30px rgba(10,12,16,.08);--hdr:rgba(255,255,255,.92)}
+[data-theme="dark"]{--bg:#0b0c0f;--bg2:#121318;--card:#16171c;--ink:#ffffff;--txt:#d9dbe0;--mut:#9a9ea8;--line:#26282f;--chip:#1e2026;--shadow:0 10px 30px rgba(0,0,0,.45);--hdr:rgba(11,12,15,.9)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.02em}
+.red{color:var(--red)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:13px 20px;font-weight:700;font-size:14px;border:1.5px solid transparent;cursor:pointer;font-family:inherit;transition:.18s;white-space:nowrap}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 8px 22px rgba(226,0,26,.28)}.btn-red:hover{background:var(--red-d);transform:translateY(-1px)}
+.btn-ghost{background:var(--card);color:var(--ink);border-color:var(--line)}.btn-ghost:hover{border-color:var(--ink)}
+.btn-sm{padding:9px 14px;font-size:13px;border-radius:10px}
+.ico{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sec{padding:56px 0}.sec-alt{background:var(--bg2)}
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+.sec-h h2{font-size:30px;font-weight:800}
+.lnk{color:var(--red);font-weight:700;font-size:14px;display:inline-flex;gap:6px;align-items:center}
+.lnk:hover{gap:10px}
+/* test banner */
+.dp-note{background:#111;color:#fff;font-size:12.5px;text-align:center;padding:7px 12px}.dp-note b{color:#ff4d5e}
+/* header */
+.hdr{position:sticky;top:0;z-index:50;background:var(--hdr);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.hdr .wrap{display:flex;align-items:center;gap:22px;height:72px}
+.logo img{height:34px;width:auto}.logo .lw{display:none}[data-theme="dark"] .logo .lb{display:none}[data-theme="dark"] .logo .lw{display:block}
+.nav{display:flex;gap:4px;flex:1}
+.nav a{padding:8px 12px;border-radius:10px;font-weight:600;font-size:14px;color:var(--ink)}.nav a:hover{background:var(--chip)}
+.hdr-r{display:flex;align-items:center;gap:10px}
+.iconbtn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:inline-flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer}
+.iconbtn:hover{border-color:var(--ink)}
+.lang{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;color:var(--ink);background:var(--card)}
+.flag{width:18px;height:12px;border-radius:2px;background:linear-gradient(#ce2939 33%,#fff 33% 66%,#477050 66%)}
+.burger{display:none}
+/* hero */
+.hero{position:relative;overflow:hidden;padding:40px 0 28px}
+.hero .wrap{display:grid;grid-template-columns:1.02fr 1fr;gap:20px;align-items:center;min-height:440px}
+.eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-bottom:14px}
+.hero h1{font-size:clamp(38px,5.2vw,64px);line-height:1.02;font-weight:800}
+.hero p{font-size:17px;color:var(--mut);max-width:520px;margin:18px 0 26px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero-img{position:relative;height:100%;min-height:380px}
+.hero-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:28px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%);mask-image:linear-gradient(90deg,transparent 0,#000 22%)}
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+.trust div{display:flex;gap:10px;align-items:center;font-weight:600;font-size:14px;color:var(--ink)}
+.trust .ico{color:var(--red)}
+/* services */
+.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.svc a{position:relative;border-radius:20px;overflow:hidden;min-height:200px;padding:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:.2s}
+.svc a:hover{transform:translateY(-3px)}
+.svc .bgimg{position:absolute;right:0;top:0;width:62%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 55%);mask-image:linear-gradient(90deg,transparent,#000 55%);opacity:.95}
+.svc .in{position:relative;z-index:1;max-width:62%}
+.svc .ico{width:30px;height:30px;color:var(--ink);margin-bottom:14px}
+.svc h3{font-size:19px;font-weight:800;margin-bottom:6px}
+.svc p{font-size:13px;color:var(--mut);margin:0}
+.svc .go{position:absolute;right:16px;bottom:16px;z-index:1;width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center}
+/* search */
+.search{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;font-family:inherit}
+.tab.on{background:var(--red);border-color:var(--red);color:#fff}
+.sgrid{display:grid;grid-template-columns:1.2fr 1.2fr 1.6fr auto auto;gap:12px;align-items:end}
+.fld label{display:block;font-size:12px;font-weight:700;color:var(--mut);margin:0 0 6px}
+.fld select,.fld input{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font:inherit;font-size:14px}
+.rng{display:flex;align-items:center;gap:8px}.rng span{color:var(--mut)}
+.ctype{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.ctype b{font-size:13px;color:var(--ink);margin-right:6px}
+.ct{flex:1;min-width:200px;display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;font-family:inherit}
+.ct.on{border-color:var(--red);color:var(--red);background:rgba(226,0,26,.06)}
+.imp-pane{display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:6px 2px}
+.imp-pane p{margin:0;color:var(--mut);max-width:640px}
+/* cars */
+.cars{position:relative;margin-top:22px}
+.ctrack{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 48px)/4);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:4px 2px 10px;cursor:grab}
+.ctrack::-webkit-scrollbar{display:none}
+.car{scroll-snap-align:start;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:.2s}
+.car:hover{transform:translateY(-3px)}
+.car .ph{position:relative;aspect-ratio:16/10;background:var(--chip);overflow:hidden}
+.car .ph img{width:100%;height:100%;object-fit:cover}
+.heart{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#111}
+.heart.on{color:var(--red)}.heart.on .ico{fill:var(--red)}
+.car .bd{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.car h3{font-size:15.5px;font-weight:800;line-height:1.3}
+.car .pr{color:var(--red);font-weight:800;font-size:19px}
+.car .pr small{font-size:11.5px;color:var(--mut);font-weight:600;margin-left:4px}
+.bb{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bb button{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:6px 4px;font-family:inherit;cursor:pointer;color:var(--ink);line-height:1.15}
+.bb button b{display:block;font-size:13px}.bb button span{font-size:10.5px;color:var(--mut)}
+.bb button.on{border-color:var(--red);background:rgba(226,0,26,.06)}.bb button.on b{color:var(--red)}
+.sp{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:12.5px;color:var(--mut);border-top:1px solid var(--line);padding-top:10px;margin-top:auto}
+.sp span{display:flex;gap:6px;align-items:center}.sp .ico{width:15px;height:15px}
+.arrow{position:absolute;top:38%;width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);z-index:2}
+.arrow.l{left:-18px}.arrow.r{right:-18px}
+.skel{height:330px;border-radius:18px;background:linear-gradient(90deg,var(--chip),var(--bg2),var(--chip));background-size:200% 100%;animation:sk 1.2s infinite}@keyframes sk{to{background-position:-200% 0}}
+/* split banners */
+.split{display:grid;grid-template-columns:1.05fr 1fr;gap:34px;align-items:center}
+.split .img{border-radius:22px;overflow:hidden;aspect-ratio:16/9;box-shadow:var(--shadow)}
+.split .img img{width:100%;height:100%;object-fit:cover}
+.split h2{font-size:34px;font-weight:800;line-height:1.1}
+.split .sub{color:var(--mut);margin:8px 0 16px}
+.checks{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:9px}
+.checks li{display:flex;gap:10px;align-items:center;font-weight:600;color:var(--ink);font-size:14.5px}
+.checks .ico{color:var(--red)}
+.import-band{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow);display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:24px;align-items:center}
+.import-band .img{border-radius:16px;overflow:hidden;aspect-ratio:16/10}.import-band .img img{width:100%;height:100%;object-fit:cover}
+.import-band h2{font-size:28px;font-weight:800;line-height:1.1}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative}
+.step{position:relative;padding:4px 18px 0 0}
+.step .ico{width:36px;height:36px;color:var(--red);margin-bottom:12px}
+.step h3{font-size:16px;font-weight:800;margin-bottom:6px}
+.step p{margin:0;font-size:13.5px;color:var(--mut)}
+.step:not(:last-child)::after{content:"";position:absolute;top:16px;right:8px;width:34%;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 12px)}
+/* about */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+.stat{display:flex;gap:12px;align-items:center;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.stat .ico{width:32px;height:32px;color:var(--red)}
+.stat b{display:block;font-size:20px;color:var(--ink);font-weight:800;line-height:1.1}.stat span{font-size:12.5px;color:var(--mut)}
+/* reviews */
+.revs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+.stars{color:var(--red);letter-spacing:2px;font-size:16px}
+.rev p{margin:0;color:var(--txt);font-size:14.5px}
+.who{display:flex;align-items:center;gap:10px;margin-top:auto;font-weight:700;color:var(--ink);font-size:14px}
+.who small{display:block;color:var(--mut);font-weight:500;font-size:12px}
+/* cta */
+.cta{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.cta h2{font-size:28px;font-weight:800}.cta p{margin:6px 0 0;color:var(--mut)}
+.cta-r{display:flex;gap:10px;flex-wrap:wrap}
+/* footer */
+.ftr{padding:44px 0 22px;border-top:1px solid var(--line);margin-top:56px}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:24px}
+.fgrid h4{margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.fgrid a{display:block;color:var(--mut);font-size:13.5px;padding:3px 0}.fgrid a:hover{color:var(--red)}
+.fgrid p{color:var(--mut);font-size:13.5px;margin:12px 0}
+.legal{border-top:1px solid var(--line);margin-top:28px;padding-top:16px;font-size:12px;color:var(--mut)}
+/* responsive */
+@media(max-width:1100px){.nav{display:none}.burger{display:inline-flex}.svc{grid-template-columns:repeat(2,1fr)}.ctrack{grid-auto-columns:calc((100% - 32px)/3)}.sgrid{grid-template-columns:1fr 1fr}.import-band{grid-template-columns:1fr 1fr}.import-band .img{grid-column:1/-1}.fgrid{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:760px){.hero .wrap{grid-template-columns:1fr;min-height:0}.hero-img{min-height:240px;order:-1}.hero-img img{-webkit-mask-image:none;mask-image:none}.trust{grid-template-columns:1fr 1fr}.svc{grid-template-columns:1fr}.ctrack{grid-auto-columns:82%}.split,.import-band{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.step::after{display:none}.stats{grid-template-columns:1fr 1fr}.revs{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr 1fr}.sec-h h2{font-size:24px}.split h2{font-size:28px}.hdr .btn-red span{display:none}.lang{display:none}.arrow{display:none}}
+.mnav{display:none;position:fixed;inset:72px 0 0;background:var(--bg);z-index:49;padding:16px 24px}.mnav.open{display:block}.mnav a{display:block;padding:14px 0;border-bottom:1px solid var(--line);font-weight:700;color:var(--ink)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h-1a1 1 0 0 1-1-1v-4l2-5h14l2 5v4a1 1 0 0 1-1 1h-1"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M5 12h14"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-1 7 9-11h-7z"/></symbol>
+<symbol id="i-like" viewBox="0 0 24 24"><path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2v4h6a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7"/></symbol>
+<symbol id="i-head" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+<symbol id="i-gauge" viewBox="0 0 24 24"><path d="M5 18a8 8 0 1 1 14 0"/><path d="M12 14l4-4"/></symbol>
+<symbol id="i-fuel" viewBox="0 0 24 24"><path d="M4 20V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15M3 20h12M4 10h10M14 8l3 2v7a1.5 1.5 0 0 0 3 0V9l-3-3"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v8M12 8v8M18 8v4H6"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l2 2M15 8l2 2"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.3L12 17.5 6.5 20.4l1-6.3L3 9.7l6.2-.9z"/></symbol>
+<symbol id="i-hand" viewBox="0 0 24 24"><path d="M3 12l4-4 5 3 5-3 4 4-6 6-3-2-3 2z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-build" viewBox="0 0 24 24"><path d="M4 21V5l8-2v18M12 9h8v12M8 8v1M8 12v1M8 16v1M16 13v1M16 17v1M2 21h20"/></symbol>
+<symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+<symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+</svg>
+
+<div class="dp-note"><b>TESZT</b> · Ez az új dizájn előnézete — nem élő oldal, a caradvance.hu változatlan.</div>
+
+<header class="hdr"><div class="wrap">
+<a class="logo" href="/" aria-label="CarAdvance"><img class="lb" src="/caradvance-logo.webp" alt="CarAdvance" width="150" height="34"><img class="lw" src="/caradvance-logo-white.webp" alt="CarAdvance" width="150" height="34"></a>
+<nav class="nav" aria-label="Fő menü">
+<a href="/auto-rendeles/">Autóimport</a><a href="/autoink/">Vétel</a><a href="/tartos-berlet/">Bérlet</a><a href="/eladom/">Értékesítés</a><a href="/finanszirozas-lizing/">Finanszírozás</a><a href="/miert-mi/">Rólunk</a><a href="/kapcsolat/">Kapcsolat</a>
+</nav>
+<div class="hdr-r">
+<button class="iconbtn" id="themeBtn" type="button" aria-label="Világos / sötét mód"><svg class="ico"><use href="#i-moon"/></svg></button>
+<span class="lang"><i class="flag"></i>HU</span>
+<a class="iconbtn" href="tel:+36302336060" aria-label="Telefon"><svg class="ico"><use href="#i-phone"/></svg></a>
+<a class="btn btn-red btn-sm" href="/kapcsolat/"><span>Ajánlatkérés</span><svg class="ico"><use href="#i-arrow"/></svg></a>
+<button class="iconbtn burger" id="burger" type="button" aria-label="Menü"><svg class="ico"><use href="#i-menu"/></svg></button>
+</div></div></header>
+<div class="mnav" id="mnav"><a href="/auto-rendeles/">Autóimport</a><a href="/autoink/">Vétel</a><a href="/tartos-berlet/">Bérlet</a><a href="/eladom/">Értékesítés</a><a href="/finanszirozas-lizing/">Finanszírozás</a><a href="/miert-mi/">Rólunk</a><a href="/kapcsolat/">Kapcsolat</a></div>
+
+<main>
+<section class="hero"><div class="wrap">
+<div>
+<div class="eyebrow">Autóimport • Vétel • Bérlet • Értékesítés</div>
+<h1>Prémium autó<br><span class="red">Németországból.</span></h1>
+<p>Prémium autóbérlés és -eladás, autóimport Németországból — a te autódat pedig bizományban eladjuk. Magánszemélyeknek és cégeknek.</p>
+<div class="hero-btns"><a class="btn btn-red" href="#kereses"><svg class="ico"><use href="#i-car"/></svg>Autót keresek<svg class="ico"><use href="#i-arrow"/></svg></a><a class="btn btn-ghost" href="#hogyan"><svg class="ico"><use href="#i-play"/></svg>Hogyan működik?</a></div>
+</div>
+<div class="hero-img"><img src="/cover-bmw-x5-vasarlas-behozatal.webp" alt="BMW X5 a hegyek között" fetchpriority="high"></div>
+</div>
+<div class="wrap"><div class="trust">
+<div><svg class="ico"><use href="#i-shield"/></svg>Biztonságos vásárlás</div>
+<div><svg class="ico"><use href="#i-bolt"/></svg>Gyors ügyintézés</div>
+<div><svg class="ico"><use href="#i-like"/></svg>Átlátható feltételek</div>
+<div><svg class="ico"><use href="#i-head"/></svg>Személyes támogatás</div>
+</div></div></section>
+
+<section class="sec" style="padding-top:18px"><div class="wrap svc">
+<a href="/auto-rendeles/"><img class="bgimg" src="/caradvance-hero-beszerzesi-poster.jpg" alt="" loading="lazy"><div class="in"><svg class="ico"><use href="#i-car"/></svg><h3>Autóimport</h3><p>Autó beszerzése és teljes ügyintézése Németországból.</p></div><span class="go"><svg class="ico"><use href="#i-arrow"/></svg></span></a>
+<a href="/autoink/"><img class="bgimg" src="/cover-nemet-hasznaltauto-vasarlas.webp" alt="" loading="lazy"><div class="in"><svg class="ico"><use href="#i-layers"/></svg><h3>Vétel</h3><p>Ellenőrzött prémium autók, azonnal átvehetően.</p></div><span class="go"><svg class="ico"><use href="#i-arrow"/></svg></span></a>
+<a href="/tartos-berlet/"><img class="bgimg" src="/cover-hosszu-tavu-autoberles.webp" alt="" loading="lazy"><div class="in"><svg class="ico"><use href="#i-cal"/></svg><h3>Bérlet</h3><p>Tartós bérlet 6 hónaptól, cégeknek és magánszemélyeknek.</p></div><span class="go"><svg class="ico"><use href="#i-arrow"/></svg></span></a>
+<a href="/eladom/"><img class="bgimg" src="/cover-bizomanyos-auto-ertekesites.webp" alt="" loading="lazy"><div class="in"><svg class="ico"><use href="#i-coins"/></svg><h3>Értékesítés</h3><p>Eladjuk az autódat bizományban — gyorsan, korrekt áron.</p></div><span class="go"><svg class="ico"><use href="#i-arrow"/></svg></span></a>
+</div></section>
+
+<section class="sec sec-alt" id="kereses"><div class="wrap">
+<div class="sec-h"><h2>Autó keresése</h2><a class="lnk" href="/autoink/">Összes autó megtekintése<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+<div class="search">
+<div class="tabs"><button class="tab on" data-p="stock" type="button">Készleten lévő autók</button><button class="tab" data-p="imp" type="button">Autóimport</button></div>
+<div id="paneStock">
+<div class="sgrid">
+<div class="fld"><label for="sMake">Márka</label><select id="sMake"><option value="">Válassz márkát</option></select></div>
+<div class="fld"><label for="sModel">Modell</label><select id="sModel"><option value="">Válassz modellt</option></select></div>
+<div class="fld"><label>Ár (HUF)</label><div class="rng"><input id="sMin" inputmode="numeric" placeholder="Min"><span>–</span><input id="sMax" inputmode="numeric" placeholder="Max"></div></div>
+<button class="iconbtn" type="button" id="sReset" aria-label="Szűrők törlése" style="width:46px;height:46px;border-radius:12px"><svg class="ico"><use href="#i-filter"/></svg></button>
+<button class="btn btn-red" type="button" id="sGo" style="height:46px">Keresés (<span id="sCnt">…</span> találat)</button>
+</div>
+<div class="ctype"><b>Ügyféltípus:</b><button class="ct on" data-ct="b2c" type="button"><svg class="ico"><use href="#i-user"/></svg>Magánszemély (B2C)</button><button class="ct" data-ct="b2b" type="button"><svg class="ico"><use href="#i-build"/></svg>Cég / Flotta (B2B)</button></div>
+</div>
+<div class="imp-pane" id="paneImp"><p>Nincs a készletben, amit keresel? Megkeressük neked Németországban a mobile.de kínálatából, és teljes ügyintézéssel hazahozzuk.</p><a class="btn btn-red" href="/auto-rendeles/">Import ajánlatot kérek<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+</div>
+<div class="cars">
+<button class="arrow l" type="button" id="cPrev" aria-label="Előző"><svg class="ico"><use href="#i-left"/></svg></button>
+<div class="ctrack" id="ctrack"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+<button class="arrow r" type="button" id="cNext" aria-label="Következő"><svg class="ico"><use href="#i-right"/></svg></button>
+</div>
+</div></section>
+
+<section class="sec"><div class="wrap"><div class="import-band">
+<div class="img"><img src="/caradvance-hero-beszerzesi-poster.jpg" alt="Autószállítás Németországból" loading="lazy"></div>
+<div><h2>Professzionális<br><span class="red">autóimport</span></h2><p style="color:var(--mut);margin:8px 0 16px">Németországból, teljes ügyintézéssel.</p><a class="btn btn-red btn-sm" href="/auto-rendeles/">Tudjon meg többet<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+<ul class="checks" style="margin:0"><li><svg class="ico"><use href="#i-check"/></svg>Autóbeszerzés teljes ügyintézéssel</li><li><svg class="ico"><use href="#i-check"/></svg>Szállítás Magyarországra</li><li><svg class="ico"><use href="#i-check"/></svg>Honosítás, forgalomba helyezés</li><li><svg class="ico"><use href="#i-check"/></svg>Céges és magánügyfeleknek</li></ul>
+</div></div></section>
+
+<section class="sec sec-alt" id="hogyan"><div class="wrap">
+<div class="sec-h"><h2>Hogyan működik az autóimport?</h2></div>
+<div class="steps">
+<div class="step"><svg class="ico"><use href="#i-car"/></svg><h3>1. Kiválasztás</h3><p>Segítünk megtalálni az igényeidnek megfelelő autót Németországban.</p></div>
+<div class="step"><svg class="ico"><use href="#i-shield"/></svg><h3>2. Ellenőrzés és beszerzés</h3><p>Átnézzük az autót és az előéletét, majd biztonságosan megvásároljuk.</p></div>
+<div class="step"><svg class="ico"><use href="#i-doc"/></svg><h3>3. Ügyintézés</h3><p>Szállítás, honosítás, műszaki vizsga és forgalomba helyezés — helyetted.</p></div>
+<div class="step"><svg class="ico"><use href="#i-key"/></svg><h3>4. Átadás</h3><p>Kulcsrakészen, magyar rendszámmal adjuk át az autót.</p></div>
+</div></div></section>
+
+<section class="sec"><div class="wrap split">
+<div class="img"><img src="/cover-ceges-auto-operativ-lizing-tartos-berlet.webp" alt="Tartós bérlet" loading="lazy"></div>
+<div><h2>Tartós autóbérlet<br><span class="red">rugalmas</span> feltételekkel.</h2><p class="sub">Vadonatúj prémium autók 6 hónaptól — casco, szerviz és gumi a havidíjban.</p>
+<ul class="checks"><li><svg class="ico"><use href="#i-check"/></svg>Fix, kiszámítható havidíj</li><li><svg class="ico"><use href="#i-check"/></svg>Céges és magánügyfeleknek</li><li><svg class="ico"><use href="#i-check"/></svg>0 km-es, gyári garanciás autók</li><li><svg class="ico"><use href="#i-check"/></svg>Visszajáró kaució, nincs önerő</li></ul>
+<a class="btn btn-red" href="/autoink/#berelheto">Bérelhető autóink<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+</div></section>
+
+<section class="sec sec-alt"><div class="wrap">
+<div class="split" style="grid-template-columns:1fr .9fr">
+<div><h2>Rólunk – Car<span class="red">Advance</span></h2><p class="sub" style="max-width:560px">A Caradvance GmbH 2003 óta foglalkozik prémium autókkal Németországban. Magyarországi ügyfeleinknek bérlést, vásárlást, egyedi rendelést, importot és bizományos értékesítést kínálunk — átlátható feltételekkel, egy helyen.</p><a class="btn btn-red btn-sm" href="/miert-mi/">Ismerjen meg minket<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+<div class="img" style="aspect-ratio:4/3"><img src="/caradvance-iroda.webp" alt="A CarAdvance irodája" loading="lazy" style="object-position:center 40%"></div>
+</div>
+<div class="stats">
+<div class="stat"><svg class="ico"><use href="#i-cal"/></svg><div><b>2003 óta</b><span>német céges háttér</span></div></div>
+<div class="stat"><svg class="ico"><use href="#i-car"/></svg><div><b>5000+</b><span>eladott prémium autó</span></div></div>
+<div class="stat"><svg class="ico"><use href="#i-star"/></svg><div><b>5,0 ★</b><span>Google-értékelés</span></div></div>
+<div class="stat"><svg class="ico"><use href="#i-hand"/></svg><div><b>DE + HU</b><span>német cég, magyar képviselet</span></div></div>
+</div></div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sec-h"><h2>Ügyfeleink mondták <span class="red">rólunk</span></h2><a class="lnk" href="https://www.google.com/maps/search/?api=1&query=Caradvance%20GmbH%20Autovermietung" target="_blank" rel="noopener">Összes vélemény<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+<div class="revs">
+<div class="rev"><div class="stars">★★★★★</div><p>„Kiváló munka. Délelőtt 11-re érkeztem, és 14 órára, a fizetés után már vittem is az autót. Az ár stimmelt, az autó minden adata pontos volt. Köszönöm!”</p><div class="who"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.9 6.6-9.6 6.6-16.2z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.5 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.8-.7-4.3s.3-3 .7-4.3V14H4.5C3 17 2 20.4 2 24s1 7 2.5 10z"/><path fill="#EA4335" d="M24 10.8c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.5 2 8.1 6.9 4.5 14l7.3 5.7c1.7-5.2 6.5-8.9 12.2-8.9z"/></svg><div>Alexandru Ion<small>Google · 2 éve</small></div></div></div>
+<div class="rev"><div class="stars">★★★★★</div><p>„Komoly, és főleg előzékeny, kedves munkatársak. A megkereséseket és e-maileket gyorsan megválaszolják.”</p><div class="who"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.9 6.6-9.6 6.6-16.2z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.5 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.8-.7-4.3s.3-3 .7-4.3V14H4.5C3 17 2 20.4 2 24s1 7 2.5 10z"/><path fill="#EA4335" d="M24 10.8c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.5 2 8.1 6.9 4.5 14l7.3 5.7c1.7-5.2 6.5-8.9 12.2-8.9z"/></svg><div>Ciccio Grifó<small>Google · 4 éve</small></div></div></div>
+<div class="rev"><div class="stars">★★★★★</div><p>„Nagyon kedves és hozzáértő munkatársak. Itt fel is veszik a telefont — és pontosan azt kapod, amit ígérnek.”</p><div class="who"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1c4.2-3.9 6.6-9.6 6.6-16.2z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.5 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.8-.7-4.3s.3-3 .7-4.3V14H4.5C3 17 2 20.4 2 24s1 7 2.5 10z"/><path fill="#EA4335" d="M24 10.8c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.5 2 8.1 6.9 4.5 14l7.3 5.7c1.7-5.2 6.5-8.9 12.2-8.9z"/></svg><div>Bad Martin<small>Google · 2 éve</small></div></div></div>
+</div></div></section>
+
+<section class="sec" style="padding-top:0"><div class="wrap"><div class="cta">
+<div><h2>Kérdése van? <span class="red">Segítünk!</span></h2><p>Írjon vagy hívjon minket — kollégáink rövid időn belül válaszolnak.</p></div>
+<div class="cta-r"><a class="btn btn-ghost" href="tel:+36302336060"><svg class="ico"><use href="#i-phone"/></svg>+36 30 233 6060</a><a class="btn btn-ghost" href="mailto:info@caradvance.hu"><svg class="ico"><use href="#i-mail"/></svg>info@caradvance.hu</a><a class="btn btn-red" href="/kapcsolat/">Kapcsolatfelvétel<svg class="ico"><use href="#i-arrow"/></svg></a></div>
+</div></div></section>
+</main>
+
+<footer class="ftr"><div class="wrap">
+<div class="fgrid">
+<div><a class="logo" href="/"><img class="lb" src="/caradvance-logo.webp" alt="CarAdvance" style="height:32px"><img class="lw" src="/caradvance-logo-white.webp" alt="CarAdvance" style="height:32px"></a><p>Prémium autók Németországból — bérlés, vásárlás, egyedi rendelés, import és bizományos értékesítés.</p><a href="tel:+36302336060">+36 30 233 6060</a><a href="mailto:info@caradvance.hu">info@caradvance.hu</a></div>
+<div><h4>Tartós bérlet</h4><a href="/autoink/#berelheto">Bérelhető autóink</a><a href="/berles-elonyei/">A bérlés előnyei</a><a href="/berlesi-folyamat/">Bérlési folyamat</a><a href="/berlesi-feltetelek/">Feltételek és kaució</a></div>
+<div><h4>Vásárlás és import</h4><a href="/autoink/">Megvásárolható autóink</a><a href="/egyedi-auto-rendeles/">Egyedi autó rendelés</a><a href="/auto-rendeles/">Autó rendelés Németországból</a><a href="/honositas-kalkulator/">Honosítás kalkulátor</a><a href="/finanszirozas-lizing/">Finanszírozás – lízing</a></div>
+<div><h4>Eladás és cégünk</h4><a href="/eladom/">Eladom az autómat</a><a href="/miert-mi/">Miért mi?</a><a href="/blog/">Blog</a><a href="/kapcsolat/">Kapcsolat</a></div>
+<div><h4>Kövessen minket</h4><a href="https://www.facebook.com/caradvancehungary/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/caradvance_hungary/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/channel/UCbmogjjIDqVwFtFoA-h3jjw" target="_blank" rel="noopener">YouTube</a></div>
+</div>
+<div class="legal">© 2026 Caradvance GmbH · Bgm-Graf-Ring 21, 82538 Geretsried · Amtsgericht München HRB 151009 · USt-IdNr. DE232664616 · Magyarországi képviselet: BH Group Zrt.</div>
+</div></footer>
+
+<script src="/rent-data.js"></script>
+<script>
+(function(){
+  var root=document.documentElement;
+  function setIcon(){var d=root.getAttribute('data-theme')==='dark';document.querySelector('#themeBtn use').setAttribute('href',d?'#i-sun':'#i-moon');}
+  setIcon();
+  document.getElementById('themeBtn').onclick=function(){var t=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',t);try{localStorage.setItem('dp-theme',t);}catch(e){}setIcon();};
+  document.getElementById('burger').onclick=function(){document.getElementById('mnav').classList.toggle('open');};
+
+  // keresés fülek
+  [].forEach.call(document.querySelectorAll('.tab'),function(b){b.onclick=function(){[].forEach.call(document.querySelectorAll('.tab'),function(x){x.classList.toggle('on',x===b);});var imp=b.dataset.p==='imp';document.getElementById('paneStock').style.display=imp?'none':'';document.getElementById('paneImp').style.display=imp?'flex':'none';};});
+
+  var CT='b2c', CARS=[], RATE=362, VAT=1.27, FAV={};
+  try{FAV=JSON.parse(localStorage.getItem('dp-fav')||'{}');}catch(e){}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function ft(v){return (Math.ceil(v/10000)*10000).toLocaleString('hu-HU')+' Ft';}
+  function huf(c,ct){return c.eur*RATE*((ct||CT)==='b2c'?VAT:1);}
+  function slug(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  function makeOf(c){return c.marka||String(c.modell||'').split(' ')[0];}
+  function sp(ic,t){return t?'<span><svg class="ico"><use href="#'+ic+'"/></svg>'+esc(t)+'</span>':'';}
+  function card(c,i){
+    var k=slug(c.modell), on=FAV[k]?' on':'';
+    var media=c.img?'<img src="'+esc(c.img)+'" alt="'+esc(c.modell)+'" loading="lazy" referrerpolicy="no-referrer">':'';
+    return '<a class="car" href="/auto/'+k+'/" data-i="'+i+'"><div class="ph">'+media+'<button class="heart'+on+'" type="button" data-k="'+k+'" aria-label="Kedvenc"><svg class="ico"><use href="#i-heart"/></svg></button></div>'
+      +'<div class="bd"><h3>'+esc(c.modell)+'</h3><div class="pr" data-pr>'+ft(huf(c))+'<small>'+(CT==='b2c'?'bruttó':'nettó')+'</small></div>'
+      +'<div class="bb"><button type="button" data-ct="b2c" class="'+(CT==='b2c'?'on':'')+'"><b>B2C</b><span>Magánszemély</span></button><button type="button" data-ct="b2b" class="'+(CT==='b2b'?'on':'')+'"><b>B2B</b><span>Cég / Flotta</span></button></div>'
+      +'<div class="sp">'+sp('i-cal',c.evjarat)+sp('i-gauge',c.km)+sp('i-fuel',c.uzemanyag)+sp('i-gear',c.valto)+'</div></div></a>';
+  }
+  var track=document.getElementById('ctrack');
+  function filtered(){
+    var mk=document.getElementById('sMake').value, md=document.getElementById('sModel').value;
+    var mn=+String(document.getElementById('sMin').value).replace(/\D/g,'')||0, mx=+String(document.getElementById('sMax').value).replace(/\D/g,'')||0;
+    return CARS.filter(function(c){var p=huf(c);return (!mk||makeOf(c)===mk)&&(!md||c.modell===md)&&(!mn||p>=mn)&&(!mx||p<=mx);});
+  }
+  function render(){var L=filtered();document.getElementById('sCnt').textContent=L.length;track.innerHTML=L.slice(0,16).map(card).join('')||'<p style="color:var(--mut);padding:20px">Nincs a szűrésnek megfelelő autó.</p>';}
+  function fillModels(){var mk=document.getElementById('sMake').value,sel=document.getElementById('sModel');var ms=CARS.filter(function(c){return !mk||makeOf(c)===mk;}).map(function(c){return c.modell;});ms=ms.filter(function(m,i){return ms.indexOf(m)===i;}).sort();sel.innerHTML='<option value="">Válassz modellt</option>'+ms.map(function(m){return '<option>'+esc(m)+'</option>';}).join('');}
+  ['sMake','sModel','sMin','sMax'].forEach(function(id){var el=document.getElementById(id);el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){if(id==='sMake')fillModels();render();});});
+  document.getElementById('sReset').onclick=function(){['sMake','sMin','sMax'].forEach(function(id){document.getElementById(id).value='';});fillModels();render();};
+  document.getElementById('sGo').onclick=function(){var mk=document.getElementById('sMake').value;location.href='/autoink/'+(mk?'?marka='+encodeURIComponent(slug(mk)):'');};
+  function setCT(v){CT=v;[].forEach.call(document.querySelectorAll('.ct'),function(b){b.classList.toggle('on',b.dataset.ct===v);});render();}
+  [].forEach.call(document.querySelectorAll('.ct'),function(b){b.onclick=function(){setCT(b.dataset.ct);};});
+  track.addEventListener('click',function(e){
+    var h=e.target.closest('.heart');if(h){e.preventDefault();var k=h.dataset.k;FAV[k]=!FAV[k];h.classList.toggle('on',!!FAV[k]);try{localStorage.setItem('dp-fav',JSON.stringify(FAV));}catch(x){}return;}
+    var b=e.target.closest('.bb button');if(b){e.preventDefault();setCT(b.dataset.ct);}
+    if(drag.moved){e.preventDefault();}
+  });
+  // nyilak + húzás egérrel
+  function step(){var c=track.querySelector('.car');return c?c.getBoundingClientRect().width+16:300;}
+  document.getElementById('cPrev').onclick=function(){track.scrollBy({left:-step(),behavior:'smooth'});};
+  document.getElementById('cNext').onclick=function(){track.scrollBy({left:step(),behavior:'smooth'});};
+  var drag={x:0,s:0,on:false,moved:false};
+  track.addEventListener('mousedown',function(e){drag={x:e.clientX,s:track.scrollLeft,on:true,moved:false};track.style.scrollSnapType='none';});
+  window.addEventListener('mousemove',function(e){if(!drag.on)return;var dx=e.clientX-drag.x;if(Math.abs(dx)>5)drag.moved=true;track.scrollLeft=drag.s-dx;});
+  window.addEventListener('mouseup',function(){if(!drag.on)return;drag.on=false;track.style.scrollSnapType='';setTimeout(function(){drag.moved=false;},50);});
+  track.addEventListener('dragstart',function(e){e.preventDefault();});
+
+  function boot(){
+    var R=window.RENT; if(!R){track.innerHTML='<p style="color:var(--mut);padding:20px">Az autók betöltése nem sikerült.</p>';return;}
+    R.loadRate(function(){RATE=(R.getRate&&R.getRate())||RATE;R.loadAll(function(sale){
+      CARS=(sale||[]).filter(function(c){return c&&c.eur>0;});
+      var ks=CARS.filter(function(c){return c.kiemelt;}),rs=CARS.filter(function(c){return !c.kiemelt;});CARS=ks.concat(rs);
+      var mks=CARS.map(makeOf);mks=mks.filter(function(m,i){return m&&mks.indexOf(m)===i;}).sort();
+      document.getElementById('sMake').innerHTML='<option value="">Válassz márkát</option>'+mks.map(function(m){return '<option>'+esc(m)+'</option>';}).join('');
+      fillModels();render();
+    });});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+</body>
+</html>
