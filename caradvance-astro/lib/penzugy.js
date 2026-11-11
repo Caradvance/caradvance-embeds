@@ -720,6 +720,15 @@ export function sha3_512Hex(str) {
 async function sha512Hex(s) { const b = await crypto.subtle.digest('SHA-512', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('').toUpperCase(); }
 const xe = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+/** A titkos változók bemásolásakor gyakori a szóköz / sortörés — levágjuk. */
+function navEnv(env) {
+  const t = (v) => String(v == null ? '' : v).replace(/^[\s\u00a0\u200b\ufeff]+|[\s\u00a0\u200b\ufeff]+$/g, '');
+  return { ...env, NAV_LOGIN: t(env.NAV_LOGIN), NAV_PASSWORD: t(env.NAV_PASSWORD), NAV_SIGN_KEY: t(env.NAV_SIGN_KEY), NAV_TAX_NUMBER: t(env.NAV_TAX_NUMBER).replace(/\D/g, '').slice(0, 8) };
+}
+function navHint(env) {
+  const k = env.NAV_SIGN_KEY || '', l = env.NAV_LOGIN || '';
+  return ` [ellenőrzéshez — felhasználónév: ${l.length} karakter (${l.slice(0, 3)}…${l.slice(-2)}), aláírókulcs: ${k.length} karakter (${k.slice(0, 4)}…${k.slice(-4)}), adószám: ${env.NAV_TAX_NUMBER}]`;
+}
 export function navConfigured(env) { return !!(env.NAV_LOGIN && env.NAV_PASSWORD && env.NAV_SIGN_KEY && /^\d{8}$/.test(String(env.NAV_TAX_NUMBER || '').slice(0, 8))); }
 
 export async function navDigestRequest(env, dir, from, to, page) {
@@ -762,7 +771,8 @@ export function parseDigestResponse(x) {
   return { avail, list };
 }
 /** NAV szinkron: [from, to] időszak, 35 napos szeletekben, bejövő + kimenő irány. */
-export async function navSync(env, from, to, who) {
+export async function navSync(envRaw, from, to, who) {
+  const env = navEnv(envRaw);
   if (!navConfigured(env)) throw new Error('A NAV hozzáférés nincs beállítva (NAV_LOGIN, NAV_PASSWORD, NAV_SIGN_KEY, NAV_TAX_NUMBER).');
   const base = env.NAV_TEST === '1' ? 'https://api-test.onlineszamla.nav.gov.hu' : 'https://api.onlineszamla.nav.gov.hu';
   let fetched = 0, inserted = 0, calls = 0;
@@ -774,7 +784,8 @@ export async function navSync(env, from, to, who) {
         const { xml } = await navDigestRequest(env, dir, a, b, page);
         const r = await fetch(base + '/invoiceService/v3/queryInvoiceDigest', { method: 'POST', headers: { 'Content-Type': 'application/xml', Accept: 'application/xml' }, body: xml });
         const txt = await r.text();
-        const res = parseDigestResponse(txt);
+        let res;
+        try { res = parseDigestResponse(txt); } catch (e) { throw new Error(e.message + (/SIGNATURE|SECURITY_USER|NOT_REGISTERED|INVALID_USER/.test(e.message) ? navHint(env) : '')); }
         avail = res.avail;
         const st = [];
         for (const d of res.list) {
