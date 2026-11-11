@@ -525,7 +525,7 @@ function renderDocs() {
   $('#mGo').onclick = function () { api('match/auto', {}).then(must).then(function (j) { toast(j.matched + ' új párosítás'); reload(); }); };
   if ($('#nGo')) $('#nGo').onclick = function () {
     var b = this; b.disabled = true; b.textContent = 'Lekérés…';
-    api('nav/sync', { from: $('#nFrom').value, to: $('#nTo').value }).then(function (j) { b.disabled = false; b.textContent = 'Számlák lekérése a NAV-tól'; must(j); toast(j.fetched + ' számla a NAV-tól, ' + j.matched + ' új párosítás', 4000); return refreshMeta().then(reload); }).catch(function () { b.disabled = false; b.textContent = 'Számlák lekérése a NAV-tól'; });
+    api('nav/sync', { from: $('#nFrom').value, to: $('#nTo').value }).then(function (j) { b.disabled = false; b.textContent = 'Számlák lekérése a NAV-tól'; must(j); toast(j.fetched + ' számla a NAV-tól, ' + j.matched + ' új párosítás' + (j.detailsLeft ? ' — még ' + j.detailsLeft + ' egyszerűsített számla összege hátra, kattints újra' : ''), 6000); return refreshMeta().then(reload); }).catch(function () { b.disabled = false; b.textContent = 'Számlák lekérése a NAV-tól'; });
   };
 }
 function readFile(file) {

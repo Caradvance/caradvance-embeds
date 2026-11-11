@@ -263,6 +263,9 @@ export async function purgeBlocked(env) {
     const ch = list.slice(i, i + 90);
     await env.DB.prepare(`DELETE FROM fin_tx WHERE id IN (${ch.map(() => '?').join(',')})`).bind(...ch).run();
   }
+  // a tiltott partnerek bizonylatai (pl. NAV-ból jött számlák) sem kellenek
+  const docs = (await env.DB.prepare(`SELECT id, partner FROM fin_docs`).all()).results.filter((d) => isBlocked(block, { ttype: '', partner: d.partner, memo: '', iban: '' }));
+  for (const d of docs) await env.DB.batch([env.DB.prepare(`UPDATE fin_tx SET doc_id = NULL, match_kind = NULL WHERE doc_id = ?`).bind(d.id), env.DB.prepare(`DELETE FROM fin_files WHERE doc_id = ?`).bind(d.id), env.DB.prepare(`DELETE FROM fin_docs WHERE id = ?`).bind(d.id)]);
   return list.length;
 }
 
@@ -796,14 +799,77 @@ export async function navSync(envRaw, from, to, who) {
           const key = `${inb ? 'in' : 'out'}|${d.supplier_tax}|${d.number}|${d.op}`;
           st.push(env.DB.prepare(`INSERT INTO fin_docs (dir, kind, source, nav_key, op, number, partner, partner_tax, issue_date, perf_date, pay_date, pay_method, currency, net, vat, gross, net_huf, vat_huf, gross_huf, created_by)
             VALUES (?, 'szamla', 'nav', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(nav_key) DO UPDATE SET net = excluded.net, vat = excluded.vat, gross = excluded.gross, net_huf = excluded.net_huf, vat_huf = excluded.vat_huf, gross_huf = excluded.gross_huf, pay_date = excluded.pay_date`)
+            ON CONFLICT(nav_key) DO UPDATE SET net = COALESCE(excluded.net, fin_docs.net), vat = COALESCE(excluded.vat, fin_docs.vat), gross = COALESCE(excluded.gross, fin_docs.gross), net_huf = COALESCE(excluded.net_huf, fin_docs.net_huf), vat_huf = COALESCE(excluded.vat_huf, fin_docs.vat_huf), gross_huf = COALESCE(excluded.gross_huf, fin_docs.gross_huf), pay_date = excluded.pay_date`)
             .bind(inb ? 'in' : 'out', key, d.op, d.number, inb ? d.supplier : d.customer, inb ? d.supplier_tax : d.customer_tax, d.issue_date, d.perf_date, d.pay_date, d.pay_method, d.currency, d.net, d.vat, gross, d.net_huf, d.vat_huf, grossHuf, who || 'NAV'));
         }
         for (let i = 0; i < st.length; i += 50) { const rr = await env.DB.batch(st.slice(i, i + 50)); rr.forEach((x) => { inserted += (x && x.meta && x.meta.changes) || 0; }); }
       }
     }
   }
+  const details = await navFillAmounts(env, 30, base);
   await setSetting(env, 'nav_last', { at: nowIso(), from, to, fetched });
+  await purgeBlocked(env);
   const matched = await autoMatch(env);
-  return { fetched, upserted: inserted, matched };
+  return { fetched, upserted: inserted, details: details.done, detailsLeft: details.left, matched };
+}
+
+/* ---- egyszerűsített számlák (benzinkút, Flix…): a kivonatban nincs összeg → a teljes számlát kérjük le (queryInvoiceData) ---- */
+async function navDataRequest(env, number, dir, supplierTax) {
+  const tax = String(env.NAV_TAX_NUMBER).slice(0, 8);
+  const ts = new Date().toISOString(), sigTs = ts.slice(0, 19).replace(/[-:T]/g, '');
+  const rid = ('CD' + Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/[^a-zA-Z0-9]/g, '').slice(0, 30).toUpperCase();
+  const sig = sha3_512Hex(rid + sigTs + env.NAV_SIGN_KEY), pw = await sha512Hex(env.NAV_PASSWORD);
+  const swId = String(env.NAV_SOFTWARE_ID || ('HU' + tax + '-CAFIN01')).toUpperCase().replace(/[^0-9A-Z-]/g, '').padEnd(18, '0').slice(0, 18);
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<QueryInvoiceDataRequest xmlns="http://schemas.nav.gov.hu/OSA/3.0/api" xmlns:common="http://schemas.nav.gov.hu/NTCA/1.0/common">
+<common:header><common:requestId>${rid}</common:requestId><common:timestamp>${ts}</common:timestamp><common:requestVersion>3.0</common:requestVersion><common:headerVersion>1.0</common:headerVersion></common:header>
+<common:user><common:login>${xe(env.NAV_LOGIN)}</common:login><common:passwordHash cryptoType="SHA-512">${pw}</common:passwordHash><common:taxNumber>${tax}</common:taxNumber><common:requestSignature cryptoType="SHA3-512">${sig}</common:requestSignature></common:user>
+<software><softwareId>${swId}</softwareId><softwareName>CarAdvance belso penzugy</softwareName><softwareOperation>ONLINE_SERVICE</softwareOperation><softwareMainVersion>1.0</softwareMainVersion><softwareDevName>CarAdvance</softwareDevName><softwareDevContact>info@caradvance.hu</softwareDevContact><softwareDevCountryCode>HU</softwareDevCountryCode><softwareDevTaxNumber>${tax}</softwareDevTaxNumber></software>
+<invoiceNumberQuery><invoiceNumber>${xe(number)}</invoiceNumber><invoiceDirection>${dir}</invoiceDirection>${dir === 'INBOUND' && supplierTax ? `<supplierTaxNumber>${xe(String(supplierTax).slice(0, 8))}</supplierTaxNumber>` : ''}</invoiceNumberQuery>
+</QueryInvoiceDataRequest>`;
+}
+async function gunzipB64(b64) {
+  const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  const stream = new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return await new Response(stream).text();
+}
+function b64Utf8(b64) { return new TextDecoder('utf-8').decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))); }
+/** A számla XML összesítőjéből: bruttó, nettó, áfa (számla pénznemében és forintban). */
+export function parseInvoiceTotals(x) {
+  const n = (v) => (v === '' || v == null ? null : Number(v));
+  const cur = tag(x, 'currencyCode') || 'HUF';
+  const gross = n(tag(x, 'invoiceGrossAmount')), grossHuf = n(tag(x, 'invoiceGrossAmountHUF'));
+  if (gross != null) {
+    const net = n(tag(x, 'invoiceNetAmount')), vat = n(tag(x, 'invoiceVatAmount'));
+    return { currency: cur, gross, gross_huf: grossHuf ?? (cur === 'HUF' ? gross : null), net: net ?? (vat != null ? r2(gross - vat) : null), vat, net_huf: n(tag(x, 'invoiceNetAmountHUF')), vat_huf: n(tag(x, 'invoiceVatAmountHUF')) };
+  }
+  // egyszerűsített számla: summarySimplified blokkok (áfatartalom + bruttó)
+  const blocks = tags(x, 'summarySimplified');
+  if (!blocks.length) return null;
+  let g = 0, gh = 0, v = 0, ghOk = true;
+  for (const b of blocks) {
+    const bg = n(tag(b, 'vatContentGrossAmount')) || 0, bgh = n(tag(b, 'vatContentGrossAmountHUF')), vc = n(tag(b, 'vatContent')) || 0;
+    g += bg; if (bgh == null) ghOk = false; else gh += bgh; v += bg * vc;
+  }
+  g = r2(g); v = r2(v);
+  return { currency: cur, gross: g, gross_huf: ghOk ? r2(gh) : (cur === 'HUF' ? g : null), net: r2(g - v), vat: v, net_huf: cur === 'HUF' ? r2(g - v) : null, vat_huf: cur === 'HUF' ? v : null };
+}
+async function navFillAmounts(env, budget, base) {
+  const rows = (await env.DB.prepare(`SELECT id, dir, number, partner_tax FROM fin_docs WHERE source = 'nav' AND gross IS NULL AND (op = '' OR op = 'CREATE') ORDER BY issue_date DESC`).all()).results;
+  let done = 0;
+  for (const d of rows.slice(0, budget)) {
+    try {
+      const r = await fetch(base + '/invoiceService/v3/queryInvoiceData', { method: 'POST', headers: { 'Content-Type': 'application/xml', Accept: 'application/xml' }, body: await navDataRequest(env, d.number, d.dir === 'in' ? 'INBOUND' : 'OUTBOUND', d.partner_tax) });
+      const txt = await r.text();
+      if (tag(txt, 'funcCode') !== 'OK') continue;
+      const data = tag(txt, 'invoiceData');
+      if (!data) continue;
+      const xml = /true/i.test(tag(txt, 'compressedContentIndicator')) ? await gunzipB64(data) : b64Utf8(data);
+      const t = parseInvoiceTotals(xml);
+      if (!t) continue;
+      await env.DB.prepare(`UPDATE fin_docs SET currency = ?, gross = ?, net = ?, vat = ?, gross_huf = ?, net_huf = ?, vat_huf = ? WHERE id = ?`).bind(t.currency, t.gross, t.net, t.vat, t.gross_huf, t.net_huf, t.vat_huf, d.id).run();
+      done++;
+    } catch (e) { /* egy hibás számla nem állítja meg a többit */ }
+  }
+  return { done, left: Math.max(0, rows.length - Math.min(budget, rows.length)) };
 }
