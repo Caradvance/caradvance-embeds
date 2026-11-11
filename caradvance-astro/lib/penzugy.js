@@ -677,11 +677,13 @@ export async function pnl(env, from, to) {
     env.DB.prepare(`SELECT * FROM fin_cats ORDER BY sort, id`).all().then((r) => r.results),
     getSetting(env, 'alloc', { mode: 'fixed', key: {} })
   ]);
-  const txs = (await env.DB.prepare(`SELECT t.id, t.bdate, t.amount, t.amount_huf, t.cat_id, t.split, t.vat, d.net AS dnet, d.gross AS dgross
+  const txs = (await env.DB.prepare(`SELECT t.id, t.bdate, t.amount, t.amount_huf, t.cat_id, t.split, t.vat, t.plate, d.net AS dnet, d.gross AS dgross
     FROM fin_tx t LEFT JOIN fin_docs d ON d.id = t.doc_id WHERE t.bdate BETWEEN ? AND ? AND COALESCE(t.is_split, 0) = 0 ORDER BY t.bdate`).bind(from, to).all()).results;
   const C = Object.fromEntries(cats.map((c) => [c.id, c]));
   const lineIds = new Set(lines.map((l) => l.id));
   const cells = {}; // catKey → month → lineKey → [net, gross, n]
+  const pcells = {}; // catKey → rendszám ('' = nincs) → month → lineKey → [net, gross, n] (autónkénti al-sorok)
+  const withPlate = new Set(txs.filter((t) => t.plate).map((t) => (t.cat_id ? String(t.cat_id) : 'UNCAT')));
   let noFx = 0;
   for (const t of txs) {
     const cat = t.cat_id ? C[t.cat_id] : null;
@@ -694,6 +696,11 @@ export async function pnl(env, from, to) {
       const a = ((cells[ck] = cells[ck] || {})[m] = cells[ck][m] || {});
       const c = (a[s.l] = a[s.l] || [0, 0, 0]);
       c[0] = r2(c[0] + v[0] * s.p / 100); c[1] = r2(c[1] + v[1] * s.p / 100); c[2] += 1;
+      if (withPlate.has(ck)) {
+        const pa = (((pcells[ck] = pcells[ck] || {})[t.plate || ''] = pcells[ck][t.plate || ''] || {})[m] = pcells[ck][t.plate || ''][m] || {});
+        const pc = (pa[s.l] = pa[s.l] || [0, 0, 0]);
+        pc[0] = r2(pc[0] + v[0] * s.p / 100); pc[1] = r2(pc[1] + v[1] * s.p / 100); pc[2] += 1;
+      }
     }
   }
   const months = [];
@@ -702,7 +709,7 @@ export async function pnl(env, from, to) {
     const [y, mm] = d.split('-').map(Number);
     d = mm === 12 ? `${y + 1}-01` : `${y}-${String(mm + 1).padStart(2, '0')}`;
   }
-  return { from, to, months, lines, cats, alloc, cells, noFx, txCount: txs.length };
+  return { from, to, months, lines, cats, alloc, cells, pcells, noFx, txCount: txs.length };
 }
 
 /* ============================== bizonylat-párosítás ============================== */

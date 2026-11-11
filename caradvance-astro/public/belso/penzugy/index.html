@@ -48,6 +48,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .pl tr.grp td:first-child{padding-left:18px;font-weight:700;cursor:pointer}
 .pl tr.cat td:first-child{padding-left:30px;color:#334155}
 .pl tr.cat.top td:first-child{padding-left:18px}
+.pl tr.hascar td:first-child{cursor:pointer}.pl tr.car td{font-size:12.5px;background:#FAFBFD}.pl tr.car td:first-child{padding-left:46px;background:#FAFBFD;color:#334155}
 .pl tr.sub td{font-weight:700;background:#F8FAFC}.pl tr.sub td:first-child{background:#F8FAFC}
 .pl tr.tot td{font-weight:800;background:#0B0B0D;color:#fff;border-bottom:0}.pl tr.tot td:first-child{background:#0B0B0D}.pl tr.tot td.neg{color:#ff8a80}
 .pl tr.kpi2 td{font-weight:800;background:#EEF2F7}.pl tr.kpi2 td:first-child{background:#EEF2F7}
@@ -88,7 +89,7 @@ code{background:#F1F4F9;border-radius:6px;padding:1px 5px;font-size:12px}
 (function () {
 'use strict';
 var A = '/api/belso-penzugy/', app = document.getElementById('app');
-var S = { tab: 'pl', meta: null, pnl: null, tx: [], docs: [], from: '', to: '', view: { lines: 'all', cols: 'months', basis: 'net', alloc: null, empty: false, collapsed: {} }, f: { q: '', st: 'all', cat: '', line: '', acc: '', plate: '' }, sel: {}, carSel: '' };
+var S = { tab: 'pl', meta: null, pnl: null, tx: [], docs: [], from: '', to: '', view: { lines: 'all', cols: 'months', basis: 'net', alloc: null, empty: false, collapsed: {}, cars: {} }, f: { q: '', st: 'all', cat: '', line: '', acc: '', plate: '' }, sel: {}, carSel: '' };
 var KIND = { rev: 'Árbevétel', cogs: 'Közvetlen költség', opex: 'Működési költség', below: 'Adó / pénzügyi', excl: 'Nem eredményhatású' };
 var MON = ['jan', 'feb', 'márc', 'ápr', 'máj', 'jún', 'júl', 'aug', 'szept', 'okt', 'nov', 'dec'];
 
@@ -218,27 +219,32 @@ function computePL() {
   var key = (S.meta.alloc && S.meta.alloc.key) || {};
   var catK = {}; S.meta.cats.forEach(function (c) { catK[c.id] = c.kind; });
   // V[catKey][month][lineKey] = érték (a választott alap szerint)
-  var V = {};
-  Object.keys(P.cells).forEach(function (ck) { V[ck] = {}; Object.keys(P.cells[ck]).forEach(function (m) { V[ck][m] = {}; Object.keys(P.cells[ck][m]).forEach(function (l) { V[ck][m][l] = P.cells[ck][m][l][basis]; }); }); });
+  var V = {}, VP = {};
+  function pick(src) { var o = {}; Object.keys(src).forEach(function (m) { o[m] = {}; Object.keys(src[m]).forEach(function (l) { o[m][l] = src[m][l][basis]; }); }); return o; }
+  Object.keys(P.cells).forEach(function (ck) { V[ck] = pick(P.cells[ck]); });
+  Object.keys(P.pcells || {}).forEach(function (ck) { VP[ck] = {}; Object.keys(P.pcells[ck]).forEach(function (pl) { VP[ck][pl] = pick(P.pcells[ck][pl]); }); });
   if (mode !== 'none' && shared.length) {
     // havi árbevétel üzletáganként (árbevétel-arányos felosztáshoz)
     var rev = {};
     Object.keys(V).forEach(function (ck) { if (catK[ck] !== 'rev') return; Object.keys(V[ck]).forEach(function (m) { Object.keys(V[ck][m]).forEach(function (l) { if (shared.indexOf(l) !== -1 || l === 'NA') return; (rev[m] = rev[m] || {})[l] = (rev[m][l] || 0) + V[ck][m][l]; }); }); });
-    Object.keys(V).forEach(function (ck) {
+    var allocate = function (ck, O) {
       if (catK[ck] === 'excl') return;
-      Object.keys(V[ck]).forEach(function (m) {
+      Object.keys(O).forEach(function (m) {
         shared.forEach(function (sl) {
-          var v = V[ck][m][sl]; if (!v) return;
+          var v = O[m][sl]; if (!v) return;
           var w = {};
           if (mode === 'revenue' && rev[m]) { var tot = 0; Object.keys(rev[m]).forEach(function (l) { if (rev[m][l] > 0) { w[l] = rev[m][l]; tot += rev[m][l]; } }); if (tot > 0) Object.keys(w).forEach(function (l) { w[l] = w[l] / tot; }); else w = {}; }
           if (!Object.keys(w).length) Object.keys(key).forEach(function (l) { if (shared.indexOf(String(l)) === -1) w[l] = (Number(key[l]) || 0) / 100; });
           var used = 0;
-          Object.keys(w).forEach(function (l) { if (!w[l]) return; V[ck][m][l] = (V[ck][m][l] || 0) + v * w[l]; used += w[l]; });
-          V[ck][m][sl] = v * (1 - Math.min(1, used));
+          Object.keys(w).forEach(function (l) { if (!w[l]) return; O[m][l] = (O[m][l] || 0) + v * w[l]; used += w[l]; });
+          O[m][sl] = v * (1 - Math.min(1, used));
         });
       });
-    });
+    };
+    Object.keys(V).forEach(function (ck) { allocate(ck, V[ck]); });
+    Object.keys(VP).forEach(function (ck) { Object.keys(VP[ck]).forEach(function (pl) { allocate(ck, VP[ck][pl]); }); });
   }
+  S.VP = VP;
   return V;
 }
 function renderPL() {
@@ -247,8 +253,8 @@ function renderPL() {
   var colsMode = S.view.cols;
   var cols = colsMode === 'months' ? P.months.map(function (m) { return { k: m, t: mlabel(m) }; })
     : lines.filter(function (l) { return l.active && (selL === 'all' || String(l.id) === String(selL)); }).map(function (l) { return { k: String(l.id), t: l.name, color: l.color }; }).concat(selL === 'all' ? [{ k: 'NA', t: 'Üzletág nélkül' }] : []);
-  function val(ck, col) {
-    var o = V[ck]; if (!o) return 0; var s = 0;
+  function val(ck, col, O) {
+    var o = O || V[ck]; if (!o) return 0; var s = 0;
     Object.keys(o).forEach(function (m) {
       if (colsMode === 'months' && m !== col) return;
       Object.keys(o[m]).forEach(function (l) {
@@ -270,7 +276,22 @@ function renderPL() {
       return '<td class="n ' + nc(v) + clk + '">' + ft(v, true) + '</td>';
     }).join('');
   }
-  function catRow(c, top) { var v = rowVals([String(c.id)]); if (!S.view.empty && !v.some(function (x) { return Math.abs(x) >= 0.5; })) return { v: v, h: '' }; return { v: v, h: '<tr class="cat' + (top ? ' top' : '') + '" data-g="' + esc(c.grp) + '"><td>' + esc(c.name) + '</td>' + cells(v, String(c.id)) + '</tr>' }; }
+  function carRows(ck) {
+    var VP = S.VP[ck]; if (!VP) return '';
+    var open = S.view.cars[ck];
+    return Object.keys(VP).map(function (pl) {
+      var r = cols.map(function (c) { return val(ck, c.k, VP[pl]); }); r.push(r.reduce(function (a, b) { return a + b; }, 0));
+      return { pl: pl, r: r };
+    }).filter(function (x) { return x.r.some(function (v) { return Math.abs(v) >= 0.5; }); })
+      .sort(function (a, b) { return a.pl === '' ? 1 : b.pl === '' ? -1 : a.r[a.r.length - 1] - b.r[b.r.length - 1]; })
+      .map(function (x) { var nm = x.pl ? (vehName(x.pl) ? esc(vehName(x.pl)) + ' · ' : '') + '<b>' + esc(x.pl) + '</b>' : '<span class="muted">rendszám nélkül</span>';
+        return '<tr class="cat car' + (open ? '' : ' hide') + '" data-g="' + esc(ck) + '"><td>🚗 ' + nm + '</td>' + x.r.map(function (v, i) { return '<td class="n ' + nc(v) + ' c" data-ck="' + ck + '" data-pl="' + esc(x.pl || '-') + '" data-col="' + (i < cols.length ? cols[i].k : '*') + '">' + ft(v, true) + '</td>'; }).join('') + '</tr>'; }).join('');
+  }
+  function catRow(c, top) {
+    var ck = String(c.id), v = rowVals([ck]); if (!S.view.empty && !v.some(function (x) { return Math.abs(x) >= 0.5; })) return { v: v, h: '' };
+    var sub = carRows(ck);
+    return { v: v, h: '<tr class="cat' + (top ? ' top' : '') + (sub ? ' hascar' : '') + '" data-g="' + esc(c.grp) + '"' + (sub ? ' data-car="' + ck + '"' : '') + '><td>' + (sub ? (S.view.cars[ck] ? '▾ ' : '▸ ') : '') + esc(c.name) + (sub ? ' <span class="small muted">· autónként</span>' : '') + '</td>' + cells(v, ck) + '</tr>' + sub };
+  }
   function block(kind, title, totTitle) {
     var list = byKind(kind), tot = zero.slice(), h = '';
     if (kind === 'opex') {
@@ -335,10 +356,11 @@ function renderPL() {
   $('#kUnc').onclick = function () { S.tab = 'tx'; S.f.st = 'uncat'; render(); };
   if ($('#fxFill')) $('#fxFill').onclick = function () { api('fx/fill', {}).then(must).then(function (j) { toast(j.missing ? j.missing + ' tétel még mindig árfolyam nélkül' : 'Árfolyamok rendben'); reload(); }); };
   $$('.pl tr.grp').forEach(function (tr) { tr.onclick = function () { var g = tr.dataset.grp; S.view.collapsed[g] = !S.view.collapsed[g]; renderPL(); }; });
-  $$('.pl td.c').forEach(function (td) { td.onclick = function () { drillDown(td.dataset.ck, td.dataset.col, colsMode); }; });
+  $$('.pl tr.hascar td:first-child').forEach(function (td) { td.onclick = function () { var ck = td.parentNode.dataset.car; S.view.cars[ck] = !S.view.cars[ck]; renderPL(); }; });
+  $$('.pl td.c').forEach(function (td) { td.onclick = function () { drillDown(td.dataset.ck, td.dataset.col, colsMode, td.dataset.pl); }; });
   $('#plCsv').onclick = function () {
     var rows = [['Sor'].concat(cols.map(function (c) { return c.t; })).concat(['Összesen'])];
-    $$('.pl tbody tr').forEach(function (tr) { var t = $$('td', tr).map(function (td) { return td.textContent.replace(/ /g, '').replace('−', '-').replace(/^[▾▸⚠]\s*/, '').replace('–', '0'); }); if (t.length > 1) rows.push(t); else rows.push([t[0]]); });
+    $$('.pl tbody tr').forEach(function (tr) { if (tr.classList.contains('car') && tr.classList.contains('hide')) return; var t = $$('td', tr).map(function (td) { return td.textContent.replace(/ /g, '').replace('−', '-').replace(/^[▾▸⚠]\s*/, '').replace('–', '0'); }); if (t.length > 1) rows.push(t); else rows.push([t[0]]); });
     download('eredmenykimutatas_' + S.from + '_' + S.to + '.csv', rows);
   };
 }
@@ -347,10 +369,11 @@ function download(name, rows) {
   var csv = '﻿' + rows.map(function (r) { return r.map(function (c) { c = String(c == null ? '' : c); return /[;"\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(';'); }).join('\r\n');
   var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = name; a.click();
 }
-function drillDown(ck, col, colsMode) {
+function drillDown(ck, col, colsMode, pl) {
   var selL = S.view.lines;
   var list = S.tx.filter(function (t) {
     if (t.is_split) return false;
+    if (pl && (pl === '-' ? t.plate : t.plate !== pl)) return false;
     if (ck === 'UNCAT' ? t.cat_id : String(t.cat_id) !== ck) return false;
     var sp = parseSplit(t.split) || [{ l: 'NA', p: 100 }];
     var lk = sp.map(function (x) { return String(x.l); });
@@ -359,7 +382,7 @@ function drillDown(ck, col, colsMode) {
     return true;
   });
   var c = ck === 'UNCAT' ? { name: 'Besorolásra vár' } : catBy(Number(ck));
-  var m = modal('<h2>' + esc(c ? c.name : '') + '</h2><p class="muted small">' + (col === '*' ? 'Teljes időszak' : colsMode === 'months' ? mlabel(col) : (lineBy(col) || { name: 'Üzletág nélkül' }).name) + ' · ' + list.length + ' tétel' + (S.view.alloc !== 'none' ? ' (a közös tételek a felosztás előtti teljes összeggel)' : '') + '</p>' + txTable(list, false), true);
+  var m = modal('<h2>' + esc(c ? c.name : '') + (pl ? ' · ' + (pl === '-' ? 'rendszám nélkül' : esc((vehName(pl) ? vehName(pl) + ' ' : '') + pl)) : '') + '</h2><p class="muted small">' + (col === '*' ? 'Teljes időszak' : colsMode === 'months' ? mlabel(col) : (lineBy(col) || { name: 'Üzletág nélkül' }).name) + ' · ' + list.length + ' tétel' + (S.view.alloc !== 'none' ? ' (a közös tételek a felosztás előtti teljes összeggel)' : '') + '</p>' + txTable(list, false), true);
   bindTxRows(m, function () { m.remove(); });
 }
 function sharedIn(lk) { return S.meta.lines.some(function (l) { return l.shared && lk.indexOf(String(l.id)) !== -1; }); }
