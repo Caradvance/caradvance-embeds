@@ -18,7 +18,7 @@
 import {
   json, ensureFin, clean, isDate, addDays, normSplit, nowIso, importRows, applyRules, autoMatch, suggestDocs, saveFile, loadFile,
   pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs, genRecurring,
-  normPlate, splitTx, unsplitTx
+  normPlate, splitTx, unsplitTx, refxAll
 } from '../../../lib/penzugy.js';
 
 async function staffUser(request, env) {
@@ -100,10 +100,10 @@ export async function onRequest(context) {
       const endM = /^\d{4}-\d{2}$/.test(body.end_month || '') ? body.end_month : '';
       const cur = /^[A-Z]{3}$/.test(body.currency || '') ? body.currency : 'HUF';
       const split = normSplit(body.split, await lineSet(env));
-      const vals = [name, clean(body.partner, 160), amount, cur, Number(body.cat_id) || null, split ? JSON.stringify(split) : null, vatOk(body.vat), docModeOk(body.doc_mode), Math.min(28, Math.max(1, Math.round(num(body.day) || 1))), start, endM, body.active === false || body.active === 0 ? 0 : 1];
+      const vals = [name, clean(body.partner, 160), amount, cur, Number(body.cat_id) || null, split ? JSON.stringify(split) : null, vatOk(body.vat), docModeOk(body.doc_mode), Math.min(28, Math.max(1, Math.round(num(body.day) || 1))), start, endM, body.active === false || body.active === 0 ? 0 : 1, normPlate(body.plate)];
       let id = Number(body.id) || null;
-      if (id) await DB.prepare(`UPDATE fin_recurring SET name = ?, partner = ?, amount = ?, currency = ?, cat_id = ?, split = ?, vat = ?, doc_mode = ?, day = ?, start = ?, end_month = ?, active = ? WHERE id = ?`).bind(...vals, id).run();
-      else id = (await DB.prepare(`INSERT INTO fin_recurring (name, partner, amount, currency, cat_id, split, vat, doc_mode, day, start, end_month, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals).run()).meta.last_row_id;
+      if (id) await DB.prepare(`UPDATE fin_recurring SET name = ?, partner = ?, amount = ?, currency = ?, cat_id = ?, split = ?, vat = ?, doc_mode = ?, day = ?, start = ?, end_month = ?, active = ?, plate = ? WHERE id = ?`).bind(...vals, id).run();
+      else id = (await DB.prepare(`INSERT INTO fin_recurring (name, partner, amount, currency, cat_id, split, vat, doc_mode, day, start, end_month, active, plate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals).run()).meta.last_row_id;
       return json({ id, generated: await genRecurring(env) });
     }
 
@@ -346,6 +346,7 @@ export async function onRequest(context) {
       return json(await navSync(env, from, to, who));
     }
     if (m === 'POST' && p0 === 'fx' && p1 === 'fill') return json({ missing: await fillFx(env) });
+    if (m === 'POST' && p0 === 'fx' && p1 === 'mnb') return json({ missing: await refxAll(env) }); // minden devizás tétel újraszámolása MNB középárfolyammal
 
     return json({ error: 'Nem található.' }, 404);
   } catch (e) {

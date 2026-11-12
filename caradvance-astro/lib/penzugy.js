@@ -108,6 +108,8 @@ async function migrateVehV5(env) {
   if (!tx.has('parent_id')) st.push(env.DB.prepare(`ALTER TABLE fin_tx ADD COLUMN parent_id INTEGER`));
   if (!tx.has('is_split')) st.push(env.DB.prepare(`ALTER TABLE fin_tx ADD COLUMN is_split INTEGER DEFAULT 0`));
   if (!dc.has('plate')) st.push(env.DB.prepare(`ALTER TABLE fin_docs ADD COLUMN plate TEXT DEFAULT ''`));
+  const rc = await cols('fin_recurring');
+  if (!rc.has('plate')) st.push(env.DB.prepare(`ALTER TABLE fin_recurring ADD COLUMN plate TEXT DEFAULT ''`));
   for (const s of st) await s.run();
   if (st.length) await env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_fin_tx_parent ON fin_tx (parent_id)`).run();
 }
@@ -357,7 +359,7 @@ export async function deleteTxs(env, ids, who) {
 export async function genRecurring(env) {
   const recs = (await env.DB.prepare(`SELECT * FROM fin_recurring WHERE active = 1`).all()).results;
   if (!recs.length) return 0;
-  const now = new Date(), cur = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+  const now = new Date(), cur = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`, today = now.toISOString().slice(0, 10);
   const del = new Set((await env.DB.prepare(`SELECT uid FROM fin_deleted WHERE uid LIKE 'rec-%'`).all()).results.map((r) => r.uid));
   const acc = await env.DB.prepare(`SELECT id FROM fin_accounts WHERE ext_id = 'CASH'`).first();
   const st = [];
@@ -365,12 +367,12 @@ export async function genRecurring(env) {
     const last = r.end_month && r.end_month < cur ? r.end_month : cur;
     for (let ym = r.start; ym <= last;) {
       const uid = `rec-${r.id}-${ym}`;
-      if (!del.has(uid)) {
-        const day = String(Math.min(28, Math.max(1, r.day || 1))).padStart(2, '0');
-        st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, updated_by)
-          VALUES (?, ?, 'manual', ?, ?, 'Ismétlődő tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 'ismétlődő')`)
+      const day = String(Math.min(28, Math.max(1, r.day || 1))).padStart(2, '0');
+      if (!del.has(uid) && `${ym}-${day}` <= today) { // csak a már esedékes (múltbeli / mai) hónapok – pénzforgalmi szemlélet
+        st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, plate, updated_by)
+          VALUES (?, ?, 'manual', ?, ?, 'Ismétlődő tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, 'ismétlődő')`)
           .bind(uid, acc ? acc.id : null, `${ym}-${day}`, `${ym}-${day}`, r.amount, r.currency, r.currency === 'HUF' ? 1 : null, r.currency === 'HUF' ? r.amount : null,
-            r.partner || r.name, r.name, r.cat_id, r.split, r.vat, r.doc_mode, 'Ismétlődő: ' + r.name));
+            r.partner || r.name, r.name, r.cat_id, r.split, r.vat, r.doc_mode, 'Ismétlődő: ' + r.name, r.plate || ''));
       }
       const [y, m] = ym.split('-').map(Number);
       ym = m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`;
@@ -555,8 +557,34 @@ export async function inheritFeeSplits(env) {
 }
 
 /* ============================== árfolyamok (EKB, frankfurter.dev) ============================== */
+/** MNB hivatalos középárfolyamok (SOAP: arfolyamok.asmx) – { 'YYYY-MM-DD': forint / 1 egység }; gyorsítótár: fin_fx, cur = 'EUR@MNB'. */
+async function mnbRates(env, cur, from, to) {
+  const key = cur + '@MNB';
+  const have = (await env.DB.prepare(`SELECT date, rate FROM fin_fx WHERE cur = ? AND date BETWEEN ? AND ?`).bind(key, addDays(from, -7), to).all()).results;
+  const map = Object.fromEntries(have.map((r) => [r.date, r.rate]));
+  const today = new Date().toISOString().slice(0, 10);
+  const has = (day) => Object.keys(map).some((d) => d <= day && d >= addDays(day, -5));
+  if (has(from) && (has(to) || to >= today && has(addDays(today, -1)))) return map;
+  const body = `<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.mnb.hu/webservices/"><soap:Body><web:GetExchangeRates><web:startDate>${addDays(from, -7)}</web:startDate><web:endDate>${to < today ? to : today}</web:endDate><web:currencyNames>${cur}</web:currencyNames></web:GetExchangeRates></soap:Body></soap:Envelope>`;
+  const r = await fetch('https://www.mnb.hu/arfolyamok.asmx', { method: 'POST', headers: { 'Content-Type': 'text/xml; charset=utf-8', SOAPAction: '"http://www.mnb.hu/webservices/MNBArfolyamServiceSoap/GetExchangeRates"' }, body });
+  if (!r.ok) throw new Error('MNB HTTP ' + r.status);
+  const x = (await r.text()).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  const st = []; let n = 0;
+  for (const m of x.matchAll(/<Day date="(\d{4}-\d{2}-\d{2})">([\s\S]*?)<\/Day>/g)) {
+    const rm = new RegExp(`<Rate unit="(\\d+)" curr="${cur}">([\\d.,]+)<\\/Rate>`).exec(m[2]);
+    if (!rm) continue;
+    const rate = Number(rm[2].replace(/\./g, '').replace(',', '.')) / (Number(rm[1]) || 1);
+    if (!(rate > 0)) continue;
+    map[m[1]] = rate; n++;
+    st.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_fx (cur, date, rate) VALUES (?, ?, ?)`).bind(key, m[1], rate));
+  }
+  for (let i = 0; i < st.length; i += 80) await env.DB.batch(st.slice(i, i + 80));
+  if (!n) throw new Error('MNB: nincs árfolyam');
+  return map;
+}
 export async function fxRates(env, cur, from, to) {
   if (cur === 'HUF') return {};
+  try { const m = await mnbRates(env, cur, from, to); if (Object.keys(m).length) return m; } catch (e) { /* MNB nem elérhető → EKB tartalék */ }
   const have = (await env.DB.prepare(`SELECT date, rate FROM fin_fx WHERE cur = ? AND date BETWEEN ? AND ?`).bind(cur, addDays(from, -7), to).all()).results;
   const map = Object.fromEntries(have.map((r) => [r.date, r.rate]));
   const has = (day) => Object.keys(map).some((d) => d <= day && d >= addDays(day, -5));
@@ -605,7 +633,18 @@ export async function fillFx(env) {
     }
   }
   for (let i = 0; i < st.length; i += 80) await env.DB.batch(st.slice(i, i + 80));
+  await fillSplitChildren(env);
   return missing;
+}
+/** Az összes devizás tétel újraszámolása (MNB középárfolyam a fizetés napján); a kártyás forintösszeg-alapú tételek maradnak. */
+export async function refxAll(env) {
+  await env.DB.prepare(`UPDATE fin_tx SET amount_huf = NULL, fx = NULL WHERE currency != 'HUF' AND (memo IS NULL OR memo NOT LIKE '% HUF V_s_rl_s%')`).run();
+  return fillFx(env);
+}
+async function fillSplitChildren(env) {
+  await env.DB.prepare(`UPDATE fin_tx SET fx = (SELECT p.fx FROM fin_tx p WHERE p.id = fin_tx.parent_id),
+    amount_huf = ROUND((SELECT p.amount_huf * 1.0 / p.amount FROM fin_tx p WHERE p.id = fin_tx.parent_id) * amount, 2)
+    WHERE parent_id IS NOT NULL AND amount_huf IS NULL AND (SELECT p.amount_huf FROM fin_tx p WHERE p.id = fin_tx.parent_id) IS NOT NULL`).run();
 }
 
 /* ============================== import ============================== */
