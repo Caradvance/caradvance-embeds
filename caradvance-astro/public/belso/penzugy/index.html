@@ -214,6 +214,7 @@ function render() {
     + tabBtn('dash', 'Áttekintés') + tabBtn('pl', 'Eredménykimutatás') + tabBtn('stat', 'Statisztika') + tabBtn('tx', 'Tételek', unc + nol ? '<span class="cnt" title="besorolásra vár / üzletág nélkül">' + (unc + nol) + '</span>' : '')
     + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('cars', 'Autók') + tabBtn('crm', 'Ügyletek') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
   $$('.tabs button').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; render(); }; });
+  (function () { var hh = 0; $$('header').forEach(function (h) { var p = getComputedStyle(h).position; if (p === 'sticky' || p === 'fixed') hh = Math.max(hh, h.getBoundingClientRect().height); }); $('.tabs').style.top = (hh + 8) + 'px'; })(); // a rögzített fülsor az admin fejléce alatt
   $('#pFrom').onchange = $('#pTo').onchange = function () { S.from = $('#pFrom').value || S.from; S.to = $('#pTo').value || S.to; if (S.from > S.to) S.to = S.from; reload(); };
   $$('[data-pre]').forEach(function (b) {
     b.onclick = function () {
