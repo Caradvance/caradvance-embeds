@@ -18,7 +18,7 @@
 import {
   json, ensureFin, clean, isDate, addDays, normSplit, nowIso, importRows, applyRules, autoMatch, suggestDocs, saveFile, loadFile,
   pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs, genRecurring,
-  normPlate, splitTx, unsplitTx, refxAll
+  normPlate, splitTx, unsplitTx, refxAll, listRentals, payRental, unpayRental
 } from '../../../lib/penzugy.js';
 
 async function staffUser(request, env) {
@@ -92,6 +92,27 @@ export async function onRequest(context) {
       let removed = 0;
       if (body.remove_future) { const now = new Date().toISOString().slice(0, 7); removed = (await DB.prepare(`DELETE FROM fin_tx WHERE uid LIKE ? AND substr(bdate, 1, 7) > ?`).bind(`rec-${Number(p1)}-%`, now).run()).meta.changes; }
       return json({ ok: true, removed });
+    }
+    /* ---------- bérlések ---------- */
+    if (m === 'GET' && p0 === 'rentals') return json({ rentals: await listRentals(env) });
+    if (m === 'POST' && p0 === 'rentals' && !p1) {
+      const renter = clean(body.renter, 160), start = isDate(body.start_date) ? body.start_date : null, amount = Math.abs(num(body.amount));
+      if (!renter || !start || !amount) return json({ error: 'Bérlő, kezdő nap és havi díj kötelező.' }, 400);
+      const vals = [renter, clean(body.co_renter, 160), clean(body.contact, 300), clean(body.car, 120), normPlate(body.plate), clean(body.contract_no, 60), Number(body.doc_id) || null, start,
+        Math.max(1, Math.min(120, Math.round(num(body.months) || 1))), amount, /^[A-Z]{3}$/.test(body.currency || '') ? body.currency : 'EUR', vatOk(body.vat), body.pay_method === 'transfer' ? 'transfer' : 'cash',
+        num(body.deposit) || null, clean(body.note, 600), body.status === 'ended' ? 'ended' : 'active', who];
+      let id = Number(body.id) || null;
+      if (id) await DB.prepare(`UPDATE fin_rentals SET renter = ?, co_renter = ?, contact = ?, car = ?, plate = ?, contract_no = ?, doc_id = ?, start_date = ?, months = ?, amount = ?, currency = ?, vat = ?, pay_method = ?, deposit = ?, note = ?, status = ?, updated_by = ? WHERE id = ?`).bind(...vals, id).run();
+      else id = (await DB.prepare(`INSERT INTO fin_rentals (renter, co_renter, contact, car, plate, contract_no, doc_id, start_date, months, amount, currency, vat, pay_method, deposit, note, status, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals).run()).meta.last_row_id;
+      return json({ id });
+    }
+    if (m === 'POST' && p0 === 'rentals' && p1 && p2 === 'pay') {
+      try { return json({ ok: true, tx_id: await payRental(env, Number(p1), Number(body.seq), body, who) }); } catch (e) { return json({ error: e.message }, 400); }
+    }
+    if (m === 'POST' && p0 === 'rentals' && p1 && p2 === 'unpay') return json({ ok: true, removed: await unpayRental(env, Number(p1), Number(body.seq)) });
+    if (m === 'POST' && p0 === 'rentals' && p1 && p2 === 'delete') {
+      if ((await DB.prepare(`SELECT COUNT(*) AS n FROM fin_tx WHERE rental_id = ?`).bind(Number(p1)).first()).n) return json({ error: 'Van már könyvelt díja – előbb vond vissza a fizetéseket, vagy állítsd „lezárt”-ra.' }, 400);
+      await DB.prepare(`DELETE FROM fin_rentals WHERE id = ?`).bind(Number(p1)).run(); return json({ ok: true });
     }
     if (m === 'POST' && p0 === 'recurring' && !p1) {
       const name = clean(body.name, 120), amount = num(body.amount);

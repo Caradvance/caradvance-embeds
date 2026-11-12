@@ -58,6 +58,11 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .pl tr.memo td{color:var(--mut)}
 .pl td.c{cursor:pointer}.pl td.c:hover{background:#EEF4FF;text-decoration:underline}
 .pl tr.hide{display:none}
+.rmonths{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:14px}
+.rm{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:4px;background:#fff;font-size:12.5px}
+.rm-h{display:flex;justify-content:space-between;gap:6px}.rm-h span{color:var(--mut)}.rm-s{font-weight:700}.rm-v{font-variant-numeric:tabular-nums}
+.rm.paid{background:#ECFDF3;border-color:#ABEFC6}.rm.paid .rm-s{color:#067647}.rm.due{background:#FEF3F2;border-color:#FECDCA}.rm.due .rm-s{color:#B42318}.rm.future .rm-s{color:var(--mut)}
+.rm .btn{align-self:flex-start;margin-top:2px}.rm .lnk{border:0;background:none;padding:0;color:var(--mut);font-size:11.5px;text-decoration:underline;cursor:pointer;align-self:flex-start}
 .pl th.totc,.pl td.totc{position:sticky;right:0;z-index:1;background:#EEF3FA;font-weight:800;border-left:2px solid #CFDAEA;min-width:118px;box-shadow:-6px 0 10px -6px rgba(15,23,42,.12)}
 .pl th.totc{color:var(--ink);background:#E3EBF6}.pl tr.sub td.totc{background:#E3EBF6}.pl tr.kpi2 td.totc{background:#DCE5F2}.pl tr.uncat td.totc{background:#FCEFC7}
 .pl tr.car td.totc{background:#F0F4FA;font-weight:700}.pl tr.memo td.totc{background:#F3F6FB}.pl tr.sec td.totc{background:transparent}
@@ -222,7 +227,7 @@ function render() {
     + '<span class="small muted">' + (S.meta.stats.n || 0) + ' tétel összesen · utolsó: ' + hd(S.meta.stats.max) + '</span></div>'
     + '<div class="tabs">'
     + tabBtn('dash', 'Áttekintés') + tabBtn('pl', 'Eredménykimutatás') + tabBtn('stat', 'Statisztika') + tabBtn('tx', 'Tételek', unc + nol ? '<span class="cnt" title="besorolásra vár / üzletág nélkül">' + (unc + nol) + '</span>' : '')
-    + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('cars', 'Autók') + tabBtn('crm', 'Ügyletek') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
+    + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('rent', 'Bérlések') + tabBtn('cars', 'Autók') + tabBtn('crm', 'Ügyletek') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
   $$('.tabs button').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; render(); }; });
   (function () { var hh = 0; $$('header').forEach(function (h) { var p = getComputedStyle(h).position; if (p === 'sticky' || p === 'fixed') hh = Math.max(hh, h.getBoundingClientRect().height); }); $('.tabs').style.top = (hh + 8) + 'px'; })(); // a rögzített fülsor az admin fejléce alatt
   $('#pFrom').onchange = $('#pTo').onchange = function () { S.from = $('#pFrom').value || S.from; S.to = $('#pTo').value || S.to; if (S.from > S.to) S.to = S.from; reload(); };
@@ -235,7 +240,7 @@ function render() {
       reload();
     };
   });
-  ({ dash: renderDash, stat: renderStat, pl: renderPL, tx: renderTx, docs: renderDocs, cars: renderCars, crm: function () { window.CA_renderUgyletek(document.getElementById('tab'), S.from, S.to); }, imp: renderImp, set: renderSet })[S.tab]();
+  ({ dash: renderDash, stat: renderStat, pl: renderPL, tx: renderTx, docs: renderDocs, cars: renderCars, rent: renderRent, crm: function () { window.CA_renderUgyletek(document.getElementById('tab'), S.from, S.to); }, imp: renderImp, set: renderSet })[S.tab]();
 }
 function tabBtn(k, t, extra) { return '<button data-t="' + k + '" class="' + (S.tab === k ? 'on' : '') + '">' + t + (extra || '') + '</button>'; }
 
@@ -822,6 +827,83 @@ function renderStat() {
   bindLine($('#sLine'), months, series);
   bindBasis(renderStat);
   $$('.hbars .hb.clk').forEach(function (el, i) { el.onclick = function () { var name = catKeys[i], c = S.meta.cats.filter(function (x) { return x.name === name; })[0]; S.tab = 'tx'; S.f.cat = c ? String(c.id) : ''; S.f.st = c ? 'all' : 'uncat'; render(); }; });
+}
+
+/* =================== BÉRLÉSEK (bérlők, havi díjak, „fizetve” pipa → pénzügy) =================== */
+function renderRent() {
+  var el = document.getElementById('tab');
+  el.innerHTML = '<div class="card"><p class="muted">Betöltés…</p></div>';
+  api('rentals').then(must).then(function (j) {
+    var today = todayIso(), act = j.rentals.filter(function (r) { return r.status === 'active'; }), ended = j.rentals.filter(function (r) { return r.status !== 'active'; });
+    var dueNow = 0; act.forEach(function (r) { r.schedule.forEach(function (s) { if (!s.paid && s.due <= today) dueNow++; }); });
+    el.innerHTML = '<div class="card"><div class="row"><h2 style="margin:0">Bérlések</h2><span class="small muted">Aktív bérlők és havi díjaik. A „Fizetve” pipával a díj automatikusan bekerül a pénzügybe (bevétel, Bérlés üzletág, rendszám, MNB középárfolyam a fizetés napján, a bérleti hónap napjai szerint elosztva).</span><span class="sp"></span>'
+      + (dueNow ? '<span class="badge warn">' + dueNow + ' esedékes díj</span>' : '') + '<button class="btn sm red" id="rNewR">+ Új bérlés</button></div></div>'
+      + (act.length ? act.map(rentCard).join('') : '<div class="card"><p class="muted">Nincs aktív bérlés.</p></div>')
+      + (ended.length ? '<div class="card"><h2>Lezárt bérlések</h2>' + ended.map(function (r) { return '<div class="row" style="padding:6px 0;border-top:1px solid var(--line)"><b>' + esc(r.renter) + '</b>' + plateChip(r.plate) + '<span class="small muted">' + hd(r.start_date) + ' · ' + r.months + ' hó · ' + money(r.amount, r.currency) + '/hó · ' + r.schedule.filter(function (s) { return s.paid; }).length + ' fizetett hónap</span><span class="sp"></span><button class="btn sm ghost" data-redit="' + r.id + '">Megnyitás</button></div>'; }).join('') + '</div>' : '');
+    $('#rNewR').onclick = function () { rentForm(null); };
+    $$('[data-redit]').forEach(function (b) { b.onclick = function () { rentForm(j.rentals.filter(function (r) { return r.id === Number(b.dataset.redit); })[0]); }; });
+    $$('[data-rpay]').forEach(function (b) { b.onclick = function () { var p = b.dataset.rpay.split(':'), r = j.rentals.filter(function (x) { return x.id === Number(p[0]); })[0]; rentPay(r, r.schedule[Number(p[1]) - 1]); }; });
+    $$('[data-runpay]').forEach(function (b) { b.onclick = function () { var p = b.dataset.runpay.split(':'); if (!confirm('Visszavonod ezt a fizetést? A pénzügyi tétel törlődik (átutalásnál csak a párosítás bomlik).')) return; api('rentals/' + p[0] + '/unpay', { seq: Number(p[1]) }).then(must).then(function () { toast('Visszavonva'); reloadKeep(); }); }; });
+  });
+  function reloadKeep() { reload(); }
+  function rentCard(r) {
+    var today = todayIso(), paid = r.schedule.filter(function (s) { return s.paid; }), huf = paid.reduce(function (a, s) { return a + (Number(s.paid.amount_huf) || 0); }, 0);
+    var open = r.schedule.filter(function (s) { return !s.paid && s.due <= today; }), last = r.schedule[r.schedule.length - 1];
+    return '<div class="card rent"><div class="row" style="align-items:flex-start"><div><div style="font-size:17px;font-weight:800">' + esc(r.renter) + (r.co_renter ? ' <span class="small muted" style="font-weight:500">· bérlőtárs: ' + esc(r.co_renter) + '</span>' : '') + '</div>'
+      + '<div class="small" style="margin-top:3px">' + plateChip(r.plate) + ' ' + esc(r.car || vehName(r.plate)) + '</div>'
+      + '<div class="small muted" style="margin-top:3px">' + (r.contract_no ? 'Szerződés: <b>' + esc(r.contract_no) + '</b>' + (r.doc_id && r.doc_file ? ' · <a target="_blank" href="' + A + 'docs/' + r.doc_id + '/file">megnyitás</a>' : '') + ' · ' : '') + hd(r.start_date) + ' – ' + hd(last.to) + ' · ' + r.months + ' hónap · ' + (r.pay_method === 'transfer' ? 'átutalás' : 'készpénz') + (r.vat ? ' · ÁFA ' + r.vat + '%' : ' · ÁFA nélkül') + (r.deposit ? ' · óvadék ' + money(r.deposit, r.currency) : '') + (r.contact ? ' · ' + esc(r.contact) : '') + '</div></div>'
+      + '<span class="sp"></span><div style="text-align:right"><div style="font-size:20px;font-weight:800">' + money(r.amount, r.currency) + '<span class="small muted" style="font-weight:500"> / hó</span></div><div class="small muted">' + paid.length + '/' + r.months + ' fizetve · ' + ft(huf) + ' Ft befolyt' + (open.length ? ' · <b class="neg">' + open.length + ' esedékes</b>' : '') + '</div><button class="btn sm ghost" data-redit="' + r.id + '" style="margin-top:6px">Szerkesztés</button></div></div>'
+      + '<div class="rmonths">' + r.schedule.map(function (s) {
+        var st = s.paid ? 'paid' : s.due <= today ? 'due' : 'future';
+        return '<div class="rm ' + st + '"><div class="rm-h"><b>' + s.seq + '. hónap</b><span>' + hd(s.from).slice(5) + ' – ' + hd(s.to).slice(5) + '</span></div>'
+          + (s.paid ? '<div class="rm-s">✓ Fizetve ' + hd(s.paid.bdate).slice(5) + '</div><div class="rm-v">' + money(s.paid.amount, s.paid.currency) + (s.paid.currency !== 'HUF' && s.paid.amount_huf ? '<br><span class="muted">' + ft(s.paid.amount_huf) + ' Ft · ' + String(s.paid.fx || '').replace('.', ',') + '</span>' : '') + '</div><button class="lnk" data-runpay="' + r.id + ':' + s.seq + '">visszavonás</button>'
+            : '<div class="rm-s">' + (st === 'due' ? 'Esedékes ' : 'Várható ') + hd(s.due).slice(5) + '</div><div class="rm-v">' + money(r.amount, r.currency) + '</div><button class="btn sm ' + (st === 'due' ? 'red' : 'ghost') + '" data-rpay="' + r.id + ':' + s.seq + '">✓ Fizetve</button>') + '</div>';
+      }).join('') + '</div></div>';
+  }
+}
+function rentPay(r, s) {
+  var today = todayIso(), def = s.due <= today ? s.due : today;
+  var m = modal('<h2>Fizetve: ' + esc(r.renter) + ' · ' + s.seq + '. hónap</h2><p class="small muted">' + plateChip(r.plate) + ' ' + hd(s.from) + ' – ' + hd(s.to) + ' · esedékes ' + hd(s.due) + '</p>'
+    + '<div class="row" style="gap:16px;margin:8px 0"><label><input type="radio" name="pm" value="cash"' + (r.pay_method !== 'transfer' ? ' checked' : '') + '> Készpénz (Házipénztár)</label><label><input type="radio" name="pm" value="transfer"' + (r.pay_method === 'transfer' ? ' checked' : '') + '> Átutalás – banki jóváírás párosítása</label></div>'
+    + '<div id="pmCash" class="grid"><label class="f">Fizetés napja<input class="in" type="date" id="pDate" value="' + def + '"></label><label class="f">Összeg<input class="in" type="number" step="0.01" id="pAmt" value="' + r.amount + '"></label><label class="f">Deviza<select class="in" id="pCur"><option' + (r.currency === 'EUR' ? ' selected' : '') + '>EUR</option><option' + (r.currency === 'HUF' ? ' selected' : '') + '>HUF</option></select></label><label class="f" style="grid-column:1/-1">Megjegyzés<input class="in" id="pNote" placeholder="pl. átvételi elismervény száma"></label></div>'
+    + '<div id="pmTr" style="display:none"><p class="small muted">Válaszd ki a bankszámlán megjelent jóváírást (esedékesség −15 / +45 nap):</p><div id="pmList" class="small muted">Betöltés…</div></div>'
+    + '<p class="small muted">Deviza esetén a forintérték az MNB középárfolyama a fizetés napján. Bevétel · Autóbérlés · Bérlés üzletág · ' + esc(r.plate || '') + ' · a bérleti hónap napjai szerint elosztva.</p>'
+    + '<div class="row" style="margin-top:12px"><button class="btn red" id="pSave">Fizetve – könyvelés</button></div>', true);
+  var pick = null;
+  function mode() { var v = $('input[name=pm]:checked', m).value; $('#pmCash', m).style.display = v === 'cash' ? '' : 'none'; $('#pmTr', m).style.display = v === 'transfer' ? '' : 'none'; if (v === 'transfer') loadTr(); }
+  function loadTr() {
+    var from = addD(s.due, -15), to = addD(s.due, 45);
+    api('tx?from=' + from + '&to=' + to).then(must).then(function (j) {
+      var c = j.tx.filter(function (t) { return Number(t.amount) > 0 && !t.rental_id && !t.is_split; }).sort(function (a, b) { return Math.abs(Number(a.amount) - r.amount) - Math.abs(Number(b.amount) - r.amount); });
+      $('#pmList', m).innerHTML = c.length ? '<table class="tx"><tbody>' + c.slice(0, 25).map(function (t) { return '<tr data-pt="' + t.id + '"><td>' + hd(t.bdate) + '</td><td><div class="p">' + esc(t.partner || t.ttype) + '</div><div class="m">' + esc((t.memo || '').slice(0, 70)) + ' · ' + esc(t.account_name || '') + '</div></td><td class="n pos">' + money(t.amount, t.currency) + '</td></tr>'; }).join('') + '</tbody></table>' : 'Nincs párosítatlan jóváírás ebben az időszakban (importáld a bankszámlakivonatot, vagy rögzítsd készpénzként).';
+      $$('[data-pt]', m).forEach(function (tr) { tr.onclick = function () { $$('[data-pt]', m).forEach(function (x) { x.style.background = ''; }); tr.style.background = '#EEF4FF'; pick = Number(tr.dataset.pt); }; });
+    });
+  }
+  function addD(d, n) { var t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); }
+  $$('input[name=pm]', m).forEach(function (x) { x.onchange = mode; }); mode();
+  $('#pSave', m).onclick = function () {
+    var v = $('input[name=pm]:checked', m).value, body = { seq: s.seq };
+    if (v === 'transfer') { if (!pick) return toast('Válassz egy jóváírást.'); body.tx_id = pick; }
+    else { body.date = $('#pDate', m).value; body.amount = Number($('#pAmt', m).value); body.currency = $('#pCur', m).value; body.note = $('#pNote', m).value; }
+    api('rentals/' + r.id + '/pay', body).then(must).then(function () { m.remove(); toast('Fizetve – könyvelve a pénzügybe'); reload(); });
+  };
+}
+function rentForm(r) {
+  r = r || { renter: '', co_renter: '', contact: '', car: '', plate: '', contract_no: '', doc_id: null, start_date: todayIso(), months: 1, amount: '', currency: 'EUR', vat: 0, pay_method: 'cash', deposit: '', note: '', status: 'active' };
+  var docs = S.docs.slice().sort(function (a, b) { return String(b.issue_date).localeCompare(String(a.issue_date)); });
+  var m = modal('<h2>' + (r.id ? 'Bérlés szerkesztése' : 'Új bérlés') + '</h2>' + plateList()
+    + '<div class="grid"><label class="f">Bérlő<input class="in" id="fRenter" value="' + esc(r.renter) + '"></label><label class="f">Bérlőtárs<input class="in" id="fCo" value="' + esc(r.co_renter || '') + '"></label><label class="f">Kapcsolat (tel., e-mail)<input class="in" id="fContact" value="' + esc(r.contact || '') + '"></label>'
+    + '<label class="f">Autó<input class="in" id="fCar" value="' + esc(r.car || '') + '"></label><label class="f">Rendszám<input class="in" id="fPlate" list="plList" value="' + esc(r.plate || '') + '"></label><label class="f">Szerződésszám<input class="in" id="fNo" value="' + esc(r.contract_no || '') + '"></label>'
+    + '<label class="f">Bérlés kezdete (átadás)<input class="in" type="date" id="fStart" value="' + esc(r.start_date) + '"></label><label class="f">Időtartam (hónap)<input class="in" type="number" min="1" max="120" id="fMonths" value="' + r.months + '"></label><label class="f">Havi díj<input class="in" type="number" step="0.01" id="fAmt" value="' + esc(r.amount) + '"></label>'
+    + '<label class="f">Deviza<select class="in" id="fCur"><option' + (r.currency === 'EUR' ? ' selected' : '') + '>EUR</option><option' + (r.currency === 'HUF' ? ' selected' : '') + '>HUF</option></select></label><label class="f">ÁFA<select class="in" id="fVat"><option value="0"' + (!r.vat ? ' selected' : '') + '>0% / nincs</option><option value="27"' + (r.vat === 27 ? ' selected' : '') + '>27%</option></select></label><label class="f">Fizetés módja<select class="in" id="fPm"><option value="cash"' + (r.pay_method !== 'transfer' ? ' selected' : '') + '>készpénz</option><option value="transfer"' + (r.pay_method === 'transfer' ? ' selected' : '') + '>átutalás</option></select></label>'
+    + '<label class="f">Óvadék<input class="in" type="number" step="0.01" id="fDep" value="' + esc(r.deposit || '') + '"></label><label class="f" style="grid-column:span 2">Szerződés (bizonylat)<select class="in" id="fDoc"><option value="">—</option>' + docs.map(function (d) { return '<option value="' + d.id + '"' + (d.id === r.doc_id ? ' selected' : '') + '>' + esc((d.number || '') + ' · ' + (d.partner || '').slice(0, 30) + ' · ' + hd(d.issue_date)) + '</option>'; }).join('') + '</select></label>'
+    + '<label class="f" style="grid-column:1/-1">Megjegyzés<input class="in" id="fNote" value="' + esc(r.note || '') + '"></label><label class="f">Állapot<select class="in" id="fSt"><option value="active">aktív</option><option value="ended"' + (r.status === 'ended' ? ' selected' : '') + '>lezárt</option></select></label></div>'
+    + '<div class="row" style="margin-top:14px"><button class="btn red" id="fSave">Mentés</button>' + (r.id ? '<button class="btn ghost" id="fDel">Törlés</button>' : '') + '</div>', true);
+  $('#fSave', m).onclick = function () {
+    var b = { id: r.id || null, renter: $('#fRenter', m).value, co_renter: $('#fCo', m).value, contact: $('#fContact', m).value, car: $('#fCar', m).value, plate: $('#fPlate', m).value, contract_no: $('#fNo', m).value, doc_id: Number($('#fDoc', m).value) || null, start_date: $('#fStart', m).value, months: Number($('#fMonths', m).value), amount: Number($('#fAmt', m).value), currency: $('#fCur', m).value, vat: Number($('#fVat', m).value), pay_method: $('#fPm', m).value, deposit: Number($('#fDep', m).value) || null, note: $('#fNote', m).value, status: $('#fSt', m).value };
+    api('rentals', b).then(must).then(function () { m.remove(); toast('Mentve'); renderRent(); });
+  };
+  if ($('#fDel', m)) $('#fDel', m).onclick = function () { if (confirm('Törlöd ezt a bérlést?')) api('rentals/' + r.id + '/delete', {}).then(must).then(function () { m.remove(); toast('Törölve'); renderRent(); }); };
 }
 
 /* =================== AUTÓK =================== */
