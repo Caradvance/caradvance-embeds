@@ -133,6 +133,16 @@ export function accrualParts(t) {
   for (let k = 0; k < n; k++) { acc[ym] = (acc[ym] || 0) + first / n; if (first < 1) acc[next(ym)] = (acc[next(ym)] || 0) + (1 - first) / n; ym = next(ym); }
   return Object.entries(acc).map(([m, f]) => ({ m, f }));
 }
+/* ---- Pénzügyi kezdőnap: ennél korábbi tétel nem kerül be (import, ismétlődő, kimutatás) – Marc: 2026-07-01 ---- */
+export const FIN_START_DEFAULT = '2026-07-01';
+export async function finStart(env) { const v = await getSetting(env, 'fin_start', FIN_START_DEFAULT); return isDate(v) ? v : FIN_START_DEFAULT; }
+export async function purgeBefore(env) {
+  const st = await finStart(env);
+  const n = (await env.DB.prepare(`DELETE FROM fin_tx WHERE bdate < ?`).bind(st).run()).meta.changes;
+  await env.DB.prepare(`UPDATE fin_recurring SET start = ? WHERE start < ?`).bind(st.slice(0, 7), st.slice(0, 7)).run();
+  return n;
+}
+
 /* ---- Bérlések: bérlőnként havi díjütemezés; a „fizetve” pipa a pénzügybe könyvel (időarányos elhatárolással) ---- */
 export function addMonthsKeepDay(date, n) { // 2026-09-23 + 1 → 2026-10-23 (hónap végén: az utolsó nap)
   const [y, m, d] = date.split('-').map(Number), t = new Date(Date.UTC(y, m - 1 + n, 1)), last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
@@ -450,7 +460,7 @@ export async function deleteTxs(env, ids, who) {
 export async function genRecurring(env) {
   const recs = (await env.DB.prepare(`SELECT * FROM fin_recurring WHERE active = 1`).all()).results;
   if (!recs.length) return 0;
-  const now = new Date(), cur = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`, today = now.toISOString().slice(0, 10);
+  const now = new Date(), cur = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`, today = now.toISOString().slice(0, 10), startDay = await finStart(env);
   const del = new Set((await env.DB.prepare(`SELECT uid FROM fin_deleted WHERE uid LIKE 'rec-%'`).all()).results.map((r) => r.uid));
   const acc = await env.DB.prepare(`SELECT id FROM fin_accounts WHERE ext_id = 'CASH'`).first();
   const st = [];
@@ -459,7 +469,7 @@ export async function genRecurring(env) {
     for (let ym = r.start; ym <= last;) {
       const uid = `rec-${r.id}-${ym}`;
       const day = String(Math.min(28, Math.max(1, r.day || 1))).padStart(2, '0');
-      if (!del.has(uid) && `${ym}-${day}` <= today) { // csak a már esedékes (múltbeli / mai) hónapok – pénzforgalmi szemlélet
+      if (!del.has(uid) && `${ym}-${day}` <= today && `${ym}-${day}` >= startDay) { // csak a már esedékes (múltbeli / mai) hónapok – pénzforgalmi szemlélet
         st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, plate, period_from, period_months, updated_by)
           VALUES (?, ?, 'manual', ?, ?, 'Ismétlődő tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, 'ismétlődő')`)
           .bind(uid, acc ? acc.id : null, `${ym}-${day}`, `${ym}-${day}`, r.amount, r.currency, r.currency === 'HUF' ? 1 : null, r.currency === 'HUF' ? r.amount : null,
@@ -777,8 +787,10 @@ export async function importRows(env, account, rows, who) {
   const block = await loadBlock(env);
   const parsed = rows.map(parseBankRow);
   const bRefs = new Set(parsed.filter((t) => t.bank_ref && isBlocked(block, t)).map((t) => t.bank_ref));
+  const startDay = await finStart(env);
   for (const t of parsed) {
     if (!t.bdate || !isFinite(t.amount) || t.amount === 0) { bad++; continue; }
+    if (t.bdate < startDay) { blocked++; continue; } // a pénzügyi kezdőnap előtti tétel nem kerül be
     if (isBlocked(block, t) || (t.bank_ref && bRefs.has(t.bank_ref))) { blocked++; continue; }
     const base = [acc.id, t.bdate, t.vdate, t.bank_ref, t.amount, t.ttype, t.raw].join('|');
     seen[base] = (seen[base] || 0) + 1;
@@ -823,6 +835,7 @@ export function txValues(tx, cat, doc) {
 
 /* ============================== P&L ============================== */
 export async function pnl(env, from, to) {
+  const sd = await finStart(env); if (from < sd) from = sd; if (to < from) to = from;
   const [lines, cats, alloc] = await Promise.all([
     env.DB.prepare(`SELECT * FROM fin_lines ORDER BY sort, id`).all().then((r) => r.results),
     env.DB.prepare(`SELECT * FROM fin_cats ORDER BY sort, id`).all().then((r) => r.results),

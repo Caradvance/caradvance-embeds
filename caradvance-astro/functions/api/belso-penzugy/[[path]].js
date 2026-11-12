@@ -18,7 +18,7 @@
 import {
   json, ensureFin, clean, isDate, addDays, normSplit, nowIso, importRows, applyRules, autoMatch, suggestDocs, saveFile, loadFile,
   pnl, getSetting, setSetting, navConfigured, navSync, fillFx, norm, subjectOf, loadBlock, purgeBlocked, deleteTxs, genRecurring,
-  normPlate, splitTx, unsplitTx, refxAll, listRentals, payRental, unpayRental
+  normPlate, splitTx, unsplitTx, refxAll, listRentals, payRental, unpayRental, finStart, purgeBefore
 } from '../../../lib/penzugy.js';
 
 async function staffUser(request, env) {
@@ -81,7 +81,7 @@ export async function onRequest(context) {
         getSetting(env, 'vehicles', {})
       ]);
       const block = (await loadBlock(env)).map((b) => ({ id: b.id, name: b.name, pattern: b.pattern, created_at: b.created_at }));
-      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, block, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats, vehicles });
+      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, block, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats, vehicles, fin_start: await finStart(env) });
     }
 
     /* ---------- P&L ---------- */
@@ -369,6 +369,10 @@ export async function onRequest(context) {
     }
     if (m === 'POST' && p0 === 'fx' && p1 === 'fill') return json({ missing: await fillFx(env) });
     if (m === 'POST' && p0 === 'fx' && p1 === 'mnb') return json({ missing: await refxAll(env) }); // minden devizás tétel újraszámolása MNB középárfolyammal
+    if (m === 'POST' && p0 === 'fin-start') { // pénzügyi kezdőnap beállítása; az előtte lévő tételek törlődnek
+      if (isDate(body.date)) await setSetting(env, 'fin_start', body.date);
+      return json({ ok: true, start: await finStart(env), removed: await purgeBefore(env) });
+    }
     if (m === 'GET' && p0 === 'fx' && p1 === 'status') return json({ err: await getSetting(env, 'fx_mnb_err', null), mnb: (await DB.prepare(`SELECT cur, COUNT(*) AS n, MIN(date) AS min, MAX(date) AS max FROM fin_fx WHERE cur LIKE '%@MNB' GROUP BY cur`).all()).results });
     if (m === 'POST' && p0 === 'fx' && p1 === 'rates') { // MNB-árfolyamok kézi betöltése (pl. ha az MNB szolgáltatás nem érhető el a szerverről): { cur, rates: { 'YYYY-MM-DD': rate } }
       const cur = /^[A-Z]{3}$/.test(body.cur || '') ? body.cur : null; if (!cur) return json({ error: 'cur' }, 400);

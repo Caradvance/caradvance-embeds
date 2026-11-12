@@ -195,7 +195,11 @@ function initPeriod() {
   var to = todayIso().slice(0, 7);
   var from = st.min && st.min.slice(0, 4) === String(y) ? st.min.slice(0, 7) : y + '-01';
   if (st.max && st.max.slice(0, 7) > to) to = st.max.slice(0, 7);
-  S.from = from; S.to = to;
+  S.from = from; S.to = to; clampPeriod();
+}
+function clampPeriod() { // a pénzügyi kezdőnap (2026.07.01.) előtti hónap nem választható
+  var sm = String(S.meta.fin_start || '').slice(0, 7); if (!sm) return;
+  if (S.from < sm) S.from = sm; if (S.to < S.from) S.to = S.from;
 }
 function boot() {
   api('meta').then(function (j) {
@@ -222,7 +226,7 @@ function render() {
   var miss = S.tx.filter(needsDoc).length;
   var presets = [['ytd', 'Idei év'], ['3m', 'Elmúlt 3 hónap'], ['12m', 'Elmúlt 12 hónap'], ['py', 'Előző év']];
   app.innerHTML = '<div class="row" style="margin:4px 0 2px">'
-    + '<label class="small muted">Időszak</label><input class="in" type="month" id="pFrom" value="' + S.from + '"><span class="muted">–</span><input class="in" type="month" id="pTo" value="' + S.to + '">'
+    + '<label class="small muted">Időszak</label><input class="in" type="month" id="pFrom" min="' + String(S.meta.fin_start || '').slice(0, 7) + '" value="' + S.from + '"><span class="muted">–</span><input class="in" type="month" id="pTo" value="' + S.to + '">'
     + presets.map(function (p) { return '<button class="btn sm ghost" data-pre="' + p[0] + '">' + p[1] + '</button>'; }).join('') + '<span class="sp"></span>'
     + '<span class="small muted">' + (S.meta.stats.n || 0) + ' tétel összesen · utolsó: ' + hd(S.meta.stats.max) + '</span></div>'
     + '<div class="tabs">'
@@ -230,14 +234,14 @@ function render() {
     + tabBtn('docs', 'Bizonylatok', miss ? '<span class="cnt grey">' + miss + '</span>' : '') + tabBtn('rent', 'Bérlések') + tabBtn('cars', 'Autók') + tabBtn('crm', 'Ügyletek') + tabBtn('imp', 'Import') + tabBtn('set', 'Beállítások') + '</div><div id="tab"></div>';
   $$('.tabs button').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; render(); }; });
   (function () { var hh = 0; $$('header').forEach(function (h) { var p = getComputedStyle(h).position; if (p === 'sticky' || p === 'fixed') hh = Math.max(hh, h.getBoundingClientRect().height); }); $('.tabs').style.top = (hh + 8) + 'px'; })(); // a rögzített fülsor az admin fejléce alatt
-  $('#pFrom').onchange = $('#pTo').onchange = function () { S.from = $('#pFrom').value || S.from; S.to = $('#pTo').value || S.to; if (S.from > S.to) S.to = S.from; reload(); };
+  $('#pFrom').onchange = $('#pTo').onchange = function () { S.from = $('#pFrom').value || S.from; S.to = $('#pTo').value || S.to; if (S.from > S.to) S.to = S.from; clampPeriod(); reload(); };
   $$('[data-pre]').forEach(function (b) {
     b.onclick = function () {
       var d = new Date(), y = d.getFullYear(), m = d.getMonth() + 1, ym = function (yy, mm) { while (mm < 1) { mm += 12; yy--; } return yy + '-' + String(mm).padStart(2, '0'); };
       var p = b.dataset.pre;
       if (p === 'ytd') { S.from = y + '-01'; S.to = ym(y, m); } else if (p === '3m') { S.from = ym(y, m - 2); S.to = ym(y, m); }
       else if (p === '12m') { S.from = ym(y, m - 11); S.to = ym(y, m); } else { S.from = (y - 1) + '-01'; S.to = (y - 1) + '-12'; }
-      reload();
+      clampPeriod(); reload();
     };
   });
   ({ dash: renderDash, stat: renderStat, pl: renderPL, tx: renderTx, docs: renderDocs, cars: renderCars, rent: renderRent, crm: function () { window.CA_renderUgyletek(document.getElementById('tab'), S.from, S.to); }, imp: renderImp, set: renderSet })[S.tab]();
