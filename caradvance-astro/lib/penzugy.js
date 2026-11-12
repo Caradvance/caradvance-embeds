@@ -565,19 +565,40 @@ async function mnbRates(env, cur, from, to) {
   const today = new Date().toISOString().slice(0, 10);
   const has = (day) => Object.keys(map).some((d) => d <= day && d >= addDays(day, -5));
   if (has(from) && (has(to) || to >= today && has(addDays(today, -1)))) return map;
-  const body = `<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.mnb.hu/webservices/"><soap:Body><web:GetExchangeRates><web:startDate>${addDays(from, -7)}</web:startDate><web:endDate>${to < today ? to : today}</web:endDate><web:currencyNames>${cur}</web:currencyNames></web:GetExchangeRates></soap:Body></soap:Envelope>`;
-  const r = await fetch(env.MNB_URL || 'https://www.mnb.hu/arfolyamok.asmx', { method: 'POST', headers: { 'Content-Type': 'text/xml; charset=utf-8', SOAPAction: '"http://www.mnb.hu/webservices/MNBArfolyamServiceSoap/GetExchangeRates"' }, body });
-  if (!r.ok) throw new Error('MNB HTTP ' + r.status + ' ' + (await r.text()).slice(0, 160));
-  const x = (await r.text()).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
-  const st = []; let n = 0;
-  for (const m of x.matchAll(/<Day date="(\d{4}-\d{2}-\d{2})">([\s\S]*?)<\/Day>/g)) {
-    const rm = new RegExp(`<Rate unit="(\\d+)" curr="${cur}">([\\d.,]+)<\\/Rate>`).exec(m[2]);
-    if (!rm) continue;
-    const rate = Number(rm[2].replace(/\./g, '').replace(',', '.')) / (Number(rm[1]) || 1);
-    if (!(rate > 0)) continue;
-    map[m[1]] = rate; n++;
-    st.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_fx (cur, date, rate) VALUES (?, ?, ?)`).bind(key, m[1], rate));
+  const d1 = addDays(from, -7), d2 = to < today ? to : today, found = {}, errs = [];
+  // 1) MNB SOAP webszolgáltatás
+  try {
+    const body = `<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.mnb.hu/webservices/"><soap:Body><web:GetExchangeRates><web:startDate>${d1}</web:startDate><web:endDate>${d2}</web:endDate><web:currencyNames>${cur}</web:currencyNames></web:GetExchangeRates></soap:Body></soap:Envelope>`;
+    const r = await fetch(env.MNB_URL || 'http://www.mnb.hu/arfolyamok.asmx', { method: 'POST', headers: { 'Content-Type': 'text/xml; charset=utf-8', SOAPAction: '"http://www.mnb.hu/webservices/MNBArfolyamServiceSoap/GetExchangeRates"' }, body });
+    if (!r.ok) throw new Error('SOAP HTTP ' + r.status);
+    const x = (await r.text()).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    for (const m of x.matchAll(/<Day date="(\d{4}-\d{2}-\d{2})">([\s\S]*?)<\/Day>/g)) {
+      const rm = new RegExp(`<Rate unit="(\\d+)" curr="${cur}">([\\d.,]+)<\\/Rate>`).exec(m[2]);
+      if (rm) found[m[1]] = Number(rm[2].replace(/\./g, '').replace(',', '.')) / (Number(rm[1]) || 1);
+    }
+  } catch (e) { errs.push(String(e.message || e)); }
+  // 2) tartalék: az MNB honlap árfolyam-táblázata (ugyanaz a hivatalos középárfolyam)
+  if (!Object.keys(found).length) {
+    try {
+      const HM = { január: 1, február: 2, március: 3, április: 4, május: 5, június: 6, július: 7, augusztus: 8, szeptember: 9, október: 10, november: 11, december: 12 };
+      const dot = (d) => d.replace(/-/g, '.') + '.';
+      const r = await fetch(`https://www.mnb.hu/arfolyam-tablazat?deviza=rbCurrencySelect&devizaSelected=${cur}&datefrom=${dot(d1)}&datetill=${dot(d2)}&order=1`, { headers: { 'User-Agent': 'Mozilla/5.0 (CarAdvance belső pénzügy)', Accept: 'text/html' } });
+      if (!r.ok) throw new Error('HTML HTTP ' + r.status);
+      const h = await r.text();
+      const unit = Number((/<th[^>]*>\s*(\d+)\s*<\/th>/.exec(h) || [])[1]) || 1;
+      for (const m of h.matchAll(/(\d{4})\. ([a-záéíóöőúüű]+) (\d{1,2})\.,[^<]*<\/td>\s*<td[^>]*>\s*([\d\s ]+,\d+)\s*<\/td>/g)) {
+        const mo = HM[m[2]]; if (!mo) continue;
+        found[`${m[1]}-${String(mo).padStart(2, '0')}-${m[3].padStart(2, '0')}`] = Number(m[4].replace(/[\s ]/g, '').replace(',', '.')) / unit;
+      }
+    } catch (e) { errs.push(String(e.message || e)); }
   }
+  const st = []; let n = 0;
+  for (const [d, rate] of Object.entries(found)) {
+    if (!(rate > 0)) continue;
+    map[d] = rate; n++;
+    st.push(env.DB.prepare(`INSERT OR REPLACE INTO fin_fx (cur, date, rate) VALUES (?, ?, ?)`).bind(key, d, rate));
+  }
+  if (!n && errs.length) throw new Error(errs.join(' · '));
   for (let i = 0; i < st.length; i += 80) await env.DB.batch(st.slice(i, i + 80));
   if (!n) throw new Error('MNB: nincs árfolyam');
   return map;
