@@ -18,6 +18,8 @@ const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[^a-
 const ALIAS = { vw: 'volkswagen', mercedesbenz: 'mercedes' };
 const bkey = (s) => { const n = norm(s); return ALIAS[n] || n; };
 // logó-fájl és megjelenített név márkakulcsonként (a -dark változat a sötét logó világos háttérre)
+// márkaszínes logók (világos módban, nem kijelölt állapotban); a többi márka hivatalos logója fekete
+const COLOR = new Set(['vw', 'bmw', 'mercedes', 'hyundai', 'cupra']);
 const LOGO = { bmw: ['bmw', 'BMW'], mercedes: ['mercedes', 'Mercedes-Benz'], audi: ['audi', 'Audi'], mini: ['mini', 'MINI'], volkswagen: ['vw', 'Volkswagen'], cupra: ['cupra', 'CUPRA'], hyundai: ['hyundai', 'Hyundai'], man: ['man', 'MAN'], kia: ['kia', 'Kia'], seat: ['seat', 'SEAT'], volvo: ['volvo', 'Volvo'] };
 const TX = {
   hu: { all: 'Összes', none: 'Ebben a kategóriában most nincs ilyen márkájú autó.', prev: 'Előző', next: 'Következő', brands: 'Márkák' },
@@ -345,7 +347,7 @@ try {
     h = h.replace('var n=db||6;', 'var n=db||30;').replace('if(!flags) return cars.slice(0,6);', 'if(!flags) return cars.slice(0,30);').replace('return k.concat(r).slice(0,6); }', 'return k.concat(r).slice(0,30); }');
     // 3) fejléc: balra cím + fülek, jobbra márkák
     const chips = '<button type="button" class="cf-br on" data-b="" aria-pressed="true">' + escH(T.all) + '</button>'
-      + BR.map((k) => { const [file, name] = LOGO[k]; return '<button type="button" class="cf-br" data-b="' + k + '" aria-pressed="false" title="' + escH(name) + '"><img class="cf-d" src="/bl-' + file + '-dark.webp" alt="' + escH(name) + '" width="48" height="24" loading="lazy"><img class="cf-l" src="/bl-' + file + '.webp" alt="" width="48" height="24" loading="lazy"></button>'; }).join('');
+      + BR.map((k) => { const [file, name] = LOGO[k]; return '<button type="button" class="cf-br" data-b="' + k + '" aria-pressed="false" title="' + escH(name) + '"><img class="cf-d" src="/bl-' + file + (COLOR.has(file) ? '-color' : '-dark') + '.webp" alt="' + escH(name) + '" width="48" height="24" loading="lazy"><img class="cf-l" src="/bl-' + file + '.webp" alt="" width="48" height="24" loading="lazy"></button>'; }).join('');
     // a „Kínálat / Autóink” cím egyelőre nem látszik (csak képernyőolvasónak marad meg a címsor)
     h = h.replace(/<div class="autok-head">\s*<div>([\s\S]*?)<\/div>\s*(<div class="autok-tabs"[^>]*>[\s\S]*?<\/div>)\s*<\/div>/, (m, left, tabs) => '<div class="autok-head"><div class="ah-l"><div class="ah-t">' + left + '</div>' + tabs + '</div><div class="ah-r" role="group" aria-label="' + escH(T.brands) + '">' + chips + '</div></div>');
     // a blokk közvetlenül a fő fejléc (hero) után, a statisztika-sáv elé
