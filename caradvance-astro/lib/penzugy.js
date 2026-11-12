@@ -138,47 +138,70 @@ export function addMonthsKeepDay(date, n) { // 2026-09-23 + 1 → 2026-10-23 (h�
   const [y, m, d] = date.split('-').map(Number), t = new Date(Date.UTC(y, m - 1 + n, 1)), last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
   return `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(Math.min(d, last)).padStart(2, '0')}`;
 }
+/** Díjütemezés naptári hónapok szerint: az első időszak a kezdőnaptól a hónap végéig (időarányos díj), utána teljes naptári
+ * hónapok, az utolsó a bérlés végéig (szintén időarányos). 30 napos konvenció: 09.23-tól 8/30, a végén 03.22-ig 22/30 –
+ * így az összes díj pontosan „hónapok × havidíj”. Esedékesség: az első díj a kezdőnapon, a többi a hónap 5. napjáig. */
 export function rentalSchedule(r) {
-  const out = [];
-  for (let i = 0; i < (r.months || 1); i++) { const from = addMonthsKeepDay(r.start_date, i); out.push({ seq: i + 1, from, to: addDays(addMonthsKeepDay(r.start_date, i + 1), -1), due: from }); }
+  const out = [], start = r.start_date, end = addDays(addMonthsKeepDay(start, r.months || 1), -1), amt = Number(r.amount) || 0;
+  const r2c = (x) => Math.round(x * 100) / 100;
+  let from = start, seq = 1;
+  while (from <= end && seq < 200) {
+    const [y, m] = from.split('-').map(Number), last = `${y}-${String(m).padStart(2, '0')}-${String(new Date(Date.UTC(y, m, 0)).getUTCDate()).padStart(2, '0')}`;
+    const to = last < end ? last : end, d1 = Math.min(30, Number(from.slice(8, 10))), d2 = to === last ? 30 : Math.min(30, Number(to.slice(8, 10)));
+    const frac = Math.max(0, d2 - d1 + 1) / 30;
+    out.push({ seq, from, to, month: from.slice(0, 7), days: Math.round(frac * 30), expected: r2c(amt * frac), due: seq === 1 ? from : `${from.slice(0, 7)}-05` });
+    from = addDays(to, 1); seq++;
+  }
+  const diff = r2c(amt * (r.months || 1) - out.reduce((a, x) => a + x.expected, 0)); // kerekítési különbség az utolsó időszakra
+  if (out.length && Math.abs(diff) < 1) out[out.length - 1].expected = r2c(out[out.length - 1].expected + diff);
   return out;
 }
 export async function listRentals(env) {
   const rs = (await env.DB.prepare(`SELECT r.*, d.file_size AS doc_file FROM fin_rentals r LEFT JOIN fin_docs d ON d.id = r.doc_id ORDER BY r.status = 'active' DESC, r.start_date DESC`).all()).results;
-  const pays = (await env.DB.prepare(`SELECT t.id, t.rental_id, t.rental_seq, t.bdate, t.amount, t.currency, t.fx, t.amount_huf, t.src, t.uid, a.name AS account_name FROM fin_tx t LEFT JOIN fin_accounts a ON a.id = t.account_id WHERE t.rental_id IS NOT NULL`).all()).results;
-  return rs.map((r) => ({ ...r, schedule: rentalSchedule(r).map((s) => ({ ...s, paid: pays.find((p) => p.rental_id === r.id && p.rental_seq === s.seq) || null })) }));
+  const pays = (await env.DB.prepare(`SELECT t.id, t.rental_id, t.rental_seq, t.bdate, t.amount, t.currency, t.fx, t.amount_huf, t.src, t.uid, a.name AS account_name FROM fin_tx t LEFT JOIN fin_accounts a ON a.id = t.account_id WHERE t.rental_id IS NOT NULL ORDER BY t.bdate, t.id`).all()).results;
+  return rs.map((r) => ({ ...r, end_date: addDays(addMonthsKeepDay(r.start_date, r.months || 1), -1), schedule: rentalSchedule(r).map((s) => {
+    const p = pays.filter((x) => x.rental_id === r.id && x.rental_seq === s.seq);
+    const paidAmt = Math.round(p.reduce((a, x) => a + (x.currency === r.currency ? Number(x.amount) : 0), 0) * 100) / 100;
+    return { ...s, payments: p, paid_amount: paidAmt, paid_huf: p.reduce((a, x) => a + (Number(x.amount_huf) || 0), 0), status: paidAmt >= s.expected - 0.005 && p.length ? 'paid' : p.length ? 'partial' : 'open' };
+  }) }));
 }
-/** Egy havi díj „fizetve”: kp. esetén új tétel a Házipénztárban, átutalásnál a meglévő banki jóváírás párosítása. */
+/** Egy időszak (rész)fizetése: kp. esetén új tétel a Házipénztárban, átutalásnál a meglévő banki jóváírás párosítása.
+ * A bevétel az időszak naptári hónapjába kerül (period_from = a hónap 1. napja). */
 export async function payRental(env, id, seq, o, who) {
   const r = await env.DB.prepare(`SELECT * FROM fin_rentals WHERE id = ?`).bind(id).first(); if (!r) throw new Error('Nincs ilyen bérlés.');
-  const s = rentalSchedule(r).find((x) => x.seq === Number(seq)); if (!s) throw new Error('Nincs ilyen hónap.');
-  if (await env.DB.prepare(`SELECT id FROM fin_tx WHERE rental_id = ? AND rental_seq = ?`).bind(id, s.seq).first()) throw new Error('Ez a hónap már fizetve van.');
+  const s = rentalSchedule(r).find((x) => x.seq === Number(seq)); if (!s) throw new Error('Nincs ilyen időszak.');
   const cat = await env.DB.prepare(`SELECT id FROM fin_cats WHERE code = 'REV_BERLES'`).first();
   const line = await env.DB.prepare(`SELECT id FROM fin_lines WHERE name LIKE 'Bérlés%' ORDER BY id LIMIT 1`).first();
   const split = line ? JSON.stringify([{ l: line.id, p: 100 }]) : null;
-  const memo = `Bérleti díj ${s.seq}/${r.months} · ${s.from} – ${s.to}${r.contract_no ? ' · ' + r.contract_no : ''}`;
+  const memo = `Bérleti díj ${s.from} – ${s.to}${s.days < 30 ? ` (${s.days}/30 nap)` : ''}${r.contract_no ? ' · ' + r.contract_no : ''}`;
+  const pf = `${s.month}-01`;
   if (o.tx_id) { // átutalás: meglévő banki tétel
     const t = await env.DB.prepare(`SELECT * FROM fin_tx WHERE id = ?`).bind(Number(o.tx_id)).first();
     if (!t || t.amount <= 0) throw new Error('A választott tétel nem jóváírás.');
-    if (t.rental_id) throw new Error('Ez a tétel már egy másik bérleti díjhoz tartozik.');
+    if (t.rental_id && !(t.rental_id === id && t.rental_seq === s.seq)) throw new Error('Ez a tétel már egy másik bérleti díjhoz tartozik.');
     await env.DB.prepare(`UPDATE fin_tx SET rental_id = ?, rental_seq = ?, period_from = ?, period_months = 1, plate = ?, cat_id = COALESCE(?, cat_id), split = COALESCE(?, split), vat = ?, manual = 1, note = ?, updated_at = ?, updated_by = ? WHERE id = ?`)
-      .bind(id, s.seq, s.from, r.plate || '', cat ? cat.id : null, split, r.vat, memo, nowIso(), who || '', t.id).run();
+      .bind(id, s.seq, pf, r.plate || '', cat ? cat.id : null, split, r.vat, memo, nowIso(), who || '', t.id).run();
     return t.id;
   }
-  const date = isDate(o.date) ? o.date : s.due, amount = Math.abs(Number(o.amount) || r.amount), cur = /^[A-Z]{3}$/.test(o.currency || '') ? o.currency : r.currency;
+  const done = (await env.DB.prepare(`SELECT COALESCE(SUM(amount), 0) AS s, COUNT(*) AS n FROM fin_tx WHERE rental_id = ? AND rental_seq = ?`).bind(id, s.seq).first());
+  const date = isDate(o.date) ? o.date : s.due, cur = /^[A-Z]{3}$/.test(o.currency || '') ? o.currency : r.currency;
+  const amount = Math.abs(Number(o.amount) || Math.max(0, s.expected - (cur === r.currency ? done.s : 0)));
+  if (!amount) throw new Error('Ez az időszak már ki van fizetve.');
   const acc = await env.DB.prepare(`SELECT id FROM fin_accounts WHERE ext_id = 'CASH'`).first();
   const res = await env.DB.prepare(`INSERT INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, plate, period_from, period_months, rental_id, rental_seq, updated_at, updated_by)
     VALUES (?, ?, 'manual', ?, ?, 'Bérleti díj (készpénz)', ?, ?, ?, ?, ?, ?, ?, ?, ?, 'none', 1, ?, ?, ?, 1, ?, ?, ?, ?)`)
-    .bind(`rent-${id}-${s.seq}`, acc ? acc.id : null, date, date, amount, cur, cur === 'HUF' ? 1 : null, cur === 'HUF' ? amount : null, r.renter, memo, cat ? cat.id : null, split, r.vat,
-      String(o.note || '').slice(0, 300), r.plate || '', s.from, id, s.seq, nowIso(), who || '').run();
+    .bind(`rent-${id}-${s.seq}-${done.n + 1}`, acc ? acc.id : null, date, date, amount, cur, cur === 'HUF' ? 1 : null, cur === 'HUF' ? amount : null, r.renter, memo, cat ? cat.id : null, split, r.vat,
+      String(o.note || '').slice(0, 300), r.plate || '', pf, id, s.seq, nowIso(), who || '').run();
   if (cur !== 'HUF') await fillFx(env);
   return res.meta.last_row_id;
 }
-export async function unpayRental(env, id, seq) {
-  const t = await env.DB.prepare(`SELECT * FROM fin_tx WHERE rental_id = ? AND rental_seq = ?`).bind(id, Number(seq)).first(); if (!t) return 0;
-  if (t.src === 'manual' && /^(rent|rec)-/.test(t.uid || '')) await env.DB.prepare(`DELETE FROM fin_tx WHERE id = ?`).bind(t.id).run();
-  else await env.DB.prepare(`UPDATE fin_tx SET rental_id = NULL, rental_seq = NULL, period_from = NULL, period_months = NULL WHERE id = ?`).bind(t.id).run();
-  return 1;
+export async function unpayRental(env, id, seq, txId) {
+  const list = (await env.DB.prepare(`SELECT * FROM fin_tx WHERE rental_id = ? AND rental_seq = ?${txId ? ' AND id = ?' : ''}`).bind(...[id, Number(seq)].concat(txId ? [Number(txId)] : [])).all()).results;
+  for (const t of list) {
+    if (t.src === 'manual' && /^(rent|rec)-/.test(t.uid || '')) await env.DB.prepare(`DELETE FROM fin_tx WHERE id = ?`).bind(t.id).run();
+    else await env.DB.prepare(`UPDATE fin_tx SET rental_id = NULL, rental_seq = NULL, period_from = NULL, period_months = NULL WHERE id = ?`).bind(t.id).run();
+  }
+  return list.length;
 }
 
 /** Rendszám egységes alakja: nagybetű, egy szóköz, max. 20 karakter (pl. „m-ao  1230” → „M-AO 1230”). */

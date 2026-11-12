@@ -109,7 +109,7 @@ export async function onRequest(context) {
     if (m === 'POST' && p0 === 'rentals' && p1 && p2 === 'pay') {
       try { return json({ ok: true, tx_id: await payRental(env, Number(p1), Number(body.seq), body, who) }); } catch (e) { return json({ error: e.message }, 400); }
     }
-    if (m === 'POST' && p0 === 'rentals' && p1 && p2 === 'unpay') return json({ ok: true, removed: await unpayRental(env, Number(p1), Number(body.seq)) });
+    if (m === 'POST' && p0 === 'rentals' && p1 && p2 === 'unpay') return json({ ok: true, removed: await unpayRental(env, Number(p1), Number(body.seq), body.tx_id) });
     if (m === 'POST' && p0 === 'rentals' && p1 && p2 === 'delete') {
       if ((await DB.prepare(`SELECT COUNT(*) AS n FROM fin_tx WHERE rental_id = ?`).bind(Number(p1)).first()).n) return json({ error: 'Van már könyvelt díja – előbb vond vissza a fizetéseket, vagy állítsd „lezárt”-ra.' }, 400);
       await DB.prepare(`DELETE FROM fin_rentals WHERE id = ?`).bind(Number(p1)).run(); return json({ ok: true });
