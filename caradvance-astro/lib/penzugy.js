@@ -110,8 +110,25 @@ async function migrateVehV5(env) {
   if (!dc.has('plate')) st.push(env.DB.prepare(`ALTER TABLE fin_docs ADD COLUMN plate TEXT DEFAULT ''`));
   const rc = await cols('fin_recurring');
   if (!rc.has('plate')) st.push(env.DB.prepare(`ALTER TABLE fin_recurring ADD COLUMN plate TEXT DEFAULT ''`));
+  if (!rc.has('accrue')) st.push(env.DB.prepare(`ALTER TABLE fin_recurring ADD COLUMN accrue INTEGER DEFAULT 0`));
+  if (!tx.has('period_from')) st.push(env.DB.prepare(`ALTER TABLE fin_tx ADD COLUMN period_from TEXT`));
+  if (!tx.has('period_months')) st.push(env.DB.prepare(`ALTER TABLE fin_tx ADD COLUMN period_months REAL`));
   for (const s of st) await s.run();
   if (st.length) await env.DB.prepare(`CREATE INDEX IF NOT EXISTS ix_fin_tx_parent ON fin_tx (parent_id)`).run();
+}
+/** Időarányos elhatárolás: egy előre fizetett havi díj (pl. bérleti díj) a teljesítési időszak napjai szerint oszlik a naptári hónapokra.
+ * 30 napos hónap-konvenció: a 23-án induló bérleti hónap 8/30-a esik az indulás hónapjára, 22/30-a a következőre – így két
+ * egymást követő havi díj együtt pontosan egy teljes hónapot ad (közbülső hónapok = teljes havidíj), az összeg nem változik.
+ * Visszaad: [{ m: 'YYYY-MM', f: hányad }] (Σf = 1). Elhatárolás nélkül: a fizetés hónapja, f = 1. */
+export function accrualParts(t) {
+  const bm = String(t.bdate || '').slice(0, 7);
+  if (!t.period_from || !isDate(t.period_from)) return [{ m: bm, f: 1 }];
+  const n = Math.max(1, Math.round(Number(t.period_months) || 1)), d = Math.min(30, Number(t.period_from.slice(8, 10)));
+  const next = (ym) => { const [y, mm] = ym.split('-').map(Number); return mm === 12 ? `${y + 1}-01` : `${y}-${String(mm + 1).padStart(2, '0')}`; };
+  const acc = {}; let ym = t.period_from.slice(0, 7);
+  const first = (31 - d) / 30;
+  for (let k = 0; k < n; k++) { acc[ym] = (acc[ym] || 0) + first / n; if (first < 1) acc[next(ym)] = (acc[next(ym)] || 0) + (1 - first) / n; ym = next(ym); }
+  return Object.entries(acc).map(([m, f]) => ({ m, f }));
 }
 /** Rendszám egységes alakja: nagybetű, egy szóköz, max. 20 karakter (pl. „m-ao  1230” → „M-AO 1230”). */
 export function normPlate(s) { return String(s || '').toUpperCase().replace(/\s+/g, ' ').trim().slice(0, 20); }
@@ -369,10 +386,10 @@ export async function genRecurring(env) {
       const uid = `rec-${r.id}-${ym}`;
       const day = String(Math.min(28, Math.max(1, r.day || 1))).padStart(2, '0');
       if (!del.has(uid) && `${ym}-${day}` <= today) { // csak a már esedékes (múltbeli / mai) hónapok – pénzforgalmi szemlélet
-        st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, plate, updated_by)
-          VALUES (?, ?, 'manual', ?, ?, 'Ismétlődő tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, 'ismétlődő')`)
+        st.push(env.DB.prepare(`INSERT OR IGNORE INTO fin_tx (uid, account_id, src, bdate, vdate, ttype, amount, currency, fx, amount_huf, partner, memo, cat_id, split, vat, doc_mode, manual, note, plate, period_from, period_months, updated_by)
+          VALUES (?, ?, 'manual', ?, ?, 'Ismétlődő tétel', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, 'ismétlődő')`)
           .bind(uid, acc ? acc.id : null, `${ym}-${day}`, `${ym}-${day}`, r.amount, r.currency, r.currency === 'HUF' ? 1 : null, r.currency === 'HUF' ? r.amount : null,
-            r.partner || r.name, r.name, r.cat_id, r.split, r.vat, r.doc_mode, 'Ismétlődő: ' + r.name, r.plate || ''));
+            r.partner || r.name, r.name, r.cat_id, r.split, r.vat, r.doc_mode, 'Ismétlődő: ' + r.name, r.plate || '', r.accrue ? `${ym}-${day}` : null, r.accrue ? 1 : null));
       }
       const [y, m] = ym.split('-').map(Number);
       ym = m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`;
@@ -737,8 +754,9 @@ export async function pnl(env, from, to) {
     env.DB.prepare(`SELECT * FROM fin_cats ORDER BY sort, id`).all().then((r) => r.results),
     getSetting(env, 'alloc', { mode: 'fixed', key: {} })
   ]);
-  const txs = (await env.DB.prepare(`SELECT t.id, t.bdate, t.amount, t.amount_huf, t.cat_id, t.split, t.vat, t.plate, d.net AS dnet, d.gross AS dgross
-    FROM fin_tx t LEFT JOIN fin_docs d ON d.id = t.doc_id WHERE t.bdate BETWEEN ? AND ? AND COALESCE(t.is_split, 0) = 0 ORDER BY t.bdate`).bind(from, to).all()).results;
+  const txs = (await env.DB.prepare(`SELECT t.id, t.bdate, t.amount, t.amount_huf, t.cat_id, t.split, t.vat, t.plate, t.period_from, t.period_months, d.net AS dnet, d.gross AS dgross
+    FROM fin_tx t LEFT JOIN fin_docs d ON d.id = t.doc_id WHERE (t.bdate BETWEEN ? AND ? OR (t.period_from IS NOT NULL AND t.period_from <= ? AND t.bdate >= ?)) AND COALESCE(t.is_split, 0) = 0 ORDER BY t.bdate`).bind(from, to, to, addDays(from, -800)).all()).results;
+  const inRange = (m) => m >= from.slice(0, 7) && m <= to.slice(0, 7);
   const C = Object.fromEntries(cats.map((c) => [c.id, c]));
   const lineIds = new Set(lines.map((l) => l.id));
   const cells = {}; // catKey → month → lineKey → [net, gross, n]
@@ -750,17 +768,20 @@ export async function pnl(env, from, to) {
     const v = txValues(t, cat, t.dgross != null ? { net: t.dnet, gross: t.dgross } : null);
     if (!v) { noFx++; continue; }
     const ck = cat ? String(cat.id) : 'UNCAT';
-    const m = t.bdate.slice(0, 7);
     const sp = normSplit(t.split, lineIds) || [{ l: 'NA', p: 100 }];
+    for (const part of accrualParts(t)) {
+    const m = part.m; if (!inRange(m)) continue;
+    const pv = [v[0] * part.f, v[1] * part.f];
     for (const s of sp) {
       const a = ((cells[ck] = cells[ck] || {})[m] = cells[ck][m] || {});
       const c = (a[s.l] = a[s.l] || [0, 0, 0]);
-      c[0] = r2(c[0] + v[0] * s.p / 100); c[1] = r2(c[1] + v[1] * s.p / 100); c[2] += 1;
+      c[0] = r2(c[0] + pv[0] * s.p / 100); c[1] = r2(c[1] + pv[1] * s.p / 100); c[2] += 1;
       if (withPlate.has(ck)) {
         const pa = (((pcells[ck] = pcells[ck] || {})[t.plate || ''] = pcells[ck][t.plate || ''] || {})[m] = pcells[ck][t.plate || ''][m] || {});
         const pc = (pa[s.l] = pa[s.l] || [0, 0, 0]);
-        pc[0] = r2(pc[0] + v[0] * s.p / 100); pc[1] = r2(pc[1] + v[1] * s.p / 100); pc[2] += 1;
+        pc[0] = r2(pc[0] + pv[0] * s.p / 100); pc[1] = r2(pc[1] + pv[1] * s.p / 100); pc[2] += 1;
       }
+    }
     }
   }
   const months = [];

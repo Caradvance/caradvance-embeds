@@ -100,10 +100,10 @@ export async function onRequest(context) {
       const endM = /^\d{4}-\d{2}$/.test(body.end_month || '') ? body.end_month : '';
       const cur = /^[A-Z]{3}$/.test(body.currency || '') ? body.currency : 'HUF';
       const split = normSplit(body.split, await lineSet(env));
-      const vals = [name, clean(body.partner, 160), amount, cur, Number(body.cat_id) || null, split ? JSON.stringify(split) : null, vatOk(body.vat), docModeOk(body.doc_mode), Math.min(28, Math.max(1, Math.round(num(body.day) || 1))), start, endM, body.active === false || body.active === 0 ? 0 : 1, normPlate(body.plate)];
+      const vals = [name, clean(body.partner, 160), amount, cur, Number(body.cat_id) || null, split ? JSON.stringify(split) : null, vatOk(body.vat), docModeOk(body.doc_mode), Math.min(28, Math.max(1, Math.round(num(body.day) || 1))), start, endM, body.active === false || body.active === 0 ? 0 : 1, normPlate(body.plate), body.accrue ? 1 : 0];
       let id = Number(body.id) || null;
-      if (id) await DB.prepare(`UPDATE fin_recurring SET name = ?, partner = ?, amount = ?, currency = ?, cat_id = ?, split = ?, vat = ?, doc_mode = ?, day = ?, start = ?, end_month = ?, active = ?, plate = ? WHERE id = ?`).bind(...vals, id).run();
-      else id = (await DB.prepare(`INSERT INTO fin_recurring (name, partner, amount, currency, cat_id, split, vat, doc_mode, day, start, end_month, active, plate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals).run()).meta.last_row_id;
+      if (id) await DB.prepare(`UPDATE fin_recurring SET name = ?, partner = ?, amount = ?, currency = ?, cat_id = ?, split = ?, vat = ?, doc_mode = ?, day = ?, start = ?, end_month = ?, active = ?, plate = ?, accrue = ? WHERE id = ?`).bind(...vals, id).run();
+      else id = (await DB.prepare(`INSERT INTO fin_recurring (name, partner, amount, currency, cat_id, split, vat, doc_mode, day, start, end_month, active, plate, accrue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...vals).run()).meta.last_row_id;
       return json({ id, generated: await genRecurring(env) });
     }
 
@@ -191,6 +191,7 @@ export async function onRequest(context) {
       const note = Object.prototype.hasOwnProperty.call(body, 'note') ? clean(body.note, 400) : t.note;
       const extra = [];
       if (Object.prototype.hasOwnProperty.call(body, 'plate')) extra.push(['plate', normPlate(body.plate)]);
+      if (Object.prototype.hasOwnProperty.call(body, 'period_from')) { extra.push(['period_from', isDate(body.period_from) ? body.period_from : null]); extra.push(['period_months', isDate(body.period_from) ? Math.max(1, Math.min(60, Math.round(num(body.period_months) || 1))) : null]); }
       if (t.src === 'split' && body.memo != null) extra.push(['memo', clean(body.memo, 400)]);
       if (t.src === 'manual') {
         if (isDate(body.bdate)) extra.push(['bdate', body.bdate]);

@@ -140,6 +140,16 @@ function txNet(t) {
 function txDocMode(t) { var c = t.cat_id ? catBy(t.cat_id) : null; return t.doc_mode || (c && c.doc_mode) || 'invoice'; }
 function needsDoc(t) { var c = t.cat_id ? catBy(t.cat_id) : null; return !t.is_split && !t.doc_id && txDocMode(t) !== 'none' && !(c && c.kind === 'excl'); }
 /* ---------- autók (rendszám) ---------- */
+/* időarányos elhatárolás (ld. accrualParts a szerveren): 30 napos hónap-konvenció */
+function txMonths(t) {
+  var bm = String(t.bdate || '').slice(0, 7);
+  if (!t.period_from || !/^\d{4}-\d{2}-\d{2}$/.test(t.period_from)) return [{ m: bm, f: 1 }];
+  var n = Math.max(1, Math.round(Number(t.period_months) || 1)), d = Math.min(30, Number(t.period_from.slice(8, 10))), first = (31 - d) / 30, acc = {}, ym = t.period_from.slice(0, 7);
+  function next(x) { var p = x.split('-').map(Number); return p[1] === 12 ? (p[0] + 1) + '-01' : p[0] + '-' + String(p[1] + 1).padStart(2, '0'); }
+  for (var k = 0; k < n; k++) { acc[ym] = (acc[ym] || 0) + first / n; if (first < 1) acc[next(ym)] = (acc[next(ym)] || 0) + (1 - first) / n; ym = next(ym); }
+  return Object.keys(acc).map(function (m) { return { m: m, f: acc[m] }; });
+}
+function accrualBadge(t) { if (!t.period_from) return ''; var p = txMonths(t); return ' <span class="badge" title="Időarányosan elhatárolva: a teljesítési időszak napjai szerint oszlik a hónapokra">⏱ ' + p.map(function (x) { return mlabel(x.m) + ' ' + Math.round(x.f * 30) + '/30'; }).join(' · ') + '</span>'; }
 function vehName(p) { return (S.meta.vehicles || {})[p] || ''; }
 function plateChip(p) { return p ? '<span class="chip plate" title="' + esc(vehName(p)) + '">🚗 ' + esc(p) + (vehName(p) ? ' <span class="muted">' + esc(vehName(p)) + '</span>' : '') + '</span>' : ''; }
 function knownPlates() {
@@ -364,7 +374,7 @@ function renderPL() {
     + (P.noFx ? '<div class="note warn">' + P.noFx + ' deviza-tételnek nincs árfolyama, ezek kimaradtak. <button class="btn sm" id="fxFill">Árfolyamok lekérése</button></div>' : '')
     + bars
     + '<div class="pl"><table><thead><tr><th>Ft · ' + (S.view.basis === 'net' ? 'nettó' : 'bruttó') + ' · pénzforgalmi</th>' + cols.map(function (c) { return '<th class="n">' + (c.color ? '<span class="ldot" style="background:' + c.color + '"></span>' : '') + esc(c.t) + '</th>'; }).join('') + '<th class="n totc">Összesen</th></tr></thead><tbody>' + html + '</tbody></table></div>'
-    + '<p class="small muted" style="margin:10px 0 0">Pénzforgalmi szemlélet: a tételek a banki könyvelés napján számítanak. A nettó érték a párosított bizonylat nettó/bruttó arányából, ennek hiányában a kategória (vagy tétel) levonható ÁFA-kulcsából számol; 0% = a bruttó a költség (pl. személyautó üzemanyag). Deviza: MNB hivatalos középárfolyam a fizetés napján (ha az MNB nem érhető el: EKB), kártyás vásárlásnál a terhelt forintösszeg. Ez vezetői kimutatás, nem a könyvelő főkönyve.</p></div>';
+    + '<p class="small muted" style="margin:10px 0 0">Pénzforgalmi szemlélet: a tételek a banki könyvelés napján számítanak, kivéve az időarányosan elhatárolt tételeket (pl. előre fizetett bérleti díj), amelyek a teljesítési időszak napjai szerint oszlanak a hónapokra. A nettó érték a párosított bizonylat nettó/bruttó arányából, ennek hiányában a kategória (vagy tétel) levonható ÁFA-kulcsából számol; 0% = a bruttó a költség (pl. személyautó üzemanyag). Deviza: MNB hivatalos középárfolyam a fizetés napján (ha az MNB nem érhető el: EKB), kártyás vásárlásnál a terhelt forintösszeg. Ez vezetői kimutatás, nem a könyvelő főkönyve.</p></div>';
   $('#vLine').onchange = function () { S.view.lines = this.value; renderPL(); };
   $$('[data-cols]').forEach(function (b) { b.onclick = function () { S.view.cols = b.dataset.cols; renderPL(); }; });
   $$('[data-basis]').forEach(function (b) { b.onclick = function () { S.view.basis = b.dataset.basis; renderPL(); }; });
@@ -394,7 +404,7 @@ function drillDown(ck, col, colsMode, pl) {
     if (ck === 'UNCAT' ? t.cat_id : String(t.cat_id) !== ck) return false;
     var sp = parseSplit(t.split) || [{ l: 'NA', p: 100 }];
     var lk = sp.map(function (x) { return String(x.l); });
-    if (colsMode === 'months') { if (col !== '*' && t.bdate.slice(0, 7) !== col) return false; if (selL !== 'all' && lk.indexOf(String(selL)) === -1 && !sharedIn(lk)) return false; }
+    if (colsMode === 'months') { if (col !== '*' && !txMonths(t).some(function (x) { return x.m === col; })) return false; if (selL !== 'all' && lk.indexOf(String(selL)) === -1 && !sharedIn(lk)) return false; }
     else { if (col !== '*' && lk.indexOf(col) === -1 && !(sharedIn(lk) && S.view.alloc !== 'none')) return false; }
     return true;
   });
@@ -431,7 +441,7 @@ function txTable(list, withSel) {
       var doc = t.is_split ? '<span class="badge navy">felbontva ↓</span>' : t.doc_id ? '<span class="badge ok" title="' + esc(t.doc_number || '') + '">✓ ' + esc((t.doc_number || 'csatolva').slice(0, 16)) + '</span>' : (needsDoc(t) ? '<span class="badge warn">hiányzik</span>' : '<span class="muted small">nem kell</span>');
       return '<tr data-id="' + t.id + '" class="' + (t.is_split ? 'par' : t.parent_id ? 'kid' : '') + '">' + (withSel ? '<td onclick="event.stopPropagation()"><input type="checkbox" class="sel" data-id="' + t.id + '"' + (S.sel[t.id] ? ' checked' : '') + '></td>' : '')
         + '<td class="small" style="white-space:nowrap">' + hd(t.bdate) + '</td>'
-        + '<td><div class="p">' + (t.parent_id ? '↳ ' : '') + esc(t.partner || t.ttype) + ' ' + plateChip(t.plate) + (t.is_split ? ' <span class="badge" title="A részei számítanak az eredménybe">felbontott tétel</span>' : '') + (t.manual && !t.parent_id ? ' <span class="badge navy" title="kézzel besorolva">kézi</span>' : '') + (t.src === 'manual' ? ' <span class="badge">kézi tétel</span>' : '') + '</div><div class="m" title="' + esc(t.memo) + '">' + esc(t.ttype) + (t.memo ? ' · ' + esc(t.memo) : '') + '</div></td>'
+        + '<td><div class="p">' + (t.parent_id ? '↳ ' : '') + esc(t.partner || t.ttype) + ' ' + plateChip(t.plate) + accrualBadge(t) + (t.is_split ? ' <span class="badge" title="A részei számítanak az eredménybe">felbontott tétel</span>' : '') + (t.manual && !t.parent_id ? ' <span class="badge navy" title="kézzel besorolva">kézi</span>' : '') + (t.src === 'manual' ? ' <span class="badge">kézi tétel</span>' : '') + '</div><div class="m" title="' + esc(t.memo) + '">' + esc(t.ttype) + (t.memo ? ' · ' + esc(t.memo) : '') + '</div></td>'
         + '<td class="n ' + nc(t.amount) + '">' + money(t.amount, t.currency) + '</td>'
         + '<td class="n ' + (t.is_split ? 'muted' : nc(net)) + '">' + (net == null ? '<span class="badge err">nincs árfolyam</span>' : t.is_split ? '<s title="A részei számítanak">' + ft(net) + '</s>' : ft(net)) + '</td>'
         + '<td>' + (c ? esc(c.name) : '<span class="badge err">besorolásra vár</span>') + '</td>'
@@ -521,7 +531,7 @@ function editTx(id, after) {
       + '<label class="f">Partner<input class="in" id="ePartner" value="' + esc(t.partner) + '"></label><label class="f" style="grid-column:span 2">Leírás<input class="in" id="eMemo" value="' + esc(t.memo) + '"></label></div>' : '')
     + '<div class="grid"><label class="f" style="grid-column:span 2">Kategória<select class="in" id="eCat">' + catOptions(t.cat_id, true) + '</select></label>'
     + '<label class="f">ÁFA-kulcs (nettósítás)<select class="in" id="eVat"><option value="">kategória szerint' + (c ? ' (' + c.vat + '%)' : '') + '</option>' + [0, 5, 18, 27].map(function (v) { return '<option value="' + v + '"' + (t.vat === v ? ' selected' : '') + '>' + v + '%' + (v === 0 ? ' – nem levonható / nincs' : '') + '</option>'; }).join('') + '</select></label></div>'
-    + '<div class="grid" style="margin-top:8px"><label class="f">Autó (rendszám)<input class="in" id="ePlate" list="plList" placeholder="pl. M-AO 1230" value="' + esc(t.plate || '') + '"></label><div class="small muted" style="grid-column:span 2;align-self:end">Az Autók fülön autónként összesíthető (bérleti díj, útdíj, üzemanyag, bevétel).</div></div>' + plateList()
+    + '<div class="grid" style="margin-top:8px"><label class="f">Autó (rendszám)<input class="in" id="ePlate" list="plList" placeholder="pl. M-AO 1230" value="' + esc(t.plate || '') + '"></label><label class="f">Teljesítési időszak kezdete<input class="in" type="date" id="ePerFrom" value="' + esc(t.period_from || '') + '"></label><label class="f">Hány hónapra szól<input class="in" type="number" min="1" max="60" id="ePerN" value="' + esc(t.period_months || 1) + '"></label></div><p class="small muted" style="margin:4px 0 0">Ha megadod, az eredménykimutatásban az összeg időarányosan oszlik a hónapokra (pl. 09.23-án induló bérleti hónap: szeptemberre 8/30, októberre 22/30; így a közbülső hónapok teljes havidíjat kapnak). Üresen: a fizetés hónapjában számít.</p>' + plateList()
     + '<h3>Üzletág</h3>' + splitEditor(t.split)
     + '<div class="grid" style="margin-top:10px"><label class="f">Bizonylat kell?<select class="in" id="eDoc"><option value="">kategória szerint</option><option value="invoice"' + (t.doc_mode === 'invoice' ? ' selected' : '') + '>igen, számla / nyugta</option><option value="none"' + (t.doc_mode === 'none' ? ' selected' : '') + '>nem kell</option></select></label>'
     + '<label class="f" style="grid-column:span 2">Megjegyzés<input class="in" id="eNote" value="' + esc(t.note || '') + '"></label></div>'
@@ -531,7 +541,7 @@ function editTx(id, after) {
   bindSplit(m);
   function done(msg) { m.remove(); toast(msg); (after || function () {})(); reload().then(refreshMeta); }
   $('#eSave', m).onclick = function () {
-    var body = { cat_id: Number($('#eCat', m).value) || null, split: readSplit(m), vat: $('#eVat', m).value === '' ? null : Number($('#eVat', m).value), doc_mode: $('#eDoc', m).value || null, note: $('#eNote', m).value, plate: $('#ePlate', m).value };
+    var body = { cat_id: Number($('#eCat', m).value) || null, split: readSplit(m), vat: $('#eVat', m).value === '' ? null : Number($('#eVat', m).value), doc_mode: $('#eDoc', m).value || null, note: $('#eNote', m).value, plate: $('#ePlate', m).value, period_from: $('#ePerFrom', m).value || null, period_months: Number($('#ePerN', m).value) || 1 };
     if (isNew || man) { body.bdate = $('#eDate', m).value; body.amount = Number($('#eAmt', m).value); body.partner = $('#ePartner', m).value; body.memo = $('#eMemo', m).value; body.currency = $('#eCur', m).value; if (!body.amount) return toast('Add meg az összeget.'); }
     if ($('#eRule', m) && $('#eRule', m).checked) body.make_rule = { pattern: $('#ePat', m).value.trim(), dir: $('#eDir', m).value, name: t.partner };
     api(isNew ? 'tx' : 'tx/' + t.id, body).then(must).then(function (j) { done(j.rule_id ? 'Mentve + szabály létrehozva (' + (j.applied || 0) + ' további tétel besorolva)' : 'Mentve'); });
@@ -624,12 +634,12 @@ function expenses() {
     if (t.is_split || t.amount_huf == null) return null;
     var g = expGroup(t); if (!g) return null;
     var v = gross ? Number(t.amount_huf) : txNet(t); if (v == null) return null;
-    return { t: t, g: g, v: -v, m: String(t.bdate).slice(0, 7) };
-  }).filter(Boolean);
+    return txMonths(t).map(function (p) { return { t: t, g: g, v: -v * p.f, m: p.m }; });
+  }).filter(Boolean).reduce(function (a, b) { return a.concat(b); }, []);
 }
 function revenueByMonth() {
   var r = {}, gross = S.view.basis === 'gross';
-  S.tx.forEach(function (t) { var c = t.cat_id && catBy(t.cat_id); if (t.is_split || !c || c.kind !== 'rev' || t.amount_huf == null) return; var v = gross ? Number(t.amount_huf) : txNet(t); var m = String(t.bdate).slice(0, 7); r[m] = (r[m] || 0) + (v || 0); });
+  S.tx.forEach(function (t) { var c = t.cat_id && catBy(t.cat_id); if (t.is_split || !c || c.kind !== 'rev' || t.amount_huf == null) return; var v = gross ? Number(t.amount_huf) : txNet(t); txMonths(t).forEach(function (p) { r[p.m] = (r[p.m] || 0) + (v || 0) * p.f; }); });
   return r;
 }
 function sumBy(list, keyFn) { var o = {}; list.forEach(function (x) { var k = keyFn(x); if (k == null) return; o[k] = (o[k] || 0) + x.v; }); return o; }
@@ -1053,7 +1063,7 @@ function renderSet() {
   document.getElementById('tab').innerHTML =
     '<div class="card"><h2>Ismétlődő havi tételek</h2><p class="small muted" style="margin-top:0">Havi fix költségek vagy bevételek (pl. mobil, internet, készpénzes autóbérleti díj), amelyek nem jelennek meg a feltöltött bankszámlákon. Minden hónapra külön tétel készül automatikusan a megadott napon, amint az esedékes (a kezdő hónaptól a záró hónapig); deviza esetén a fizetés napi MNB középárfolyamon. Egy-egy hónap a Tételek között külön is módosítható vagy törölhető.</p><div id="recList" class="small muted">Betöltés…</div>'
     + '<div class="row" style="margin-top:10px"><select class="in" id="rcDir"><option value="-1">Kiadás</option><option value="1">Bevétel</option></select><input class="in" id="rcName" placeholder="Megnevezés (pl. Mobil – Tóth Károly)" style="min-width:200px;flex:1"><input class="in" id="rcPartner" placeholder="Partner (opcionális)" style="width:170px"><input class="in" id="rcAmt" type="number" step="0.01" placeholder="Havi bruttó összeg" style="width:130px"><select class="in" id="rcCur"><option>HUF</option><option>EUR</option></select></div>'
-    + '<div class="row" style="margin-top:6px"><select class="in" id="rcCat">' + catOptions(null) + '</select><select class="in" id="rcLine">' + lineOptions(null) + '</select><label class="small muted">ÁFA <select class="in" id="rcVat"><option value="">kategória szerint</option><option value="0">0% / nincs</option><option value="5">5%</option><option value="18">18%</option><option value="27">27%</option></select></label><input class="in" id="rcPlate" list="plList" placeholder="Rendszám" style="width:110px">' + plateList() + '<label class="small muted">nap <input class="in" id="rcDay" type="number" min="1" max="28" value="1" style="width:60px"></label><label class="small muted">tól <input class="in" type="month" id="rcStart" value="' + todayIso().slice(0, 7) + '"></label><label class="small muted">ig <input class="in" type="month" id="rcEnd"></label><button class="btn sm red" id="rcAdd">Hozzáadás</button></div></div>'
+    + '<div class="row" style="margin-top:6px"><select class="in" id="rcCat">' + catOptions(null) + '</select><select class="in" id="rcLine">' + lineOptions(null) + '</select><label class="small muted">ÁFA <select class="in" id="rcVat"><option value="">kategória szerint</option><option value="0">0% / nincs</option><option value="5">5%</option><option value="18">18%</option><option value="27">27%</option></select></label><input class="in" id="rcPlate" list="plList" placeholder="Rendszám" style="width:110px">' + plateList() + '<label class="small muted">nap <input class="in" id="rcDay" type="number" min="1" max="28" value="1" style="width:60px"></label><label class="small muted">tól <input class="in" type="month" id="rcStart" value="' + todayIso().slice(0, 7) + '"></label><label class="small muted">ig <input class="in" type="month" id="rcEnd"></label><label class="small" title="pl. bérleti díj: a 23-án fizetett havidíj 8/30-a az adott hónapra, 22/30-a a következőre"><input type="checkbox" id="rcAcc"> időarányosan (a fizetés napjától egy hónapra)</label><button class="btn sm red" id="rcAdd">Hozzáadás</button></div></div>'
     + '<div class="card"><h2>Tiltólista — soha nem kerül a pénzügyekbe</h2><p class="small muted" style="margin-top:0">Ezek a partnerek / minták tételei importkor kimaradnak, a már bent lévők törlődnek — a hozzájuk tartozó banki díjakkal (azonos tranzakció-azonosító) együtt.</p>'
     + (bl.length ? '<table><tbody>' + bl.map(function (b) { return '<tr><td><b>' + esc(b.name) + '</b></td><td><code>' + esc(b.pattern) + '</code></td><td class="small muted">' + hd(b.created_at) + '</td><td><button class="btn sm ghost" data-bdel="' + b.id + '">Levétel</button></td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted small">Üres.</p>')
     + '<div class="row" style="margin-top:10px"><input class="in" id="bName" placeholder="Név (pl. XY Kft.)" style="min-width:180px"><input class="in" id="bPat" placeholder="Minta: partner neve ékezet nélkül, NAGYBETŰVEL" style="flex:1;min-width:220px"><button class="btn sm red" id="bAdd">Hozzáadás és törlés</button></div></div>'
@@ -1080,7 +1090,7 @@ function renderSet() {
   });
   $('#rcAdd').onclick = function () {
     var amt = Math.abs(Number($('#rcAmt').value)); if (!$('#rcName').value.trim() || !amt) return toast('Megnevezés és havi összeg kell.');
-    api('recurring', { name: $('#rcName').value.trim(), partner: $('#rcPartner').value.trim(), amount: Number($('#rcDir').value) * amt, currency: $('#rcCur').value, cat_id: Number($('#rcCat').value) || null, split: [{ l: Number($('#rcLine').value), p: 100 }], vat: $('#rcVat').value === '' ? null : Number($('#rcVat').value), plate: $('#rcPlate').value, day: Number($('#rcDay').value) || 1, start: $('#rcStart').value, end_month: $('#rcEnd').value, doc_mode: 'none' }).then(must).then(function (j) { toast('Hozzáadva, ' + j.generated + ' havi tétel létrehozva'); reload(); });
+    api('recurring', { name: $('#rcName').value.trim(), partner: $('#rcPartner').value.trim(), amount: Number($('#rcDir').value) * amt, currency: $('#rcCur').value, cat_id: Number($('#rcCat').value) || null, split: [{ l: Number($('#rcLine').value), p: 100 }], vat: $('#rcVat').value === '' ? null : Number($('#rcVat').value), plate: $('#rcPlate').value, day: Number($('#rcDay').value) || 1, start: $('#rcStart').value, end_month: $('#rcEnd').value, accrue: $('#rcAcc').checked, doc_mode: 'none' }).then(must).then(function (j) { toast('Hozzáadva, ' + j.generated + ' havi tétel létrehozva'); reload(); });
   };
   api('deleted').then(must).then(function (j) {
     var el = $('#delList'); if (!el) return;
