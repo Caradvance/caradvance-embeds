@@ -347,6 +347,13 @@ export async function onRequest(context) {
     }
     if (m === 'POST' && p0 === 'fx' && p1 === 'fill') return json({ missing: await fillFx(env) });
     if (m === 'POST' && p0 === 'fx' && p1 === 'mnb') return json({ missing: await refxAll(env) }); // minden devizás tétel újraszámolása MNB középárfolyammal
+    if (m === 'GET' && p0 === 'fx' && p1 === 'status') return json({ err: await getSetting(env, 'fx_mnb_err', null), mnb: (await DB.prepare(`SELECT cur, COUNT(*) AS n, MIN(date) AS min, MAX(date) AS max FROM fin_fx WHERE cur LIKE '%@MNB' GROUP BY cur`).all()).results });
+    if (m === 'POST' && p0 === 'fx' && p1 === 'rates') { // MNB-árfolyamok kézi betöltése (pl. ha az MNB szolgáltatás nem érhető el a szerverről): { cur, rates: { 'YYYY-MM-DD': rate } }
+      const cur = /^[A-Z]{3}$/.test(body.cur || '') ? body.cur : null; if (!cur) return json({ error: 'cur' }, 400);
+      const st = Object.entries(body.rates || {}).filter(([d, v]) => isDate(d) && Number(v) > 0).map(([d, v]) => DB.prepare(`INSERT OR REPLACE INTO fin_fx (cur, date, rate) VALUES (?, ?, ?)`).bind(cur + '@MNB', d, Number(v)));
+      for (let i = 0; i < st.length; i += 80) await DB.batch(st.slice(i, i + 80));
+      return json({ ok: true, n: st.length });
+    }
 
     return json({ error: 'Nem található.' }, 404);
   } catch (e) {

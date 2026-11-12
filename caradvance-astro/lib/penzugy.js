@@ -566,8 +566,8 @@ async function mnbRates(env, cur, from, to) {
   const has = (day) => Object.keys(map).some((d) => d <= day && d >= addDays(day, -5));
   if (has(from) && (has(to) || to >= today && has(addDays(today, -1)))) return map;
   const body = `<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://www.mnb.hu/webservices/"><soap:Body><web:GetExchangeRates><web:startDate>${addDays(from, -7)}</web:startDate><web:endDate>${to < today ? to : today}</web:endDate><web:currencyNames>${cur}</web:currencyNames></web:GetExchangeRates></soap:Body></soap:Envelope>`;
-  const r = await fetch('https://www.mnb.hu/arfolyamok.asmx', { method: 'POST', headers: { 'Content-Type': 'text/xml; charset=utf-8', SOAPAction: '"http://www.mnb.hu/webservices/MNBArfolyamServiceSoap/GetExchangeRates"' }, body });
-  if (!r.ok) throw new Error('MNB HTTP ' + r.status);
+  const r = await fetch(env.MNB_URL || 'https://www.mnb.hu/arfolyamok.asmx', { method: 'POST', headers: { 'Content-Type': 'text/xml; charset=utf-8', SOAPAction: '"http://www.mnb.hu/webservices/MNBArfolyamServiceSoap/GetExchangeRates"' }, body });
+  if (!r.ok) throw new Error('MNB HTTP ' + r.status + ' ' + (await r.text()).slice(0, 160));
   const x = (await r.text()).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
   const st = []; let n = 0;
   for (const m of x.matchAll(/<Day date="(\d{4}-\d{2}-\d{2})">([\s\S]*?)<\/Day>/g)) {
@@ -584,7 +584,7 @@ async function mnbRates(env, cur, from, to) {
 }
 export async function fxRates(env, cur, from, to) {
   if (cur === 'HUF') return {};
-  try { const m = await mnbRates(env, cur, from, to); if (Object.keys(m).length) return m; } catch (e) { /* MNB nem elérhető → EKB tartalék */ }
+  try { const m = await mnbRates(env, cur, from, to); if (Object.keys(m).length) return m; } catch (e) { /* MNB nem elérhető → EKB tartalék */ try { await env.DB.prepare(`INSERT OR REPLACE INTO fin_settings (k, v) VALUES ('fx_mnb_err', ?)`).bind(JSON.stringify({ at: new Date().toISOString(), msg: String(e && e.message || e).slice(0, 300) })).run(); } catch (x) { /* */ } }
   const have = (await env.DB.prepare(`SELECT date, rate FROM fin_fx WHERE cur = ? AND date BETWEEN ? AND ?`).bind(cur, addDays(from, -7), to).all()).results;
   const map = Object.fromEntries(have.map((r) => [r.date, r.rate]));
   const has = (day) => Object.keys(map).some((d) => d <= day && d >= addDays(day, -5));
