@@ -56,6 +56,10 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .pl tr.memo td{color:var(--mut)}
 .pl td.c{cursor:pointer}.pl td.c:hover{background:#EEF4FF;text-decoration:underline}
 .pl tr.hide{display:none}
+.pl th.totc,.pl td.totc{position:sticky;right:0;z-index:1;background:#EEF3FA;font-weight:800;border-left:2px solid #CFDAEA;min-width:118px;box-shadow:-6px 0 10px -6px rgba(15,23,42,.12)}
+.pl th.totc{color:var(--ink);background:#E3EBF6}.pl tr.sub td.totc{background:#E3EBF6}.pl tr.kpi2 td.totc{background:#DCE5F2}.pl tr.uncat td.totc{background:#FCEFC7}
+.pl tr.car td.totc{background:#F0F4FA;font-weight:700}.pl tr.memo td.totc{background:#F3F6FB}.pl tr.sec td.totc{background:transparent}
+.pl tr.tot td.totc{background:#22447d;color:#fff;border-left-color:#22447d}.pl tr.tot td.totc.neg{color:#ffb4ab}
 .vchart{width:100%;height:auto;display:block;overflow:visible}.vgrid{stroke:#EEF1F5;stroke-width:1}.vax{font-size:11px;fill:#6B7A90}.vval{font-size:11px;font-weight:700;fill:#334155}
 .vhit{fill:transparent}.vbar{cursor:pointer}.vbar:hover .vhit{fill:#F3F6FA}.vbar.sel .vhit{fill:#EEF4FF}.vbar:hover path,.vbar:hover rect[data-k]{filter:brightness(1.06)}.vcross{stroke:#94A3B8;stroke-width:1}
 .vlegend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:2px 0 6px;font-size:12.5px;color:#334155}.vlegend span{display:inline-flex;align-items:center;gap:6px}.vlegend i{width:10px;height:10px;border-radius:3px;display:inline-block}
@@ -283,7 +287,7 @@ function renderPL() {
   function cells(vals, ck, cls) {
     return vals.map(function (v, i) {
       var clk = ck ? ' c" data-ck="' + ck + '" data-col="' + (i < cols.length ? cols[i].k : '*') : '';
-      return '<td class="n ' + nc(v) + clk + '">' + ft(v, true) + '</td>';
+      return '<td class="n ' + nc(v) + (i === cols.length ? ' totc' : '') + clk + '">' + ft(v, true) + '</td>';
     }).join('');
   }
   function carRows(ck) {
@@ -295,7 +299,7 @@ function renderPL() {
     }).filter(function (x) { return x.r.some(function (v) { return Math.abs(v) >= 0.5; }); })
       .sort(function (a, b) { return a.pl === '' ? 1 : b.pl === '' ? -1 : a.r[a.r.length - 1] - b.r[b.r.length - 1]; })
       .map(function (x) { var nm = x.pl ? (vehName(x.pl) ? esc(vehName(x.pl)) + ' · ' : '') + '<b>' + esc(x.pl) + '</b>' : '<span class="muted">rendszám nélkül</span>';
-        return '<tr class="cat car' + (open ? '' : ' hide') + '" data-g="' + esc(ck) + '"><td>🚗 ' + nm + '</td>' + x.r.map(function (v, i) { return '<td class="n ' + nc(v) + ' c" data-ck="' + ck + '" data-pl="' + esc(x.pl || '-') + '" data-col="' + (i < cols.length ? cols[i].k : '*') + '">' + ft(v, true) + '</td>'; }).join('') + '</tr>'; }).join('');
+        return '<tr class="cat car' + (open ? '' : ' hide') + '" data-g="' + esc(ck) + '"><td>🚗 ' + nm + '</td>' + x.r.map(function (v, i) { return '<td class="n ' + nc(v) + (i === cols.length ? ' totc' : '') + ' c" data-ck="' + ck + '" data-pl="' + esc(x.pl || '-') + '" data-col="' + (i < cols.length ? cols[i].k : '*') + '">' + ft(v, true) + '</td>'; }).join('') + '</tr>'; }).join('');
   }
   function catRow(c, top) {
     var ck = String(c.id), v = rowVals([ck]); if (!S.view.empty && !v.some(function (x) { return Math.abs(x) >= 0.5; })) return { v: v, h: '' };
@@ -329,7 +333,7 @@ function renderPL() {
   if (U.some(function (x) { return Math.abs(x) >= 0.5; })) html += '<tr class="uncat"><td>⚠ Besorolásra vár (kategória nélkül)</td>' + cells(U, 'UNCAT') + '</tr>';
   html += '<tr class="kpi2"><td>EBITDA (működési eredmény)</td>' + cells(ebitda) + '</tr>' + B.h;
   html += '<tr class="tot"><td>Eredmény</td>' + cells(res) + '</tr>';
-  html += '<tr class="memo"><td>Eredmény / árbevétel</td>' + res.map(function (v, i) { var r = R.v[i]; return '<td class="n">' + (Math.abs(r) >= 1 ? Math.round(v / r * 100) + '%' : '–') + '</td>'; }).join('') + '</tr>';
+  html += '<tr class="memo"><td>Eredmény / árbevétel</td>' + res.map(function (v, i) { var r = R.v[i]; return '<td class="n' + (i === cols.length ? ' totc' : '') + '">' + (Math.abs(r) >= 1 ? Math.round(v / r * 100) + '%' : '–') + '</td>'; }).join('') + '</tr>';
   var X = byKind('excl'), xh = '';
   X.forEach(function (c) { var v = rowVals([String(c.id)]); if (v.some(function (x) { return Math.abs(x) >= 0.5; })) xh += '<tr class="cat top memo"><td>' + esc(c.name) + '</td>' + cells(v, String(c.id)) + '</tr>'; });
   if (xh) html += '<tr class="sec"><td colspan="' + (cols.length + 2) + '">Nem eredményhatású mozgások (tájékoztató)</td></tr>' + xh;
@@ -356,7 +360,7 @@ function renderPL() {
     + '<button class="btn sm ghost" id="plCsv">CSV export</button></div>'
     + (P.noFx ? '<div class="note warn">' + P.noFx + ' deviza-tételnek nincs árfolyama, ezek kimaradtak. <button class="btn sm" id="fxFill">Árfolyamok lekérése</button></div>' : '')
     + bars
-    + '<div class="pl"><table><thead><tr><th>Ft · ' + (S.view.basis === 'net' ? 'nettó' : 'bruttó') + ' · pénzforgalmi</th>' + cols.map(function (c) { return '<th class="n">' + (c.color ? '<span class="ldot" style="background:' + c.color + '"></span>' : '') + esc(c.t) + '</th>'; }).join('') + '<th class="n">Összesen</th></tr></thead><tbody>' + html + '</tbody></table></div>'
+    + '<div class="pl"><table><thead><tr><th>Ft · ' + (S.view.basis === 'net' ? 'nettó' : 'bruttó') + ' · pénzforgalmi</th>' + cols.map(function (c) { return '<th class="n">' + (c.color ? '<span class="ldot" style="background:' + c.color + '"></span>' : '') + esc(c.t) + '</th>'; }).join('') + '<th class="n totc">Összesen</th></tr></thead><tbody>' + html + '</tbody></table></div>'
     + '<p class="small muted" style="margin:10px 0 0">Pénzforgalmi szemlélet: a tételek a banki könyvelés napján számítanak. A nettó érték a párosított bizonylat nettó/bruttó arányából, ennek hiányában a kategória (vagy tétel) levonható ÁFA-kulcsából számol; 0% = a bruttó a költség (pl. személyautó üzemanyag). Deviza: EKB napi árfolyam, vagy a kártyás forintösszeg. Ez vezetői kimutatás, nem a könyvelő főkönyve.</p></div>';
   $('#vLine').onchange = function () { S.view.lines = this.value; renderPL(); };
   $$('[data-cols]').forEach(function (b) { b.onclick = function () { S.view.cols = b.dataset.cols; renderPL(); }; });
@@ -755,9 +759,9 @@ function renderDash() {
     + '<div class="kpi' + (open.length ? ' alert' : '') + '" id="kOpen"><span title="Beérkező számlák, amelyekhez még nincs banki tétel párosítva (lehet, hogy egy nem importált számláról fizették)">Párosítatlan beérkező számlák</span><b>' + open.length + ' db</b><small>' + (Object.keys(openCur).map(function (c) { return money(openCur[c], c); }).join(' · ') || 'nincs') + '</small></div></div>'
     + '<div class="card"><div class="row" style="margin-bottom:6px"><h2 style="margin:0">Havi kiadások</h2><span class="small muted">Ft · ' + basisLbl() + ' · pénzforgalmi · kattints egy hónapra a részletekért</span><span class="sp"></span>' + basisToggle() + '</div>'
     + legend(keys.map(function (k, i) { return { name: k, color: colors[i] }; })) + '<div id="dStack">' + stackedChart(months, keys, colors, data, S.dashM) + '</div>'
-    + '<details class="vtable"><summary class="small">Táblázat nézet</summary><div class="pl"><table><thead><tr><th>Csoport</th>' + months.map(function (m) { return '<th class="n">' + esc(mlabel(m)) + '</th>'; }).join('') + '<th class="n">Összesen</th></tr></thead><tbody>'
-    + keys.map(function (k, i) { var r = months.map(function (m) { return (data[m] || {})[k] || 0; }); return '<tr class="cat top"><td><span class="ldot" style="background:' + colors[i] + '"></span>' + esc(k) + '</td>' + r.map(function (v) { return '<td class="n">' + ft(v, true) + '</td>'; }).join('') + '<td class="n"><b>' + ft(r.reduce(function (a, b) { return a + b; }, 0)) + '</b></td></tr>'; }).join('')
-    + '<tr class="sub"><td>Összesen</td>' + mt.map(function (v) { return '<td class="n">' + ft(v, true) + '</td>'; }).join('') + '<td class="n">' + ft(total) + '</td></tr></tbody></table></div></details></div>'
+    + '<details class="vtable"><summary class="small">Táblázat nézet</summary><div class="pl"><table><thead><tr><th>Csoport</th>' + months.map(function (m) { return '<th class="n">' + esc(mlabel(m)) + '</th>'; }).join('') + '<th class="n totc">Összesen</th></tr></thead><tbody>'
+    + keys.map(function (k, i) { var r = months.map(function (m) { return (data[m] || {})[k] || 0; }); return '<tr class="cat top"><td><span class="ldot" style="background:' + colors[i] + '"></span>' + esc(k) + '</td>' + r.map(function (v) { return '<td class="n">' + ft(v, true) + '</td>'; }).join('') + '<td class="n totc"><b>' + ft(r.reduce(function (a, b) { return a + b; }, 0)) + '</b></td></tr>'; }).join('')
+    + '<tr class="sub"><td>Összesen</td>' + mt.map(function (v) { return '<td class="n">' + ft(v, true) + '</td>'; }).join('') + '<td class="n totc">' + ft(total) + '</td></tr></tbody></table></div></details></div>'
     + '<div class="card"><h2>' + esc(mlabel(S.dashM)) + ' · csoportonként</h2>'
     + (mE.length ? hbars(keys.filter(function (k) { return k === 'Egyéb' ? rest.some(function (r) { return mG[r]; }) : mG[k]; }).map(function (k) { var i = keys.indexOf(k); return { label: k, v: k === 'Egyéb' ? rest.reduce(function (a, r) { return a + (mG[r] || 0); }, 0) : mG[k], color: colors[i] }; }).sort(function (a, b) { return b.v - a.v; }), null, { total: cur }) : '<p class="muted">Nincs kiadás ebben a hónapban.</p>')
     + '</div><div class="card"><h2>' + esc(mlabel(S.dashM)) + ' · legnagyobb tételek</h2><div class="ovx">' + (topTx.length ? txTable(topTx, false) : '<p class="muted">–</p>') + '</div></div>';
