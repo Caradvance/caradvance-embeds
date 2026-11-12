@@ -12,8 +12,12 @@ const MAX = 8;
 
 const CSS = '<style id="ca-show-css">'
   // színpad
-  + '#autoink.ca-show{max-width:none!important;margin:18px 16px 0!important;padding:46px max(22px,calc((100% - 1240px)/2)) 34px!important;border-radius:28px;position:relative;overflow:hidden;color:#fff;'
-  + 'background:radial-gradient(ellipse 46% 40% at 50% 46%,rgba(255,255,255,.11),transparent 72%),radial-gradient(ellipse 38% 22% at 50% 96%,rgba(226,0,26,.22),transparent 72%),linear-gradient(180deg,#17181d 0%,#0b0b0e 58%,#060608 100%)}'
+  // a hero és a színpad egyetlen összefüggő sötét felület: nincs rés, a videó alja átúszik a színpadba
+  + 'section.hero:has(+#autoink){margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}'
+  + 'section.hero:has(+#autoink)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:160px;pointer-events:none;z-index:1;background:linear-gradient(180deg,rgba(23,24,29,0) 0%,rgba(23,24,29,.85) 70%,#17181d 100%)}'
+  + 'section.hero:has(+#autoink) .scrolldown{z-index:2}'
+  + '#autoink.ca-show{max-width:none!important;width:auto!important;box-sizing:border-box;margin:0 16px 0!important;padding:34px max(22px,calc((100% - 1240px)/2)) 34px!important;border-radius:0 0 32px 32px;position:relative;overflow:hidden;color:#fff;'
+  + 'background:radial-gradient(ellipse 46% 40% at 50% 52%,rgba(255,255,255,.10),transparent 72%),radial-gradient(ellipse 38% 22% at 50% 96%,rgba(226,0,26,.22),transparent 72%),linear-gradient(180deg,#17181d 0%,#0f1013 40%,#0a0a0d 70%,#060608 100%)}'
   + '#autoink.ca-show::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 120px);-webkit-mask-image:linear-gradient(180deg,#000,transparent 60%);mask-image:linear-gradient(180deg,#000,transparent 60%)}'
   // fejléc
   + '#autoink .ca-sh{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:0 0 22px;position:relative;z-index:6}'
@@ -64,7 +68,7 @@ const CSS = '<style id="ca-show-css">'
   + '#autoink .ca-dots button{width:8px;height:8px;padding:0;border:0;border-radius:99px;background:rgba(255,255,255,.3);cursor:pointer;transition:width .3s,background .3s}'
   + '#autoink .ca-dots button.on{width:26px;background:#e2001a}'
   + '#autoink.ca-show .cf-none{color:rgba(255,255,255,.7)}'
-  + '@media(max-width:860px){#autoink.ca-show{margin:12px 8px 0!important;padding:28px 16px 22px!important;border-radius:22px}#autoink .ca-sh{align-items:flex-start;gap:14px;margin-bottom:16px}#autoink .ca-sh-r{width:100%;flex-wrap:nowrap;gap:8px}'
+  + '@media(max-width:860px){#autoink.ca-show{padding:22px 16px 22px!important}#autoink .ca-sh{align-items:flex-start;gap:14px;margin-bottom:16px}#autoink .ca-sh-r{width:100%;flex-wrap:nowrap;gap:8px}'
   + '#autoink .ca-sh p{display:none}#autoink .ca-sh h2{font-size:28px}#autoink .ca-bt small{display:none}#autoink .ca-bt button{padding:8px 12px;font-size:13px}'
   + '#autoink .ca-all{height:40px;padding:0 14px;font-size:13px;flex:1 1 auto;justify-content:center;min-width:0;overflow:hidden;text-overflow:ellipsis}}'
   + '@media(prefers-reduced-motion:reduce){#autoink.ca-show .cw.cf3d .cw-item{transition:none!important}}'
@@ -166,7 +170,17 @@ const CLIENT = function () {
     setTimeout(head, 0);
   }, true);
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#autoink .autok-tab')) setTimeout(head, 80); });
-  function init() { var s = sec(); if (!s) return; s.classList.add('ca-show'); head(); }
+  function init() {
+    var s = sec(); if (!s) return; s.classList.add('ca-show');
+    // csak akkor olvad össze a heróval, ha közvetlenül utána áll; a vízszintes margó a heróéval egyezik
+    var hero = s.previousElementSibling;
+    if (hero && hero.matches('section.hero')) {
+      document.body.classList.add('ca-show-on');
+      var m = getComputedStyle(hero); s.style.setProperty('margin-left', m.marginLeft, 'important'); s.style.setProperty('margin-right', m.marginRight, 'important');
+      var r = parseFloat(m.borderTopLeftRadius) || 32; s.style.borderRadius = '0 0 ' + r + 'px ' + r + 'px';
+    } else { s.style.setProperty('margin-top', '18px', 'important'); s.style.borderRadius = '28px'; }
+    head();
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 };
 
