@@ -48,6 +48,10 @@ const CSS = '<style id="ca-dark-tidy-css">'
   + '#ca-cta .card.ca-cta-card>div{width:100%;display:flex;flex-direction:column;align-items:center}'
   + '#ca-cta h2{margin:0 0 8px;font-size:clamp(26px,3vw,38px);letter-spacing:-.02em}#ca-cta p{margin:0;opacity:.8;font-size:16px}'
   + '#ca-cta .ca-cta-btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center}'
+  // telefonszám-gomb: Liquid Glass üveggomb ikonnal (jóváhagyott „A”)
+  + '#ca-cta .ca-tel{display:inline-flex;align-items:center;gap:9px;color:#fff!important;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.06))!important;border:1px solid rgba(255,255,255,.28)!important;'
+  + '-webkit-backdrop-filter:blur(12px) saturate(180%);backdrop-filter:blur(12px) saturate(180%);box-shadow:inset 1px 1px 1px rgba(255,255,255,.45),inset -1px -1px 1px rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.35)!important;transition:background .25s,border-color .25s}'
+  + '#ca-cta .ca-tel:hover{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.10))!important;border-color:rgba(255,255,255,.45)!important}'
   + '#ca-cta .ca-cta-alt{display:block;margin-top:12px;font-size:14px;opacity:.75}#ca-cta .ca-cta-alt a{color:inherit;font-weight:700}'
   + '@media(max-width:640px){#ca-cta .card.ca-cta-card{padding:28px 22px}}'
   + '</style>';
@@ -138,7 +142,7 @@ try {
         edits.push([loc(gyik).endOffset, loc(gyik).endOffset,
           '<section class="block" id="ca-cta" style="padding-top:10px"><div class="wrap"><div class="card ca-cta-card reveal">'
           + '<div><h2>Melyik autó érdekel?</h2><p>Írd meg, mit keresel — személyre szabott ajánlatot küldünk.</p></div>'
-          + '<div><div class="ca-cta-btns"><a class="btn btn-red" href="/autot-keresek/">Ajánlatot kérek →</a><a class="btn btn-outline" href="tel:+36302336060">+36 30 233 6060</a></div>'
+          + '<div><div class="ca-cta-btns"><a class="btn btn-red" href="/autot-keresek/">Ajánlatot kérek →</a><a class="btn ca-tel" data-dm-skip href="tel:+36302336060"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>+36 30 233 6060</a></div>'
           + '<span class="ca-cta-alt">vagy írj nekünk: <a href="mailto:info@caradvance.hu">info@caradvance.hu</a></span></div>'
           + '</div></div></section>']);
       }
