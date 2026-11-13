@@ -44,9 +44,10 @@ const CSS = '<style id="ca-dark-tidy-css">'
   + '#gyik .faq-list:not(.ca-all-open) .faq-item.ca-faq-more{display:none}'
   + '#gyik .ca-faq-btn{margin-top:16px}'
   // záró ajánlatkérő kártya
-  + '#ca-cta .card.ca-cta-card{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:40px 44px;flex-wrap:wrap}'
+  + '#ca-cta .card.ca-cta-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:24px;padding:48px 44px}'
+  + '#ca-cta .card.ca-cta-card>div{width:100%;display:flex;flex-direction:column;align-items:center}'
   + '#ca-cta h2{margin:0 0 8px;font-size:clamp(26px,3vw,38px);letter-spacing:-.02em}#ca-cta p{margin:0;opacity:.8;font-size:16px}'
-  + '#ca-cta .ca-cta-btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}'
+  + '#ca-cta .ca-cta-btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center}'
   + '#ca-cta .ca-cta-alt{display:block;margin-top:12px;font-size:14px;opacity:.75}#ca-cta .ca-cta-alt a{color:inherit;font-weight:700}'
   + '@media(max-width:640px){#ca-cta .card.ca-cta-card{padding:28px 22px}}'
   + '</style>';
