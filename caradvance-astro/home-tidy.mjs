@@ -26,14 +26,23 @@ const CSS = '<style id="ca-dark-tidy-css">'
   // szolgáltatás-kártyák: egy gomb, egységes alj
   + '#szolgaltatasok .card.svc{display:flex;flex-direction:column}#szolgaltatasok .card.svc ul{margin-bottom:22px}'
   + '#szolgaltatasok .ca-svc-cta{margin-top:auto;align-self:flex-start}'
-  // Rólunk
-  + '#rolunk .ca-about{display:grid;grid-template-columns:1.05fr 1fr;gap:34px;align-items:center;margin-top:8px}'
-  + '#rolunk .ca-about p{font-size:17px;line-height:1.65;margin:0 0 22px;opacity:.88}'
-  + '#rolunk .ca-vals{display:grid;grid-template-columns:1fr 1fr;gap:14px}'
-  + '#rolunk .ca-vals .card{padding:20px 20px 18px;margin:0}#rolunk .ca-vals .card h3{margin:12px 0 6px;font-size:16.5px}#rolunk .ca-vals .card p{margin:0;font-size:13.5px;line-height:1.5;opacity:.75}'
-  + '#rolunk .ca-vals .ic{width:38px;height:38px}'
-  + '#rolunk #jotekonysag{margin-top:34px}'
-  + '@media(max-width:900px){#rolunk .ca-about{grid-template-columns:1fr}}@media(max-width:520px){#rolunk .ca-vals{grid-template-columns:1fr}}'
+  // Rólunk: felül cím balra + bemutatkozás jobbra; alatta a 4 érték egy sorban, egyforma kártyákon
+  // Rólunk („nagy idézet”, jóváhagyott 4. ötlet): középen küldetésmondat, alatta aláírás + egy mondat, az értékek vékony sorban
+  + '#rolunk .ca-quote{text-align:center;padding:10px 0 4px}'
+  + '#rolunk .ca-quote .eyebrow{justify-content:center}'
+  + '#rolunk .ca-q{font-size:clamp(30px,3.6vw,50px);line-height:1.15;letter-spacing:-.02em;font-weight:800;color:#fff;max-width:900px;margin:14px auto 0}'
+  + '#rolunk .ca-q em{font-style:normal;background:linear-gradient(90deg,#ff2a40,#ff7a6a);-webkit-background-clip:text;background-clip:text;color:transparent}'
+  + '#rolunk .ca-by{margin-top:18px;color:rgba(255,255,255,.6);font-size:15px}#rolunk .ca-by b{color:#fff}'
+  + '#rolunk .ca-lead{max-width:680px;margin:20px auto 0;color:rgba(255,255,255,.75);font-size:16px;line-height:1.65}'
+  + '#rolunk .ca-vrow{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:34px;padding-top:26px;border-top:1px solid rgba(255,255,255,.08);text-align:left}'
+  + '#rolunk .ca-vrow>div{display:flex;gap:12px;align-items:flex-start}#rolunk .ca-vrow svg{flex:none;width:22px;height:22px;stroke:#ff3b4e;margin-top:2px}'
+  + '#rolunk .ca-vrow b{display:block;color:#fff;font-size:15.5px;margin-bottom:3px}#rolunk .ca-vrow span{font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.62)}'
+  + '#rolunk .ca-quote-cta{margin-top:26px}'
+  + '#rolunk .ca-about-btn{display:inline-flex;align-items:center;gap:8px;color:#fff!important;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.06))!important;border:1px solid rgba(255,255,255,.28)!important;'
+  + '-webkit-backdrop-filter:blur(12px) saturate(180%);backdrop-filter:blur(12px) saturate(180%);box-shadow:inset 1px 1px 1px rgba(255,255,255,.45),inset -1px -1px 1px rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.35)!important;transition:background .25s,border-color .25s}'
+  + '#rolunk .ca-about-btn:hover{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.10))!important;border-color:rgba(255,255,255,.45)!important}'
+  + '#rolunk #jotekonysag{margin-top:40px}'
+  + '@media(max-width:900px){#rolunk .ca-vrow{grid-template-columns:1fr 1fr}}@media(max-width:700px){#rolunk .ca-q{font-size:30px}}@media(max-width:420px){#rolunk .ca-vrow{grid-template-columns:1fr}}'
   // vélemények: link az összesre
   + '#velemenyek .ca-rev-all{display:inline-flex;margin-top:18px}'
   // „Bővebben” (SEO-szöveg) és GYIK
@@ -97,18 +106,15 @@ try {
       // 3) Rólunk: a „Kik vagyunk?” + „Amiben hiszünk” helyett; a jótékonysági kártya ide kerül
       //    (a blokk azonosítóját átnevezzük, különben a chat szkript visszamozgatná az autós rész alá)
       const tort = byId('tortenet'), ert = byId('ertekek'), jot = byId('jotekonysag-blokk'), rev = byId('velemenyek');
-      const vals = findAll(ert, (n) => n.tagName === 'div' && hasClass(n, 'value') && hasClass(n, 'card')).map((v) => {
-        const ic = findAll(v, (n) => hasClass(n, 'ic'))[0], h3 = findAll(v, (n) => n.tagName === 'h3')[0], p = findAll(v, (n) => n.tagName === 'p')[0];
-        const first = p ? inner(p).split(/(?<=\.)\s/)[0] : '';
-        return '<div class="card value reveal">' + (ic ? src(ic) : '') + (h3 ? src(h3) : '') + '<p>' + first + '</p></div>';
-      }).join('');
+      const VROW = '<div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><p style="margin:0"><b>Átláthatóság</b><span>Nincs apró betű, nincs rejtett költség.</span></p></div><div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg><p style="margin:0"><b>Biztonság</b><span>1 év szavatosság importált autóinkra.</span></p></div><div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.5a3 3 0 0 1 0 6M21 20c0-2.6-1.6-4.8-4-5.6"/></svg><p style="margin:0"><b>Személyes figyelem</b><span>Az első kérdéstől az átadásig veled vagyunk.</span></p></div><div class="reveal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9C.7 8.6 2.6 5 6 5c2 0 3.3 1 4 2.2.7-1.2 2-2.2 4-2.2 3.4 0 5.3 3.6 3.5 7-2.5 4.4-9.5 9-9.5 9z"/></svg><p style="margin:0"><b>Társadalmi felelősség</b><span>A jutalék egy része jótékony célra megy.</span></p></div>';
       const charity = jot ? findAll(jot, (n) => attr(n, 'id') === 'jotekonysag')[0] : null;
       const rolunk = '<section class="block" id="rolunk" style="padding-top:0"><div class="wrap">'
-        + '<span class="eyebrow reveal">Rólunk</span><h2 class="sec-title reveal">Kik vagyunk?</h2>'
-        + '<div class="ca-about"><div class="reveal"><p>A Caradvance a németországi <strong>Caradvance GmbH</strong> márkája — 2003 óta a német autópiac megbízható szereplője. '
-        + 'Magyarországon a <strong>BH Group Zrt.</strong> képviseli: magyarul, helyben, személyesen kísérünk végig, leinformált, bevizsgált autókkal és <strong>1 év szavatossággal</strong>.</p>'
-        + '<a class="btn btn-outline" href="/miert-mi/">Tudj meg többet rólunk →</a></div>'
-        + '<div class="ca-vals">' + vals + '</div></div>'
+        + '<div class="ca-quote"><span class="eyebrow reveal">Rólunk</span>'
+        + '<h2 class="ca-q reveal">„Visszaadni a <em>bizalmat</em> az autókereskedelembe.”</h2>'
+        + '<div class="ca-by reveal"><b>Caradvance csapata</b> · Caradvance GmbH, 2003 óta · Magyarországon a BH Group Zrt.</div>'
+        + '<p class="ca-lead reveal">Minden autó mögött valódi előélet, minden ügylet mögött valódi felelősségvállalás — és minden eladásból jut valami vissza a közösségnek is.</p>'
+        + '<div class="ca-vrow">' + VROW + '</div>'
+        + '<div class="ca-quote-cta reveal"><a class="btn ca-about-btn" data-dm-skip href="/miert-mi/">Tudj meg többet rólunk →</a></div></div>'
         + (charity ? src(charity) : '') + '</div></section>';
       if (tort) cut(tort); if (ert) cut(ert); if (jot) cut(jot);
       // a Rólunk a vélemények ELÉ kerül (előbb kik vagyunk, utána a bizonyíték: amit az ügyfeleink mondanak)
