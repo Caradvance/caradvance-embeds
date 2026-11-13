@@ -1,7 +1,8 @@
 // Build lépés: „prémium” finomságok a magyar főoldalon (CSAK dist/index.html). Idempotens.
 //  1) megjelenési animációk görgetéskor (a meglévő .reveal-re építve, lépcsőzetesen) + felpörgő számok a statisztikákon
 //  2) fényes kártyák: a kurzort követő piros fényfolt; csillanás a gombokon
-//  3) „Így dolgozunk” idővonal: görgetésre kirajzolódó piros fényvonal, a lépésszámok sorban kigyulladnak
+//  3) „Így dolgozunk” idővonal: lágyan kirajzolódó fényvonal, a lépések a fej nyomán izzanak fel
+//  5) üveghatású (glassy) kártyák
 //  4) bizalmi sáv a fejlécben a gombok alatt
 // A „kevesebb mozgás” rendszerbeállításnál az animációk kimaradnak.
 import fs from 'node:fs';
@@ -44,17 +45,35 @@ const CSS = '<style id="ca-dark-extras-css">'
   + '.ca-shine::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;pointer-events:none;transform:skewX(-20deg) translateX(0);'
   + 'background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);transition:transform .8s cubic-bezier(.2,.7,.2,1)}'
   + '.ca-shine:hover::after{transform:skewX(-20deg) translateX(420%)}'
-  // 3) idővonal
-  + '#miert .ca-tl{position:relative;height:12px;margin:34px 0 -16px}'
-  + '#miert .ca-tl-track{position:absolute;left:var(--x0,0);right:var(--x1,0);top:5px;height:2px;border-radius:2px;background:rgba(255,255,255,.1)}'
-  + '#miert .ca-tl-fill{position:absolute;left:var(--x0,0);top:5px;height:2px;width:var(--w,0px);border-radius:2px;transition:width .7s cubic-bezier(.2,.7,.2,1);'
-  + 'background:linear-gradient(90deg,rgba(226,0,26,.4),#ff2a40);box-shadow:0 0 14px 2px rgba(226,0,26,.6)}'
-  + '#miert .ca-tl-dot{position:absolute;top:0;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#2B313C;border:2px solid #0D0F13;transition:background .4s,box-shadow .4s}'
-  + '#miert .ca-tl-dot.on{background:#ff2a40;box-shadow:0 0 0 4px rgba(226,0,26,.18),0 0 16px rgba(226,0,26,.8)}'
-  + '#miert .ic-num{background-color:#F1F3F6!important;color:#0D0F13!important;transition:background-color .45s,color .45s,box-shadow .45s,transform .45s}'
-  + '#miert .card.ca-on .ic-num{background-color:#e2001a!important;color:#fff!important;box-shadow:0 0 0 6px rgba(226,0,26,.14),0 8px 26px rgba(226,0,26,.55);transform:scale(1.06)}'
-  + '#miert .card.ca-on{border-color:rgba(255,70,90,.28)!important}'
+  // 3) idővonal: a vonal lágyan, fényes „fejjel” rajzolódik ki balról jobbra; ahol a fej elhalad, a lépésszám
+  //    fokozatosan pirosra izzik.
+  + '#miert .ca-tl{position:relative;height:14px;margin:34px 0 -16px}'
+  + '#miert .ca-tl-track{position:absolute;left:var(--x0,0);right:var(--x1,0);top:6px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.12),rgba(255,255,255,.04))}'
+  + '#miert .ca-tl-fill{position:absolute;left:var(--x0,0);top:6px;height:2px;width:var(--w,0px);border-radius:2px;transition:width 2.6s cubic-bezier(.65,0,.35,1);'
+  + 'background:linear-gradient(90deg,rgba(226,0,26,0),rgba(226,0,26,.55) 30%,#ff2a40);box-shadow:0 0 12px 1px rgba(226,0,26,.45)}'
+  + '#miert .ca-tl-fill::after{content:"";position:absolute;right:-7px;top:-6px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#fff 0,#ff5a6a 35%,rgba(226,0,26,0) 72%);'
+  + 'box-shadow:0 0 22px 6px rgba(255,40,60,.55);opacity:var(--head,0);transition:opacity .6s}'
+  + '#miert .ca-tl-dot{position:absolute;top:1px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#20252e;border:2px solid #0D0F13;box-shadow:0 0 0 1px rgba(255,255,255,.08);transition:background 1s,box-shadow 1s}'
+  + '#miert .ca-tl-dot.on{background:#ff2a40;box-shadow:0 0 0 4px rgba(226,0,26,.14),0 0 14px rgba(226,0,26,.7)}'
+  + '#miert .ic-num{background-color:rgba(255,255,255,.92)!important;color:#0D0F13!important;transition:background-color 1s,color 1s,box-shadow 1s,transform 1s cubic-bezier(.2,.7,.2,1)}'
+  + '#miert .card.ca-on .ic-num{background-color:#e2001a!important;color:#fff!important;box-shadow:0 0 0 6px rgba(226,0,26,.12),0 8px 26px rgba(226,0,26,.5);transform:scale(1.06)}'
   + '@media(max-width:960px){#miert .ca-tl{display:none}}'
+  // 5) „Liquid Glass” (Apple-stílus, merészebb) blokkok: áttetsző, világos üveglap; vastag, csillanó perem (bal felül és
+  //    jobb alul izzik), fényes „lakkcsík” a tetején, belső élfény a vastagsághoz, mély árnyék. Mögöttük élénk fények.
+  + 'html.ca-dark .cah .card,html.ca-dark .stats .stat{'
+  + 'background:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 18%,rgba(255,255,255,0) 42%),radial-gradient(130% 90% at 0% 0%,rgba(255,255,255,.14),transparent 50%),radial-gradient(120% 90% at 100% 100%,rgba(255,255,255,.07),transparent 55%),rgba(255,255,255,.055)!important;'
+  + 'background-color:transparent!important;-webkit-backdrop-filter:blur(14px) saturate(200%) brightness(1.15);backdrop-filter:blur(14px) saturate(200%) brightness(1.15);border:1px solid transparent!important;position:relative;'
+  + 'box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.45),inset -1px -1px 1px rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.06),inset 0 10px 30px rgba(255,255,255,.05),0 30px 70px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.35)!important}'
+  // vastag, csillanó perem (gradiens keret maszkkal)
+  + 'html.ca-dark .cah .card::before,html.ca-dark .stats .stat::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.6px;pointer-events:none;z-index:2;'
+  + 'background:linear-gradient(135deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.35) 12%,rgba(255,255,255,.06) 32%,rgba(255,255,255,.03) 60%,rgba(255,255,255,.28) 86%,rgba(255,255,255,.85) 100%);'
+  + '-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}'
+  + 'html.ca-dark .cah .card.ca-spot:hover{border-color:transparent!important}'
+  + 'html.ca-dark .cah .faq-item{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03))!important;-webkit-backdrop-filter:blur(12px) saturate(200%);backdrop-filter:blur(12px) saturate(200%);'
+  + 'border:1px solid rgba(255,255,255,.16)!important;box-shadow:inset 1px 1px 1px rgba(255,255,255,.35),0 10px 30px rgba(0,0,0,.35)!important}'
+  + 'html.ca-dark .cah .values-grid,html.ca-dark .cah .svc-grid,html.ca-dark .cah .rev-grid,html.ca-dark .stats-in{position:relative;isolation:isolate}'
+  + 'html.ca-dark .cah .values-grid::before,html.ca-dark .cah .svc-grid::before,html.ca-dark .cah .rev-grid::before,html.ca-dark .stats-in::before{content:"";position:absolute;inset:4% 2%;z-index:-1;pointer-events:none;filter:blur(38px);'
+  + 'background:radial-gradient(30% 55% at 20% 45%,rgba(255,30,55,.45),transparent 70%),radial-gradient(26% 50% at 58% 30%,rgba(255,255,255,.16),transparent 70%),radial-gradient(30% 55% at 85% 70%,rgba(226,0,26,.30),transparent 70%)}'
   // 4) bizalmi sáv
   + 'section.hero .ca-trust{display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin:26px auto 0;padding:10px 20px;border-radius:999px;'
   + 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:rgba(255,255,255,.78);font-size:13.5px;font-weight:500;line-height:1.3;position:relative;z-index:2}'
@@ -121,29 +140,38 @@ const CLIENT = function () {
     }, { passive: true });
     [].forEach.call(document.querySelectorAll('.btn, #autoink .ca-all, #autoink .sub-btn'), function (b) { b.classList.add('ca-shine'); });
 
-    // 3) „Így dolgozunk” idővonal
+    // 3) „Így dolgozunk” idővonal: amikor a rész láthatóvá válik, a vonal lágyan kirajzolódik; ahol a fej elhalad,
+    //    ott izzik fel a lépés
     var sec = document.getElementById('miert'), grid = sec && sec.querySelector('.values-grid');
     if (grid) {
-      var steps = [].slice.call(grid.children);
+      var steps = [].slice.call(grid.children), n = steps.length;
       var tl = document.createElement('div'); tl.className = 'ca-tl'; tl.setAttribute('data-dm-skip', '');
       tl.innerHTML = '<div class="ca-tl-track"></div><div class="ca-tl-fill"></div>' + steps.map(function () { return '<span class="ca-tl-dot"></span>'; }).join('');
       grid.parentNode.insertBefore(tl, grid);
-      var dots = [].slice.call(tl.querySelectorAll('.ca-tl-dot')), xs = [];
+      var dots = [].slice.call(tl.querySelectorAll('.ca-tl-dot')), fill = tl.querySelector('.ca-tl-fill'), xs = [], drawn = false;
       function place() {
         var tr = tl.getBoundingClientRect();
         xs = steps.map(function (s) { var b = s.querySelector('.ic-num') || s, r = b.getBoundingClientRect(); return r.left + r.width / 2 - tr.left; });
         dots.forEach(function (d, i) { d.style.left = xs[i] + 'px'; });
-        tl.style.setProperty('--x0', xs[0] + 'px'); tl.style.setProperty('--x1', (tr.width - xs[xs.length - 1]) + 'px');
-        upd();
+        tl.style.setProperty('--x0', xs[0] + 'px'); tl.style.setProperty('--x1', (tr.width - xs[n - 1]) + 'px'); tl.style.setProperty('--len', (xs[n - 1] - xs[0]) + 'px');
+        if (drawn) tl.style.setProperty('--w', (xs[n - 1] - xs[0]) + 'px');
       }
-      function upd() {
-        var lim = innerHeight * 0.72, last = -1;
-        steps.forEach(function (s, i) { var on = s.getBoundingClientRect().top < lim; s.classList.toggle('ca-on', on); if (dots[i]) dots[i].classList.toggle('on', on); if (on) last = i; });
-        tl.style.setProperty('--w', last < 0 ? '0px' : (xs[last] - xs[0]) + 'px');
+      function light(i) { steps[i].classList.add('ca-on'); dots[i].classList.add('on'); }
+      function draw() {
+        if (drawn) return; drawn = true;
+        if (RM) { tl.style.setProperty('--w', (xs[n - 1] - xs[0]) + 'px'); steps.forEach(function (s, i) { light(i); }); return; }
+        // mobilon nincs vonal (a kártyák egymás alatt): a lépések egymás után, lágyan izzanak fel
+        if (innerWidth <= 960) { steps.forEach(function (s, i) { setTimeout(function () { light(i); }, i * 650); }); return; }
+        light(0); tl.style.setProperty('--head', 1); tl.style.setProperty('--w', (xs[n - 1] - xs[0]) + 'px');
+        // a fej aktuális helyzete alapján gyulladnak a lépések
+        (function watch() { var w = fill.getBoundingClientRect().width, all = true;
+          for (var i = 1; i < n; i++) { if (w >= xs[i] - xs[0] - 4) light(i); else all = false; }
+          if (!all) requestAnimationFrame(watch); else setTimeout(function () { tl.style.setProperty('--head', 0); }, 400); })();
       }
-      var raf = 0; function onS() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; upd(); }); }
-      addEventListener('scroll', onS, { passive: true }); addEventListener('resize', function () { place(); }); place();
-      setTimeout(place, 800);
+      place();
+      var o = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { setTimeout(draw, 300); o.disconnect(); } }); }, { threshold: 0.5 });
+      o.observe(grid);
+      addEventListener('resize', place); setTimeout(place, 800);
     }
   });
 };
