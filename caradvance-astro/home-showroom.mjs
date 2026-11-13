@@ -10,7 +10,7 @@ import path from 'node:path';
 const FILE = path.join('dist', 'index.html');
 const MAX = 8;
 
-const CSS = '<style id="ca-show-css">'
+const CSS = '<style id="ca-dark-show-css">'
   // színpad
   // a hero és a színpad egyetlen összefüggő sötét felület: nincs rés, a videó alja átúszik a színpadba
   + 'section.hero:has(+#autoink){margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}'
@@ -36,11 +36,11 @@ const CSS = '<style id="ca-show-css">'
   + '#autoink.ca-show .autok-tabs{background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.1)!important;box-shadow:none!important}'
   + '#autoink.ca-show .autok-tab{color:rgba(255,255,255,.7)!important;background:transparent!important}'
   + '#autoink.ca-show .autok-tab.on{background:#fff!important;color:#0b0b0d!important}'
-  + '#autoink.ca-show .cf-br{background:rgba(255,255,255,.96)!important;border-color:transparent!important;box-shadow:0 6px 18px rgba(0,0,0,.35)!important;color:#141519!important}'
-  + '#autoink.ca-show .cf-br .cf-d{display:block!important}#autoink.ca-show .cf-br .cf-l{display:none!important}'
-  + '#autoink.ca-show .cf-br:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.45),0 0 0 2px rgba(255,255,255,.5)!important}'
-  + '#autoink.ca-show .cf-br.on{background:#e2001a!important;color:#fff!important;box-shadow:0 8px 24px rgba(226,0,26,.45)!important}'
-  + '#autoink.ca-show .cf-br.on .cf-d{display:none!important}#autoink.ca-show .cf-br.on .cf-l{display:block!important}'
+  + 'html #autoink.ca-show .cf-br{background:rgba(255,255,255,.96)!important;border-color:transparent!important;box-shadow:0 6px 18px rgba(0,0,0,.35)!important;color:#141519!important}'
+  + 'html #autoink.ca-show .cf-br .cf-d{display:block!important}#autoink.ca-show .cf-br .cf-l{display:none!important}'
+  + 'html #autoink.ca-show .cf-br:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.45),0 0 0 2px rgba(255,255,255,.5)!important}'
+  + 'html #autoink.ca-show .cf-br.on{background:#e2001a!important;color:#fff!important;box-shadow:0 8px 24px rgba(226,0,26,.45)!important}'
+  + 'html #autoink.ca-show .cf-br.on .cf-d{display:none!important}#autoink.ca-show .cf-br.on .cf-l{display:block!important}'
   // körhinta: oldalsó kártyák a sötétben, középen tükröződés
   + '#autoink.ca-show .cw.cf3d{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12%,#000 88%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 12%,#000 88%,transparent 100%)}'
   + '#autoink.ca-show .cw.cf3d .cw-item{transition:transform .6s cubic-bezier(.22,.61,.36,1),opacity .45s,filter .45s!important}'
@@ -61,8 +61,8 @@ const CSS = '<style id="ca-show-css">'
   + '#autoink.ca-show .sub-media .ca-cmp b{font-size:17px!important;line-height:1;margin:0!important}'
   + '#autoink.ca-show .sub-media .ca-cmp:hover{background:#141519!important;color:#fff!important}'
   // lapozó: nyilak + pöttyök
-  + '#autoink.ca-show .cf-btn{background:rgba(255,255,255,.08)!important;color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;box-shadow:none!important}'
-  + '#autoink.ca-show .cf-btn:hover{background:#fff!important;color:#0b0b0d!important}'
+  + 'html #autoink.ca-show .cf-btn{background:rgba(255,255,255,.08)!important;color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;box-shadow:none!important}'
+  + 'html #autoink.ca-show .cf-btn:hover{background:#fff!important;color:#0b0b0d!important}'
   + '#autoink.ca-show .cf-cnt{display:none!important}'
   + '#autoink .ca-dots{display:flex;align-items:center;gap:8px;padding:0 10px}'
   + '#autoink .ca-dots button{width:8px;height:8px;padding:0;border:0;border-radius:99px;background:rgba(255,255,255,.3);cursor:pointer;transition:width .3s,background .3s}'
@@ -188,7 +188,7 @@ try {
   if (!fs.existsSync(FILE)) { console.log('[home-showroom] nincs dist/index.html'); }
   else {
     let h = fs.readFileSync(FILE, 'utf8');
-    if (h.indexOf('id="ca-show-css"') > -1) console.log('[home-showroom] már alkalmazva');
+    if (h.indexOf('id="ca-dark-show-css"') > -1) console.log('[home-showroom] már alkalmazva');
     else if (h.indexOf('id="ca-cf3d-js"') < 0 || h.indexOf('id="autoink"') < 0) console.log('[home-showroom] a főoldalon nincs 3D körhinta — kihagyva');
     else {
       const js = '<script id="ca-show-js">(' + CLIENT.toString().replace('__MAX__', String(MAX)) + ')();</script>';
