@@ -248,7 +248,10 @@
     muts.forEach(function (m) {
       if (m.type === 'attributes') {
         var t = m.target;
-        if (m.attributeName === 'class') { var strip = function (v) { return (v || '').replace(/(^|\s)dm-\S+/g, ' ').replace(/\s+/g, ' ').trim(); }; if (strip(m.oldValue) === strip(t.getAttribute('class'))) return; }
+        // kényszerített sötét módban (főoldal) a megjelenési / kiemelési jelzők (in, ca-*) váltása nem indít újraszínezést —
+        // különben az újraszínezés a beúszó animációkat is letiltaná
+        if (m.attributeName === 'class') { var strip = function (v) { v = (v || '').replace(/(^|\s)dm-\S+/g, ' '); if (force) v = v.replace(/(^|\s)(in|ca-[\w-]+)(?=\s|$)/g, ' '); return v.replace(/\s+/g, ' ').trim(); }; if (strip(m.oldValue) === strip(t.getAttribute('class'))) return; }
+        if (force && m.attributeName === 'style') { var cp = function (v) { return (v || '').replace(/--[\w-]+\s*:[^;]*;?/g, '').replace(/\s+/g, ' ').trim(); }; if (cp(m.oldValue) === cp(t.getAttribute('style'))) return; }
         if (m.attributeName === 'style' && (t.hasAttribute('data-dmc') || t.hasAttribute('data-dmbd') || t.hasAttribute('data-dmbi') || t.hasAttribute('data-dmbg') || /dm-/.test(t.getAttribute('class') || ''))) return;
         if (t.nodeType === 1 && !(t instanceof SVGElement)) { (pending || (pending = [])).push(t); if (m.attributeName === 'class' && t !== document.body && t !== d) (resets || (resets = [])).push(t); }
         return;
