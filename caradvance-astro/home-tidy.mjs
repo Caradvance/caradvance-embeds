@@ -176,8 +176,11 @@ try {
       edits.sort((a, b) => b[0] - a[0] || b[1] - a[1]);
       for (const [s, e, r] of edits) h = h.slice(0, s) + r + h.slice(e);
       // szolgáltatás-képek: fehér hátterű fotók helyett kivágott autók sötét „stúdió-színpadon”
-      for (const f of ['piros-bmw-x6-m-premium-autoberles', 'bmw-m3-touring-premium-auto-eladas', 'autoszallitas-autoimport-nemetorszagbol', 'toyota-rav4-hybrid-hasznaltauto-eladas'])
+      for (const f of ['piros-bmw-x6-m-premium-autoberles', 'autoszallitas-autoimport-nemetorszagbol', 'toyota-rav4-hybrid-hasznaltauto-eladas'])
         h = h.replace('<div class="svc-media"><img src="/' + f + '.webp"', '<div class="svc-media ca-stage"><img src="/' + f + '-cut.webp"');
+      // az eladás kártyán a fehér M3 helyett MINI John Cooper Works (BMW Group sajtófotó, az orra jobbra néz, mint a többi)
+      h = h.replace('<div class="svc-media"><img src="/bmw-m3-touring-premium-auto-eladas.webp" alt="BMW M3 Touring — prémium autó eladás"',
+        '<div class="svc-media ca-stage"><img src="/mini-jcw-premium-auto-eladas-cut.webp" alt="MINI John Cooper Works — prémium autó eladás"');
       h = h.replace('</head>', CSS + '</head>');
       fs.writeFileSync(FILE, h);
       console.log('[home-tidy] letisztult főoldal: ' + edits.length + ' módosítás');
