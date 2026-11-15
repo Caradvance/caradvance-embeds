@@ -53,6 +53,13 @@ const CSS = '<style id="ca-dark-tidy-css">'
   + '#rolunk .ca-vrow svg{width:48px;height:48px;padding:12px;margin:0;border-radius:50%;stroke:#fff;box-sizing:border-box;'
   + 'background:radial-gradient(circle at 35% 30%,rgba(255,80,95,.55),rgba(226,0,26,.25) 60%,rgba(226,0,26,.12));box-shadow:0 0 26px rgba(226,0,26,.45),inset 0 0 0 1px rgba(255,110,120,.45),inset 1px 1px 2px rgba(255,255,255,.35)}'
   + '#rolunk .ca-vrow b{font-size:16.5px;margin-bottom:6px}'
+  // szolgáltatás-kártyák képe: sötét stúdió, felülről lágy fény, piros padlófény, tükröződés; hoverre az autó kicsit előregördül
+  + '.cah .svc-media.ca-stage{height:230px;position:relative;padding:22px 26px 34px;box-sizing:border-box;align-items:flex-end;'
+  + 'background:radial-gradient(ellipse 60% 55% at 50% 20%,rgba(255,255,255,.10),transparent 70%),radial-gradient(ellipse 55% 22% at 50% 88%,rgba(226,0,26,.45),transparent 75%),linear-gradient(180deg,#1b1d23 0%,#121318 70%,#0f1014 100%)!important;border-bottom:1px solid rgba(255,255,255,.08)}'
+  + '.cah .svc-media.ca-stage::after{content:"";position:absolute;left:12%;right:12%;bottom:30px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,60,75,.8),transparent);box-shadow:0 0 14px rgba(226,0,26,.6)}'
+  + '.cah .svc-media.ca-stage img{position:relative;z-index:1;width:auto!important;height:auto!important;max-width:88%;max-height:100%;object-fit:contain!important;'
+  + 'filter:drop-shadow(0 18px 14px rgba(0,0,0,.65)) drop-shadow(0 0 30px rgba(226,0,26,.18));-webkit-box-reflect:below -2px linear-gradient(transparent 72%,rgba(255,255,255,.14));transition:transform .5s cubic-bezier(.2,.8,.2,1)}'
+  + '.cah .svc:hover .svc-media.ca-stage img{transform:translateX(10px) scale(1.04)}'
   + '@media(max-width:900px){#rolunk .ca-vrow{grid-template-columns:1fr 1fr}}@media(max-width:700px){#rolunk .ca-q{font-size:30px}}@media(max-width:420px){#rolunk .ca-vrow{grid-template-columns:1fr}}'
   // vélemények: link az összesre
   + '#velemenyek .ca-rev-all{display:inline-flex;margin-top:18px}'
@@ -168,6 +175,9 @@ try {
       // szerkesztések hátulról előre, hogy a pozíciók ne csússzanak
       edits.sort((a, b) => b[0] - a[0] || b[1] - a[1]);
       for (const [s, e, r] of edits) h = h.slice(0, s) + r + h.slice(e);
+      // szolgáltatás-képek: fehér hátterű fotók helyett kivágott autók sötét „stúdió-színpadon”
+      for (const f of ['piros-bmw-x6-m-premium-autoberles', 'bmw-m3-touring-premium-auto-eladas', 'autoszallitas-autoimport-nemetorszagbol', 'toyota-rav4-hybrid-hasznaltauto-eladas'])
+        h = h.replace('<div class="svc-media"><img src="/' + f + '.webp"', '<div class="svc-media ca-stage"><img src="/' + f + '-cut.webp"');
       h = h.replace('</head>', CSS + '</head>');
       fs.writeFileSync(FILE, h);
       console.log('[home-tidy] letisztult főoldal: ' + edits.length + ' módosítás');
