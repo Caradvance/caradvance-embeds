@@ -17,6 +17,9 @@ const RED = 'background:#E2001A!important;color:#fff!important;border:0!importan
 const CSS = '<style id="ca-stage-css">'
   + '#autoink.ca-show.ca-stg-on{overflow:clip!important}'
   + '#autoink.ca-show::before{display:none!important}'
+  // a hero a teljes képernyőt kitölti — a Kínálat csak lefelé görgetve jelenik meg
+  + 'section.hero:has(+#autoink){min-height:calc(100vh - 12px)!important;min-height:calc(100svh - 12px)!important;display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box}'
+  + 'section.hero:has(+#autoink) .scrolldown{position:absolute!important;left:50%;bottom:28px;transform:translateX(-50%)}'
   // a fejléc jobb oldala (Cég/Magán + „Összes … autó”) a színpadon már megvan → fent elrejtve, kisebb üres rés
   + '#autoink.ca-stg-on .ca-sh .ca-sh-r{display:none!important}#autoink.ca-stg-on .ca-sh{margin-bottom:0!important;padding-bottom:0!important}'
   + '#autoink.ca-stg-on .autok-panel.on .autok-more{margin:8px 0 10px!important}'
