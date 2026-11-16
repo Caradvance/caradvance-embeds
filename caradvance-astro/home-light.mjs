@@ -10,8 +10,8 @@ const FILE = path.join('dist', 'index.html');
 // színek
 const BG = '#F6F6F3', CARD = '#FFFFFF', INK = '#121317', MUTED = '#5E616A', LINE = 'rgba(18,19,23,.09)', RED = '#E2001A';
 const SH = '0 1px 2px rgba(18,19,23,.04),0 12px 32px rgba(18,19,23,.06)';
-const CARDCSS = 'background:linear-gradient(180deg,rgba(255,255,255,.92) 0%,rgba(255,255,255,.72) 55%,rgba(255,255,255,.62) 100%)!important;border:1px solid rgba(255,255,255,.9)!important;'
-  + 'box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(18,19,23,.05),0 1px 2px rgba(18,19,23,.04),0 18px 44px rgba(18,19,23,.08)!important;-webkit-backdrop-filter:blur(18px) saturate(170%)!important;backdrop-filter:blur(18px) saturate(170%)!important';
+const CARDCSS = 'background:linear-gradient(135deg,rgba(255,255,255,.72) 0%,rgba(255,255,255,.28) 42%,rgba(255,255,255,.46) 100%)!important;border:1px solid rgba(255,255,255,.95)!important;'
+  + 'box-shadow:inset 0 1.5px 0 #fff,inset 1.5px 0 0 rgba(255,255,255,.8),inset 0 -1px 0 rgba(18,19,23,.05),0 0 0 1px rgba(18,19,23,.05),0 2px 4px rgba(18,19,23,.03),0 22px 50px rgba(18,19,23,.10)!important;-webkit-backdrop-filter:blur(22px) saturate(190%)!important;backdrop-filter:blur(22px) saturate(190%)!important';
 const BTN2 = 'background:#fff!important;color:' + INK + '!important;border:1px solid rgba(18,19,23,.16)!important;box-shadow:none!important';
 const L = 'html.ca-light ';
 const A = L + '#autoink ';           // Kínálat
@@ -113,7 +113,7 @@ const CSS = '<style id="ca-light-css">'
   + L + '#ca-cta .ca-tel:hover{border-color:' + INK + '!important}'
   // ── prémium elemek világos alapon ────────────────────────────────────────
   // háttér: lágy, halvány fényfoltok, hogy az üvegkártyák „üvegnek” látsszanak
-  + L + 'body{background:radial-gradient(900px 600px at 85% 18%,rgba(226,0,26,.05),transparent 70%),radial-gradient(800px 700px at 8% 46%,rgba(18,19,23,.04),transparent 70%),radial-gradient(900px 700px at 90% 74%,rgba(226,0,26,.045),transparent 70%),' + BG + '!important;background-attachment:fixed!important}'
+  + L + 'body{background:radial-gradient(640px 520px at 88% 22%,rgba(255,60,80,.30),transparent 70%),radial-gradient(680px 560px at 6% 62%,rgba(110,135,200,.28),transparent 70%),radial-gradient(480px 420px at 70% 92%,rgba(255,140,110,.26),transparent 70%),radial-gradient(420px 380px at 30% 8%,rgba(150,165,210,.22),transparent 70%),' + BG + '!important;background-attachment:fixed!important}'
   // fénycsík a szekcióhatárokon (a sötét „A” változat világos párja)
   + ['#szolgaltatasok', '#rolunk', '#velemenyek', '#ca-cta'].map((x) => L + x + '{position:relative}' + L + x + '::after{content:"";position:absolute;left:10%;right:10%;top:0;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(226,0,26,.55) 50%,transparent);box-shadow:0 0 16px 1px rgba(226,0,26,.22)}').join('')
   // színpad: reflektorfény + halvány piros padlófény + vékony piros horizont
