@@ -20,6 +20,8 @@ const CSS = '<style id="ca-stage-css">'
   + '#autoink:not(.ca-stg-on){min-height:min(1000px,100vh)}'
   + '#autoink:not(.ca-stg-on) .ca-sh-r,#autoink:not(.ca-stg-on) .autok-head,#autoink:not(.ca-stg-on) .autok-panel,#autoink:not(.ca-stg-on) .cf-none{opacity:0;pointer-events:none;animation:caStgFb .3s 5s forwards}'
   + '@keyframes caStgFb{to{opacity:1;pointer-events:auto}}'
+  // „Melyik autó érdekel?” doboz: a két izzó vonal között fent és lent ugyanakkora hely
+  + 'body section#ca-cta.block{padding-top:47px!important;padding-bottom:47px!important}'
   // sötét módban a menüsor már az első képkockától sötét (ne villanjon fehéren, amíg a dark-mode.js betölt)
   + 'html.ca-dark .ca-nav{background:#161A21!important;border-color:#2B313C!important;color:#E8EBF0}html.ca-dark .ca-nav .navlink{color:#E8EBF0!important}'
   + 'html.ca-dark .ca-nav .ca-sbtn,html.ca-dark .ca-nav .ca-pbtn,html.ca-dark .ca-nav .burger{background-color:#161A21!important;color:#E8EBF0!important;border-color:#2B313C!important}html.ca-dark .ca-nav .burger span{background-color:#E8EBF0!important}'
