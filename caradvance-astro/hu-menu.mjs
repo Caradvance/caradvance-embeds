@@ -96,7 +96,7 @@ html.ca-dark #ca-am-dim{background:rgba(0,0,0,.45)}
 .ca-am .am-st-p{font-size:13px;color:var(--am-mut);margin-top:5px;line-height:1.45}
 .ca-am .am-bg{position:absolute;right:-6%;bottom:0;width:70%;opacity:.95;pointer-events:none;filter:drop-shadow(0 16px 16px rgba(0,0,0,.35))}
 .ca-am .am-photo{position:absolute;inset:0;background:center/cover no-repeat}
-.ca-am .am-photo{background-position:70% center!important}.ca-am .am-photo:after{content:"";position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(10,10,12,.95) 0%,rgba(10,10,12,.85) 50%,rgba(10,10,12,.35) 100%)!important}
+.ca-am .am-photo{background-position:60% 55%!important}.ca-am .am-photo:after{content:"";position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(10,10,12,.9) 0%,rgba(10,10,12,.68) 34%,rgba(10,10,12,.12) 62%,rgba(10,10,12,0) 100%),linear-gradient(0deg,rgba(10,10,12,.7) 0%,rgba(10,10,12,0) 32%)!important}
 .ca-am .am-on-photo{color:#F5F5F7}.ca-am .am-on-photo .am-st-p{color:#C7C7CC}
 .ca-am .am-stars{display:inline-flex;gap:2px;color:#F5B301}.ca-am .am-stars svg{width:15px;height:15px;fill:currentColor}
 .ca-am .am-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#fff;background:rgba(226,0,26,.9);border-radius:999px;padding:5px 11px}
@@ -323,8 +323,8 @@ const CLIENT = function (CFG) {
       + '<div class="am-calc">' + x.calc.map(function (c) { return '<a href="' + esc(c[1]) + '">' + esc(c[0]) + ' ›</a>'; }).join('') + '</div></div></div>';
   }
   function stAbout(x) {
-    return '<div class="am-stage am-on-photo" data-st="about" style="background:#111"><div class="am-photo" style="background-image:url(\'/caradvance-iroda.webp\')"></div>'
-      + '<div style="position:relative;z-index:2;max-width:64%"><div class="am-st-h">Gyere be hozzánk</div><div class="am-st-p">Solymár, Ibolya utca 18.<br>Hétfőtől péntekig 9–17</div>'
+    return '<div class="am-stage am-on-photo" data-st="about" style="background:#111"><div class="am-photo" style="background-image:url(\'/caradvance-solymar.webp\')"></div>'
+      + '<div style="position:relative;z-index:2;max-width:52%;text-shadow:0 1px 12px rgba(0,0,0,.5)"><div class="am-st-h">Gyere be hozzánk</div><div class="am-st-p">Solymár, Ibolya utca 18.<br>Hétfőtől péntekig 9–17</div>'
       + '<div class="am-st-p" style="margin-top:14px">Német háttér, magyar ügyintézés –<br>2003 óta, több mint 5000 autóval.</div></div>'
       + '<div class="am-st-bot" style="position:relative;z-index:2;display:flex;align-items:center;gap:8px"><a class="am-go" href="/kapcsolat/">Kapcsolat →</a><a class="am-go wh" href="/referenciak/" style="background:#fff;color:#111!important">Referenciák</a>'
       + '<span class="am-soc">' + x.so.map(function (o) { return '<a target="_blank" rel="noopener" href="' + esc(o.h) + '" title="' + esc(o.t) + '" aria-label="' + esc(o.t) + '">' + o.svg + '</a>'; }).join('') + '</span></div></div>';
