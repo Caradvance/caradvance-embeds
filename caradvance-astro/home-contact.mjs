@@ -1,7 +1,7 @@
 // Build lépés: a magyar főoldal végére „Gyere be hozzánk” kapcsolat-szekció térképpel (a „Melyik autó érdekel?” után).
 // Bal oldalt elérhetőségek üvegkártyákon + élő nyitvatartás, jobbra saját stílusú térkép (sötét/világos), piros
 // jelölővel. Az élő Google-térkép csak kattintásra töltődik be (gyors, sütimentes betöltés).
-// Térképadatok: © OpenStreetMap közreműködők. Idempotens.
+// Mozgás: a kártyák beúsznak, a jelölő leérkezik. Térképadatok: © OpenStreetMap közreműködők. Idempotens.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -30,8 +30,6 @@ const HTML = '<section class="block" id="ca-contact" data-dm-skip><div class="wr
   + '<div class="cc-card cc-hours"><span class="cc-ic">' + sv('clock') + '</span><span><small>Nyitvatartás</small><b>Hétfőtől péntekig 9–17</b></span><span class="cc-live" id="cc-live"></span></div>'
   + '</div><div class="cc-btns"><a class="btn btn-red" href="/autot-keresek/">Ajánlatot kérek →</a><a class="cc-ghost" href="' + DIR + '" target="_blank" rel="noopener">Útvonaltervezés</a></div></div>'
   + '<div class="cc-map reveal" role="region" aria-label="Térkép: ' + ADDR + '"><div class="cc-mapimg"></div>'
-  + '<svg class="cc-eu" viewBox="0 0 1180 1026" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image class="cc-eu-l" href="/terkep-europa-light.webp" width="1180" height="1026"/><image class="cc-eu-d" href="/terkep-europa-dark.webp" width="1180" height="1026"/><rect class="cc-eu-v" width="1180" height="1026"/><path class="cc-route-bg" d="M250.5 498.5 C274.3 499.8 350.6 516.5 393.4 506.2 C436.2 495.9 456.7 446.1 507.2 436.8 C557.7 427.5 645.8 436.3 696.5 450.4 C747.2 464.4 772.2 507.0 811.2 521.1 C850.2 535.2 910.5 532.9 930.4 535.3"/><path class="cc-route" d="M250.5 498.5 C274.3 499.8 350.6 516.5 393.4 506.2 C436.2 495.9 456.7 446.1 507.2 436.8 C557.7 427.5 645.8 436.3 696.5 450.4 C747.2 464.4 772.2 507.0 811.2 521.1 C850.2 535.2 910.5 532.9 930.4 535.3"/><g class="cc-city cc-c1"><circle cx="250.5" cy="498.5" r="11"/><text x="250.5" y="446.5" text-anchor="middle">Geretsried</text><text class="cc-sub" x="250.5" y="474.5" text-anchor="middle">Németország</text></g><g class="cc-city cc-c2"><circle cx="930.4" cy="535.3" r="11"/><text x="930.4" y="593.3" text-anchor="middle">Solymár</text><text class="cc-sub" x="930.4" y="621.3" text-anchor="middle">Magyarország</text></g><g class="cc-car"><circle r="22" class="cc-car-glow"/><circle r="11"/></g></svg>'
-  + '<span class="cc-chip">Németországból Solymárra</span>'
   + '<div class="cc-pin"><i></i><span>CarAdvance</span></div>'
   + '<div class="cc-mtop"><a class="cc-mbtn" href="' + OPEN + '" target="_blank" rel="noopener">Megnyitás Google Térképen ↗</a></div>'
   + '<button type="button" class="cc-load">Interaktív térkép betöltése</button>'
@@ -86,24 +84,7 @@ const CSS = '<style id="ca-contact-css">'
   + '#ca-contact .cc-map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:4}'
   + '#ca-contact .cc-map.on .cc-load,#ca-contact .cc-map.on .cc-pin,#ca-contact .cc-map.on .cc-photo{display:none}'
   + '@media(max-width:900px){#ca-contact .cc-grid{grid-template-columns:1fr;gap:24px}#ca-contact .cc-cards{grid-template-columns:1fr}#ca-contact .cc-map{min-height:360px}#ca-contact .cc-photo{width:140px}#ca-contact .cc-photo img{height:86px}#ca-contact .cc-load{bottom:22px;top:auto;right:auto;left:50%;transform:translateX(-50%);white-space:nowrap}#ca-contact .cc-hours{flex-wrap:wrap}#ca-contact .cc-hours .cc-live{margin-left:55px;width:100%}#ca-contact .cc-card b{white-space:normal}#ca-contact .cc-btns{flex-wrap:nowrap}#ca-contact .cc-btns .btn,#ca-contact .cc-ghost{flex:1;justify-content:center;padding:0 12px;white-space:nowrap}}'
-  // ---- mozgás: Németországból Solymárra, majd ráközelítés és a jelölő leérkezése ----
-  + '#ca-contact .cc-eu{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:none;transform-origin:79% 52%;transition:transform 1.4s cubic-bezier(.6,0,.2,1),opacity 1s ease .25s}'
-  + '#ca-contact .cc-map.cc-js:not(.cc-skip) .cc-eu{display:block}'
-  + '#ca-contact .cc-eu-d{display:none}html.ca-dark #ca-contact .cc-eu-d{display:inline}html.ca-dark #ca-contact .cc-eu-l{display:none}'
-  + '#ca-contact .cc-eu-v{fill:url(#none);fill:rgba(246,246,243,.35)}html.ca-dark #ca-contact .cc-eu-v{fill:rgba(13,15,19,.35)}'
-  + '#ca-contact .cc-route-bg{fill:none;stroke:rgba(226,0,26,.22);stroke-width:10;stroke-linecap:round;stroke-dasharray:2 16}'
-  + '#ca-contact .cc-route{fill:none;stroke:#E2001A;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 10px rgba(226,0,26,.8))}'
-  + '#ca-contact .cc-city circle{fill:#fff;stroke:#E2001A;stroke-width:6}'
-  + '#ca-contact .cc-city text{font:800 42px/1 inherit;font-family:inherit;fill:#121317;paint-order:stroke;stroke:rgba(255,255,255,.9);stroke-width:8px}'
-  + 'html.ca-dark #ca-contact .cc-city text{fill:#F5F5F7;stroke:rgba(10,10,12,.85)}'
-  + '#ca-contact .cc-city .cc-sub{font-size:27px;font-weight:600;fill:#6B7080}html.ca-dark #ca-contact .cc-city .cc-sub{fill:#9AA0AC}'
-  + '#ca-contact .cc-city{opacity:0;transition:opacity .5s ease}#ca-contact .cc-map.cc-play .cc-c1{opacity:1}#ca-contact .cc-map.cc-arrive .cc-c2{opacity:1}'
-  + '#ca-contact .cc-car{opacity:0}#ca-contact .cc-car circle{fill:#E2001A}#ca-contact .cc-car .cc-car-glow{fill:rgba(226,0,26,.25)}'
-  + '#ca-contact .cc-chip{position:absolute;left:16px;top:16px;z-index:3;display:none;height:36px;align-items:center;padding:0 14px;border-radius:999px;background:rgba(18,19,23,.82);color:#fff;font-size:13px;font-weight:700;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transform:translateY(-6px);transition:opacity .4s,transform .4s}'
-  + '#ca-contact .cc-map.cc-js:not(.cc-skip) .cc-chip{display:inline-flex}#ca-contact .cc-map.cc-play .cc-chip{opacity:1;transform:none}#ca-contact .cc-map.cc-zoom .cc-chip{opacity:0}'
-  + '#ca-contact .cc-map.cc-zoom .cc-eu{transform:scale(5.5);opacity:0}'
-  + '#ca-contact .cc-map.cc-js .cc-mapimg{opacity:0;transform:scale(1.3)!important;transition:opacity .9s ease .35s,transform 1.4s cubic-bezier(.6,0,.2,1)!important}'
-  + '#ca-contact .cc-map.cc-js.cc-zoom .cc-mapimg,#ca-contact .cc-map.cc-js.cc-skip .cc-mapimg{opacity:1;transform:scale(1.02)!important}'
+  // ---- mozgás: a jelölő leérkezése, amikor a térkép láthatóvá válik ----
   + '#ca-contact .cc-map.cc-js:not(.cc-done) .cc-pin,#ca-contact .cc-map.cc-js:not(.cc-done) .cc-load,#ca-contact .cc-map.cc-js:not(.cc-done) .cc-mtop{opacity:0}'
   + '#ca-contact .cc-load,#ca-contact .cc-mtop{transition:opacity .5s ease .5s}'
   + '#ca-contact .cc-map.cc-done:not(.cc-skip) .cc-pin i{animation:ccDrop .7s cubic-bezier(.3,1.6,.5,1) both}'
@@ -131,16 +112,11 @@ const JS = '<script id="ca-contact-js">(function(){var s=document.getElementById
   + 'var nx=(wd===5&&h>=17)||wd===6||wd===0?"Hétfőn 9-től":(h<9?"Ma 9-től":"Holnap 9-től");var l=document.getElementById("cc-live");if(l){l.className="cc-live"+(open?"":" off");l.innerHTML="<i></i>"+(open?"Most nyitva":nx)}'
   + 'var m=s.querySelector(".cc-map"),b=s.querySelector(".cc-load");if(b)b.addEventListener("click",function(){var f=document.createElement("iframe");f.src=' + JSON.stringify(EMBED) + ';f.title="CarAdvance – ' + ADDR + '";f.loading="lazy";f.referrerPolicy="no-referrer-when-downgrade";m.appendChild(f);m.classList.add("on")});'
 
-  // mozgás: egyszer fut le, amikor a térkép láthatóvá válik; „mozgás csökkentése” esetén a kész állapot látszik
+  // mozgás: a jelölő egyszer érkezik le, amikor a térkép láthatóvá válik; „mozgás csökkentése” esetén azonnal kész
   + 'var red=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;m.classList.add("cc-js");'
-  + 'function fin(){m.classList.add("cc-zoom","cc-done","cc-skip");s.classList.remove("cc-pre")}'
-  + 'if(red||!("IntersectionObserver" in window)){fin()}else{s.classList.add("cc-pre");'
+  + 'if(red||!("IntersectionObserver" in window)){m.classList.add("cc-done","cc-skip")}else{s.classList.add("cc-pre");'
   + 'var cards=s.querySelector(".cc-cards"),io2=new IntersectionObserver(function(es){if(es[0].isIntersecting){s.classList.remove("cc-pre");io2.disconnect()}},{threshold:.25});io2.observe(cards);'
-  + 'var svg=m.querySelector(".cc-eu"),rt=m.querySelector(".cc-route"),car=m.querySelector(".cc-car"),L=rt.getTotalLength();rt.style.strokeDasharray=L;rt.style.strokeDashoffset=L;'
-  + 'function org(){try{var r=m.getBoundingClientRect(),q=svg.createSVGPoint();q.x=930.4;q.y=535.3;var c=q.matrixTransform(svg.getScreenCTM());svg.style.transformOrigin=(c.x-r.left)+"px "+(c.y-r.top)+"px"}catch(e){}}'
-  + 'function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}'
-  + 'function play(){m.classList.add("cc-play");org();var t0=0,D=2300;setTimeout(function(){car.style.opacity=1;requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/D),e=ease(k),pt=rt.getPointAtLength(L*e);rt.style.strokeDashoffset=L*(1-e);car.setAttribute("transform","translate("+pt.x+" "+pt.y+")");if(k<1)requestAnimationFrame(st);else{m.classList.add("cc-arrive");car.style.transition="opacity .4s";car.style.opacity=0;setTimeout(function(){org();m.classList.add("cc-zoom");setTimeout(function(){m.classList.add("cc-done")},1150)},650)}})},350)}'
-  + 'var io=new IntersectionObserver(function(es){if(es[0].isIntersecting&&es[0].intersectionRatio>=.45){io.disconnect();play()}},{threshold:[0,.45,.8]});io.observe(m)}'
+  + 'var io=new IntersectionObserver(function(es){if(es[0].isIntersecting){io.disconnect();setTimeout(function(){m.classList.add("cc-done")},250)}},{threshold:.5});io.observe(m)}'
   + '})();</script>';
 
 try {
