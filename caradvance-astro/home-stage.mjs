@@ -20,6 +20,15 @@ const CSS = '<style id="ca-stage-css">'
   + '#autoink:not(.ca-stg-on){min-height:min(1000px,100vh)}'
   + '#autoink:not(.ca-stg-on) .ca-sh-r,#autoink:not(.ca-stg-on) .autok-head,#autoink:not(.ca-stg-on) .autok-panel,#autoink:not(.ca-stg-on) .cf-none{opacity:0;pointer-events:none;animation:caStgFb .3s 5s forwards}'
   + '@keyframes caStgFb{to{opacity:1;pointer-events:auto}}'
+  // grafikai javítások (audit, 2026-11-16)
+  + 'body #rolunk .ca-qpanel>*{min-width:0}body #rolunk .ca-qpanel p:not(.ca-q){overflow-wrap:break-word}'
+  + '@media(max-width:820px){body #rolunk .ca-qpanel{grid-template-columns:minmax(0,1fr)!important}}'
+  + '@media(max-width:820px){body>.cav-sec,body>.cah{overflow-x:clip}}'
+  + '@media(max-width:480px){body #rolunk .ca-qpanel p.ca-q{font-size:25px!important;line-height:1.2!important}}'
+  + '@media(max-width:640px){section.hero:has(+#autoink) .scrolldown{display:none!important}}'
+  + 'html.ca-light .stats img[src$="/caradvance-logo.webp"]{content:url(/caradvance-logo-clear.webp)}'
+  + 'body #ca-cta .ca-cta-btns .ca-tel,body #ca-cta .ca-cta-alt{display:none!important}'
+  + 'html.ca-dark body .cah .svc-grid::before{background:radial-gradient(26% 22% at 27% 30%,rgba(226,0,26,.3),transparent 72%),radial-gradient(26% 22% at 73% 30%,rgba(226,0,26,.3),transparent 72%),radial-gradient(26% 22% at 27% 78%,rgba(226,0,26,.3),transparent 72%),radial-gradient(26% 22% at 73% 78%,rgba(226,0,26,.3),transparent 72%)!important}'
   // „Melyik autó érdekel?” doboz: a két izzó vonal között fent és lent ugyanakkora hely
   + 'body section#ca-cta.block{padding-top:47px!important;padding-bottom:47px!important}'
   // sötét módban a menüsor már az első képkockától sötét (ne villanjon fehéren, amíg a dark-mode.js betölt)
