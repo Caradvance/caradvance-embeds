@@ -20,7 +20,7 @@ const CSS = '<style id="ca-stage-css">'
   // okos menüsor: lefelé görgetve elrejtőzik, felfelé görgetve azonnal visszajön
   + 'html .ca-navwrap{transition:transform .38s cubic-bezier(.2,.8,.2,1)!important;will-change:transform}html .ca-navwrap.ca-nav-hide{transform:translateY(calc(-100% - 24px))!important}'
   // a hero a teljes képernyőt kitölti — a Kínálat csak lefelé görgetve jelenik meg
-  + 'section.hero:has(+#autoink){min-height:calc(100vh - 12px)!important;min-height:calc(100svh - 12px)!important;display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box}'
+  + 'section.hero:has(+#autoink){margin:0!important;margin-top:calc(0px - var(--navh,0px))!important;border-radius:0!important;width:100%!important;min-height:100vh!important;min-height:100svh!important;display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box}'
   + 'section.hero:has(+#autoink) .scrolldown{position:absolute!important;left:50%;bottom:28px;transform:translateX(-50%)}'
   // a fejléc jobb oldala (Cég/Magán + „Összes … autó”) a színpadon már megvan → fent elrejtve, kisebb üres rés
   + '#autoink.ca-stg-on .ca-sh .ca-sh-r{display:none!important}#autoink.ca-stg-on .ca-sh{margin-bottom:0!important;padding-bottom:0!important}'

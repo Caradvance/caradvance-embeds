@@ -23,7 +23,6 @@ const CSS = '<style id="ca-light-css">'
   + L + ',' + L + 'body{background:' + BG + '!important;color:' + INK + '}'
   + L + '.cah .sec-title,' + L + 'h2.sec-title{color:' + INK + '}'
   // hero: a videó alja az oldal hátterébe olvad
-  + L + 'section.hero:has(+#autoink){border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}'
   + L + 'section.hero:has(+#autoink)::after{display:block!important;height:260px!important;background:linear-gradient(180deg,rgba(246,246,243,0) 0%,rgba(246,246,243,.18) 30%,rgba(246,246,243,.62) 62%,rgba(246,246,243,.92) 84%,' + BG + ' 100%)!important}'
   + L + 'section.hero:has(+#autoink) .scrolldown{color:#3a3d44!important}' + L + 'section.hero:has(+#autoink) .scrolldown *{color:#3a3d44!important;border-color:#3a3d44!important;stroke:#3a3d44!important}'
 

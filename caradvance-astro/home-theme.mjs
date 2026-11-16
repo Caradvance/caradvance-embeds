@@ -1,7 +1,7 @@
 // Build lépés (a home-dark.mjs ÉS a home-light.mjs után fut): a magyar főoldalon választható a sötét és a fehér téma.
-// A két külön témaváltó szkriptet egyetlen döntő szkriptre cseréli (localStorage „ca-theme”: "dark" | "light",
-// alapból fehér), és egy kis lebegő kapcsolót tesz az oldal bal alsó sarkába. Váltáskor az oldal újratölt,
-// és ugyanott marad, ahol a látogató volt. Idempotens.
+// A két témaváltó szkriptet egyetlen döntő szkriptre cseréli: a téma a készülék beállítását követi
+// (prefers-color-scheme; automatikus módban nappal fehér, este sötét). Ha a készülék közben vált, az oldal
+// átvált és ugyanott marad. Teszteléshez: ?tema=feher / ?tema=sotet. Idempotens.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -19,9 +19,12 @@ try {
       if (dm) h = h.replace(dm[0], '');
       h = h.replace(/<script id="ca-home-dark">[\s\S]*?<\/script>/, '');
       h = h.replace(/<script id="ca-home-light">[\s\S]*?<\/script>/, '');
-      const decide = '<script id="ca-theme">(function(){var t="' + DEFAULT + '";try{var q=location.search.match(/[?&]tema=(sotet|feher)/);if(q){t=q[1]==="sotet"?"dark":"light";localStorage.setItem("ca-theme",t)}else t=localStorage.getItem("ca-theme")||t}catch(e){}'
+      const decide = '<script id="ca-theme">(function(){var mq=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null,t=mq&&mq.matches?"dark":"light";'
+        + 'try{var q=location.search.match(/[?&]tema=(sotet|feher)/);if(q)t=q[1]==="sotet"?"dark":"light"}catch(e){}'
         + 'var d=document.documentElement;if(t==="dark"){window.__CA_FORCE_DARK=1;d.classList.add("ca-dark");document.addEventListener("DOMContentLoaded",function(){var s=document.createElement("script");s.src="' + dmSrc + '";document.head.appendChild(s)})}else d.classList.add("ca-light");'
-        + 'window.__caTheme=t;try{var y=sessionStorage.getItem("ca-theme-y");if(y){sessionStorage.removeItem("ca-theme-y");addEventListener("load",function(){setTimeout(function(){scrollTo(0,+y)},60)})}}catch(e){}})();</script>';
+        + 'window.__caTheme=t;try{var y=sessionStorage.getItem("ca-theme-y");if(y){sessionStorage.removeItem("ca-theme-y");addEventListener("load",function(){setTimeout(function(){scrollTo(0,+y)},60)})}}catch(e){}'
+        // ha a készülék közben vált (pl. automatikus mód este), az oldal átvált, és ugyanott marad
+        + 'if(mq&&!q){var f=function(e){if((e.matches?"dark":"light")!==t){try{sessionStorage.setItem("ca-theme-y",String(scrollY))}catch(x){}location.reload()}};mq.addEventListener?mq.addEventListener("change",f):mq.addListener&&mq.addListener(f)}})();</script>';
       h = h.replace(/<head([^>]*)>/i, (m) => m + decide);
       const SUN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
       const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>';
@@ -43,9 +46,8 @@ try {
         + 'b.onclick=function(){var t=dk?"light":"dark";b.classList.add("go");try{localStorage.setItem("ca-theme",t);sessionStorage.setItem("ca-theme-y",String(scrollY))}catch(e){}'
         + 'setTimeout(function(){var u=new URL(location.href);u.searchParams.delete("tema");location.replace(u.toString())},280)};r.insertBefore(b,r.firstChild)}'
         + 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",put);else put()})();</script>';
-      h = h.replace('</head>', sw + '</head>').replace(/<\/body>/i, swJs + '</body>');
       fs.writeFileSync(FILE, h);
-      console.log('[home-theme] téma-kapcsoló (alapból: ' + DEFAULT + ')');
+      console.log('[home-theme] a téma a készülék beállítását követi (világos/sötét/automatikus)');
     }
   }
 } catch (e) { console.log('[home-theme] hiba:', e.message); }
