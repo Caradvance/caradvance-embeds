@@ -17,6 +17,9 @@ const RED = 'background:#E2001A!important;color:#fff!important;border:0!importan
 const CSS = '<style id="ca-stage-css">'
   + '#autoink.ca-show.ca-stg-on{overflow:clip!important}'
   + '#autoink.ca-show::before{display:none!important}'
+  // hero gombok: három egyforma gomb (Autót keresek · Autó import · Add el az autód)
+  + 'section.hero .cta-row{display:flex!important;flex-wrap:wrap;justify-content:center;gap:12px!important}section.hero .cta-row .btn{min-width:190px;justify-content:center;text-align:center}'
+  + '@media(max-width:600px){section.hero .cta-row{flex-direction:column;align-items:stretch;width:100%;max-width:320px;margin-left:auto;margin-right:auto}section.hero .cta-row .btn{min-width:0;width:100%}}'
   // okos menüsor: lefelé görgetve elrejtőzik, felfelé görgetve azonnal visszajön
   + 'html .ca-navwrap{transition:transform .38s cubic-bezier(.2,.8,.2,1)!important;will-change:transform}html .ca-navwrap.ca-nav-hide{transform:translateY(calc(-100% - 24px))!important}'
   // a hero a teljes képernyőt kitölti — a Kínálat csak lefelé görgetve jelenik meg
@@ -109,7 +112,7 @@ const CSS = '<style id="ca-stage-css">'
   + '#ca-stg .stg-nav{position:relative;left:auto;right:auto;bottom:auto;margin:14px 0 18px;gap:12px}#ca-stg .stg-ar{width:44px;height:44px}#ca-stg .stg-dots{display:none}#ca-stg .stg-cnt{white-space:nowrap;min-width:90px}'
   + '#ca-stg :is(.stg-cars,.stg-bgl):empty{display:none}#ca-stg .stg-side{position:relative;left:auto;bottom:auto;width:auto}#ca-stg .stg-model{font-size:clamp(40px,12vw,58px)}}'
   + '#ca-stg .stg-clk{cursor:zoom-in}#ca-stg .stg-cars .stg-clk.on:hover img{transform:scale(1.03);transition:transform .4s}'
-  + '#ca-stg:not(.gal-mode) .stg-hintpic{display:none}#ca-stg .stg-hintpic{position:absolute;right:2%;top:27%;z-index:3;font-size:12.5px;font-weight:700;letter-spacing:.04em;color:rgba(255,255,255,.75);padding:8px 14px;border-radius:999px;pointer-events:none;'
+  + '#ca-stg:not(.gal-mode) .stg-hintpic{display:none}#ca-stg .stg-hintpic{position:absolute;right:1%;top:var(--stg-hinttop,34px);z-index:3;font-size:12.5px;font-weight:700;letter-spacing:.04em;color:rgba(255,255,255,.75);padding:8px 14px;border-radius:999px;pointer-events:none;'
   + 'background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}'
   + '.stg-lb{position:fixed;inset:0;z-index:2147483000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:3vh 3vw;background:rgba(8,9,12,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}'
   + '.stg-lb.on{display:flex;animation:stg-lbin .3s ease}@keyframes stg-lbin{from{opacity:0}to{opacity:1}}'
@@ -187,7 +190,7 @@ const JS = '<script id="ca-stage-js">(function(){'
   + 'cnt.innerHTML="<b>"+String(j+1).padStart(2,"0")+"</b> / "+String(n).padStart(2,"0");pb.disabled=j===0;nb.disabled=j===n-1;'
   + 'var put=function(){var bk={"volkswagen":"vw","vw":"vw","bmw":"bmw","mini":"mini","mercedes-benz":"mercedes","mercedes":"mercedes","audi":"audi","hyundai":"hyundai","cupra":"cupra","kia":"kia","man":"man","seat":"seat","volvo":"volvo"}[(it.brand||"").toLowerCase()],be=tl.querySelector(".stg-brand");be.textContent="";if(bk){var li=new Image();li.alt="";li.src="/bl-"+bk+".webp";li.onerror=function(){li.remove()};be.appendChild(li)}be.appendChild(document.createTextNode(it.brand));tl.querySelector(".stg-model").textContent=it.model;tl.querySelector(".stg-spec").textContent=it.spec;tl.classList.toggle("lg",it.model.length>11)};'
   + 'clearTimeout(busy);if(instant){put();tl.classList.remove("sw")}else{tl.classList.add("sw");busy=setTimeout(function(){put();tl.classList.remove("sw")},300)}}'
-  + 'function fit(){if(!stg||innerWidth<821)return;var t=stg.querySelector(".stg-top");if(!t)return;var b=t.getBoundingClientRect().bottom-stg.getBoundingClientRect().top;stg.style.setProperty("--stg-sidetop",Math.round(b+44)+"px")}addEventListener("resize",fit);setInterval(fit,1500);'
+  + 'function fit(){if(!stg||innerWidth<821)return;var t=stg.querySelector(".stg-top");if(!t)return;var b=t.getBoundingClientRect().bottom-stg.getBoundingClientRect().top;stg.style.setProperty("--stg-sidetop",Math.round(b+44)+"px");var tb=t.querySelector(".autok-tabs");if(tb){var r0=stg.getBoundingClientRect(),rt=tb.getBoundingClientRect();stg.style.setProperty("--stg-hinttop",Math.round(rt.top-r0.top+(rt.height-36)/2)+"px")}}addEventListener("resize",fit);setInterval(fit,1500);'
   + 'var to=0;function later(){clearTimeout(to);to=setTimeout(build,140)}'
   + 'function boot(){S=document.getElementById("autoink");if(!S||!S.querySelector(".cw.cf3d .cw-item"))return setTimeout(boot,300);build();'
   + 'new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!stg||!stg.contains(ms[i].target)){later();return}}}).observe(S,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class"]});'
@@ -209,6 +212,8 @@ try {
     else {
       const dir = path.join('dist', 'elado-cut');
       const cuts = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith('.webp')).map((f) => f.slice(0, -5)) : [];
+      h = h.replace('<a class="btn btn-white" href="mailto:info@caradvance.hu?subject=Aut%C3%B3%20elad%C3%A1sa%20%E2%80%93%20bizom%C3%A1ny">Add el az autód</a>',
+        '<a class="btn btn-white ca-hb-imp" href="/auto-rendeles/">Autó import</a><a class="btn btn-white" href="mailto:info@caradvance.hu?subject=Aut%C3%B3%20elad%C3%A1sa%20%E2%80%93%20bizom%C3%A1ny">Add el az autód</a>');
       h = h.replace('</head>', CSS + '</head>').replace(/<\/body>/i, JS.replace('__SALECUTS__', JSON.stringify(cuts)) + '</body>');
       fs.writeFileSync(FILE, h);
       console.log('[home-stage] színpad a Kínálat részben');
