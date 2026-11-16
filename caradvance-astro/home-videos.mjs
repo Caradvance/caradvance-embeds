@@ -11,10 +11,13 @@ import path from 'node:path';
 const FILE = path.join('dist', 'index.html');
 
 const GLASS = 'background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03) 40%,rgba(255,255,255,.02)),rgba(20,22,27,.6);border:1px solid rgba(255,255,255,.14);'
-  + 'box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.22),0 40px 100px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)';
+  + 'box-shadow:inset 1.5px 1.5px 1px rgba(255,255,255,.22),0 40px 100px rgba(0,0,0,.55)';
 
 const CSS = '<style id="ca-video-css">'
   + '.cav-sec{position:relative;padding:96px 0 40px}'
+  // a videó alatti üvegkártyák „elmosott háttere” a futó videó fényét is felvette (fehér sáv) — itt nem kell
+  + 'html .stats .stat{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}'
+  + '.cav-screen::before,.cav-film::before{inset:-40px -30px!important}'
   + '.cav-sec .wrap{position:relative}'
   // AI kereső: szöveg balra, „képernyő” jobbra
   + '.cav-ai{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:56px;align-items:center}'
