@@ -153,14 +153,14 @@ html.ca-dark .mobilepanel .am-m{--m-ink:#F5F5F7;--m-mut:#8E8E93;--m-line:rgba(25
 .ca-am .am-stage{min-height:340px!important}
 .ca-am [data-st=rent] .am-car{bottom:132px;width:66%;max-height:150px}
 .ca-am .am-logos{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 10px}
-.ca-am .am-lg{display:flex;align-items:center;justify-content:center;height:34px;min-width:38px;padding:0 7px;border-radius:10px;border:1px solid transparent;font-size:12px;font-weight:700;color:var(--am-sub);transition:background .15s,border-color .15s,transform .15s}
+.ca-am .am-lg{cursor:pointer;display:flex;align-items:center;justify-content:center;height:34px;min-width:38px;padding:0 7px;border-radius:10px;border:1px solid transparent;font-size:12px;font-weight:700;color:var(--am-sub);transition:background .15s,border-color .15s,transform .15s}
 .ca-am .am-lg img{width:24px;height:20px;object-fit:contain;filter:var(--am-logo);opacity:.9}
 .ca-am .am-lg:hover,.ca-am .am-lg.on{background:var(--am-in);border-color:rgba(226,0,26,.45);transform:translateY(-1px)}
 .ca-am .am-lg img.col{filter:none!important;opacity:1}
 html.ca-dark .ca-am .am-lg img.col[src*="vw-color"],html.ca-dark .ca-am .am-lg img.col[src*="hyundai-color"],html.ca-dark .ca-am .am-br img.col[src*="vw-color"],html.ca-dark .ca-am .am-br img.col[src*="hyundai-color"]{filter:brightness(2.6) saturate(1.3)!important}
 .ca-am .am-stage.am-over .am-pr b{color:var(--am-mut)}
 .ca-am .am-prl{display:inline}
-.ca-am [data-st=sale] .am-car{left:auto!important;right:-3%!important;transform:none;width:60%!important;bottom:70px!important;max-height:190px!important}
+.ca-am [data-st=sale] .am-car{left:auto!important;right:5%!important;transform:none;width:50%!important;bottom:76px!important;max-height:180px!important}
 .ca-am [data-st=sale] .am-sl-br .am-logos{margin:0}
 .ca-am [data-st=sell] .am-ngos{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px!important;max-width:none}
 .ca-am [data-st=sell] .am-ngos a{height:40px;padding:4px 5px}
@@ -316,7 +316,7 @@ const CLIENT = function (CFG) {
   function stImport(x) {
     var y = new Date().getFullYear(), ys = '';
     for (var i = y; i >= y - 15; i--) ys += '<option>' + i + '</option>';
-    return '<div class="am-stage" data-st="import"><img class="am-bg" alt="" src="/autoszallitas-autoimport-nemetorszagbol-cut.webp" style="width:46%;right:-2%;bottom:auto;top:22px">'
+    return '<div class="am-stage" data-st="import"><img class="am-bg" alt="" src="/autoszallitas-autoimport-nemetorszagbol-cut.webp" style="width:40%;right:4%;bottom:auto;top:26px">'
       + '<div style="position:relative;z-index:2;max-width:52%"><span class="am-badge">Csak 30% előleg</span><div class="am-st-h" style="margin-top:10px">Autó Németországból, kulcsrakészen</div><div class="am-st-p">Szállítás, honosítás, forgalomba helyezés – mi intézzük.</div></div>'
       + '<div class="am-st-bot" style="position:relative;z-index:2"><div class="am-h" style="margin:0 0 8px">Honosítás gyorsan</div><form class="am-form" action="/honositas-kalkulator/" method="get" style="grid-template-columns:1fr 1fr auto;margin:0"><input type="hidden" name="am" value="1">'
       + '<input name="le" type="number" min="40" max="1200" placeholder="Teljesítmény (LE)" aria-label="Teljesítmény lóerőben"><select name="ev" aria-label="Első forgalomba helyezés éve"><option value="">Évjárat</option>' + ys + '</select><button class="am-go" type="submit" style="grid-column:auto;height:42px">Kiszámolom →</button></form>'
@@ -379,8 +379,14 @@ const CLIENT = function (CFG) {
       }
       var sv = store('ca_am_bud'); if (sv) rng.value = sv;
       rng.addEventListener('input', function () { budget(); show(); store('ca_am_bud', +rng.value); });
-      [].forEach.call(d.querySelectorAll('.am-lg'), function (a) { a.addEventListener('mouseenter', function () { [].forEach.call(d.querySelectorAll('.am-lg.on'), function (z) { z.classList.remove('on'); }); a.classList.add('on'); selBk = a.getAttribute('data-bk') || ''; budget(); show(); }); });
-      budget(); loadRent().then(function () { if (RENT && RENT.length) { var fs = RENT.map(function (m) { return m.ft; }), lo = Math.floor(Math.min.apply(null, fs) / 10000) * 10000, hi = Math.ceil(Math.max.apply(null, fs) / 10000) * 10000; rng.min = lo; rng.max = hi; rng.value = Math.max(lo, Math.min(hi, +rng.value)); } show(); budget(); });
+      // márkalogó: kattintásra kiválasztja a márkát (nem visz át), a csúszka ezután a márka árai között mozog
+      function range(keep) {
+        if (!RENT || !RENT.length) return; var L = RENT.filter(function (m) { return !selBk || m.bk === selBk; }); if (!L.length) L = RENT;
+        var fs = L.map(function (m) { return m.ft; }), lo = Math.floor(Math.min.apply(null, fs) / 10000) * 10000, hi = Math.ceil(Math.max.apply(null, fs) / 10000) * 10000; if (hi <= lo) hi = lo + 10000;
+        var v = +rng.value; rng.min = lo; rng.max = hi; rng.value = keep ? Math.max(lo, Math.min(hi, v)) : (v < lo || v > hi ? Math.round((lo + (hi - lo) * .5) / 10000) * 10000 : v);
+      }
+      [].forEach.call(d.querySelectorAll('.am-lg'), function (a) { a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); [].forEach.call(d.querySelectorAll('.am-lg.on'), function (z) { z.classList.remove('on'); }); a.classList.add('on'); selBk = a.getAttribute('data-bk') || ''; fit.href = a.getAttribute('href') || '/autoink/#berelheto'; range(false); budget(); show(); }); });
+      budget(); loadRent().then(function () { range(true); show(); budget(); });
     }
     if (st === 'sale') {
       var S2 = d.querySelector('.am-stage'), car2 = S2.querySelector('.am-car'), lg2 = S2.querySelector('.am-sl-br');
