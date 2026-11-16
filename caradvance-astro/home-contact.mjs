@@ -8,8 +8,9 @@ import path from 'node:path';
 const FILE = path.join('dist', 'index.html');
 const ADDR = 'Solymár, Ibolya utca 18.';
 const Q = encodeURIComponent('CarAdvance, 2083 Solymár, Ibolya utca 18');
-const EMBED = 'https://www.google.com/maps?q=' + Q + '&hl=hu&z=16&output=embed';
-const DIR = 'https://www.google.com/maps/dir/?api=1&destination=' + Q;
+const LL = '47.583480,18.941276'; // a solymári iroda pontos helye
+const EMBED = 'https://www.google.com/maps?q=' + LL + '&hl=hu&z=17&output=embed';
+const DIR = 'https://www.google.com/maps/dir/?api=1&destination=' + LL;
 const OPEN = 'https://www.google.com/maps/search/?api=1&query=' + Q;
 
 const I = {
