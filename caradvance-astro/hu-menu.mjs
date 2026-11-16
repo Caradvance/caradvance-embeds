@@ -33,7 +33,7 @@ html.ca-dark #ca-am-dim{background:rgba(0,0,0,.45)}
 @keyframes caAmIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @keyframes caAmSw{from{opacity:0}to{opacity:1}}
 .ca-am a{color:inherit;text-decoration:none}
-.ca-am .am-grid{display:grid;grid-template-columns:380px minmax(0,1fr) 470px;gap:0 34px;padding:26px 28px 24px}
+.ca-am .am-grid{display:grid;grid-template-columns:360px minmax(0,1fr) 470px;gap:0 40px;padding:26px 28px 26px}
 .ca-am .am-h{font-size:12px;font-weight:500;color:var(--am-mut);margin:0 0 12px}
 .ca-am .am-tiles{display:flex;flex-direction:column;gap:10px}
 .ca-am .am-t{position:relative;display:flex;gap:14px;align-items:center;padding:14px 40px 14px 14px;border-radius:18px;background:var(--am-tile);border:1px solid var(--am-line);overflow:hidden;transition:border-color .2s,box-shadow .2s,transform .2s}
@@ -41,27 +41,28 @@ html.ca-dark #ca-am-dim{background:rgba(0,0,0,.45)}
 .ca-am .am-t:hover,.ca-am .am-t:focus-visible,.ca-am .am-tiles:not(:hover) .am-t.am-main{border-color:rgba(226,0,26,.5);box-shadow:0 0 0 1px rgba(226,0,26,.18),0 14px 34px rgba(226,0,26,.14);outline:none}
 .ca-am .am-t:hover:before,.ca-am .am-tiles:not(:hover) .am-t.am-main:before{opacity:1}
 .ca-am .am-t:hover{transform:translateX(2px)}
-.ca-am .am-ic{position:relative;flex:none;width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:var(--am-ic);box-shadow:inset 0 1px 0 rgba(255,255,255,.2);transition:background .25s,box-shadow .25s}
+.ca-am .am-t .am-ic,.ca-am .am-ic{position:relative;flex:none;margin:0;padding:0;line-height:0;width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:var(--am-ic);box-shadow:inset 0 1px 0 rgba(255,255,255,.2);transition:background .25s,box-shadow .25s}
 .ca-am .am-t:hover .am-ic,.ca-am .am-tiles:not(:hover) .am-t.am-main .am-ic{background:linear-gradient(145deg,#FF3B4E,#B3001A);box-shadow:0 8px 18px rgba(226,0,26,.35),inset 0 1px 0 rgba(255,255,255,.35)}
-.ca-am .am-ic svg{width:21px;height:21px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ca-am .am-ic svg{display:block;margin:0;flex:none;width:21px;height:21px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ca-am .am-t b{position:relative;display:flex;align-items:center;gap:8px;font-size:16.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
 .ca-am .am-t b i{font-style:normal;font-size:11px;font-weight:700;color:#fff;background:#E2001A;border-radius:999px;padding:2px 7px;letter-spacing:0}
-.ca-am .am-t span{position:relative;display:block;font-size:12.5px;color:var(--am-mut);margin-top:2px;line-height:1.35}
+.ca-am .am-t>div>span{position:relative;display:block;font-size:12.5px;color:var(--am-mut);margin-top:2px;line-height:1.35}
 .ca-am .am-t em{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--am-mut);transition:transform .2s,color .2s}
 .ca-am .am-t:hover em{color:#E2001A;transform:translate(3px,-50%)}
 .ca-am .am-mid{display:flex;flex-direction:column;gap:22px;min-width:0;padding-top:2px}
-.ca-am .am-links{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px}
+.ca-am .am-links{display:grid;grid-template-columns:repeat(2,max-content);gap:11px 34px}
+.ca-am .am-mid{gap:24px!important}
 .ca-am .am-links a{font-size:14px;font-weight:600;color:var(--am-sub);transition:color .15s}
 .ca-am .am-links a:after{content:" ›";color:var(--am-mut)}
 .ca-am .am-links a:hover{color:#E2001A}
 .ca-am .am-chips{display:flex;flex-wrap:wrap;gap:7px}
 .ca-am .am-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:11px;border:1px solid var(--am-line);font-size:13px;font-weight:600;color:var(--am-sub);transition:background .15s,border-color .15s,color .15s}
 .ca-am .am-chip:hover,.ca-am .am-chip.on{background:var(--am-hov);border-color:rgba(226,0,26,.45);color:var(--am-ink)}
-.ca-am .am-chip img{width:22px;height:16px;object-fit:contain;filter:var(--am-logo);opacity:.85}
+.ca-am .am-chip img{width:24px;height:18px;object-fit:contain;filter:var(--am-logo);opacity:.9}.ca-am .am-chip img.col,.ca-am .am-br img.col,.mobilepanel .am-m .am-mc img.col{filter:none!important;opacity:1!important}
 .ca-am .am-chip svg{width:16px;height:16px;flex:none}
 .ca-am .am-ngos{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
-.ca-am .am-ngos img{height:30px;max-width:92px;object-fit:contain;filter:grayscale(1);mix-blend-mode:multiply;opacity:.6;transition:opacity .2s,filter .2s}
-html.ca-dark .ca-am .am-ngos img{filter:grayscale(1) invert(1);mix-blend-mode:screen}
+.ca-am .am-ngos{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px!important;max-width:420px}html.ca-dark .ca-am img.col[src*="vw-color"],html.ca-dark .ca-am img.col[src*="hyundai-color"],html.ca-dark .mobilepanel img.col[src*="vw-color"],html.ca-dark .mobilepanel img.col[src*="hyundai-color"]{filter:brightness(2.6) saturate(1.3)!important}.ca-am .am-ngos a{display:flex;min-width:0;align-items:center;justify-content:center;height:46px;padding:5px 9px;border-radius:12px;background:#fff;border:1px solid var(--am-line);transition:transform .2s,box-shadow .2s}.ca-am .am-ngos a:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.ca-am .am-ngos img{height:34px;max-width:100%;object-fit:contain;filter:none!important;mix-blend-mode:normal!important;opacity:1}
 .ca-am .am-ngos a:hover img{opacity:1}
 .ca-am .am-stage{position:relative;border-radius:22px;overflow:hidden;background:var(--am-stage);border:1px solid var(--am-line);min-height:292px;padding:18px 20px;display:flex;flex-direction:column}
 .ca-am .am-st-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
@@ -95,7 +96,7 @@ html.ca-dark .ca-am .am-ngos img{filter:grayscale(1) invert(1);mix-blend-mode:sc
 .ca-am .am-st-p{font-size:13px;color:var(--am-mut);margin-top:5px;line-height:1.45}
 .ca-am .am-bg{position:absolute;right:-6%;bottom:0;width:70%;opacity:.95;pointer-events:none;filter:drop-shadow(0 16px 16px rgba(0,0,0,.35))}
 .ca-am .am-photo{position:absolute;inset:0;background:center/cover no-repeat}
-.ca-am .am-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,10,12,.92) 0%,rgba(10,10,12,.7) 45%,rgba(10,10,12,.15) 100%)}
+.ca-am .am-photo{background-position:70% center!important}.ca-am .am-photo:after{content:"";position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(10,10,12,.95) 0%,rgba(10,10,12,.85) 50%,rgba(10,10,12,.35) 100%)!important}
 .ca-am .am-on-photo{color:#F5F5F7}.ca-am .am-on-photo .am-st-p{color:#C7C7CC}
 .ca-am .am-stars{display:inline-flex;gap:2px;color:#F5B301}.ca-am .am-stars svg{width:15px;height:15px;fill:currentColor}
 .ca-am .am-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#fff;background:rgba(226,0,26,.9);border-radius:999px;padding:5px 11px}
@@ -237,7 +238,8 @@ const CLIENT = function (CFG) {
   function bkey(b) { b = String(b || '').toLowerCase(); return { vw: 'volkswagen', 'mercedes-benz': 'mercedes' }[b] || b; }
 
   // ---- a mega menü saját (rejtett) adatai ----
-  function brands(p) { var o = []; [].forEach.call(p.querySelectorAll('.mm-brands .mm-b'), function (a) { var t = (a.textContent || '').trim(), im = a.querySelector('img'); if (t && !a.classList.contains('mm-ball')) o.push({ t: t, h: a.getAttribute('href'), img: im ? im.getAttribute('src') : '', k: bkey(t) }); }); return o; }
+  var COL = ['vw', 'bmw', 'mercedes', 'hyundai', 'cupra'];
+  function brands(p) { var o = []; [].forEach.call(p.querySelectorAll('.mm-brands .mm-b'), function (a) { var t = (a.textContent || '').trim(), im = a.querySelector('img'); if (t && !a.classList.contains('mm-ball')) var sr = im ? im.getAttribute('src') : '', mk = sr.match(/\/bl-([a-z]+)(?:-dark|-color)?\.webp/), col = mk && COL.indexOf(mk[1]) > -1; if (col) sr = '/bl-' + mk[1] + '-color.webp'; o.push({ t: t, h: a.getAttribute('href'), img: sr, col: col, k: bkey(t) }); }); return o; }
   function count(p, re) { var n = ''; [].forEach.call(p.querySelectorAll('.mm-more'), function (a) { var t = a.textContent || ''; if (re.test(t)) { var m = t.match(/\((\d+)\)/); if (m) n = m[1]; } }); return n; }
   function ngos(p) { var o = [], seen = {}; [].forEach.call(p.querySelectorAll('.mm-ngos .mm-ng'), function (a) { var im = a.querySelector('img'); if (im && !seen[im.src]) { seen[im.src] = 1; o.push({ src: im.getAttribute('src'), t: a.getAttribute('title') || im.alt || '' }); } }); return o; }
   function socials(p) { var o = []; [].forEach.call(p.querySelectorAll('.mm-schip'), function (a) { var s = a.querySelector('svg'); o.push({ t: (a.textContent || '').trim(), h: a.getAttribute('href'), svg: s ? s.outerHTML.replace(/mm(Fb|Ig)/g, 'am$1') : '' }); }); return o; }
@@ -254,7 +256,7 @@ const CLIENT = function (CFG) {
   var STARS = '<span class="am-stars">' + new Array(6).join('<svg viewBox="0 0 24 24"><path d="M12 2.6l2.83 6.07 6.64.73-4.95 4.5 1.36 6.55L12 17.1l-5.88 3.35 1.36-6.55-4.95-4.5 6.64-.73z"/></svg>') + '</span>';
   function bar() {
     var R = (store('ca_recent') || []).slice(0, 3), left = R.length ? '<span class="am-rec"><span>Legutóbb megnézett:</span>' + R.map(function (x) { return '<a href="' + esc(x.u) + '">' + esc(x.t) + '</a>'; }).join('') + '</span>' : live();
-    return '<div class="am-bar">' + left + '<span class="am-sp"></span>' + (R.length ? live() : '') + '<span class="am-live" style="gap:6px">' + STARS + '<span><b>5,0</b> Google</span></span><a class="am-ph" href="tel:+36302336060">+36 30 233 6060</a></div>';
+    return '<div class="am-bar">' + left + '<span class="am-sp"></span>' + (R.length ? live() : '<a class="am-ph" href="/kapcsolat/">Írj nekünk →</a>') + '</div>';
   }
 
   // ---- színpadok ----
@@ -289,7 +291,7 @@ const CLIENT = function (CFG) {
   function stAbout() {
     return '<div class="am-stage am-on-photo" data-st="about" style="background:#111"><div class="am-photo" style="background-image:url(\'/caradvance-iroda.webp\')"></div>'
       + '<div style="position:relative;z-index:2;max-width:64%"><div class="am-st-h">Gyere be hozzánk</div><div class="am-st-p">Solymár, Ibolya utca 18.<br>Hétfőtől péntekig 9–17</div>'
-      + '<div style="margin-top:18px;display:flex;align-items:center;gap:10px">' + STARS + '<span style="font-size:22px;font-weight:800">5,0</span></div><div class="am-st-p" style="margin-top:2px">Google-értékelés · elégedett ügyfeleink szerint</div></div>'
+      + '<div class="am-st-p" style="margin-top:14px">Német háttér, magyar ügyintézés –<br>2003 óta, több mint 5000 autóval.</div></div>'
       + '<div class="am-st-bot" style="position:relative;z-index:2;display:flex;gap:8px"><a class="am-go" href="/kapcsolat/">Kapcsolat →</a><a class="am-go wh" href="/referenciak/" style="background:#fff;color:#111!important">Referenciák</a></div></div>';
   }
 
@@ -304,7 +306,7 @@ const CLIENT = function (CFG) {
     var tiles = C.tiles.map(function (t, k) { var n = t[4] && cn[t[4]]; return '<a class="am-t' + (k === 0 ? ' am-main' : '') + '" href="' + esc(t[1]) + '"><span class="am-ic">' + ic(t[3]) + '</span><div><b>' + esc(t[0]) + (n ? ' <i>' + esc(n) + '</i>' : '') + '</b><span>' + esc(t[2]) + '</span></div><em>→</em></a>'; }).join('');
     var info = '<div><p class="am-h">' + esc(C.info[0]) + '</p><div class="am-links">' + C.info[1].map(function (x) { return '<a href="' + esc(x[1]) + '">' + esc(x[0]) + '</a>'; }).join('') + '</div></div>';
     var q = C.quick, qh = '';
-    if (q[1] === 'BRANDS') qh = '<div class="am-chips">' + bs.map(function (b) { return '<a class="am-chip" data-bk="' + esc(b.k) + '" href="' + esc(b.h) + '">' + (b.img ? '<img alt="" src="' + esc(b.img) + '">' : '') + esc(b.t) + '</a>'; }).join('') + '</div>';
+    if (q[1] === 'BRANDS') qh = '<div class="am-chips">' + bs.map(function (b) { return '<a class="am-chip" data-bk="' + esc(b.k) + '" href="' + esc(b.h) + '">' + (b.img ? '<img alt=""' + (b.col ? ' class="col"' : '') + ' src="' + esc(b.img) + '">' : '') + esc(b.t) + '</a>'; }).join('') + '</div>';
     else if (q[1] === 'NGOS') qh = '<div class="am-ngos">' + ng.map(function (n) { return '<a href="/jotekonysag/" title="' + esc(n.t) + '"><img alt="' + esc(n.t) + '" src="' + esc(n.src) + '"></a>'; }).join('') + '</div>';
     else if (q[1] === 'SOCIAL') qh = '<div class="am-chips">' + so.map(function (s) { return '<a class="am-chip" target="_blank" rel="noopener" href="' + esc(s.h) + '">' + s.svg + esc(s.t) + '</a>'; }).join('') + '</div>';
     else qh = '<div class="am-chips">' + q[1].map(function (x) { return '<a class="am-chip" href="' + esc(x[1]) + '">' + esc(x[0]) + '</a>'; }).join('') + '</div>';
@@ -323,7 +325,7 @@ const CLIENT = function (CFG) {
         if (!RENT) return; var L = RENT.filter(function (m) { return m.cut && (!bk || m.bk === bk); }); if (!L.length) L = RENT.filter(function (m) { return m.cut; }); if (!L.length) return;
         var m = L.slice().sort(function (a, b) { return (b.now - a.now) || (b.n - a.n); })[0]; if (cur === m.href) return; cur = m.href;
         var bi = d.querySelector('.am-chip[data-bk="' + m.bk + '"] img'); var br = S.querySelector('.am-br');
-        br.querySelector('img').src = bi ? bi.getAttribute('src') : ''; br.querySelector('img').style.display = bi ? '' : 'none'; br.querySelector('span').textContent = m.b;
+        br.querySelector('img').src = bi ? bi.getAttribute('src') : ''; br.querySelector('img').className = bi && bi.classList.contains('col') ? 'col' : ''; br.querySelector('img').style.display = bi ? '' : 'none'; br.querySelector('span').textContent = m.b;
         S.querySelector('.am-md').textContent = m.m; S.querySelector('.am-pr b').textContent = fmt(m.ft) + ' Ft';
         var av = S.querySelector('.am-avail'); av.textContent = m.now ? m.now + ' azonnal elérhető' : m.n + ' autó elérhető'; av.style.visibility = 'visible';
         car.classList.add('out'); var n = new Image(); n.onload = function () { car.src = m.cut; car.alt = m.b + ' ' + m.m; requestAnimationFrame(function () { car.classList.remove('out'); }); }; n.src = m.cut;
@@ -392,7 +394,7 @@ const CLIENT = function (CFG) {
       var h = C.tiles.map(function (t, k) { return '<a class="am-mt' + (k === 0 ? ' am-main' : '') + '" href="' + esc(t[1]) + '"><span class="am-ic">' + ic(t[3]) + '</span><span class="am-mx"><b>' + esc(t[0]) + '</b><small>' + esc(t[2]) + '</small></span><em>›</em></a>'; }).join('');
       h += '<p class="am-mh">' + esc(C.info[0]) + '</p><div class="am-ml">' + C.info[1].map(function (x) { return '<a href="' + esc(x[1]) + '">' + esc(x[0]) + '<em>›</em></a>'; }).join('') + '</div>';
       var q = C.quick, ch = '';
-      if (q[1] === 'BRANDS') ch = bs.map(function (b) { return '<a class="am-mc" href="' + esc(b.h) + '">' + (b.img ? '<img alt="" src="' + esc(b.img) + '">' : '') + esc(b.t) + '</a>'; }).join('');
+      if (q[1] === 'BRANDS') ch = bs.map(function (b) { return '<a class="am-mc" href="' + esc(b.h) + '">' + (b.img ? '<img alt=""' + (b.col ? ' class="col"' : '') + ' src="' + esc(b.img) + '">' : '') + esc(b.t) + '</a>'; }).join('');
       else if (q[1] === 'SOCIAL') ch = CFG.soc.map(function (x) { return '<a class="am-mc" target="_blank" rel="noopener" href="' + esc(x[1]) + '">' + esc(x[0]) + '</a>'; }).join('');
       else if (q[1] === 'NGOS') ch = '<a class="am-mc" href="/jotekonysag/">Akiket támogatunk ›</a>';
       else ch = q[1].map(function (x) { return '<a class="am-mc" href="' + esc(x[1]) + '">' + esc(x[0]) + '</a>'; }).join('');
@@ -400,7 +402,7 @@ const CLIENT = function (CFG) {
       sub.innerHTML = '<div class="am-m" data-dm-skip>' + h + '</div>';
     });
     var k = mp.querySelector('.m-kapcsolat'), bx = document.createElement('div'); bx.className = 'am-m am-mbar'; bx.setAttribute('data-dm-skip', '');
-    bx.innerHTML = live() + '<span class="am-mrow">' + STARS + '<span><b>5,0</b> Google</span><a href="tel:+36302336060">+36 30 233 6060</a></span>';
+    bx.innerHTML = live();
     if (k) mp.insertBefore(bx, k); else mp.appendChild(bx);
   }
   function boot() {
