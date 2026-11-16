@@ -17,6 +17,15 @@ const RED = 'background:#E2001A!important;color:#fff!important;border:0!importan
 const CSS = '<style id="ca-stage-css">'
   + '#autoink.ca-show.ca-stg-on{overflow:clip!important}'
   + '#autoink.ca-show::before{display:none!important}'
+  // csillagok
+  + '.gstars.ca-gs{letter-spacing:0!important;font-size:0!important;line-height:0!important;display:inline-flex}.ca-stars{display:inline-flex;gap:2px}'
+  + '.ca-stars svg{width:17px;height:17px;fill:url(#ca-star-g);fill:#F5B301;filter:drop-shadow(0 1px 1.5px rgba(200,120,0,.35))}'
+  + '.rev-summary .ca-stars svg{width:20px;height:20px}.rev-summary{gap:12px!important;padding:12px 22px!important}.rev-summary b{font-size:20px!important;letter-spacing:-.01em}'
+  // sötét: a Kínálat háttere egybeolvad az oldallal (nincs függőleges csík a széleken), a hero alja is ehhez igazodik
+  + 'html.ca-dark #autoink.ca-show{background:transparent!important;border:0!important;box-shadow:none!important}'
+  + 'html.ca-dark section.hero:has(+#autoink)::after{background:linear-gradient(180deg,rgba(13,15,19,0) 0%,rgba(13,15,19,.85) 70%,#0D0F13 100%)!important}'
+  // sötét: a Porsche-címer színes marad (nem fehérítjük ki)
+  + 'html.ca-dark .stats img[src*="porsche"],html.ca-dark .stat-logos img[src*="porsche"]{filter:none!important;opacity:1!important}'
   // hero gombok: három egyforma gomb (Autót keresek · Autó import · Add el az autód)
   + 'section.hero .cta-row{display:flex!important;flex-wrap:wrap;justify-content:center;gap:12px!important}section.hero .cta-row .btn{min-width:190px;justify-content:center;text-align:center}'
   + '@media(max-width:600px){section.hero .cta-row{flex-direction:column;align-items:stretch;width:100%;max-width:320px;margin-left:auto;margin-right:auto}section.hero .cta-row .btn{min-width:0;width:100%}}'
@@ -214,6 +223,9 @@ try {
       const cuts = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith('.webp')).map((f) => f.slice(0, -5)) : [];
       h = h.replace('<a class="btn btn-white" href="mailto:info@caradvance.hu?subject=Aut%C3%B3%20elad%C3%A1sa%20%E2%80%93%20bizom%C3%A1ny">Add el az autód</a>',
         '<a class="btn btn-white ca-hb-imp" href="/auto-rendeles/">Autó import</a><a class="btn btn-white" href="mailto:info@caradvance.hu?subject=Aut%C3%B3%20elad%C3%A1sa%20%E2%80%93%20bizom%C3%A1ny">Add el az autód</a>');
+      // Google-csillagok: szöveges ★ helyett éles, aranyszínű SVG csillagok
+      const STARS = '<span class="ca-stars" role="img" aria-label="5 csillagból 5">' + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.83 6.07 6.64.73-4.95 4.5 1.36 6.55L12 17.1l-5.88 3.35 1.36-6.55-4.95-4.5 6.64-.73z"/></svg>'.repeat(5) + '</span>';
+      h = h.replace(/<(div|span) class="gstars">★★★★★<\/\1>/g, (m, t) => '<' + t + ' class="gstars ca-gs">' + STARS + '</' + t + '>');
       h = h.replace('</head>', CSS + '</head>').replace(/<\/body>/i, JS.replace('__SALECUTS__', JSON.stringify(cuts)) + '</body>');
       fs.writeFileSync(FILE, h);
       console.log('[home-stage] színpad a Kínálat részben');
