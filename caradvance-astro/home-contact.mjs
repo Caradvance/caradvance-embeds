@@ -38,8 +38,8 @@ const HTML = '<section class="block" id="ca-contact" data-dm-skip><div class="wr
   + '</div></div></section>';
 
 const CSS = '<style id="ca-contact-css">'
-  + '#ca-contact{--cc-ink:#121317;--cc-mut:#5E616A;--cc-line:rgba(18,19,23,.09);--cc-card:linear-gradient(160deg,rgba(255,255,255,.85),rgba(255,255,255,.55));--cc-ic:linear-gradient(145deg,#4A4D55,#24262B);--cc-map:url(/terkep-solymar-light.webp);padding-top:30px!important;padding-bottom:70px!important}'
-  + 'html.ca-dark #ca-contact{--cc-ink:#F2F3F5;--cc-mut:#9AA0AC;--cc-line:rgba(255,255,255,.09);--cc-card:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));--cc-ic:linear-gradient(145deg,#3A3D45,#1B1C21);--cc-map:url(/terkep-solymar-dark.webp)}'
+  + '#ca-contact{--cc-ink:#121317;--cc-mut:#5E616A;--cc-line:rgba(18,19,23,.09);--cc-card:linear-gradient(160deg,rgba(255,255,255,.85),rgba(255,255,255,.55));--cc-ic:linear-gradient(145deg,#4A4D55,#24262B);--cc-map:url(/terkep-solymar-light.webp?v=2);padding-top:30px!important;padding-bottom:70px!important}'
+  + 'html.ca-dark #ca-contact{--cc-ink:#F2F3F5;--cc-mut:#9AA0AC;--cc-line:rgba(255,255,255,.09);--cc-card:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));--cc-ic:linear-gradient(145deg,#3A3D45,#1B1C21);--cc-map:url(/terkep-solymar-dark.webp?v=2)}'
   + '#ca-contact .cc-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:stretch}'
   + '#ca-contact .cc-left{display:flex;flex-direction:column;color:var(--cc-ink)}'
   + '#ca-contact .sec-title{margin:6px 0 10px;color:var(--cc-ink)!important}'
