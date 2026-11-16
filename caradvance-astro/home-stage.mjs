@@ -16,6 +16,7 @@ const RED = 'background:#E2001A!important;color:#fff!important;border:0!importan
 
 const CSS = '<style id="ca-stage-css">'
   + '#autoink.ca-show.ca-stg-on{overflow:clip!important}'
+  + '#autoink.ca-show::before{display:none!important}'
   + '#autoink.ca-stg-on .autok-panel .cw.cf3d{display:none!important}'
   + '#autoink.ca-stg-on .autok-panel.on .autok-more{display:flex!important;justify-content:center;margin:30px 0 10px!important}'
   + '#ca-stg{position:relative;height:clamp(860px,100vh,980px);margin-top:4px}'
