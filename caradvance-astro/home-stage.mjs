@@ -17,6 +17,8 @@ const RED = 'background:#E2001A!important;color:#fff!important;border:0!importan
 const CSS = '<style id="ca-stage-css">'
   + '#autoink.ca-show.ca-stg-on{overflow:clip!important}'
   + '#autoink.ca-show::before{display:none!important}'
+  // okos menüsor: lefelé görgetve elrejtőzik, felfelé görgetve azonnal visszajön
+  + 'html .ca-navwrap{transition:transform .38s cubic-bezier(.2,.8,.2,1)!important;will-change:transform}html .ca-navwrap.ca-nav-hide{transform:translateY(calc(-100% - 24px))!important}'
   // a hero a teljes képernyőt kitölti — a Kínálat csak lefelé görgetve jelenik meg
   + 'section.hero:has(+#autoink){min-height:calc(100vh - 12px)!important;min-height:calc(100svh - 12px)!important;display:flex!important;flex-direction:column!important;justify-content:center!important;box-sizing:border-box}'
   + 'section.hero:has(+#autoink) .scrolldown{position:absolute!important;left:50%;bottom:28px;transform:translateX(-50%)}'
@@ -192,6 +194,9 @@ const JS = '<script id="ca-stage-js">(function(){'
   // fül- vagy márkaváltás: azonnal elhalványul a régi tartalom, és csak az új autókkal jelenik meg újra
   + 'S.addEventListener("click",function(e){var tb=e.target.closest&&e.target.closest(".autok-tab,.cf-br");if(!tb||!stg)return;stg.classList.add("swap");sig="";'
   + 'setTimeout(function(){place(panel())},0);setTimeout(build,260);setTimeout(build,700);setTimeout(function(){stg.classList.remove("swap")},2500)},true)}'
+  + '(function(){var y0=scrollY,w=null;addEventListener("scroll",function(){w=w||document.querySelector(".ca-navwrap");if(!w)return;var y=scrollY,d=y-y0;if(Math.abs(d)<6)return;'
+  + 'var mp=w.querySelector(".mobilepanel"),open=mp&&mp.getBoundingClientRect().height>40&&getComputedStyle(mp).visibility!=="hidden"&&getComputedStyle(mp).display!=="none";'
+  + 'if(d>0&&y>140&&!open&&!w.matches(":hover"))w.classList.add("ca-nav-hide");else if(d<0)w.classList.remove("ca-nav-hide");y0=y},{passive:true})})();'
   + 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot()'
   + '})();</script>';
 
