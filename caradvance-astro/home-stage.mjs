@@ -23,7 +23,7 @@ const CSS = '<style id="ca-stage-css">'
   + '.rev-summary .ca-stars svg{width:20px;height:20px}.rev-summary{gap:12px!important;padding:12px 22px!important}.rev-summary b{font-size:20px!important;letter-spacing:-.01em}'
   // sötét: a Kínálat háttere egybeolvad az oldallal (nincs függőleges csík a széleken), a hero alja is ehhez igazodik
   + 'html.ca-dark #autoink.ca-show{background:transparent!important;border:0!important;box-shadow:none!important}'
-  + 'html.ca-dark section.hero:has(+#autoink)::after{background:linear-gradient(180deg,rgba(13,15,19,0) 0%,rgba(13,15,19,.85) 70%,#0D0F13 100%)!important}'
+  + 'html.ca-dark body section.hero:has(+#autoink)::after,html.ca-dark body .cah section.hero:has(+#autoink)::after{height:220px!important;background:linear-gradient(180deg,rgba(13,15,19,0) 0%,rgba(13,15,19,.55) 45%,rgba(13,15,19,.9) 78%,#0D0F13 100%)!important;background-color:transparent!important}'
   // sötét: a Porsche-címer színes marad (nem fehérítjük ki)
   + 'html.ca-dark .stats img[src*="porsche"],html.ca-dark .stat-logos img[src*="porsche"]{filter:none!important;opacity:1!important}'
   // hero gombok: három egyforma gomb (Autót keresek · Autó import · Add el az autód)
