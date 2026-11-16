@@ -10,8 +10,9 @@ const FILE = path.join('dist', 'index.html');
 // színek
 const BG = '#F6F6F3', CARD = '#FFFFFF', INK = '#121317', MUTED = '#5E616A', LINE = 'rgba(18,19,23,.09)', RED = '#E2001A';
 const SH = '0 1px 2px rgba(18,19,23,.04),0 12px 32px rgba(18,19,23,.06)';
-const CARDCSS = 'background:linear-gradient(135deg,rgba(255,255,255,.72) 0%,rgba(255,255,255,.28) 42%,rgba(255,255,255,.46) 100%)!important;border:1px solid rgba(255,255,255,.95)!important;'
-  + 'box-shadow:inset 0 1.5px 0 #fff,inset 1.5px 0 0 rgba(255,255,255,.8),inset 0 -1px 0 rgba(18,19,23,.05),0 0 0 1px rgba(18,19,23,.05),0 2px 4px rgba(18,19,23,.03),0 22px 50px rgba(18,19,23,.10)!important;-webkit-backdrop-filter:blur(22px) saturate(190%)!important;backdrop-filter:blur(22px) saturate(190%)!important';
+const CARDCSS = 'background:linear-gradient(125deg,rgba(255,255,255,.62) 0%,rgba(255,255,255,.18) 34%,rgba(255,255,255,.06) 55%,rgba(255,255,255,.24) 100%)!important;border:1.5px solid rgba(255,255,255,.85)!important;'
+  + 'box-shadow:inset 2px 2px 1px rgba(255,255,255,.95),inset -1px -1px 1px rgba(255,255,255,.55),inset 0 -14px 28px rgba(255,255,255,.18),inset 0 0 0 1px rgba(18,19,23,.04),0 1px 2px rgba(18,19,23,.05),0 24px 60px rgba(18,19,23,.12)!important;'
+  + '-webkit-backdrop-filter:blur(26px) saturate(210%) brightness(1.06)!important;backdrop-filter:blur(26px) saturate(210%) brightness(1.06)!important';
 const BTN2 = 'background:#fff!important;color:' + INK + '!important;border:1px solid rgba(18,19,23,.16)!important;box-shadow:none!important';
 const L = 'html.ca-light ';
 const A = L + '#autoink ';           // Kínálat
@@ -22,8 +23,9 @@ const CSS = '<style id="ca-light-css">'
   + L + ',' + L + 'body{background:' + BG + '!important;color:' + INK + '}'
   + L + '.cah .sec-title,' + L + 'h2.sec-title{color:' + INK + '}'
   // hero: a videó alja az oldal hátterébe olvad
-  + L + 'section.hero:has(+#autoink)::after{display:none!important}'
-  + L + 'section.hero:has(+#autoink){border-radius:0 0 28px 28px!important}'
+  + L + 'section.hero:has(+#autoink){border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}'
+  + L + 'section.hero:has(+#autoink)::after{display:block!important;height:260px!important;background:linear-gradient(180deg,rgba(246,246,243,0) 0%,rgba(246,246,243,.18) 30%,rgba(246,246,243,.62) 62%,rgba(246,246,243,.92) 84%,' + BG + ' 100%)!important}'
+  + L + 'section.hero:has(+#autoink) .scrolldown{color:#3a3d44!important}' + L + 'section.hero:has(+#autoink) .scrolldown *{color:#3a3d44!important;border-color:#3a3d44!important;stroke:#3a3d44!important}'
 
   // ── Kínálat ─────────────────────────────────────────────────────────────
   + A + '{color:' + INK + '}'
@@ -111,6 +113,14 @@ const CSS = '<style id="ca-light-css">'
   + L + '#gyik .ca-faq-btn,' + L + '#gyik button.ca-faq-all,' + L + '#gyik .faq-list+button{' + BTN2 + ';border-radius:999px!important}'
   + L + '#ca-cta .ca-tel{' + BTN2 + '}' + L + '#ca-cta .ca-tel svg{stroke:' + INK + '!important;color:' + INK + '!important}'
   + L + '#ca-cta .ca-tel:hover{border-color:' + INK + '!important}'
+  // színes „fényfoltok” a kártyák mögött — ettől látszik az üveg
+  + L + '.stats{background:radial-gradient(420px 260px at 18% 55%,rgba(255,45,70,.38),transparent 70%),radial-gradient(420px 280px at 82% 45%,rgba(90,125,220,.34),transparent 70%),radial-gradient(360px 240px at 52% 70%,rgba(255,150,100,.30),transparent 70%)!important}'
+  + L + '#szolgaltatasok{background:radial-gradient(520px 380px at 12% 30%,rgba(255,45,70,.22),transparent 70%),radial-gradient(520px 420px at 92% 70%,rgba(90,125,220,.22),transparent 70%)!important}'
+  + L + '#miert{background:radial-gradient(460px 300px at 22% 75%,rgba(255,150,100,.34),transparent 70%),radial-gradient(460px 300px at 78% 80%,rgba(255,45,70,.30),transparent 70%),radial-gradient(400px 260px at 50% 30%,rgba(90,125,220,.18),transparent 70%)!important}'
+  + L + '#rolunk{background:radial-gradient(460px 320px at 15% 28%,rgba(255,45,70,.32),transparent 70%),radial-gradient(500px 340px at 88% 40%,rgba(90,125,220,.30),transparent 70%),radial-gradient(520px 300px at 40% 62%,rgba(255,150,100,.30),transparent 70%)!important}'
+  + L + '#velemenyek{background:radial-gradient(480px 300px at 80% 60%,rgba(90,125,220,.26),transparent 70%),radial-gradient(420px 280px at 20% 70%,rgba(255,45,70,.22),transparent 70%)!important}'
+  + L + '#ca-cta{background:radial-gradient(520px 300px at 30% 50%,rgba(255,45,70,.26),transparent 70%),radial-gradient(520px 300px at 72% 50%,rgba(90,125,220,.24),transparent 70%)!important}'
+  + L + '#ca-cta .card.ca-cta-card,' + L + '#gyik .faq-item,' + L + '#gyik details.ca-more,' + L + '#velemenyek .card,' + L + '#velemenyek [class*="rev"]:is(.card,article){' + CARDCSS + '}'
   // ── prémium elemek világos alapon ────────────────────────────────────────
   // háttér: lágy, halvány fényfoltok, hogy az üvegkártyák „üvegnek” látsszanak
   + L + 'body{background:radial-gradient(640px 520px at 88% 22%,rgba(255,60,80,.30),transparent 70%),radial-gradient(680px 560px at 6% 62%,rgba(110,135,200,.28),transparent 70%),radial-gradient(480px 420px at 70% 92%,rgba(255,140,110,.26),transparent 70%),radial-gradient(420px 380px at 30% 8%,rgba(150,165,210,.22),transparent 70%),' + BG + '!important;background-attachment:fixed!important}'
