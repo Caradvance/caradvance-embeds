@@ -143,7 +143,36 @@ html.ca-dark .mobilepanel .am-m{--m-ink:#F5F5F7;--m-mut:#8E8E93;--m-line:rgba(25
 .mobilepanel .am-mbar .am-mrow{display:flex;align-items:center;gap:8px}
 .mobilepanel .am-mbar .am-stars{display:inline-flex;gap:2px;color:#F5B301}.mobilepanel .am-mbar .am-stars svg{width:14px;height:14px;fill:currentColor}
 .mobilepanel .am-mbar a{margin-left:auto;color:var(--m-ink);font-weight:700}
-@media(max-width:1250px){.ca-am .am-grid{grid-template-columns:330px minmax(0,1fr) 400px;gap:0 24px}}
+.ca-am .am-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr)!important;gap:0 32px!important;align-items:stretch}
+.ca-am .am-left{display:flex;flex-direction:column;gap:20px;min-width:0}
+.ca-am .am-right{min-width:0;display:flex}.ca-am .am-right>.am-stage{flex:1}
+.ca-am .am-info{padding:14px 4px 0;border-top:1px solid var(--am-line)}
+.ca-am .am-info .am-h{margin:0 0 10px}
+.ca-am .am-info .am-links{display:flex!important;flex-wrap:wrap;gap:8px 22px}
+.ca-am .am-info .am-links a{font-size:13.5px;font-weight:600;color:var(--am-sub)}
+.ca-am .am-stage{min-height:340px!important}
+.ca-am [data-st=rent] .am-car{bottom:132px;width:66%;max-height:150px}
+.ca-am .am-logos{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 10px}
+.ca-am .am-lg{display:flex;align-items:center;justify-content:center;height:34px;min-width:38px;padding:0 7px;border-radius:10px;border:1px solid transparent;font-size:12px;font-weight:700;color:var(--am-sub);transition:background .15s,border-color .15s,transform .15s}
+.ca-am .am-lg img{width:24px;height:20px;object-fit:contain;filter:var(--am-logo);opacity:.9}
+.ca-am .am-lg:hover,.ca-am .am-lg.on{background:var(--am-in);border-color:rgba(226,0,26,.45);transform:translateY(-1px)}
+.ca-am .am-lg img.col{filter:none!important;opacity:1}
+html.ca-dark .ca-am .am-lg img.col[src*="vw-color"],html.ca-dark .ca-am .am-lg img.col[src*="hyundai-color"],html.ca-dark .ca-am .am-br img.col[src*="vw-color"],html.ca-dark .ca-am .am-br img.col[src*="hyundai-color"]{filter:brightness(2.6) saturate(1.3)!important}
+.ca-am .am-stage.am-over .am-pr b{color:var(--am-mut)}
+.ca-am .am-prl{display:inline}
+.ca-am [data-st=sale] .am-car{left:auto!important;right:-3%!important;transform:none;width:60%!important;bottom:70px!important;max-height:190px!important}
+.ca-am [data-st=sale] .am-sl-br .am-logos{margin:0}
+.ca-am [data-st=sell] .am-ngos{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px!important;max-width:none}
+.ca-am [data-st=sell] .am-ngos a{height:40px;padding:4px 5px}
+.ca-am [data-st=sell] .am-ngos img{height:30px}
+.ca-am .am-hl{display:block;margin:0 0 8px!important}.ca-am .am-hl:hover{color:#E2001A}
+.ca-am .am-calc{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px}
+.ca-am .am-calc a{font-size:12.5px;font-weight:600;color:var(--am-mut)}.ca-am .am-calc a:hover{color:#E2001A}
+.ca-am .am-soc{display:flex;gap:6px;margin-left:auto}
+.ca-am .am-soc a{display:flex;width:32px;height:32px;border-radius:9px;overflow:hidden;transition:transform .15s}
+.ca-am .am-soc a:hover{transform:translateY(-2px)}
+.ca-am .am-soc svg{width:32px;height:32px;display:block}
+
 </style>`;
 
 // ikonok (vonalas, 24x24)
@@ -259,43 +288,49 @@ const CLIENT = function (CFG) {
     return '<div class="am-bar">' + left + '<span class="am-sp"></span>' + (R.length ? live() : '<a class="am-ph" href="/kapcsolat/">Írj nekünk →</a>') + '</div>';
   }
 
-  // ---- színpadok ----
-  function stRent() {
-    return '<div class="am-stage" data-st="rent"><div class="am-st-top"><div><div class="am-br"><img alt="" src=""><span></span></div><div class="am-md">&nbsp;</div><div class="am-avail" style="visibility:hidden"></div></div><div class="am-pr">havidíj<b>&nbsp;</b>-tól · nettó</div></div>'
+  // ---- színpadok (x = a menü gyors elérése: márkák, alapítványok, kalkulátorok, közösségi oldalak) ----
+  function logos(bs, all) {
+    return '<div class="am-logos">' + (all ? '<a class="am-lg am-lg-all on" data-bk="" href="' + esc(all) + '">Összes</a>' : '') + bs.map(function (b) { return '<a class="am-lg" data-bk="' + esc(b.k) + '" href="' + esc(b.h) + '" title="' + esc(b.t) + '" aria-label="' + esc(b.t) + '">' + (b.img ? '<img alt=""' + (b.col ? ' class="col"' : '') + ' src="' + esc(b.img) + '">' : esc(b.t)) + '</a>'; }).join('') + '</div>';
+  }
+  function stRent(x) {
+    return '<div class="am-stage" data-st="rent"><div class="am-st-top"><div><div class="am-br"><img alt="" src=""><span></span></div><div class="am-md">&nbsp;</div><div class="am-avail" style="visibility:hidden"></div></div><div class="am-pr"><span class="am-prl">havidíj</span><b>&nbsp;</b>-tól · nettó</div></div>'
       + '<img class="am-car out" alt="">'
-      + '<div class="am-st-bot"><div class="am-slide"><label>Havi keret<b class="am-bud">450 000 Ft</b></label><input type="range" min="250000" max="1000000" step="10000" value="450000" aria-label="Havi keret"><a class="am-go am-fit" href="/autoink/#berelheto">0 autó →</a></div></div></div>';
+      + '<div class="am-st-bot">' + logos(x.bs, '/autoink/#berelheto') + '<div class="am-slide"><label>Havi keret<b class="am-bud">450 000 Ft</b></label><input type="range" min="250000" max="1200000" step="10000" value="450000" aria-label="Havi keret"><a class="am-go am-fit" href="/autoink/#berelheto">0 autó →</a></div></div></div>';
   }
-  function stSale(cn) {
+  function stSale(x) {
     return '<div class="am-stage" data-st="sale"><div class="am-st-top"><div><div class="am-seg"><button type="button" class="on" data-v="new">Új autók</button><button type="button" data-v="used">Használt autók</button></div>'
-      + '<div class="am-md am-sh" style="margin-top:12px">Új autó német áron</div><div class="am-st-p am-sp2">BMW, MINI, Mercedes, Audi – gyári garanciával</div></div><span class="am-badge am-sb">akár −25%</span></div>'
-      + '<img class="am-car" alt="" src="/mini-jcw-premium-auto-eladas-cut.webp" style="width:62%">'
-      + '<div class="am-st-bot" style="display:flex;justify-content:flex-end"><a class="am-go am-sl" href="/egyedi-auto-rendeles/">Konfigurálom →</a></div></div>';
+      + '<div class="am-md am-sh" style="margin-top:14px">Új autó német áron</div><div class="am-st-p am-sp2">BMW, MINI, Mercedes, Audi – gyári garanciával</div></div><span class="am-badge am-sb">akár −25%</span></div>'
+      + '<img class="am-car" alt="" src="/mini-jcw-premium-auto-eladas-cut.webp">'
+      + '<div class="am-st-bot" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px"><div class="am-sl-br">' + logos(x.bs) + '</div><a class="am-go am-sl" href="/egyedi-auto-rendeles/">Konfigurálom →</a></div></div>';
   }
-  function stSell() {
+  function stSell(x) {
     var mk = ['Audi', 'BMW', 'Mercedes-Benz', 'MINI', 'Porsche', 'Volkswagen', 'Skoda', 'Toyota', 'Ford', 'Opel', 'Volvo', 'Egyéb'], y = new Date().getFullYear(), ys = '';
     for (var i = y; i >= y - 20; i--) ys += '<option>' + i + '</option>';
-    return '<div class="am-stage" data-st="sell"><img class="am-bg" alt="" src="/elado-cut/jaguar-f-type-s-3-0-v6-s-c-automata.webp" style="opacity:.16;width:78%;right:-14%;bottom:-6%;filter:none">'
+    return '<div class="am-stage" data-st="sell"><img class="am-bg" alt="" src="/elado-cut/jaguar-f-type-s-3-0-v6-s-c-automata.webp" style="opacity:.14;width:72%;right:-14%;bottom:auto;top:-4%;filter:none">'
       + '<div style="position:relative;z-index:2"><div class="am-st-h">Mennyit ér az autód?</div><div class="am-st-p">Ingyenes értékbecslés 24 órán belül. Mi hirdetjük, bemutatjuk és intézzük a papírokat.</div>'
-      + '<form class="am-form" action="/eladom/" method="get"><input type="hidden" name="am" value="1"><select name="marka" aria-label="Márka"><option value="">Márka</option>' + mk.map(function (x) { return '<option>' + x + '</option>'; }).join('') + '</select>'
+      + '<form class="am-form" action="/eladom/" method="get"><input type="hidden" name="am" value="1"><select name="marka" aria-label="Márka"><option value="">Márka</option>' + mk.map(function (z) { return '<option>' + z + '</option>'; }).join('') + '</select>'
       + '<select name="ev" aria-label="Évjárat"><option value="">Évjárat</option>' + ys + '</select><input name="km" type="number" min="0" step="1000" placeholder="Km" aria-label="Kilométer">'
-      + '<button class="am-go" type="submit">Ingyenes értékbecslés →</button></form></div></div>';
+      + '<button class="am-go" type="submit">Ingyenes értékbecslés →</button></form></div>'
+      + '<div class="am-st-bot" style="position:relative;z-index:2"><a class="am-h am-hl" href="/jotekonysag/">Minden eladás után adományozunk ›</a><div class="am-ngos">' + x.ng.map(function (n) { return '<a href="/jotekonysag/" title="' + esc(n.t) + '"><img alt="' + esc(n.t) + '" src="' + esc(n.src) + '"></a>'; }).join('') + '</div></div></div>';
   }
-  function stImport() {
+  function stImport(x) {
     var y = new Date().getFullYear(), ys = '';
     for (var i = y; i >= y - 15; i--) ys += '<option>' + i + '</option>';
-    return '<div class="am-stage" data-st="import"><img class="am-bg" alt="" src="/autoszallitas-autoimport-nemetorszagbol-cut.webp" style="width:50%;right:-3%;bottom:auto;top:22px">'
-      + '<div style="position:relative;z-index:2;max-width:48%"><span class="am-badge">Csak 30% előleg</span><div class="am-st-h" style="margin-top:10px">Autó Németországból, kulcsrakészen</div><div class="am-st-p">Szállítás, honosítás, forgalomba helyezés – mi intézzük.</div></div>'
+    return '<div class="am-stage" data-st="import"><img class="am-bg" alt="" src="/autoszallitas-autoimport-nemetorszagbol-cut.webp" style="width:46%;right:-2%;bottom:auto;top:22px">'
+      + '<div style="position:relative;z-index:2;max-width:52%"><span class="am-badge">Csak 30% előleg</span><div class="am-st-h" style="margin-top:10px">Autó Németországból, kulcsrakészen</div><div class="am-st-p">Szállítás, honosítás, forgalomba helyezés – mi intézzük.</div></div>'
       + '<div class="am-st-bot" style="position:relative;z-index:2"><div class="am-h" style="margin:0 0 8px">Honosítás gyorsan</div><form class="am-form" action="/honositas-kalkulator/" method="get" style="grid-template-columns:1fr 1fr auto;margin:0"><input type="hidden" name="am" value="1">'
-      + '<input name="le" type="number" min="40" max="1200" placeholder="Teljesítmény (LE)" aria-label="Teljesítmény lóerőben"><select name="ev" aria-label="Első forgalomba helyezés éve"><option value="">Évjárat</option>' + ys + '</select><button class="am-go" type="submit" style="grid-column:auto;height:42px">Kiszámolom →</button></form></div></div>';
+      + '<input name="le" type="number" min="40" max="1200" placeholder="Teljesítmény (LE)" aria-label="Teljesítmény lóerőben"><select name="ev" aria-label="Első forgalomba helyezés éve"><option value="">Évjárat</option>' + ys + '</select><button class="am-go" type="submit" style="grid-column:auto;height:42px">Kiszámolom →</button></form>'
+      + '<div class="am-calc">' + x.calc.map(function (c) { return '<a href="' + esc(c[1]) + '">' + esc(c[0]) + ' ›</a>'; }).join('') + '</div></div></div>';
   }
-  function stAbout() {
+  function stAbout(x) {
     return '<div class="am-stage am-on-photo" data-st="about" style="background:#111"><div class="am-photo" style="background-image:url(\'/caradvance-iroda.webp\')"></div>'
       + '<div style="position:relative;z-index:2;max-width:64%"><div class="am-st-h">Gyere be hozzánk</div><div class="am-st-p">Solymár, Ibolya utca 18.<br>Hétfőtől péntekig 9–17</div>'
       + '<div class="am-st-p" style="margin-top:14px">Német háttér, magyar ügyintézés –<br>2003 óta, több mint 5000 autóval.</div></div>'
-      + '<div class="am-st-bot" style="position:relative;z-index:2;display:flex;gap:8px"><a class="am-go" href="/kapcsolat/">Kapcsolat →</a><a class="am-go wh" href="/referenciak/" style="background:#fff;color:#111!important">Referenciák</a></div></div>';
+      + '<div class="am-st-bot" style="position:relative;z-index:2;display:flex;align-items:center;gap:8px"><a class="am-go" href="/kapcsolat/">Kapcsolat →</a><a class="am-go wh" href="/referenciak/" style="background:#fff;color:#111!important">Referenciák</a>'
+      + '<span class="am-soc">' + x.so.map(function (o) { return '<a target="_blank" rel="noopener" href="' + esc(o.h) + '" title="' + esc(o.t) + '" aria-label="' + esc(o.t) + '">' + o.svg + '</a>'; }).join('') + '</span></div></div>';
   }
 
-  // ---- panel felépítése ----
+  // ---- panel felépítése: balra a fő pontok és alattuk a tudnivalók, jobbra a nagy színpad ----
   function build(p, i) {
     var C = M[i]; if (!C) return null;
     var bs = brands(p); if (bs.length) cache['b' + i] = bs; bs = cache['b' + i] || [];
@@ -304,15 +339,11 @@ const CLIENT = function (CFG) {
     var cn = { rent: count(p, /bérelhető/i), sale: count(p, /eladó/i), biz: count(p, /bizományos/i) };
     ['rent', 'sale', 'biz'].forEach(function (k) { if (cn[k]) cache[k] = cn[k]; else cn[k] = cache[k] || ''; });
     var tiles = C.tiles.map(function (t, k) { var n = t[4] && cn[t[4]]; return '<a class="am-t' + (k === 0 ? ' am-main' : '') + '" href="' + esc(t[1]) + '"><span class="am-ic">' + ic(t[3]) + '</span><div><b>' + esc(t[0]) + (n ? ' <i>' + esc(n) + '</i>' : '') + '</b><span>' + esc(t[2]) + '</span></div><em>→</em></a>'; }).join('');
-    var info = '<div><p class="am-h">' + esc(C.info[0]) + '</p><div class="am-links">' + C.info[1].map(function (x) { return '<a href="' + esc(x[1]) + '">' + esc(x[0]) + '</a>'; }).join('') + '</div></div>';
-    var q = C.quick, qh = '';
-    if (q[1] === 'BRANDS') qh = '<div class="am-chips">' + bs.map(function (b) { return '<a class="am-chip" data-bk="' + esc(b.k) + '" href="' + esc(b.h) + '">' + (b.img ? '<img alt=""' + (b.col ? ' class="col"' : '') + ' src="' + esc(b.img) + '">' : '') + esc(b.t) + '</a>'; }).join('') + '</div>';
-    else if (q[1] === 'NGOS') qh = '<div class="am-ngos">' + ng.map(function (n) { return '<a href="/jotekonysag/" title="' + esc(n.t) + '"><img alt="' + esc(n.t) + '" src="' + esc(n.src) + '"></a>'; }).join('') + '</div>';
-    else if (q[1] === 'SOCIAL') qh = '<div class="am-chips">' + so.map(function (s) { return '<a class="am-chip" target="_blank" rel="noopener" href="' + esc(s.h) + '">' + s.svg + esc(s.t) + '</a>'; }).join('') + '</div>';
-    else qh = '<div class="am-chips">' + q[1].map(function (x) { return '<a class="am-chip" href="' + esc(x[1]) + '">' + esc(x[0]) + '</a>'; }).join('') + '</div>';
-    var stage = { rent: stRent, sale: stSale, sell: stSell, import: stImport, about: stAbout }[C.stage](cn);
+    var info = '<div class="am-info"><p class="am-h">' + esc(C.info[0]) + '</p><div class="am-links">' + C.info[1].map(function (z) { return '<a href="' + esc(z[1]) + '">' + esc(z[0]) + '</a>'; }).join('') + '</div></div>';
+    var x = { bs: bs.filter(function (b) { return b.img; }), ng: ng, so: so, calc: Array.isArray(C.quick[1]) ? C.quick[1] : [] };
+    var stage = { rent: stRent, sale: stSale, sell: stSell, import: stImport, about: stAbout }[C.stage](x);
     var d = document.createElement('div'); d.className = 'ca-am'; d.setAttribute('data-i', i);
-    d.innerHTML = '<div class="am-grid"><div class="am-tiles">' + tiles + '</div><div class="am-mid">' + info + '<div><p class="am-h">' + esc(q[0]) + '</p>' + qh + '</div></div><div>' + stage + '</div></div>' + bar();
+    d.innerHTML = '<div class="am-grid"><div class="am-left"><div class="am-tiles">' + tiles + '</div>' + info + '</div><div class="am-right">' + stage + '</div></div>' + bar();
     wire(d, C.stage, cn);
     return d;
   }
@@ -320,34 +351,45 @@ const CLIENT = function (CFG) {
   // ---- interakciók a színpadokon ----
   function wire(d, st, cn) {
     if (st === 'rent') {
-      var S = d.querySelector('.am-stage'), car = S.querySelector('.am-car'), rng = S.querySelector('input[type=range]'), fit = S.querySelector('.am-fit'), bud = S.querySelector('.am-bud'), cur = '';
-      function show(bk) {
-        if (!RENT) return; var L = RENT.filter(function (m) { return m.cut && (!bk || m.bk === bk); }); if (!L.length) L = RENT.filter(function (m) { return m.cut; }); if (!L.length) return;
-        var m = L.slice().sort(function (a, b) { return (b.now - a.now) || (b.n - a.n); })[0]; if (cur === m.href) return; cur = m.href;
-        var bi = d.querySelector('.am-chip[data-bk="' + m.bk + '"] img'); var br = S.querySelector('.am-br');
-        br.querySelector('img').src = bi ? bi.getAttribute('src') : ''; br.querySelector('img').className = bi && bi.classList.contains('col') ? 'col' : ''; br.querySelector('img').style.display = bi ? '' : 'none'; br.querySelector('span').textContent = m.b;
+      var S = d.querySelector('.am-stage'), car = S.querySelector('.am-car'), rng = S.querySelector('input[type=range]'), fit = S.querySelector('.am-fit'), bud = S.querySelector('.am-bud'), cur = '', selBk = '', tm = 0;
+      // a kerethez legjobban illő autó: a legdrágább, ami még belefér (márkán belül, ha van kiválasztva)
+      function pick() {
+        var v = +rng.value, L = RENT.filter(function (m) { return m.cut && (!selBk || m.bk === selBk); }); if (!L.length) return null;
+        var fits = L.filter(function (m) { return m.ft <= v; });
+        if (fits.length) return { m: fits.sort(function (a, b) { return (b.ft - a.ft) || (b.now - a.now) || (b.n - a.n); })[0], over: false };
+        return { m: L.sort(function (a, b) { return a.ft - b.ft; })[0], over: true };
+      }
+      function show() {
+        if (!RENT) return; var r = pick(); if (!r) return; var m = r.m;
+        S.querySelector('.am-prl').textContent = r.over ? 'a keret felett · havidíj' : 'havidíj';
+        S.classList.toggle('am-over', r.over);
+        if (cur === m.href) return; cur = m.href;
+        var bi = d.querySelector('.am-lg[data-bk="' + m.bk + '"] img'), br = S.querySelector('.am-br'), im = br.querySelector('img');
+        im.src = bi ? bi.getAttribute('src') : ''; im.className = bi && bi.classList.contains('col') ? 'col' : ''; im.style.display = bi ? '' : 'none'; br.querySelector('span').textContent = m.b;
         S.querySelector('.am-md').textContent = m.m; S.querySelector('.am-pr b').textContent = fmt(m.ft) + ' Ft';
         var av = S.querySelector('.am-avail'); av.textContent = m.now ? m.now + ' azonnal elérhető' : m.n + ' autó elérhető'; av.style.visibility = 'visible';
-        car.classList.add('out'); var n = new Image(); n.onload = function () { car.src = m.cut; car.alt = m.b + ' ' + m.m; requestAnimationFrame(function () { car.classList.remove('out'); }); }; n.src = m.cut;
-        S.onclick = function (e) { if (e.target.closest('.am-slide')) return; location.href = m.href; }; S.style.cursor = 'pointer';
+        car.classList.add('out'); clearTimeout(tm); var n = new Image(); n.onload = function () { tm = setTimeout(function () { car.src = m.cut; car.alt = m.b + ' ' + m.m; requestAnimationFrame(function () { car.classList.remove('out'); }); }, 120); }; n.src = m.cut;
+        S.__href = m.href;
       }
+      S.addEventListener('click', function (e) { if (e.target.closest('.am-slide,.am-logos,a')) return; if (S.__href) location.href = S.__href; }); S.style.cursor = 'pointer';
       function budget() {
         var v = +rng.value; bud.textContent = fmt(v) + ' Ft'; rng.style.setProperty('--p', ((v - rng.min) / (rng.max - rng.min) * 100) + '%');
-        if (!RENT) return; var n = 0, mods = 0; RENT.forEach(function (m) { if (m.ft <= v) { n += m.n; mods++; } });
-        fit.textContent = (n ? fmt(n) + ' autó' : 'Nincs autó') + ' →'; fit.title = mods + ' modell fér bele';
+        if (!RENT) return; var n = 0; RENT.forEach(function (m) { if (m.ft <= v && (!selBk || m.bk === selBk)) n += m.n; });
+        fit.textContent = (n ? fmt(n) + ' autó' : 'Nincs autó') + ' →';
       }
       var sv = store('ca_am_bud'); if (sv) rng.value = sv;
-      rng.addEventListener('input', function () { budget(); store('ca_am_bud', +rng.value); });
-      [].forEach.call(d.querySelectorAll('.am-chip[data-bk]'), function (a) { a.addEventListener('mouseenter', function () { [].forEach.call(d.querySelectorAll('.am-chip.on'), function (x) { x.classList.remove('on'); }); a.classList.add('on'); show(a.getAttribute('data-bk')); }); });
-      budget(); loadRent().then(function () { show(''); budget(); });
+      rng.addEventListener('input', function () { budget(); show(); store('ca_am_bud', +rng.value); });
+      [].forEach.call(d.querySelectorAll('.am-lg'), function (a) { a.addEventListener('mouseenter', function () { [].forEach.call(d.querySelectorAll('.am-lg.on'), function (z) { z.classList.remove('on'); }); a.classList.add('on'); selBk = a.getAttribute('data-bk') || ''; budget(); show(); }); });
+      budget(); loadRent().then(function () { if (RENT && RENT.length) { var fs = RENT.map(function (m) { return m.ft; }), lo = Math.floor(Math.min.apply(null, fs) / 10000) * 10000, hi = Math.ceil(Math.max.apply(null, fs) / 10000) * 10000; rng.min = lo; rng.max = hi; rng.value = Math.max(lo, Math.min(hi, +rng.value)); } show(); budget(); });
     }
     if (st === 'sale') {
-      var S2 = d.querySelector('.am-stage'), car2 = S2.querySelector('.am-car');
+      var S2 = d.querySelector('.am-stage'), car2 = S2.querySelector('.am-car'), lg2 = S2.querySelector('.am-sl-br');
       var V = { new: ['Új autó német áron', 'BMW, MINI, Mercedes, Audi – gyári garanciával', 'akár −25%', '/mini-jcw-premium-auto-eladas-cut.webp', '/egyedi-auto-rendeles/', 'Konfigurálom →'],
         used: ['Ellenőrzött használt autók', 'Dokumentált előélet, valós km, Németországból', (cn.sale ? cn.sale + ' autó' : 'Készleten'), '/bmw-m3-touring-premium-auto-eladas-cut.webp', '/autoink/', 'Megnézem →'] };
       [].forEach.call(S2.querySelectorAll('.am-seg button'), function (b) {
-        b.addEventListener('click', function (e) { e.preventDefault(); var v = V[b.getAttribute('data-v')]; [].forEach.call(S2.querySelectorAll('.am-seg button'), function (x) { x.classList.toggle('on', x === b); });
+        b.addEventListener('click', function (e) { e.preventDefault(); var k = b.getAttribute('data-v'), v = V[k]; [].forEach.call(S2.querySelectorAll('.am-seg button'), function (z) { z.classList.toggle('on', z === b); });
           S2.querySelector('.am-sh').textContent = v[0]; S2.querySelector('.am-sp2').textContent = v[1]; S2.querySelector('.am-sb').textContent = v[2]; var go = S2.querySelector('.am-sl'); go.href = v[4]; go.textContent = v[5];
+          if (lg2) lg2.style.visibility = k === 'new' ? '' : 'hidden';
           car2.classList.add('out'); setTimeout(function () { car2.src = v[3]; car2.classList.remove('out'); }, 180); });
         b.addEventListener('mouseenter', function () { b.click(); });
       });
