@@ -74,7 +74,7 @@ html.ca-dark .ca-am .am-ngos img{filter:grayscale(1) invert(1);mix-blend-mode:sc
 .ca-am .am-car.out{opacity:0;transform:translateX(-46%)}
 .ca-am .am-st-bot{position:relative;z-index:2;margin-top:auto}
 .ca-am .am-avail{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--am-mut);margin-top:6px}
-.ca-am .am-avail:before{content:"";width:7px;height:7px;border-radius:50%;background:#30D158}
+.ca-am .am-avail:before{content:"";width:7px;height:7px;border-radius:50%;background:none;box-shadow:inset 0 0 0 4px #30D158}
 .ca-am .am-slide{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--am-in);border:1px solid var(--am-line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .ca-am .am-slide label{font-size:12px;color:var(--am-mut);white-space:nowrap}
 .ca-am .am-slide label b{display:block;font-size:15px;color:var(--am-ink)}
