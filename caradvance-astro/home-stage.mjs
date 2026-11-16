@@ -15,6 +15,16 @@ const G = 'background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,
 const RED = 'background:#E2001A!important;color:#fff!important;border:0!important;box-shadow:0 10px 30px rgba(226,0,26,.45)!important';
 
 const CSS = '<style id="ca-stage-css">'
+  // betöltéskor a régi körhinta-nézet ne villanjon fel: amíg a színpad el nem készül, csak a cím látszik (helyfoglalással);
+  // ha a szkript valamiért nem futna le, 5 mp után a régi nézet megjelenik
+  + '#autoink:not(.ca-stg-on){min-height:min(1000px,100vh)}'
+  + '#autoink:not(.ca-stg-on) .ca-sh-r,#autoink:not(.ca-stg-on) .autok-head,#autoink:not(.ca-stg-on) .autok-panel,#autoink:not(.ca-stg-on) .cf-none{opacity:0;pointer-events:none;animation:caStgFb .3s 5s forwards}'
+  + '@keyframes caStgFb{to{opacity:1;pointer-events:auto}}'
+  // sötét módban a menüsor már az első képkockától sötét (ne villanjon fehéren, amíg a dark-mode.js betölt)
+  + 'html.ca-dark .ca-nav{background:#161A21!important;border-color:#2B313C!important;color:#E8EBF0}html.ca-dark .ca-nav .navlink{color:#E8EBF0!important}'
+  + 'html.ca-dark .ca-nav .ca-sbtn,html.ca-dark .ca-nav .ca-pbtn,html.ca-dark .ca-nav .burger{background-color:#161A21!important;color:#E8EBF0!important;border-color:#2B313C!important}html.ca-dark .ca-nav .burger span{background-color:#E8EBF0!important}'
+  + 'html.ca-dark .ca-nav .brand img[src$="/caradvance-logo.webp"]{content:url(/caradvance-logo-white.webp)}'
+  + '#ca-stg{animation:caStgIn .55s cubic-bezier(.2,.7,.2,1) both}@keyframes caStgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}'
   + '#autoink.ca-show.ca-stg-on{overflow:clip!important}'
   + '#autoink.ca-show::before{display:none!important}'
   // csillagok
