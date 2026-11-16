@@ -23,16 +23,26 @@ try {
         + 'var d=document.documentElement;if(t==="dark"){window.__CA_FORCE_DARK=1;d.classList.add("ca-dark");document.addEventListener("DOMContentLoaded",function(){var s=document.createElement("script");s.src="' + dmSrc + '";document.head.appendChild(s)})}else d.classList.add("ca-light");'
         + 'window.__caTheme=t;try{var y=sessionStorage.getItem("ca-theme-y");if(y){sessionStorage.removeItem("ca-theme-y");addEventListener("load",function(){setTimeout(function(){scrollTo(0,+y)},60)})}}catch(e){}})();</script>';
       h = h.replace(/<head([^>]*)>/i, (m) => m + decide);
-      const sw = '<style id="ca-theme-css">.ca-tsw{position:fixed;left:18px;bottom:18px;z-index:2147482000;display:inline-flex;gap:2px;padding:4px;border-radius:999px;font:600 13px/1 inherit;'
-        + 'background:rgba(20,21,26,.72);border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.25)}'
-        + '.ca-tsw button{border:0;cursor:pointer;font:inherit;padding:9px 14px;border-radius:999px;color:rgba(255,255,255,.75);background:transparent}'
-        + '.ca-tsw button.on{background:#fff;color:#121317}'
-        + 'html.ca-light .ca-tsw{background:rgba(255,255,255,.75);border-color:rgba(18,19,23,.1)}html.ca-light .ca-tsw button{color:#5E616A}html.ca-light .ca-tsw button.on{background:#121317;color:#fff}'
-        + '@media(max-width:600px){.ca-tsw{left:12px;bottom:12px}.ca-tsw button{padding:8px 11px}}</style>';
-      const swJs = '<script id="ca-theme-js">(function(){var b=document.createElement("div");b.className="ca-tsw";b.setAttribute("data-dm-skip","");b.setAttribute("role","group");b.setAttribute("aria-label","Téma");'
-        + 'b.innerHTML=\'<button type="button" data-t="light">☀ Fehér</button><button type="button" data-t="dark">☾ Sötét</button>\';'
-        + '[].forEach.call(b.children,function(x){x.classList.toggle("on",x.getAttribute("data-t")===window.__caTheme);x.onclick=function(){var t=x.getAttribute("data-t");if(t===window.__caTheme)return;try{localStorage.setItem("ca-theme",t);sessionStorage.setItem("ca-theme-y",String(scrollY))}catch(e){}'
-        + 'var u=new URL(location.href);u.searchParams.delete("tema");location.replace(u.toString())}});document.body.appendChild(b)})();</script>';
+      const SUN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
+      const MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/></svg>';
+      const sw = '<style id="ca-theme-css">'
+        + '.ca-tsw{position:relative;flex:0 0 auto;width:26px;height:46px;padding:0;margin:0 6px 0 2px;border-radius:999px;cursor:pointer;align-self:center;'
+        + 'background:linear-gradient(180deg,#ececE9,#dcdcd8);border:1px solid rgba(18,19,23,.14);box-shadow:inset 0 1px 3px rgba(18,19,23,.18);transition:background .3s,border-color .3s}'
+        + '.ca-tsw i{position:absolute;left:2px;top:2px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;'
+        + 'background:radial-gradient(circle at 35% 30%,#3a3c42,#0d0e11);box-shadow:0 2px 5px rgba(0,0,0,.35);transition:top .3s cubic-bezier(.2,.8,.2,1),background .3s}'
+        + '.ca-tsw svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}.ca-tsw .mo{display:none}.ca-tsw .mo svg{fill:#121317;stroke:none}'
+        + 'html.ca-dark .ca-tsw{background:linear-gradient(180deg,#0a0b0e,#1c1d22);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}'
+        + 'html.ca-dark .ca-tsw i{top:22px;background:radial-gradient(circle at 35% 30%,#fff,#d9d9d6)}html.ca-dark .ca-tsw .su{display:none}html.ca-dark .ca-tsw .mo{display:flex}'
+        + '.ca-tsw.go i{top:22px}html.ca-dark .ca-tsw.go i{top:2px}'
+        + '.ca-tsw:focus-visible{outline:2px solid #E2001A;outline-offset:2px}'
+        + '@media(max-width:820px){.ca-tsw{width:22px;height:40px;margin:0 2px}.ca-tsw i{width:16px;height:16px}html.ca-dark .ca-tsw i,.ca-tsw.go i{top:20px}html.ca-dark .ca-tsw.go i{top:2px}.ca-tsw svg{width:10px;height:10px}}'
+        + '</style>';
+      const swJs = '<script id="ca-theme-js">(function(){function put(){var r=document.querySelector(".ca-nav .navright");if(!r)return setTimeout(put,200);if(r.querySelector(".ca-tsw"))return;'
+        + 'var b=document.createElement("button");b.type="button";b.className="ca-tsw";b.setAttribute("data-dm-skip","");var dk=window.__caTheme==="dark";b.setAttribute("aria-label",dk?"Váltás világos módra":"Váltás sötét módra");b.title=dk?"Világos mód":"Sötét mód";'
+        + 'b.innerHTML=\'<i><span class="su">' + SUN + '</span><span class="mo">' + MOON + '</span></i>\';'
+        + 'b.onclick=function(){var t=dk?"light":"dark";b.classList.add("go");try{localStorage.setItem("ca-theme",t);sessionStorage.setItem("ca-theme-y",String(scrollY))}catch(e){}'
+        + 'setTimeout(function(){var u=new URL(location.href);u.searchParams.delete("tema");location.replace(u.toString())},280)};r.insertBefore(b,r.firstChild)}'
+        + 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",put);else put()})();</script>';
       h = h.replace('</head>', sw + '</head>').replace(/<\/body>/i, swJs + '</body>');
       fs.writeFileSync(FILE, h);
       console.log('[home-theme] téma-kapcsoló (alapból: ' + DEFAULT + ')');
