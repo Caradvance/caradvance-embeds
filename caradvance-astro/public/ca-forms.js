@@ -235,7 +235,7 @@
     cfg.X.forEach(function (x) {
       for (var p = 0; p < 5; p++) if (sel[p] !== null && x[p] !== sel[p]) return;
       if (sa !== null && x[5] !== sa) return;
-      var v = x[7]; if (v == null) return;
+      var v = x[7]; if (v == null || !(v > 0)) return;   // 0 / hiányzó alapdíj = nincs ár (különben csak a +750 € felár menne ki, pl. BMW X6 lead 2026-11-16)
       if (lo === null || v < lo) lo = v; if (hi === null || v > hi) hi = v;
     });
     if (lo === null) return null;
