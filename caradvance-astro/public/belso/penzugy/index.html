@@ -45,6 +45,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .kpi.alert{cursor:pointer;outline:2px solid #FCD34D}
 .pl{overflow:auto}.pl table{min-width:640px}
 .pl td,.pl th{padding:6px 10px}
+.pl thead th{background:#fff;position:relative;z-index:2;will-change:transform}.pl thead th:first-child,.pl thead th.totc{z-index:3}.pl thead.stuck th{box-shadow:0 6px 10px -6px rgba(15,23,42,.18)}.pl thead.stuck th.totc{box-shadow:-6px 0 10px -6px rgba(15,23,42,.12),0 6px 10px -6px rgba(15,23,42,.18)}
 .pl th:first-child,.pl td:first-child{position:sticky;left:0;background:#fff;z-index:1;min-width:250px}
 .pl tr.sec td{font-weight:800;padding-top:16px;border-bottom:0;color:var(--ink);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
 .pl tr.grp td:first-child{padding-left:18px;font-weight:700;cursor:pointer}
@@ -1227,5 +1228,34 @@ boot();
 })();
 </script>
 <script src="/belso/belso-ui.js?v=4" defer></script>
+<script>
+/* P&L / havi táblák fejléce görgetéskor a lap tetején marad (a fülsáv alatt) — Marc, 2026-11-18 */
+(function(){
+  function off(){
+    var o=0,t=document.querySelector('.tabs');
+    if(t){var r=t.getBoundingClientRect();if(r.top<60)o=Math.max(o,r.bottom+4);}
+    var w=document.querySelector('.pl'),x=w?w.getBoundingClientRect().left+20:200;
+    try{document.elementsFromPoint(x,4).forEach(function(e){var p=getComputedStyle(e).position;if(p==='fixed'||p==='sticky'){var b=e.getBoundingClientRect().bottom;if(b<200)o=Math.max(o,b);}});}catch(e){}
+    return o;
+  }
+  function stick(){
+    var o=off();
+    document.querySelectorAll('.pl').forEach(function(w){
+      var th=w.querySelector('thead');if(!th)return;
+      var r=w.getBoundingClientRect(),h=th.offsetHeight;
+      var y=Math.max(0,Math.min(o-r.top,r.height-h-6));
+      y=Math.round(y);
+      if(th.__y===y)return;th.__y=y;
+      var tf=y>0?'translateY('+y+'px)':'';
+      th.querySelectorAll('th').forEach(function(c){c.style.transform=tf;});
+      th.classList.toggle('stuck',y>0);
+    });
+  }
+  window.addEventListener('scroll',stick,{passive:true});
+  window.addEventListener('resize',stick);
+  try{new MutationObserver(function(){requestAnimationFrame(stick);}).observe(document.getElementById('tab')||document.body,{childList:true,subtree:true});}catch(e){}
+  setInterval(stick,1000);
+})();
+</script>
 </body>
 </html>
