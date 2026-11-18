@@ -84,8 +84,6 @@ const JS = '<script id="ca-site-js">(function(){var BC=' + JSON.stringify(BC) + 
 
 export function apply(h) {
   if (!/<html[^>]*\slang="hu"/.test(h) || h.indexOf('id="ca-site-theme"') > -1 || h.indexOf('id="ca-theme"') > -1) return null;
-  // Tóth Károly kártyáján (Import) a kért szivárványzászló a nyelvi zászlók után
-  h = h.replace(/(<h3 class="tc-name"[^>]*>Tóth Károly<\/h3>\s*<div class="tc-flags"[^>]*>[\s\S]*?)(<\/div>)/, (m, a, b) => a.indexOf('flag-pride') > -1 ? m : a + '<span class="tc-flag" style="background-image:url(/flag-pride.webp)" title="Pride"' + (a.match(/data-astro-cid-[a-z0-9]+/) ? ' ' + a.match(/data-astro-cid-[a-z0-9]+/)[0] : '') + '></span>' + b);
   h = h.replace(/<head([^>]*)>/i, (m) => m + DECIDE);
   h = h.replace('</head>', () => CSS + '</head>');
   h = h.replace('</body>', () => JS + '</body>');
