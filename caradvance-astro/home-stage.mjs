@@ -28,7 +28,8 @@ const CSS = '<style id="ca-stage-css">'
   + '@media(max-width:640px){section.hero:has(+#autoink) .scrolldown{display:none!important}}'
   + 'html.ca-light .stats img[src$="/caradvance-logo.webp"]{content:url(/caradvance-logo-clear.webp)}'
   + 'body #ca-cta .ca-cta-btns .ca-tel,body #ca-cta .ca-cta-alt{display:none!important}'
-  + 'html.ca-dark body .cah .svc-grid::before{background:radial-gradient(26% 22% at 27% 30%,rgba(226,0,26,.3),transparent 72%),radial-gradient(26% 22% at 73% 30%,rgba(226,0,26,.3),transparent 72%),radial-gradient(26% 22% at 27% 78%,rgba(226,0,26,.3),transparent 72%),radial-gradient(26% 22% at 73% 78%,rgba(226,0,26,.3),transparent 72%)!important}'
+  + 'html.ca-dark[lang] body .cah .svc-grid::before,html.ca-dark[lang] body #szolgaltatasok .svc-grid::before{background-color:transparent!important}' // a dark-mode.js szürkére festette (kékes kártyák)
+  + 'html.ca-dark body .cah .svc-grid::before{background:radial-gradient(26% 22% at 27% 30%,rgba(226,0,26,.11),transparent 72%),radial-gradient(26% 22% at 73% 30%,rgba(226,0,26,.11),transparent 72%),radial-gradient(26% 22% at 27% 78%,rgba(226,0,26,.11),transparent 72%),radial-gradient(26% 22% at 73% 78%,rgba(226,0,26,.11),transparent 72%)!important}'
   // „Melyik autó érdekel?” doboz: a két izzó vonal között fent és lent ugyanakkora hely
   + 'body section#ca-cta.block{padding-top:47px!important;padding-bottom:47px!important}'
   // sötét módban a menüsor már az első képkockától sötét (ne villanjon fehéren, amíg a dark-mode.js betölt)
