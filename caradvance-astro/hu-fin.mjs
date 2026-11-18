@@ -21,8 +21,8 @@ const CSS = '<style id="ca-fin-css">'
   // ---- 1) fejléc
   + P + 'section.hero video.ca-lv{filter:brightness(.55) saturate(.9)}'
   + P + 'section.hero :is(h1,.sub){text-shadow:0 2px 24px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.35)}'
-  + P + 'section.hero h1 .accent{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;position:relative;display:inline-block}'
-  + P + 'section.hero h1 .accent::after{content:"";position:absolute;left:4%;right:4%;bottom:.02em;height:.12em;border-radius:.1em;background:#E2001A}'
+  + P + 'section.hero h1 .accent{color:#F0182F!important;-webkit-text-fill-color:#F0182F!important;background:none!important;text-shadow:0 2px 18px rgba(0,0,0,.75),0 1px 3px rgba(0,0,0,.6),0 0 1px rgba(0,0,0,.5)!important}'
+  
   + P + 'section.hero .sub{max-width:620px!important;margin-left:auto!important;margin-right:auto!important}'
   + P + '.ca-fst{display:flex;justify-content:center;margin:16px auto 22px}'
   + P + '.ca-fst span{display:flex;flex-direction:column;align-items:center;padding:0 22px;color:rgba(255,255,255,.78);font-size:12.5px;font-weight:600;text-shadow:0 1px 10px rgba(0,0,0,.4)}'
