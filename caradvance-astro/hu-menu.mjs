@@ -259,7 +259,7 @@ const CLIENT = function (CFG) {
       if (!RATE) RATE = S.rate_fallback || 364;
       RENT = (S.models || []).filter(function (m) { return m.net; }).map(function (m) {
         var img = PH[m.brand + ' ' + m.model] || '', k = (img.match(/\/berles\/([^\/?#]+)\.webp/) || [])[1];
-        return { b: m.brand === 'VW' ? 'Volkswagen' : m.brand, bk: bkey(m.brand), m: dname(m.model), ft: Math.ceil((m.net + 750) * RATE / 10000) * 10000, n: m.count || 0, now: m.now || 0, cut: k && BC.indexOf(k) > -1 ? '/berles-cut/' + k + '.webp?v=3' : '', href: rhref(m.brand, m.model) };
+        return { b: m.brand === 'VW' ? 'Volkswagen' : m.brand, bk: bkey(m.brand), m: dname(m.model), ft: Math.ceil((m.net + 750) * RATE / 10000) * 10000, n: m.count || 0, now: m.now || 0, cut: k && BC.indexOf(k) > -1 ? '/berles-cut/' + k + '.webp' : '', href: rhref(m.brand, m.model) };
       });
     }).catch(function () {});
     return rentP;

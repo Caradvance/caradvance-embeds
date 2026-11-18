@@ -35,7 +35,7 @@ const CSS = '<style id="ca-light-css">'
   + S + '.stg-light{background:radial-gradient(ellipse 50% 60% at 50% 42%,#fff,rgba(255,255,255,0) 70%)!important}'
   + S + '.stg-floor{background:radial-gradient(ellipse 42% 26% at 50% 64%,rgba(18,19,23,.12),transparent 72%)!important}'
   + S + '.stg-floor::after{background:linear-gradient(90deg,transparent,rgba(18,19,23,.14),transparent)!important;box-shadow:none!important}'
-  + S + '.stg-cars .stg-car img{filter:drop-shadow(0 14px 12px rgba(18,19,23,.16)) drop-shadow(0 3px 3px rgba(18,19,23,.10))!important;-webkit-box-reflect:unset!important}'
+  + S + '.stg-cars .stg-car img{filter:drop-shadow(0 22px 18px rgba(18,19,23,.22))!important;-webkit-box-reflect:below 2px linear-gradient(transparent 82%,rgba(255,255,255,.55))!important}'
   + S + '.stg-brand{color:' + INK + '!important}' + S + '.stg-brand img{filter:brightness(0)!important;opacity:.85}' + S + '.stg-brand img[src*="-color"]{filter:none!important;opacity:1}'
   + S + '.stg-model{color:' + INK + '!important}' + S + '.stg-spec{color:' + MUTED + '!important}'
   // fülek + márkák
@@ -87,7 +87,7 @@ const CSS = '<style id="ca-light-css">'
   // ── Szolgáltatás-képek: világos stúdió ───────────────────────────────────
   + L + '.cah .svc-media.ca-stage{background:radial-gradient(ellipse 60% 60% at 50% 32%,#fff,#EFEFEB 80%)!important;border-bottom:1px solid ' + LINE + '!important}'
   + L + '.cah .svc-media.ca-stage::after{background:linear-gradient(90deg,transparent,rgba(18,19,23,.12),transparent)!important;box-shadow:none!important}'
-  + L + '.cah .svc-media.ca-stage img{filter:drop-shadow(0 12px 10px rgba(18,19,23,.16)) drop-shadow(0 3px 3px rgba(18,19,23,.10))!important;-webkit-box-reflect:unset!important}'
+  + L + '.cah .svc-media.ca-stage img{filter:drop-shadow(0 14px 12px rgba(18,19,23,.22))!important;-webkit-box-reflect:below -2px linear-gradient(transparent 78%,rgba(255,255,255,.5))!important}'
   + L + '.cah .svc{' + CARDCSS + '}'
 
   // ── Így dolgozunk ───────────────────────────────────────────────────────

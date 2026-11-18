@@ -11,9 +11,6 @@ const CSS = '<style id="ca-apple-css">'
   + 'html.ca-light,html.ca-light body{background:' + BG + '!important;background-image:none!important}'
   // színes foltok ki
   + L + ':is(#szolgaltatasok,#miert,#rolunk,#velemenyek,#ca-cta,.stats,#autoink,#ai-autokereso,#ca-contact,#gyik,.cav-sec){background:none!important;background-color:transparent!important}'
-  // autók: világosban nincs tükröződés (szürke dobozt adott), csak puha talajárnyék
-  + 'html.ca-light body #ca-stg .stg-car img,html.ca-light body #ca-stg .stg-cars .stg-car img,html.ca-light body #ca-stg .stg-bgl .stg-car img{-webkit-box-reflect:unset!important;filter:drop-shadow(0 16px 14px rgba(18,19,23,.14)) drop-shadow(0 3px 3px rgba(18,19,23,.10))!important}'
-  + 'html.ca-light body #ca-stg .stg-floor{background:radial-gradient(ellipse 40% 18% at 50% 62%,rgba(18,19,23,.10),transparent 72%)!important}'
   // Kínálat: a szekció ne legyen külön (melegebb) téglalap; a bérlési kártya árnyéka és a gomb piros ragyogása halkabb
   + 'html.ca-light body #autoink.ca-show,html.ca-light body #autoink.ca-show.ca-stg-on{background:transparent!important;background-color:transparent!important;background-image:none!important}'
   + 'html.ca-light body #autoink #ca-stg .stg-card.card.on,html.ca-light body #autoink #ca-stg .stg-card{background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.78))!important;box-shadow:inset 0 1px 0 #fff,0 1px 2px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06)!important}'
