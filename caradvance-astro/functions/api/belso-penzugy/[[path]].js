@@ -70,7 +70,7 @@ export async function onRequest(context) {
 
     /* ---------- meta ---------- */
     if (m === 'GET' && p0 === 'meta') {
-      const [lines, cats, rules, accounts, alloc, navLast, stats, vehicles] = await Promise.all([
+      const [lines, cats, rules, accounts, alloc, navLast, stats, vehicles, car_terms] = await Promise.all([
         DB.prepare(`SELECT * FROM fin_lines ORDER BY sort, id`).all().then((r) => r.results),
         DB.prepare(`SELECT * FROM fin_cats ORDER BY sort, id`).all().then((r) => r.results),
         DB.prepare(`SELECT * FROM fin_rules ORDER BY prio, id`).all().then((r) => r.results),
@@ -78,10 +78,11 @@ export async function onRequest(context) {
         getSetting(env, 'alloc', { mode: 'fixed', key: {} }),
         getSetting(env, 'nav_last', null),
         DB.prepare(`SELECT MIN(bdate) AS min, MAX(bdate) AS max, COUNT(*) AS n FROM fin_tx`).first(),
-        getSetting(env, 'vehicles', {})
+        getSetting(env, 'vehicles', {}),
+        getSetting(env, 'car_terms', {})
       ]);
       const block = (await loadBlock(env)).map((b) => ({ id: b.id, name: b.name, pattern: b.pattern, created_at: b.created_at }));
-      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, block, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats, vehicles, fin_start: await finStart(env) });
+      return json({ me: { name: me.name, email: me.email }, lines, cats, rules, accounts, alloc, block, nav: { configured: navConfigured(env), last: navLast, test: env.NAV_TEST === '1' }, stats, vehicles, car_terms, fin_start: await finStart(env) });
     }
 
     /* ---------- P&L ---------- */
@@ -299,6 +300,20 @@ export async function onRequest(context) {
       for (const [k, v] of Object.entries(body.map || {})) { const pl = normPlate(k); if (pl) out[pl] = clean(v, 80); }
       await setSetting(env, 'vehicles', out);
       return json({ ok: true, vehicles: out });
+    }
+    if (m === 'POST' && p0 === 'car-terms') { // autónkénti tartási időszak a költség-előrejelzéshez: { plate, start: 'ÉÉÉÉ-HH-NN', months, monthly (Ft, nettó, opcionális) } — months = 0 → törlés
+      const pl = normPlate(body.plate); if (!pl) return json({ error: 'Rendszám kötelező.' }, 400);
+      const all = await getSetting(env, 'car_terms', {});
+      const months = Math.round(num(body.months) || 0);
+      if (!months) delete all[pl];
+      else {
+        const start = /^\d{4}-\d{2}-\d{2}$/.test(String(body.start || '')) ? String(body.start) : null;
+        if (!start) return json({ error: 'A kezdő dátum kötelező (ÉÉÉÉ-HH-NN).' }, 400);
+        const monthly = Math.abs(num(body.monthly) || 0);
+        all[pl] = { start, months: Math.min(120, Math.max(1, months)), monthly: monthly ? Math.round(monthly) : null, by: who, at: nowIso() };
+      }
+      await setSetting(env, 'car_terms', all);
+      return json({ ok: true, car_terms: all });
     }
     if (m === 'POST' && p0 === 'alloc') {
       const mode = ['fixed', 'revenue', 'none'].includes(body.mode) ? body.mode : 'fixed';
