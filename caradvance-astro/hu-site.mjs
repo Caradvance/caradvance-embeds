@@ -10,7 +10,7 @@ import path from 'node:path';
 const DIST = 'dist';
 const SKIP = /^(index\.html$|admin\/|belso\/|fiok\/|szerzodes\/|alairas\/|adatok\/|ajanlat\/|icons\/|teszt-mega-menu\/|_ttest)/;
 
-const BG_L = '#F6F6F3', BG_D = '#0D0F13';
+const BG_L = '#F5F5F7', BG_D = '#0D0F13';
 const HERO = 'section.hero,.cd-hero,.egl-land-hero,.egl-mhero,.kaphero,.bp-hero,.lg-hero';
 const cutList = () => { for (const d of [path.join(DIST, 'berles-cut'), path.join('public', 'berles-cut')]) if (fs.existsSync(d)) return fs.readdirSync(d).filter((f) => f.endsWith('.webp')).map((f) => f.slice(0, -5)); return []; };
 const BC = cutList();
@@ -33,6 +33,7 @@ const CSS = '<style id="ca-site-css">'
   // háttér és fények
   + L + '{background:' + BG_L + '!important}' + L + 'body{background:transparent!important}'
   + D + '{background:' + BG_D + '!important}' + D + 'body{background:transparent!important;background-color:transparent!important}'
+  + L + '#ca-orbs{display:none!important}'
   + '#ca-orbs{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}'
   + '#ca-orbs i{position:absolute;border-radius:50%;filter:blur(90px)}'
   + L + '#ca-orbs i:nth-child(1){left:-12%;top:8%;width:46vw;height:46vw;background:rgba(170,180,200,.22)}'
@@ -53,7 +54,7 @@ const CSS = '<style id="ca-site-css">'
   + 'html.ca-site body .kaphero.ca-hero{padding-top:calc(var(--navh,80px) + 10px)!important}'
   + 'html.ca-site body .ca-cut{background:transparent!important;object-fit:contain!important;filter:drop-shadow(0 18px 18px rgba(0,0,0,.28))}'
   + 'html.ca-site body .ca-hero>.ca-hfade{position:absolute;left:0;right:0;bottom:-1px;height:200px;pointer-events:none;z-index:1}'
-  + L + 'body .ca-hero>.ca-hfade{background:linear-gradient(180deg,rgba(246,246,243,0) 0%,rgba(246,246,243,.55) 55%,rgba(246,246,243,.9) 82%,' + BG_L + ' 100%)}'
+  + L + 'body .ca-hero>.ca-hfade{background:linear-gradient(180deg,rgba(245,245,247,0) 0%,rgba(245,245,247,.55) 55%,rgba(245,245,247,.9) 82%,' + BG_L + ' 100%)}'
   + D + 'body .ca-hero>.ca-hfade{background:linear-gradient(180deg,rgba(13,15,19,0) 0%,rgba(13,15,19,.55) 50%,rgba(13,15,19,.9) 80%,' + BG_D + ' 100%)}'
   + 'html.ca-site body .ca-hero>:not(.ca-hfade):not(video):not(img):not(picture){position:relative;z-index:2}'
   + '@media(prefers-reduced-motion:reduce){html.ca-site body .ca-gl{transition:none!important;transform:none!important}}'
