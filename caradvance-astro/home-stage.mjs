@@ -28,6 +28,9 @@ const CSS = '<style id="ca-stage-css">'
   + '@media(max-width:640px){section.hero:has(+#autoink) .scrolldown{display:none!important}}'
   + 'html.ca-light .stats img[src$="/caradvance-logo.webp"]{content:url(/caradvance-logo-clear.webp)}'
   + 'body #ca-cta .ca-cta-btns .ca-tel,body #ca-cta .ca-cta-alt{display:none!important}'
+  // sötét: a statisztika- és szolgáltatás-kártyák egységes, semleges sötét üvege, alul halk piros fénnyel (a háttérszínektől független)
+  + 'html.ca-dark[lang] body .stats .stat,html.ca-dark[lang] body #szolgaltatasok .card.svc{background:radial-gradient(70% 45% at 50% 100%,rgba(226,0,26,.20),rgba(226,0,26,0) 72%),linear-gradient(180deg,#2A2B30 0%,#1B1C21 48%,#141519 100%)!important;background-color:#17181C!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}'
+  + 'html.ca-dark[lang] body #szolgaltatasok .card.svc .svc-media{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0))!important;background-color:transparent!important}'
   + 'html.ca-dark[lang] body .cah .svc-grid::before,html.ca-dark[lang] body #szolgaltatasok .svc-grid::before{background-color:transparent!important}' // a dark-mode.js szürkére festette (kékes kártyák)
   + 'html.ca-dark body .cah .svc-grid::before{background:radial-gradient(26% 22% at 27% 30%,rgba(226,0,26,.11),transparent 72%),radial-gradient(26% 22% at 73% 30%,rgba(226,0,26,.11),transparent 72%),radial-gradient(26% 22% at 27% 78%,rgba(226,0,26,.11),transparent 72%),radial-gradient(26% 22% at 73% 78%,rgba(226,0,26,.11),transparent 72%)!important}'
   // „Melyik autó érdekel?” doboz: a két izzó vonal között fent és lent ugyanakkora hely
