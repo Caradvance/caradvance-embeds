@@ -101,7 +101,7 @@ code{background:#F1F4F9;border-radius:6px;padding:1px 5px;font-size:12px}
 @media (max-width:600px){main{padding:10px}.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.tx .m{max-width:170px}}
 </style>
 <link rel="stylesheet" href="/belso/belso-ui.css?v=4">
-<style id="pl-look">/* P&L: kategória-sorok kiemelve, tételsorok halványabbak, nulla értékek szürkék — 2026-11-18 */.pl td.n:not(.neg):not(.pos){color:#C3CAD5}.pl tr.cat:not(.top):not(.car) td{font-size:13px;border-bottom-color:#F0F2F6}.pl tr.cat:not(.top):not(.car) td:first-child{color:#475569}.pl tr.cat:not(.top):not(.car) td.neg{color:#C2413A}.pl tr.cat:not(.top):not(.car) td.pos{color:#2E9E5B}.pl tr.cat:not(.top):not(.car):hover td{background:#F8FAFD}.pl tr.grp td{background:#F2F4F8;font-weight:800;color:#0B0B0D;font-size:13.5px;border-top:8px solid #fff;border-bottom:1px solid #E1E6EE;padding-top:9px;padding-bottom:9px}.pl tr.grp td:first-child{background:#F2F4F8;box-shadow:inset 3px 0 0 #E2001A;padding-left:14px}.pl tr.grp td.neg{color:#B42318}.pl tr.grp td.pos{color:#15803D}.pl tr.grp td.totc{background:#E2E9F4}.pl tr.grp:hover td{background:#ECEFF5}.pl tr.grp:hover td.totc{background:#DCE4F1}.pl tr.sub td{border-top:2px solid #CBD5E1;font-weight:800;background:#F1F5F9}.pl tr.sub td:first-child{background:#F1F5F9}.pl tr.sec td{padding-top:24px;padding-bottom:8px}.pl tr.sec td:first-child::before{content:"";display:inline-block;width:3px;height:12px;background:#E2001A;margin-right:8px;vertical-align:-1px;border-radius:2px}</style>
+<style id="pl-fc">.pl .cf-info{display:flex;flex-wrap:wrap;gap:4px 10px;margin:3px 0 0 22px;font-size:11.5px;color:#64748b;font-weight:500}.pl .cf-info b{color:#334155;font-weight:700}.pl .cf-ed{border:1px solid #d6dde8;background:#fff;border-radius:999px;padding:1px 8px;font:inherit;font-size:11.5px;color:#334155;cursor:pointer}.pl .cf-ed:hover{border-color:#0b0b0d}.pl .cf-ed i{color:#94a3b8;font-style:normal}.pl .cf-bad{color:#b45309;font-weight:700}.pl td.cf-miss{background:#FFF4D6!important;box-shadow:inset 0 0 0 1px #F5C451}.pl td.cf-miss .cf-x{display:block;color:#b45309;font-weight:800;font-size:11px}.pl td.cf-miss .cf-e{display:block;color:#92400e;font-size:11px}.pl td.cf-fc{color:#94a3b8!important;font-style:italic}</style><style id="pl-look">/* P&L: kategória-sorok kiemelve, tételsorok halványabbak, nulla értékek szürkék — 2026-11-18 */.pl td.n:not(.neg):not(.pos){color:#C3CAD5}.pl tr.cat:not(.top):not(.car) td{font-size:13px;border-bottom-color:#F0F2F6}.pl tr.cat:not(.top):not(.car) td:first-child{color:#475569}.pl tr.cat:not(.top):not(.car) td.neg{color:#C2413A}.pl tr.cat:not(.top):not(.car) td.pos{color:#2E9E5B}.pl tr.cat:not(.top):not(.car):hover td{background:#F8FAFD}.pl tr.grp td{background:#F2F4F8;font-weight:800;color:#0B0B0D;font-size:13.5px;border-top:8px solid #fff;border-bottom:1px solid #E1E6EE;padding-top:9px;padding-bottom:9px}.pl tr.grp td:first-child{background:#F2F4F8;box-shadow:inset 3px 0 0 #E2001A;padding-left:14px}.pl tr.grp td.neg{color:#B42318}.pl tr.grp td.pos{color:#15803D}.pl tr.grp td.totc{background:#E2E9F4}.pl tr.grp:hover td{background:#ECEFF5}.pl tr.grp:hover td.totc{background:#DCE4F1}.pl tr.sub td{border-top:2px solid #CBD5E1;font-weight:800;background:#F1F5F9}.pl tr.sub td:first-child{background:#F1F5F9}.pl tr.sec td{padding-top:24px;padding-bottom:8px}.pl tr.sec td:first-child::before{content:"";display:inline-block;width:3px;height:12px;background:#E2001A;margin-right:8px;vertical-align:-1px;border-radius:2px}</style>
 </head>
 <body>
 <header><a href="/belso/"><img src="/caradvance-logo-white.webp" alt="CarAdvance"></a><b>Pénzügy</b><span class="sp"></span><span id="sys"></span><a href="/belso/">← Belső felület</a></header>
@@ -314,16 +314,76 @@ function renderPL() {
       return '<td class="n ' + nc(v) + (i === cols.length ? ' totc' : '') + clk + '">' + ft(v, true) + '</td>';
     }).join('');
   }
+  // autónkénti költség: tartási időszak (alapból 6 hó az első számla hónapjától), várható havidíj, hiányzó számlák, előrejelzés
+  function monthVal(O, m) { var o = O && O[m]; if (!o) return 0; var s = 0; Object.keys(o).forEach(function (l) { if (selL !== 'all' && l !== String(selL)) return; s += o[l]; }); return s; }
+  function addM(ym, n) { var p = ym.split('-').map(Number), d = new Date(p[0], p[1] - 1 + n, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+  function carPlan(pl, O) {
+    var T = (S.meta.car_terms || {})[pl] || null, curM = todayIso().slice(0, 7);
+    var mv = P.months.map(function (m) { return Math.abs(monthVal(O, m)); });
+    var i0 = -1; mv.forEach(function (v, i) { if (i0 < 0 && v >= 0.5) i0 = i; });
+    if (!T && i0 < 0) return null;
+    var startM = T ? T.start.slice(0, 7) : P.months[i0], months = T ? T.months : 6;
+    var si = P.months.indexOf(startM);
+    var later = mv.filter(function (v, i) { return (si < 0 ? i > i0 : i > si) && v >= 0.5; });
+    var monthly = (T && T.monthly) || (later.length ? Math.min.apply(null, later) : (i0 >= 0 ? mv[i0] : 0));
+    if (!monthly) return null;
+    var f0;
+    if (T) { var p = T.start.split('-').map(Number), dim = new Date(p[0], p[1], 0).getDate(); f0 = Math.min(30, dim - p[2] + 1) / 30; }
+    else f0 = Math.min(1, (si >= 0 ? mv[si] : monthly) / monthly);
+    if (f0 > 0.97) f0 = 1;
+    var plan = {}; plan[startM] = f0;
+    for (var k = 1; k < months; k++) plan[addM(startM, k)] = 1;
+    if (f0 < 1 && 1 - f0 > 0.02) plan[addM(startM, months)] = Math.round((1 - f0) * 1000) / 1000;
+    var keys = Object.keys(plan).sort(), total = 0, paid = 0, rest = 0, miss = [], pend = [];
+    keys.forEach(function (m) { total += monthly * plan[m]; });
+    P.months.forEach(function (m, i) { if (plan[m]) paid += mv[i]; });
+    keys.forEach(function (m) {
+      var e = monthly * plan[m], i = P.months.indexOf(m), a = i >= 0 ? mv[i] : 0;
+      if (m > curM) rest += e;
+      else if (a < 0.5) { if (m === curM) { pend.push(m); rest += e; } else if (i >= 0) miss.push(m); }
+    });
+    return { T: T, startM: startM, endM: keys[keys.length - 1], months: months, monthly: monthly, plan: plan, total: total, paid: paid, rest: rest, miss: miss, pend: pend, curM: curM };
+  }
   function carRows(ck) {
     var VP = S.VP[ck]; if (!VP) return '';
-    var open = S.view.cars[ck];
+    var open = S.view.cars[ck], cat = catBy(Number(ck)), isCost = cat && (cat.kind === 'cogs' || cat.kind === 'opex') && colsMode === 'months';
     return Object.keys(VP).map(function (pl) {
       var r = cols.map(function (c) { return val(ck, c.k, VP[pl]); }); r.push(r.reduce(function (a, b) { return a + b; }, 0));
-      return { pl: pl, r: r };
-    }).filter(function (x) { return x.r.some(function (v) { return Math.abs(v) >= 0.5; }); })
+      return { pl: pl, r: r, F: isCost && pl ? carPlan(pl, VP[pl]) : null };
+    }).filter(function (x) { return x.r.some(function (v) { return Math.abs(v) >= 0.5; }) || (x.F && x.F.T); })
       .sort(function (a, b) { return a.pl === '' ? 1 : b.pl === '' ? -1 : a.r[a.r.length - 1] - b.r[b.r.length - 1]; })
-      .map(function (x) { var nm = x.pl ? (vehName(x.pl) ? esc(vehName(x.pl)) + ' · ' : '') + '<b>' + esc(x.pl) + '</b>' : '<span class="muted">rendszám nélkül</span>';
-        return '<tr class="cat car' + (open ? '' : ' hide') + '" data-g="' + esc(ck) + '"><td>🚗 ' + nm + '</td>' + x.r.map(function (v, i) { return '<td class="n ' + nc(v) + (i === cols.length ? ' totc' : '') + ' c" data-ck="' + ck + '" data-pl="' + esc(x.pl || '-') + '" data-col="' + (i < cols.length ? cols[i].k : '*') + '">' + ft(v, true) + '</td>'; }).join('') + '</tr>'; }).join('');
+      .map(function (x) {
+        var F = x.F, nm = x.pl ? (vehName(x.pl) ? esc(vehName(x.pl)) + ' · ' : '') + '<b>' + esc(x.pl) + '</b>' : '<span class="muted">rendszám nélkül</span>';
+        var info = '';
+        if (F) {
+          var pm = function (m) { return m.slice(0, 4) + '.' + m.slice(5); };
+          info = '<div class="cf-info"><button class="cf-ed" type="button" data-cfpl="' + esc(x.pl) + '" title="Tartási időszak és havidíj beállítása">' + F.months + ' hó · ' + pm(F.startM) + ' – ' + pm(F.endM) + (F.T ? '' : ' <i>(becsült)</i>') + ' ✎</button>'
+            + '<span>várható össz. <b>−' + ft(F.total) + '</b></span><span>hátra <b>−' + ft(F.rest) + '</b></span>'
+            + (F.miss.length ? '<span class="cf-bad">⚠ ' + F.miss.length + ' hiányzó számla</span>' : '') + '</div>';
+        }
+        var tds = x.r.map(function (v, i) {
+          var base = 'n ' + nc(v) + (i === cols.length ? ' totc' : '') + ' c', txt = ft(v, true), tip = '';
+          if (F && i < cols.length) {
+            var m = cols[i].k, f = F.plan[m], e = f ? F.monthly * f : 0;
+            if (f && Math.abs(v) < 0.5) {
+              if (F.miss.indexOf(m) !== -1) { base += ' cf-miss'; txt = '<span class="cf-x">⚠ hiányzik</span><span class="cf-e">≈ −' + ft(e) + '</span>'; tip = 'Hiányzó számla erre a hónapra – várható kb. −' + ft(e) + ' Ft' + (f < 1 ? ' (időarányos, ' + Math.round(f * 30) + '/30 nap)' : ''); }
+              else if (m >= F.curM) { base += ' cf-fc'; txt = '≈ −' + ft(e); tip = 'Várható költség (még nincs számla)'; }
+            } else if (f && Math.abs(v) > e * 1.5) tip = 'Több havi összeg egyben (kb. ' + (Math.round(Math.abs(v) / F.monthly * 10) / 10).toString().replace('.', ',') + ' hónap) – lehet, hogy egy korábbi hónap számlája is itt van';
+          }
+          if (F && i === cols.length) tip = 'Eddig könyvelve: −' + ft(x.r[i] < 0 ? -x.r[i] : x.r[i]) + ' Ft · teljes időszakra várható: −' + ft(F.total) + ' Ft · még hátra: −' + ft(F.rest) + ' Ft';
+          return '<td class="' + base + '" data-ck="' + ck + '" data-pl="' + esc(x.pl || '-') + '" data-col="' + (i < cols.length ? cols[i].k : '*') + '"' + (tip ? ' title="' + esc(tip) + '"' : '') + '>' + txt + '</td>';
+        }).join('');
+        return '<tr class="cat car' + (open ? '' : ' hide') + '" data-g="' + esc(ck) + '"><td>🚗 ' + nm + info + '</td>' + tds + '</tr>';
+      }).join('');
+  }
+  function carTermForm(pl) {
+    var T = (S.meta.car_terms || {})[pl] || {}, cur = todayIso();
+    var m = modal('<h2>Tartási időszak · ' + esc(vehName(pl) || '') + ' ' + esc(pl) + '</h2><p class="small muted">A költség-előrejelzéshez és a hiányzó számlák jelzéséhez. Ha nincs megadva, a rendszer az első számla hónapjától 6 hónappal és a legkisebb teljes havi számlával számol.</p>'
+      + '<div class="grid"><label class="f">Átvétel napja (kezdet)<input class="in" type="date" id="ctS" value="' + esc(T.start || cur) + '"></label><label class="f">Időtartam (hónap)<input class="in" type="number" min="1" max="120" id="ctM" value="' + (T.months || 6) + '"></label><label class="f">Havidíj (Ft, nettó – üresen: számlák alapján)<input class="in" type="number" step="1" id="ctA" value="' + (T.monthly || '') + '"></label></div>'
+      + '<div class="row" style="margin-top:14px"><button class="btn red" id="ctSave">Mentés</button>' + (T.start ? '<button class="btn ghost" id="ctDel">Visszaállítás becsültre</button>' : '') + '</div>', true);
+    function save(body) { api('car-terms', body).then(must).then(function (j) { S.meta.car_terms = j.car_terms; m.remove(); toast('Mentve'); renderPL(); }); }
+    $('#ctSave', m).onclick = function () { save({ plate: pl, start: $('#ctS', m).value, months: Number($('#ctM', m).value), monthly: Number($('#ctA', m).value) || null }); };
+    if ($('#ctDel', m)) $('#ctDel', m).onclick = function () { save({ plate: pl, months: 0 }); };
   }
   function catRow(c, top) {
     var ck = String(c.id), v = rowVals([ck]); if (!S.view.empty && !v.some(function (x) { return Math.abs(x) >= 0.5; })) return { v: v, h: '' };
@@ -388,6 +448,7 @@ function renderPL() {
     + '<p class="small muted" style="margin:10px 0 0">Pénzforgalmi szemlélet: a tételek a banki könyvelés napján számítanak, kivéve az időarányosan elhatárolt tételeket (pl. előre fizetett bérleti díj), amelyek a teljesítési időszak napjai szerint oszlanak a hónapokra. A nettó érték a párosított bizonylat nettó/bruttó arányából, ennek hiányában a kategória (vagy tétel) levonható ÁFA-kulcsából számol; 0% = a bruttó a költség (pl. személyautó üzemanyag). Deviza: MNB hivatalos középárfolyam a fizetés napján (ha az MNB nem érhető el: EKB), kártyás vásárlásnál a terhelt forintösszeg. Ez vezetői kimutatás, nem a könyvelő főkönyve.</p></div>';
   $('#vLine').onchange = function () { S.view.lines = this.value; renderPL(); };
   $$('[data-cols]').forEach(function (b) { b.onclick = function () { S.view.cols = b.dataset.cols; renderPL(); }; });
+  $$('[data-cfpl]').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); carTermForm(b.dataset.cfpl); }; });
   $$('[data-basis]').forEach(function (b) { b.onclick = function () { S.view.basis = b.dataset.basis; renderPL(); }; });
   $('#vAlloc').onchange = function () { S.view.alloc = this.value; renderPL(); };
   $('#vEmpty').onchange = function () { S.view.empty = this.checked; renderPL(); };
