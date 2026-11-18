@@ -16,7 +16,7 @@ const cutList = () => { for (const d of [path.join(DIST, 'berles-cut'), path.joi
 const BC = cutList();
 
 const DECIDE = '<script id="ca-site-theme">(function(){var mq=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null,t=mq&&mq.matches?"dark":"light",q=null;'
-  + 'try{var qa=location.search.match(/[?&]tema=(sotet|feher|auto)/);if(qa&&qa[1]==="auto")localStorage.removeItem("ca-tema");else if(qa)localStorage.setItem("ca-tema",qa[1]);var v=localStorage.getItem("ca-tema");if(v){q=[0,v];t=v==="sotet"?"dark":"light"}}catch(e){}'
+  + 'try{localStorage.removeItem("ca-tema");q=location.search.match(/[?&]tema=(sotet|feher)/);if(q)t=q[1]==="sotet"?"dark":"light"}catch(e){}'
   + 'var d=document.documentElement;d.classList.add("ca-site");if(t==="dark"){window.__CA_FORCE_DARK=1;d.classList.add("ca-dark")}else d.classList.add("ca-light");window.__caTheme=t;'
   + 'try{var y=sessionStorage.getItem("ca-theme-y");if(y){sessionStorage.removeItem("ca-theme-y");addEventListener("load",function(){setTimeout(function(){scrollTo(0,+y)},60)})}}catch(e){}'
   + 'if(mq&&!q){var f=function(e){if((e.matches?"dark":"light")!==t){try{sessionStorage.setItem("ca-theme-y",String(scrollY))}catch(x){}location.reload()}};mq.addEventListener?mq.addEventListener("change",f):mq.addListener&&mq.addListener(f)}})();</script>';
