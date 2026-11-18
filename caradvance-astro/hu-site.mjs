@@ -56,6 +56,10 @@ const CSS = '<style id="ca-site-css">'
   + 'html.ca-site body .ca-hero>.ca-hfade{position:absolute;left:0;right:0;bottom:-1px;height:200px;pointer-events:none;z-index:1}'
   + L + 'body .ca-hero>.ca-hfade{background:linear-gradient(180deg,rgba(245,245,247,0) 0%,rgba(245,245,247,.55) 55%,rgba(245,245,247,.9) 82%,' + BG_L + ' 100%)}'
   + D + 'body .ca-hero>.ca-hfade{background:linear-gradient(180deg,rgba(13,15,19,0) 0%,rgba(13,15,19,.55) 50%,rgba(13,15,19,.9) 80%,' + BG_D + ' 100%)}'
+  // sötétben a hero ne tömör színbe fusson ki (éles határ a ragyogó háttér előtt): a videó alja átlátszóba fakul
+  + D + 'body section.ca-hero{background:transparent!important;background-image:none!important}'
+  + D + 'body .ca-hero>.ca-hfade{display:none!important}'
+  + D + 'body .ca-hero>:is(video,img,picture){-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,rgba(0,0,0,.55) 78%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,rgba(0,0,0,.55) 78%,transparent 100%)}'
   + 'html.ca-site body .ca-hero>:not(.ca-hfade):not(video):not(img):not(picture){position:relative;z-index:2}'
   + '@media(prefers-reduced-motion:reduce){html.ca-site body .ca-gl{transition:none!important;transform:none!important}}'
   + '</style>';
