@@ -300,7 +300,7 @@ const CLIENT = function (CFG) {
   function stSale(x) {
     return '<div class="am-stage" data-st="sale"><div class="am-st-top"><div><div class="am-seg"><button type="button" class="on" data-v="new">Új autók</button><button type="button" data-v="used">Használt autók</button></div>'
       + '<div class="am-md am-sh" style="margin-top:14px">Új autó német áron</div><div class="am-st-p am-sp2">BMW, MINI, Mercedes, Audi – gyári garanciával</div></div><span class="am-badge am-sb">akár −25%</span></div>'
-      + '<img class="am-car" alt="" src="/mini-jcw-premium-auto-eladas-cut.webp">'
+      + '<img class="am-car" alt="" src="/mini-jcw-premium-auto-eladas-cut.webp?v=2">'
       + '<div class="am-st-bot" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px"><div class="am-sl-br">' + logos(x.bs) + '</div><a class="am-go am-sl" href="/egyedi-auto-rendeles/">Konfigurálom →</a></div></div>';
   }
   function stSell(x) {
@@ -390,7 +390,7 @@ const CLIENT = function (CFG) {
     }
     if (st === 'sale') {
       var S2 = d.querySelector('.am-stage'), car2 = S2.querySelector('.am-car'), lg2 = S2.querySelector('.am-sl-br');
-      var V = { new: ['Új autó német áron', 'BMW, MINI, Mercedes, Audi – gyári garanciával', 'akár −25%', '/mini-jcw-premium-auto-eladas-cut.webp', '/egyedi-auto-rendeles/', 'Konfigurálom →'],
+      var V = { new: ['Új autó német áron', 'BMW, MINI, Mercedes, Audi – gyári garanciával', 'akár −25%', '/mini-jcw-premium-auto-eladas-cut.webp?v=2', '/egyedi-auto-rendeles/', 'Konfigurálom →'],
         used: ['Ellenőrzött használt autók', 'Dokumentált előélet, valós km, Németországból', (cn.sale ? cn.sale + ' autó' : 'Készleten'), '/bmw-m3-touring-premium-auto-eladas-cut.webp', '/autoink/', 'Megnézem →'] };
       [].forEach.call(S2.querySelectorAll('.am-seg button'), function (b) {
         b.addEventListener('click', function (e) { e.preventDefault(); var k = b.getAttribute('data-v'), v = V[k]; [].forEach.call(S2.querySelectorAll('.am-seg button'), function (z) { z.classList.toggle('on', z === b); });

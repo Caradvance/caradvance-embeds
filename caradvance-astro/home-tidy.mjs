@@ -180,7 +180,7 @@ try {
         h = h.replace('<div class="svc-media"><img src="/' + f + '.webp"', '<div class="svc-media ca-stage"><img src="/' + f + '-cut.webp"');
       // az eladás kártyán a fehér M3 helyett MINI John Cooper Works (BMW Group sajtófotó, az orra jobbra néz, mint a többi)
       h = h.replace('<div class="svc-media"><img src="/bmw-m3-touring-premium-auto-eladas.webp" alt="BMW M3 Touring — prémium autó eladás"',
-        '<div class="svc-media ca-stage"><img src="/mini-jcw-premium-auto-eladas-cut.webp" alt="MINI John Cooper Works — prémium autó eladás"');
+        '<div class="svc-media ca-stage"><img src="/mini-jcw-premium-auto-eladas-cut.webp?v=2" alt="MINI John Cooper Works — prémium autó eladás"');
       h = h.replace('</head>', CSS + '</head>');
       fs.writeFileSync(FILE, h);
       console.log('[home-tidy] letisztult főoldal: ' + edits.length + ' módosítás');
