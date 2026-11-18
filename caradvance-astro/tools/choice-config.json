@@ -84,7 +84,8 @@
     "Mercedes-Benz A-Klasse Kompaktlimousine": "/berles/mercedes-benz-a-klasse.webp",
     "MINI John Cooper Works": "/berles/mini-john-cooper-works.webp",
     "MINI John Cooper Works Cabrio": "/berles/mini-john-cooper-works-cabrio.webp",
-    "BMW iX2": "/bmw/ix2.webp"
+    "BMW iX2": "/bmw/ix2.webp",
+    "MAN TGE Kastenwagen": "/berles/man-tge-kastenwagen.webp"
   },
   "colors": {
     "Frost Blue": "Frost kék",
@@ -118,6 +119,7 @@
     "Dravitgrau metallic": "Dravitszürke metál",
     "Celestial Blue Metallic": "Celestial kék metál",
     "Dark Moss Green Metallic": "Sötét moha zöld metál",
-    "Flame Red Metallic": "Flame piros metál"
+    "Flame Red Metallic": "Flame piros metál",
+    "Maple Red Metallic": "Maple vörös metál"
   }
 }
