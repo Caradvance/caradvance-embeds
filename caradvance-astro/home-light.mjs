@@ -114,15 +114,15 @@ const CSS = '<style id="ca-light-css">'
   + L + '#ca-cta .ca-tel:hover{border-color:' + INK + '!important}'
   // színes „fényfoltok” a kártyák mögött — ettől látszik az üveg
   + L + '.stats{background:none!important}' // a kártyák mögötti erős színes foltok kivéve (túl nagy kontraszt)
-  + L + '#szolgaltatasok{background:radial-gradient(520px 380px at 12% 30%,rgba(255,45,70,.22),transparent 70%),radial-gradient(520px 420px at 92% 70%,rgba(90,125,220,.22),transparent 70%)!important}'
-  + L + '#miert{background:radial-gradient(460px 300px at 22% 75%,rgba(255,150,100,.34),transparent 70%),radial-gradient(460px 300px at 78% 80%,rgba(255,45,70,.30),transparent 70%),radial-gradient(400px 260px at 50% 30%,rgba(90,125,220,.18),transparent 70%)!important}'
-  + L + '#rolunk{background:radial-gradient(460px 320px at 15% 28%,rgba(255,45,70,.32),transparent 70%),radial-gradient(500px 340px at 88% 40%,rgba(90,125,220,.30),transparent 70%),radial-gradient(520px 300px at 40% 62%,rgba(255,150,100,.30),transparent 70%)!important}'
-  + L + '#velemenyek{background:radial-gradient(480px 300px at 80% 60%,rgba(90,125,220,.26),transparent 70%),radial-gradient(420px 280px at 20% 70%,rgba(255,45,70,.22),transparent 70%)!important}'
-  + L + '#ca-cta{background:radial-gradient(520px 300px at 30% 50%,rgba(255,45,70,.26),transparent 70%),radial-gradient(520px 300px at 72% 50%,rgba(90,125,220,.24),transparent 70%)!important}'
+  + L + '#szolgaltatasok{background:radial-gradient(520px 380px at 12% 30%,rgba(170,180,200,0.12),transparent 70%),radial-gradient(520px 420px at 92% 70%,rgba(150,170,215,0.12),transparent 70%)!important}'
+  + L + '#miert{background:radial-gradient(460px 300px at 22% 75%,rgba(170,180,200,0.19),transparent 70%),radial-gradient(460px 300px at 78% 80%,rgba(170,180,200,0.17),transparent 70%),radial-gradient(400px 260px at 50% 30%,rgba(150,170,215,0.10),transparent 70%)!important}'
+  + L + '#rolunk{background:radial-gradient(460px 320px at 15% 28%,rgba(170,180,200,0.18),transparent 70%),radial-gradient(500px 340px at 88% 40%,rgba(150,170,215,0.17),transparent 70%),radial-gradient(520px 300px at 40% 62%,rgba(170,180,200,0.17),transparent 70%)!important}'
+  + L + '#velemenyek{background:radial-gradient(480px 300px at 80% 60%,rgba(150,170,215,0.14),transparent 70%),radial-gradient(420px 280px at 20% 70%,rgba(170,180,200,0.12),transparent 70%)!important}'
+  + L + '#ca-cta{background:radial-gradient(520px 300px at 30% 50%,rgba(170,180,200,0.14),transparent 70%),radial-gradient(520px 300px at 72% 50%,rgba(150,170,215,0.13),transparent 70%)!important}'
   + L + '#ca-cta .card.ca-cta-card,' + L + '#gyik .faq-item,' + L + '#gyik details.ca-more,' + L + '#velemenyek .card,' + L + '#velemenyek [class*="rev"]:is(.card,article){' + CARDCSS + '}'
   // ── prémium elemek világos alapon ────────────────────────────────────────
   // háttér: lágy, halvány fényfoltok, hogy az üvegkártyák „üvegnek” látsszanak
-  + L + 'body{background:radial-gradient(640px 520px at 88% 22%,rgba(255,60,80,.30),transparent 70%),radial-gradient(680px 560px at 6% 62%,rgba(110,135,200,.28),transparent 70%),radial-gradient(480px 420px at 70% 92%,rgba(255,140,110,.26),transparent 70%),radial-gradient(420px 380px at 30% 8%,rgba(150,165,210,.22),transparent 70%),' + BG + '!important;background-attachment:fixed!important}'
+  + L + 'body{background:radial-gradient(640px 520px at 88% 22%,rgba(170,180,200,0.17),transparent 70%),radial-gradient(680px 560px at 6% 62%,rgba(110,135,200,.28),transparent 70%),radial-gradient(480px 420px at 70% 92%,rgba(170,180,200,0.14),transparent 70%),radial-gradient(420px 380px at 30% 8%,rgba(150,165,210,.22),transparent 70%),' + BG + '!important;background-attachment:fixed!important}'
   // fénycsík a szekcióhatárokon (a sötét „A” változat világos párja)
   + ['#szolgaltatasok', '#rolunk', '#velemenyek', '#ca-cta'].map((x) => L + x + '{position:relative}' + L + x + '::after{content:"";position:absolute;left:10%;right:10%;top:0;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(226,0,26,.55) 50%,transparent);box-shadow:0 0 16px 1px rgba(226,0,26,.22)}').join('')
   // színpad: reflektorfény + halvány piros padlófény + vékony piros horizont
