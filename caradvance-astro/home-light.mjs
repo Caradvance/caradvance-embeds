@@ -113,7 +113,7 @@ const CSS = '<style id="ca-light-css">'
   + L + '#ca-cta .ca-tel{' + BTN2 + '}' + L + '#ca-cta .ca-tel svg{stroke:' + INK + '!important;color:' + INK + '!important}'
   + L + '#ca-cta .ca-tel:hover{border-color:' + INK + '!important}'
   // színes „fényfoltok” a kártyák mögött — ettől látszik az üveg
-  + L + '.stats{background:radial-gradient(420px 260px at 18% 55%,rgba(255,45,70,.38),transparent 70%),radial-gradient(420px 280px at 82% 45%,rgba(90,125,220,.34),transparent 70%),radial-gradient(360px 240px at 52% 70%,rgba(255,150,100,.30),transparent 70%)!important}'
+  + L + '.stats{background:none!important}' // a kártyák mögötti erős színes foltok kivéve (túl nagy kontraszt)
   + L + '#szolgaltatasok{background:radial-gradient(520px 380px at 12% 30%,rgba(255,45,70,.22),transparent 70%),radial-gradient(520px 420px at 92% 70%,rgba(90,125,220,.22),transparent 70%)!important}'
   + L + '#miert{background:radial-gradient(460px 300px at 22% 75%,rgba(255,150,100,.34),transparent 70%),radial-gradient(460px 300px at 78% 80%,rgba(255,45,70,.30),transparent 70%),radial-gradient(400px 260px at 50% 30%,rgba(90,125,220,.18),transparent 70%)!important}'
   + L + '#rolunk{background:radial-gradient(460px 320px at 15% 28%,rgba(255,45,70,.32),transparent 70%),radial-gradient(500px 340px at 88% 40%,rgba(90,125,220,.30),transparent 70%),radial-gradient(520px 300px at 40% 62%,rgba(255,150,100,.30),transparent 70%)!important}'
