@@ -20,6 +20,13 @@ const CSS = '<style id="ca-ai-css">'
   + 'html.ca-ai [data-hero="berelheto"].on{padding-top:96px}'
   + 'html.ca-ai [data-hero="berelheto"] .sub{max-width:620px;margin-left:auto;margin-right:auto}'
   + 'html.ca-ai section.hero video.video-bg{filter:brightness(.7) saturate(1.05)}' + 'html.ca-ai [data-hero="berelheto"] :is(.hh,.sub){text-shadow:0 2px 22px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.35)}' + '@media(max-width:640px){html.ca-ai [data-hero="berelheto"].on{padding-top:64px}}'
+  // ---- 1b) Görgess: középen, a hero alján
+  + 'html.ca-ai section.hero .scrolldown{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:34px!important;transform:translateX(-50%)!important;margin:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;z-index:3!important;color:rgba(18,19,23,.62)!important;background:none!important;border:0!important;font-size:11px!important;letter-spacing:.14em!important;text-transform:uppercase;cursor:pointer;text-shadow:none!important}'
+  + 'html.ca-ai.ca-dark section.hero .scrolldown{color:rgba(255,255,255,.7)!important}'
+  + 'html.ca-ai section.hero .scrolldown svg{width:20px;height:20px;animation:caBob 1.8s ease-in-out infinite}'
+  + '@keyframes caBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}'
+  + '@media(prefers-reduced-motion:reduce){html.ca-ai section.hero .scrolldown svg{animation:none}}'
+  + '@media(max-width:640px){html.ca-ai section.hero .scrolldown{display:none!important}}'
   // ---- 2) előnyök
   + P + '.rb-wrap{margin:6px 0 26px}'
   + P + '.rb-grid{gap:0!important;border-radius:22px;overflow:hidden;background:rgba(255,255,255,.62);border:1px solid rgba(18,19,23,.07);box-shadow:0 1px 2px rgba(18,19,23,.04),0 10px 28px rgba(18,19,23,.05);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}'
@@ -140,6 +147,7 @@ function js(cuts) {
   // 1) morzsamenü + szöveg
   + 'function hero(){if(!onP()){H.classList.remove("ca-ai");return}H.classList.add("ca-ai");'
   + 'var c=document.querySelector(".wrap>.crumb");if(c&&!c.__ai){c.__ai=1;c.__old=c.innerHTML}if(c)c.innerHTML=\'<a href="/">Főoldal</a> / <a href="/tartos-berlet/">Tartós bérlet</a> / <b>Bérelhető autóink</b>\';'
+  + 'var sd=document.querySelector("section.hero .scrolldown");if(sd&&!sd.__ai){sd.__ai=1;sd.addEventListener("click",function(e){if(!onP())return;e.preventDefault();e.stopImmediatePropagation();var t=document.querySelector("#panel-berelheto .rb-wrap")||document.getElementById("panel-berelheto");if(t)scrollTo({top:t.getBoundingClientRect().top+scrollY-110,behavior:"smooth"})},true)}'
   + 'var s=document.querySelector(\'[data-hero="berelheto"] .sub\');if(s&&!s.__ai){s.__ai=1;s.textContent="Új, 0 km-es prémium autók fix havidíjjal — casco, szerviz és gumi benne."}}'
   // 3) szűrősáv
   + 'var bar,chips,fbtn,bts;function bsel(){return document.getElementById("sf-brand")}'
