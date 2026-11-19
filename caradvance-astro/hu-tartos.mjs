@@ -168,6 +168,10 @@ const CSS = '<style id="ca-tb-css">'
   + 'html.ca-dark body section.tb section.hero.ca-hero .ca-tsd{color:rgba(255,255,255,.7)!important;-webkit-text-fill-color:rgba(255,255,255,.7)!important}'
   + 'section.tb .ca-tsd svg{animation:caTBob 1.8s ease-in-out infinite}@keyframes caTBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}'
   + '@media(max-width:640px){html:root body section.tb section.hero.ca-hero .ca-tsd{display:none!important}}'
+  // kalkulátor: a hosszú választólisták ne tolják ki az oldalt (oldalra csúszás javítása)
+  + 'body section.tb .tb-cf{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)!important}'
+  + 'body section.tb .tb-cf label{min-width:0!important}body section.tb .tb-cf select{width:100%!important;min-width:0!important;max-width:100%!important;text-overflow:ellipsis}'
+  + '@media(max-width:700px){body section.tb .tb-cf{grid-template-columns:minmax(0,1fr)!important}}'
   + '</style>';
 
 function js(cuts) {

@@ -9,6 +9,10 @@ const BG = '#F5F5F7', BGR = '245,245,247';
 const L = 'html.ca-light body ';
 const CSS = '<style id="ca-apple-css">'
   // sötétben a lábléc se éles vonallal kezdődjön, hanem puhán fakuljon be
+  + 'footer.cafoot .cafoot-copy span{white-space:normal!important;min-width:0!important;overflow-wrap:anywhere}'
+  + 'body section.cav-sec,body section:has(> .wrap > .cav-film-wrap){overflow-x:clip}'
+  + '@media(min-width:641px) and (max-width:1100px){body .stats .stats-in{grid-template-columns:repeat(2,minmax(0,1fr))!important}}'
+  + 'body .stats .stats-in>.stat{min-width:0!important}'
   + 'html.ca-dark body footer.cafoot{border-top-color:transparent!important;box-shadow:none!important;background:linear-gradient(180deg,rgba(11,11,13,0) 0,#0B0B0D 140px)!important;background-color:transparent!important}'
   + 'html.ca-light,html.ca-light body{background:' + BG + '!important;background-image:none!important}'
   // színes foltok ki
