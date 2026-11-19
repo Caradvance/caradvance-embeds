@@ -55,6 +55,8 @@ function seo(h, log) {
     });
     h = h.slice(0, k) + seg + h.slice(end);
   }
+  // 2b) a kalkulátor-sáv második gombja: ne vigyen vissza a keresőhöz, hanem közvetlen kapcsolat Tóth Károllyal
+  h = h.replace(/<a class="ic-btn ic-btn-w"([^>]*)href="#rendeles"([^>]*)>Pontos ajánlatot kérek<\/a>/, (a, x, y) => { log.cta = 1; return '<a class="ic-btn ic-btn-w ca-call"' + x + 'href="tel:+36302146989"' + y + '><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>Hívom Károlyt</a><a class="ic-btn ic-btn-w ca-wa"' + x + 'href="https://wa.me/36302146989" target="_blank" rel="noopener"' + y + '><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 14.9L2 22l5.3-1.4A10 10 0 1 0 12 2zm5.6 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.6-1.2-3.1s.8-2.2 1.1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.3 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.5.3.1.1.1.6-.1 1.3z"/></svg>WhatsApp</a>'; });
   // 3) morzsamenü
   h = h.replace('</head>', () => '<script type="application/ld+json">' + JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Főoldal', item: SITE + '/' },
@@ -148,6 +150,10 @@ const CSS = '<style id="ca-imp-css">'
   + P + '.ic-cta b{font-size:20px!important}'
   + P + '.ic-btn{border-radius:999px!important;padding:14px 22px!important;box-shadow:0 10px 26px rgba(226,0,26,.35)}'
   + P + '.ic-btn.ic-btn-w{background:transparent!important;border:1px solid rgba(255,255,255,.28)!important;color:#fff!important;box-shadow:none}'
+  + P + '.ic-btn:is(.ca-call,.ca-wa){display:inline-flex!important;align-items:center;justify-content:center;gap:8px}' + P + '.ic-btn.ca-wa:hover{border-color:#25D366!important;color:#25D366!important}' + P + '.ic-btn.ca-call:hover{border-color:#fff!important}'
+  + '@media(min-width:900px){' + P + '.ic-cta{flex-wrap:nowrap!important}' + P + '.ic-cta>div{flex:1 1 auto!important;min-width:0}' + P + '.ic-cta .ic-btn{flex:0 0 auto!important}}'
+  + '@media(max-width:899px){' + P + '.ic-cta>div{flex:1 1 100%!important}' + P + '.ic-cta .ic-btn{flex:1 1 0!important;box-sizing:border-box;white-space:nowrap}}'
+  + '@media(max-width:640px){' + P + '.ic-cta .ic-btn{flex:1 1 100%!important;max-width:100%}}'
   + D + '.ic-cta{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03))!important;border:1px solid rgba(255,255,255,.08)}'
   + P + '.ic-opt{border-radius:20px!important;transition:transform .2s,box-shadow .2s;' + HL + '}'
   + P + '.ic-opt:hover{transform:translateY(-2px)}'
@@ -192,7 +198,7 @@ const JS = '<script id="ca-imp-js">(function(){var H=document.documentElement;'
   + '})();</script>';
 
 export function apply(h) {
-  const log = { svc: 0, links: 0, miss: [] };
+  const log = { svc: 0, links: 0, miss: [], cta: 0 };
   if (h.indexOf('id="ca-imp-css"') > -1 || h.indexOf('class="imp') < 0) return { h, log };
   h = seo(h, log);
   h = h.replace('</head>', () => CSS + '</head>');
