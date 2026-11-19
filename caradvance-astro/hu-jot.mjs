@@ -52,7 +52,7 @@ const CSS = '<style id="ca-jot-css">'
   + P + '.sg-card:not(.sg-total){' + CARD + '}'
   + D + '.sg-card:not(.sg-total){' + CARDD + '}'
   // ---- 5) projektek: végtelen jobbra úszás
-  + P + '.ca-pjw{position:relative;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);margin:0 -20px}'
+  + P + '.ca-pjw{position:relative;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);margin:0;max-width:100%}'
   + P + '.pj-grid.ca-mq{display:flex!important;flex-wrap:nowrap!important;gap:20px!important;width:max-content!important;max-width:none!important;padding:6px 0 16px!important;margin:0!important;will-change:transform;animation:caJMq var(--dur,60s) linear infinite}'
   + '@keyframes caJMq{from{transform:translate3d(calc(-1 * var(--w)),0,0)}to{transform:translate3d(0,0,0)}}'
   + P + '.pj-grid.ca-mq .pj-card{flex:0 0 320px!important;width:320px!important;border-radius:22px!important;' + CARD + '}'
@@ -81,11 +81,12 @@ const CSS = '<style id="ca-jot-css">'
   + D + '.ol-impact{background:color-mix(in srgb,var(--c) 16%,transparent)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}'
   // ---- záró CTA: világosban lekerekített kártya, sötétben átmenetes (nincs kemény él)
   + P + 'section.jot-cta{max-width:1240px;margin:40px auto 70px!important;border-radius:32px;background:#121317!important;position:relative;overflow:hidden}'
-  + P + 'section.jot-cta::before{content:"";position:absolute;inset:auto -10% -60% -10%;height:120%;background:radial-gradient(50% 50% at 50% 50%,rgba(226,0,26,.28),transparent 70%);pointer-events:none}'
+  + P + 'section.jot-cta::before{content:"";position:absolute;inset:auto -10% -60% -10%;height:120%;background:radial-gradient(50% 50% at 50% 50%,rgba(226,0,26,.28),transparent 70%)!important;background-color:transparent!important;pointer-events:none}'
   + P + 'section.jot-cta>*{position:relative}'
   + D + 'section.jot-cta{background:transparent!important;max-width:none;margin:0!important;border-radius:0}'
-  + D + 'section.jot-cta::before{inset:10% 15%;height:auto;background:radial-gradient(50% 50% at 50% 55%,rgba(226,0,26,.16),transparent 72%)}'
+  + D + 'section.jot-cta::before{inset:10% 15%;height:auto;background:radial-gradient(50% 50% at 50% 55%,rgba(226,0,26,.16),transparent 72%)!important;background-color:transparent!important}'
   + '@media(max-width:1280px){' + P + 'section.jot-cta{margin-left:16px!important;margin-right:16px!important}' + D + 'section.jot-cta{margin:0!important}}'
+  + '@media(max-width:820px){' + P + '.splitg .sg-op{transform:none!important;justify-self:center!important;line-height:1!important;height:auto!important;font-size:26px!important;margin:-2px 0!important}}'
   + '</style>';
 
 const JS = '<script id="ca-jot-js">(function(){var H=document.documentElement;'
