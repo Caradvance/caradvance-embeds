@@ -25,10 +25,10 @@ var nr=pan.querySelector(".ca-nr"),pk=pan.querySelector(".ca-pk span"),pt=pan.qu
 var T=steps.map(function(s){var h=s.querySelector("h3"),g=s.querySelector(".tl-tag");return [h?h.textContent.trim():"",g?g.textContent.trim():""]});
 function two(n){return (n<10?"0":"")+n}
 var act=-1,cc=0,tc=0,raf=0;
-function swap(box,txt,dir){var kids=[].slice.call(box.children),cur=kids.filter(function(k){return k.className.indexOf("out")<0}).pop();if(cur&&cur.textContent===txt)return;kids.forEach(function(o){if(o.className.indexOf("out")>-1)return;o.className="out "+(dir>0?"up":"dn");setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},720)});var all=[].slice.call(box.children);while(all.length>2){var x=all.shift();if(x.parentNode)x.parentNode.removeChild(x)}var n=document.createElement("span");n.textContent=txt;n.className="in "+(dir>0?"up":"dn");box.appendChild(n);n.getBoundingClientRect();requestAnimationFrame(function(){n.className="on"})}
+function swap(box,txt,dir){var kids=[].slice.call(box.children),cur=kids.filter(function(k){return k.className.indexOf("out")<0}).pop();if(cur&&cur.textContent===txt)return;kids.forEach(function(o){if(o.className.indexOf("out")>-1)return;o.className="out "+(dir>0?"up":"dn");setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},650)});var all=[].slice.call(box.children);while(all.length>2){var x=all.shift();if(x.parentNode)x.parentNode.removeChild(x)}var n=document.createElement("span");n.textContent=txt;n.className="in "+(dir>0?"up":"dn");box.appendChild(n);n.getBoundingClientRect();requestAnimationFrame(function(){requestAnimationFrame(function(){n.className="on"})})}
 function setAct(i){if(i===act)return;var dir=i>act?1:-1;act=i;steps.forEach(function(s,j){s.classList.toggle("ca-on",j===i);s.classList.toggle("ca-past",j<i)});
 var k=phOf(i);swap(nr,two(i+1),dir);swap(pt,T[i][0],dir);swap(ptag,T[i][1],dir);swap(pk,"0"+(k+1)+" · "+PH[k][0],dir);segs.forEach(function(sg,j){sg.classList.toggle("on",j===k)});mn.textContent=i+1;mp.textContent=PH[k][0]}
-function measure(){var y=innerHeight*.5,C=steps.map(function(s){var r=s.getBoundingClientRect();return r.top+r.height/2});var i=0,best=1e9;C.forEach(function(c,j){var d=Math.abs(c-y);if(d<best){best=d;i=j}});
+function measure(){var y=innerHeight*.5,C=steps.map(function(s){var r=s.getBoundingClientRect();return r.top+r.height/2});var i=0,best=1e9;C.forEach(function(c,j){var d=Math.abs(c-y);if(d<best){best=d;i=j}});if(act>-1&&i!==act&&Math.abs(C[act]-y)-best<36)i=act;
 var t;if(y<=C[0])t=-.5+Math.max(0,1-(C[0]-y)/(innerHeight*.5))*.5;else if(y>=C[8])t=8+Math.min(1,(y-C[8])/(innerHeight*.5))*.5;else{for(var j=0;j<8;j++)if(y>=C[j]&&y<C[j+1]){t=j+(y-C[j])/(C[j+1]-C[j]);break}}
 tc=t;setAct(i);if(!raf)raf=requestAnimationFrame(anim)}
 function anim(){raf=0;cc+=(tc-cc)*.12;if(Math.abs(tc-cc)<.002)cc=tc;segs.forEach(function(sg,k){var a=PH[k][1],b=PH[k][2],f=Math.max(0,Math.min(1,(cc+.5-a)/(b-a)));sg.querySelector("b").style.transform="scaleX("+f+")"});mf.style.transform="scaleX("+Math.max(0,Math.min(1,(cc+.5)/9))+")";if(cc!==tc)raf=requestAnimationFrame(anim)}
@@ -68,12 +68,15 @@ const CSS = '<style id="ca-ef-css">'
   + P + '.ca-sty{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:80px;max-width:1160px;margin:56px auto 0;align-items:start}'
   + P + '.ca-pan{position:sticky;top:calc(50vh - 200px);height:400px;display:flex;flex-direction:column;justify-content:center}'
   + P + '.ca-pk,' + P + '.ca-pt,' + P + '.ca-ptag,' + P + '.ca-nr{position:relative;overflow:hidden}' + P + '.ca-pan{overflow:hidden}'
-  + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span{display:block;transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .7s cubic-bezier(.2,.8,.2,1),filter .7s ease}'
-  + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span.in.up{transform:translateY(60%);opacity:0;filter:blur(6px)}'
-  + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span.in.dn{transform:translateY(-60%);opacity:0;filter:blur(6px)}'
-  + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span.out{position:absolute;left:0;top:0;right:0}'
-  + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span.out.up{transform:translateY(-60%);opacity:0;filter:blur(6px)}'
-  + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span.out.dn{transform:translateY(60%);opacity:0;filter:blur(6px)}'
+  // váltás: a nagy szám „tárcsaként” gördül (a keret levágja, sosem fedik egymást); a szövegek gyors ki-, késleltetett beúszással
+  + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span{display:block;will-change:transform,opacity;backface-visibility:hidden}'
+  + P + '.ca-pan .ca-nr span{transition:transform .62s cubic-bezier(.16,1,.3,1),opacity .62s cubic-bezier(.16,1,.3,1)}'
+  + P + '.ca-pan .ca-nr span.in.up{transform:translate3d(0,100%,0);opacity:.4;transition:none}' + P + '.ca-pan .ca-nr span.in.dn{transform:translate3d(0,-100%,0);opacity:.4;transition:none}'
+  + P + '.ca-pan .ca-nr span.out{position:absolute;left:0;top:4px}' + P + '.ca-pan .ca-nr span.out.up{transform:translate3d(0,-100%,0);opacity:.15}' + P + '.ca-pan .ca-nr span.out.dn{transform:translate3d(0,100%,0);opacity:.15}'
+  + P + '.ca-pan :is(.ca-pk,.ca-pt,.ca-ptag) span{transition:transform .5s cubic-bezier(.16,1,.3,1) .09s,opacity .42s ease .09s}'
+  + P + '.ca-pan :is(.ca-pk,.ca-pt,.ca-ptag) span.in.up{transform:translate3d(0,14px,0);opacity:0;transition:none}' + P + '.ca-pan :is(.ca-pk,.ca-pt,.ca-ptag) span.in.dn{transform:translate3d(0,-14px,0);opacity:0;transition:none}'
+  + P + '.ca-pan :is(.ca-pk,.ca-pt,.ca-ptag) span.out{position:absolute;left:0;top:0;right:0;transition:transform .22s ease-in,opacity .18s ease-in}'
+  + P + '.ca-pan :is(.ca-pk,.ca-pt,.ca-ptag) span.out.up{transform:translate3d(0,-8px,0);opacity:0}' + P + '.ca-pan :is(.ca-pk,.ca-pt,.ca-ptag) span.out.dn{transform:translate3d(0,8px,0);opacity:0}'
   + P + '.ca-pk{font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#E2001A;min-height:18px}'
   + P + '.ca-big{display:flex;align-items:flex-end;gap:10px;margin:10px 0 6px}'
   + P + '.ca-nr{position:relative;overflow:hidden;font-size:clamp(110px,11vw,164px);font-weight:800;letter-spacing:-.06em;line-height:.86;padding:4px .16em 8px 0}'
