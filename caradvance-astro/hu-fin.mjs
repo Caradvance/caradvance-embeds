@@ -109,6 +109,8 @@ const CSS = '<style id="ca-fin-css">'
   + P + '.fl-faq:not(.ca-all) details:nth-of-type(n+7){display:none!important}'
   + P + '.fl-faq .ca-fmb{grid-column:1/-1;justify-self:center;margin-top:8px}'
   + '@media(max-width:900px){' + P + '.fl-faq{grid-template-columns:1fr}}'
+  // mobilon a mezők súgó-buborékai a mező szélességéhez igazodnak (ne csússzon oldalra az oldal)
+  + '@media(max-width:640px){body .lk-field label{position:relative!important}body .lk-field .lk-tip{position:static!important}body .lk-field .lk-tiptext{left:0!important;right:0!important;top:calc(1.5em + 8px)!important;width:auto!important;max-width:none!important}body .lk-field .lk-tiptext::before{display:none!important}}'
   + '</style>';
 
 const IC = {
