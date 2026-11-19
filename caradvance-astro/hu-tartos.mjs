@@ -162,6 +162,12 @@ const CSS = '<style id="ca-tb-css">'
   + P + '.tb-cta{border-radius:26px!important;background:radial-gradient(70% 120% at 100% 0%,rgba(226,0,26,.38),transparent 60%),linear-gradient(135deg,#17181d,#0e0f12)!important;box-shadow:0 20px 50px rgba(18,19,23,.18)!important;padding:34px 38px!important;overflow:hidden}'
   + P + '.tb-cta h2{font-size:30px!important;letter-spacing:-.02em}'
   + P + '.tb-cta .btn{background:#E2001A!important;color:#fff!important;border:0!important;box-shadow:0 10px 24px rgba(226,0,26,.35)!important}'
+  // teljes képernyős első nézet: fejléc + útvonal + kapszulás menü együtt adja ki a képernyőt; Görgess alul középen
+  + '@media(min-width:641px){html:root body section.tb section.hero.ca-hero.ca-tfs{min-height:calc(100vh - var(--tbx,120px))!important;min-height:calc(100svh - var(--tbx,120px))!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;justify-content:center!important}}'
+  + 'html:root body section.tb section.hero.ca-hero .ca-tsd{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:22px!important;transform:translateX(-50%)!important;margin:0!important;z-index:3!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;background:none!important;border:0!important;padding:0!important;cursor:pointer;font-family:inherit!important;font-weight:600!important;font-size:11px!important;letter-spacing:.14em!important;line-height:1!important;color:rgba(18,19,23,.62)!important;-webkit-text-fill-color:rgba(18,19,23,.62)!important;text-shadow:none!important}'
+  + 'html.ca-dark body section.tb section.hero.ca-hero .ca-tsd{color:rgba(255,255,255,.7)!important;-webkit-text-fill-color:rgba(255,255,255,.7)!important}'
+  + 'section.tb .ca-tsd svg{animation:caTBob 1.8s ease-in-out infinite}@keyframes caTBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}'
+  + '@media(max-width:640px){html:root body section.tb section.hero.ca-hero .ca-tsd{display:none!important}}'
   + '</style>';
 
 function js(cuts) {
@@ -209,7 +215,11 @@ function js(cuts) {
   + 'function cmp(){var th=$(".tb-cmp thead th:last-child");if(th&&!th.querySelector(".ca-rec")){var s=el("span","ca-rec","Ajánlott");th.appendChild(s)}}'
   // 11) GYIK
   + 'function faq(){var f=$(".tb-faq");if(!f||f.__f)return;f.__f=1;var n=$$("details",f).length;if(n<=6)return;var b=el("button","ca-morebtn ca-faqbtn","Összes kérdés ("+n+") <i>⌄</i>");b.type="button";f.appendChild(b);b.addEventListener("click",function(){var o=f.classList.toggle("ca-all");b.classList.toggle("open",o);b.firstChild.nodeValue=o?"Kevesebb kérdés ":"Összes kérdés ("+n+") "})}'
-  + 'function go(){try{hero()}catch(e){}try{toc()}catch(e){}try{rb()}catch(e){}try{miez()}catch(e){}try{cm()}catch(e){}try{ev()}catch(e){}try{brands()}catch(e){}try{cmp()}catch(e){}try{faq()}catch(e){}}'
+  + 'function fsv(){var h=$("section.tb section.hero"),t=$(".tb-toc");if(!h||!t)return;h.classList.add("ca-tfs");'
+  + 'if(!h.querySelector(".ca-tsd")){var b=el("button","ca-tsd","GÖRGESS<svg width=\\"22\\" height=\\"22\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\"><path d=\\"m6 9 6 6 6-6\\"/></svg>");b.type="button";b.setAttribute("aria-label","Görgess lefelé");h.appendChild(b);'
+  + 'b.addEventListener("click",function(){var n=t.nextElementSibling;while(n&&n.offsetHeight===0)n=n.nextElementSibling;var y=(n||t).getBoundingClientRect().top+scrollY-170;scrollTo({top:y,behavior:"smooth"})})}'
+  + 'function m(){if(scrollY>40)return;var ht=h.getBoundingClientRect().bottom,tb=t.getBoundingClientRect().bottom;var x=Math.round(tb-ht)+18;if(x>40&&x<260)h.style.setProperty("--tbx",x+"px")}m();setTimeout(m,400);setTimeout(m,1500);addEventListener("resize",m)}'
+  + 'function go(){try{fsv()}catch(e){}try{hero()}catch(e){}try{toc()}catch(e){}try{rb()}catch(e){}try{miez()}catch(e){}try{cm()}catch(e){}try{ev()}catch(e){}try{brands()}catch(e){}try{cmp()}catch(e){}try{faq()}catch(e){}}'
   + 'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go()'
   + '})();</script>';
 }
