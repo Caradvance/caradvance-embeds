@@ -102,8 +102,8 @@ const CSS = '<style id="ca-imp-css">'
   + P + 'section.hero .hero-src{gap:8px!important;flex-wrap:nowrap!important}' + P + 'section.hero .hero-src-t{display:none!important}' + P + 'section.hero .hero-src img{height:22px!important}}'
   + P + 'section.hero .ca-subm{display:none}'
   // a kereső mögött a videó puhán elhalványul az oldal hátterébe, így a doboz tisztán elválik (a keresőhöz nem nyúl)
-  + P + 'section.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:min(330px,46%);z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(245,245,247,0) 0%,rgba(245,245,247,.55) 38%,rgba(245,245,247,.9) 70%,#F5F5F7 100%)}'
-  + D + 'section.hero::after{background:linear-gradient(180deg,rgba(13,15,19,0) 0%,rgba(13,15,19,.6) 38%,rgba(13,15,19,.92) 70%,#0D0F13 100%)}'
+  + P + 'section.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:min(330px,46%);z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(245,245,247,0) 0%,rgba(245,245,247,.55) 38%,rgba(245,245,247,.9) 70%,#F5F5F7 100%)!important;background-color:transparent!important}'
+  + D + 'section.hero::after{background:linear-gradient(180deg,rgba(13,15,19,0) 0%,rgba(13,15,19,.6) 38%,rgba(13,15,19,.92) 70%,#0D0F13 100%)!important;background-color:transparent!important}' + 'html.ca-dark.ca-imp.ca-dark body section.imp section.hero::after{background-color:transparent!important}'
   + P + 'section.hero .inner{z-index:3!important}'
   + '@media(max-width:640px){' + P + 'section.hero::after{height:min(190px,36%)}}'
   // számkártyák
