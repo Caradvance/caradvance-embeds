@@ -122,6 +122,8 @@ const CSS = '<style id="ca-imp-css">'
   + P + '.ic-card .ic-n svg{width:22px;height:22px}'
   + P + '.ic-card .ic-n i{position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:50%;background:#fff;color:#E2001A;box-shadow:0 2px 6px rgba(0,0,0,.25);font-family:inherit;font-weight:800;font-size:11px;line-height:20px;text-align:center;font-style:normal}'
   + P + '.ic-card h3{font-size:18px!important}'
+  // a piros linkek egy szintre: a kártya oszlop, a link a kártya aljára kerül
+  + P + '.ic-grid{align-items:stretch!important}' + P + '.ic-card{display:flex!important;flex-direction:column!important;align-items:flex-start!important}' + P + '.ic-card>a{margin-top:auto!important;padding-top:12px}'
   + P + '.ic-cta{position:relative;overflow:hidden;border-radius:26px!important;padding:28px 30px!important;background:#121317!important}'
   + P + '.ic-cta::before{content:"";position:absolute;inset:-40% -10% auto 40%;height:180%;background:radial-gradient(50% 50% at 50% 50%,rgba(226,0,26,.3),transparent 70%);pointer-events:none}'
   + P + '.ic-cta>*{position:relative}'
