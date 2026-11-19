@@ -10,6 +10,8 @@ const L = 'html.ca-light body ';
 const CSS = '<style id="ca-apple-css">'
   // sötétben a lábléc se éles vonallal kezdődjön, hanem puhán fakuljon be
   + 'footer.cafoot .cafoot-copy span{white-space:normal!important;min-width:0!important;overflow-wrap:anywhere}'
+  // egységes, pontosan középre igazított +/× ikon minden GYIK-kártyán (a karakteres „+” helyett rajzolt kereszt)
+  + 'html body details>summary::after,html body #gyik details.ca-more>summary::after,html body :is(.faq-item,.gyik-item)>summary::after{content:""!important;flex:0 0 28px!important;width:28px!important;height:28px!important;min-width:28px!important;border-radius:50%!important;background:linear-gradient(#fff,#fff) center/12px 2px no-repeat,linear-gradient(#fff,#fff) center/2px 12px no-repeat,#E2001A!important;background-color:#E2001A!important;font-size:0!important;line-height:0!important;color:transparent!important;border:0!important;margin:0 0 0 auto!important;position:static!important;display:block!important;box-shadow:0 4px 12px rgba(226,0,26,.25)!important;transform:none!important;transition:transform .35s cubic-bezier(.2,.8,.2,1)!important}html body details[open]>summary::after,html body #gyik details.ca-more[open]>summary::after,html body :is(.faq-item,.gyik-item)[open]>summary::after{transform:rotate(45deg)!important}html body details>summary .pl{display:none!important}'
   + 'body section.cav-sec,body section:has(> .wrap > .cav-film-wrap){overflow-x:clip}'
   + '@media(min-width:641px) and (max-width:1100px){body .stats .stats-in{grid-template-columns:repeat(2,minmax(0,1fr))!important}}'
   + 'body .stats .stats-in>.stat{min-width:0!important}'
