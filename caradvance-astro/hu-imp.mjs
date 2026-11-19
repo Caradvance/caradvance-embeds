@@ -26,6 +26,8 @@ const strip = (s) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const slug = (s) => strip(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70);
 
 function seo(h, log) {
+  // tartalmi egységesítés (tulajdonosi döntés 2026-11-19): a behozatal jellemzően 5–14 nap
+  h = h.split('általában 1–3 hét:').join('általában 5–14 nap:');
   // 1) a keresőtől származó, /autot-keresek/ URL-ű Service-jelölés eltávolítása (csak a jelölés, a kereső marad)
   h = h.replace(/<script type="application\/ld\+json">(\{[^<]*?"@type":"Service"[^<]*?\})<\/script>/g, (a, j) => {
     try { const o = JSON.parse(j); if (o.url && /\/autot-keresek\//.test(o.url)) { log.svc++; return ''; } } catch (e) {}
