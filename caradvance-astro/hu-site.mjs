@@ -30,6 +30,8 @@ const GL_D = 'background:linear-gradient(180deg,rgba(255,255,255,.12) 0%,rgba(25
 
 const L = 'html.ca-site.ca-light ', D = 'html.ca-site.ca-dark ';
 const CSS = '<style id="ca-site-css">'
+  // sötétben a lábléc se éles vonallal kezdődjön, hanem puhán fakuljon be
+  + 'html.ca-dark body footer.cafoot{border-top-color:transparent!important;box-shadow:none!important;background:linear-gradient(180deg,rgba(11,11,13,0) 0,#0B0B0D 140px)!important;background-color:transparent!important}'
   // háttér és fények
   + L + '{background:' + BG_L + '!important}' + L + 'body{background:transparent!important}'
   + D + '{background:' + BG_D + '!important}' + D + 'body{background:transparent!important;background-color:transparent!important}'

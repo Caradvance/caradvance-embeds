@@ -8,6 +8,8 @@ const FILE = path.join('dist', 'index.html');
 const BG = '#F5F5F7', BGR = '245,245,247';
 const L = 'html.ca-light body ';
 const CSS = '<style id="ca-apple-css">'
+  // sötétben a lábléc se éles vonallal kezdődjön, hanem puhán fakuljon be
+  + 'html.ca-dark body footer.cafoot{border-top-color:transparent!important;box-shadow:none!important;background:linear-gradient(180deg,rgba(11,11,13,0) 0,#0B0B0D 140px)!important;background-color:transparent!important}'
   + 'html.ca-light,html.ca-light body{background:' + BG + '!important;background-image:none!important}'
   // színes foltok ki
   + L + ':is(#szolgaltatasok,#miert,#rolunk,#velemenyek,#ca-cta,.stats,#autoink,#ai-autokereso,#ca-contact,#gyik,.cav-sec){background:none!important;background-color:transparent!important}'
