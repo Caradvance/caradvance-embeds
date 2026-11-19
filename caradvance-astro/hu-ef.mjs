@@ -25,7 +25,7 @@ var nr=pan.querySelector(".ca-nr"),pk=pan.querySelector(".ca-pk span"),pt=pan.qu
 var T=steps.map(function(s){var h=s.querySelector("h3"),g=s.querySelector(".tl-tag");return [h?h.textContent.trim():"",g?g.textContent.trim():""]});
 function two(n){return (n<10?"0":"")+n}
 var act=-1,cc=0,tc=0,raf=0;
-function swap(box,txt,dir){var o=box.firstChild;if(o&&o.textContent===txt)return;var n=document.createElement("span");n.textContent=txt;n.className="in "+(dir>0?"up":"dn");box.appendChild(n);if(o){o.className="out "+(dir>0?"up":"dn");setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},700)}requestAnimationFrame(function(){requestAnimationFrame(function(){n.className="on"})})}
+function swap(box,txt,dir){var kids=[].slice.call(box.children),cur=kids.filter(function(k){return k.className.indexOf("out")<0}).pop();if(cur&&cur.textContent===txt)return;kids.forEach(function(o){if(o.className.indexOf("out")>-1)return;o.className="out "+(dir>0?"up":"dn");setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},720)});var all=[].slice.call(box.children);while(all.length>2){var x=all.shift();if(x.parentNode)x.parentNode.removeChild(x)}var n=document.createElement("span");n.textContent=txt;n.className="in "+(dir>0?"up":"dn");box.appendChild(n);n.getBoundingClientRect();requestAnimationFrame(function(){n.className="on"})}
 function setAct(i){if(i===act)return;var dir=i>act?1:-1;act=i;steps.forEach(function(s,j){s.classList.toggle("ca-on",j===i);s.classList.toggle("ca-past",j<i)});
 var k=phOf(i);swap(nr,two(i+1),dir);swap(pt,T[i][0],dir);swap(ptag,T[i][1],dir);swap(pk,"0"+(k+1)+" · "+PH[k][0],dir);segs.forEach(function(sg,j){sg.classList.toggle("on",j===k)});mn.textContent=i+1;mp.textContent=PH[k][0]}
 function measure(){var y=innerHeight*.5,C=steps.map(function(s){var r=s.getBoundingClientRect();return r.top+r.height/2});var i=0,best=1e9;C.forEach(function(c,j){var d=Math.abs(c-y);if(d<best){best=d;i=j}});
@@ -67,7 +67,7 @@ const CSS = '<style id="ca-ef-css">'
   + P + '#lepesek .tl::before{display:none!important}'
   + P + '.ca-sty{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:80px;max-width:1160px;margin:56px auto 0;align-items:start}'
   + P + '.ca-pan{position:sticky;top:calc(50vh - 200px);height:400px;display:flex;flex-direction:column;justify-content:center}'
-  + P + '.ca-pk,' + P + '.ca-pt,' + P + '.ca-ptag{position:relative;overflow:hidden}'
+  + P + '.ca-pk,' + P + '.ca-pt,' + P + '.ca-ptag,' + P + '.ca-nr{position:relative;overflow:hidden}' + P + '.ca-pan{overflow:hidden}'
   + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span{display:block;transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .7s cubic-bezier(.2,.8,.2,1),filter .7s ease}'
   + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span.in.up{transform:translateY(60%);opacity:0;filter:blur(6px)}'
   + P + '.ca-pan :is(.ca-pk,.ca-nr,.ca-pt,.ca-ptag) span.in.dn{transform:translateY(-60%);opacity:0;filter:blur(6px)}'
