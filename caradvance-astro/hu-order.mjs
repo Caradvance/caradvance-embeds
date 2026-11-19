@@ -33,7 +33,7 @@ const CSS = '<style id="ca-ord-css">'
   + P + '.ca-ost span{display:flex;flex-direction:column;align-items:center;padding:0 24px;color:rgba(255,255,255,.78);font-size:12.5px;font-weight:600;text-shadow:0 1px 10px rgba(0,0,0,.4)}'
   + P + '.ca-ost span+span{border-left:1px solid rgba(255,255,255,.28)}'
   + P + '.ca-ost b{color:#fff;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-bottom:2px}'
-  + P + '.egl-mhero-scroll{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:34px!important;transform:translateX(-50%)!important;z-index:3!important;color:rgba(18,19,23,.62)!important;background:none!important;border:0!important}'
+  + P + '.egl-mhero-scroll{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:28px!important;transform:translateX(-50%)!important;z-index:3!important;color:rgba(18,19,23,.62)!important;background:none!important;border:0!important}'
   + D + '.egl-mhero-scroll{color:rgba(255,255,255,.7)!important}'
   + '@media(max-width:640px){' + P + '.ca-ost span{padding:0 11px;font-size:11px}' + P + '.ca-ost b{font-size:18px}' + P + '.egl-mhero-scroll{display:none!important}}'
   // ---- 2) márkakártyák

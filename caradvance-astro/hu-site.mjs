@@ -32,6 +32,9 @@ const L = 'html.ca-site.ca-light ', D = 'html.ca-site.ca-dark ';
 const CSS = '<style id="ca-site-css">'
   // sötétben a lábléc se éles vonallal kezdődjön, hanem puhán fakuljon be
   + 'html.ca-dark body footer.cafoot{border-top-color:transparent!important;box-shadow:none!important;background:linear-gradient(180deg,rgba(11,11,13,0) 0,#0B0B0D 140px)!important;background-color:transparent!important}'
+  // Görgess mindig a képernyő alján, mint a főoldalon: a Görgess-gombos fejléc kitölti a képernyőt (asztali/tablet)
+  + '@media(min-width:641px){html:root body :is(section,div).ca-hero:has(.scrolldown,.bizhero-scroll,.egl-mhero-scroll){min-height:100vh!important;min-height:100svh!important;height:auto!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;justify-content:center!important}'
+  + 'html:root body :is(section,div).ca-hero :is(.scrolldown,.bizhero-scroll,.egl-mhero-scroll){position:absolute!important;top:auto!important;bottom:28px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;margin:0!important}}'
   // háttér és fények
   + L + '{background:' + BG_L + '!important}' + L + 'body{background:transparent!important}'
   + D + '{background:' + BG_D + '!important}' + D + 'body{background:transparent!important;background-color:transparent!important}'
