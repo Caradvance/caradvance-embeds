@@ -109,7 +109,7 @@ const CSS = '<style id="ca-bfo-css">'
   + D + '.ca-jt{background:rgba(255,255,255,.05)}'
   + P + '.ca-jt summary{list-style:none;display:flex!important;align-items:center;gap:8px;padding:11px 14px!important;font-size:13px!important;font-weight:800!important;cursor:pointer;color:inherit!important;background:none!important;border:0!important;box-shadow:none!important}'
   + P + '.ca-jt summary::-webkit-details-marker{display:none}'
-  + 'html.ca-bfo body section.pf .ca-jt>summary::after{flex:0 0 22px!important;width:22px!important;height:22px!important;margin-left:auto!important;background-size:10px 2px,2px 10px,auto!important}'
+  + 'html.ca-bfo body section.pf .ca-jt>summary::after{flex:0 0 22px!important;width:22px!important;height:22px!important;min-width:22px!important;max-width:22px!important;min-height:22px!important;max-height:22px!important;padding:0!important;box-sizing:border-box!important;margin-left:auto!important;background-size:10px 2px,2px 10px,auto!important}'
   + P + '.ca-jt summary svg{width:16px;height:16px;color:' + RED + '}'
   + P + '.ca-jt p{font-size:13px!important;line-height:1.55!important;opacity:.72;margin:0!important;padding:0 14px 12px!important;color:inherit!important}'
   + P + '.ca-jt p+p{padding-top:2px!important}'
@@ -279,7 +279,7 @@ var tl=el("div","ca-tl",'<span class="ca-tl-a s">Átadás</span><span class="ca-
 six.appendChild(el("div","ca-six-f",'<div>'+IC.gauge+'<span><b>2 000–4 000 km / hó</b>futáskeret, autótól függően'+(NOTE[4]?'<details class="ca-jt"><summary>'+IC.info+'Jó tudni</summary><p>'+NOTE[4]+'</p></details>':'')+'</span></div><div>'+IC.bill+'<span><b>Számla minden hónap 1-jén</b>a havi díjat előre kell megfizetni</span></div><div>'+IC.door+'<span><b>Utána 30 napos felmondás</b>a bérleti hónap végére mondható fel</span></div>'));
 bt.innerHTML="";bt.appendChild(six);
 var tf=tl.querySelector(".ca-tl-f"),td=tl.querySelector(".ca-tl-dot"),tt=[].slice.call(tl.querySelectorAll(".ca-tl-t")),tls=[].slice.call(tl.querySelectorAll(".ca-tl-l span")),tx=tl.querySelector(".ca-tl-x"),te=tl.querySelector(".ca-tl-a.e"),trq=0;
-function tlu(){trq=0;var r=tl.getBoundingClientRect(),vh=innerHeight,p=RM?1:Math.max(0,Math.min(1,(vh*.88-r.top)/(vh*.5)));tf.style.transform="scaleX("+p.toFixed(4)+")";td.style.left=(p*100).toFixed(2)+"%";var m=p*6;tt.forEach(function(t,k){t.classList.toggle("on",m>=k+1)});tls.forEach(function(s,k){s.classList.toggle("on",k<6?m>k+.15:p>=.999)});tx.classList.toggle("on",p>=.999);te.classList.toggle("on",p>=.999)}
+function tlu(){trq=0;var r=bt.getBoundingClientRect(),vh=innerHeight,nb=(document.querySelector(".ca-navwrap")||{getBoundingClientRect:function(){return{bottom:80}}}).getBoundingClientRect().bottom,tg=(Math.max(60,Math.min(120,nb))+vh)/2,cc=r.top+r.height/2,c0=vh*.92+r.height/2,p=RM?1:Math.max(0,Math.min(1,(c0-cc)/Math.max(1,c0-tg)));tf.style.transform="scaleX("+p.toFixed(4)+")";td.style.left=(p*100).toFixed(2)+"%";var m=p*6;tt.forEach(function(t,k){t.classList.toggle("on",m>=k+1)});tls.forEach(function(s,k){s.classList.toggle("on",k<6?m>k+.15:p>=.999)});tx.classList.toggle("on",p>=.999);te.classList.toggle("on",p>=.999)}
 addEventListener("scroll",function(){if(!trq){trq=1;requestAnimationFrame(tlu)}},{passive:true});addEventListener("resize",tlu);tlu()}
 // --- szerződés-kártyák ikonjai
 var BI={kaucio:IC.shield,kezdet:IC.cal,tartalom:IC.check,km:IC.gauge,biztositas:IC.umb,visszaadas:IC.back};
