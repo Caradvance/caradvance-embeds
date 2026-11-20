@@ -13,9 +13,18 @@ const CSS = '<style id="ca-ak-css">'
   + '@media(max-width:640px){html body main .ik{margin-top:-40px!important}html:root body main section.hero>button.scrolldown.scrolldown{display:none!important}}'
   + '</style>';
 
+const JS = '<script id="ca-ak-js">' + String.raw`(function(){
+function go(e){var a=e.target.closest&&e.target.closest('a[href="#rendeles"],a[href$="/autot-keresek/#rendeles"]');if(!a)return;var k=document.querySelector(".ik .ik-card")||document.getElementById("rendeles");if(!k)return;e.preventDefault();
+var nv=document.querySelector(".ca-navwrap,header"),nb=nv?Math.max(0,nv.getBoundingClientRect().bottom):80,r=k.getBoundingClientRect(),room=innerHeight-nb,y=r.top+scrollY-nb-Math.max(12,(room-r.height)/2);
+scrollTo({top:Math.max(0,y),behavior:"smooth"});history.replaceState(null,"","#rendeles")}
+document.addEventListener("click",go,true);
+if(location.hash==="#rendeles")addEventListener("load",function(){setTimeout(function(){var k=document.querySelector(".ik .ik-card");if(!k)return;var nv=document.querySelector(".ca-navwrap,header"),nb=nv?nv.getBoundingClientRect().bottom:80,r=k.getBoundingClientRect();scrollTo(0,Math.max(0,r.top+scrollY-nb-Math.max(12,(innerHeight-nb-r.height)/2)))},150)});
+})();</script>`;
+
 export function apply(h) {
   if (h.indexOf('id="ca-ak-css"') > -1 || h.indexOf('class="ik"') < 0) return null;
-  return h.replace('</head>', () => CSS + '</head>');
+  h = h.replace('</head>', () => CSS + '</head>');
+  return h.replace(/<\/body>(?![\s\S]*<\/body>)/, () => JS + '</body>');
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname);
