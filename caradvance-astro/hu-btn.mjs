@@ -14,8 +14,8 @@ const SKIP = /^(admin\/|belso\/|fiok\/|szerzodes\/|alairas\/|adatok\/|ajanlat\/|
 
 const CSS = '<style id="ca-btn-css">'
   + '@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){'
-  + '.cbx-b{transition:translate .45s cubic-bezier(.34,1.56,.64,1),scale .3s cubic-bezier(.34,1.56,.64,1),box-shadow .4s ease,filter .3s ease,background-color .3s ease!important;will-change:translate}'
-  + '.cbx-b.cbx-h{translate:var(--cmx,0px) calc(var(--cmy,0px) - 2px)}'
+  + '.cbx-b{transition:translate .4s cubic-bezier(.25,1.1,.5,1),scale .3s cubic-bezier(.34,1.56,.64,1),box-shadow .4s ease,filter .3s ease,background-color .3s ease!important;will-change:translate}'
+  + '.cbx-b.cbx-h{translate:var(--cmx,0px) -1px}'
   + '.cbx-b.cbx-h:active{scale:.96;transition-duration:.12s!important}'
   + '.cbx-b.cbx-f.cbx-h{box-shadow:0 14px 30px -10px var(--cagl,rgba(0,0,0,.35)),0 4px 10px -4px var(--cagl,rgba(0,0,0,.2))!important;filter:saturate(1.08) brightness(1.04)}'
   + '.cbx-b.cbx-o.cbx-h{box-shadow:inset 0 0 0 999px var(--caof,rgba(127,127,127,.08)),0 10px 24px -12px rgba(0,0,0,.25)!important}'
@@ -72,7 +72,7 @@ el.classList.remove("cbx-h");void el.offsetWidth;el.classList.add("cbx-h")},{pas
 document.addEventListener("pointerout",function(e){if(!cur)return;var to=e.relatedTarget;if(to&&cur.contains(to))return;leave()},{passive:true});
 document.addEventListener("pointermove",function(e){if(!cur||raf)return;var x=e.clientX,y=e.clientY;raf=requestAnimationFrame(function(){raf=0;if(!cur)return;var r=cur.getBoundingClientRect();if(!r.width)return;
 var px=(x-r.left)/r.width,py=(y-r.top)/r.height;cur.style.setProperty("--chx",(px*100).toFixed(1)+"%");cur.style.setProperty("--chy",(py*100).toFixed(1)+"%");
-var m=cur.classList.contains("cbx-f")?5:3;cur.style.setProperty("--cmx",((px-.5)*m).toFixed(2)+"px");cur.style.setProperty("--cmy",((py-.5)*m*.6).toFixed(2)+"px")})},{passive:true});
+var m=cur.classList.contains("cbx-f")?3:2;cur.style.setProperty("--cmx",((px-.5)*m).toFixed(2)+"px");0})},{passive:true});
 addEventListener("scroll",function(){if(cur&&!cur.matches(":hover"))leave()},{passive:true});
 })();</script>`;
 
