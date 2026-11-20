@@ -1,6 +1,6 @@
 ---
 import '../styles/eladom.css';
-import KeresoForm from './KeresoForm.astro';
+import ImportKereso from './ImportKereso.astro';
 import type { Locale } from '../i18n/utils';
 const { lang } = Astro.props as { lang: Locale };
 ---
@@ -27,4 +27,4 @@ const { lang } = Astro.props as { lang: Locale };
   <button class="scrolldown" aria-label="Görgess lejjebb" onclick="window.scrollBy({top:Math.round(innerHeight*0.9),behavior:'smooth'})">Görgess<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
 </section>
 
-<KeresoForm lang={lang} />
+<ImportKereso lang={lang} />
