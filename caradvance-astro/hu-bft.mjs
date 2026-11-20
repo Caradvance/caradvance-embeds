@@ -237,3 +237,6 @@ if (isMain) {
   if (!o) console.log('[hu-bft] már alkalmazva');
   else { fs.writeFileSync(FILE, o); console.log('[hu-bft] feltételek és kaució: letisztult nézet'); }
 }
+
+// a jogi oldalak (hu-legal.mjs) ugyanerre az elrendezésre épülnek
+export { CSS as BFT_CSS, JS as BFT_JS };
