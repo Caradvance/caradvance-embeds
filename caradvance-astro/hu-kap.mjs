@@ -21,8 +21,8 @@ const RED = '#E2001A';
 const CSS = '<style id="ca-kap-css">'
   // ---- fejléc
   + P + '.kaphero{min-height:100vh!important;min-height:100svh!important;position:relative!important}'
-  + P + '.kaphero-logo{display:none!important}'
-  + P + '.kaphero-ov{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;z-index:1!important}' + P + '.kaphero-inner{position:relative;z-index:2}' + P + '.kaphero-ov{background:linear-gradient(180deg,rgba(8,8,10,.55),rgba(8,8,10,.45) 40%,rgba(8,8,10,.7))!important}'
+  + P + '.kaphero-logo{display:none!important}' + P + '.kaphero{justify-content:flex-start!important;padding-top:clamp(120px,17vh,190px)!important}' + P + '.kaphero-bg{object-position:50% 70%!important}' + '@media(max-width:700px){' + P + '.kaphero-bg{object-position:63% 72%!important}}' + P + '.ca-ph img{object-position:50% 55%}'
+  + P + '.kaphero-ov{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;z-index:1!important}' + P + '.kaphero-inner{position:relative;z-index:2}' + P + '.kaphero-ov{background:linear-gradient(180deg,rgba(8,8,10,.66) 0%,rgba(8,8,10,.52) 38%,rgba(8,8,10,.16) 64%,rgba(8,8,10,.2) 84%,rgba(8,8,10,.45) 100%)!important}'
   + D + '.kaphero{background:transparent!important}'
   + P + '.kaphero-h1{font-size:clamp(44px,6vw,80px)!important;letter-spacing:-.035em!important;line-height:1!important;margin:0 0 14px!important;text-shadow:0 2px 24px rgba(0,0,0,.5)}'
   + P + '.kaphero-h1::after{content:"";display:block;width:56px;height:4px;border-radius:4px;background:' + RED + ';margin:22px auto 0;box-shadow:0 4px 18px rgba(226,0,26,.6)}'
@@ -33,7 +33,7 @@ const CSS = '<style id="ca-kap-css">'
   + P + '.kaphero-cta .kaphero-btn.ghost{background:rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.3)!important;color:#fff!important}'
   + P + '.kaphero-cta .kaphero-btn.red{background:' + RED + '!important;color:#fff!important;box-shadow:0 10px 28px rgba(226,0,26,.4)!important}'
   + P + '.kaphero-scroll{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:28px!important;margin:0!important;color:rgba(255,255,255,.8)!important}'
-  + P + '.ca-sm{display:none}' + '@media(max-width:640px){' + P + '.ca-lg{display:none}' + P + '.ca-sm{display:inline}' + P + '.kaphero-cta .kaphero-btn{white-space:nowrap}' + P + '.kaphero-scroll{display:none!important}' + P + '.kaphero-ov{background:linear-gradient(180deg,rgba(8,8,10,.6),rgba(8,8,10,.72) 50%,rgba(8,8,10,.8))!important}' + P + '.kaphero-cta .kaphero-btn{flex:1 1 calc(50% - 10px);justify-content:center;padding:0 12px!important;font-size:14px!important;height:46px}}'
+  + P + '.ca-sm{display:none}' + '@media(max-width:640px){' + P + '.ca-lg{display:none}' + P + '.ca-sm{display:inline}' + P + '.kaphero-cta .kaphero-btn{white-space:nowrap}' + P + '.kaphero-scroll{display:none!important}' + P + '.kaphero-ov{background:linear-gradient(180deg,rgba(8,8,10,.7) 0%,rgba(8,8,10,.58) 42%,rgba(8,8,10,.14) 62%,rgba(8,8,10,.2) 85%,rgba(8,8,10,.45) 100%)!important}' + P + '.kaphero{padding-top:104px!important}' + P + '.kaphero-cta .kaphero-btn{flex:1 1 calc(50% - 10px);justify-content:center;padding:0 12px!important;font-size:14px!important;height:46px}}'
   // ---- iroda + foglaló rács
   + P + '.ca-kgrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px;max-width:1200px;margin:56px auto 0;padding:0 24px;box-sizing:border-box;align-items:stretch}'
   + 'html.ca-kap body #kap-office{display:none!important}'
@@ -197,7 +197,7 @@ o.innerHTML='<span class="ca-ey">Az iroda</span><h2>Gyere be hozzánk</h2><span 
 +'<div class="ca-addr"><span class="ic">'+IC.pin+'</span><div><b>'+ADR+'</b><span>Budapesttől 20 percre, ingyenes parkolással</span></div></div>'
 +'<a class="ca-route" href="https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent("CarAdvance, "+ADR)+'" target="_blank" rel="noopener">Útvonaltervezés →</a>'
 +'<dl class="ca-hours"><dt data-d="1-5">Hétfő – Péntek</dt><dd data-d="1-5">9:00 – 17:00</dd><dt data-d="6-0">Szombat – Vasárnap</dt><dd data-d="6-0">Előzetes egyeztetéssel</dd></dl>'
-+'<div class="ca-quick" style="order:0"><a href="tel:+36302336060">'+IC.phone+'+36 30 233 6060</a><a href="mailto:info@caradvance.hu">'+IC.mail+'info@caradvance.hu</a></div><div class="ca-ph"><img src="/caradvance-iroda.webp" alt="A CarAdvance iroda Solymáron" loading="lazy"></div>';
++'<div class="ca-quick" style="order:0"><a href="tel:+36302336060">'+IC.phone+'+36 30 233 6060</a><a href="mailto:info@caradvance.hu">'+IC.mail+'info@caradvance.hu</a></div><div class="ca-ph"><img src="/kapcsolat-iroda-belso.webp" alt="A CarAdvance iroda belülről" loading="lazy"></div>';
 grid.appendChild(o);var dr=el("div","ca-depsrow",'<div class="ca-dh"><span class="ca-ey">Osztályok</span><h2>Írj közvetlenül a megfelelő kollégának</h2></div><div class="ca-deps"></div>');grid.parentNode.insertBefore(dr,grid.nextSibling);
 (function fill(n){var sr=$(".kap-off2",root);if(sr&&sr.querySelector(".kap-cat")){$(".ca-deps",dr).innerHTML=depsH(sr);cln&&setTimeout(cln,50);return}if(n<40)setTimeout(function(){fill(n+1)},150)})(0);
 (function(){var n=new Date(),d=n.getDay(),m=n.getHours()*60+n.getMinutes(),wk=d>=1&&d<=5&&HOL.indexOf(ymd(n))<0,op=wk&&m>=540&&m<1020,e=$("#ca-open");e.classList.toggle("off",!op);
@@ -252,6 +252,8 @@ function cln(){$$(".ca-kgrid,.ca-kgrid *,.ca-depsrow,.ca-depsrow *,#kap-team>.ka
 export function apply(h) {
   if (h.indexOf('id="ca-kap-css"') > -1 || h.indexOf('class="kaphero') < 0) return h;
   h = h.replace('</head>', () => CSS + '</head>');
+  // fejléc háttér: az iroda épülete (a ház és az autó mindig látszik — objektum-pozíció asztalon/mobilon külön)
+  h = h.replace(/<img class="kaphero-bg" src="\/caradvance-iroda\.webp[^"]*" alt="[^"]*">/, '<img class="kaphero-bg" src="/kapcsolat-epulet.webp" srcset="/kapcsolat-epulet-m.webp 1200w, /kapcsolat-epulet.webp 2000w" sizes="100vw" alt="A CarAdvance irodája Solymáron" fetchpriority="high">');
   h = h.replace(/<\/body>(?![\s\S]*<\/body>)/, () => JS + '</body>');
   return h;
 }
